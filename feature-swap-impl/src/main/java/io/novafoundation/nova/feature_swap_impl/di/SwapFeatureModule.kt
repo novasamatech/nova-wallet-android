@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.Max
 import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -58,7 +59,8 @@ class SwapFeatureModule {
         quoterFactory: PathQuoter.Factory,
         customFeeCapabilityFacade: CustomFeeCapabilityFacade,
         extrinsicServiceFactory: ExtrinsicService.Factory,
-        defaultFeePaymentRegistry: FeePaymentProviderRegistry
+        defaultFeePaymentRegistry: FeePaymentProviderRegistry,
+        tokenRepository: TokenRepository,
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionFactory,
@@ -69,7 +71,8 @@ class SwapFeatureModule {
             quoterFactory = quoterFactory,
             customFeeCapabilityFacade = customFeeCapabilityFacade,
             extrinsicServiceFactory = extrinsicServiceFactory,
-            defaultFeePaymentProviderRegistry = defaultFeePaymentRegistry
+            defaultFeePaymentProviderRegistry = defaultFeePaymentRegistry,
+            tokenRepository = tokenRepository
         )
     }
 

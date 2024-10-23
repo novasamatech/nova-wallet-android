@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.FeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLab
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
@@ -24,14 +26,18 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import java.math.BigDecimal
 import java.math.BigInteger
 
 class CrossChainTransferAssetExchangeFactory(
@@ -99,6 +105,14 @@ class CrossChainTransferAssetExchange(
             return null
         }
 
+        override suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype {
+            return CrossChainTransferOperationPrototype(from.chainId, to.chainId)
+        }
+
+        override suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype? {
+           return null
+        }
+
         override suspend fun debugLabel(): String {
             return "To ${chainRegistry.getChain(delegate.to.chainId).name}"
         }
@@ -116,6 +130,34 @@ class CrossChainTransferAssetExchange(
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             return amount
+        }
+    }
+
+    inner class CrossChainTransferOperationPrototype(
+        override val fromChain: ChainId,
+        private val toChain: ChainId,
+    ): AtomicSwapOperationPrototype {
+
+        override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
+            var totalAmount = usdConverter.nativeAssetEquivalentOf(0.15)
+
+            if (isChainWithExpensiveCrossChain(fromChain)) {
+                totalAmount += usdConverter.nativeAssetEquivalentOf(0.15)
+            }
+
+            if (isChainWithExpensiveCrossChain(toChain)) {
+                totalAmount += usdConverter.nativeAssetEquivalentOf(0.1)
+            }
+
+            if (!(isChainWithExpensiveCrossChain(fromChain) || isChainWithExpensiveCrossChain(toChain))) {
+                totalAmount += usdConverter.nativeAssetEquivalentOf(0.01)
+            }
+
+            return totalAmount
+        }
+
+        private fun isChainWithExpensiveCrossChain(chainId: ChainId): Boolean {
+            return (chainId == Chain.Geneses.POLKADOT) or  (chainId == Chain.Geneses.POLKADOT_ASSET_HUB)
         }
     }
 

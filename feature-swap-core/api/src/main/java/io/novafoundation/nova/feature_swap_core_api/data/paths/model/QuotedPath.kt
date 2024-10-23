@@ -6,15 +6,19 @@ import java.math.BigInteger
 
 class QuotedPath<E>(
     val direction: SwapDirection,
-    val path: Path<QuotedEdge<E>>
+    val path: Path<QuotedEdge<E>>,
+    val roughFeeEstimation: PathRoughFeeEstimation,
 ) : Comparable<QuotedPath<E>> {
+
+    private val amountOutAfterFees: BigInteger = lastSegmentQuote - roughFeeEstimation.inAssetOut
+    private val amountInAfterFees: BigInteger = firstSegmentQuote + roughFeeEstimation.inAssetIn
 
     override fun compareTo(other: QuotedPath<E>): Int {
         return when (direction) {
             // When we want to sell a token, the bigger the quote - the better
-            SwapDirection.SPECIFIED_IN -> (lastSegmentQuote - other.lastSegmentQuote).signum()
+            SwapDirection.SPECIFIED_IN -> (amountOutAfterFees - other.amountOutAfterFees).signum()
             // When we want to buy a token, the smaller the quote - the better
-            SwapDirection.SPECIFIED_OUT -> (other.firstSegmentQuote - firstSegmentQuote).signum()
+            SwapDirection.SPECIFIED_OUT -> (other.amountInAfterFees - amountInAfterFees).signum()
         }
     }
 }

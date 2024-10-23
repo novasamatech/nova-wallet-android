@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
+import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
@@ -18,6 +19,7 @@ import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -32,6 +34,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -44,11 +47,15 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.amountToLeaveOnOriginToPayTxFees
 import io.novafoundation.nova.feature_swap_api.domain.model.replaceAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.totalFeeEnsuringSubmissionAsset
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_core_api.data.paths.PathFeeEstimator
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuotedAmount
@@ -63,12 +70,18 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromFiatOrZero
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isUtility
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.ext.utilityAssetOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -88,6 +101,7 @@ import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.MathContext
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
@@ -107,6 +121,7 @@ internal class RealSwapService(
     private val customFeeCapabilityFacade: CustomFeeCapabilityFacade,
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
+    private val tokenRepository: TokenRepository,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
 
@@ -469,7 +484,129 @@ internal class RealSwapService(
             val graph = directionsGraph(computationScope).first()
             val filter = canPayFeeNodeFilter(computationScope)
 
-            quoterFactory.create(graph, this, filter)
+            quoterFactory.create(graph, this, SwapPathFeeEstimator(), filter)
+        }
+    }
+
+    private inner class SwapPathFeeEstimator : PathFeeEstimator<SwapGraphEdge> {
+
+        override suspend fun roughlyEstimateFee(path: Path<QuotedEdge<SwapGraphEdge>>): PathRoughFeeEstimation {
+            // USDT is used to determine usd to selected currency rate without making a separate request to price api
+            val usdtOnAssetHub = chainRegistry.getUSDTOnAssetHub() ?: return PathRoughFeeEstimation.zero()
+
+            val operationPrototypes = path.constructAtomicOperationPrototypes()
+
+            val nativeAssetsSegments = operationPrototypes.allNativeAssets()
+            val assetIn = chainRegistry.asset(path.first().edge.from)
+            val assetOut = chainRegistry.asset(path.last().edge.to)
+
+            val prices = getTokens(assetIn = assetIn, assetOut = assetOut, usdTiedAsset = usdtOnAssetHub, fees = nativeAssetsSegments)
+
+            val totalFiat = operationPrototypes.estimateTotalFeeInFiat(prices, usdtOnAssetHub.fullId)
+
+            return PathRoughFeeEstimation(
+                inAssetIn = prices.fiatToPlanks(totalFiat, assetIn),
+                inAssetOut = prices.fiatToPlanks(totalFiat, assetOut)
+            )
+        }
+
+        private suspend fun ChainRegistry.getUSDTOnAssetHub(): Chain.Asset? {
+            val assetHub = getChain(Chain.Geneses.POLKADOT_ASSET_HUB)
+            return assetHub.assets.find { it.symbol.value == "USDT" }
+        }
+
+        private fun Map<FullChainAssetId, Token>.fiatToPlanks(fiat: BigDecimal, chainAsset: Chain.Asset): Balance {
+            val token = get(chainAsset.fullId) ?: return Balance.ZERO
+
+            return token.planksFromFiatOrZero(fiat)
+        }
+
+        private suspend fun getTokens(
+            assetIn: Chain.Asset,
+            assetOut: Chain.Asset,
+            usdTiedAsset: Chain.Asset,
+            fees: List<Chain.Asset>
+        ): Map<FullChainAssetId, Token> {
+            val allTokensToRequestPrices = buildList {
+                addAll(fees)
+                add(assetIn)
+                add(usdTiedAsset)
+                add(assetOut)
+            }
+
+            return tokenRepository.getTokens(allTokensToRequestPrices)
+        }
+
+        private suspend fun List<AtomicSwapOperationPrototype>.allNativeAssets(): List<Chain.Asset> {
+            return map {
+                val chain = chainRegistry.getChain(it.fromChain)
+                chain.utilityAsset
+            }
+        }
+
+        private suspend fun List<AtomicSwapOperationPrototype>.estimateTotalFeeInFiat(
+            prices: Map<FullChainAssetId, Token>,
+            usdTiedAsset: FullChainAssetId
+        ): BigDecimal {
+            return sumOf {
+                val nativeAssetId = FullChainAssetId.utilityAssetOf(it.fromChain)
+                val token = prices[nativeAssetId] ?: return@sumOf BigDecimal.ZERO
+
+                val usdConverter = PriceBasedUsdConverter(prices, nativeAssetId, usdTiedAsset)
+
+                val roughFee = it.roughlyEstimateNativeFee(usdConverter)
+                token.amountToFiat(roughFee)
+            }
+        }
+
+        private suspend fun Path<QuotedEdge<SwapGraphEdge>>.constructAtomicOperationPrototypes(): List<AtomicSwapOperationPrototype> {
+            var currentSwapTx: AtomicSwapOperationPrototype? = null
+            val finishedSwapTxs = mutableListOf<AtomicSwapOperationPrototype>()
+
+            forEach { quotedEdge ->
+                // Initial case - begin first operation
+                if (currentSwapTx == null) {
+                    currentSwapTx = quotedEdge.edge.beginOperationPrototype()
+                    return@forEach
+                }
+
+                // Try to append segment to current swap tx
+                val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperationPrototype(currentSwapTx!!)
+
+                currentSwapTx = if (maybeAppendedCurrentTx == null) {
+                    finishedSwapTxs.add(currentSwapTx!!)
+                    quotedEdge.edge.beginOperationPrototype()
+                } else {
+                    maybeAppendedCurrentTx
+                }
+            }
+
+            finishedSwapTxs.add(currentSwapTx!!)
+
+            return finishedSwapTxs
+        }
+
+        private inner class PriceBasedUsdConverter(
+            private val prices: Map<FullChainAssetId, Token>,
+            private val nativeAsset: FullChainAssetId,
+            private val usdTiedAsset: FullChainAssetId,
+        ) : UsdConverter {
+
+            val currencyToUsdRate = determineCurrencyToUsdRate()
+
+            override suspend fun nativeAssetEquivalentOf(usdAmount: Double): BigDecimal {
+                val priceInCurrency = prices[nativeAsset]?.coinRate?.rate ?: return BigDecimal.ZERO
+                val priceInUsd = priceInCurrency * currencyToUsdRate
+                return usdAmount.toBigDecimal() / priceInUsd
+            }
+
+            private fun determineCurrencyToUsdRate(): BigDecimal {
+                val usdTiedAssetPrice = prices[usdTiedAsset] ?: return BigDecimal.ZERO
+                val rate = usdTiedAssetPrice.coinRate?.rate.orZero()
+                if (rate.isZero) return BigDecimal.ZERO
+
+                return BigDecimal.ONE.divide(rate, MathContext.DECIMAL64)
+            }
         }
     }
 
@@ -525,11 +662,12 @@ internal class RealSwapService(
                 val amountIn: Balance
                 val amountOut: Balance
 
-                when(trade.direction) {
+                when (trade.direction) {
                     SwapDirection.SPECIFIED_IN -> {
                         amountIn = quotedSwapEdge.quotedAmount
                         amountOut = quotedSwapEdge.quote
                     }
+
                     SwapDirection.SPECIFIED_OUT -> {
                         amountIn = quotedSwapEdge.quote
                         amountOut = quotedSwapEdge.quotedAmount
@@ -540,6 +678,13 @@ internal class RealSwapService(
                     val assetIn = chainRegistry.asset(quotedSwapEdge.edge.from)
                     val initialAmount = amountIn.formatPlanks(assetIn)
                     append(initialAmount)
+
+                    if (trade.direction == SwapDirection.SPECIFIED_OUT) {
+                        val roughFeesInAssetIn = trade.roughFeeEstimation.inAssetIn
+                        val roughFeesInAssetInAmount = roughFeesInAssetIn.formatPlanks(assetIn)
+
+                        append(" (+${roughFeesInAssetInAmount} fees) ")
+                    }
                 }
 
                 append(" --- " + quotedSwapEdge.edge.debugLabel() + " ---> ")
@@ -548,6 +693,15 @@ internal class RealSwapService(
                 val outAmount = amountOut.formatPlanks(assetOut)
 
                 append(outAmount)
+
+                if (index == trade.path.size - 1) {
+                    if (trade.direction == SwapDirection.SPECIFIED_IN) {
+                        val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
+                        val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
+
+                        append(" (-${roughFeesInAssetOutAmount} fees)")
+                    }
+                }
             }
         }
     }

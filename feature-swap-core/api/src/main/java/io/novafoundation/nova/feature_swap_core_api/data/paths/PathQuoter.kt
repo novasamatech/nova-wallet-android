@@ -17,6 +17,7 @@ interface PathQuoter<E : QuotableEdge> {
         fun <E : QuotableEdge> create(
             graph: Graph<FullChainAssetId, E>,
             computationalScope: CoroutineScope,
+            pathFeeEstimation: PathFeeEstimator<E>? = null,
             filter: EdgeVisitFilter<E>? = null
         ): PathQuoter<E>
     }

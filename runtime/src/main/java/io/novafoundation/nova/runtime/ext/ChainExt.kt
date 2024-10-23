@@ -520,3 +520,5 @@ fun Chain.hasReferendaSummaryApi(): Boolean {
 fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
     return externalApi<Chain.ExternalApi.ReferendumSummary>()
 }
+
+fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

@@ -8,8 +8,10 @@ import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.measureExecution
+import io.novafoundation.nova.feature_swap_core_api.data.paths.PathFeeEstimator
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.BestPathQuote
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
@@ -31,9 +33,10 @@ class RealPathQuoterFactory(
     override fun <E : QuotableEdge> create(
         graph: Graph<FullChainAssetId, E>,
         computationalScope: CoroutineScope,
+        pathFeeEstimation: PathFeeEstimator<E>?,
         filter: EdgeVisitFilter<E>?
     ): PathQuoter<E> {
-        return RealPathQuoter(computationalCache, graph, computationalScope, filter)
+        return RealPathQuoter(computationalCache, graph, computationalScope, pathFeeEstimation, filter)
     }
 }
 
@@ -41,6 +44,7 @@ private class RealPathQuoter<E : QuotableEdge>(
     private val computationalCache: ComputationalCache,
     private val graph: Graph<FullChainAssetId, E>,
     private val computationalScope: CoroutineScope,
+    private val pathFeeEstimation: PathFeeEstimator<E>?,
     private val filter: EdgeVisitFilter<E>?,
 ) : PathQuoter<E> {
 
@@ -101,7 +105,13 @@ private class RealPathQuoter<E : QuotableEdge>(
             SwapDirection.SPECIFIED_OUT -> quotePathBuy(path, amount)
         } ?: return null
 
-        return QuotedPath(swapDirection, quote)
+        val pathRoughFeeEstimation = pathFeeEstimation.roughlyEstimateFeeOrZero(quote)
+
+        return QuotedPath(swapDirection, quote, pathRoughFeeEstimation)
+    }
+
+    private suspend fun PathFeeEstimator<E>?.roughlyEstimateFeeOrZero(quote: Path<QuotedEdge<E>>): PathRoughFeeEstimation {
+        return this?.roughlyEstimateFee(quote) ?: PathRoughFeeEstimation.zero()
     }
 
     private suspend fun quotePathBuy(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>>? {

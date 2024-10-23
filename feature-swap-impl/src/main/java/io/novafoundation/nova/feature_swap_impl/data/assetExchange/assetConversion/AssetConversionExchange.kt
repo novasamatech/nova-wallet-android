@@ -14,12 +14,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -32,6 +34,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
@@ -51,6 +54,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
+import java.math.BigDecimal
 
 class AssetConversionExchangeFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
@@ -177,6 +181,14 @@ private class AssetConversionExchange(
             return null
         }
 
+        override suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype {
+            return AssetConversionOperationPrototype(fromAsset.chainId)
+        }
+
+        override suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype? {
+            return null
+        }
+
         override suspend fun debugLabel(): String {
             return "AssetConversion"
         }
@@ -207,6 +219,14 @@ private class AssetConversionExchange(
             get() = Weights.AssetConversion.SWAP
     }
 
+    inner class AssetConversionOperationPrototype(override val fromChain: ChainId) : AtomicSwapOperationPrototype {
+
+        override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
+            // in DOT
+            return 0.0015.toBigDecimal()
+        }
+    }
+
     inner class AssetConversionOperation(
         private val transactionArgs: AtomicSwapOperationArgs,
         private val fromAsset: Chain.Asset,
@@ -231,7 +251,7 @@ private class AssetConversionExchange(
 
         override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
             val quoteArgs = ParentQuoterArgs(
-                chainAssetIn =fromAsset,
+                chainAssetIn = fromAsset,
                 chainAssetOut = toAsset,
                 amount = extraOutAmount,
                 swapDirection = SwapDirection.SPECIFIED_OUT
@@ -245,7 +265,7 @@ private class AssetConversionExchange(
         }
 
         override suspend fun inProgressLabel(): String {
-           return "Swapping ${fromAsset.symbol} to ${toAsset.symbol} on ${chain.name}"
+            return "Swapping ${fromAsset.symbol} to ${toAsset.symbol} on ${chain.name}"
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
@@ -259,13 +279,13 @@ private class AssetConversionExchange(
                 // Send swapped funds to the executingAccount since it the account doing the swap
                 executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.executingAccount)
             }.requireOk().mapCatching {
-               SwapExecutionCorrection(
-                   actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
-               )
+                SwapExecutionCorrection(
+                    actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
+                )
             }
         }
 
-        private fun List<GenericEvent.Instance>.determineActualSwappedAmount() : Balance {
+        private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {
             val swap = findEventOrThrow(Modules.ASSET_CONVERSION, "SwapExecuted")
             val (_, _, _, amountOut) = swap.arguments
 

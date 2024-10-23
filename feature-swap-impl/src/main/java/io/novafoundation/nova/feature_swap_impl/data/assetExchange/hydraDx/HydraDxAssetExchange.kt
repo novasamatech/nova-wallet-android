@@ -27,12 +27,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.acceptedCurrencies
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.multiTransactionPayment
@@ -55,6 +57,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
@@ -72,6 +75,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.math.BigDecimal
 import java.math.BigInteger
 
 
@@ -225,6 +229,18 @@ private class HydraDxAssetExchange(
             return currentTransaction.appendSegment(sourceQuotableEdge, args)
         }
 
+        override suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype {
+            return HydraDxOperationPrototype(from.chainId)
+        }
+
+        override suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype? {
+            return if (currentTransaction is HydraDxOperationPrototype) {
+                currentTransaction
+            } else {
+                null
+            }
+        }
+
         override suspend fun debugLabel(): String {
             return sourceQuotableEdge.debugLabel()
         }
@@ -236,6 +252,14 @@ private class HydraDxAssetExchange(
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
             return true
+        }
+    }
+
+    inner class HydraDxOperationPrototype(override val fromChain: ChainId) : AtomicSwapOperationPrototype {
+
+        override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
+            // in HDX
+            return 0.5.toBigDecimal()
         }
     }
 

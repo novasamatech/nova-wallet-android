@@ -19,12 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
-interface AssetTransferBase {
-
-    val recipientAccountId: AccountId
-        get() = destinationChain.accountIdOf(recipient)
-
-    val recipient: String
+interface AssetTransferDirection {
 
     val originChain: Chain
 
@@ -33,6 +28,14 @@ interface AssetTransferBase {
     val destinationChain: Chain
 
     val destinationChainAsset: Chain.Asset
+}
+
+interface AssetTransferBase : AssetTransferDirection {
+
+    val recipientAccountId: AccountId
+        get() = destinationChain.accountIdOf(recipient)
+
+    val recipient: String
 
     val feePaymentCurrency: FeePaymentCurrency
 

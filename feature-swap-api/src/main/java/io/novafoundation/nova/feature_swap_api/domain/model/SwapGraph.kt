@@ -6,6 +6,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 interface SwapGraphEdge : QuotableEdge {
 
+    /**
+     * Begin a fully-constructed, ready to submit operation
+     */
     suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation
 
     /**
@@ -14,6 +17,20 @@ interface SwapGraphEdge : QuotableEdge {
      * [beginOperation]
      */
     suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
+
+    /**
+     * Begin a operation prototype that should reflect similar structure to [beginOperation] and [appendToOperation] but is limited to available functionality
+     * Used during quoting to construct the operations array when not all parameters are still known
+     */
+    suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype
+
+    /**
+     * Append current swap edge execution to the existing transaction prototype
+     * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
+     * [beginOperationPrototype]
+     */
+    suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype?
+
 
     suspend fun debugLabel(): String
 
