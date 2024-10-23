@@ -4,17 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
+import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
@@ -66,10 +71,13 @@ class BalanceListFragment :
         balanceListAssets.setHasFixedSize(true)
         balanceListAssets.adapter = adapter
 
-        AssetGroupingDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        val animationSettings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
+        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
 
-        // modification animations only harm here
-        balanceListAssets.itemAnimator = null
+        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
+
+        AssetNetworkDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
 
         walletContainer.setOnRefreshListener {
             viewModel.fullSync()
@@ -139,7 +147,14 @@ class BalanceListFragment :
     }
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
-        viewModel.assetListMixin.expandToken(tokenGroup)
+        if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
+            viewModel.assetClicked(tokenGroup.groupType.item)
+        } else {
+            val itemAnimator = balanceListAssets.itemAnimator as AssetTokensItemAnimator
+            itemAnimator.prepareForAnimation()
+
+            viewModel.assetListMixin.expandToken(tokenGroup)
+        }
     }
 
     override fun totalBalanceClicked() {

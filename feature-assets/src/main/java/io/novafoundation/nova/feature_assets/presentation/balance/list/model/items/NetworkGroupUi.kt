@@ -7,5 +7,5 @@ data class NetworkGroupUi(
     val groupBalanceFiat: String
 ) : AssetGroupRvItem {
 
-    override val id: String = chainUi.id
+    override val itemId: String = chainUi.id
 }

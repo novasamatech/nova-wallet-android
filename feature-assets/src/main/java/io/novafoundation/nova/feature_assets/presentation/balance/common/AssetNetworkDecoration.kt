@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetViewHolder
-import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetGroupViewHolder
-import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetViewHolder
 import kotlin.math.roundToInt
 
 /**
@@ -23,7 +21,7 @@ import kotlin.math.roundToInt
  * The issue is that this decoration does not currently support partial list updates and assumes it will be iterated over whole list
  * TODO update decoration to not require this invalidation
  */
-class AssetGroupingDecoration(
+class AssetNetworkDecoration(
     private val background: Drawable,
     private val assetsAdapter: ListAdapter<*, *>,
     context: Context,
@@ -113,27 +111,25 @@ class AssetGroupingDecoration(
     }
 
     private fun isFinalItemInGroup(nextType: Int?): Boolean {
-        return nextType == TYPE_NETWORK_GROUP || nextType == TYPE_TOKEN_GROUP || nextType == null
+        return nextType == TYPE_NETWORK_GROUP || nextType == null
     }
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
-        val isGroupViewHolder = viewHolder is NetworkAssetViewHolder ||
-            viewHolder is NetworkAssetGroupViewHolder ||
-            viewHolder is TokenAssetViewHolder ||
-            viewHolder is TokenAssetGroupViewHolder
+        val isNetworkViewHolder = viewHolder is NetworkAssetViewHolder ||
+            viewHolder is NetworkAssetGroupViewHolder
 
-        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isGroupViewHolder
+        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isNetworkViewHolder
     }
 }
 
-fun AssetGroupingDecoration.Companion.applyDefaultTo(
+fun AssetNetworkDecoration.Companion.applyDefaultTo(
     recyclerView: RecyclerView,
     adapter: ListAdapter<*, *>
 ) {
     val groupBackground = with(recyclerView.context) {
         addRipple(getRoundedCornerDrawable(R.color.block_background))
     }
-    val decoration = AssetGroupingDecoration(
+    val decoration = AssetNetworkDecoration(
         background = groupBackground,
         assetsAdapter = adapter,
         context = recyclerView.context,
