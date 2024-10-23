@@ -150,6 +150,9 @@ class BalanceListFragment :
         if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
             viewModel.assetClicked(tokenGroup.groupType.item)
         } else {
+            val itemAnimator = balanceListAssets.itemAnimator as AssetTokensItemAnimator
+            itemAnimator.prepareForAnimation()
+
             viewModel.assetListMixin.expandToken(tokenGroup)
         }
     }

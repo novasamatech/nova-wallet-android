@@ -17,6 +17,8 @@ abstract class ExpandableItemAnimator(
     private val expandableAnimator: ExpandableAnimator
 ) : SimpleItemAnimator() {
 
+    private var preparedForAnimation = false
+
     private val addAnimations = mutableMapOf<String, MutableList<ViewHolder>>() // Parent item to children
     private val removeAnimations = mutableMapOf<String, MutableList<ViewHolder>>() // Parent item to children
     private val moveAnimations = mutableListOf<ViewHolder>()
@@ -33,12 +35,23 @@ abstract class ExpandableItemAnimator(
         supportsChangeAnimations = false
     }
 
+    /**
+     * Use this method before adapter.submitList() to prepare items for animation.
+     * Item animations will be skipped otherwise
+     */
+    fun prepareForAnimation() {
+        preparedForAnimation = true
+    }
+
     override fun animateAdd(holder: ViewHolder): Boolean {
-        if (holder !is ExpandableChildViewHolder || holder.expandableItem == null) {
+        val notPreparedForAnimation = !preparedForAnimation
+        val notExpandableChildItem = holder !is ExpandableChildViewHolder || holder.expandableItem == null
+        if (notPreparedForAnimation || notExpandableChildItem) {
             dispatchAddFinished(holder)
             return true
         }
-        val item = holder.expandableItem!!
+
+        val item = (holder as ExpandableChildViewHolder).expandableItem!!
 
         // Reset move state helps clear translationY when animation is being to be canceled
         if (pendingMoveAnimations.contains(holder)) {
@@ -62,11 +75,14 @@ abstract class ExpandableItemAnimator(
     }
 
     override fun animateRemove(holder: ViewHolder): Boolean {
-        if (holder !is ExpandableChildViewHolder || holder.expandableItem == null) {
+        val notPreparedForAnimation = !preparedForAnimation
+        val notExpandableChildItem = holder !is ExpandableChildViewHolder || holder.expandableItem == null
+        if (notPreparedForAnimation || notExpandableChildItem) {
             dispatchRemoveFinished(holder)
-            return false
+            return true
         }
-        val item = holder.expandableItem!!
+
+        val item = (holder as ExpandableChildViewHolder).expandableItem!!
 
         // Reset move state helps clear translationY when animation is being to be canceled
         if (pendingMoveAnimations.contains(holder)) {
@@ -90,9 +106,10 @@ abstract class ExpandableItemAnimator(
     }
 
     override fun animateMove(holder: ViewHolder, fromX: Int, fromY: Int, toX: Int, toY: Int): Boolean {
-        if (holder !is ExpandableBaseViewHolder<*>) {
+        val notPreparedForAnimation = !preparedForAnimation
+        if (notPreparedForAnimation || holder !is ExpandableBaseViewHolder<*>) {
             dispatchMoveFinished(holder)
-            return false
+            return true
         }
 
         // Reset add state helps clear alpha and scale when animation is being to be canceled
@@ -142,6 +159,11 @@ abstract class ExpandableItemAnimator(
         }
 
         pendingMoveAnimations.addAll(animatingViewHolders)
+
+        // Set prepare for animation = false to return to skipping animations
+        if (pendingAddAnimations.isNotEmpty() || pendingRemoveAnimations.isNotEmpty() || pendingMoveAnimations.isNotEmpty()) {
+            preparedForAnimation = false
+        }
     }
 
     private fun runExpandableAnimationFor(
