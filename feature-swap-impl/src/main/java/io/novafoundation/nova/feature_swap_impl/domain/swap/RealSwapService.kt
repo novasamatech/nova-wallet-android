@@ -198,7 +198,6 @@ internal class RealSwapService(
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
 
         return flow {
-            // Zip assumes atomicOperations and atomicOperationFees were constructed the same way
             atomicOperations.fold(initialCorrection) { prevStepCorrection, (segmentFee, operation) ->
                 prevStepCorrection.flatMap { correction ->
                     emit(SwapProgress.StepStarted(operation.inProgressLabel()))
@@ -210,7 +209,9 @@ internal class RealSwapService(
                         amountIn + calculatedFee.additionalAmountForSwap.amount
                     }
 
-                    val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn)
+                    // We cannot execute buy for segments after first one since we deal with actualReceivedAmount there
+                    val shouldReplaceBuyWithSell = correction != null
+                    val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
 
                     Log.d("SwapSubmission", operation.inProgressLabel() + " with $actualSwapLimit")

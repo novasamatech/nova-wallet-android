@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.state
 
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.flip
@@ -56,7 +57,7 @@ class RealSwapSettingsState(
         selectedOption.value = selectedOption.value.copy(amount = amount, swapDirection = swapDirection)
     }
 
-    override fun setSlippage(slippage: Percent) {
+    override fun setSlippage(slippage: Fraction) {
         selectedOption.value = selectedOption.value.copy(slippage = slippage)
     }
 

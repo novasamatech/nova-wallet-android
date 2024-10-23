@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
@@ -129,7 +129,7 @@ class SwapConfirmationViewModel(
 
     private val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfigFlow, slippageFlow)
 
-    private val chainIn =  initialSwapState.map {
+    private val chainIn = initialSwapState.map {
         chainRegistry.getChain(it.quote.assetIn.chainId)
     }
         .shareInBackground()
@@ -253,7 +253,7 @@ class SwapConfirmationViewModel(
 
         swapInteractor.executeSwap(fee)
             .onEach { progressResult ->
-                when(progressResult) {
+                when (progressResult) {
                     SwapProgress.Done -> navigateToNextScreen(quote.assetOut)
                     is SwapProgress.Failure -> showError(progressResult.error)
                     is SwapProgress.StepStarted -> showMessage(progressResult.step)
@@ -281,7 +281,7 @@ class SwapConfirmationViewModel(
             ),
             rate = formatRate(confirmationState.swapQuote.swapRate(), assetIn, assetOut),
             priceDifference = formatPriceDifference(confirmationState.swapQuote.priceImpact),
-            slippage =slippageFlow.first().format()
+            slippage = slippageFlow.first().formatPercents()
         )
     }
 

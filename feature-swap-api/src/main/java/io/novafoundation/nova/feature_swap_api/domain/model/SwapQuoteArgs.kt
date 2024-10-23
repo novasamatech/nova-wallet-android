@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
-import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.divideToDecimal
-import io.novafoundation.nova.common.utils.fraction
 import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -20,7 +22,7 @@ data class SwapQuoteArgs(
 
 open class SwapFeeArgs(
     val assetIn: Chain.Asset,
-    val slippage: Percent,
+    val slippage: Fraction,
     val executionPath: Path<SegmentExecuteArgs>,
     val direction: SwapDirection,
     val firstSegmentFees: Chain.Asset
@@ -49,11 +51,32 @@ sealed class SwapLimit {
  * Adjusts SwapLimit to the [newAmountIn] based on the quoted swap rate
  * This is only suitable for small changes amount in, as it implicitly assumes the swap rate stays the same
  */
-fun SwapLimit.replaceAmountIn(newAmountIn: Balance): SwapLimit {
-    return when(this) {
+fun SwapLimit.replaceAmountIn(newAmountIn: Balance, shouldReplaceBuyWithSell: Boolean): SwapLimit {
+    return when (this) {
         is SwapLimit.SpecifiedIn -> updateInAmount(newAmountIn)
-        is SwapLimit.SpecifiedOut -> updateInAmount(newAmountIn)
+        is SwapLimit.SpecifiedOut -> {
+            if (shouldReplaceBuyWithSell) {
+                updateInAmountChangingToSell(newAmountIn)
+            } else {
+                updateInAmount(newAmountIn)
+            }
+        }
     }
+}
+
+private fun SwapLimit.SpecifiedOut.updateInAmountChangingToSell(newAmountIn: Balance): SwapLimit {
+    val slippage = slippage()
+
+    val inferredQuotedBalance = replacedInQuoteAmount(newAmountIn, amountOut)
+
+    return SpecifiedIn(amount = newAmountIn, slippage, quotedBalance = inferredQuotedBalance)
+}
+
+private fun SwapLimit.SpecifiedOut.slippage(): Fraction {
+    if (amountInQuote.isZero) return Fraction.ZERO
+
+    val slippageAsFraction = (amountInMax.divideToDecimal(amountInQuote) - BigDecimal.ONE).atLeastZero()
+    return slippageAsFraction.fractions
 }
 
 private fun SwapLimit.SpecifiedIn.replaceInMultiplier(amount: Balance): BigDecimal {
@@ -88,7 +111,7 @@ private fun SwapLimit.SpecifiedOut.updateInAmount(newAmountInQuote: Balance): Sw
     )
 }
 
-fun SwapQuote.toExecuteArgs(slippage: Percent, firstSegmentFees: Chain.Asset): SwapFeeArgs {
+fun SwapQuote.toExecuteArgs(slippage: Fraction, firstSegmentFees: Chain.Asset): SwapFeeArgs {
     return SwapFeeArgs(
         assetIn = amountIn.chainAsset,
         slippage = slippage,
@@ -98,16 +121,15 @@ fun SwapQuote.toExecuteArgs(slippage: Percent, firstSegmentFees: Chain.Asset): S
     )
 }
 
-fun SwapLimit(direction: SwapDirection, amount: Balance, slippage: Percent, quotedBalance: Balance): SwapLimit {
+fun SwapLimit(direction: SwapDirection, amount: Balance, slippage: Fraction, quotedBalance: Balance): SwapLimit {
     return when (direction) {
         SwapDirection.SPECIFIED_IN -> SpecifiedIn(amount, slippage, quotedBalance)
         SwapDirection.SPECIFIED_OUT -> SpecifiedOut(amount, slippage, quotedBalance)
     }
 }
 
-@Suppress("FunctionName")
-private fun SpecifiedIn(amount: Balance, slippage: Percent, quotedBalance: Balance): SwapLimit.SpecifiedIn {
-    val lessAmountCoefficient = BigDecimal.ONE - slippage.fraction
+private fun SpecifiedIn(amount: Balance, slippage: Fraction, quotedBalance: Balance): SwapLimit.SpecifiedIn {
+    val lessAmountCoefficient = BigDecimal.ONE - slippage.inFraction.toBigDecimal()
     val amountOutMin = quotedBalance.toBigDecimal() * lessAmountCoefficient
 
     return SwapLimit.SpecifiedIn(
@@ -117,9 +139,8 @@ private fun SpecifiedIn(amount: Balance, slippage: Percent, quotedBalance: Balan
     )
 }
 
-@Suppress("FunctionName")
-private fun SpecifiedOut(amount: Balance, slippage: Percent, quotedBalance: Balance): SwapLimit.SpecifiedOut {
-    val moreAmountCoefficient = BigDecimal.ONE + slippage.fraction
+private fun SpecifiedOut(amount: Balance, slippage: Fraction, quotedBalance: Balance): SwapLimit.SpecifiedOut {
+    val moreAmountCoefficient = BigDecimal.ONE + slippage.inFraction.toBigDecimal()
     val amountInMax = quotedBalance.toBigDecimal() * moreAmountCoefficient
 
     return SwapLimit.SpecifiedOut(

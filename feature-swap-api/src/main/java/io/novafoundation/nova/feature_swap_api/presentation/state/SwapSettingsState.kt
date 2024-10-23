@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.presentation.state
 
-import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -16,7 +16,7 @@ interface SwapSettingsState : SelectedOptionSharedState<SwapSettings> {
 
     fun setAmount(amount: Balance?, swapDirection: SwapDirection)
 
-    fun setSlippage(slippage: Percent)
+    fun setSlippage(slippage: Fraction)
 
     suspend fun flipAssets(): SwapSettings
 
