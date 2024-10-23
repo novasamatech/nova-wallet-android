@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
-import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpendOnBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -17,12 +16,12 @@ import java.math.BigInteger
 data class SwapValidationPayload(
     val detailedAssetIn: SwapAssetData,
     val detailedAssetOut: SwapAssetData,
-    val slippage: Percent,
+    val slippage: Fraction,
     val feeAsset: Asset,
     val decimalFee: GenericDecimalFee<SwapFee>,
     val swapQuote: SwapQuote,
     val swapQuoteArgs: SwapQuoteArgs,
-    val swapExecuteArgs: SwapExecuteArgs
+    val swapExecuteArgs: SwapFeeArgs
 ) {
 
     data class SwapAssetData(
@@ -38,13 +37,6 @@ val SwapValidationPayload.isFeePayingByAssetIn: Boolean
 val SwapValidationPayload.swapAmountInFeeToken: Balance
     get() = if (isFeePayingByAssetIn) {
         detailedAssetIn.amountInPlanks
-    } else {
-        BigInteger.ZERO
-    }
-
-val SwapValidationPayload.toBuyAmountToKeepMainEDInFeeAsset: Balance
-    get() = if (isFeePayingByAssetIn) {
-        decimalFee.genericFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
     } else {
         BigInteger.ZERO
     }

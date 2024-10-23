@@ -24,9 +24,12 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -35,12 +38,14 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -57,13 +62,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
-import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
-import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicServiceFactory
+import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
@@ -82,6 +85,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.mi
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
 import io.novafoundation.nova.feature_account_impl.di.modules.CloudBackupModule
+import io.novafoundation.nova.feature_account_impl.di.modules.CustomFeeModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
@@ -92,25 +96,22 @@ import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInt
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
-import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.RealCreateCloudBackupPasswordInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RealEnterCloudBackupInteractor
-import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
-import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.RealStartCreateWalletInteractor
-import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicServiceFactory
-import io.novafoundation.nova.feature_account_impl.di.modules.CustomFeeModule
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
+import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.CommonExportSecretsInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.export.RealCommonExportSecretsInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.CreateCloudBackupPasswordInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.RealCreateCloudBackupPasswordInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.EnterCloudBackupInteractor
+import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.enterPassword.RealEnterCloudBackupInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.ManualBackupSelectWalletInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupSelectAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.manualBackup.RealManualBackupSelectWalletInteractor
+import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.RealStartCreateWalletInteractor
+import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
@@ -132,13 +133,13 @@ import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBack
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
@@ -187,7 +188,8 @@ class AccountFeatureModule {
         chainRegistry: ChainRegistry,
         signerProvider: SignerProvider,
         extrinsicSplitter: ExtrinsicSplitter,
-        feePaymentProviderRegistry: FeePaymentProviderRegistry
+        feePaymentProviderRegistry: FeePaymentProviderRegistry,
+        eventsRepository: EventsRepository,
     ): ExtrinsicService.Factory = RealExtrinsicServiceFactory(
         rpcCalls,
         chainRegistry,
@@ -195,6 +197,7 @@ class AccountFeatureModule {
         extrinsicBuilderFactory,
         signerProvider,
         extrinsicSplitter,
+        eventsRepository,
         feePaymentProviderRegistry
     )
 
@@ -207,7 +210,8 @@ class AccountFeatureModule {
         chainRegistry: ChainRegistry,
         signerProvider: SignerProvider,
         extrinsicSplitter: ExtrinsicSplitter,
-        feePaymentProviderRegistry: FeePaymentProviderRegistry
+        feePaymentProviderRegistry: FeePaymentProviderRegistry,
+        eventsRepository: EventsRepository,
     ): ExtrinsicService = RealExtrinsicService(
         rpcCalls,
         chainRegistry,
@@ -216,6 +220,7 @@ class AccountFeatureModule {
         signerProvider,
         extrinsicSplitter,
         feePaymentProviderRegistry,
+        eventsRepository,
         coroutineScope = null
     )
 

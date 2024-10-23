@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineAssetBalance
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.statemine.StatemineAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine.StatemineAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -93,4 +94,8 @@ class StatemineAssetsModule {
         balance = statemineAssetBalance,
         history = statemineAssetHistory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideStatemineAssetEventDetectorFactory(chainRegistry: ChainRegistry) = StatemineAssetEventDetectorFactory(chainRegistry)
 }

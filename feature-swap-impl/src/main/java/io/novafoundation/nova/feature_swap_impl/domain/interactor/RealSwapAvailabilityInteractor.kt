@@ -24,7 +24,6 @@ class RealSwapAvailabilityInteractor(
     }
 
     override suspend fun swapAvailableFlow(asset: Chain.Asset, coroutineScope: CoroutineScope): Flow<Boolean> {
-        return swapService.availableSwapDirectionsFor(asset, coroutineScope)
-            .map { it.isNotEmpty() }
+        return swapService.hasAvailableSwapDirections(asset, coroutineScope)
     }
 }

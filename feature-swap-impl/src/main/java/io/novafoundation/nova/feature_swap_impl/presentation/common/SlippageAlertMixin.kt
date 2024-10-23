@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.R
@@ -11,7 +12,7 @@ class SlippageAlertMixinFactory(
     private val resourceManager: ResourceManager
 ) {
 
-    fun create(slippageConfig: Flow<SlippageConfig>, slippageFlow: Flow<Percent?>): SlippageAlertMixin {
+    fun create(slippageConfig: Flow<SlippageConfig>, slippageFlow: Flow<Fraction?>): SlippageAlertMixin {
         return RealSlippageAlertMixin(
             resourceManager,
             slippageConfig,
@@ -27,7 +28,7 @@ interface SlippageAlertMixin {
 class RealSlippageAlertMixin(
     val resourceManager: ResourceManager,
     slippageConfig: Flow<SlippageConfig>,
-    slippageFlow: Flow<Percent?>
+    slippageFlow: Flow<Fraction?>
 ) : SlippageAlertMixin {
 
     override val slippageAlertMessage: Flow<String?> = combine(slippageConfig, slippageFlow) { slippageConfig, slippage ->

@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDef
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
@@ -110,13 +111,16 @@ class NativeAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Balance> {
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
         return remoteStorage.subscribe(chain.id, sharedSubscriptionBuilder) {
-            metadata.system.account.observe(accountId).map {
-                val accountInfo = it ?: AccountInfo.empty()
+            metadata.system.account.observeWithRaw(accountId).map {
+                val accountInfo = it.value ?: AccountInfo.empty()
 
-                accountInfo.transferableBalance()
+                TransferableBalanceUpdate(
+                    newBalance = accountInfo.transferableBalance(),
+                    updatedAt = it.at
+                )
             }
         }
     }

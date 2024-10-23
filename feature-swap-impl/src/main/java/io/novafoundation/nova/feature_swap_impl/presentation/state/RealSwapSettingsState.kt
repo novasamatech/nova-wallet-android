@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.state
 
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
-import io.novafoundation.nova.feature_swap_core.domain.model.flip
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.flip
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -56,7 +57,7 @@ class RealSwapSettingsState(
         selectedOption.value = selectedOption.value.copy(amount = amount, swapDirection = swapDirection)
     }
 
-    override fun setSlippage(slippage: Percent) {
+    override fun setSlippage(slippage: Fraction) {
         selectedOption.value = selectedOption.value.copy(slippage = slippage)
     }
 

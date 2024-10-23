@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml.OrmlAssetBalance
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.orml.OrmlAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml.OrmlAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -77,4 +78,8 @@ class OrmlAssetsModule {
         balance = ormlAssetBalance,
         history = ormlAssetHistory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideOrmlAssetEventDetectorFactory(chainRegistry: ChainRegistry) = OrmlAssetEventDetectorFactory(chainRegistry)
 }

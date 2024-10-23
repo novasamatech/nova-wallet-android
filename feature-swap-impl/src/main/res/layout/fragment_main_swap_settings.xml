@@ -177,17 +177,6 @@
                 </FrameLayout>
 
             </io.novafoundation.nova.common.view.ExpandableView>
-
-            <io.novafoundation.nova.common.view.AlertView
-                android:id="@+id/swapMainSettingsMinBalanceAlert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                app:alertMode="info"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsDetails" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

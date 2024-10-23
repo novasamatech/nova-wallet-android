@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -95,8 +95,8 @@ class SwapMainSettingsModule {
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
-        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
-        maxActionProviderFactory: MaxActionProviderFactory
+        maxActionProviderFactory: MaxActionProviderFactory,
+        swapStateStoreProvider: SwapStateStoreProvider,
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -116,9 +116,9 @@ class SwapMainSettingsModule {
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapRateFormatter = swapRateFormatter,
-            swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter,
             selectedAccountUseCase = accountUseCase,
             buyMixinFactory = buyMixinFactory,
+            swapStateStoreProvider = swapStateStoreProvider,
             maxActionProviderFactory = maxActionProviderFactory
         )
     }

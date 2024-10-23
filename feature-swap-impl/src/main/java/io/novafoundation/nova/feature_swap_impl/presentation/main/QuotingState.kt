@@ -12,5 +12,5 @@ sealed class QuotingState {
 
     object NotAvailable : QuotingState()
 
-    data class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs, val feeAsset: Chain.Asset) : QuotingState()
+    data class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs, val firstSegmentFeeAsset: Chain.Asset) : QuotingState()
 }

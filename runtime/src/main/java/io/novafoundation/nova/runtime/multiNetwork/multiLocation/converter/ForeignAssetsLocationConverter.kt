@@ -1,6 +1,5 @@
 package io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter
 
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.toHexUntypedOrNull
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.ext.statemineOrNull
@@ -13,8 +12,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.statemineAssetIdS
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
-import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import kotlinx.coroutines.Deferred
 
 private typealias ScaleEncodedMultiLocation = String
 private typealias ForeignAssetsAssetId = ScaleEncodedMultiLocation
@@ -25,7 +22,7 @@ private const val FOREIGN_ASSETS_PALLET_NAME = "ForeignAssets"
 
 internal class ForeignAssetsLocationConverter(
     private val chain: Chain,
-    private val runtime: Deferred<RuntimeSnapshot>
+    private val runtime: RuntimeSource
 ) : MultiLocationConverter {
 
     private val assetIdToAssetMapping by lazy { constructAssetIdToAssetMapping() }
@@ -37,9 +34,9 @@ internal class ForeignAssetsLocationConverter(
     }
 
     override suspend fun toChainAsset(multiLocation: MultiLocation): Chain.Asset? {
-        val assetIdType = statemineAssetIdScaleType(runtime(), FOREIGN_ASSETS_PALLET_NAME) ?: return null
+        val assetIdType = statemineAssetIdScaleType(runtime.getRuntime(), FOREIGN_ASSETS_PALLET_NAME) ?: return null
         val encodableInstance = multiLocation.toEncodableInstance()
-        val multiLocationHex = assetIdType.toHexUntypedOrNull(runtime(), encodableInstance) ?: return null
+        val multiLocationHex = assetIdType.toHexUntypedOrNull(runtime.getRuntime(), encodableInstance) ?: return null
 
         return assetIdToAssetMapping[multiLocationHex]
     }
@@ -63,7 +60,7 @@ internal class ForeignAssetsLocationConverter(
         if (!assetsType.id.isScaleEncoded()) return null
 
         return runCatching {
-            val encodableMultiLocation = assetsType.prepareIdForEncoding(runtime())
+            val encodableMultiLocation = assetsType.prepareIdForEncoding(runtime.getRuntime())
             bindMultiLocation(encodableMultiLocation)
         }.getOrNull()
     }

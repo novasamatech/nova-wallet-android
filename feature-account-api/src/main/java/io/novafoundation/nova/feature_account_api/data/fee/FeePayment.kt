@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_account_api.data.fee
 
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapability
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 
@@ -16,9 +17,11 @@ interface FeePayment : CustomFeeCapability {
 interface FeePaymentProvider {
 
     suspend fun feePaymentFor(feePaymentCurrency: FeePaymentCurrency, coroutineScope: CoroutineScope?): FeePayment
+
+    suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability?
 }
 
 interface FeePaymentProviderRegistry {
 
-    suspend fun providerFor(chain: Chain): FeePaymentProvider
+    suspend fun providerFor(chainId: ChainId): FeePaymentProvider
 }

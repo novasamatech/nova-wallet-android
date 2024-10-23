@@ -99,7 +99,7 @@ class RealGovernanceUnlockInteractor(
         extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
             if (claimable == null) error("Nothing to claim")
 
-            executeUnlock(accountIdToUnlock = origin.requestedOrigin, governanceSelectedOption, claimable)
+            executeUnlock(accountIdToUnlock = origin.executingAccount, governanceSelectedOption, claimable)
         }.awaitInBlock()
     }
 
