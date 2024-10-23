@@ -139,7 +139,7 @@ class CrossChainTransferAssetExchange(
     ): AtomicSwapOperationPrototype {
 
         override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
-            var totalAmount = usdConverter.nativeAssetEquivalentOf(0.15)
+            var totalAmount = BigDecimal.ZERO
 
             if (isChainWithExpensiveCrossChain(fromChain)) {
                 totalAmount += usdConverter.nativeAssetEquivalentOf(0.15)
