@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import android.view.ViewPropertyAnimator
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAdapter
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableItemAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator

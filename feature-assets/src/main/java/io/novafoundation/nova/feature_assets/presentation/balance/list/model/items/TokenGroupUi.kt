@@ -17,7 +17,6 @@ data class TokenGroupUi(
     val groupType: GroupType
 ) : AssetGroupRvItem, ExpandableParentItem {
 
-
     sealed interface GroupType {
         object Group : GroupType
 

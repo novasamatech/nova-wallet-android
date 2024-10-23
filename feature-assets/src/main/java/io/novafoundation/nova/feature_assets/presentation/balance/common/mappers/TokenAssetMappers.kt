@@ -38,7 +38,6 @@ private fun mapAssetsToAssetModels(
     return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
 }
 
-
 private fun mapAssetGroupToUi(
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
