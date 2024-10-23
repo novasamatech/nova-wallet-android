@@ -168,7 +168,13 @@ internal class RealSwapService(
         val fees = atomicOperations.mapAsync { SwapFee.SwapSegment(it.estimateFee(), it) }
         val convertedFees = fees.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
-        return SwapFee(segments = fees, intermediateSegmentFeesInAssetIn = convertedFees).also(::logFee)
+        val firstOperation = atomicOperations.first()
+
+        return SwapFee(
+            segments = fees,
+            intermediateSegmentFeesInAssetIn = convertedFees,
+            additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction()
+        ).also(::logFee)
     }
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {

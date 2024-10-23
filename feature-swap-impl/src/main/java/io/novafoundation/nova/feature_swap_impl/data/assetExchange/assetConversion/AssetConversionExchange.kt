@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.assetConversion
@@ -7,8 +8,8 @@ import io.novafoundation.nova.feature_account_api.data.conversion.assethub.asset
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
@@ -36,10 +37,12 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.Multi
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
@@ -237,23 +240,36 @@ private class AssetConversionExchange(
             return swapHost.quote(quoteArgs)
         }
 
+        override suspend fun additionalMaxAmountDeduction(): Balance {
+            return Balance.ZERO
+        }
+
         override suspend fun inProgressLabel(): String {
            return "Swapping ${fromAsset.symbol} to ${toAsset.symbol} on ${chain.name}"
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
-            return extrinsicService.submitAndWatchExtrinsic(
+            return extrinsicService.submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
                     feePaymentCurrency = transactionArgs.feePaymentCurrency
                 )
             ) { submissionOrigin ->
-                // Send swapped funds to the requested origin since it the account doing the swap
+                // Send swapped funds to the executingAccount since it the account doing the swap
                 executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.executingAccount)
-            }.awaitInBlock().map {
-               TODO()
+            }.requireOk().mapCatching {
+               SwapExecutionCorrection(
+                   actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
+               )
             }
+        }
+
+        private fun List<GenericEvent.Instance>.determineActualSwappedAmount() : Balance {
+            val swap = findEventOrThrow(Modules.ASSET_CONVERSION, "SwapExecuted")
+            val (_, _, _, amountOut) = swap.arguments
+
+            return bindNumber(amountOut)
         }
 
         private suspend fun ExtrinsicBuilder.executeSwap(

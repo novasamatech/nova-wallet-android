@@ -103,6 +103,10 @@ internal class RealCrossChainTransfersUseCase(
        return crossChainTransfersRepository.getConfiguration()
     }
 
+    override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
+       return crossChainTransactor.requiredRemainingAmountAfterTransfer(sendingAsset, originChain)
+    }
+
 
     override suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,

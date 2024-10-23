@@ -16,7 +16,9 @@ class SwapFee(
     /**
      *  Fees for second and subsequent segments converted to assetIn
      */
-    val intermediateSegmentFeesInAssetIn: FeeBase
+    val intermediateSegmentFeesInAssetIn: FeeBase,
+
+    private val additionalMaxAmountDeduction: Balance,
 ) : GenericFee, MaxAvailableDeduction {
 
     data class SwapSegment(val fee: AtomicSwapOperationFee, val operation: AtomicSwapOperation)
@@ -34,6 +36,10 @@ class SwapFee(
     override val networkFee: Fee = determineNetworkFee()
 
     override fun deductionFor(amountAsset: Chain.Asset): Balance {
+      return totalFeeAmount(amountAsset) + additionalMaxAmountDeduction
+    }
+
+    private fun totalFeeAmount(amountAsset: Chain.Asset): Balance {
         val executingAccount = submissionFee.submissionOrigin.executingAccount
 
         val submissionFeeAmount = submissionFee.getAmount(amountAsset, executingAccount)
@@ -52,6 +58,6 @@ class SwapFee(
     // TODO this is for simpler understanding of real fee until multi-chain view is developed
     private fun determineNetworkFee(): Fee {
         val submissionFeeAsset = submissionFee.asset
-        return submissionFee.replacePlanks(newPlanks = deductionFor(submissionFeeAsset))
+        return submissionFee.replacePlanks(newPlanks = totalFeeAmount(submissionFeeAsset))
     }
 }

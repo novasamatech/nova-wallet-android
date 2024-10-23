@@ -150,6 +150,11 @@ class CrossChainTransferAssetExchange(
             return extraOutAmount
         }
 
+        override suspend fun additionalMaxAmountDeduction(): Balance {
+            val (chain, chainAsset) = chainRegistry.chainWithAsset(edge.from)
+            return crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(chainAsset, chain)
+        }
+
         override suspend fun inProgressLabel(): String {
             val chainTo = chainRegistry.getChain(edge.to.chainId)
             val assetFrom = chainRegistry.asset(edge.from)

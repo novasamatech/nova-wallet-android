@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface CrossChainTransactor {
 
@@ -22,6 +23,8 @@ interface CrossChainTransactor {
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ): Result<ExtrinsicSubmission>
+
+    suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance
 
     /**
      * @return result of actual received balance on destination

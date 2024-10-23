@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.TypeBasedAssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.utility.NativeAssetEventDetector
 
 @Module(
@@ -36,6 +37,7 @@ class AssetsModule {
 
         nativeAssetEventDetector: NativeAssetEventDetector,
         ormlAssetEventDetectorFactory: OrmlAssetEventDetectorFactory,
+        statemineAssetEventDetectorFactory: StatemineAssetEventDetectorFactory,
     ): AssetSourceRegistry = TypeBasedAssetSourceRegistry(
         nativeSource = native,
         statemineSource = statemine,
@@ -46,6 +48,7 @@ class AssetsModule {
         unsupportedBalanceSource = unsupported,
 
         nativeAssetEventDetector = nativeAssetEventDetector,
-        ormlAssetEventDetectorFactory = ormlAssetEventDetectorFactory
+        ormlAssetEventDetectorFactory = ormlAssetEventDetectorFactory,
+        statemineAssetEventDetectorFactory = statemineAssetEventDetectorFactory
     )
 }

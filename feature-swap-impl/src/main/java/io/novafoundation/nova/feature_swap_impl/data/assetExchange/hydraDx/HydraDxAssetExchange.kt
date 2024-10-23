@@ -72,6 +72,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import java.math.BigInteger
 
 
 class HydraDxExchangeFactory(
@@ -285,6 +286,10 @@ private class HydraDxAssetExchange(
             )
 
             return swapHost.quote(quoteArgs)
+        }
+
+        override suspend fun additionalMaxAmountDeduction(): Balance {
+            return BigInteger.ZERO
         }
 
         override suspend fun inProgressLabel(): String {

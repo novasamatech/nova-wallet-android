@@ -55,6 +55,10 @@ fun List<GenericEvent.Instance>.nativeFee(): BigInteger? {
     return bindNumber(actualFee) + bindNumber(tip)
 }
 
+fun List<GenericEvent.Instance>.assetTxFeePaidEvent(): GenericEvent.Instance? {
+    return findEvent(Modules.ASSET_TX_PAYMENT, "AssetTxFeePaid")
+}
+
 fun List<GenericEvent.Instance>.requireNativeFee(): BigInteger {
     return requireNotNull(nativeFee()) {
         "No native fee event found"

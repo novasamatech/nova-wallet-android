@@ -29,6 +29,11 @@ interface CrossChainTransfersUseCase {
 
     suspend fun getConfiguration(): CrossChainTransfersConfiguration
 
+    suspend fun requiredRemainingAmountAfterTransfer(
+        sendingAsset: Chain.Asset,
+        originChain: Chain
+    ): Balance
+
     suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,
         computationalScope: CoroutineScope

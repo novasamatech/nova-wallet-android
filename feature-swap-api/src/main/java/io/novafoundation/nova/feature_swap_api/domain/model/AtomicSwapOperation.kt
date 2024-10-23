@@ -13,6 +13,12 @@ interface AtomicSwapOperation {
 
     suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance
 
+    /**
+     * Additional amount that max amount calculation should leave aside for the **first** operation in the swap
+     * One example is Existential Deposit in case operation executes in "keep alive" manner
+     */
+    suspend fun additionalMaxAmountDeduction(): Balance
+
     // TODO this is a temporarily function until we developer Operation Manager
     suspend fun inProgressLabel(): String
 

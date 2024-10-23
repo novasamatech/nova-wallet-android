@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.UnsupportedEventDetector
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.utility.NativeAssetEventDetector
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -29,7 +30,8 @@ class TypeBasedAssetSourceRegistry(
     private val unsupportedBalanceSource: AssetSource,
 
     private val nativeAssetEventDetector: NativeAssetEventDetector,
-    private val ormlAssetEventDetectorFactory: OrmlAssetEventDetectorFactory
+    private val ormlAssetEventDetectorFactory: OrmlAssetEventDetectorFactory,
+    private val statemineAssetEventDetectorFactory: StatemineAssetEventDetectorFactory,
 ) : AssetSourceRegistry {
 
     override fun sourceFor(chainAsset: Chain.Asset): AssetSource {
@@ -50,9 +52,9 @@ class TypeBasedAssetSourceRegistry(
             is Chain.Asset.Type.EvmErc20,
             Chain.Asset.Type.EvmNative,
 
-            // TODO implement statemine
-            is Chain.Asset.Type.Statemine,
             Chain.Asset.Type.Unsupported -> UnsupportedEventDetector()
+
+            is Chain.Asset.Type.Statemine -> statemineAssetEventDetectorFactory.create(chainAsset)
 
             is Chain.Asset.Type.Orml -> ormlAssetEventDetectorFactory.create(chainAsset)
 
