@@ -48,7 +48,7 @@ abstract class ExpandableItemAnimator(
         val notExpandableChildItem = holder !is ExpandableChildViewHolder || holder.expandableItem == null
         if (notPreparedForAnimation || notExpandableChildItem) {
             dispatchAddFinished(holder)
-            return true
+            return false
         }
 
         val item = (holder as ExpandableChildViewHolder).expandableItem!!
@@ -79,7 +79,7 @@ abstract class ExpandableItemAnimator(
         val notExpandableChildItem = holder !is ExpandableChildViewHolder || holder.expandableItem == null
         if (notPreparedForAnimation || notExpandableChildItem) {
             dispatchRemoveFinished(holder)
-            return true
+            return false
         }
 
         val item = (holder as ExpandableChildViewHolder).expandableItem!!
@@ -109,7 +109,7 @@ abstract class ExpandableItemAnimator(
         val notPreparedForAnimation = !preparedForAnimation
         if (notPreparedForAnimation || holder !is ExpandableBaseViewHolder<*>) {
             dispatchMoveFinished(holder)
-            return true
+            return false
         }
 
         // Reset add state helps clear alpha and scale when animation is being to be canceled
