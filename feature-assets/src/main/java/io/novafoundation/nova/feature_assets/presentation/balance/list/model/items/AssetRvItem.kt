@@ -13,8 +13,8 @@ interface BalanceListRvItem : ExpandableBaseItem {
     }
 }
 
-interface AssetGroupRvItem : BalanceListRvItem, ExpandableParentItem
+interface AssetGroupRvItem : BalanceListRvItem
 
-interface AssetRvItem : BalanceListRvItem, ExpandableChildItem {
+interface AssetRvItem : BalanceListRvItem {
     val asset: AssetModel
 }

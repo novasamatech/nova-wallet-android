@@ -7,21 +7,18 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.recyclerview.widget.SimpleItemAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimationItemState
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
-import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
-import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 
 /**
  * Potential problems:
  * - If in one time we will run add and move animation or remove and move animation - one of an animation will be cancelled
  */
 abstract class ExpandableItemAnimator(
-    private val adapter: ExpandableAdapter,
     private val settings: ExpandableAnimationSettings,
     private val expandableAnimator: ExpandableAnimator
 ) : SimpleItemAnimator() {
 
-    private val addAnimations = mutableMapOf<ItemKey, MutableList<ViewHolder>>()
-    private val removeAnimations = mutableMapOf<ItemKey, MutableList<ViewHolder>>()
+    private val addAnimations = mutableMapOf<String, MutableList<ViewHolder>>() // Parent item to children
+    private val removeAnimations = mutableMapOf<String, MutableList<ViewHolder>>() // Parent item to children
     private val moveAnimations = mutableListOf<ViewHolder>()
 
     private val pendingAddAnimations = mutableSetOf<ViewHolder>()
@@ -37,10 +34,11 @@ abstract class ExpandableItemAnimator(
     }
 
     override fun animateAdd(holder: ViewHolder): Boolean {
-        if (holder !is ExpandableChildViewHolder) return false
-        val item = holder.expandableItem ?: return false
-
-        val parentItem = getParentFor(item) ?: return false
+        if (holder !is ExpandableChildViewHolder || holder.expandableItem == null) {
+            dispatchAddFinished(holder)
+            return true
+        }
+        val item = holder.expandableItem!!
 
         // Reset move state helps clear translationY when animation is being to be canceled
         if (pendingMoveAnimations.contains(holder)) {
@@ -55,21 +53,20 @@ abstract class ExpandableItemAnimator(
             preAddImpl(holder)
         }
 
-        val itemKey = parentItem.toKey()
+        if (item.groupId !in addAnimations) addAnimations[item.groupId] = mutableListOf()
+        addAnimations[item.groupId]?.add(holder)
 
-        if (itemKey !in addAnimations) addAnimations[itemKey] = mutableListOf()
-        addAnimations[itemKey]?.add(holder)
-
-        expandableAnimator.prepareAnimationToState(parentItem, ExpandableAnimationItemState.Type.EXPANDING)
+        expandableAnimator.prepareAnimationToState(item.groupId, ExpandableAnimationItemState.Type.EXPANDING)
 
         return true
     }
 
     override fun animateRemove(holder: ViewHolder): Boolean {
-        if (holder !is ExpandableChildViewHolder) return false
-        val item = holder.expandableItem ?: return false
-
-        val parentItem = getParentFor(item) ?: return false
+        if (holder !is ExpandableChildViewHolder || holder.expandableItem == null) {
+            dispatchRemoveFinished(holder)
+            return false
+        }
+        val item = holder.expandableItem!!
 
         // Reset move state helps clear translationY when animation is being to be canceled
         if (pendingMoveAnimations.contains(holder)) {
@@ -84,18 +81,19 @@ abstract class ExpandableItemAnimator(
             preRemoveImpl(holder)
         }
 
-        val itemKey = parentItem.toKey()
+        if (item.groupId !in removeAnimations) removeAnimations[item.groupId] = mutableListOf()
+        removeAnimations[item.groupId]?.add(holder)
 
-        if (itemKey !in removeAnimations) removeAnimations[itemKey] = mutableListOf()
-        removeAnimations[itemKey]?.add(holder)
-
-        expandableAnimator.prepareAnimationToState(parentItem, ExpandableAnimationItemState.Type.COLLAPSING)
+        expandableAnimator.prepareAnimationToState(item.groupId, ExpandableAnimationItemState.Type.COLLAPSING)
 
         return true
     }
 
     override fun animateMove(holder: ViewHolder, fromX: Int, fromY: Int, toX: Int, toY: Int): Boolean {
-        if (holder !is ExpandableBaseViewHolder<*>) return false
+        if (holder !is ExpandableBaseViewHolder<*>) {
+            dispatchMoveFinished(holder)
+            return false
+        }
 
         // Reset add state helps clear alpha and scale when animation is being to be canceled
         if (pendingAddAnimations.contains(holder)) {
@@ -119,6 +117,12 @@ abstract class ExpandableItemAnimator(
     }
 
     override fun animateChange(oldHolder: ViewHolder?, newHolder: ViewHolder?, fromLeft: Int, fromTop: Int, toLeft: Int, toTop: Int): Boolean {
+        if (oldHolder == newHolder) {
+            dispatchChangeFinished(newHolder, false)
+        } else {
+            dispatchChangeFinished(oldHolder, true)
+            dispatchChangeFinished(newHolder, false)
+        }
         return false
     }
 
@@ -141,15 +145,15 @@ abstract class ExpandableItemAnimator(
     }
 
     private fun runExpandableAnimationFor(
-        animationGroup: MutableMap<ItemKey, MutableList<ViewHolder>>,
+        animationGroup: MutableMap<String, MutableList<ViewHolder>>,
         pendingAnimations: MutableSet<ViewHolder>,
         runAnimation: (ViewHolder) -> Unit
     ) {
-        val parentItems = animationGroup.keys.toList()
+        val parentItemIds = animationGroup.keys.toList()
         val animatingViewHolders = animationGroup.flatMap { (_, viewHolders) -> viewHolders }
         animationGroup.clear()
 
-        parentItems.forEach { expandableAnimator.runAnimationFor(it.item) }
+        parentItemIds.forEach { expandableAnimator.runAnimationFor(it) }
         for (holder in animatingViewHolders) {
             runAnimation(holder)
         }
@@ -263,24 +267,4 @@ abstract class ExpandableItemAnimator(
 
         dispatchAnimationFinished(holder)
     }
-
-    private fun getParentFor(item: ExpandableChildItem): ExpandableParentItem? {
-        return adapter.getItems().firstOrNull { it.getId() == item.groupId } as? ExpandableParentItem
-    }
-}
-
-private class ItemKey(val item: ExpandableParentItem) {
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is ItemKey) return false
-        return item.getId() == other.item.getId()
-    }
-
-    override fun hashCode(): Int {
-        return item.hashCode()
-    }
-}
-
-private fun ExpandableParentItem.toKey(): ItemKey {
-    return ItemKey(this)
 }

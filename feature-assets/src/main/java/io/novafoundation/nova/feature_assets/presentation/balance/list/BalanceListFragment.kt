@@ -75,7 +75,7 @@ class BalanceListFragment :
         val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
 
         balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
-        balanceListAssets.itemAnimator = AssetTokensItemAnimator(assetsAdapter, animationSettings, animator)
+        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
 
         AssetNetworkDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
 
@@ -147,7 +147,11 @@ class BalanceListFragment :
     }
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
-        viewModel.assetListMixin.expandToken(tokenGroup)
+        if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
+            viewModel.assetClicked(tokenGroup.groupType.item)
+        } else {
+            viewModel.assetListMixin.expandToken(tokenGroup)
+        }
     }
 
     override fun totalBalanceClicked() {

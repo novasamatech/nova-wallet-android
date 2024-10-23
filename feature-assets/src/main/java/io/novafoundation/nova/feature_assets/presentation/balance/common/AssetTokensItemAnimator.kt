@@ -8,11 +8,9 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableIte
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 
 class AssetTokensItemAnimator(
-    adapter: ExpandableAdapter,
     settings: ExpandableAnimationSettings,
     expandableAnimator: ExpandableAnimator
 ) : ExpandableItemAnimator(
-    adapter,
     settings,
     expandableAnimator
 ) {

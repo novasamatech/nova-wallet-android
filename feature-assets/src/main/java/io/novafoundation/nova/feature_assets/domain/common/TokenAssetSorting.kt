@@ -17,6 +17,8 @@ class TokenAssetGroup(
     val itemsCount: Int
 ) {
 
+    val groupId: String = token.symbol.value
+
     data class Token(
         val icon: String?,
         val symbol: TokenSymbol,

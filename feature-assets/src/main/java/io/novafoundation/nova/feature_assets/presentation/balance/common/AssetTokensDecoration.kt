@@ -75,11 +75,10 @@ class AssetTokensDecoration(
         children: List<RecyclerView.ViewHolder>
     ) {
         val expandingFraction = animationState.expandingFraction()
-        val flippedExpandingFraction = expandingFraction.flippedFraction()
 
         val parentBounds = parentBounds(parent)
         if (parentBounds != null) {
-            drawParentBlock(flippedExpandingFraction, parentBounds, canvas, expandingFraction)
+            drawParentBlock(parentBounds, canvas, expandingFraction)
         }
 
         // Don't draw children background if it's a single item
@@ -116,13 +115,12 @@ class AssetTokensDecoration(
     }
 
     private fun drawParentBlock(
-        flippedExpandingFraction: Float,
         parentBounds: RectF,
         canvas: Canvas,
         expandingFraction: Float
     ) {
         val path = Path()
-        val bottomRadius = blockRadiusExpanded * flippedExpandingFraction
+        val bottomRadius = blockRadiusExpanded * expandingFraction.flippedFraction()
         parentBounds.toPath(path, topRadius = blockRadiusExpanded, bottomRadius = bottomRadius)
         paint.color = blockColor
         canvas.drawPath(path, paint)

@@ -9,9 +9,9 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
-import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -86,15 +86,17 @@ class RealAssetListMixin(
         when (viewMode) {
             AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).mapGroupedAssetsToUi(currency)
             AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances)
-                .mapValues { filterExpandedItems(it, expandedTokens) }
-                .mapGroupedAssetsToUi()
+                .mapGroupedAssetsToUi(
+                    assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
+                )
         }
     }.distinctUntilChanged()
         .shareInBackground()
 
     override suspend fun switchViewMode() {
-        val assetViewMode = assetsViewModeFlow.first()
+        expandedTokenIdsFlow.value = emptySet()
 
+        val assetViewMode = assetsViewModeFlow.first()
         assetsListInteractor.setAssetViewMode(assetViewMode.switch())
     }
 
@@ -102,14 +104,19 @@ class RealAssetListMixin(
         expandedTokenIdsFlow.updateValue { it.toggle(tokenGroupUi.itemId) }
     }
 
-    private fun filterExpandedItems(entry: Map.Entry<TokenAssetGroup, List<AssetWithNetwork>>, expandedTokens: Set<String>): List<AssetWithNetwork> {
-        val group = entry.key
-        val items = entry.value
-
-        if (group.token.symbol.value in expandedTokens) {
-            return items
+    private fun filterTokens(groupId: String, assets: List<TokenAssetUi>, expandedGroups: Set<String>): List<TokenAssetUi> {
+        if (groupId in expandedGroups) {
+            return filterIfSingleItem(assets)
         }
 
         return emptyList()
+    }
+
+    private fun filterIfSingleItem(assets: List<TokenAssetUi>): List<TokenAssetUi> {
+        return if (assets.size <= 1) {
+            emptyList()
+        } else {
+            assets
+        }
     }
 }
