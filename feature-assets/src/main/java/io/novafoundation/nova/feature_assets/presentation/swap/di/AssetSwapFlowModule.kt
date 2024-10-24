@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowViewModel
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor

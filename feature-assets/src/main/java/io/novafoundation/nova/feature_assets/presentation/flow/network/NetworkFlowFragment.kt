@@ -51,10 +51,6 @@ abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
         return layoutInflater.inflate(R.layout.fragment_network_flow, container, false)
     }
 
-    fun setTitle(@StringRes titleRes: Int) {
-        assetFlowToolbar.setTitle(titleRes)
-    }
-
     override fun initViews() {
         networkFlowToolbar.applyStatusBarInsets()
         networkFlowToolbar.setHomeButtonListener { viewModel.backClicked() }

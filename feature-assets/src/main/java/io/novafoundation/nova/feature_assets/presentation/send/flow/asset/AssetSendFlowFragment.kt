@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.send.flow
+package io.novafoundation.nova.feature_assets.presentation.send.flow.asset
 
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_assets.R
@@ -24,9 +24,5 @@ class AssetSendFlowFragment : AssetFlowFragment<AssetSendFlowViewModel>() {
             .sendFlowComponent()
             .create(this)
             .inject(this)
-    }
-
-    override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
-        showMessage("Not implemented yet")
     }
 }

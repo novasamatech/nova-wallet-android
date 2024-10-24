@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -25,7 +27,8 @@ abstract class NetworkFlowViewModel(
     internal val accountUseCase: SelectedAccountUseCase,
     externalBalancesInteractor: ExternalBalancesInteractor,
     internal val resourceManager: ResourceManager,
-    private val networkFlowPayload: NetworkFlowPayload
+    private val networkFlowPayload: NetworkFlowPayload,
+    internal val chainRegistry: ChainRegistry
 ) : BaseViewModel() {
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
@@ -48,12 +51,12 @@ abstract class NetworkFlowViewModel(
         router.back()
     }
 
-    internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {
+    internal fun validate(networkFlowRvItem: NetworkFlowRvItem, onAccept: () -> Unit) {
         launch {
             val metaAccount = accountUseCase.getSelectedMetaAccount()
-            val chainAsset = assetModel.token.configuration
+            val chainAsset = chainRegistry.asset(networkFlowRvItem.chainId, networkFlowRvItem.assetId)
             controllableAssetCheck.check(metaAccount, chainAsset) {
-                onAccept(assetModel)
+                onAccept()
             }
         }
     }

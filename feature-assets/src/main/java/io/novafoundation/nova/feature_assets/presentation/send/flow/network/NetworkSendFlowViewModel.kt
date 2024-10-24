@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.buy.flow.network
+package io.novafoundation.nova.feature_assets.presentation.send.flow.network
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -13,19 +13,17 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
-class NetworkBuyFlowViewModel(
+class NetworkSendFlowViewModel(
     interactor: AssetNetworksInteractor,
     router: AssetsRouter,
     externalBalancesInteractor: ExternalBalancesInteractor,
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
-    buyMixinFactory: BuyMixin.Factory,
     resourceManager: ResourceManager,
     networkFlowPayload: NetworkFlowPayload,
     chainRegistry: ChainRegistry
@@ -40,24 +38,22 @@ class NetworkBuyFlowViewModel(
     chainRegistry
 ) {
 
-    val buyMixin = buyMixinFactory.create(scope = this)
-
     override fun getAssetBalance(asset: AssetWithNetwork): Amount {
-        return asset.balanceWithOffChain.total
+        return asset.balanceWithOffChain.transferable
     }
 
     override fun assetsFlow(tokenSymbol: TokenSymbol): Flow<List<AssetWithNetwork>> {
-        return interactor.buyAssetFlow(tokenSymbol, externalBalancesFlow)
+        return interactor.sendAssetFlow(tokenSymbol, externalBalancesFlow)
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
-        launch {
-            val chainAsset = chainRegistry.asset(network.chainId, network.assetId)
-            buyMixin.buyClicked(chainAsset)
+        validate(network) {
+            val assetPayload = AssetPayload(network.chainId, network.assetId)
+            router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
         }
     }
 
     override fun getTitle(tokenSymbol: TokenSymbol): String {
-        return resourceManager.getString(R.string.buy_network_flow_title, tokenSymbol.value)
+        return resourceManager.getString(R.string.send_network_flow_title, tokenSymbol.value)
     }
 }

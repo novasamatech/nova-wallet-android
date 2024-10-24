@@ -79,7 +79,7 @@ class AssetNetworksInteractor(
         return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filterFlow = filterFlow)
     }
 
-    fun receiveAssetsFlow(
+    fun receiveAssetFlow(
         tokenSymbol: TokenSymbol,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<List<AssetWithNetwork>> {

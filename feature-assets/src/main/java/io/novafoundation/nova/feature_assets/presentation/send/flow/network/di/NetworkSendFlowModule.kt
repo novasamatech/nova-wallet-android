@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.send.flow.di
+package io.novafoundation.nova.feature_assets.presentation.send.flow.network.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -11,40 +11,45 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.send.flow.AssetSendFlowViewModel
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowViewModel
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
-class AssetSendFlowModule {
+class NetworkSendFlowModule {
 
     @Provides
-    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): AssetSendFlowViewModel {
-        return ViewModelProvider(fragment, factory).get(AssetSendFlowViewModel::class.java)
+    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): NetworkSendFlowViewModel {
+        return ViewModelProvider(fragment, factory).get(NetworkSendFlowViewModel::class.java)
     }
 
     @Provides
     @IntoMap
-    @ViewModelKey(AssetSendFlowViewModel::class)
+    @ViewModelKey(NetworkSendFlowViewModel::class)
     fun provideViewModel(
-        interactor: AssetSearchInteractor,
+        interactor: AssetNetworksInteractor,
         router: AssetsRouter,
-        currencyInteractor: CurrencyInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
         controllableAssetCheck: ControllableAssetCheckMixin,
         accountUseCase: SelectedAccountUseCase,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        networkFlowPayload: NetworkFlowPayload,
+        chainRegistry: ChainRegistry
     ): ViewModel {
-        return AssetSendFlowViewModel(
+        return NetworkSendFlowViewModel(
             interactor = interactor,
             router = router,
-            currencyInteractor = currencyInteractor,
             externalBalancesInteractor = externalBalancesInteractor,
             controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            networkFlowPayload = networkFlowPayload,
+            chainRegistry = chainRegistry
         )
     }
 }

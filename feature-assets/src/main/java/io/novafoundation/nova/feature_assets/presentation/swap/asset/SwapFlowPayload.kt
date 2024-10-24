@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.swap
+package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload

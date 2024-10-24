@@ -60,8 +60,8 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -386,11 +386,11 @@ class Navigator(
     }
 
     override fun openSendNetworks(networkFlowPayload: NetworkFlowPayload) {
-        TODO("Not yet implemented")
+        navController?.navigate(R.id.action_sendFlow_to_sendFlowNetwork, NetworkFlowFragment.createPayload(networkFlowPayload))
     }
 
     override fun openReceiveNetworks(networkFlowPayload: NetworkFlowPayload) {
-        TODO("Not yet implemented")
+        navController?.navigate(R.id.action_receiveFlow_to_receiveFlowNetwork, NetworkFlowFragment.createPayload(networkFlowPayload))
     }
 
     override fun openSwapNetworks(networkFlowPayload: NetworkFlowPayload) {

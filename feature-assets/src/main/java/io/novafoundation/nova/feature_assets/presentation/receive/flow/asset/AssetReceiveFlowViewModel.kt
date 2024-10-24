@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.receive.flow
+package io.novafoundation.nova.feature_assets.presentation.receive.flow.asset
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +43,7 @@ class AssetReceiveFlowViewModel(
     }
 
     override fun tokenClicked(assetModel: TokenGroupUi) {
+        router.openReceiveNetworks(NetworkFlowPayload(assetModel.tokenSymbol))
     }
 
     private fun openNextScreen(assetModel: AssetModel) {

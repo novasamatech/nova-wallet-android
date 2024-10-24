@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.swap
+package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.send.flow
+package io.novafoundation.nova.feature_assets.presentation.send.flow.asset
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.PlaceholderModel
@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -54,6 +55,7 @@ class AssetSendFlowViewModel(
     }
 
     override fun tokenClicked(assetModel: TokenGroupUi) {
+        router.openSendNetworks(NetworkFlowPayload(assetModel.tokenSymbol))
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {

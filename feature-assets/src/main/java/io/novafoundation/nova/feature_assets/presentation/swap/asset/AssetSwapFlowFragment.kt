@@ -1,23 +1,34 @@
-package io.novafoundation.nova.feature_assets.presentation.receive.flow
+package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
+import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
 
-class AssetReceiveFlowFragment : AssetFlowFragment<AssetReceiveFlowViewModel>() {
+class AssetSwapFlowFragment : AssetFlowFragment<AssetSwapFlowViewModel>() {
+
+    companion object {
+
+        private const val KEY_PAYLOAD = "AssetSwapFlowFragment.payload"
+
+        fun getBundle(payload: SwapFlowPayload): Bundle {
+            return Bundle().apply {
+                putParcelable(KEY_PAYLOAD, payload)
+            }
+        }
+    }
 
     override fun initViews() {
         super.initViews()
-        setTitle(R.string.wallet_asset_receive)
+        setTitle(viewModel.getTitleRes())
     }
 
     override fun inject() {
         FeatureUtils.getFeature<AssetsFeatureComponent>(this, AssetsFeatureApi::class.java)
-            .receiveFlowComponent()
-            .create(this)
+            .swapFlowComponent()
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 

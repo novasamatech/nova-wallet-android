@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_assets.presentation.receive.flow.di
+package io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_assets.presentation.receive.flow.AssetReceiveFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.AssetReceiveFlowFragment
 
 @Subcomponent(
     modules = [
