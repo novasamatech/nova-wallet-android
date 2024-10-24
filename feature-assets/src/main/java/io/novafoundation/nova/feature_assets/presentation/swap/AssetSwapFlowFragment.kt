@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
 
 class AssetSwapFlowFragment : AssetFlowFragment<AssetSwapFlowViewModel>() {
 

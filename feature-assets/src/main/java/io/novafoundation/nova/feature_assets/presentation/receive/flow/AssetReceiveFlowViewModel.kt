@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_assets.presentation.receive.flow
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
-import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
+import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.Flow
@@ -31,14 +31,17 @@ class AssetReceiveFlowViewModel(
     externalBalancesInteractor,
     resourceManager,
 ) {
-    override fun searchAssetsFlow(): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
-        return interactor.searchAssetsFlow(query, externalBalancesFlow)
+    override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
+        return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)
     }
 
     override fun assetClicked(assetModel: AssetModel) {
         validate(assetModel) {
             openNextScreen(assetModel)
         }
+    }
+
+    override fun tokenClicked(assetModel: TokenGroupUi) {
     }
 
     private fun openNextScreen(assetModel: AssetModel) {

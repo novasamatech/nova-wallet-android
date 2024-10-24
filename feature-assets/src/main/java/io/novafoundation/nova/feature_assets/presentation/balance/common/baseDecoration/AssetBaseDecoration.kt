@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.balance.common
+package io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration
 
 import android.content.Context
 import android.graphics.Canvas
@@ -12,8 +12,6 @@ import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder
-import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetViewHolder
 import kotlin.math.roundToInt
 
 /**
@@ -21,17 +19,16 @@ import kotlin.math.roundToInt
  * The issue is that this decoration does not currently support partial list updates and assumes it will be iterated over whole list
  * TODO update decoration to not require this invalidation
  */
-class AssetNetworkDecoration(
+class AssetBaseDecoration(
     private val background: Drawable,
     private val assetsAdapter: ListAdapter<*, *>,
     context: Context,
+    private val preferences: AssetDecorationPreferences
 ) : RecyclerView.ItemDecoration() {
 
     companion object;
 
     private val bounds = Rect()
-    private val groupOuterSpacing = 8.dp(context)
-    private val groupInnerSpacing = 8.dp(context)
 
     // used to hide rounded corners for the last group to simulate effect of not-closed group
     private val finalGroupExtraPadding = 20.dp(context)
@@ -61,7 +58,7 @@ class AssetNetworkDecoration(
                     parent.getDecoratedBoundsWithMargins(view, bounds)
                     bounds.set(view.left, bounds.top, view.right, bounds.bottom)
 
-                    val groupBottom = bounds.bottom + view.translationY.roundToInt() - groupOuterSpacing
+                    val groupBottom = bounds.bottom + view.translationY.roundToInt() - preferences.outerGroupPadding(viewHolder)
 
                     background.setBounds(bounds.left, groupTop!!, bounds.right, groupBottom)
                     background.draw(c)
@@ -99,7 +96,11 @@ class AssetNetworkDecoration(
 
         val nextType = assetsAdapter.getItemViewTypeOrNull(adapterPosition + 1)
 
-        val bottom = if (isFinalItemInGroup(nextType)) groupInnerSpacing + groupOuterSpacing else 0
+        val bottom = if (isFinalItemInGroup(nextType)) {
+            preferences.outerGroupPadding(viewHolder) + preferences.innerGroupPadding(viewHolder)
+        } else {
+            0
+        }
 
         outRect.set(0, 0, 0, bottom)
     }
@@ -111,28 +112,30 @@ class AssetNetworkDecoration(
     }
 
     private fun isFinalItemInGroup(nextType: Int?): Boolean {
-        return nextType == TYPE_NETWORK_GROUP || nextType == null
+        return nextType == null || preferences.isGroupItem(nextType)
     }
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
-        val isNetworkViewHolder = viewHolder is NetworkAssetViewHolder ||
-            viewHolder is NetworkAssetGroupViewHolder
+        val noPosition = viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION
+        val unsupportedViewHolder = !preferences.shouldUseViewHolder(viewHolder)
 
-        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isNetworkViewHolder
+        return noPosition || unsupportedViewHolder
     }
 }
 
-fun AssetNetworkDecoration.Companion.applyDefaultTo(
+fun AssetBaseDecoration.Companion.applyDefaultTo(
     recyclerView: RecyclerView,
-    adapter: ListAdapter<*, *>
+    adapter: ListAdapter<*, *>,
+    preferences: AssetDecorationPreferences = NetworkAssetDecorationPreferences()
 ) {
     val groupBackground = with(recyclerView.context) {
         addRipple(getRoundedCornerDrawable(R.color.block_background))
     }
-    val decoration = AssetNetworkDecoration(
+    val decoration = AssetBaseDecoration(
         background = groupBackground,
         assetsAdapter = adapter,
         context = recyclerView.context,
+        preferences = preferences
     )
     recyclerView.addItemDecoration(decoration)
 }

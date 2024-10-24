@@ -52,6 +52,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.startCreateWalle
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
@@ -381,6 +383,22 @@ class Navigator(
 
     override fun closeSendFlow() {
         navController?.navigate(R.id.action_close_send_flow)
+    }
+
+    override fun openSendNetworks(networkFlowPayload: NetworkFlowPayload) {
+        TODO("Not yet implemented")
+    }
+
+    override fun openReceiveNetworks(networkFlowPayload: NetworkFlowPayload) {
+        TODO("Not yet implemented")
+    }
+
+    override fun openSwapNetworks(networkFlowPayload: NetworkFlowPayload) {
+        TODO("Not yet implemented")
+    }
+
+    override fun openBuyNetworks(networkFlowPayload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(networkFlowPayload))
     }
 
     override fun openSwapFlow() {

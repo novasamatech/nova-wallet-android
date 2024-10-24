@@ -1,15 +1,22 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
+import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.getAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComparator
+import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComparator
+import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
+import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
@@ -34,28 +41,52 @@ class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val assetSourceRegistry: AssetSourceRegistry,
-    private val swapService: SwapService
+    private val swapService: SwapService,
+    private val assetsViewModeRepository: AssetsViewModeRepository
 ) {
 
     fun buyAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow) {
-            it.token.configuration.buyProviders.isNotEmpty()
+    ): Flow<AssetFlowSearchResult> {
+        val filter = { asset: Asset -> asset.token.configuration.buyProviders.isNotEmpty() }
+
+        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+            when (viewMode) {
+                AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
+                    .map { AssetFlowSearchResult.ByNetworks(it) }
+
+                AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
+                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+            }
         }
     }
 
     fun sendAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
-        val groupComparator = getAssetGroupBaseComparator { it.groupTransferableBalanceFiat }
-        val assetsComparator = getAssetBaseComparator { it.balanceWithOffchain.transferable.fiat }
+    ): Flow<AssetFlowSearchResult> {
+        val filter = { asset: Asset -> asset.transferableInPlanks.isPositive() }
 
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, groupComparator, assetsComparator) { asset ->
-            asset.transferableInPlanks.isPositive()
+        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+            when (viewMode) {
+                AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(
+                    queryFlow,
+                    externalBalancesFlow,
+                    assetGroupComparator = getAssetGroupBaseComparator { it.groupTransferableBalanceFiat },
+                    assetsComparator = getAssetBaseComparator { it.balanceWithOffchain.transferable.fiat },
+                    filter = filter
+                ).map { AssetFlowSearchResult.ByNetworks(it) }
+
+                AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(
+                    queryFlow,
+                    externalBalancesFlow,
+                    assetGroupComparator = getTokenAssetGroupBaseComparator { it.groupBalance.transferable.fiat },
+                    assetsComparator = getTokenAssetBaseComparator { it.balanceWithOffChain.transferable.fiat },
+                    filter = filter
+                )
+                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+            }
         }
     }
 
@@ -64,7 +95,7 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
-    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
+    ): Flow<AssetFlowSearchResult> {
         val filterFlow = getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
             val filter: AssetSearchFilter = { asset ->
                 val chainAsset = asset.token.configuration
@@ -75,14 +106,88 @@ class AssetSearchInteractor(
             filter
         }
 
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
+        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+            when (viewMode) {
+                AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
+                    .map { AssetFlowSearchResult.ByNetworks(it) }
+
+                AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
+                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+            }
+        }
+    }
+
+    fun searchReceiveAssetsFlow(
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+    ): Flow<AssetFlowSearchResult> {
+        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+            when (viewMode) {
+                AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
+                    .map { AssetFlowSearchResult.ByNetworks(it) }
+
+                AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = null)
+                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+            }
+        }
     }
 
     fun searchAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, filter = null)
+        return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
+    }
+
+    fun searchAssetsByNetworksInternalFlow(
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+        assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
+        assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
+        filterFlow: Flow<AssetSearchFilter?>,
+    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
+        val assetsFlow = filteredAssetFlow(filterFlow)
+
+        val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
+
+        return combine(assetsFlow, aggregatedExternalBalances, queryFlow) { assets, externalBalances, query ->
+            val chainsById = chainRegistry.enabledChainById()
+            val filtered = assets.filterBy(query, chainsById)
+
+            groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)
+        }
+    }
+
+    fun searchAssetsByTokensInternalFlow(
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+        assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
+        assetsComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator(),
+        filterFlow: Flow<AssetSearchFilter?>,
+    ): Flow<Map<TokenAssetGroup, List<AssetWithNetwork>>> {
+        val assetsFlow = filteredAssetFlow(filterFlow)
+
+        val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
+
+        return combine(assetsFlow, aggregatedExternalBalances, queryFlow) { assets, externalBalances, query ->
+            val chainsById = chainRegistry.enabledChainById()
+            val filtered = assets.filterBy(query, chainsById)
+
+            groupAndSortAssetsByToken(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)
+        }
+    }
+
+    private fun filteredAssetFlow(filterFlow: Flow<AssetSearchFilter?>): Flow<List<Asset>> {
+        val assetsFlow = accountRepository.selectedMetaAccountFlow()
+            .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
+
+        return combine(assetsFlow, filterFlow) { assets, filter ->
+            if (filter == null) {
+                assets
+            } else {
+                assets.filter { filter(it) }
+            }
+        }
     }
 
     private fun getAvailableSwapAssets(asset: FullChainAssetId?, coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {
@@ -97,46 +202,6 @@ class AssetSearchInteractor(
         }
     }
 
-    private fun searchAssetsInternalFlow(
-        queryFlow: Flow<String>,
-        externalBalancesFlow: Flow<List<ExternalBalance>>,
-        assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
-        assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
-        filter: AssetSearchFilter?,
-    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
-        val filterFlow = flowOf(filter)
-
-        return searchAssetsInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
-    }
-
-    private fun searchAssetsInternalFlow(
-        queryFlow: Flow<String>,
-        externalBalancesFlow: Flow<List<ExternalBalance>>,
-        assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
-        assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
-        filterFlow: Flow<AssetSearchFilter?>,
-    ): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
-        var assetsFlow = accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
-
-        assetsFlow = combine(assetsFlow, filterFlow) { assets, filter ->
-            if (filter == null) {
-                assets
-            } else {
-                assets.filter { filter(it) }
-            }
-        }
-
-        val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
-
-        return combine(assetsFlow, aggregatedExternalBalances, queryFlow) { assets, externalBalances, query ->
-            val chainsById = chainRegistry.enabledChainById()
-            val filtered = assets.filterBy(query, chainsById)
-
-            groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)
-        }
-    }
-
     private fun List<Asset>.filterBy(query: String, chainsById: ChainsById): List<Asset> {
         return searchTokens(
             query = query,
@@ -145,4 +210,28 @@ class AssetSearchInteractor(
             relevantToChains = { asset, chainIds -> asset.token.configuration.chainId in chainIds }
         )
     }
+}
+
+private fun AssetSearchInteractor.searchAssetsByNetworksInternalFlow(
+    queryFlow: Flow<String>,
+    externalBalancesFlow: Flow<List<ExternalBalance>>,
+    assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
+    assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
+    filter: AssetSearchFilter?,
+): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
+    val filterFlow = flowOf(filter)
+
+    return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
+}
+
+private fun AssetSearchInteractor.searchAssetsByTokensInternalFlow(
+    queryFlow: Flow<String>,
+    externalBalancesFlow: Flow<List<ExternalBalance>>,
+    assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
+    assetsComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator(),
+    filter: AssetSearchFilter?,
+): Flow<Map<TokenAssetGroup, List<AssetWithNetwork>>> {
+    val filterFlow = flowOf(filter)
+
+    return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
 }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -73,4 +74,12 @@ interface AssetsRouter {
     fun openStaking()
 
     fun closeSendFlow()
+
+    fun openSendNetworks(networkFlowPayload: NetworkFlowPayload)
+
+    fun openReceiveNetworks(networkFlowPayload: NetworkFlowPayload)
+
+    fun openSwapNetworks(networkFlowPayload: NetworkFlowPayload)
+
+    fun openBuyNetworks(networkFlowPayload: NetworkFlowPayload)
 }

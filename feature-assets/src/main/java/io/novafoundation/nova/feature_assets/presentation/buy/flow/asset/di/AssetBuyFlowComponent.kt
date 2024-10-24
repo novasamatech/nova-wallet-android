@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_assets.presentation.buy.flow.di
+package io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowFragment
 
 @Subcomponent(
     modules = [

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.flow
+package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -8,13 +8,18 @@ import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.models.toList
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapAssetGroupToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -23,12 +28,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
-class AssetFlowListModel(
-    val assets: List<BalanceListRvItem>,
-    val placeholder: PlaceholderModel?,
-)
 
 abstract class AssetFlowViewModel(
     protected val interactor: AssetSearchInteractor,
@@ -50,29 +51,41 @@ abstract class AssetFlowViewModel(
 
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
+    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() }
+
     val searchResults = combine(
-        flowOfAll { searchAssetsFlow() }, // lazy use searchAssetsFlow to let subclasses initialize self
+        searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self
         selectedCurrency,
     ) { assets, currency ->
-        val groupedAssets = mapAssets(assets, currency)
-        AssetFlowListModel(
-            groupedAssets,
-            getPlaceholder(query.value, groupedAssets)
-        )
-    }
-        .distinctUntilChanged()
+        mapAssets(assets, currency)
+    }.distinctUntilChanged()
         .shareInBackground(SharingStarted.Lazily)
+
+    val placeholder = searchAssetsFlow.map { getPlaceholder(query.value, it.toList()) }
 
     fun backClicked() {
         router.back()
     }
 
-    abstract fun searchAssetsFlow(): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>>
+    abstract fun searchAssetsFlow(): Flow<AssetFlowSearchResult>
 
     abstract fun assetClicked(assetModel: AssetModel)
 
-    open fun mapAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
+    abstract fun tokenClicked(assetModel: TokenGroupUi)
+
+    private fun mapAssets(searchResult: AssetFlowSearchResult, currency: Currency): List<BalanceListRvItem> {
+        return when (searchResult) {
+            is AssetFlowSearchResult.ByNetworks -> mapNetworkAssets(searchResult.assets, currency)
+            is AssetFlowSearchResult.ByTokens -> mapTokensAssets(searchResult.tokens)
+        }
+    }
+
+    open fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
         return assets.mapGroupedAssetsToUi(currency)
+    }
+
+    open fun mapTokensAssets(assets: List<TokenAssetGroup>): List<BalanceListRvItem> {
+        return assets.map { mapAssetGroupToUi(it, assets = emptyList()) }
     }
 
     internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {

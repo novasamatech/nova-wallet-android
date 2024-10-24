@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -56,9 +58,18 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        assetSourceRegistry: AssetSourceRegistry,
+        swapService: SwapService,
+        assetsViewModeRepository: AssetsViewModeRepository
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, swapService, assetsViewModeRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideAssetNetworksInteractor(
+        walletRepository: WalletRepository,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
         swapService: SwapService
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry, swapService)
+    ) = AssetNetworksInteractor(walletRepository, accountRepository, chainRegistry, swapService)
 
     @Provides
     @FeatureScope

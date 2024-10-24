@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.buy.flow.di
+package io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowViewModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 

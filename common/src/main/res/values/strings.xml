@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="buy_network_flow_title">Select network for buying %s</string>
+
     <string name="asset_view_tokens">Tokens</string>
     <string name="asset_view_networks">Networks</string>
 

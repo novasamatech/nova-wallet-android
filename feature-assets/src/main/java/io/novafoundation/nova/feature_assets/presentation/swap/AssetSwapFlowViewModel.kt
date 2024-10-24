@@ -6,15 +6,19 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.TotalAndTransferableBalance
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapAssetGroupToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
-import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
+import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -59,7 +63,7 @@ class AssetSwapFlowViewModel(
         }
     }
 
-    override fun searchAssetsFlow(): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
+    override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
         return interactor.searchSwapAssetsFlow(
             forAsset = payload.constraintDirectionsAsset?.fullChainAssetId,
             queryFlow = query,
@@ -75,7 +79,16 @@ class AssetSwapFlowViewModel(
         }
     }
 
-    override fun mapAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
+    override fun tokenClicked(assetModel: TokenGroupUi) {
+    }
+
+    override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
         return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, TotalAndTransferableBalance::transferable)
+    }
+
+    override fun mapTokensAssets(assets: List<TokenAssetGroup>): List<BalanceListRvItem> {
+        return assets.map {
+            mapAssetGroupToUi(it, assets = emptyList()) { it.groupBalance.transferable }
+        }
     }
 }

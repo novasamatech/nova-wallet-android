@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.flow
+package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,9 +17,13 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.CompoundAssetDecorationPreferences
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.NetworkAssetDecorationPreferences
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.TokenAssetGroupDecorationPreferences
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import javax.inject.Inject
@@ -64,7 +68,14 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
             setHasFixedSize(true)
             adapter = assetsAdapter
 
-            AssetNetworkDecoration.applyDefaultTo(this, assetsAdapter)
+            AssetBaseDecoration.applyDefaultTo(
+                this,
+                assetsAdapter,
+                CompoundAssetDecorationPreferences(
+                    NetworkAssetDecorationPreferences(),
+                    TokenAssetGroupDecorationPreferences()
+                )
+            )
             itemAnimator = null
         }
 
@@ -75,15 +86,18 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
     override fun subscribe(viewModel: T) {
         assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
-        viewModel.searchResults.observe { searchResult ->
-            assetFlowPlaceholder.setModelOrHide(searchResult.placeholder)
-            assetFlowList.setVisible(searchResult.assets.isNotEmpty())
+        viewModel.searchResults.observe { assets ->
+            assetFlowList.setVisible(assets.isNotEmpty())
 
             assetsAdapter.submitListPreservingViewPoint(
-                data = searchResult.assets,
+                data = assets,
                 into = assetFlowList,
                 extraDiffCompletedCallback = { assetFlowList.invalidateItemDecorations() }
             )
+        }
+
+        viewModel.placeholder.observe { placeholder ->
+            assetFlowPlaceholder.setModelOrHide(placeholder)
         }
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
@@ -97,6 +111,12 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
 
     override fun assetClicked(asset: AssetModel) {
         viewModel.assetClicked(asset)
+
+        assetFlowToolbar.searchField.hideSoftKeyboard()
+    }
+
+    override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
+        viewModel.tokenClicked(tokenGroup)
 
         assetFlowToolbar.searchField.hideSoftKeyboard()
     }

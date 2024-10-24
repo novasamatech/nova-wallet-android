@@ -893,8 +893,23 @@
 
     <fragment
         android:id="@+id/buyFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowFragment"
-        android:label="AssetBuyFlowFragment" />
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowFragment"
+        android:label="AssetBuyFlowFragment">
+
+        <action
+            android:id="@+id/action_buyFlow_to_buyFlowNetwork"
+            app:destination="@id/buyFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/buyFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowFragment"
+        android:label="NetworkBuyFlowFragment" />
 
     <fragment
         android:id="@+id/swapFlowFragment"

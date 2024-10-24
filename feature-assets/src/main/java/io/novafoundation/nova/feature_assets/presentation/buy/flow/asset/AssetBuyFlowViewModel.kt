@@ -1,14 +1,15 @@
-package io.novafoundation.nova.feature_assets.presentation.buy.flow
+package io.novafoundation.nova.feature_assets.presentation.buy.flow.asset
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
-import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.flow.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
+import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -35,7 +36,7 @@ class AssetBuyFlowViewModel(
 
     val buyMixin = buyMixinFactory.create(scope = this)
 
-    override fun searchAssetsFlow(): Flow<Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>> {
+    override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
         return interactor.buyAssetSearch(query, externalBalancesFlow)
     }
 
@@ -44,5 +45,9 @@ class AssetBuyFlowViewModel(
             val chainAsset = assetModel.token.configuration
             buyMixin.buyClicked(chainAsset)
         }
+    }
+
+    override fun tokenClicked(assetModel: TokenGroupUi) {
+        router.openBuyNetworks(NetworkFlowPayload(assetModel.tokenSymbol))
     }
 }

@@ -30,18 +30,10 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
         .filterIsInstance<BalanceListRvItem>()
 }
 
-private fun mapAssetsToAssetModels(
-    group: TokenGroupUi,
-    assets: List<AssetWithNetwork>,
-    balance: (TotalAndTransferableBalance) -> Amount
-): List<TokenAssetUi> {
-    return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
-}
-
-private fun mapAssetGroupToUi(
+fun mapAssetGroupToUi(
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
-    groupBalance: (TokenAssetGroup) -> Amount
+    groupBalance: (TokenAssetGroup) -> Amount = { it.groupBalance.total }
 ): TokenGroupUi {
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(
@@ -51,13 +43,21 @@ private fun mapAssetGroupToUi(
         recentRateChange = assetGroup.token.coinRate?.recentRateChange.orZero().formatAsChange(),
         rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.token.coinRate),
         tokenSymbol = assetGroup.token.symbol.value,
-        groupWithOneItem = assetGroup.itemsCount == 1,
+        singleItemGroup = assetGroup.itemsCount <= 1,
         balance = AmountModel(
             token = balance.amount.formatTokenAmount(),
             fiat = balance.fiat.formatAsCurrency(assetGroup.token.currency)
         ),
         groupType = mapType(assetGroup, assets, groupBalance)
     )
+}
+
+fun mapAssetsToAssetModels(
+    group: TokenGroupUi,
+    assets: List<AssetWithNetwork>,
+    balance: (TotalAndTransferableBalance) -> Amount
+): List<TokenAssetUi> {
+    return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
 }
 
 private fun mapType(
