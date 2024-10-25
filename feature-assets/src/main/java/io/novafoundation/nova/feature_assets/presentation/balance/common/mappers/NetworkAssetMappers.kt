@@ -3,10 +3,10 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.mapper
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_assets.domain.common.Amount
+import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
-import io.novafoundation.nova.feature_assets.domain.common.TotalAndTransferableBalance
+import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkGroupUi
@@ -17,7 +17,7 @@ import java.math.BigDecimal
 fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal = NetworkAssetGroup::groupTotalBalanceFiat,
-    balance: (TotalAndTransferableBalance) -> Amount = TotalAndTransferableBalance::total,
+    balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
         .mapValues { (group, assets) -> mapAssetsToAssetModels(assets, balance) }
@@ -27,12 +27,12 @@ fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToU
 
 private fun mapAssetsToAssetModels(
     assets: List<AssetWithOffChainBalance>,
-    balance: (TotalAndTransferableBalance) -> Amount
+    balance: (AssetBalance) -> PricedAmount
 ): List<BalanceListRvItem> {
     return assets.map { NetworkAssetUi(mapAssetToAssetModel(it.asset, balance(it.balanceWithOffchain))) }
 }
 
-private fun mapAssetGroupToUi(
+fun mapAssetGroupToUi(
     assetGroup: NetworkAssetGroup,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal

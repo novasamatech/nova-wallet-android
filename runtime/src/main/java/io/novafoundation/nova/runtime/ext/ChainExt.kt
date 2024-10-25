@@ -3,7 +3,9 @@ package io.novafoundation.nova.runtime.ext
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
@@ -196,10 +198,21 @@ val Chain.Asset.isUtilityAsset: Boolean
 inline val Chain.Asset.isCommissionAsset: Boolean
     get() = isUtilityAsset
 
-private const val MOONBEAM_XC_PREFIX = "xc"
+private const val XC_PREFIX = "xc"
 
-fun Chain.Asset.unifiedSymbol(): String {
-    return symbol.value.removePrefix(MOONBEAM_XC_PREFIX)
+fun Chain.Asset.normalizeSymbol(): String {
+    return normalizeTokenSymbol(this.symbol.value)
+}
+
+fun TokenSymbol.normalize(): TokenSymbol {
+    return normalizeTokenSymbol(value).asTokenSymbol()
+}
+
+fun normalizeTokenSymbol(symbol: String): String {
+    if (symbol.startsWith(XC_PREFIX)) {
+        return symbol.removePrefix(XC_PREFIX)
+    }
+    return symbol
 }
 
 val Chain.Node.isWss: Boolean
