@@ -21,7 +21,7 @@ class NetworkAssetGroup(
 
 class AssetWithOffChainBalance(
     val asset: Asset,
-    val balanceWithOffchain: TotalAndTransferableBalance,
+    val balanceWithOffchain: AssetBalance,
 )
 
 fun groupAndSortAssetsByNetwork(
@@ -63,7 +63,7 @@ fun getAssetGroupBaseComparator(
         .then(Chain.defaultComparatorFrom(NetworkAssetGroup::chain))
 }
 
-fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): TotalAndTransferableBalance {
+fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): AssetBalance {
     val onChainTotal = total
     val offChainTotal = externalBalances[token.configuration.fullId]
         ?.let(token::amountFromPlanks)
@@ -72,8 +72,8 @@ fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): T
     val overallTotal = onChainTotal + offChainTotal
     val overallFiat = token.amountToFiat(overallTotal)
 
-    return TotalAndTransferableBalance(
-        Amount(overallTotal, overallFiat),
-        Amount(transferable, token.amountToFiat(transferable))
+    return AssetBalance(
+        PricedAmount(overallTotal, overallFiat),
+        PricedAmount(transferable, token.amountToFiat(transferable))
     )
 }

@@ -7,13 +7,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
+import io.novafoundation.nova.runtime.ext.normalize
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
 
 class TokenAssetGroup(
     val token: Token,
-    val groupBalance: TotalAndTransferableBalance
+    val groupBalance: AssetBalance
 ) {
 
     data class Token(
@@ -27,7 +28,7 @@ class TokenAssetGroup(
 class AssetWithNetwork(
     val chain: Chain,
     val asset: Asset,
-    val balanceWithOffChain: TotalAndTransferableBalance,
+    val balanceWithOffChain: AssetBalance,
 )
 
 fun groupAndSortAssetsByToken(
@@ -45,7 +46,7 @@ fun groupAndSortAssetsByToken(
         .mapKeys { (token, assets) ->
             TokenAssetGroup(
                 token = token,
-                groupBalance = assets.fold(TotalAndTransferableBalance.ZERO) { acc, element -> acc + element.balanceWithOffChain },
+                groupBalance = assets.fold(AssetBalance.ZERO) { acc, element -> acc + element.balanceWithOffChain },
             )
         }.toSortedMap(assetGroupComparator)
 }
@@ -68,7 +69,7 @@ fun getTokenAssetGroupBaseComparator(
 
 private fun mapToTokenGroup(it: AssetWithNetwork) = TokenAssetGroup.Token(
     it.asset.token.configuration.iconUrl,
-    normalizeTokenSymbol(it.asset.token.configuration.symbol),
+    it.asset.token.configuration.symbol.normalize(),
     it.asset.token.currency,
     it.asset.token.coinRate
 )

@@ -90,10 +90,9 @@ class BalanceListViewModel(
         { walletInteractor.syncAssetsRates(selectedCurrency.first()) },
         walletInteractor::syncAllNfts
     )
-
-    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
-
     val assetListMixin = assetListMixinFactory.create(viewModelScope)
+
+    private val externalBalancesFlow = assetListMixin.externalBalancesFlow
 
     private val isFiltersEnabledFlow = walletInteractor.isFiltersEnabledFlow()
 

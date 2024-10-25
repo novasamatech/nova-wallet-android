@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.domain.common.Amount
+import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.model.TokenModel
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -24,7 +24,7 @@ fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): Stri
 
 fun mapAssetToAssetModel(
     asset: Asset,
-    balance: Amount
+    balance: PricedAmount
 ): AssetModel {
     return AssetModel(
         token = mapTokenToTokenModel(asset.token),
