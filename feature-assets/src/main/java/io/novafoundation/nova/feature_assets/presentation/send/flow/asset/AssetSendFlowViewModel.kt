@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
@@ -54,17 +55,21 @@ class AssetSendFlowViewModel(
         router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
     }
 
-    override fun tokenClicked(assetModel: TokenGroupUi) {
-        router.openSendNetworks(NetworkFlowPayload(assetModel.tokenSymbol))
+    override fun tokenClicked(tokenGroup: TokenGroupUi) {
+        when (val type = tokenGroup.groupType) {
+            is TokenGroupUi.GroupType.SingleItem -> assetClicked(type.asset)
+
+            TokenGroupUi.GroupType.Group -> router.openSendNetworks(NetworkFlowPayload(tokenGroup.tokenSymbol))
+        }
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
         return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, TotalAndTransferableBalance::transferable)
     }
 
-    override fun mapTokensAssets(assets: List<TokenAssetGroup>): List<BalanceListRvItem> {
-        return assets.map {
-            mapAssetGroupToUi(it, assets = emptyList()) { it.groupBalance.transferable }
+    override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
+        return assets.map { (group, assets) ->
+            mapAssetGroupToUi(group, assets = assets) { it.groupBalance.transferable }
         }
     }
 

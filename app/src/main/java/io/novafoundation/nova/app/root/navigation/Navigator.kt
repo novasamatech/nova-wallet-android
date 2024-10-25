@@ -62,6 +62,8 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayloa
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -385,20 +387,20 @@ class Navigator(
         navController?.navigate(R.id.action_close_send_flow)
     }
 
-    override fun openSendNetworks(networkFlowPayload: NetworkFlowPayload) {
-        navController?.navigate(R.id.action_sendFlow_to_sendFlowNetwork, NetworkFlowFragment.createPayload(networkFlowPayload))
+    override fun openSendNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_sendFlow_to_sendFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
-    override fun openReceiveNetworks(networkFlowPayload: NetworkFlowPayload) {
-        navController?.navigate(R.id.action_receiveFlow_to_receiveFlowNetwork, NetworkFlowFragment.createPayload(networkFlowPayload))
+    override fun openReceiveNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_receiveFlow_to_receiveFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
-    override fun openSwapNetworks(networkFlowPayload: NetworkFlowPayload) {
-        TODO("Not yet implemented")
+    override fun openSwapNetworks(payload: NetworkSwapFlowPayload) {
+        navController?.navigate(R.id.action_swapFlow_to_swapFlowNetwork, NetworkSwapFlowFragment.createPayload(payload))
     }
 
-    override fun openBuyNetworks(networkFlowPayload: NetworkFlowPayload) {
-        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(networkFlowPayload))
+    override fun openBuyNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
     override fun openSwapFlow() {

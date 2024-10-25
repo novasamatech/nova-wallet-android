@@ -26,13 +26,17 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
@@ -152,4 +156,20 @@ class AssetsFeatureModule {
         coinPriceRepository = coinPriceRepository,
         poolAccountDerivation = poolAccountDerivation
     )
+
+    @Provides
+    fun provideInitialSwapFlowExecutor(
+        assetsRouter: AssetsRouter
+    ): InitialSwapFlowExecutor {
+        return InitialSwapFlowExecutor(assetsRouter)
+    }
+
+    @Provides
+    fun provideSwapExecutor(
+        initialSwapFlowExecutor: InitialSwapFlowExecutor,
+        assetsRouter: AssetsRouter,
+        swapSettingsStateProvider: SwapSettingsStateProvider
+    ): SwapFlowExecutorFactory {
+        return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
+    }
 }

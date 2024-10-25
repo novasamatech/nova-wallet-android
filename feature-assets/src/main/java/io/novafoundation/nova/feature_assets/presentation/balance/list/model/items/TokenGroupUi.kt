@@ -20,6 +20,6 @@ data class TokenGroupUi(
     sealed interface GroupType {
         object Group : GroupType
 
-        data class SingleItem(val item: AssetModel) : GroupType
+        data class SingleItem(val asset: AssetModel) : GroupType
     }
 }

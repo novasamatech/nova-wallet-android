@@ -924,6 +924,21 @@
     </fragment>
 
     <fragment
+        android:id="@+id/swapFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
+        android:label="AssetSwapFlowFragment" >
+
+        <action
+            android:id="@+id/action_swapFlow_to_swapFlowNetwork"
+            app:destination="@id/swapFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
         android:id="@+id/sendFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment"
         android:label="NetworkSendFlowFragment" />
@@ -939,9 +954,9 @@
         android:label="NetworkBuyFlowFragment" />
 
     <fragment
-        android:id="@+id/swapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment" />
+        android:id="@+id/swapFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment"
+        android:label="NetworkBuyFlowFragment" />
 
     <fragment
         android:id="@+id/walletConnectScanFragment"

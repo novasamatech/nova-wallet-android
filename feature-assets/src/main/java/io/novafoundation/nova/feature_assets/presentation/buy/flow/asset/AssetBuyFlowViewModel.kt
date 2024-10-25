@@ -47,7 +47,10 @@ class AssetBuyFlowViewModel(
         }
     }
 
-    override fun tokenClicked(assetModel: TokenGroupUi) {
-        router.openBuyNetworks(NetworkFlowPayload(assetModel.tokenSymbol))
+    override fun tokenClicked(tokenGroup: TokenGroupUi) {
+        when (val type = tokenGroup.groupType) {
+            is TokenGroupUi.GroupType.SingleItem -> assetClicked(type.asset)
+            TokenGroupUi.GroupType.Group -> router.openBuyNetworks(NetworkFlowPayload(tokenGroup.tokenSymbol))
+        }
     }
 }

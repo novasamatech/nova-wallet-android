@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
-import io.novafoundation.nova.common.utils.FragmentPayloadHolder
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
@@ -17,13 +15,11 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowToolbar
 import kotlinx.android.synthetic.main.fragment_network_flow.networkFlowList
 import kotlinx.android.synthetic.main.fragment_network_flow.networkFlowToolbar
 
 abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
     BaseFragment<T>(),
-    FragmentPayloadHolder<NetworkFlowPayload>,
     NetworkFlowAdapter.ItemNetworkHandler {
 
     companion object : PayloadCreator<NetworkFlowPayload> by FragmentPayloadCreator()

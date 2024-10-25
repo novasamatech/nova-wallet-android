@@ -148,7 +148,7 @@ class BalanceListFragment :
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
         if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
-            viewModel.assetClicked(tokenGroup.groupType.item)
+            viewModel.assetClicked(tokenGroup.groupType.asset)
         } else {
             val itemAnimator = balanceListAssets.itemAnimator as AssetTokensItemAnimator
             itemAnimator.prepareForAnimation()

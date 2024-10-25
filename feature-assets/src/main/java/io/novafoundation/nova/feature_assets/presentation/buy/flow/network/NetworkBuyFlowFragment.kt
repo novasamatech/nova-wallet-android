@@ -1,16 +1,17 @@
 package io.novafoundation.nova.feature_assets.presentation.buy.flow.network
 
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.common.utils.FragmentPayloadHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import javax.inject.Inject
 
-class NetworkBuyFlowFragment : NetworkFlowFragment<NetworkBuyFlowViewModel>() {
+class NetworkBuyFlowFragment :
+    NetworkFlowFragment<NetworkBuyFlowViewModel>(),
+    FragmentPayloadHolder<NetworkFlowPayload> {
 
     @Inject
     lateinit var buyMixin: BuyMixinUi

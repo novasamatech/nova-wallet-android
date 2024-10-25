@@ -47,10 +47,8 @@ class NetworkSendFlowViewModel(
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
-        validate(network) {
-            val assetPayload = AssetPayload(network.chainId, network.assetId)
-            router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
-        }
+        val assetPayload = AssetPayload(network.chainId, network.assetId)
+        router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
     }
 
     override fun getTitle(tokenSymbol: TokenSymbol): String {

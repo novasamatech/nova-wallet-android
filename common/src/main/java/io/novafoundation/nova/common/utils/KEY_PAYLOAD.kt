@@ -32,5 +32,4 @@ interface FragmentPayloadHolder<T : Parcelable> : PayloadHolder<T> {
             require(this is Fragment)
             return requireArguments().getParcelable(KEY_PAYLOAD)!!
         }
-
 }

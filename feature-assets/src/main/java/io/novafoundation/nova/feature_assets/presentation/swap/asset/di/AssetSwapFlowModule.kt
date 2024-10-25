@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.swap.di
+package io.novafoundation.nova.feature_assets.presentation.swap.asset.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -16,30 +16,12 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {
-
-    @Provides
-    fun provideInitialSwapFlowExecutor(
-        assetsRouter: AssetsRouter
-    ): InitialSwapFlowExecutor {
-        return InitialSwapFlowExecutor(assetsRouter)
-    }
-
-    @Provides
-    fun provideSwapExecutor(
-        initialSwapFlowExecutor: InitialSwapFlowExecutor,
-        assetsRouter: AssetsRouter,
-        swapSettingsStateProvider: SwapSettingsStateProvider
-    ): SwapFlowExecutorFactory {
-        return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
-    }
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): AssetSwapFlowViewModel {
@@ -70,7 +52,7 @@ class AssetSwapFlowModule {
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             swapFlowExecutor = executorFactory.create(payload),
-            payload = payload,
+            swapPayload = payload,
             swapAvailabilityInteractor = swapAvailabilityInteractor
         )
     }

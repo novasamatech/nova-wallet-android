@@ -9,8 +9,9 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
-import io.novafoundation.nova.feature_assets.domain.assets.models.toList
+import io.novafoundation.nova.feature_assets.domain.assets.models.groupList
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
@@ -61,7 +62,7 @@ abstract class AssetFlowViewModel(
     }.distinctUntilChanged()
         .shareInBackground(SharingStarted.Lazily)
 
-    val placeholder = searchAssetsFlow.map { getPlaceholder(query.value, it.toList()) }
+    val placeholder = searchAssetsFlow.map { getPlaceholder(query.value, it.groupList()) }
 
     fun backClicked() {
         router.back()
@@ -71,7 +72,7 @@ abstract class AssetFlowViewModel(
 
     abstract fun assetClicked(assetModel: AssetModel)
 
-    abstract fun tokenClicked(assetModel: TokenGroupUi)
+    abstract fun tokenClicked(tokenGroup: TokenGroupUi)
 
     private fun mapAssets(searchResult: AssetFlowSearchResult, currency: Currency): List<BalanceListRvItem> {
         return when (searchResult) {
@@ -84,8 +85,8 @@ abstract class AssetFlowViewModel(
         return assets.mapGroupedAssetsToUi(currency)
     }
 
-    open fun mapTokensAssets(assets: List<TokenAssetGroup>): List<BalanceListRvItem> {
-        return assets.map { mapAssetGroupToUi(it, assets = emptyList()) }
+    open fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
+        return assets.map { mapAssetGroupToUi(it.key, assets = it.value) }
     }
 
     internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {

@@ -13,10 +13,11 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
-import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class NetworkSwapFlowViewModel(
     interactor: AssetNetworksInteractor,
@@ -26,7 +27,8 @@ class NetworkSwapFlowViewModel(
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
     networkFlowPayload: NetworkFlowPayload,
-    chainRegistry: ChainRegistry
+    chainRegistry: ChainRegistry,
+    private val swapFlowExecutor: SwapFlowExecutor
 ) : NetworkFlowViewModel(
     interactor,
     router,
@@ -43,17 +45,17 @@ class NetworkSwapFlowViewModel(
     }
 
     override fun assetsFlow(tokenSymbol: TokenSymbol): Flow<List<AssetWithNetwork>> {
-        return interactor.sendAssetFlow(tokenSymbol, externalBalancesFlow)
+        return interactor.swapAssetsFlow(tokenSymbol, externalBalancesFlow, coroutineScope)
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
-        validate(network) {
-            val assetPayload = AssetPayload(network.chainId, network.assetId)
-            router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
+        launch {
+            val chainAsset = chainRegistry.asset(network.chainId, network.assetId)
+            swapFlowExecutor.openNextScreen(coroutineScope, chainAsset)
         }
     }
 
     override fun getTitle(tokenSymbol: TokenSymbol): String {
-        return resourceManager.getString(R.string.send_network_flow_title, tokenSymbol.value)
+        return resourceManager.getString(R.string.swap_network_flow_title, tokenSymbol.value)
     }
 }

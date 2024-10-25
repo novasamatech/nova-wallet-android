@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.swap.di
+package io.novafoundation.nova.feature_assets.presentation.swap.asset.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
 

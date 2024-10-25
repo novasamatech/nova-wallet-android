@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectS
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.flow.asset.di.AssetSendFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.send.flow.network.di.NetworkSendFlowComponent
-import io.novafoundation.nova.feature_assets.presentation.swap.di.AssetSwapFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.di.AssetSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.swap.network.di.NetworkSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent

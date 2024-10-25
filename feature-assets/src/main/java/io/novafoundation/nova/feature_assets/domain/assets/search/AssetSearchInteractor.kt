@@ -57,7 +57,7 @@ class AssetSearchInteractor(
                     .map { AssetFlowSearchResult.ByNetworks(it) }
 
                 AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
-                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+                    .map { AssetFlowSearchResult.ByTokens(it) }
             }
         }
     }
@@ -85,7 +85,7 @@ class AssetSearchInteractor(
                     assetsComparator = getTokenAssetBaseComparator { it.balanceWithOffChain.transferable.fiat },
                     filter = filter
                 )
-                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+                    .map { AssetFlowSearchResult.ByTokens(it) }
             }
         }
     }
@@ -112,7 +112,7 @@ class AssetSearchInteractor(
                     .map { AssetFlowSearchResult.ByNetworks(it) }
 
                 AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
-                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+                    .map { AssetFlowSearchResult.ByTokens(it) }
             }
         }
     }
@@ -127,7 +127,7 @@ class AssetSearchInteractor(
                     .map { AssetFlowSearchResult.ByNetworks(it) }
 
                 AssetViewMode.TOKENS -> searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = null)
-                    .map { AssetFlowSearchResult.ByTokens(it.keys.toList()) }
+                    .map { AssetFlowSearchResult.ByTokens(it) }
             }
         }
     }

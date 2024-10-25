@@ -4,7 +4,6 @@ import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
 
 class AssetSwapFlowFragment : AssetFlowFragment<AssetSwapFlowViewModel>() {
@@ -30,9 +29,5 @@ class AssetSwapFlowFragment : AssetFlowFragment<AssetSwapFlowViewModel>() {
             .swapFlowComponent()
             .create(this, argument(KEY_PAYLOAD))
             .inject(this)
-    }
-
-    override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
-        showMessage("Not implemented yet")
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.domain.networks
 
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.filterList
+import io.novafoundation.nova.common.utils.filterSet
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
@@ -23,6 +24,7 @@ import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -61,12 +63,11 @@ class AssetNetworksInteractor(
     }
 
     fun swapAssetsFlow(
-        forAsset: FullChainAssetId?,
         tokenSymbol: TokenSymbol,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<List<AssetWithNetwork>> {
-        val filterFlow = getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
+        val filterFlow = getAvailableSwapAssets(tokenSymbol, coroutineScope).map { availableAssetsForSwap ->
             val filter: AssetFilter = { asset ->
                 val chainAsset = asset.token.configuration
 
@@ -119,15 +120,16 @@ class AssetNetworksInteractor(
         }
     }
 
-    private fun getAvailableSwapAssets(asset: FullChainAssetId?, coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {
+    private fun getAvailableSwapAssets(tokenSymbol: TokenSymbol, coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {
         return flowOfAll {
-            val chainAsset = asset?.let { chainRegistry.asset(it) }
+            val chains = chainRegistry.enabledChainById()
+                .filter { (_, chain) ->
+                    // Take only chains that have target asset
+                    chain.assets.any { it.symbol == tokenSymbol }
+                }
 
-            if (chainAsset == null) {
-                swapService.assetsAvailableForSwap(coroutineScope)
-            } else {
-                swapService.availableSwapDirectionsFor(chainAsset, coroutineScope)
-            }
+            swapService.assetsAvailableForSwap(coroutineScope)
+                .filterSet { it.chainId in chains.keys }
         }
     }
 }

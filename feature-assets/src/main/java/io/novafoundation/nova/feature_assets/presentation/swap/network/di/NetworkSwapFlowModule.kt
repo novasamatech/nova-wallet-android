@@ -14,11 +14,9 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowViewModel
-import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowViewModel
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowViewModel
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -39,7 +37,8 @@ class NetworkSwapFlowModule {
         controllableAssetCheck: ControllableAssetCheckMixin,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
-        networkFlowPayload: NetworkFlowPayload,
+        executorFactory: SwapFlowExecutorFactory,
+        payload: NetworkSwapFlowPayload,
         chainRegistry: ChainRegistry
     ): ViewModel {
         return NetworkSwapFlowViewModel(
@@ -49,8 +48,9 @@ class NetworkSwapFlowModule {
             controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
-            networkFlowPayload = networkFlowPayload,
-            chainRegistry = chainRegistry
+            networkFlowPayload = payload.networkFlowPayload,
+            chainRegistry = chainRegistry,
+            swapFlowExecutor = executorFactory.create(payload.swapFlowPayload)
         )
     }
 }

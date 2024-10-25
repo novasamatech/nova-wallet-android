@@ -42,13 +42,17 @@ class AssetReceiveFlowViewModel(
         }
     }
 
-    override fun tokenClicked(assetModel: TokenGroupUi) {
-        router.openReceiveNetworks(NetworkFlowPayload(assetModel.tokenSymbol))
+    override fun tokenClicked(tokenGroup: TokenGroupUi) {
+        when (val type = tokenGroup.groupType) {
+            is TokenGroupUi.GroupType.SingleItem -> assetClicked(type.asset)
+
+            TokenGroupUi.GroupType.Group -> router.openReceiveNetworks(NetworkFlowPayload(tokenGroup.tokenSymbol))
+        }
     }
 
     private fun openNextScreen(assetModel: AssetModel) {
         val chainAsset = assetModel.token.configuration
-        val assePayload = AssetPayload(chainAsset.chainId, chainAsset.id)
-        router.openReceive(assePayload)
+        val assetPayload = AssetPayload(chainAsset.chainId, chainAsset.id)
+        router.openReceive(assetPayload)
     }
 }
