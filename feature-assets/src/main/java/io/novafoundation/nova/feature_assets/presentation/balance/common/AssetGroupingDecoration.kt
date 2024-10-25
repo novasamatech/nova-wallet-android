@@ -8,11 +8,14 @@ import android.view.View
 import androidx.core.view.children
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder
+import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetViewHolder
+import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetGroupViewHolder
+import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetViewHolder
 import kotlin.math.roundToInt
 
 /**
@@ -47,7 +50,6 @@ class AssetGroupingDecoration(
 
             val bindingPosition = viewHolder.bindingAdapterPosition
 
-            val currentType = assetsAdapter.getItemViewType(bindingPosition)
             val nextType = assetsAdapter.getItemViewTypeOrNull(bindingPosition + 1)
 
             if (groupTop == null) {
@@ -57,7 +59,7 @@ class AssetGroupingDecoration(
 
             when {
                 // if group is finished
-                isFinalItemInGroup(currentType, nextType) -> {
+                isFinalItemInGroup(nextType) -> {
                     parent.getDecoratedBoundsWithMargins(view, bounds)
                     bounds.set(view.left, bounds.top, view.right, bounds.bottom)
 
@@ -97,10 +99,9 @@ class AssetGroupingDecoration(
 
         val adapterPosition = viewHolder.bindingAdapterPosition
 
-        val currentType = assetsAdapter.getItemViewTypeOrNull(adapterPosition)
         val nextType = assetsAdapter.getItemViewTypeOrNull(adapterPosition + 1)
 
-        val bottom = if (isFinalItemInGroup(currentType, nextType)) groupInnerSpacing + groupOuterSpacing else 0
+        val bottom = if (isFinalItemInGroup(nextType)) groupInnerSpacing + groupOuterSpacing else 0
 
         outRect.set(0, 0, 0, bottom)
     }
@@ -111,13 +112,17 @@ class AssetGroupingDecoration(
         return getItemViewType(position)
     }
 
-    private fun isFinalItemInGroup(currentType: Int?, nextType: Int?): Boolean {
-        return currentType == GroupedListAdapter.TYPE_CHILD && (nextType == GroupedListAdapter.TYPE_GROUP || nextType == null)
+    private fun isFinalItemInGroup(nextType: Int?): Boolean {
+        return nextType == TYPE_NETWORK_GROUP || nextType == TYPE_TOKEN_GROUP || nextType == null
     }
 
     private fun shouldSkip(viewHolder: RecyclerView.ViewHolder): Boolean {
-        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION ||
-            (viewHolder !is AssetViewHolder && viewHolder !is AssetGroupViewHolder)
+        val isGroupViewHolder = viewHolder is NetworkAssetViewHolder ||
+            viewHolder is NetworkAssetGroupViewHolder ||
+            viewHolder is TokenAssetViewHolder ||
+            viewHolder is TokenAssetGroupViewHolder
+
+        return viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION || !isGroupViewHolder
     }
 }
 
