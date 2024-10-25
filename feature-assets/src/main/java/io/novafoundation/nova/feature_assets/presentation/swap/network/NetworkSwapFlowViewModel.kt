@@ -45,7 +45,7 @@ class NetworkSwapFlowViewModel(
     }
 
     override fun assetsFlow(tokenSymbol: TokenSymbol): Flow<List<AssetWithNetwork>> {
-        return interactor.swapAssetsFlow(tokenSymbol, externalBalancesFlow, coroutineScope)
+        return interactor.swapAssetsFlow(tokenSymbol, externalBalancesFlow)
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {

@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -64,20 +63,9 @@ class AssetNetworksInteractor(
 
     fun swapAssetsFlow(
         tokenSymbol: TokenSymbol,
-        externalBalancesFlow: Flow<List<ExternalBalance>>,
-        coroutineScope: CoroutineScope
+        externalBalancesFlow: Flow<List<ExternalBalance>>
     ): Flow<List<AssetWithNetwork>> {
-        val filterFlow = getAvailableSwapAssets(tokenSymbol, coroutineScope).map { availableAssetsForSwap ->
-            val filter: AssetFilter = { asset ->
-                val chainAsset = asset.token.configuration
-
-                chainAsset.fullId in availableAssetsForSwap
-            }
-
-            filter
-        }
-
-        return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filterFlow = filterFlow)
+        return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = null)
     }
 
     fun receiveAssetFlow(
