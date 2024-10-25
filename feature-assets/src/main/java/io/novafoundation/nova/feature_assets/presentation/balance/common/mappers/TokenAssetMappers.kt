@@ -63,7 +63,7 @@ private fun mapAssetGroupToUi(
 private fun mapType(
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
-    groupBalance: (TokenAssetGroup) -> Amount
+    groupBalance: (TokenAssetGroup) -> PricedAmount
 ): TokenGroupUi.GroupType {
     return if (assets.size == 1) {
         val balance = groupBalance(assetGroup)
