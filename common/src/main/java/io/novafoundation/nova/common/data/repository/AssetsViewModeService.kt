@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-interface AssetsViewModeRepository {
+interface AssetsViewModeService {
     fun assetsViewModeFlow(): Flow<AssetViewMode>
     suspend fun setAssetsViewMode(assetsViewMode: AssetViewMode)
 }
@@ -15,9 +15,9 @@ interface AssetsViewModeRepository {
 private const val PREFS_ASSETS_VIEW_MODE = "PREFS_ASSETS_VIEW_MODE"
 private val ASSET_VIEW_MODE_DEFAULT = AssetViewMode.TOKENS
 
-class RealAssetsViewModeRepository(
+class RealAssetsViewModeService(
     private val preferences: Preferences
-) : AssetsViewModeRepository {
+) : AssetsViewModeService {
 
     override fun assetsViewModeFlow(): Flow<AssetViewMode> {
         return preferences.stringFlow(PREFS_ASSETS_VIEW_MODE)

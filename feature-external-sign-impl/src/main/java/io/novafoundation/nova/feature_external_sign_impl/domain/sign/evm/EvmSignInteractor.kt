@@ -311,7 +311,7 @@ class EvmSignInteractor(
         val chainCurrency = evmChain.nativeCurrency
 
         return Chain.Asset(
-            iconUrl = evmChain.iconUrl,
+            icon = evmChain.iconUrl?.let { Chain.Icon(it) },
             id = 0,
             priceId = null,
             chainId = evmChain.chainId,

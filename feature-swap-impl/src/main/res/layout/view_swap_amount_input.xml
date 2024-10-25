@@ -20,12 +20,10 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/bg_token_container"
-            android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/icon_primary"
-            tools:src="@drawable/ic_token_ksm" />
+            tools:src="@drawable/ic_token_dot_colored" />
 
         <ImageView
             android:id="@+id/swapAmountInputSubtitleImage"
@@ -132,8 +130,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:visibility="gone"
         android:textColor="@color/text_negative"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/swapAmountInputContainer" />
 

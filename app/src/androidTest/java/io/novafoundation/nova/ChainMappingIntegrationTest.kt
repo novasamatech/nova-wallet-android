@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.Gson
 import androidx.test.platform.app.InstrumentationRegistry
 import dagger.Component
+import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.FeatureContainer
@@ -100,7 +101,8 @@ class ChainMappingIntegrationTest {
             assetsLocal = assetsLocal,
             explorersLocal = explorersLocal,
             externalApisLocal = externalApisLocal,
-            gson = gson
+            gson = gson,
+            assetIconMode = AssetIconMode.COLORED
         )
     }
 
@@ -123,7 +125,8 @@ class ChainMappingIntegrationTest {
             assetsLocal = assetsLocal,
             explorersLocal = explorersLocal,
             externalApisLocal = externalApisLocal,
-            gson = gson
+            gson = gson,
+            assetIconMode = AssetIconMode.COLORED
         )
     }
 }

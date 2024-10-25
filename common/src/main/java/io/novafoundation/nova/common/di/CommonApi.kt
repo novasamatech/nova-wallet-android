@@ -14,7 +14,8 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
-import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.AssetsIconModeService
+import io.novafoundation.nova.common.data.repository.AssetsViewModeService
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -155,7 +156,9 @@ interface CommonApi {
 
     fun buildTypeProvider(): BuildTypeProvider
 
-    fun assetsViewModeRepository(): AssetsViewModeRepository
+    fun assetsViewModeRepository(): AssetsViewModeService
+
+    fun assetsIconModeService(): AssetsIconModeService
 
     val systemCallExecutor: SystemCallExecutor
 

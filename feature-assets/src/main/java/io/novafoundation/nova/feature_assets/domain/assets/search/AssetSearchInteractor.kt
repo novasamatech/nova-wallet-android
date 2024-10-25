@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
-import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.AssetsViewModeService
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
@@ -42,7 +42,7 @@ class AssetSearchInteractor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val swapService: SwapService,
-    private val assetsViewModeRepository: AssetsViewModeRepository
+    private val assetsViewModeService: AssetsViewModeService
 ) {
 
     fun buyAssetSearch(
@@ -51,7 +51,7 @@ class AssetSearchInteractor(
     ): Flow<AssetFlowSearchResult> {
         val filter = { asset: Asset -> asset.token.configuration.buyProviders.isNotEmpty() }
 
-        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+        return assetsViewModeService.assetsViewModeFlow().flatMapLatest { viewMode ->
             when (viewMode) {
                 AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
                     .map { AssetFlowSearchResult.ByNetworks(it) }
@@ -68,7 +68,7 @@ class AssetSearchInteractor(
     ): Flow<AssetFlowSearchResult> {
         val filter = { asset: Asset -> asset.transferableInPlanks.isPositive() }
 
-        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+        return assetsViewModeService.assetsViewModeFlow().flatMapLatest { viewMode ->
             when (viewMode) {
                 AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(
                     queryFlow,
@@ -106,7 +106,7 @@ class AssetSearchInteractor(
             filter
         }
 
-        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+        return assetsViewModeService.assetsViewModeFlow().flatMapLatest { viewMode ->
             when (viewMode) {
                 AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
                     .map { AssetFlowSearchResult.ByNetworks(it) }
@@ -121,7 +121,7 @@ class AssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<AssetFlowSearchResult> {
-        return assetsViewModeRepository.assetsViewModeFlow().flatMapLatest { viewMode ->
+        return assetsViewModeService.assetsViewModeFlow().flatMapLatest { viewMode ->
             when (viewMode) {
                 AssetViewMode.NETWORKS -> searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
                     .map { AssetFlowSearchResult.ByNetworks(it) }

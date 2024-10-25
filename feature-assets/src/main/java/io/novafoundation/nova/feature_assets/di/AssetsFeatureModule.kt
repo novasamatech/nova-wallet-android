@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
-import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.AssetsViewModeService
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -63,8 +63,8 @@ class AssetsFeatureModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         swapService: SwapService,
-        assetsViewModeRepository: AssetsViewModeRepository
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, swapService, assetsViewModeRepository)
+        assetsViewModeService: AssetsViewModeService
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, swapService, assetsViewModeService)
 
     @Provides
     @FeatureScope

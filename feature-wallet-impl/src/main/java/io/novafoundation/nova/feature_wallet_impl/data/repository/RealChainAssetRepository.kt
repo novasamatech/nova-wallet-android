@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.SetAssetEnabledParams
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
@@ -26,6 +27,6 @@ class RealChainAssetRepository(
     }
 
     override suspend fun getEnabledAssets(): List<Chain.Asset> {
-        return chainAssetDao.getEnabledAssets().map { mapChainAssetLocalToAsset(it, gson) }
+        return chainAssetDao.getEnabledAssets().map { mapChainAssetLocalToAsset(it, gson, AssetIconMode.WHITE) }
     }
 }

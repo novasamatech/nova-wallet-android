@@ -2,11 +2,11 @@ package io.novafoundation.nova.runtime.multiNetwork
 
 import android.util.Log
 import com.google.gson.Gson
+import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
@@ -40,6 +40,7 @@ import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -63,11 +64,13 @@ class ChainRegistry(
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
     private val runtimeSyncService: RuntimeSyncService,
     private val web3ApiPool: Web3ApiPool,
-    private val gson: Gson
+    private val gson: Gson,
+    private val assetsIconModeService: AssetsIconModeService
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
-    val currentChains = chainDao.joinChainInfoFlow()
-        .mapList { mapChainLocalToChain(it, gson) }
+    val currentChains = combine(chainDao.joinChainInfoFlow(), assetsIconModeService.assetsIconModeFlow()) { chains, assetIconMode ->
+        chains.map { mapChainLocalToChain(it, gson, assetIconMode) }
+    }
         .diffed()
         .map { diff ->
             diff.removed.forEach { unregisterChain(it) }
