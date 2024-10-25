@@ -6,10 +6,10 @@ import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_assets.domain.common.Amount
+import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.TotalAndTransferableBalance
+import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
@@ -18,8 +18,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
     assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi>,
-    groupBalance: (TokenAssetGroup) -> Amount = { it.groupBalance.total },
-    balance: (TotalAndTransferableBalance) -> Amount = TotalAndTransferableBalance::total,
+    groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
+    balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (group, assets) -> mapAssetGroupToUi(group, assets, groupBalance) }
         .mapValues { (group, assets) ->
@@ -33,7 +33,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
 private fun mapAssetsToAssetModels(
     group: TokenGroupUi,
     assets: List<AssetWithNetwork>,
-    balance: (TotalAndTransferableBalance) -> Amount
+    balance: (AssetBalance) -> PricedAmount
 ): List<TokenAssetUi> {
     return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
 }
@@ -41,7 +41,7 @@ private fun mapAssetsToAssetModels(
 private fun mapAssetGroupToUi(
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
-    groupBalance: (TokenAssetGroup) -> Amount
+    groupBalance: (TokenAssetGroup) -> PricedAmount
 ): TokenGroupUi {
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(

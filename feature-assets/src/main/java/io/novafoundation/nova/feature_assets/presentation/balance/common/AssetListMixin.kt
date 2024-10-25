@@ -14,9 +14,11 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -39,6 +41,10 @@ class AssetListMixinFactory(
 
 interface AssetListMixin {
 
+    val assetsViewModeFlow: Flow<AssetViewMode>
+
+    val externalBalancesFlow: SharedFlow<List<ExternalBalance>>
+
     val assetsFlow: Flow<List<Asset>>
 
     val filteredAssetsFlow: Flow<List<Asset>>
@@ -46,8 +52,8 @@ interface AssetListMixin {
     val assetModelsFlow: Flow<List<BalanceListRvItem>>
 
     fun expandToken(tokenGroupUi: TokenGroupUi)
+
     suspend fun switchViewMode()
-    val assetsViewModeFlow: Flow<AssetViewMode>
 }
 
 class RealAssetListMixin(
@@ -67,7 +73,7 @@ class RealAssetListMixin(
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
         .shareInBackground()
 
-    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
+    override val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
         .shareInBackground()
 
     private val expandedTokenIdsFlow = MutableStateFlow(setOf<String>())
