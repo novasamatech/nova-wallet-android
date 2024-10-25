@@ -215,10 +215,6 @@ class BalanceListViewModel(
         router.openSwitchWallet()
     }
 
-    fun filtersClicked() {
-        router.openAssetFilters()
-    }
-
     fun manageClicked() {
         router.openManageTokens()
     }

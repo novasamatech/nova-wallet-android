@@ -366,14 +366,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_assetFiltersFragment"
-            app:destination="@id/assetFiltersFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_mainFragment_to_nfts_nav_graph"
             app:destination="@id/nfts_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
@@ -846,11 +838,6 @@
     <include app:graph="@navigation/dapp_search_graph" />
 
     <include app:graph="@navigation/nfts_nav_graph" />
-
-    <dialog
-        android:id="@+id/assetFiltersFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersBottomSheetFragment"
-        android:label="AssetFiltersFragment" />
 
     <fragment
         android:id="@+id/authorizedDAppsFragment"

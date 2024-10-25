@@ -40,8 +40,6 @@ interface AssetsRouter {
 
     fun openReceive(assetPayload: AssetPayload)
 
-    fun openAssetFilters()
-
     fun openAssetSearch()
 
     fun openManageTokens()
