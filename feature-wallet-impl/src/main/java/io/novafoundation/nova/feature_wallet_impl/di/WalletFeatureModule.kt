@@ -6,6 +6,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileCache
@@ -322,8 +323,9 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideChainAssetRepository(
         chainAssetDao: ChainAssetDao,
-        gson: Gson
-    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson)
+        gson: Gson,
+        assetsIconModeService: AssetsIconModeService
+    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson, assetsIconModeService)
 
     @Provides
     @FeatureScope

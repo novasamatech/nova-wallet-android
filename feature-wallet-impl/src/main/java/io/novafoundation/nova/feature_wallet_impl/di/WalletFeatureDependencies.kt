@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.interfaces.FileCache
@@ -133,6 +134,8 @@ interface WalletFeatureDependencies {
     fun coinPriceDao(): CoinPriceDao
 
     fun hydraDxAssetIdConverter(): HydraDxAssetIdConverter
+
+    fun assetsIconModeService(): AssetsIconModeService
 
     val fileCache: FileCache
 
