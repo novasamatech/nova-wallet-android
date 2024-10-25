@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.common.Amount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
+import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -37,7 +37,7 @@ class NetworkReceiveFlowViewModel(
     chainRegistry
 ) {
 
-    override fun getAssetBalance(asset: AssetWithNetwork): Amount {
+    override fun getAssetBalance(asset: AssetWithNetwork): PricedAmount {
         return asset.balanceWithOffChain.total
     }
 

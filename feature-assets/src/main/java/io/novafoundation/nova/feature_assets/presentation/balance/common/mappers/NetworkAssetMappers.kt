@@ -32,7 +32,7 @@ private fun mapAssetsToAssetModels(
     return assets.map { NetworkAssetUi(mapAssetToAssetModel(it.asset, balance(it.balanceWithOffchain))) }
 }
 
-private fun mapAssetGroupToUi(
+fun mapAssetGroupToUi(
     assetGroup: NetworkAssetGroup,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal

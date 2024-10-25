@@ -21,7 +21,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
-    return mapKeys { (group, assets) -> mapAssetGroupToUi(group, assets, groupBalance) }
+    return mapKeys { (group, assets) -> mapTokenAssetGroupToUi(group, assets, groupBalance) }
         .mapValues { (group, assets) ->
             val assetModels = mapAssetsToAssetModels(group, assets, balance)
             assetFilter(group.itemId, assetModels)
@@ -30,10 +30,10 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
         .filterIsInstance<BalanceListRvItem>()
 }
 
-private fun mapAssetGroupToUi(
+fun mapTokenAssetGroupToUi(
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
-    groupBalance: (TokenAssetGroup) -> PricedAmount
+    groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total }
 ): TokenGroupUi {
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(

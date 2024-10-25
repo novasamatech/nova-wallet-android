@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.common.Amount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
+import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -38,7 +39,7 @@ abstract class NetworkFlowViewModel(
     val networks: Flow<List<NetworkFlowRvItem>> = assetsFlow(networkFlowPayload.asTokenSymbol())
         .map { mapAssets(it) }
 
-    abstract fun getAssetBalance(asset: AssetWithNetwork): Amount
+    abstract fun getAssetBalance(asset: AssetWithNetwork): PricedAmount
 
     abstract fun assetsFlow(tokenSymbol: TokenSymbol): Flow<List<AssetWithNetwork>>
 
