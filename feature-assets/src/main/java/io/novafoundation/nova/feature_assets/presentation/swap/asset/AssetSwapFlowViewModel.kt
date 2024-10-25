@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.TotalAndTransferableBalance
+import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapAssetGroupToUi
@@ -92,7 +92,7 @@ class AssetSwapFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, TotalAndTransferableBalance::transferable)
+        return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
     }
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {

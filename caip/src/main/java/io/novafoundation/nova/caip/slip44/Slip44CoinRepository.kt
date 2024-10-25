@@ -2,7 +2,7 @@ package io.novafoundation.nova.caip.slip44
 
 import io.novafoundation.nova.caip.slip44.endpoint.Slip44CoinApi
 import io.novafoundation.nova.caip.slip44.endpoint.Slip44CoinRemote
-import io.novafoundation.nova.runtime.ext.unifiedSymbol
+import io.novafoundation.nova.runtime.ext.normalizeSymbol
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -26,7 +26,7 @@ internal class RealSlip44CoinRepository(
                 .associateBy { it.symbol }
         }
 
-        return slip44Coins[chainAsset.unifiedSymbol()]
+        return slip44Coins[chainAsset.normalizeSymbol()]
             ?.index
             ?.toIntOrNull()
     }
