@@ -20,7 +20,7 @@ fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToU
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
-        .mapValues { (_, assets) -> mapAssetsToAssetModels(assets, balance) }
+        .mapValues { (group, assets) -> mapAssetsToAssetModels(assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
@@ -36,7 +36,7 @@ private fun mapAssetGroupToUi(
     assetGroup: NetworkAssetGroup,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal
-): BalanceListRvItem {
+): NetworkGroupUi {
     return NetworkGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
         groupBalanceFiat = groupBalance(assetGroup).formatAsCurrency(currency)

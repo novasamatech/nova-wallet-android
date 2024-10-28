@@ -17,36 +17,58 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
+    assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi>,
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
-    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, groupBalance) }
-        .mapValues { (_, assets) -> mapAssetsToAssetModels(assets, balance) }
+    return mapKeys { (group, assets) -> mapAssetGroupToUi(group, assets, groupBalance) }
+        .mapValues { (group, assets) ->
+            val assetModels = mapAssetsToAssetModels(group, assets, balance)
+            assetFilter(group.itemId, assetModels)
+        }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
 
 private fun mapAssetsToAssetModels(
+    group: TokenGroupUi,
     assets: List<AssetWithNetwork>,
     balance: (AssetBalance) -> PricedAmount
-): List<BalanceListRvItem> {
-    return assets.map { TokenAssetUi(mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
+): List<TokenAssetUi> {
+    return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
 }
 
 private fun mapAssetGroupToUi(
     assetGroup: TokenAssetGroup,
+    assets: List<AssetWithNetwork>,
     groupBalance: (TokenAssetGroup) -> PricedAmount
-): BalanceListRvItem {
+): TokenGroupUi {
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(
+        itemId = assetGroup.groupId,
         tokenIcon = assetGroup.token.icon,
         rate = mapCoinRateChange(assetGroup.token.coinRate, assetGroup.token.currency),
         recentRateChange = assetGroup.token.coinRate?.recentRateChange.orZero().formatAsChange(),
         rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.token.coinRate),
         tokenSymbol = assetGroup.token.symbol.value,
+        groupWithOneItem = assetGroup.itemsCount == 1,
         balance = AmountModel(
             token = balance.amount.formatTokenAmount(),
             fiat = balance.fiat.formatAsCurrency(assetGroup.token.currency)
-        )
+        ),
+        groupType = mapType(assetGroup, assets, groupBalance)
     )
+}
+
+private fun mapType(
+    assetGroup: TokenAssetGroup,
+    assets: List<AssetWithNetwork>,
+    groupBalance: (TokenAssetGroup) -> PricedAmount
+): TokenGroupUi.GroupType {
+    return if (assets.size == 1) {
+        val balance = groupBalance(assetGroup)
+        TokenGroupUi.GroupType.SingleItem(mapAssetToAssetModel(assets.first().asset, balance))
+    } else {
+        TokenGroupUi.GroupType.Group
+    }
 }

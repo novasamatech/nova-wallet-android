@@ -17,7 +17,7 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
@@ -64,7 +64,7 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
             setHasFixedSize(true)
             adapter = assetsAdapter
 
-            AssetGroupingDecoration.applyDefaultTo(this, assetsAdapter)
+            AssetNetworkDecoration.applyDefaultTo(this, assetsAdapter)
             itemAnimator = null
         }
 

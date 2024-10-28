@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
@@ -59,7 +59,7 @@ class AssetSearchFragment :
         searchAssetList.setHasFixedSize(true)
         searchAssetList.adapter = assetsAdapter
 
-        AssetGroupingDecoration.applyDefaultTo(searchAssetList, assetsAdapter)
+        AssetNetworkDecoration.applyDefaultTo(searchAssetList, assetsAdapter)
         searchAssetList.itemAnimator = null
 
         searchAssetSearch.cancel.setOnClickListener {
