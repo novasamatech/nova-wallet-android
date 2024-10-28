@@ -54,7 +54,7 @@ data class Chain(
 
         constructor(url: String) : this("", url)
 
-        fun getIconUrl(): String = "$baseUrl$name"
+        fun getIconUrl(): String = "$baseUrl/$name"
     }
 
     data class Additional(

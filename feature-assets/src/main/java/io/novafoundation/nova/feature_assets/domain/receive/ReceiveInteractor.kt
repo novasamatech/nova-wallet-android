@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_assets.domain.receive
 
 import android.graphics.Bitmap
 import android.net.Uri
-import io.novafoundation.nova.common.data.model.AssetIconMode
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.utils.write
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -18,7 +16,6 @@ class ReceiveInteractor(
     private val fileProvider: FileProvider,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val assetsIconModeService: AssetsIconModeService
 ) {
 
     suspend fun getQrCodeSharingString(chainId: ChainId): String = withContext(Dispatchers.Default) {
@@ -27,8 +24,6 @@ class ReceiveInteractor(
 
         accountRepository.createQrAccountContent(chain, account)
     }
-
-    fun getAssetIconMode(): AssetIconMode = assetsIconModeService.getIconMode()
 
     suspend fun generateTempQrFile(qrCode: Bitmap): Result<Uri> = withContext(Dispatchers.IO) {
         runCatching {

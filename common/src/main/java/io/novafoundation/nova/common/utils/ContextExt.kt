@@ -145,7 +145,3 @@ fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRippl
 context(View)
 val Int.dp: Int
     get() = dp(this@View.context)
-
-context(View)
-val Int.dpF: Float
-    get() = dpF(this@View.context)

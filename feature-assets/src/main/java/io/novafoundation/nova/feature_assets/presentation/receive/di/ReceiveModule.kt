@@ -6,16 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -31,8 +31,7 @@ class ReceiveModule {
         fileProvider: FileProvider,
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
-        assetsIconModeService: AssetsIconModeService
-    ) = ReceiveInteractor(fileProvider, chainRegistry, accountRepository, assetsIconModeService)
+    ) = ReceiveInteractor(fileProvider, chainRegistry, accountRepository)
 
     @Provides
     @IntoMap
@@ -40,22 +39,24 @@ class ReceiveModule {
     fun provideViewModel(
         interactor: ReceiveInteractor,
         qrCodeGenerator: QrCodeGenerator,
+        addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
+        externalActions: ExternalActions.Presentation,
         router: AssetsRouter,
         chainRegistry: ChainRegistry,
         selectedAccountUseCase: SelectedAccountUseCase,
         payload: AssetPayload,
-        clipboardManager: ClipboardManager
     ): ViewModel {
         return ReceiveViewModel(
             interactor,
             qrCodeGenerator,
+            addressIconGenerator,
             resourceManager,
+            externalActions,
             payload,
             chainRegistry,
             selectedAccountUseCase,
             router,
-            clipboardManager
         )
     }
 

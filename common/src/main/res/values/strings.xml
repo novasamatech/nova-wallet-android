@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
-
     <string name="buy_network_flow_title">Select network for buying %s</string>
     <string name="receive_network_flow_title">Select network for receiving %s</string>
     <string name="send_network_flow_title">Select network for sending %s</string>
