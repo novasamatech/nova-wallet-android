@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.data.repository.AssetsViewModeService
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -173,6 +174,8 @@ interface AssetsFeatureDependencies {
     fun assetsViewModeRepository(): AssetsViewModeService
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
+
+    fun assetsIconModeService(): AssetsIconModeService
 
     val assetsSourceRegistry: AssetSourceRegistry
 

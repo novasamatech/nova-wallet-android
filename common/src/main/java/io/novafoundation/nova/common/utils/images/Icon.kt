@@ -40,3 +40,9 @@ fun ImageView.setIconOrMakeGone(icon: Icon?, imageLoader: ImageLoader, builder: 
 fun Drawable.asIcon() = Icon.FromDrawable(this)
 fun @receiver:DrawableRes Int.asIcon() = Icon.FromDrawableRes(this)
 fun String.asIcon() = Icon.FromLink(this)
+
+fun ImageLoader.Companion.formatIcon(icon: Icon): Any = when (icon) {
+    is Icon.FromDrawable -> icon.data
+    is Icon.FromDrawableRes -> icon.res
+    is Icon.FromLink -> icon.data
+}

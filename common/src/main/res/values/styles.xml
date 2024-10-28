@@ -457,8 +457,12 @@
         <item name="android:backgroundTint">@color/selector_button_background_secondary</item>
     </style>
 
-    <style name="Widget.Nova.MaterialButton.Secondary.Transparent" parent="Widget.Nova.MaterialButton">
+    <style name="Widget.Nova.MaterialButton.Secondary.HalfTransparent" parent="Widget.Nova.MaterialButton">
         <item name="android:backgroundTint">@color/selector_button_background_secondary_transparent</item>
+    </style>
+
+    <style name="Widget.Nova.MaterialButton.Secondary.Transparent" parent="Widget.Nova.MaterialButton">
+        <item name="android:backgroundTint">#00FFFFFF</item>
     </style>
 
     <style name="Widget.Nova.MaterialButton.Positive" parent="Widget.Nova.MaterialButton">
