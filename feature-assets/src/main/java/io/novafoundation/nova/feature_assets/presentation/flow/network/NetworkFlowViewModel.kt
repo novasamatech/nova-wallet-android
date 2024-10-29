@@ -23,11 +23,11 @@ abstract class NetworkFlowViewModel(
     protected val interactor: AssetNetworksInteractor,
     protected val router: AssetsRouter,
     private val controllableAssetCheck: ControllableAssetCheckMixin,
-    internal val accountUseCase: SelectedAccountUseCase,
+    protected val accountUseCase: SelectedAccountUseCase,
     externalBalancesInteractor: ExternalBalancesInteractor,
-    internal val resourceManager: ResourceManager,
+    protected val resourceManager: ResourceManager,
     private val networkFlowPayload: NetworkFlowPayload,
-    internal val chainRegistry: ChainRegistry
+    protected val chainRegistry: ChainRegistry
 ) : BaseViewModel() {
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
@@ -50,7 +50,7 @@ abstract class NetworkFlowViewModel(
         router.back()
     }
 
-    internal fun validate(networkFlowRvItem: NetworkFlowRvItem, onAccept: () -> Unit) {
+    internal fun validateControllsAsset(networkFlowRvItem: NetworkFlowRvItem, onAccept: () -> Unit) {
         launch {
             val metaAccount = accountUseCase.getSelectedMetaAccount()
             val chainAsset = chainRegistry.asset(networkFlowRvItem.chainId, networkFlowRvItem.assetId)

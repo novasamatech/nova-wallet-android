@@ -2,7 +2,7 @@ package io.novafoundation.nova.common.utils
 
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.fragment.app.Fragment
+import io.novafoundation.nova.common.base.BaseFragment
 
 const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
@@ -20,16 +20,6 @@ class FragmentPayloadCreator<T : Parcelable> : PayloadCreator<T> {
     }
 }
 
-interface PayloadHolder<T : Parcelable> {
-
-    val payload: T
-}
-
-interface FragmentPayloadHolder<T : Parcelable> : PayloadHolder<T> {
-
-    override val payload: T
-        get() {
-            require(this is Fragment)
-            return requireArguments().getParcelable(KEY_PAYLOAD)!!
-        }
+fun <T> BaseFragment<*>.payload(): T {
+    return requireArguments().getParcelable(KEY_PAYLOAD)!!
 }

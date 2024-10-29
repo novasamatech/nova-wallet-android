@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
-    assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi>,
+    assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi> = { _, assets -> assets },
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {

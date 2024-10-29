@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
 import io.novafoundation.nova.feature_assets.domain.assets.models.groupList
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -33,14 +33,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 abstract class AssetFlowViewModel(
-    protected val interactor: AssetSearchInteractor,
+    interactorFactory: AssetSearchInteractorFactory,
     protected val router: AssetsRouter,
     protected val currencyInteractor: CurrencyInteractor,
     private val controllableAssetCheck: ControllableAssetCheckMixin,
-    internal val accountUseCase: SelectedAccountUseCase,
+    protected val accountUseCase: SelectedAccountUseCase,
     externalBalancesInteractor: ExternalBalancesInteractor,
-    internal val resourceManager: ResourceManager,
+    protected val resourceManager: ResourceManager,
 ) : BaseViewModel() {
+
+    protected val interactor = interactorFactory.createByAssetViewMode()
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
 
@@ -53,6 +55,7 @@ abstract class AssetFlowViewModel(
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
     private val searchAssetsFlow = flowOfAll { searchAssetsFlow() }
+        .shareInBackground()
 
     val searchResults = combine(
         searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self

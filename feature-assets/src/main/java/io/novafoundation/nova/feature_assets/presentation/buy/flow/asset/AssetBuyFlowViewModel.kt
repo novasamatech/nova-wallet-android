@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.Flow
 
 class AssetBuyFlowViewModel(
-    interactor: AssetSearchInteractor,
+    interactorFactory: AssetSearchInteractorFactory,
     router: AssetsRouter,
     externalBalancesInteractor: ExternalBalancesInteractor,
     currencyInteractor: CurrencyInteractor,
@@ -25,7 +25,7 @@ class AssetBuyFlowViewModel(
     buyMixinFactory: BuyMixin.Factory,
     resourceManager: ResourceManager,
 ) : AssetFlowViewModel(
-    interactor,
+    interactorFactory,
     router,
     currencyInteractor,
     controllableAssetCheck,

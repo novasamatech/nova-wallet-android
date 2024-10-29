@@ -51,7 +51,7 @@ class NetworkBuyFlowViewModel(
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
-        validate(network) {
+        validateControllsAsset(network) {
             launch {
                 val chainAsset = chainRegistry.asset(network.chainId, network.assetId)
                 buyMixin.buyClicked(chainAsset)
