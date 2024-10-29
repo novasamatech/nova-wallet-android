@@ -92,14 +92,14 @@ class SwapInteractor(
 //                swapTransactionHistoryRepository.insertPendingSwap(
 //                    chainAsset = swapExecuteArgs.assetIn,
 //                    swapArgs = swapExecuteArgs,
-//                    fee = decimalFee.genericFee,
+//                    fee = decimalFee,
 //                    txSubmission = submission
 //                )
 //
 //                swapTransactionHistoryRepository.insertPendingSwap(
 //                    chainAsset = swapExecuteArgs.assetOut,
 //                    swapArgs = swapExecuteArgs,
-//                    fee = decimalFee.genericFee,
+//                    fee = decimalFee,
 //                    txSubmission = submission
 //                )
 //            }

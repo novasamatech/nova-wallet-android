@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.asLiveData
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -14,11 +15,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.ChangeFeeTokenState
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
@@ -40,26 +38,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal class ChangeableFeeLoaderProviderPresentation(
-    customFeeInteractor: CustomFeeInteractor,
-    chainRegistry: ChainRegistry,
-    resourceManager: ResourceManager,
-    configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>,
-    actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    tokenFlow: Flow<Token?>,
-    coroutineScope: CoroutineScope
-) : ChangeableFeeLoaderProvider<SimpleFee>(
-    customFeeInteractor,
-    chainRegistry,
-    resourceManager,
-    configuration,
-    actionAwaitableMixinFactory,
-    tokenFlow,
-    coroutineScope
-),
-    FeeLoaderMixin.Presentation
-
-internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
+internal open class ChangeableFeeLoaderProvider<F : FeeBase>(
     private val interactor: CustomFeeInteractor,
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
@@ -130,7 +109,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         value?.run { postFeeState(this) }
     }
 
-    override fun loadFeeV2Generic(
+    override fun loadFee(
         coroutineScope: CoroutineScope,
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit
@@ -198,7 +177,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
                 RetryPayload(
                     title = resourceManager.getString(R.string.choose_amount_network_error),
                     message = resourceManager.getString(R.string.choose_amount_error_fee),
-                    onRetry = { loadFeeV2Generic(retryScope, feeConstructor, onRetryCancelled) },
+                    onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
                     onCancel = onRetryCancelled
                 )
             )
@@ -242,7 +221,7 @@ internal open class ChangeableFeeLoaderProvider<F : GenericFee>(
         val selectedAssetIsAvailableToPayFee = canPayFeeInCustomAssetFlow.first()
 
         if (commissionAsset.isCommissionAsset() && selectedAssetIsAvailableToPayFee) {
-            val feeAmount = feeStatus.feeModel.decimalFee.networkFee.amount
+            val feeAmount = feeStatus.feeModel.fee.amount
             if (interactor.hasEnoughBalanceToPayFee(commissionAsset, feeAmount)) {
                 feeLiveData.postValue(feeStatus)
             } else {

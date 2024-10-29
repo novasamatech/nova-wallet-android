@@ -81,7 +81,7 @@ class ConfirmRewardDestinationViewModel(
         .shareInBackground()
 
     val feeStatusFlow = controllerAssetFlow.map {
-        FeeStatus.Loaded(mapFeeToFeeModel(decimalFee.genericFee, it.token))
+        FeeStatus.Loaded(mapFeeToFeeModel(decimalFee, it.token))
     }
         .shareInBackground()
 

@@ -85,7 +85,7 @@ class ConfirmContributeViewModel(
     val selectedAmount = payload.amount.toString()
 
     val feeFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }

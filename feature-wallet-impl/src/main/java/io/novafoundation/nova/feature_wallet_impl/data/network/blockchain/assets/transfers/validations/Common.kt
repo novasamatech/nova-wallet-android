@@ -14,24 +14,22 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
-import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
-import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDepositMultyFee
+import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDepositMultiFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceMultyFee
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceMultiFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
-import java.math.BigDecimal
 import kotlinx.coroutines.CoroutineScope
+import java.math.BigDecimal
 
 fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
     amount = { it.transfer.amount },
@@ -57,7 +55,7 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
-        fee = { it.originFee.networkFeePart() },
+        fee = { it.originFee.submissionFee },
         balance = { it.originCommissionAsset.balanceCountedTowardsED() },
         chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.commissionChainAsset) },
         error = { payload, error -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.commissionChainAsset, error) }
@@ -71,7 +69,7 @@ fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
     calculateFee = { payload ->
         val transfers = assetSourceRegistry.sourceFor(payload.transfer.originChainAsset).transfers
         val fee = transfers.calculateFee(payload.transfer, coroutineScope)
-        SimpleGenericFee(payload.originFee.genericFee.networkFee.copy(networkFee = fee))
+        payload.originFee.copy(submissionFee = fee)
     },
     currentFee = { it.originFee },
     chainAsset = { it.commissionChainAsset },
@@ -81,7 +79,7 @@ fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
 fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDepositInUsedAsset(
     assetSourceRegistry: AssetSourceRegistry,
     extraAmount: AmountProducer<AssetTransferPayload>,
-) = doNotCrossExistentialDepositMultyFee(
+) = doNotCrossExistentialDepositMultiFee(
     countableTowardsEdBalance = { it.originUsedAsset.balanceCountedTowardsED() },
     fee = { it.originFeeListInUsedAsset },
     extraAmount = extraAmount,
@@ -89,7 +87,7 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDepositInUsedAsse
     error = { remainingAmount, payload -> payload.transfer.originChainAsset.existentialDepositError(remainingAmount) }
 )
 
-fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalanceMultyFee(
+fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalanceMultiFee(
     available = { it.originCommissionAsset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
     feeExtractor = { it.originFeeList },

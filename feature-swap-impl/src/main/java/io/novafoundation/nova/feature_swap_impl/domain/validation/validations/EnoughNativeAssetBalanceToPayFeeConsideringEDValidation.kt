@@ -28,7 +28,7 @@ class EnoughNativeAssetBalanceToPayFeeConsideringEDValidation(
             val chain = chainRegistry.getChain(feeChainAsset.chainId)
             val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, feeChainAsset)
             val availableBalance = value.feeAsset.balanceCountedTowardsEDInPlanks
-            val fee = value.decimalFee.networkFee.amountByExecutingAccount
+            val fee = value.fee.amountByExecutingAccount
             return validOrError(availableBalance - fee >= existentialDeposit) {
                 val minRequiredBalance = existentialDeposit + fee
                 NotEnoughFunds.ToPayFeeAndStayAboveED(

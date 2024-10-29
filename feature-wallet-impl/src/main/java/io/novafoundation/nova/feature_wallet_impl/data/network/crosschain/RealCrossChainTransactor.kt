@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.tryDetectDeposit
@@ -86,7 +87,7 @@ class RealCrossChainTransactor(
 
         doNotCrossExistentialDepositInUsedAsset(
             assetSourceRegistry = assetSourceRegistry,
-            extraAmount = { it.transfer.amount + it.crossChainFee?.networkFeeDecimalAmount.orZero() }
+            extraAmount = { it.transfer.amount + it.crossChainFee?.decimalAmount.orZero() }
         )
     }
 

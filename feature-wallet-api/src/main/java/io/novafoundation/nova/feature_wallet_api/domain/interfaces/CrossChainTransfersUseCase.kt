@@ -34,9 +34,12 @@ interface CrossChainTransfersUseCase {
         originChain: Chain
     ): Balance
 
+    /**
+     * @param cachingScope - a scope that will be registered as a dependency for internal caching. If null is passed, no caching will be used
+     */
     suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,
-        computationalScope: CoroutineScope
+        cachingScope: CoroutineScope?
     ): CrossChainTransferFee
 
     /**

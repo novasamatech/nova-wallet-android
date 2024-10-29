@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
@@ -53,10 +54,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -339,7 +339,7 @@ class SetupYieldBoostViewModel(
         val payload = YieldBoostValidationPayload(
             collator = selectedCollatorFlow.first(),
             configuration = modifiedYieldBoostConfiguration.first(),
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             activeTasks = activeTasksFlow.first(),
             asset = assetFlow.first()
         )
@@ -357,7 +357,7 @@ class SetupYieldBoostViewModel(
     }
 
     private fun goToNextStep(
-        fee: DecimalFee,
+        fee: Fee,
         configuration: YieldBoostConfiguration,
         collator: Collator,
     ) = launch {

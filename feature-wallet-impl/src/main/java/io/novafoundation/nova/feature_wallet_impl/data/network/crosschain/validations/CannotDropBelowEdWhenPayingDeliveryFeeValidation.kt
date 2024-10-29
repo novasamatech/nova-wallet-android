@@ -15,8 +15,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isSendingCommissionAsset
-import io.novafoundation.nova.feature_wallet_api.domain.model.deliveryFeePart
-import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novasama.substrate_sdk_android.hash.isPositive
 
 class CannotDropBelowEdWhenPayingDeliveryFeeValidation(
@@ -28,11 +26,11 @@ class CannotDropBelowEdWhenPayingDeliveryFeeValidation(
 
         val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.transfer.originChain, value.transfer.originChainAsset)
 
-        val deliveryFeePart = value.originFee.deliveryFeePart()?.networkFee?.amount.orZero()
+        val deliveryFeePart = value.originFee.deliveryFee?.amount.orZero()
         val paysDeliveryFee = deliveryFeePart.isPositive()
 
-        val networkFeePlanks = value.originFee.networkFeePart().networkFee.amountByExecutingAccount
-        val crossChainFeePlanks = value.crossChainFee?.networkFee?.amountByExecutingAccount.orZero()
+        val networkFeePlanks = value.originFee.submissionFee.amountByExecutingAccount
+        val crossChainFeePlanks = value.crossChainFee?.amount.orZero()
 
         val sendingAmount = value.transfer.amountInPlanks + crossChainFeePlanks
         val requiredAmountWhenPayingDeliveryFee = sendingAmount + networkFeePlanks + deliveryFeePart + existentialDeposit

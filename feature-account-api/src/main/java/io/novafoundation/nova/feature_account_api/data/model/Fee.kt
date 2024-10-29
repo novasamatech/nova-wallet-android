@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_account_api.data.model
 
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import java.math.BigDecimal
 import java.math.BigInteger
 
 // TODO rename FeeBase -> Fee and use SubmissionFee everywhere Fee is currently used
@@ -35,9 +37,8 @@ interface FeeBase {
     val asset: Chain.Asset
 }
 
-fun Fee.replacePlanks(newPlanks: BigInteger): Fee {
-    return  SubstrateFee(newPlanks, submissionOrigin, asset)
-}
+val FeeBase.decimalAmount: BigDecimal
+    get() = amount.amountFromPlanks(asset.precision)
 
 data class EvmFee(
     val gasLimit: BigInteger,
@@ -64,7 +65,18 @@ val Fee.executingAccountPaysFee: Boolean
     get() = submissionOrigin.executingAccount.contentEquals(submissionFeesPayer)
 
 val Fee.amountByExecutingAccount: BigInteger
-    get() = amount.asAmountByExecutingAccount
+    get() = if (executingAccountPaysFee) {
+        amount
+    } else {
+        BigInteger.ZERO
+    }
+
+val Fee.decimalAmountByExecutingAccount: BigDecimal
+    get() = if (executingAccountPaysFee) {
+        decimalAmount
+    } else {
+        BigDecimal.ZERO
+    }
 
 fun List<FeeBase>.totalAmount(chainAsset: Chain.Asset): BigInteger {
     return sumOf { it.getAmount(chainAsset) }
@@ -95,14 +107,6 @@ fun SubmissionFee.getAmount(chainAsset: Chain.Asset, origin: AccountId): BigInte
 fun FeeBase.getAmount(expectedAsset: Chain.Asset): BigInteger {
     return if (expectedAsset.fullId == asset.fullId) amount else BigInteger.ZERO
 }
-
-context(Fee)
-val BigInteger.asAmountByExecutingAccount: BigInteger
-    get() = if (executingAccountPaysFee) {
-        this
-    } else {
-        BigInteger.ZERO
-    }
 
 fun FeePaymentCurrency.toFeePaymentAsset(chain: Chain): Chain.Asset {
     return when (this) {

@@ -38,8 +38,7 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetMod
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -270,14 +269,12 @@ class CrowdloanContributeViewModel(
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
 
-                val fee = contributionInteractor.estimateFee(
+                contributionInteractor.estimateFee(
                     crowdloan,
                     amount,
                     bonusActiveState?.payload,
                     customizationPayload,
                 )
-
-                SimpleFee(fee)
             },
             onRetryCancelled = ::backClicked
         )
@@ -297,7 +294,7 @@ class CrowdloanContributeViewModel(
         val validationPayload = ContributeValidationPayload(
             crowdloan = crowdloanFlow.first(),
             customizationPayload = customizationPayload,
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             asset = assetFlow.first(),
             bonusPayload = router.latestCustomBonus,
             contributionAmount = contributionAmount

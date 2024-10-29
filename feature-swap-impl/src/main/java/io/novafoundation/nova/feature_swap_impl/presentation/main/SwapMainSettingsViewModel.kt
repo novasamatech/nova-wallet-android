@@ -32,6 +32,7 @@ import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
@@ -79,7 +80,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
@@ -337,7 +338,7 @@ class SwapMainSettingsViewModel(
 
             val swapState = SwapState(
                 quote = quotingState.value,
-                fee = feeMixin.awaitDecimalFee().genericFee,
+                fee = feeMixin.awaitFee(),
                 slippage = swapSettings.first().slippage
             )
             swapStateStoreProvider.getStore(viewModelScope).setState(swapState)
@@ -499,8 +500,8 @@ class SwapMainSettingsViewModel(
                 if (nativeAsset.transferable.isZero) return@filter true
                 if (feeModel == null) return@filter false
 
-                val isFeePaidInNativeAsset = nativeAsset.token.configuration.fullId == feeModel.chainAsset.fullId
-                val notEnoughNativeToPayFee = nativeAsset.transferable < feeModel.decimalFee.networkFeeDecimalAmount
+                val isFeePaidInNativeAsset = nativeAsset.token.configuration.fullId == feeModel.fee.asset.fullId
+                val notEnoughNativeToPayFee = nativeAsset.transferable < feeModel.fee.decimalAmount
 
                 isFeePaidInNativeAsset && notEnoughNativeToPayFee
             }.onEach {

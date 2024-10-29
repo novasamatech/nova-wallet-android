@@ -22,7 +22,7 @@ class SwapFeeSufficientBalanceValidation : SwapValidation {
             val feeAsset = value.feeAsset.token.configuration
             val maxAmountToSwap = value.maxAmountToSwap
 
-            return InsufficientBalance.CannotPayFee(chainAssetIn, feeAsset, maxAmountToSwap, value.decimalFee.networkFee).validationError()
+            return InsufficientBalance.CannotPayFee(chainAssetIn, feeAsset, maxAmountToSwap, value.fee).validationError()
         }
 
         return valid()

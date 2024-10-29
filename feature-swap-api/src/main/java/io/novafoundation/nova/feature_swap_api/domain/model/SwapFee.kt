@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.data.model.getAmount
-import io.novafoundation.nova.feature_account_api.data.model.replacePlanks
 import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxAvailableDeduction
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
 
 class SwapFee(
     val segments: List<SwapSegment>,
@@ -19,7 +19,7 @@ class SwapFee(
     val intermediateSegmentFeesInAssetIn: FeeBase,
 
     private val additionalMaxAmountDeduction: Balance,
-) : GenericFee, MaxAvailableDeduction {
+) : Fee, MaxAvailableDeduction {
 
     data class SwapSegment(val fee: AtomicSwapOperationFee, val operation: AtomicSwapOperation)
 
@@ -30,10 +30,9 @@ class SwapFee(
 
     private val assetIn = intermediateSegmentFeesInAssetIn.asset
 
-    val additionalAmountForSwap = additionalAmountForSwap()
+    val deductionForAssetIn: Balance = deductionFor(assetIn)
 
-    // TODO better multi fee display with `segmentsFees`
-    override val networkFee: Fee = determineNetworkFee()
+    val additionalAmountForSwap = additionalAmountForSwap()
 
     override fun deductionFor(amountAsset: Chain.Asset): Balance {
       return totalFeeAmount(amountAsset) + additionalMaxAmountDeduction
@@ -55,9 +54,8 @@ class SwapFee(
         return SubstrateFeeBase(totalFutureFeeInAssetIn, assetIn)
     }
 
-    // TODO this is for simpler understanding of real fee until multi-chain view is developed
-    private fun determineNetworkFee(): Fee {
-        val submissionFeeAsset = submissionFee.asset
-        return submissionFee.replacePlanks(newPlanks = totalFeeAmount(submissionFeeAsset))
-    }
+    // TODO this is until multi-chain fees are ready
+    override val submissionOrigin: SubmissionOrigin = submissionFee.submissionOrigin
+    override val amount: BigInteger = totalFeeAmount(submissionFee.asset)
+    override val asset: Chain.Asset = submissionFee.asset
 }

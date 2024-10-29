@@ -19,7 +19,7 @@ class AvailableBalanceGapValidation(
     override suspend fun validate(value: StartMultiStakingValidationPayload): ValidationStatus<StartMultiStakingValidationFailure> {
         val amount = value.selection.stake
         val stakingOption = value.selection.stakingOption
-        val fee = value.fee.networkFee.amountByExecutingAccount
+        val fee = value.fee.amountByExecutingAccount
 
         val maxToStakeWithMinStakes = candidates.map {
             val maximumToStake = it.maximumToStake(value.asset, fee)

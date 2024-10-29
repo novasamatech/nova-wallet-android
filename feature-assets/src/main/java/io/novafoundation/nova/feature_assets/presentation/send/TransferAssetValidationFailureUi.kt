@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.validation.handleSystem
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -24,7 +24,7 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<AssetTransferValidationFailure>,
     actions: ValidationFlowActions<*>,
-    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<OriginGenericFee>,
+    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<OriginFee>,
 ): TransformedFailure? {
     return when (val reason = status.reason) {
         is AssetTransferValidationFailure.DeadRecipient.InCommissionAsset -> Default(
@@ -120,7 +120,7 @@ fun autoFixSendValidationPayload(
 
     is AssetTransferValidationFailure.FeeChangeDetected -> payload.copy(
         transfer = payload.transfer.copy(
-            decimalFee = failureReason.payload.newFee
+            fee = failureReason.payload.newFee
         )
     )
 

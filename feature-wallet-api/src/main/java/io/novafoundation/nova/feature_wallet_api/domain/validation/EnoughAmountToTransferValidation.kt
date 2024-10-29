@@ -6,11 +6,10 @@ import io.novafoundation.nova.common.validation.DefaultFailureLevel
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmountByExecutingAccount
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.networkFeeByRequestedAccountOrZero
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -20,10 +19,10 @@ interface NotEnoughToPayFeesError {
     val fee: BigDecimal
 }
 
-typealias EnoughAmountToTransferValidation<P, E> = EnoughAmountToTransferValidationGeneric<P, E, SimpleFee>
+typealias EnoughAmountToTransferValidation<P, E> = EnoughAmountToTransferValidationGeneric<P, E, Fee>
 
-class EnoughAmountToTransferValidationGeneric<P, E, F : GenericFee>(
-    private val feeListExtractor: GenericFeeListProducer<F, P>,
+class EnoughAmountToTransferValidationGeneric<P, E, F : Fee>(
+    private val feeListExtractor: FeeListProducer<F, P>,
     private val availableBalanceProducer: AmountProducer<P>,
     private val errorProducer: (ErrorContext<P>) -> E,
     private val skippable: Boolean = false,
@@ -32,7 +31,7 @@ class EnoughAmountToTransferValidationGeneric<P, E, F : GenericFee>(
 
     constructor(
         extraAmountExtractor: AmountProducer<P> = { BigDecimal.ZERO },
-        feeExtractor: GenericFeeProducer<F, P>,
+        feeExtractor: OptionalFeeProducer<F, P>,
         availableBalanceProducer: AmountProducer<P>,
         errorProducer: (ErrorContext<P>) -> E,
         skippable: Boolean = false,
@@ -56,7 +55,7 @@ class EnoughAmountToTransferValidationGeneric<P, E, F : GenericFee>(
     companion object;
 
     override suspend fun validate(value: P): ValidationStatus<E> {
-        val fee = feeListExtractor(value).sumOf { it.networkFeeByRequestedAccountOrZero }
+        val fee = feeListExtractor(value).sumOf { it.decimalAmountByExecutingAccount }
         val available = availableBalanceProducer(value)
         val amount = extraAmountExtractor(value)
 
@@ -72,8 +71,8 @@ class EnoughAmountToTransferValidationGeneric<P, E, F : GenericFee>(
     }
 }
 
-fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.sufficientBalanceMultyFee(
-    feeExtractor: GenericFeeListProducer<F, P> = { emptyList() },
+fun <P, E, F : Fee> ValidationSystemBuilder<P, E>.sufficientBalanceMultiFee(
+    feeExtractor: FeeListProducer<F, P> = { emptyList() },
     amount: AmountProducer<P> = { BigDecimal.ZERO },
     available: AmountProducer<P>,
     error: (EnoughAmountToTransferValidationGeneric.ErrorContext<P>) -> E,
@@ -89,7 +88,7 @@ fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.sufficientBalanceMultyF
 )
 
 fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
-    fee: FeeProducer<P> = { null },
+    fee: SimpleFeeProducer<P> = { null },
     amount: AmountProducer<P> = { BigDecimal.ZERO },
     available: AmountProducer<P>,
     error: (EnoughAmountToTransferValidationGeneric.ErrorContext<P>) -> E,
@@ -104,14 +103,14 @@ fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalance(
     )
 )
 
-fun <P, E, F : GenericFee> ValidationSystemBuilder<P, E>.sufficientBalanceGeneric(
-    fee: GenericFeeProducer<F, P> = { null },
+fun <P, E, F : Fee> ValidationSystemBuilder<P, E>.sufficientBalanceGeneric(
+    fee: OptionalFeeProducer<F, P> = { null },
     amount: AmountProducer<P> = { BigDecimal.ZERO },
     available: AmountProducer<P>,
     error: (EnoughAmountToTransferValidationGeneric.ErrorContext<P>) -> E,
     skippable: Boolean = false
 ) = validate(
-    EnoughAmountToTransferValidationGeneric<P, E, F>(
+    EnoughAmountToTransferValidationGeneric(
         feeExtractor = fee,
         extraAmountExtractor = amount,
         errorProducer = error,

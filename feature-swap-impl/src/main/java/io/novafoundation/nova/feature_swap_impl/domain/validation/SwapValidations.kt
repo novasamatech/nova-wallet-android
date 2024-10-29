@@ -52,7 +52,7 @@ fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
         SwapValidationFailure.InsufficientBalance.BalanceNotConsiderConsumers(
             nativeAsset = payload.detailedAssetIn.asset.token.configuration,
             feeAsset = payload.feeAsset.token.configuration,
-            swapFee = payload.decimalFee.genericFee,
+            swapFee = payload.fee,
             existentialDeposit = existentialDeposit
         )
     }
@@ -69,7 +69,7 @@ fun SwapValidationSystemBuilder.enoughLiquidity(sharedQuoteValidationRetriever: 
 fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalanceGeneric(
     available = { it.feeAsset.transferable },
     amount = { BigDecimal.ZERO },
-    fee = { it.decimalFee },
+    fee = { it.fee },
     error = { SwapValidationFailure.NotEnoughFunds.ToPayFee }
 )
 
@@ -88,7 +88,7 @@ fun SwapValidationSystemBuilder.checkForFeeChanges(
     swapService: SwapService
 ) = checkForFeeChanges(
     calculateFee = { swapService.estimateFee(it.swapExecuteArgs) },
-    currentFee = { it.decimalFee },
+    currentFee = { it.fee },
     chainAsset = { it.feeAsset.token.configuration },
     error = SwapValidationFailure::FeeChangeDetected
 )

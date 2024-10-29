@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeProducer
+import io.novafoundation.nova.feature_wallet_api.domain.validation.SimpleFeeProducer
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -31,7 +31,7 @@ class PoolAvailableBalanceValidationFactory(
     context(ValidationSystemBuilder<P, E>)
     fun <P, E> enoughAvailableBalanceToStake(
         asset: (P) -> Asset,
-        fee: FeeProducer<P>,
+        fee: SimpleFeeProducer<P>,
         amount: (P) -> BigDecimal,
         error: (PoolAvailableBalanceValidation.ValidationError.Context) -> E
     ) {
@@ -50,7 +50,7 @@ class PoolAvailableBalanceValidationFactory(
 class PoolAvailableBalanceValidation<P, E>(
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val asset: (P) -> Asset,
-    private val fee: FeeProducer<P>,
+    private val fee: SimpleFeeProducer<P>,
     private val amount: (P) -> BigDecimal,
     private val error: (ValidationError.Context) -> E
 ) : Validation<P, E> {
@@ -72,7 +72,7 @@ class PoolAvailableBalanceValidation<P, E>(
         val asset = asset(value)
         val chainAsset = asset.token.configuration
 
-        val fee = fee(value)?.networkFee?.amountByExecutingAccount.orZero()
+        val fee = fee(value)?.amountByExecutingAccount.orZero()
         val availableBalance = poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
         val maxToStake = poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee)
         val enteredAmount = chainAsset.planksFromAmount(amount(value))

@@ -71,7 +71,7 @@ class ConfirmBondMoreViewModel(
         .shareInBackground()
 
     val feeStatusFlow = stashAssetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }

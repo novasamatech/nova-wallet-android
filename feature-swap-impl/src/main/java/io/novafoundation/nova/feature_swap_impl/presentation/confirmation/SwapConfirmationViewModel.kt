@@ -52,7 +52,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -246,7 +246,7 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap() = launch {
-        val fee = feeMixin.awaitDecimalFee().genericFee
+        val fee = feeMixin.awaitFee()
         val quote = confirmationStateFlow.first()?.swapQuote ?: return@launch
 
         _submissionInProgress.value = true
@@ -372,7 +372,7 @@ class SwapConfirmationViewModel(
                 firstSegmentFees = initialSwapState.first().fee.intermediateSegmentFeesInAssetIn.asset
             )
 
-            feeMixin.loadFeeV2Generic(
+            feeMixin.loadFee(
                 coroutineScope = viewModelScope,
                 feeConstructor = { swapInteractor.estimateFee(executeArgs) },
                 onRetryCancelled = { }

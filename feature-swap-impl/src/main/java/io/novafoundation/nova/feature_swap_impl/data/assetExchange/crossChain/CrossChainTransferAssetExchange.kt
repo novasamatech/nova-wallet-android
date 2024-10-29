@@ -176,13 +176,13 @@ class CrossChainTransferAssetExchange(
             }
 
             return AtomicSwapOperationFee(
-                submissionFee = SubmissionFeeWithLabel(crossChainFee.fromOriginInFeeCurrency),
+                submissionFee = SubmissionFeeWithLabel(crossChainFee.submissionFee),
                 postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
                     paidByAccount = listOfNotNull(
-                        SubmissionFeeWithLabel(crossChainFee.fromOriginInNativeCurrency, debugLabel = "Delivery"),
+                        SubmissionFeeWithLabel(crossChainFee.deliveryFee, debugLabel = "Delivery"),
                     ),
                     paidFromAmount = listOf(
-                        FeeWithLabel(crossChainFee.fromHoldingRegister, debugLabel = "Execution")
+                        FeeWithLabel(crossChainFee.executionFee, debugLabel = "Execution")
                     )
                 ),
             )

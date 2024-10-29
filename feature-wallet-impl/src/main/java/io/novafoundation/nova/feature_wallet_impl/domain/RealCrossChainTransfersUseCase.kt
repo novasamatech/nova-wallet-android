@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.paidByOriginOrNull
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.deliveryFeesOrNull
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableOutDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
@@ -110,9 +110,9 @@ internal class RealCrossChainTransfersUseCase(
 
     override suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,
-        computationalScope: CoroutineScope
+        cachingScope: CoroutineScope?
     ): CrossChainTransferFee {
-        val configuration = cachedConfigurationFlow(computationalScope).first()
+        val configuration = cachedConfigurationFlow(cachingScope).first()
         val transferConfiguration = configuration.transferConfiguration(
             originChain = transfer.originChain,
             originAsset = transfer.originChainAsset,
@@ -127,14 +127,14 @@ internal class RealCrossChainTransfersUseCase(
         val crossChainFee = crossChainWeigher.estimateFee(transfer.amountPlanks, transferConfiguration)
 
         return CrossChainTransferFee(
-            fromOriginInFeeCurrency = originFee,
-            fromOriginInNativeCurrency = crossChainFee.paidByOriginOrNull()?.let {
+            submissionFee = originFee,
+            deliveryFee = crossChainFee.deliveryFeesOrNull()?.let {
                 // Delivery fees are also paid by an actual account
                 val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.signingAccount)
                 SubstrateFee(it, submissionOrigin, transfer.originChain.commissionAsset)
             },
-            fromHoldingRegister = SubstrateFeeBase(
-                amount = crossChainFee.paidFromHoldingRegister,
+            executionFee = SubstrateFeeBase(
+                amount = crossChainFee.executionFees,
                 asset = transfer.originChainAsset,
             ),
         )
@@ -155,8 +155,12 @@ internal class RealCrossChainTransfersUseCase(
         return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
     }
 
-    private fun cachedConfigurationFlow(computationScope: CoroutineScope): Flow<CrossChainTransfersConfiguration> {
-        return computationalCache.useSharedFlow(CONFIGURATION_CACHE, computationScope) {
+    private fun cachedConfigurationFlow(cachingScope: CoroutineScope?): Flow<CrossChainTransfersConfiguration> {
+        if (cachingScope == null) {
+            return crossChainTransfersRepository.configurationFlow()
+        }
+
+        return computationalCache.useSharedFlow(CONFIGURATION_CACHE, cachingScope) {
             crossChainTransfersRepository.configurationFlow()
         }
     }

@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -145,7 +145,7 @@ class ConfirmReferendumVoteViewModel(
     }
 
     private fun setFee() = launch {
-        originFeeMixin.setFee(mapFeeFromParcel(payload.fee).genericFee)
+        originFeeMixin.setFee(mapFeeFromParcel(payload.fee))
     }
 
     private suspend fun getValidationPayload(): VoteReferendaValidationPayload {
@@ -158,7 +158,7 @@ class ConfirmReferendumVoteViewModel(
             maxAmount = payload.vote.amount,
             conviction = payload.vote.conviction,
             voteType = payload.vote.voteType,
-            fee = originFeeMixin.awaitDecimalFee()
+            fee = originFeeMixin.awaitFee()
         )
     }
 }

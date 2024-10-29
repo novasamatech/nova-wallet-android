@@ -35,7 +35,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFo
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -150,7 +150,7 @@ class RevokeDelegationConfirmViewModel(
         _showNextProgress.value = true
 
         val validationPayload = RevokeDelegationValidationPayload(
-            fee = originFeeMixin.awaitDecimalFee(),
+            fee = originFeeMixin.awaitFee(),
             asset = assetFlow.first()
         )
 

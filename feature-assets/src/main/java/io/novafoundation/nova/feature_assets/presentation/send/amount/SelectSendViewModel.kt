@@ -40,19 +40,16 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.commissionAsset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGenericChangeableFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createChangeable
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createSimple
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.isEnabled
@@ -87,7 +84,7 @@ class SelectSendViewModel(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val accountRepository: AccountRepository,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    feeLoaderMixinFactory: GenericFeeLoaderMixin.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     addressInputMixinFactory: AddressInputMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -157,7 +154,7 @@ class SelectSendViewModel(
     private val originAssetFlow = originChainAsset.flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinFactory.createGenericChangeableFee<OriginGenericFee>(
+    val originFeeMixin = feeLoaderMixinFactory.createChangeable<OriginFee>(
         originAssetFlow,
         coroutineScope,
         configuration = Configuration(
@@ -167,7 +164,7 @@ class SelectSendViewModel(
         )
     )
 
-    val crossChainFeeMixin = feeLoaderMixinFactory.create(originAssetFlow)
+    val crossChainFeeMixin = feeLoaderMixinFactory.createSimple(originAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -198,8 +195,8 @@ class SelectSendViewModel(
     fun nextClicked() = launch {
         sendInProgressFlow.value = true
 
-        val originFee = originFeeMixin.awaitDecimalFee()
-        val crossChainFee = crossChainFeeMixin.awaitOptionalDecimalFee()
+        val originFee = originFeeMixin.awaitFee()
+        val crossChainFee = crossChainFeeMixin.awaitOptionalFee()
 
         val transfer = buildTransfer(
             origin = originChainWithAsset.first(),
@@ -362,14 +359,10 @@ class SelectSendViewModel(
                 address = address
             )
 
-            val planks = originAsset.asset.planksFromAmount(amount)
+            val transferFeeModel = sendInteractor.getFee(assetTransfer, viewModelScope)
 
-            val transferFeeModel = sendInteractor.getFee(planks, assetTransfer, viewModelScope)
-            val originFee = SimpleGenericFee(transferFeeModel.originFee)
-            val crossChainFee = transferFeeModel.crossChainFee?.let { SimpleFee(it) }
-
-            originFeeMixin.setFee(originFee)
-            crossChainFeeMixin.setFee(crossChainFee)
+            originFeeMixin.setFee(transferFeeModel.originFee)
+            crossChainFeeMixin.setFee(transferFeeModel.crossChainFee)
         } catch (e: Exception) {
             e.printStackTrace()
 

@@ -86,7 +86,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             resourceManager.getString(
                 R.string.swap_failure_balance_not_consider_consumers,
                 reason.existentialDeposit.formatPlanks(reason.nativeAsset),
-                reason.swapFee.networkFee.amountByExecutingAccount.formatPlanks(reason.feeAsset)
+                reason.swapFee.amountByExecutingAccount.formatPlanks(reason.feeAsset)
             )
         ).asDefault()
 
@@ -103,7 +103,7 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             error = reason,
             resourceManager = resourceManager,
             actions = actions,
-            setFee = { setNewFee(it.newFee.genericFee) },
+            setFee = { setNewFee(it.newFee) },
         )
 
         is TooSmallRemainingBalance -> handleTooSmallRemainingBalance(

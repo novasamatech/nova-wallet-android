@@ -4,12 +4,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostConfiguration
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostTask
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 
 class YieldBoostValidationPayload(
     val collator: Collator,
     val activeTasks: List<YieldBoostTask>,
     val configuration: YieldBoostConfiguration,
     val asset: Asset,
-    val fee: DecimalFee,
+    val fee: Fee,
 )

@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.firstNotNull
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -14,9 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.ChangeFeeTokenState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -28,12 +28,12 @@ import kotlinx.coroutines.withContext
 @Deprecated("Use ChangeableFeeLoaderProviderPresentation instead")
 internal class GenericFeeLoaderProviderPresentation(
     resourceManager: ResourceManager,
-    configuration: GenericFeeLoaderMixin.Configuration<SimpleFee>,
+    configuration: GenericFeeLoaderMixin.Configuration<Fee>,
     tokenFlow: Flow<Token?>,
-) : GenericFeeLoaderProvider<SimpleFee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation
+) : GenericFeeLoaderProvider<Fee>(resourceManager, configuration, tokenFlow), FeeLoaderMixin.Presentation
 
 @Deprecated("Use ChangeableFeeLoaderProvider instead")
-internal open class GenericFeeLoaderProvider<F : GenericFee>(
+internal open class GenericFeeLoaderProvider<F : FeeBase>(
     protected val resourceManager: ResourceManager,
     protected val configuration: GenericFeeLoaderMixin.Configuration<F>,
     protected val tokenFlow: Flow<Token?>,
@@ -67,7 +67,7 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
         value?.run { feeLiveData.postValue(this) }
     }
 
-    override fun loadFeeV2Generic(
+    override fun loadFee(
         coroutineScope: CoroutineScope,
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit
@@ -131,7 +131,7 @@ internal open class GenericFeeLoaderProvider<F : GenericFee>(
                 RetryPayload(
                     title = resourceManager.getString(R.string.choose_amount_network_error),
                     message = resourceManager.getString(R.string.choose_amount_error_fee),
-                    onRetry = { loadFeeV2Generic(retryScope, feeConstructor, onRetryCancelled) },
+                    onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
                     onCancel = onRetryCancelled
                 )
             )
