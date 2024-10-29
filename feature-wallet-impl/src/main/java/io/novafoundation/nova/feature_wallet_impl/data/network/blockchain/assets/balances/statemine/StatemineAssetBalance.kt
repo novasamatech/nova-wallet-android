@@ -52,8 +52,8 @@ class StatemineAssetBalance(
         return emptyFlow()
     }
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
-        return queryAssetDetails(chainAsset).isSufficient
+    override fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+        return chainAsset.requireStatemine().isSufficient
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {

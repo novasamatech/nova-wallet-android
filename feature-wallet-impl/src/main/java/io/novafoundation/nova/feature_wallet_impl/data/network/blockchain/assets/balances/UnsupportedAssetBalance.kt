@@ -20,7 +20,7 @@ class UnsupportedAssetBalance : AssetBalance {
         subscriptionBuilder: SharedRequestsBuilder
     ) = unsupported()
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset) = unsupported()
+    override fun isSelfSufficient(chainAsset: Chain.Asset) = unsupported()
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset) = unsupported()
 

@@ -62,8 +62,9 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
             val idRaw = typeExtras?.get(STATEMINE_EXTRAS_ID)!!
             val id = mapStatemineAssetIdFromRaw(idRaw)
             val palletName = typeExtras[STATEMINE_EXTRAS_PALLET_NAME] as String?
+            val isSufficient = typeExtras[STATEMINE_IS_SUFFICIENT] as Boolean? ?: STATEMINE_IS_SUFFICIENT_DEFAULT
 
-            Chain.Asset.Type.Statemine(id, palletName)
+            Chain.Asset.Type.Statemine(id, palletName, isSufficient)
         }
 
         ASSET_ORML -> {

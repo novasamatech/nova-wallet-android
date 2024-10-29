@@ -69,6 +69,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterA
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -83,10 +84,13 @@ import io.novafoundation.nova.runtime.ext.isUtility
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAssetOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -121,6 +125,7 @@ internal class RealSwapService(
     private val customFeeCapabilityFacade: CustomFeeCapabilityFacade,
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
+    private val assetSourceRegistry: AssetSourceRegistry,
     private val tokenRepository: TokenRepository,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
@@ -407,7 +412,7 @@ internal class RealSwapService(
 
     private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): EdgeVisitFilter<SwapGraphEdge> {
         return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
-            CanPayFeeNodeVisitFilter(this)
+            CanPayFeeNodeVisitFilter(this, chainRegistry.chainsById())
         }
     }
 
@@ -751,9 +756,38 @@ internal class RealSwapService(
     /**
      * Check that it is possible to pay fees in moving asset
      */
-    private inner class CanPayFeeNodeVisitFilter(val computationScope: CoroutineScope) : EdgeVisitFilter<SwapGraphEdge> {
+    private inner class CanPayFeeNodeVisitFilter(
+        val computationScope: CoroutineScope,
+        val chainsById: ChainsById,
+    ) : EdgeVisitFilter<SwapGraphEdge> {
 
         private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
+
+        override suspend fun shouldVisit(edge: SwapGraphEdge, pathPredecessor: SwapGraphEdge?): Boolean {
+            // Utility payments and first path segments are always allowed
+            if (edge.from.isUtility || pathPredecessor == null) return true
+
+            // Destination asset must be sufficient
+            if (!isSufficient(edge.to)) return false
+
+            // Edge might request us to ignore the default requirement based on its direct predecessor
+            if (edge.shouldIgnoreFeeRequirementAfter(pathPredecessor)) return true
+
+            val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
+
+            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId)
+                && edge.canPayNonNativeFeesInIntermediatePosition()
+        }
+
+        private fun isSufficient(fullChainAssetId: FullChainAssetId): Boolean {
+            val (chain, chainAsset) = chainsById.chainWithAssetOrNull(fullChainAssetId) ?: return false
+            val balance = assetSourceRegistry.sourceFor(chainAsset).balance
+            return balance.isSelfSufficient(chainAsset).also { isSufficient ->
+                if (!isSufficient) {
+                    Log.d("Swaps", "${chainAsset.symbol} (${chain.name} is not sufficient)")
+                }
+            }
+        }
 
         private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability? {
             val fromCache = feePaymentCapabilityCache.getOrPut(chainId) {
@@ -766,19 +800,6 @@ internal class RealSwapService(
         private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability? {
             val feePaymentRegistry = exchangeRegistry(computationScope).getFeePaymentRegistry()
             return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
-        }
-
-        override suspend fun shouldVisit(edge: SwapGraphEdge, pathPredecessor: SwapGraphEdge?): Boolean {
-            // Utility payments and first path segments are always allowed
-            if (edge.from.isUtility || pathPredecessor == null) return true
-
-            // Edge might request us to ignore the default requirement based on its direct predecessor
-            if (edge.shouldIgnoreFeeRequirementAfter(pathPredecessor)) return true
-
-            val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
-
-            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId)
-                && edge.canPayNonNativeFeesInIntermediatePosition()
         }
     }
 

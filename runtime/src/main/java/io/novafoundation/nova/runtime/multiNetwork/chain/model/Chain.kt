@@ -91,7 +91,8 @@ data class Chain(
 
             data class Statemine(
                 val id: StatemineAssetId,
-                val palletName: String?
+                val palletName: String?,
+                val isSufficient: Boolean,
             ) : Type()
 
             data class Orml(

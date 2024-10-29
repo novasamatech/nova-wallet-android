@@ -61,6 +61,7 @@ class SwapFeatureModule {
         extrinsicServiceFactory: ExtrinsicService.Factory,
         defaultFeePaymentRegistry: FeePaymentProviderRegistry,
         tokenRepository: TokenRepository,
+        assetSourceRegistry: AssetSourceRegistry
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionFactory,
@@ -72,7 +73,8 @@ class SwapFeatureModule {
             customFeeCapabilityFacade = customFeeCapabilityFacade,
             extrinsicServiceFactory = extrinsicServiceFactory,
             defaultFeePaymentProviderRegistry = defaultFeePaymentRegistry,
-            tokenRepository = tokenRepository
+            tokenRepository = tokenRepository,
+            assetSourceRegistry = assetSourceRegistry
         )
     }
 

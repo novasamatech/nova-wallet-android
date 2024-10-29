@@ -39,7 +39,7 @@ interface AssetBalance {
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*> = emptyFlow<Nothing>()
 
-    suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
+    fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
 
     suspend fun existentialDeposit(
         chain: Chain,

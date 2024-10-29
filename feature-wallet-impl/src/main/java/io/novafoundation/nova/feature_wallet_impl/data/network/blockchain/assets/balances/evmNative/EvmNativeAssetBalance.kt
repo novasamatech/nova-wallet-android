@@ -42,7 +42,7 @@ class EvmNativeAssetBalance(
         return emptyFlow<Nothing>()
     }
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+    override fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
         return true
     }
 
