@@ -30,9 +30,10 @@ class SwapFee(
 
     private val assetIn = intermediateSegmentFeesInAssetIn.asset
 
+    val additionalAmountForSwap = additionalAmountForSwap()
+
     val deductionForAssetIn: Balance = deductionFor(assetIn)
 
-    val additionalAmountForSwap = additionalAmountForSwap()
 
     override fun deductionFor(amountAsset: Chain.Asset): Balance {
       return totalFeeAmount(amountAsset) + additionalMaxAmountDeduction
