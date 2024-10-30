@@ -11,6 +11,8 @@ interface AssetIconProvider {
     val fallbackIcon: Icon
 
     fun getAssetIcon(iconName: String?, fallback: Icon = fallbackIcon): Icon
+
+    fun getWhiteAssetIcon(iconName: String?, fallback: Icon = fallbackIcon): Icon
 }
 
 class RealAssetIconProvider(
@@ -26,9 +28,17 @@ class RealAssetIconProvider(
 
         val iconUrl = when (assetsIconModeRepository.getIconMode()) {
             AssetIconMode.COLORED -> "$coloredBaseUrl/$iconName"
-            AssetIconMode.WHITE -> "$coloredBaseUrl/$whiteBaseUrl"
+            AssetIconMode.WHITE -> "$whiteBaseUrl/$iconName"
         }
 
         return iconUrl.asIcon()
+    }
+
+    override fun getWhiteAssetIcon(iconName: String?, fallback: Icon): Icon {
+        return if (iconName == null) {
+            fallback
+        } else {
+            "$whiteBaseUrl/$iconName".asIcon()
+        }
     }
 }

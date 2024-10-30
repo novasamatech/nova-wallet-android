@@ -61,3 +61,7 @@ fun chainIconFallback(): Icon {
 fun AssetIconProvider.getAssetIcon(asset: Chain.Asset, fallbackIcon: Icon = this.fallbackIcon): Icon {
     return this.getAssetIcon(asset.icon, fallbackIcon)
 }
+
+fun AssetIconProvider.getWhiteAssetIcon(asset: Chain.Asset, fallbackIcon: Icon = this.fallbackIcon): Icon {
+    return this.getWhiteAssetIcon(asset.icon, fallbackIcon)
+}

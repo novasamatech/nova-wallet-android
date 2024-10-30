@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getWhiteAssetIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
@@ -276,7 +276,7 @@ fun mapOperationToOperationModel(
                     subHeader = subHeader.value,
                     subHeaderEllipsize = subHeader.elipsize,
                     statusAppearance = statusAppearance,
-                    operationIcon = assetIconProvider.getAssetIcon(operation.chainAsset)
+                    operationIcon = assetIconProvider.getWhiteAssetIcon(operation.chainAsset)
                 )
             }
 
