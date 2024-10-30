@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
 import io.novafoundation.nova.feature_assets.domain.assets.models.groupList
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
@@ -71,16 +71,16 @@ abstract class AssetFlowViewModel(
         router.back()
     }
 
-    abstract fun searchAssetsFlow(): Flow<AssetFlowSearchResult>
+    abstract fun searchAssetsFlow(): Flow<AssetsByViewModeResult>
 
     abstract fun assetClicked(assetModel: AssetModel)
 
     abstract fun tokenClicked(tokenGroup: TokenGroupUi)
 
-    private fun mapAssets(searchResult: AssetFlowSearchResult, currency: Currency): List<BalanceListRvItem> {
+    private fun mapAssets(searchResult: AssetsByViewModeResult, currency: Currency): List<BalanceListRvItem> {
         return when (searchResult) {
-            is AssetFlowSearchResult.ByNetworks -> mapNetworkAssets(searchResult.assets, currency)
-            is AssetFlowSearchResult.ByTokens -> mapTokensAssets(searchResult.tokens)
+            is AssetsByViewModeResult.ByNetworks -> mapNetworkAssets(searchResult.assets, currency)
+            is AssetsByViewModeResult.ByTokens -> mapTokensAssets(searchResult.tokens)
         }
     }
 

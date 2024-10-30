@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -8,7 +7,7 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
@@ -68,7 +67,7 @@ class AssetSwapFlowViewModel(
         }
     }
 
-    override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
+    override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.searchSwapAssetsFlow(
             forAsset = swapPayload.constraintDirectionsAsset?.fullChainAssetId,
             queryFlow = query,

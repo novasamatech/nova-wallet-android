@@ -13,14 +13,17 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
+import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.createAssetExpandableAnimationSettings
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
@@ -59,8 +62,13 @@ class AssetSearchFragment :
         searchAssetList.setHasFixedSize(true)
         searchAssetList.adapter = assetsAdapter
 
+        val animationSettings = createAssetExpandableAnimationSettings()
+        val animator = ExpandableAnimator(searchAssetList, animationSettings, assetsAdapter)
+
+        searchAssetList.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        searchAssetList.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
+
         AssetBaseDecoration.applyDefaultTo(searchAssetList, assetsAdapter)
-        searchAssetList.itemAnimator = null
 
         searchAssetSearch.cancel.setOnClickListener {
             viewModel.cancelClicked()
@@ -85,11 +93,7 @@ class AssetSearchFragment :
             searchAssetsPlaceholder.setVisible(data.isEmpty())
             searchAssetList.setVisible(data.isNotEmpty())
 
-            assetsAdapter.submitListPreservingViewPoint(
-                data = data,
-                into = searchAssetList,
-                extraDiffCompletedCallback = { searchAssetList.invalidateItemDecorations() }
-            )
+            assetsAdapter.submitList(data) { searchAssetList.invalidateItemDecorations() }
         }
     }
 
@@ -104,6 +108,13 @@ class AssetSearchFragment :
     }
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
-        showMessage("Not implemented yet")
+        if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
+            viewModel.assetClicked(tokenGroup.groupType.asset)
+        } else {
+            val itemAnimator = searchAssetList.itemAnimator as AssetTokensItemAnimator
+            itemAnimator.prepareForAnimation()
+
+            viewModel.assetListMixin.expandToken(tokenGroup)
+        }
     }
 }
