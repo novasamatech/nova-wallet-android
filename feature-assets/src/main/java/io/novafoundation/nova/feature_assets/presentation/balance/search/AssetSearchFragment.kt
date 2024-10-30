@@ -89,6 +89,12 @@ class AssetSearchFragment :
     override fun subscribe(viewModel: AssetSearchViewModel) {
         searchAssetSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
+        viewModel.query.observe {
+            searchAssetList.post {
+                searchAssetList.layoutManager!!.scrollToPosition(0)
+            }
+        }
+
         viewModel.searchResults.observe { data ->
             searchAssetsPlaceholder.setVisible(data.isEmpty())
             searchAssetList.setVisible(data.isNotEmpty())
