@@ -22,7 +22,7 @@ class QrCodeModel(
     val qrCode: QRCode,
     val overlayBackground: Drawable?,
     val overlayPaddingInDp: Int,
-    val centerOverlay: Icon?,
+    val centerOverlay: Icon,
 )
 
 class QrCodeView @JvmOverloads constructor(

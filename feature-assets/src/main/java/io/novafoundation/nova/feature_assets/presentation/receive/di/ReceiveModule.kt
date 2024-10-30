@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -45,7 +46,8 @@ class ReceiveModule {
         chainRegistry: ChainRegistry,
         selectedAccountUseCase: SelectedAccountUseCase,
         payload: AssetPayload,
-        clipboardManager: ClipboardManager
+        clipboardManager: ClipboardManager,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return ReceiveViewModel(
             interactor,
@@ -55,7 +57,8 @@ class ReceiveModule {
             chainRegistry,
             selectedAccountUseCase,
             router,
-            clipboardManager
+            clipboardManager,
+            assetIconProvider
         )
     }
 
