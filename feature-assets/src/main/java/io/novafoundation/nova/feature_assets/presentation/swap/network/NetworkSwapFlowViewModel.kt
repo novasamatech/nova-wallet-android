@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.network
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -45,7 +46,7 @@ class NetworkSwapFlowViewModel(
     }
 
     override fun assetsFlow(tokenSymbol: TokenSymbol): Flow<List<AssetWithNetwork>> {
-        return interactor.swapAssetsFlow(tokenSymbol, externalBalancesFlow)
+        return interactor.swapAssetsFlow(tokenSymbol, externalBalancesFlow, viewModelScope)
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {

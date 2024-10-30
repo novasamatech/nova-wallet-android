@@ -24,7 +24,9 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -58,22 +60,28 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSearchInteractor(
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        chainRegistry: ChainRegistry,
-        swapService: SwapService,
-        assetsViewModeService: AssetsViewModeService
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, swapService, assetsViewModeService)
-
-    @Provides
-    @FeatureScope
-    fun provideAssetNetworksInteractor(
+    fun provideAssetSearchUseCase(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         swapService: SwapService
-    ) = AssetNetworksInteractor(walletRepository, accountRepository, chainRegistry, swapService)
+    ) = AssetSearchUseCase(walletRepository, accountRepository, chainRegistry, swapService)
+
+    @Provides
+    @FeatureScope
+    fun provideSearchInteractorFactory(
+        assetViewModeRepository: AssetsViewModeService.AssetsViewModeRepository,
+        assetSearchUseCase: AssetSearchUseCase,
+        chainRegistry: ChainRegistry
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideAssetNetworksInteractor(
+        chainRegistry: ChainRegistry,
+        swapService: SwapService,
+        assetSearchUseCase: AssetSearchUseCase
+    ) = AssetNetworksInteractor(chainRegistry, swapService, assetSearchUseCase)
 
     @Provides
     @FeatureScope
@@ -158,6 +166,7 @@ class AssetsFeatureModule {
     )
 
     @Provides
+    @FeatureScope
     fun provideInitialSwapFlowExecutor(
         assetsRouter: AssetsRouter
     ): InitialSwapFlowExecutor {
@@ -165,6 +174,7 @@ class AssetsFeatureModule {
     }
 
     @Provides
+    @FeatureScope
     fun provideSwapExecutor(
         initialSwapFlowExecutor: InitialSwapFlowExecutor,
         assetsRouter: AssetsRouter,

@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowViewModel
@@ -31,7 +31,7 @@ class AssetBuyFlowModule {
     @IntoMap
     @ViewModelKey(AssetBuyFlowViewModel::class)
     fun provideViewModel(
-        interactor: AssetSearchInteractor,
+        interactorFactory: AssetSearchInteractorFactory,
         router: AssetsRouter,
         externalBalancesInteractor: ExternalBalancesInteractor,
         currencyInteractor: CurrencyInteractor,
@@ -42,7 +42,7 @@ class AssetBuyFlowModule {
         assetIconProvider: AssetIconProvider
     ): ViewModel {
         return AssetBuyFlowViewModel(
-            interactor = interactor,
+            interactorFactory = interactorFactory,
             router = router,
             externalBalancesInteractor = externalBalancesInteractor,
             currencyInteractor = currencyInteractor,
