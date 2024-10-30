@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.SetAssetEnabledParams
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository

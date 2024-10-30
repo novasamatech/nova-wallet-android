@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_assets.R

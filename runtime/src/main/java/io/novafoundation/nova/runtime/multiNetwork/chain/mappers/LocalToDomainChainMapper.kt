@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import android.util.Log
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
@@ -22,7 +21,6 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLoca
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
-import io.novafoundation.nova.runtime.BuildConfig
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

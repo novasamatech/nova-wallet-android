@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent

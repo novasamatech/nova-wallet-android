@@ -167,5 +167,4 @@ interface WalletFeatureDependencies {
     fun hydraDxAssetIdConverter(): HydraDxAssetIdConverter
 
     fun assetsIconModeService(): AssetsIconModeRepository
-
 }

@@ -5,7 +5,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel

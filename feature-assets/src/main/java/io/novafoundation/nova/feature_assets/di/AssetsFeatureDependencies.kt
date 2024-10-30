@@ -258,5 +258,4 @@ interface AssetsFeatureDependencies {
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 
     fun nftRepository(): NftRepository
-
 }
