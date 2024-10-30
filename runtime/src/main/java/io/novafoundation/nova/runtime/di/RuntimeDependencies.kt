@@ -3,7 +3,7 @@ package io.novafoundation.nova.runtime.di
 import android.content.Context
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -31,5 +31,5 @@ interface RuntimeDependencies {
 
     fun chainAssetDao(): ChainAssetDao
 
-    fun assetsIconModeService(): AssetsIconModeService
+    fun assetsIconModeService(): AssetsIconModeRepository
 }

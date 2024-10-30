@@ -5,12 +5,14 @@ import android.text.TextUtils
 import android.text.style.ImageSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
@@ -212,6 +214,7 @@ fun mapOperationToOperationModel(
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
+    assetIconProvider: AssetIconProvider
 ): OperationModel {
     val statusAppearance = mapStatusToStatusAppearance(operation.status)
     val formattedTime = resourceManager.formatTime(operation.time)
@@ -273,7 +276,7 @@ fun mapOperationToOperationModel(
                     subHeader = subHeader.value,
                     subHeaderEllipsize = subHeader.elipsize,
                     statusAppearance = statusAppearance,
-                    operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon()
+                    operationIcon = assetIconProvider.getAssetIcon(operation.chainAsset)
                 )
             }
 

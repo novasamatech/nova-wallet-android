@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -31,8 +31,8 @@ class ReceiveModule {
         fileProvider: FileProvider,
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
-        assetsIconModeService: AssetsIconModeService
-    ) = ReceiveInteractor(fileProvider, chainRegistry, accountRepository, assetsIconModeService)
+        assetsIconModeRepository: AssetsIconModeRepository
+    ) = ReceiveInteractor(fileProvider, chainRegistry, accountRepository, assetsIconModeRepository)
 
     @Provides
     @IntoMap

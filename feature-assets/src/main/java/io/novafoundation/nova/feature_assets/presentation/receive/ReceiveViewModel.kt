@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -17,7 +18,8 @@ import io.novafoundation.nova.common.view.QrCodeModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload

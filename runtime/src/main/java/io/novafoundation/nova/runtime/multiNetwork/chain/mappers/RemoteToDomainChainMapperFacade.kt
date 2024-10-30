@@ -1,15 +1,13 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
 
 class RemoteToDomainChainMapperFacade(
-    private val gson: Gson,
-    private val assetsIconModeService: AssetsIconModeService
+    private val gson: Gson
 ) {
 
     fun mapRemoteChainToDomain(chainRemote: ChainRemote, source: Chain.Source): Chain {
@@ -30,8 +28,7 @@ class RemoteToDomainChainMapperFacade(
             assetsLocal = assetsLocal,
             explorersLocal = explorersLocal,
             externalApisLocal = externalApisLocal,
-            gson = gson,
-            assetsIconModeService.getIconMode()
+            gson = gson
         )
     }
 }

@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.search
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
@@ -15,10 +17,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 
 class AssetSearchViewModel(
     private val router: AssetsRouter,
-    interactor: AssetSearchInteractor,
+    interactorFactory: AssetSearchInteractorFactory,
     currencyInteractor: CurrencyInteractor,
     externalBalancesInteractor: ExternalBalancesInteractor,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel() {
+
+    val interactor = interactorFactory.createByAssetViewMode()
 
     val query = MutableStateFlow("")
 
@@ -32,7 +37,10 @@ class AssetSearchViewModel(
         interactor.searchAssetsFlow(query, externalBalances),
         selectedCurrency,
     ) { assets, currency ->
-        assets.mapGroupedAssetsToUi(currency)
+        when (assets) {
+            is AssetFlowSearchResult.ByNetworks -> assets.assets.mapGroupedAssetsToUi(assetIconProvider, currency)
+            is AssetFlowSearchResult.ByTokens -> assets.tokens.mapGroupedAssetsToUi(assetIconProvider)
+        }
     }
         .distinctUntilChanged()
         .shareInBackground()

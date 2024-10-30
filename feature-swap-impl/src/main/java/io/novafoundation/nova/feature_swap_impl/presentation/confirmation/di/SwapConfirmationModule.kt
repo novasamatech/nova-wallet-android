@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -56,7 +57,8 @@ class SwapConfirmationModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         assetUseCase: ArbitraryAssetUseCase,
-        maxActionProviderFactory: MaxActionProviderFactory
+        maxActionProviderFactory: MaxActionProviderFactory,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter,
@@ -78,7 +80,8 @@ class SwapConfirmationModule {
             feeLoaderMixinFactory,
             descriptionBottomSheetLauncher,
             assetUseCase,
-            maxActionProviderFactory
+            maxActionProviderFactory,
+            assetIconProvider
         )
     }
 

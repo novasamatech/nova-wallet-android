@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import android.util.Log
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
@@ -22,7 +21,6 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLoca
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
-import io.novafoundation.nova.runtime.BuildConfig
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
@@ -184,7 +182,7 @@ private fun mapNodeSelectionFromLocal(nodeSelectionPreferencesLocal: NodeSelecti
     }
 }
 
-fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson, assetIconMode: AssetIconMode): Chain {
+fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson): Chain {
     return mapChainLocalToChain(
         chainLocal.chain,
         chainLocal.nodes,
@@ -192,8 +190,7 @@ fun mapChainLocalToChain(chainLocal: JoinedChainInfo, gson: Gson, assetIconMode:
         chainLocal.assets,
         chainLocal.explorers,
         chainLocal.externalApis,
-        gson,
-        assetIconMode
+        gson
     )
 }
 
@@ -204,8 +201,7 @@ fun mapChainLocalToChain(
     assetsLocal: List<ChainAssetLocal>,
     explorersLocal: List<ChainExplorerLocal>,
     externalApisLocal: List<ChainExternalApiLocal>,
-    gson: Gson,
-    assetIconMode: AssetIconMode
+    gson: Gson
 ): Chain {
     val nodes = nodesLocal.sortedBy { it.orderId }.map {
         Chain.Node(
@@ -223,7 +219,7 @@ fun mapChainLocalToChain(
         nodes = nodes
     )
 
-    val assets = assetsLocal.map { mapChainAssetLocalToAsset(it, gson, assetIconMode) }
+    val assets = assetsLocal.map { mapChainAssetLocalToAsset(it, gson) }
 
     val explorers = explorersLocal.map {
         Chain.Explorer(
@@ -278,12 +274,12 @@ fun mapChainLocalToChain(
     }
 }
 
-fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson, assetIconMode: AssetIconMode): Chain.Asset {
+fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
     val typeExtrasParsed = local.typeExtras?.let(gson::parseArbitraryObject)
     val buyProviders = local.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
 
     return Chain.Asset(
-        icon = getAssetIconUrl(local.icon, assetIconMode),
+        icon = local.icon,
         id = local.id,
         symbol = local.symbol.asTokenSymbol(),
         precision = local.precision.asPrecision(),
@@ -296,17 +292,6 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson, assetIconMode:
         source = mapAssetSourceFromLocal(local.source),
         enabled = local.enabled
     )
-}
-
-private fun getAssetIconUrl(icon: String?, assetIconMode: AssetIconMode): Chain.Icon? {
-    return icon?.let {
-        val baseUrl = when (assetIconMode) {
-            AssetIconMode.COLORED -> BuildConfig.ASSET_COLORED_ICON_URL
-            AssetIconMode.WHITE -> BuildConfig.ASSET_WHITE_ICON_URL
-        }
-
-        Chain.Icon(it, baseUrl)
-    }
 }
 
 private fun mapSourceFromLocal(local: ChainLocal.Source): Chain.Source {

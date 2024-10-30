@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork
 
 import android.util.Log
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
@@ -40,7 +39,6 @@ import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -64,12 +62,11 @@ class ChainRegistry(
     private val baseTypeSynchronizer: BaseTypeSynchronizer,
     private val runtimeSyncService: RuntimeSyncService,
     private val web3ApiPool: Web3ApiPool,
-    private val gson: Gson,
-    private val assetsIconModeService: AssetsIconModeService
+    private val gson: Gson
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
-    val currentChains = combine(chainDao.joinChainInfoFlow(), assetsIconModeService.assetsIconModeFlow()) { chains, assetIconMode ->
-        chains.map { mapChainLocalToChain(it, gson, assetIconMode) }
+    val currentChains = chainDao.joinChainInfoFlow().map { chains ->
+        chains.map { mapChainLocalToChain(it, gson) }
     }
         .diffed()
         .map { diff ->

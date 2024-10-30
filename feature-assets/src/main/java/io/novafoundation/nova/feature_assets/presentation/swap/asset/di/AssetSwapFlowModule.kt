@@ -8,10 +8,11 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowViewModel
@@ -32,7 +33,7 @@ class AssetSwapFlowModule {
     @IntoMap
     @ViewModelKey(AssetSwapFlowViewModel::class)
     fun provideViewModel(
-        interactor: AssetSearchInteractor,
+        interactorFactory: AssetSearchInteractorFactory,
         router: AssetsRouter,
         currencyInteractor: CurrencyInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
@@ -41,10 +42,11 @@ class AssetSwapFlowModule {
         resourceManager: ResourceManager,
         payload: SwapFlowPayload,
         executorFactory: SwapFlowExecutorFactory,
-        swapAvailabilityInteractor: SwapAvailabilityInteractor
+        swapAvailabilityInteractor: SwapAvailabilityInteractor,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return AssetSwapFlowViewModel(
-            interactor = interactor,
+            interactorFactory = interactorFactory,
             router = router,
             currencyInteractor = currencyInteractor,
             externalBalancesInteractor = externalBalancesInteractor,
@@ -53,7 +55,8 @@ class AssetSwapFlowModule {
             resourceManager = resourceManager,
             swapFlowExecutor = executorFactory.create(payload),
             swapPayload = payload,
-            swapAvailabilityInteractor = swapAvailabilityInteractor
+            swapAvailabilityInteractor = swapAvailabilityInteractor,
+            assetIconProvider = assetIconProvider
         )
     }
 }

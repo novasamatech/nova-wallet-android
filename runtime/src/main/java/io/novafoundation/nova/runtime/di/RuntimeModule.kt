@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core.storage.StorageCache
@@ -267,12 +266,10 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideRemoteToDomainChainMapperFacade(
-        gson: Gson,
-        assetsIconModeService: AssetsIconModeService
+        gson: Gson
     ): RemoteToDomainChainMapperFacade {
         return RemoteToDomainChainMapperFacade(
-            gson,
-            assetsIconModeService
+            gson
         )
     }
 

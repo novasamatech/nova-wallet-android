@@ -1,17 +1,15 @@
 package io.novafoundation.nova.feature_assets.presentation.buy.flow.network
 
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.FragmentPayloadHolder
+import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import javax.inject.Inject
 
 class NetworkBuyFlowFragment :
-    NetworkFlowFragment<NetworkBuyFlowViewModel>(),
-    FragmentPayloadHolder<NetworkFlowPayload> {
+    NetworkFlowFragment<NetworkBuyFlowViewModel>() {
 
     @Inject
     lateinit var buyMixin: BuyMixinUi
@@ -19,7 +17,7 @@ class NetworkBuyFlowFragment :
     override fun inject() {
         FeatureUtils.getFeature<AssetsFeatureComponent>(this, AssetsFeatureApi::class.java)
             .networkBuyFlowComponent()
-            .create(this, payload)
+            .create(this, payload())
             .inject(this)
     }
 

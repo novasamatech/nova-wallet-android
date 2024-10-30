@@ -46,7 +46,7 @@ class NetworkReceiveFlowViewModel(
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
-        validate(network) {
+        validateControllsAsset(network) {
             router.openReceive(AssetPayload(network.chainId, network.assetId))
         }
     }

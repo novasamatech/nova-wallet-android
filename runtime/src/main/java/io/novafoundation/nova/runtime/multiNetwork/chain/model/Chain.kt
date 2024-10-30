@@ -46,17 +46,6 @@ data class Chain(
 
     val assetsById = assets.associateBy(Asset::id)
 
-    data class Icon(
-        val name: String,
-        val baseUrl: String,
-    ) {
-        companion object;
-
-        constructor(url: String) : this("", url)
-
-        fun getIconUrl(): String = "$baseUrl$name"
-    }
-
     data class Additional(
         val defaultTip: BigInteger?,
         val themeColor: String?,
@@ -76,7 +65,7 @@ data class Chain(
     )
 
     data class Asset(
-        val icon: Icon?,
+        val icon: String?,
         val id: ChainAssetId,
         val priceId: String?,
         val chainId: ChainId,
@@ -89,9 +78,6 @@ data class Chain(
         val name: String,
         val enabled: Boolean,
     ) : Identifiable, Serializable {
-
-        // To support legacy code
-        val iconUrl = icon?.getIconUrl()
 
         enum class Source {
             DEFAULT, ERC20, MANUAL

@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage.model
 
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatListPreview
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.tokens.manage.MultiChainToken
 
@@ -12,19 +14,20 @@ data class MultiChainTokenModel(
 ) {
 
     class HeaderModel(
-        val icon: String?,
+        val icon: Icon,
         val symbol: String,
         val networks: String,
     )
 }
 
 class MultiChainTokenMapper(
+    private val assetIconProvider: AssetIconProvider,
     private val resourceManager: ResourceManager
 ) {
 
     fun mapHeaderToUi(multiChainToken: MultiChainToken): MultiChainTokenModel.HeaderModel {
         return MultiChainTokenModel.HeaderModel(
-            icon = multiChainToken.icon,
+            icon = assetIconProvider.getAssetIcon(multiChainToken.icon),
             symbol = multiChainToken.symbol,
             networks = constructNetworksSubtitle(multiChainToken)
         )

@@ -9,6 +9,7 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
@@ -19,11 +20,11 @@ import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
-import io.novafoundation.nova.common.data.repository.AssetsViewModeService
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
-import io.novafoundation.nova.common.data.repository.RealAssetsIconModeService
-import io.novafoundation.nova.common.data.repository.RealAssetsViewModeService
+import io.novafoundation.nova.common.data.repository.RealAssetsIconModeRepository
+import io.novafoundation.nova.common.data.repository.RealAssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
@@ -44,6 +45,8 @@ import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.condition.RealConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.RealAssetIconProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -354,9 +357,19 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun assetsViewModeService(preferences: Preferences): AssetsViewModeService = RealAssetsViewModeService(preferences)
+    fun provideAssetsViewModeRepository(preferences: Preferences): AssetsViewModeRepository = RealAssetsViewModeRepository(preferences)
 
     @Provides
     @ApplicationScope
-    fun assetsIconModeService(preferences: Preferences): AssetsIconModeService = RealAssetsIconModeService(preferences)
+    fun provideAssetsIconModeRepository(preferences: Preferences): AssetsIconModeRepository = RealAssetsIconModeRepository(preferences)
+
+    @Provides
+    @ApplicationScope
+    fun provideAssetIconProvider(repository: AssetsIconModeRepository): AssetIconProvider {
+        return RealAssetIconProvider(
+            repository,
+            BuildConfig.ASSET_COLORED_ICON_URL,
+            BuildConfig.ASSET_WHITE_ICON_URL,
+        )
+    }
 }

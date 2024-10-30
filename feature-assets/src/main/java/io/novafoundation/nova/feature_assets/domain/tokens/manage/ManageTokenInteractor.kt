@@ -103,7 +103,7 @@ class RealManageTokenInteractor(
                 MultiChainToken(
                     id = symbol,
                     symbol = symbol,
-                    icon = firstAsset.iconUrl,
+                    icon = firstAsset.icon,
                     isSwitchable = !isLastTokenEnabled,
                     instances = chainsWithAssets.map { (chain, asset) ->
                         MultiChainToken.ChainTokenInstance(

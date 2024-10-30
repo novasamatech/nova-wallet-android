@@ -2,13 +2,14 @@ package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -33,7 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class AssetSwapFlowViewModel(
-    interactor: AssetSearchInteractor,
+    interactorFactory: AssetSearchInteractorFactory,
     router: AssetsRouter,
     currencyInteractor: CurrencyInteractor,
     externalBalancesInteractor: ExternalBalancesInteractor,
@@ -42,15 +43,17 @@ class AssetSwapFlowViewModel(
     resourceManager: ResourceManager,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val swapFlowExecutor: SwapFlowExecutor,
-    private val swapPayload: SwapFlowPayload
+    private val swapPayload: SwapFlowPayload,
+    private val assetIconProvider: AssetIconProvider
 ) : AssetFlowViewModel(
-    interactor,
+    interactorFactory,
     router,
     currencyInteractor,
     controllableAssetCheck,
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
+    assetIconProvider
 ) {
 
     init {
@@ -92,12 +95,12 @@ class AssetSwapFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
+        return assets.mapGroupedAssetsToUi(assetIconProvider, currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
     }
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 }
