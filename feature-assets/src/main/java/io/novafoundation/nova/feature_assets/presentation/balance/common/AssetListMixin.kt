@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.data.model.switch
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 
 class AssetListMixinFactory(
+    private val assetIconProvider: AssetIconProvider,
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val currencyInteractor: CurrencyInteractor,
@@ -31,6 +33,7 @@ class AssetListMixinFactory(
 ) {
 
     fun create(coroutineScope: CoroutineScope): AssetListMixin = RealAssetListMixin(
+        assetIconProvider,
         walletInteractor,
         assetsListInteractor,
         currencyInteractor,
@@ -57,6 +60,7 @@ interface AssetListMixin {
 }
 
 class RealAssetListMixin(
+    assetIconProvider: AssetIconProvider,
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val currencyInteractor: CurrencyInteractor,
@@ -89,9 +93,10 @@ class RealAssetListMixin(
         expandedTokenIdsFlow
     ) { assets, currency, externalBalances, viewMode, expandedTokens ->
         when (viewMode) {
-            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).mapGroupedAssetsToUi(currency)
+            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).mapGroupedAssetsToUi(assetIconProvider, currency)
             AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances)
                 .mapGroupedAssetsToUi(
+                    assetIconProvider = assetIconProvider,
                     assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
                 )
         }

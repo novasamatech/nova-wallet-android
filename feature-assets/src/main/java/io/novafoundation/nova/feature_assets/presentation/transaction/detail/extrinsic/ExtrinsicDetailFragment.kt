@@ -9,6 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.TableCellView
@@ -93,7 +94,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         viewModel.chainUi.observe(extrinsicDetailNetwork::showChain)
 
         viewModel.operationIcon.observe {
-            extrinsicDetailIcon.loadTokenIcon(it, imageLoader)
+            extrinsicDetailIcon.setIcon(it, imageLoader)
         }
     }
 

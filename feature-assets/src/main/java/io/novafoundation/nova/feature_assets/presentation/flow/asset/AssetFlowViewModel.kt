@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.inBackground
@@ -40,6 +41,7 @@ abstract class AssetFlowViewModel(
     internal val accountUseCase: SelectedAccountUseCase,
     externalBalancesInteractor: ExternalBalancesInteractor,
     internal val resourceManager: ResourceManager,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel() {
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
@@ -82,11 +84,11 @@ abstract class AssetFlowViewModel(
     }
 
     open fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(currency)
+        return assets.mapGroupedAssetsToUi(assetIconProvider, currency)
     }
 
     open fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
-        return assets.map { mapTokenAssetGroupToUi(it.key, assets = it.value) }
+        return assets.map { mapTokenAssetGroupToUi(assetIconProvider, it.key, assets = it.value) }
     }
 
     internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {

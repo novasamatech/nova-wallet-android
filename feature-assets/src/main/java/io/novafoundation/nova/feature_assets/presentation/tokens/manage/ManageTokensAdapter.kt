@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
@@ -78,7 +79,7 @@ class ManageTokensViewHolder(
 
         bindEnabled(item)
 
-        itemManageTokenMultichainIcon.loadTokenIcon(item.header.icon, imageLoader)
+        itemManageTokenMultichainIcon.setIcon(item.header.icon, imageLoader)
         itemManageTokenMultichainSymbol.text = item.header.symbol
     }
 

@@ -9,6 +9,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
@@ -81,7 +82,7 @@ class SwapAmountInputView @JvmOverloads constructor(
     private fun setAssetIcon(icon: SwapInputAssetModel.SwapAssetIcon) {
         return when (icon) {
             is SwapInputAssetModel.SwapAssetIcon.Chosen -> {
-                swapAmountInputImage.loadTokenIcon(icon.assetIconUrl, imageLoader)
+                swapAmountInputImage.setIcon(icon.assetIcon, imageLoader)
                 swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
             }
 

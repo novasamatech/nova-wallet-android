@@ -6,11 +6,12 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -215,8 +216,9 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideAmountChooserFactory(
-        resourceManager: ResourceManager
-    ): AmountChooserMixin.Factory = AmountChooserProviderFactory(resourceManager)
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
+    ): AmountChooserMixin.Factory = AmountChooserProviderFactory(resourceManager, assetIconProvider)
 
     @Provides
     @FeatureScope
@@ -323,9 +325,8 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideChainAssetRepository(
         chainAssetDao: ChainAssetDao,
-        gson: Gson,
-        assetsIconModeService: AssetsIconModeService
-    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson, assetsIconModeService)
+        gson: Gson
+    ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson)
 
     @Provides
     @FeatureScope

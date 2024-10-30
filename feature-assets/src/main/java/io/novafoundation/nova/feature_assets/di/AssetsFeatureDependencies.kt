@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -87,6 +88,88 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    val assetsSourceRegistry: AssetSourceRegistry
+
+    val addressInputMixinFactory: AddressInputMixinFactory
+
+    val multiChainQrSharingFactory: MultiChainQrSharingFactory
+
+    val walletUiUseCase: WalletUiUseCase
+
+    val computationalCache: ComputationalCache
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val crossChainTraRepository: CrossChainTransfersRepository
+
+    val crossChainWeigher: CrossChainWeigher
+
+    val crossChainTransactor: CrossChainTransactor
+
+    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+
+    val parachainInfoRepository: ParachainInfoRepository
+
+    val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
+
+    val balanceLocksRepository: BalanceLocksRepository
+
+    val chainAssetRepository: ChainAssetRepository
+
+    val erc20Standard: Erc20Standard
+
+    val externalBalanceRepository: ExternalBalanceRepository
+
+    val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory
+
+    val paymentUpdaterFactory: PaymentUpdaterFactory
+
+    val locksUpdaterFactory: BalanceLocksUpdaterFactory
+
+    val accountUpdateScope: AccountUpdateScope
+
+    val storageSharedRequestBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val poolDisplayUseCase: PoolDisplayUseCase
+
+    val poolAccountDerivation: PoolAccountDerivation
+
+    val operationDao: OperationDao
+
+    val coinPriceRepository: CoinPriceRepository
+
+    val swapSettingsStateProvider: SwapSettingsStateProvider
+
+    val swapService: SwapService
+
+    val swapAvailabilityInteractor: SwapAvailabilityInteractor
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
+
+    val buyMixinFactory: BuyMixin.Factory
+
+    val buyMixinUi: BuyMixinUi
+
+    val crossChainTransfersUseCase: CrossChainTransfersUseCase
+
+    val arbitraryTokenUseCase: ArbitraryTokenUseCase
+
+    val swapRateFormatter: SwapRateFormatter
+
+    val bottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
+
+    val chainStateRepository: ChainStateRepository
+
+    val holdsRepository: BalanceHoldsRepository
+
+    val holdsDao: HoldsDao
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val assetIconProvider: AssetIconProvider
 
     fun web3NamesInteractor(): Web3NamesInteractor
 
@@ -174,83 +257,6 @@ interface AssetsFeatureDependencies {
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 
-    val assetsSourceRegistry: AssetSourceRegistry
-
     fun nftRepository(): NftRepository
 
-    val addressInputMixinFactory: AddressInputMixinFactory
-
-    val multiChainQrSharingFactory: MultiChainQrSharingFactory
-
-    val walletUiUseCase: WalletUiUseCase
-
-    val computationalCache: ComputationalCache
-
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-
-    val crossChainTraRepository: CrossChainTransfersRepository
-    val crossChainWeigher: CrossChainWeigher
-    val crossChainTransactor: CrossChainTransactor
-
-    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
-
-    val parachainInfoRepository: ParachainInfoRepository
-
-    val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
-
-    val balanceLocksRepository: BalanceLocksRepository
-
-    val chainAssetRepository: ChainAssetRepository
-
-    val erc20Standard: Erc20Standard
-
-    val externalBalanceRepository: ExternalBalanceRepository
-
-    val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory
-
-    val paymentUpdaterFactory: PaymentUpdaterFactory
-
-    val locksUpdaterFactory: BalanceLocksUpdaterFactory
-
-    val accountUpdateScope: AccountUpdateScope
-
-    val storageSharedRequestBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val poolDisplayUseCase: PoolDisplayUseCase
-
-    val poolAccountDerivation: PoolAccountDerivation
-
-    val operationDao: OperationDao
-
-    val coinPriceRepository: CoinPriceRepository
-
-    val swapSettingsStateProvider: SwapSettingsStateProvider
-
-    val swapService: SwapService
-
-    val swapAvailabilityInteractor: SwapAvailabilityInteractor
-
-    val bannerVisibilityRepository: BannerVisibilityRepository
-
-    val buyMixinFactory: BuyMixin.Factory
-
-    val buyMixinUi: BuyMixinUi
-
-    val crossChainTransfersUseCase: CrossChainTransfersUseCase
-
-    val arbitraryTokenUseCase: ArbitraryTokenUseCase
-
-    val swapRateFormatter: SwapRateFormatter
-
-    val bottomSheetLauncher: DescriptionBottomSheetLauncher
-
-    val selectAddressMixinFactory: SelectAddressMixin.Factory
-
-    val chainStateRepository: ChainStateRepository
-
-    val holdsRepository: BalanceHoldsRepository
-
-    val holdsDao: HoldsDao
-
-    val coinGeckoLinkParser: CoinGeckoLinkParser
 }

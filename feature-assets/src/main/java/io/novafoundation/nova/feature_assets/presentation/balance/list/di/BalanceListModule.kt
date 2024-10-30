@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -57,12 +58,14 @@ class BalanceListModule {
     @Provides
     @ScreenScope
     fun provideAssetListMixinFactory(
+        assetIconProvider: AssetIconProvider,
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         currencyInteractor: CurrencyInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor
     ): AssetListMixinFactory {
         return AssetListMixinFactory(
+            assetIconProvider,
             walletInteractor,
             assetsListInteractor,
             currencyInteractor,

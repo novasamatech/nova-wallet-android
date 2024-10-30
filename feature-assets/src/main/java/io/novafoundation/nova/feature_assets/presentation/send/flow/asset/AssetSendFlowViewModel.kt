@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.send.flow.asset
 
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -35,6 +36,7 @@ class AssetSendFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
+    private val assetIconProvider: AssetIconProvider
 ) : AssetFlowViewModel(
     interactor,
     router,
@@ -43,6 +45,7 @@ class AssetSendFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
+    assetIconProvider
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
@@ -64,12 +67,12 @@ class AssetSendFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
+        return assets.mapGroupedAssetsToUi(assetIconProvider, currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
     }
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 

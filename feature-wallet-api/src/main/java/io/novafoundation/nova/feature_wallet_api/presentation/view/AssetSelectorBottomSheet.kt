@@ -6,6 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.DiffUtil
 import coil.ImageLoader
 import coil.load
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
@@ -57,7 +58,7 @@ private class AssetSelectorHolder(
         with(itemView) {
             itemAssetSelectorBalance.text = item.assetModel.assetBalance
             itemAssetSelectorTokenName.text = item.title
-            itemAssetSelectorIcon.load(item.assetModel.imageUrl, imageLoader)
+            itemAssetSelectorIcon.setIcon(item.assetModel.icon, imageLoader)
             itemAssetSelectorCheckmark.setVisible(isSelected, falseState = View.INVISIBLE)
         }
     }

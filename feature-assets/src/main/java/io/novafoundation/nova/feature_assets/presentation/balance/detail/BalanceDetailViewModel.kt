@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -63,7 +65,8 @@ class BalanceDetailViewModel(
     private val currencyInteractor: CurrencyInteractor,
     private val controllableAssetCheck: ControllableAssetCheckMixin,
     private val externalBalancesInteractor: ExternalBalancesInteractor,
-    private val swapAvailabilityInteractor: SwapAvailabilityInteractor
+    private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -204,7 +207,8 @@ class BalanceDetailViewModel(
             token = mapTokenToTokenModel(asset.token),
             total = mapAmountToAmountModel(asset.total + totalContributed, asset),
             transferable = mapAmountToAmountModel(asset.transferable, asset),
-            locked = mapAmountToAmountModel(asset.locked + totalContributed, asset)
+            locked = mapAmountToAmountModel(asset.locked + totalContributed, asset),
+            assetIcon = assetIconProvider.getAssetIcon(asset.token.configuration)
         )
     }
 

@@ -6,10 +6,11 @@ import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
-import io.novafoundation.nova.common.data.repository.AssetsIconModeService
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
@@ -229,8 +230,7 @@ class ChainRegistryModule {
         baseTypeSynchronizer: BaseTypeSynchronizer,
         runtimeSyncService: RuntimeSyncService,
         web3ApiPool: Web3ApiPool,
-        gson: Gson,
-        assetsIconModeService: AssetsIconModeService
+        gson: Gson
     ) = ChainRegistry(
         runtimeProviderPool,
         chainConnectionPool,
@@ -241,7 +241,6 @@ class ChainRegistryModule {
         baseTypeSynchronizer,
         runtimeSyncService,
         web3ApiPool,
-        gson,
-        assetsIconModeService
+        gson
     )
 }

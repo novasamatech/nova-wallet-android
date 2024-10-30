@@ -19,7 +19,7 @@ interface SwapAmountInputMixin : AmountChooserMixinBase {
     ) {
         sealed class SwapAssetIcon {
 
-            class Chosen(val assetIconUrl: String?) : SwapAssetIcon()
+            class Chosen(val assetIcon: Icon) : SwapAssetIcon()
 
             object NotChosen : SwapAssetIcon()
         }

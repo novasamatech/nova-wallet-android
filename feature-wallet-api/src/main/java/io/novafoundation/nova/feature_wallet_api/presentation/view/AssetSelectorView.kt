@@ -9,6 +9,7 @@ import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -71,7 +72,7 @@ class AssetSelectorView @JvmOverloads constructor(
         with(assetSelectorModel) {
             assetSelectorBalance.text = assetModel.assetBalance
             assetSelectorTokenName.text = title
-            assetSelectorIcon.load(assetModel.imageUrl, imageLoader)
+            assetSelectorIcon.setIcon(assetModel.icon, imageLoader)
         }
     }
 }

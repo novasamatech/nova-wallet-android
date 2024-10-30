@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -40,6 +42,7 @@ class ReceiveViewModel(
     private val chainRegistry: ChainRegistry,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val router: AssetsRouter,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val selectedMetaAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
@@ -64,7 +67,7 @@ class ReceiveViewModel(
             TokenReceiver(
                 addressModel = addressIconGenerator.createAddressModel(chain, address, AddressIconGenerator.SIZE_BIG, it.name),
                 chain = mapChainToUi(chain),
-                chainAssetIcon = chainAsset.iconUrl
+                chainAssetIcon = assetIconProvider.getAssetIcon(chainAsset)
             )
         }
         .inBackground()
