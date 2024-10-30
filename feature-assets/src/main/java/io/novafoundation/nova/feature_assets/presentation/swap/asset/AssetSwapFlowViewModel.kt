@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
