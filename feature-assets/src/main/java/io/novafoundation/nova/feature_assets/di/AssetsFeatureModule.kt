@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
-import io.novafoundation.nova.common.data.repository.AssetsViewModeService
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -70,7 +70,7 @@ class AssetsFeatureModule {
     @Provides
     @FeatureScope
     fun provideSearchInteractorFactory(
-        assetViewModeRepository: AssetsViewModeService.AssetsViewModeRepository,
+        assetViewModeRepository: AssetsViewModeRepository,
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry
     ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry)

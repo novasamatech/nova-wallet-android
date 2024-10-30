@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.assets.list
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
-import io.novafoundation.nova.common.data.repository.AssetsViewModeService
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
@@ -18,7 +18,7 @@ class AssetsListInteractor(
     private val accountRepository: AccountRepository,
     private val nftRepository: NftRepository,
     private val bannerVisibilityRepository: BannerVisibilityRepository,
-    private val assetsViewModeService: AssetsViewModeService
+    private val assetsViewModeService: AssetsViewModeRepository
 ) {
 
     fun assetsViewModeFlow() = assetsViewModeService.assetsViewModeFlow()
