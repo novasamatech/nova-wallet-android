@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookup
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
@@ -84,6 +85,7 @@ import io.novafoundation.nova.runtime.ext.isUtility
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAssetOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -125,6 +127,7 @@ internal class RealSwapService(
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
@@ -413,7 +416,11 @@ internal class RealSwapService(
 
     private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): CanPayFeeNodeVisitFilter {
         return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
-            CanPayFeeNodeVisitFilter(this, chainRegistry.chainsById())
+            CanPayFeeNodeVisitFilter(
+                computationScope = this,
+                chainsById = chainRegistry.chainsById(),
+                selectedAccount = accountRepository.getSelectedMetaAccount()
+            )
         }
     }
 
@@ -760,6 +767,7 @@ internal class RealSwapService(
     private inner class CanPayFeeNodeVisitFilter(
         val computationScope: CoroutineScope,
         val chainsById: ChainsById,
+        val selectedAccount: MetaAccount,
     ) : EdgeVisitFilter<SwapGraphEdge> {
 
         private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
@@ -772,8 +780,13 @@ internal class RealSwapService(
             // Utility payments and first path segments are always allowed
             if (edge.from.isUtility || pathPredecessor == null) return true
 
+            val chainAndAssetOut = chainsById.chainWithAssetOrNull(edge.to) ?: return false
+
+            // User should have account on destination
+            if (!selectedAccount.hasAccountIn(chainAndAssetOut.chain)) return false
+
             // Destination asset must be sufficient
-            if (!isSufficient(edge.to)) return false
+            if (!isSufficient(chainAndAssetOut)) return false
 
             // Edge might request us to ignore the default requirement based on its direct predecessor
             if (edge.shouldIgnoreFeeRequirementAfter(pathPredecessor)) return true
@@ -784,12 +797,11 @@ internal class RealSwapService(
                 && edge.canPayNonNativeFeesInIntermediatePosition()
         }
 
-        private fun isSufficient(fullChainAssetId: FullChainAssetId): Boolean {
-            val (chain, chainAsset) = chainsById.chainWithAssetOrNull(fullChainAssetId) ?: return false
-            val balance = assetSourceRegistry.sourceFor(chainAsset).balance
-            return balance.isSelfSufficient(chainAsset).also { isSufficient ->
+        private fun isSufficient(chainAndAsset: ChainWithAsset): Boolean {
+            val balance = assetSourceRegistry.sourceFor(chainAndAsset.asset).balance
+            return balance.isSelfSufficient(chainAndAsset.asset).also { isSufficient ->
                 if (!isSufficient) {
-                    Log.d("Swaps", "${chainAsset.symbol} (${chain.name} is not sufficient)")
+                    Log.d("Swaps", "${chainAndAsset.asset.symbol} (${chainAndAsset.chain.name} is not sufficient)")
                 }
             }
         }

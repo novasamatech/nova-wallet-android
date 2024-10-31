@@ -115,7 +115,7 @@ fun MetaAccount.addressIn(chain: Chain): String? {
 
 fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()
 
-fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for $chain in $name")
+fun MetaAccount.requireAddressIn(chain: Chain): String = addressIn(chain) ?: throw NoSuchElementException("No chain account found for ${chain.name} in $name")
 
 val MetaAccount.defaultSubstrateAddress: String?
     get() = substrateAccountId?.toDefaultSubstrateAddress()

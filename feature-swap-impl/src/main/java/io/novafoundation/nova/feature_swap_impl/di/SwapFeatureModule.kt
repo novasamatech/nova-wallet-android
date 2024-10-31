@@ -9,7 +9,6 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
@@ -59,6 +58,7 @@ class SwapFeatureModule {
         extrinsicServiceFactory: ExtrinsicService.Factory,
         defaultFeePaymentRegistry: FeePaymentProviderRegistry,
         tokenRepository: TokenRepository,
+        accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry
     ): SwapService {
         return RealSwapService(
@@ -71,7 +71,8 @@ class SwapFeatureModule {
             extrinsicServiceFactory = extrinsicServiceFactory,
             defaultFeePaymentProviderRegistry = defaultFeePaymentRegistry,
             tokenRepository = tokenRepository,
-            assetSourceRegistry = assetSourceRegistry
+            assetSourceRegistry = assetSourceRegistry,
+            accountRepository = accountRepository
         )
     }
 
