@@ -144,6 +144,10 @@ class SettingsViewModel(
         router.openLanguages()
     }
 
+    fun appearanceClicked() {
+        router.openAppearance()
+    }
+
     fun changeBiometricAuth() {
         launch {
             if (biometricService.isEnabled()) {

@@ -5,6 +5,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
@@ -40,6 +41,34 @@ import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 
 interface SettingsFeatureDependencies {
+
+    val cloudBackupService: CloudBackupService
+
+    val cloudBackupFacade: LocalAccountsCloudBackupFacade
+
+    val bannerVisRepository: BannerVisibilityRepository
+
+    val runtimeProviderPool: RuntimeProviderPool
+
+    val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
+
+    val chainNodeRepository: ChainNodeRepository
+
+    val nodeConnectionFactory: NodeConnectionFactory
+
+    val web3ApiFactory: Web3ApiFactory
+
+    val validationExecutor: ValidationExecutor
+
+    val preConfiguredChainsRepository: PreConfiguredChainsRepository
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val chainRepository: ChainRepository
+
+    val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
+
+    val assetsIconModeRepository: AssetsIconModeRepository
 
     val accountRepository: AccountRepository
 
@@ -90,30 +119,4 @@ interface SettingsFeatureDependencies {
     fun customDialogProvider(): CustomDialogDisplayer.Presentation
 
     fun context(): Context
-
-    val cloudBackupService: CloudBackupService
-
-    val cloudBackupFacade: LocalAccountsCloudBackupFacade
-
-    val bannerVisRepository: BannerVisibilityRepository
-
-    val runtimeProviderPool: RuntimeProviderPool
-
-    val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory
-
-    val chainNodeRepository: ChainNodeRepository
-
-    val nodeConnectionFactory: NodeConnectionFactory
-
-    val web3ApiFactory: Web3ApiFactory
-
-    val validationExecutor: ValidationExecutor
-
-    val preConfiguredChainsRepository: PreConfiguredChainsRepository
-
-    val coinGeckoLinkParser: CoinGeckoLinkParser
-
-    val chainRepository: ChainRepository
-
-    val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
 }
