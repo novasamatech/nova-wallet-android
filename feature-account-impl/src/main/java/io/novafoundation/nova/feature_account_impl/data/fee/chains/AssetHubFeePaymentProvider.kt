@@ -46,6 +46,6 @@ class AssetHubFeePaymentProvider(
 
     override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability {
         val fetcher = assetHubFeePaymentAssetsFetcher.create(chain)
-        return AssetHubFastLookupFeeCapability(fetcher)
+        return AssetHubFastLookupFeeCapability(fetcher.fetchAvailablePaymentAssets())
     }
 }

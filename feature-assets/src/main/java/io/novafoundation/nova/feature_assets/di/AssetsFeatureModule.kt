@@ -56,9 +56,8 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        assetSourceRegistry: AssetSourceRegistry,
         swapService: SwapService
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry, swapService)
+    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, swapService)
 
     @Provides
     @FeatureScope

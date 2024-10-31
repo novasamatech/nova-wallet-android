@@ -193,7 +193,7 @@ private class AssetConversionExchange(
             return "AssetConversion"
         }
 
-        override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+        override fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
             return false
         }
 

@@ -14,7 +14,7 @@ interface CustomFeeCapability {
 
 interface FastLookupCustomFeeCapability {
 
-    suspend fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean
+    fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean
 }
 
 interface CustomFeeCapabilityFacade {

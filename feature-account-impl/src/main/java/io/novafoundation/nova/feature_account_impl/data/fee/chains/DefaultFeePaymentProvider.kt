@@ -19,9 +19,9 @@ class DefaultFeePaymentProvider : FeePaymentProvider {
     }
 }
 
-class DefaultFastLookupCustomFeeCapability(): FastLookupCustomFeeCapability {
+class DefaultFastLookupCustomFeeCapability: FastLookupCustomFeeCapability {
 
-    override suspend fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
+    override fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
         return false
     }
 }

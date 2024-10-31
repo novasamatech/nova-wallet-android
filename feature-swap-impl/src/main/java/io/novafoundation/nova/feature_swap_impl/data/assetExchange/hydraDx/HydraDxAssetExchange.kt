@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
+import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.structOf
@@ -245,7 +246,7 @@ private class HydraDxAssetExchange(
             return sourceQuotableEdge.debugLabel()
         }
 
-        override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+        override fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
             // When chaining multiple hydra edges together, the fee is always paid with the starting edge
             return predecessor is HydraDxSwapEdge
         }
@@ -507,7 +508,18 @@ private class HydraDxAssetExchange(
         }
 
         override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability {
-            return HydrationFastLookupFeeCapability()
+            val acceptedCurrencies = fetchAcceptedCurrencies()
+            return HydrationFastLookupFeeCapability(acceptedCurrencies)
+        }
+
+        private suspend fun fetchAcceptedCurrencies(): Set<ChainAssetId> {
+             val acceptedOnChainIds = remoteStorageSource.query(chain.id) {
+                metadata.multiTransactionPayment.acceptedCurrencies.keys()
+            }
+
+            val onChainToLocalIds = hydraDxAssetIdConverter.allOnChainIds(chain)
+
+            return acceptedOnChainIds.mapNotNullToSet { onChainToLocalIds[it]?.id }
         }
     }
 
@@ -551,26 +563,14 @@ private class HydraDxAssetExchange(
         }
     }
 
-    private inner class HydrationFastLookupFeeCapability : FastLookupCustomFeeCapability {
+    private inner class HydrationFastLookupFeeCapability(
+        private val acceptedCurrencies: Set<ChainAssetId>
+    ): FastLookupCustomFeeCapability {
 
         private var acceptedCurrenciesCache: Set<HydraDxAssetId>? = null
 
-        override suspend fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
-            val asset = chain.assetsById[chainAssetId] ?: return false
-            val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(asset)
-
-            val acceptedCurrencies = getAcceptedCurrencies()
-            return onChainId in acceptedCurrencies
-        }
-
-        private suspend fun getAcceptedCurrencies(): Set<HydraDxAssetId> {
-            if (acceptedCurrenciesCache != null) return acceptedCurrenciesCache!!
-
-            acceptedCurrenciesCache = remoteStorageSource.query(chain.id) {
-                metadata.multiTransactionPayment.acceptedCurrencies.keys()
-            }.toSet()
-
-            return acceptedCurrenciesCache!!
+        override fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
+            return chainAssetId in acceptedCurrencies
         }
     }
 

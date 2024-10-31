@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComp
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
@@ -22,11 +21,13 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 private typealias AssetSearchFilter = suspend (Asset) -> Boolean
 
@@ -34,9 +35,14 @@ class AssetSearchInteractor(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val assetSourceRegistry: AssetSourceRegistry,
     private val swapService: SwapService
 ) {
+
+    suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {
+        withContext(Dispatchers.IO) {
+            swapService.warmUpCommonChains(computationalScope)
+        }
+    }
 
     fun buyAssetSearch(
         queryFlow: Flow<String>,

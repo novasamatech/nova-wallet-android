@@ -49,6 +49,12 @@ class AssetSwapFlowViewModel(
                 swapAvailabilityInteractor.sync(viewModelScope)
             }
         }
+
+        launch {
+            if (payload is SwapFlowPayload.InitialSelecting) {
+                interactor.warmUpSwapCommonlyUsedChains(viewModelScope)
+            }
+        }
     }
 
     @StringRes

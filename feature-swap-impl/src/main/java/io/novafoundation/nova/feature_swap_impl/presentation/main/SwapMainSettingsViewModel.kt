@@ -282,6 +282,8 @@ class SwapMainSettingsViewModel(
     init {
         initPayload()
 
+//        launch { swapInteractor.warmUpSwapCommonlyUsedChains(viewModelScope) }
+
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
 

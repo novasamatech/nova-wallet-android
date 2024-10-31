@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface SwapService {
 
+    suspend fun warmUpCommonChains(computationScope: CoroutineScope): Result<Unit>
+
     suspend fun sync(coroutineScope: CoroutineScope)
 
     suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
@@ -23,8 +25,6 @@ interface SwapService {
     suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
 
     suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean>
-
-    suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean
 
     suspend fun quote(
         args: SwapQuoteArgs,

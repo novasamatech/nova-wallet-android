@@ -39,7 +39,7 @@ interface SwapGraphEdge : QuotableEdge {
      * Note that returning true here means that [canPayNonNativeFeesInIntermediatePosition] wont be called and checked
      *
      */
-    suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean
+    fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean
 
     /**
      * Can be used to define additional restrictions on top of default one, "is able to pay submission fee on origin"

@@ -117,7 +117,7 @@ class CrossChainTransferAssetExchange(
             return "To ${chainRegistry.getChain(delegate.to.chainId).name}"
         }
 
-        override suspend fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+        override fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
             return false
         }
 

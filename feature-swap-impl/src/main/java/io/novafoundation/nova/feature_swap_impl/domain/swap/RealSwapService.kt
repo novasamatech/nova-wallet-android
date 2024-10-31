@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
 import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.mapAsync
+import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.toPercent
@@ -26,7 +27,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
@@ -122,7 +122,6 @@ internal class RealSwapService(
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
     private val quoterFactory: PathQuoter.Factory,
-    private val customFeeCapabilityFacade: CustomFeeCapabilityFacade,
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
@@ -130,15 +129,15 @@ internal class RealSwapService(
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
 
-    override suspend fun canPayFeeInNonUtilityAsset(asset: Chain.Asset): Boolean = withContext(Dispatchers.Default) {
-        val computationScope = CoroutineScope(coroutineContext)
-        val exchangeRegistry = exchangeRegistry(computationScope)
-        val paymentRegistry = exchangeRegistry.getFeePaymentRegistry()
+    override suspend fun warmUpCommonChains(computationScope: CoroutineScope): Result<Unit> {
+        return runCatching {
+            warmUpChain(Chain.Geneses.HYDRA_DX, computationScope)
+            warmUpChain(Chain.Geneses.POLKADOT_ASSET_HUB, computationScope)
+        }
+    }
 
-        val chain = chainRegistry.getChain(asset.chainId)
-        val feePayment = paymentRegistry.providerFor(chain.id).feePaymentFor(asset.toFeePaymentCurrency(), computationScope)
-
-        customFeeCapabilityFacade.canPayFeeInNonUtilityToken(asset, feePayment)
+    private suspend fun warmUpChain(chainId: ChainId, computationScope: CoroutineScope) {
+        canPayFeeNodeFilter(computationScope).warmUpChain(chainId)
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
@@ -161,7 +160,9 @@ internal class RealSwapService(
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map {
             val filter = canPayFeeNodeFilter(computationScope)
-            it.findAllPossibleDestinations(asset.fullId, filter) - asset.fullId
+            measureExecution("findAllPossibleDestinations") {
+                it.findAllPossibleDestinations(asset.fullId, filter) - asset.fullId
+            }
         }
     }
 
@@ -410,7 +411,7 @@ internal class RealSwapService(
     }
 
 
-    private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): EdgeVisitFilter<SwapGraphEdge> {
+    private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): CanPayFeeNodeVisitFilter {
         return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
             CanPayFeeNodeVisitFilter(this, chainRegistry.chainsById())
         }
@@ -762,6 +763,10 @@ internal class RealSwapService(
     ) : EdgeVisitFilter<SwapGraphEdge> {
 
         private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
+
+        suspend fun warmUpChain(chainId: ChainId) {
+            getFeeCustomFeeCapability(chainId)
+        }
 
         override suspend fun shouldVisit(edge: SwapGraphEdge, pathPredecessor: SwapGraphEdge?): Boolean {
             // Utility payments and first path segments are always allowed

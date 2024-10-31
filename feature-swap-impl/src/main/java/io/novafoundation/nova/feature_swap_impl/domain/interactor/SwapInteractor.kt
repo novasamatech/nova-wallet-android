@@ -127,8 +127,8 @@ class SwapInteractor(
 //            }
     }
 
-    suspend fun canPayFeeInCustomAsset(asset: Chain.Asset): Boolean {
-        return swapService.canPayFeeInNonUtilityAsset(asset)
+    suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {
+        swapService.warmUpCommonChains(computationalScope)
     }
 
     suspend fun estimateFee(executeArgs: SwapFeeArgs): SwapFee {

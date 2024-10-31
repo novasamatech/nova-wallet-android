@@ -4,21 +4,10 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookup
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 
 class AssetHubFastLookupFeeCapability(
-    private val assetsFetcher: AssetHubFeePaymentAssetsFetcher,
+    private val allowedPaymentAssets: Set<Int>,
 ): FastLookupCustomFeeCapability {
 
-    private var cachedAssets: Set<Int>? = null
-
-    override suspend fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
-        return chainAssetId in getAllowedFeePaymentAssets()
-    }
-
-    private suspend fun getAllowedFeePaymentAssets(): Set<Int> {
-        // We are not guarding it with mutex to make it more optimized and avoid synchronisation overhead
-        if (cachedAssets == null) {
-            cachedAssets = assetsFetcher.fetchAvailablePaymentAssets()
-        }
-
-        return cachedAssets!!
+    override fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
+        return chainAssetId in allowedPaymentAssets
     }
 }
