@@ -59,6 +59,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider.FeeLoaderProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
@@ -241,17 +243,20 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideFeeLoaderMixinFactory(
-        customFeeInteractor: CustomFeeInteractor,
-        chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): FeeLoaderMixin.Factory {
-        return FeeLoaderProviderFactory(
-            customFeeInteractor,
-            chainRegistry,
-            resourceManager,
-            actionAwaitableMixinFactory
-        )
+        return FeeLoaderProviderFactory(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideFeeLoaderV2MixinFactory(
+        chainRegistry: ChainRegistry,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        resourceManager: ResourceManager,
+        interactor: CustomFeeInteractor,
+    ): FeeLoaderMixinV2.Factory {
+        return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor)
     }
 
     @Provides

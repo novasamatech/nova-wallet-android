@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValid
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 
 interface WalletFeatureApi {
@@ -75,4 +76,6 @@ interface WalletFeatureApi {
     val arbitraryTokenUseCase: ArbitraryTokenUseCase
 
     val holdsRepository: BalanceHoldsRepository
+
+    val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 }

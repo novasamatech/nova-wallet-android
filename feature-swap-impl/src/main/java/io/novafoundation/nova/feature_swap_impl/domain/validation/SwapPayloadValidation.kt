@@ -40,7 +40,7 @@ val SwapValidationPayload.swapAmountInFeeToken: Balance
     }
 
 val SwapValidationPayload.totalDeductedAmountInFeeToken: Balance
-    get() = fee.deductionFor(fee.asset)
+    get() = TODO()
 
 val SwapValidationPayload.maxAmountToSwap: Balance
-    get() = detailedAssetIn.asset.transferableInPlanks - fee.deductionForAssetIn
+    get() = detailedAssetIn.asset.transferableInPlanks - fee.maxAmountDeductionForAssetIn

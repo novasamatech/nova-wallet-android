@@ -31,7 +31,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInpu
 import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -83,7 +83,7 @@ class SwapMainSettingsModule {
         swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
         enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,

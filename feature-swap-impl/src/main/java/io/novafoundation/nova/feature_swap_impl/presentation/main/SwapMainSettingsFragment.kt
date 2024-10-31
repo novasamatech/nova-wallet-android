@@ -17,15 +17,13 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
-import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupSelectableFeeToken
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
@@ -96,10 +94,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         observeValidations(viewModel)
         setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput, swapMainSettingsMaxAmount)
         setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
-        setupFeeLoading(viewModel.feeMixin, swapMainSettingsDetailsNetworkFee)
-        setupSelectableFeeToken(viewModel.canChangeFeeToken, swapMainSettingsDetailsNetworkFee) {
-            viewModel.editFeeTokenClicked()
-        }
+
+        viewModel.feeMixin.setupFeeLoading(swapMainSettingsDetailsNetworkFee)
 
         buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
 
@@ -117,25 +113,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
                 field.requestFocus()
                 field.amountInput.setSelectionEnd()
             }
-        }
-
-        viewModel.canChangeFeeToken.observe { canChangeFeeToken ->
-            if (canChangeFeeToken) {
-                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(R.drawable.ic_pencil_edit, R.color.icon_secondary)
-                swapMainSettingsDetailsNetworkFee.setOnValueClickListener { viewModel.editFeeTokenClicked() }
-            } else {
-                swapMainSettingsDetailsNetworkFee.setPrimaryValueStartIcon(null)
-                swapMainSettingsDetailsNetworkFee.setOnValueClickListener(null)
-            }
-        }
-
-        viewModel.changeFeeTokenEvent.awaitableActionLiveData.observeEvent {
-            FeeAssetSelectorBottomSheet(
-                context = requireContext(),
-                payload = it.payload,
-                onOptionClicked = it.onSuccess,
-                onCancel = it.onCancel
-            ).show()
         }
 
         viewModel.validationProgress.observe(swapMainSettingsContinue::setProgressState)

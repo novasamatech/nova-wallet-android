@@ -5,7 +5,8 @@ import android.util.AttributeSet
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableCellView
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 
 class FeeView @JvmOverloads constructor(
     context: Context,
@@ -15,16 +16,18 @@ class FeeView @JvmOverloads constructor(
 
     init {
         setTitle(R.string.network_fee)
-
-        setFeeStatus(FeeStatus.Loading)
     }
 
-    fun setFeeStatus(feeStatus: FeeStatus<*>) {
+    fun setFeeStatus(feeStatus: FeeStatus<*, FeeDisplay>) {
         setVisible(feeStatus !is FeeStatus.NoFee)
 
         when (feeStatus) {
             is FeeStatus.Loading -> {
-                showProgress()
+                if (feeStatus.visibleDuringProgress) {
+                    showProgress()
+                } else {
+                    setVisible(false)
+                }
             }
 
             is FeeStatus.Error -> {
@@ -32,11 +35,15 @@ class FeeView @JvmOverloads constructor(
             }
 
             is FeeStatus.Loaded -> {
-                showAmount(feeStatus.feeModel.display)
+                showFeeDisplay(feeStatus.feeModel.display)
             }
 
             FeeStatus.NoFee -> { }
         }
+    }
+
+    private fun showFeeDisplay(feeDisplay: FeeDisplay) {
+        showValue(feeDisplay.title, feeDisplay.subtitle)
     }
 
     fun setFeeEditable(editable: Boolean, onEditTokenClick: OnClickListener) {

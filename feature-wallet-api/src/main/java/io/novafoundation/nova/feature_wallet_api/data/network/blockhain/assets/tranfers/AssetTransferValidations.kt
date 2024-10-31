@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
@@ -71,8 +72,8 @@ sealed class AssetTransferValidationFailure {
     object RecipientCannotAcceptTransfer : AssetTransferValidationFailure()
 
     class FeeChangeDetected(
-        override val payload: FeeChangeDetectedFailure.Payload<OriginFee>
-    ) : AssetTransferValidationFailure(), FeeChangeDetectedFailure<OriginFee>
+        override val payload: FeeChangeDetectedFailure.Payload<SubmissionFee>
+    ) : AssetTransferValidationFailure(), FeeChangeDetectedFailure<SubmissionFee>
 
     object RecipientIsSystemAccount : AssetTransferValidationFailure()
 }

@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmountByExecutingAccount
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -82,13 +82,13 @@ fun <P, E, F : Fee> ValidationSystemBuilder<P, E>.checkForFeeChanges(
 fun <F : Fee> CoroutineScope.handleFeeSpikeDetected(
     error: FeeChangeDetectedFailure<F>,
     resourceManager: ResourceManager,
-    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<F>,
+    setFee: SetFee<F>,
     actions: ValidationFlowActions<*>
 ): TransformedFailure? = handleFeeSpikeDetected(
     error = error,
     resourceManager = resourceManager,
     actions = actions,
-    setFee = { feeLoaderMixin.setFee(it.newFee) }
+    setFee = { setFee.setFee(it.newFee) }
 )
 
 fun <F : Fee> CoroutineScope.handleFeeSpikeDetected(

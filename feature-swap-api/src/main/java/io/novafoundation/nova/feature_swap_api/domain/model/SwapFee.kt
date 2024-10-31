@@ -13,6 +13,7 @@ import java.math.BigInteger
 
 class SwapFee(
     val segments: List<SwapSegment>,
+
     /**
      *  Fees for second and subsequent segments converted to assetIn
      */
@@ -30,13 +31,17 @@ class SwapFee(
 
     private val assetIn = intermediateSegmentFeesInAssetIn.asset
 
+    // Always in asset in
     val additionalAmountForSwap = additionalAmountForSwap()
 
-    val deductionForAssetIn: Balance = deductionFor(assetIn)
+    val maxAmountDeductionForAssetIn: Balance = maxAmountDeductionFor(assetIn)
 
-
-    override fun deductionFor(amountAsset: Chain.Asset): Balance {
+    override fun maxAmountDeductionFor(amountAsset: Chain.Asset): Balance {
       return totalFeeAmount(amountAsset) + additionalMaxAmountDeduction
+    }
+
+    fun allBasicFees(): List<FeeBase> {
+        return segments.flatMap { it.fee.allBasicFees() }
     }
 
     private fun totalFeeAmount(amountAsset: Chain.Asset): Balance {
@@ -55,7 +60,7 @@ class SwapFee(
         return SubstrateFeeBase(totalFutureFeeInAssetIn, assetIn)
     }
 
-    // TODO this is until multi-chain fees are ready
+    // TODO remove this after reworking swap validations
     override val submissionOrigin: SubmissionOrigin = submissionFee.submissionOrigin
     override val amount: BigInteger = totalFeeAmount(submissionFee.asset)
     override val asset: Chain.Asset = submissionFee.asset

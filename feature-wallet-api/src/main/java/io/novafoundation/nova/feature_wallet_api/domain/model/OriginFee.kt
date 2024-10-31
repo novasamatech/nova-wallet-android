@@ -1,22 +1,28 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
+import io.novafoundation.nova.feature_account_api.data.model.getAmount
 
 data class OriginFee(
-    val submissionFee: Fee,
-    val deliveryFee: Fee?,
-    val chainAsset: Chain.Asset
-) : Fee {
+    val submissionFee: SubmissionFee,
+    val deliveryFee: SubmissionFee?,
+) {
 
-    override val amount: BigInteger = submissionFee.amount + deliveryFee?.amount.orZero()
+    val totalInSubmissionAsset: FeeBase = createTotalFeeInSubmissionAsset()
 
-    override val submissionOrigin: SubmissionOrigin = submissionFee.submissionOrigin
+    fun replaceSubmissionFee(submissionFee: SubmissionFee): OriginFee {
+        return copy(submissionFee = submissionFee)
+    }
 
-    override val asset = submissionFee.asset
+    private fun createTotalFeeInSubmissionAsset(): FeeBase {
+        val submissionAsset = submissionFee.asset
+        val totalAmount = submissionFee.amount + deliveryFee?.getAmount(submissionAsset).orZero()
+        return SubstrateFeeBase(totalAmount, submissionAsset)
+    }
 }
 
 fun OriginFee.intoFeeList(): List<Fee> {

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_account_api.data.model.totalPlanksEnsuringAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -67,6 +68,17 @@ fun AtomicSwapOperationFee.totalFeeEnsuringSubmissionAsset(): Balance {
     val postSubmissionFeesFromHolding = postSubmissionFees.paidByAccount.totalPlanksEnsuringAsset(submissionFee.asset)
 
     return submissionFee.amount + postSubmissionFeesByAccount + postSubmissionFeesFromHolding
+}
+
+/**
+ * Collects all [FeeBase] instances from fee components
+ */
+fun AtomicSwapOperationFee.allBasicFees(): List<FeeBase> {
+    return buildList {
+        add(submissionFee)
+        postSubmissionFees.paidByAccount.onEach(::add)
+        postSubmissionFees.paidFromAmount.onEach(::add)
+    }
 }
 
 class SwapExecutionCorrection(

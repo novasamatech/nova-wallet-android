@@ -2,13 +2,10 @@ package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
-import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
@@ -47,15 +44,10 @@ interface AssetTransfer : AssetTransferBase {
 
     val sender: MetaAccount
 
-    val commissionAssetToken: Token
-
     val amount: BigDecimal
 
     override val amountPlanks: Balance
         get() = originChainAsset.planksFromAmount(amount)
-
-    override val feePaymentCurrency: FeePaymentCurrency
-        get() = commissionAssetToken.configuration.toFeePaymentCurrency()
 }
 
 fun AssetTransferBase(
@@ -85,7 +77,7 @@ class BaseAssetTransfer(
     override val originChainAsset: Chain.Asset,
     override val destinationChain: Chain,
     override val destinationChainAsset: Chain.Asset,
-    override val commissionAssetToken: Token,
+    override val feePaymentCurrency: FeePaymentCurrency,
     override val amount: BigDecimal,
 ) : AssetTransfer
 
@@ -96,7 +88,7 @@ data class WeightedAssetTransfer(
     override val originChainAsset: Chain.Asset,
     override val destinationChain: Chain,
     override val destinationChainAsset: Chain.Asset,
-    override val commissionAssetToken: Token,
+    override val feePaymentCurrency: FeePaymentCurrency,
     override val amount: BigDecimal,
     val fee: OriginFee,
 ) : AssetTransfer {
@@ -108,7 +100,7 @@ data class WeightedAssetTransfer(
         originChainAsset = assetTransfer.originChainAsset,
         destinationChain = assetTransfer.destinationChain,
         destinationChainAsset = assetTransfer.destinationChainAsset,
-        commissionAssetToken = assetTransfer.commissionAssetToken,
+        feePaymentCurrency = assetTransfer.feePaymentCurrency,
         amount = assetTransfer.amount,
         fee = fee
     )
@@ -120,13 +112,6 @@ val AssetTransfer.isCrossChain
 fun AssetTransfer.recipientOrNull(): AccountId? {
     return destinationChain.accountIdOrNull(recipient)
 }
-
-fun AssetTransfer.senderAccountId(): AccountId {
-    return sender.requireAccountIdIn(originChain)
-}
-
-val AssetTransfer.commissionAsset
-    get() = commissionAssetToken.configuration
 
 interface AssetTransfers {
 

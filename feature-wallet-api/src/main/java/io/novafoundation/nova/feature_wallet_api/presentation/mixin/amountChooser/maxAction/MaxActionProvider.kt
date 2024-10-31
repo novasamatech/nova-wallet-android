@@ -1,10 +1,9 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction
 
 import io.novafoundation.nova.common.utils.atLeastZero
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
@@ -24,9 +23,9 @@ object MaxActionProviderDsl {
         return AssetMaxActionProvider(this, field, allowMaxAction)
     }
 
-    fun <F> MaxActionProvider.deductFee(
-        feeLoaderMixin: GenericFeeLoaderMixin<F>,
-    ): MaxActionProvider where F : Fee, F : MaxAvailableDeduction {
+    fun <F: MaxAvailableDeduction> MaxActionProvider.deductFee(
+        feeLoaderMixin: FeeLoaderMixinV2<F, *>,
+    ): MaxActionProvider {
         return ComplexFeeAwareMaxActionProvider(feeLoaderMixin, inner = this)
     }
 }

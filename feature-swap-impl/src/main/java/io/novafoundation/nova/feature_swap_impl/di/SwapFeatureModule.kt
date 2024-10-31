@@ -40,7 +40,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSetti
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -99,7 +98,7 @@ class SwapFeatureModule {
         swapService: SwapService,
         assetSourceRegistry: AssetSourceRegistry,
         chainRegistry: ChainRegistry,
-        walletRepository: WalletRepository,
+        tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
         buyTokenRegistry: BuyTokenRegistry,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
@@ -114,8 +113,8 @@ class SwapFeatureModule {
             accountRepository = accountRepository,
             chainRegistry = chainRegistry,
             swapTransactionHistoryRepository = swapTransactionHistoryRepository,
-            walletRepository = walletRepository,
-            swapUpdateSystemFactory = swapUpdateSystemFactory
+            swapUpdateSystemFactory = swapUpdateSystemFactory,
+            tokenRepository = tokenRepository
         )
     }
 

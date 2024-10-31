@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.accumulate
-import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
@@ -32,10 +31,8 @@ import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAssetSelectorBottomSheet
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -53,6 +50,8 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeBalanceExtractor
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
@@ -76,22 +75,19 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.loadedFeeModelOrNullFlow
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,7 +101,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -138,7 +133,7 @@ class SwapMainSettingsViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val swapStateStoreProvider: SwapStateStoreProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
@@ -160,7 +155,6 @@ class SwapMainSettingsViewModel(
 
     private val assetOutFlow = swapSettings.assetFlowOf(SwapSettings::assetOut)
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
-    private val feeAssetFlow = swapSettings.assetFlowOf(SwapSettings::feeAsset)
 
     private val priceImpact = quotingState.map { quoteState ->
         when (quoteState) {
@@ -175,13 +169,12 @@ class SwapMainSettingsViewModel(
         .map { chainRegistry.getChain(it) }
         .shareInBackground()
 
-    private val nativeAssetFlow = originChainFlow
-        .flatMapLatest { assetUseCase.assetFlow(it.commissionAsset) }
-        .shareInBackground()
-
-    val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
-        tokenFlow = feeAssetFlow.map { it?.token },
-        configuration = GenericFeeLoaderMixin.Configuration(
+    val feeMixin = feeLoaderMixinFactory.create(
+        scope = viewModelScope,
+        selectedChainAssetFlow = swapSettings.mapNotNull { it.assetIn },
+        feeFormatter = SwapFeeFormatter(swapInteractor),
+        feeBalanceExtractor = SwapFeeBalanceExtractor(),
+        configuration = Configuration(
             initialState = Configuration.InitialState(
                 feeStatus = FeeStatus.NoFee,
             )
@@ -242,13 +235,6 @@ class SwapMainSettingsViewModel(
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
-    val canChangeFeeToken = chainAssetIn
-        .map(::isEditFeeTokenAvailable)
-        .shareInBackground()
-
-    val changeFeeTokenEvent = actionAwaitableFactory.create<FeeAssetSelectorBottomSheet.Payload, Chain.Asset>()
-    private val feeTokenOnceChangedManually = MutableStateFlow(false)
-
     private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
         .shareInBackground()
 
@@ -303,8 +289,6 @@ class SwapMainSettingsViewModel(
         setupUpdateSystem()
 
         feeMixin.setupFees()
-
-        setCustomFeeAssetIfNotEnoughNative()
 
         launch {
             swapInteractor.sync(viewModelScope)
@@ -472,59 +456,18 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    fun editFeeTokenClicked() = launch {
-        val swapSettings = swapSettings.first()
-        val originChain = originChainFlow.first()
-
-        val payload = FeeAssetSelectorBottomSheet.Payload(
-            options = listOf(
-                originChain.commissionAsset,
-                swapSettings.assetIn ?: return@launch,
-            ),
-            selectedOption = swapSettings.feeAsset ?: return@launch
-        )
-        val newFeeToken = changeFeeTokenEvent.awaitAction(payload)
-        feeTokenOnceChangedManually.value = true
-
-        swapSettingState().setFeeAsset(newFeeToken)
-    }
-
-    private fun setCustomFeeAssetIfNotEnoughNative() {
-        combineToPair(nativeAssetFlow, feeMixin.loadedFeeModelOrNullFlow())
-            .filter { (nativeAsset, feeModel) ->
-                val canChangeAutomatically = !feeTokenOnceChangedManually.value
-                val canAcceptAssetInAsPayment = canChangeFeeToken.first()
-
-                if (!canAcceptAssetInAsPayment) return@filter false
-                if (!canChangeAutomatically) return@filter false
-                if (nativeAsset.transferable.isZero) return@filter true
-                if (feeModel == null) return@filter false
-
-                val isFeePaidInNativeAsset = nativeAsset.token.configuration.fullId == feeModel.fee.asset.fullId
-                val notEnoughNativeToPayFee = nativeAsset.transferable < feeModel.fee.decimalAmount
-
-                isFeePaidInNativeAsset && notEnoughNativeToPayFee
-            }.onEach {
-                val assetIn = swapSettings.first().assetIn ?: return@onEach
-
-                swapSettingState().setFeeAsset(assetIn)
-            }
-            .launchIn(this)
-    }
-
     private fun setupUpdateSystem() = launch {
         swapInteractor.getUpdateSystem(originChainFlow, viewModelScope)
             .start()
             .launchIn(viewModelScope)
     }
 
-    @OptIn(FlowPreview::class)
-    private fun GenericFeeLoaderMixin.Presentation<SwapFee>.setupFees() {
+    private fun FeeLoaderMixinV2.Presentation<SwapFee, FeeDisplay>.setupFees() {
         quotingState
             .onEach {
                 when (it) {
-                    is QuotingState.Loading -> invalidateFee()
-                    is QuotingState.NotAvailable -> setFee(null)
+                    is QuotingState.Loading -> setFeeLoading()
+                    is QuotingState.NotAvailable -> setFeeStatus(FeeStatus.NoFee)
                     else -> {}
                 }
             }
@@ -533,21 +476,17 @@ class SwapMainSettingsViewModel(
             .zipWithPrevious()
             .mapNotNull { (previous, current) ->
                 current.takeIf {
-                    // allow same value in case user quickly switcher from this value to another and back without waiting for fee loading
-                    previous != current || feeMixin.feeLiveData.value !is FeeStatus.Loaded
+                    // allow same value in case user quickly switched from this value to another and back without waiting for fee loading
+                    previous != current || feeMixin.fee.value !is FeeStatus.Loaded
                 }
             }
-            .mapLatest { quoteState ->
+            .onEach { quoteState ->
                 val swapArgs = quoteState.value.toExecuteArgs(
                     slippage = swapSettings.first().slippage,
                     firstSegmentFees = quoteState.firstSegmentFeeAsset
                 )
 
-                loadFeeSuspending(
-                    feeConstructor = { swapInteractor.estimateFee(swapArgs) },
-                    retryScope = coroutineScope,
-                    onRetryCancelled = {}
-                )
+                loadFee { swapInteractor.estimateFee(swapArgs) }
             }
             .inBackground()
             .launchIn(viewModelScope)
@@ -572,10 +511,6 @@ class SwapMainSettingsViewModel(
         }
 
         swapDirectionFlipped.value = newSettings.swapDirection!!.event()
-    }
-
-    private suspend fun isEditFeeTokenAvailable(assetIn: Chain.Asset?): Boolean {
-        return assetIn != null && swapInteractor.canPayFeeInCustomAsset(assetIn)
     }
 
     private fun formatRate(swapQuote: SwapQuote): String {

@@ -32,6 +32,13 @@ data class Token(
     fun BigInteger.toAmount() = amountFromPlanks(this)
 }
 
+fun Token.fiatAmountOf(planks: Balance) : FiatAmount {
+    return FiatAmount(
+        currency = currency,
+        price = planksToFiat(planks)
+    )
+}
+
 data class HistoricalToken(
     override val currency: Currency,
     override val coinRate: HistoricalCoinRate?,

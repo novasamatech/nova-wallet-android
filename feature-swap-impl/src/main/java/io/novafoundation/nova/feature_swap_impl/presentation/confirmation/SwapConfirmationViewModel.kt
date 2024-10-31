@@ -39,6 +39,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeBalanceExtractor
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
@@ -49,10 +51,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -103,7 +103,7 @@ class SwapConfirmationViewModel(
     private val tokenRepository: TokenRepository,
     private val externalActions: ExternalActions.Presentation,
     private val swapStateStoreProvider: SwapStateStoreProvider,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val arbitraryAssetUseCase: ArbitraryAssetUseCase,
     private val maxActionProviderFactory: MaxActionProviderFactory,
@@ -151,13 +151,11 @@ class SwapConfirmationViewModel(
         .map { it.token }
         .shareInBackground()
 
-    val feeMixin = feeLoaderMixinFactory.createGeneric<SwapFee>(
-        tokenFlow = feeTokenFlow,
-        configuration = Configuration(
-            initialState = Configuration.InitialState(
-                feeStatus = FeeStatus.Loading,
-            )
-        )
+    val feeMixin = feeLoaderMixinFactory.create(
+        scope = viewModelScope,
+        selectedChainAssetFlow = initialSwapState.map { it.quote.assetIn },
+        feeFormatter = SwapFeeFormatter(swapInteractor),
+        feeBalanceExtractor = SwapFeeBalanceExtractor(),
     )
 
     private val maxActionProvider = createMaxActionProvider()
@@ -372,11 +370,9 @@ class SwapConfirmationViewModel(
                 firstSegmentFees = initialSwapState.first().fee.intermediateSegmentFeesInAssetIn.asset
             )
 
-            feeMixin.loadFee(
-                coroutineScope = viewModelScope,
-                feeConstructor = { swapInteractor.estimateFee(executeArgs) },
-                onRetryCancelled = { }
-            )
+            feeMixin.loadFee {
+                swapInteractor.estimateFee(executeArgs)
+            }
 
             confirmationStateFlow.value = confirmationState.copy(swapQuoteArgs = newSwapQuoteArgs, swapQuote = swapQuote)
         }

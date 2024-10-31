@@ -68,10 +68,9 @@ fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
 ) = checkForFeeChanges(
     calculateFee = { payload ->
         val transfers = assetSourceRegistry.sourceFor(payload.transfer.originChainAsset).transfers
-        val fee = transfers.calculateFee(payload.transfer, coroutineScope)
-        payload.originFee.copy(submissionFee = fee)
+        transfers.calculateFee(payload.transfer, coroutineScope)
     },
-    currentFee = { it.originFee },
+    currentFee = { it.originFee.submissionFee },
     chainAsset = { it.commissionChainAsset },
     error = AssetTransferValidationFailure::FeeChangeDetected
 )

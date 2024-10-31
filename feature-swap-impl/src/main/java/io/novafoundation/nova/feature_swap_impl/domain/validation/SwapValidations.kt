@@ -69,7 +69,7 @@ fun SwapValidationSystemBuilder.enoughLiquidity(sharedQuoteValidationRetriever: 
 fun SwapValidationSystemBuilder.sufficientBalanceInFeeAsset() = sufficientBalanceGeneric(
     available = { it.feeAsset.transferable },
     amount = { BigDecimal.ZERO },
-    fee = { it.fee },
+    fee = { TODO() },
     error = { SwapValidationFailure.NotEnoughFunds.ToPayFee }
 )
 
@@ -87,10 +87,10 @@ fun SwapValidationSystemBuilder.sufficientAssetOutBalanceToStayAboveED(
 fun SwapValidationSystemBuilder.checkForFeeChanges(
     swapService: SwapService
 ) = checkForFeeChanges(
-    calculateFee = { swapService.estimateFee(it.swapExecuteArgs) },
-    currentFee = { it.fee },
+    calculateFee = { TODO() /*swapService.estimateFee(it.swapExecuteArgs)*/ },
+    currentFee = { TODO() /*it.fee*/ },
     chainAsset = { it.feeAsset.token.configuration },
-    error = SwapValidationFailure::FeeChangeDetected
+    error = TODO()
 )
 
 fun SwapValidationSystemBuilder.positiveAmountIn() = positiveAmount(

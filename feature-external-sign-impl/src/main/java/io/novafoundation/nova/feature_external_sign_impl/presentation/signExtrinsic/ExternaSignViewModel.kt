@@ -180,7 +180,7 @@ class ExternaSignViewModel(
                 handleFeeSpikeDetected(
                     error = reason,
                     resourceManager = resourceManager,
-                    feeLoaderMixin = originFeeMixin,
+                    setFee = originFeeMixin,
                     actions = actions
                 )
             }

@@ -44,7 +44,7 @@ class TokenRepositoryImpl(
     override suspend fun getTokens(chainAssets: List<Chain.Asset>): Map<FullChainAssetId, Token> {
         if (chainAssets.isEmpty()) return emptyMap()
 
-        val symbols = chainAssets.mapToSet { it.symbol.value }.distinct()
+        val symbols = chainAssets.mapToSet { it.symbol.value }.toList()
 
         val tokens = tokenDao.getTokensWithCurrency(symbols)
 

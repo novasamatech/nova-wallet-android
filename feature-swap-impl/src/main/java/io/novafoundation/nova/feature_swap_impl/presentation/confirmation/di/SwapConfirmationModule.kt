@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.Max
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -50,7 +50,7 @@ class SwapConfirmationModule {
         validationExecutor: ValidationExecutor,
         tokenRepository: TokenRepository,
         externalActions: ExternalActions.Presentation,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         assetUseCase: ArbitraryAssetUseCase,
         maxActionProviderFactory: MaxActionProviderFactory,

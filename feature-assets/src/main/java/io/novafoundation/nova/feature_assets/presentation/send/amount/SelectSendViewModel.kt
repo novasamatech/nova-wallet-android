@@ -14,12 +14,14 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.fee.toParcel
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.view.ChainChipModel
@@ -33,23 +35,19 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.view.Cross
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.TransferFeeDisplayFormatter
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.createForTransfer
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.commissionAsset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createChangeable
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createSimple
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.isEnabled
@@ -84,7 +82,7 @@ class SelectSendViewModel(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val accountRepository: AccountRepository,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    feeLoaderMixinFactory: GenericFeeLoaderMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     addressInputMixinFactory: AddressInputMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -112,7 +110,11 @@ class SelectSendViewModel(
         )
     }
 
-    val selectAddressMixin = selectAddressMixinFactory.create(this, selectAddressPayloadFlow, ::onAddressSelect)
+    val selectAddressMixin = selectAddressMixinFactory.create(
+        coroutineScope = this,
+        payloadFlow = selectAddressPayloadFlow,
+        onAddressSelect = ::onAddressSelect
+    )
 
     val addressInputMixin = with(addressInputMixinFactory) {
         val destinationChain = destinationChainWithAsset.map { it.chain }
@@ -154,17 +156,8 @@ class SelectSendViewModel(
     private val originAssetFlow = originChainAsset.flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinFactory.createChangeable<OriginFee>(
-        originAssetFlow,
-        coroutineScope,
-        configuration = Configuration(
-            initialState = Configuration.InitialState(
-                supportCustomFee = false
-            )
-        )
-    )
-
-    val crossChainFeeMixin = feeLoaderMixinFactory.createSimple(originAssetFlow)
+    private val feeFormatter = TransferFeeDisplayFormatter()
+    val feeMixin = feeLoaderMixinFactory.createForTransfer(originChainAsset, feeFormatter)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
@@ -195,25 +188,24 @@ class SelectSendViewModel(
     fun nextClicked() = launch {
         sendInProgressFlow.value = true
 
-        val originFee = originFeeMixin.awaitFee()
-        val crossChainFee = crossChainFeeMixin.awaitOptionalFee()
+        val fee = feeMixin.awaitFee()
 
         val transfer = buildTransfer(
             origin = originChainWithAsset.first(),
             destination = destinationChainWithAsset.first(),
             amount = amountChooserMixin.amountState.first().value ?: return@launch,
-            commissionAsset = originFeeMixin.commissionAsset(),
+            feePaymentCurrency = feeMixin.feePaymentCurrency(),
             address = addressInputMixin.getAddress(),
         )
 
         val payload = AssetTransferPayload(
             transfer = WeightedAssetTransfer(
                 assetTransfer = transfer,
-                fee = originFee,
+                fee = fee.originFee,
             ),
-            crossChainFee = crossChainFee,
-            originFee = originFee,
-            originCommissionAsset = originFeeMixin.commissionAsset(),
+            crossChainFee = fee.crossChainFee,
+            originFee = fee.originFee,
+            originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = originAssetFlow.first()
         )
 
@@ -227,7 +219,7 @@ class SelectSendViewModel(
                     resourceManager = resourceManager,
                     status = status,
                     actions = actions,
-                    feeLoaderMixin = originFeeMixin
+                    setFee = { feeMixin.setFee(fee.replaceSubmission(it)) }
                 )
             },
         ) {
@@ -317,59 +309,38 @@ class SelectSendViewModel(
     }
 
     private fun setupFees() {
-        combine(
+        feeMixin.connectWith(
             originChainWithAsset,
-            originFeeMixin.commissionAssetFlow(),
             destinationChainWithAsset,
             addressInputMixin.inputFlow,
             amountChooserMixin.backPressuredAmount,
-            ::recalculateFee
-        )
-            .inBackground()
-            .launchIn(this)
-
-        // Enable custom fee only for on chain transfers
-        combine(originChain, destinationChain) { originChain, destinationChain ->
-            originFeeMixin.setSupportCustomFee(originChain.id == destinationChain.id)
-        }.launchIn(this)
-    }
-
-    private suspend fun recalculateFee(
-        originAsset: ChainWithAsset,
-        originCommissionAsset: Asset,
-        destinationAsset: ChainWithAsset,
-        address: String,
-        amount: BigDecimal
-    ) {
-        originFeeMixin.invalidateFee()
-        val hasCrossChainFee = originAsset.chain.id != destinationAsset.chain.id
-
-        if (hasCrossChainFee) {
-            crossChainFeeMixin.invalidateFee()
-        } else {
-            crossChainFeeMixin.setFee(null)
-        }
-
-        try {
+        ) { paymentCurrency, originAsset, destinationAsset, address, amount ->
             val assetTransfer = buildTransfer(
                 origin = originAsset,
                 destination = destinationAsset,
                 amount = amount,
-                commissionAsset = originCommissionAsset,
+                feePaymentCurrency = paymentCurrency,
                 address = address
             )
 
-            val transferFeeModel = sendInteractor.getFee(assetTransfer, viewModelScope)
+            sendInteractor.getFee(assetTransfer, viewModelScope)
+        }
 
-            originFeeMixin.setFee(transferFeeModel.originFee)
-            crossChainFeeMixin.setFee(transferFeeModel.crossChainFee)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        combine(originChain, destinationChain) { originChain, destinationChain ->
+            val isCrossChain = originChain.id != destinationChain.id
+            val mode = determineFeeSelectionMode(isCrossChain)
 
-            originFeeMixin.setFeeStatus(FeeStatus.Error)
-            if (hasCrossChainFee) {
-                crossChainFeeMixin.setFeeStatus(FeeStatus.Error)
-            }
+            feeFormatter.crossChainFeeShown = isCrossChain
+            feeMixin.setPaymentCurrencySelectionMode(mode)
+        }.launchIn(this)
+    }
+
+    private fun determineFeeSelectionMode(isCrossChain: Boolean): PaymentCurrencySelectionMode {
+        // Enable custom fee only for on chain transfers
+        return if (isCrossChain) {
+            PaymentCurrencySelectionMode.DISABLED
+        } else {
+            PaymentCurrencySelectionMode.ENABLED
         }
     }
 
@@ -380,10 +351,7 @@ class SelectSendViewModel(
                 chainId = validPayload.transfer.originChain.id,
                 chainAssetId = validPayload.transfer.originChainAsset.id
             ),
-            commission = AssetPayload(
-                chainId = validPayload.transfer.commissionAsset.chainId,
-                chainAssetId = validPayload.transfer.commissionAsset.id
-            ),
+            feePaymentCurrency = validPayload.transfer.feePaymentCurrency.toParcel(),
             destination = AssetPayload(
                 chainId = validPayload.transfer.destinationChain.id,
                 chainAssetId = validPayload.transfer.destinationChainAsset.id
@@ -397,14 +365,14 @@ class SelectSendViewModel(
 
     private suspend fun buildTransfer(
         origin: ChainWithAsset,
-        commissionAsset: Asset,
+        feePaymentCurrency: FeePaymentCurrency,
         destination: ChainWithAsset,
         amount: BigDecimal,
         address: String,
     ): AssetTransfer {
         return buildAssetTransfer(
             metaAccount = selectedAccount.first(),
-            commissionAsset = commissionAsset,
+            feePaymentCurrency = feePaymentCurrency,
             origin = origin,
             destination = destination,
             amount = amount,
@@ -568,10 +536,3 @@ class SelectSendViewModel(
         val balances: Asset?
     )
 }
-
-private class FeePayload(
-    val originAsset: ChainWithAsset,
-    val destinationAsset: ChainWithAsset,
-    val address: String,
-    val amount: BigDecimal
-)

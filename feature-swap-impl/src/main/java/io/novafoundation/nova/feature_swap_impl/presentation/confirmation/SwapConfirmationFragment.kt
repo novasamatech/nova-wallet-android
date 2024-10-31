@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssets
@@ -66,7 +66,8 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         observeDescription(viewModel)
-        setupFeeLoading(viewModel.feeMixin, swapConfirmationNetworkFee)
+
+        viewModel.feeMixin.setupFeeLoading(swapConfirmationNetworkFee)
 
         viewModel.swapDetails.observe {
             swapConfirmationAssets.setModel(it.assets)

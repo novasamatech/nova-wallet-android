@@ -2,8 +2,7 @@ package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
-import io.novafoundation.nova.feature_assets.domain.send.model.TransferFeeModel
+import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
@@ -31,7 +30,7 @@ class SendInteractor(
     private val extrinsicService: ExtrinsicService,
 ) {
 
-    suspend fun getFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): TransferFeeModel = withContext(Dispatchers.Default) {
+    suspend fun getFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): TransferFee = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val fees = with(crossChainTransfersUseCase) {
                 extrinsicService.estimateFee(transfer, cachingScope = null)
@@ -40,15 +39,14 @@ class SendInteractor(
             val originFee = OriginFee(
                 submissionFee = fees.submissionFee,
                 deliveryFee = fees.deliveryFee,
-                chainAsset = transfer.commissionAssetToken.configuration
             )
 
-            TransferFeeModel(originFee, fees.executionFee)
+            TransferFee(originFee, fees.executionFee)
         } else {
-            val nativeFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
-            TransferFeeModel(
-                OriginFee(nativeFee, null, transfer.commissionAssetToken.configuration),
-                null
+            val submissionFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
+            TransferFee(
+                originFee = OriginFee(submissionFee, null),
+                crossChainFee = null
             )
         }
     }
@@ -66,12 +64,12 @@ class SendInteractor(
                 extrinsicService.performTransfer(config, transfer, crossChainFee!!.amount)
             }
         } else {
-            val networkFee = originFee.submissionFee
+            val submissionFee = originFee.submissionFee
 
             getAssetTransfers(transfer).performTransfer(transfer, coroutineScope)
                 .onSuccess { submission ->
                     // Insert used fee regardless of who paid it
-                    walletRepository.insertPendingTransfer(submission.hash, transfer, networkFee.decimalAmount)
+                    walletRepository.insertPendingTransfer(submission.hash, transfer, submissionFee)
                 }
         }
     }

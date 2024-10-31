@@ -36,8 +36,10 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQu
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.sufficientNativeBalanceToPayFeeConsideringED
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.incomingCrossChainDirectionsAvailable
+import io.novafoundation.nova.feature_wallet_api.domain.model.FiatAmount
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -47,6 +49,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -55,10 +58,29 @@ class SwapInteractor(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val walletRepository: WalletRepository,
+    private val tokenRepository: TokenRepository,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapTransactionHistoryRepository: SwapTransactionHistoryRepository
 ) {
+
+    suspend fun calculateTotalFiatPrice(swapFee: SwapFee): FiatAmount {
+        return withContext(Dispatchers.Default) {
+            val basicFees = swapFee.allBasicFees()
+            val chainAssets = basicFees.map { it.asset }
+            val tokens = tokenRepository.getTokens(chainAssets)
+
+            val totalFiat = basicFees.sumOf { basicFee ->
+                val token = tokens[basicFee.asset.fullId] ?: return@sumOf BigDecimal.ZERO
+                token.planksToFiat(basicFee.amount)
+            }
+
+            FiatAmount(
+                currency = tokens.values.first().currency,
+                price = totalFiat
+            )
+        }
+
+    }
 
     suspend fun sync(coroutineScope: CoroutineScope) {
         swapService.sync(coroutineScope)
