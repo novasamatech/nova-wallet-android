@@ -6,8 +6,8 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.DefaultFeeBalanceExtractor
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeBalanceExtractor
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.DefaultFeeInspector
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.ChooseFeeCurrencyPayload
@@ -30,8 +30,9 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
     ) {
 
         class InitialState<F, D>(
+            val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native,
             val paymentCurrencySelectionMode: PaymentCurrencySelectionMode = PaymentCurrencySelectionMode.DISABLED,
-            val feeStatus: FeeStatus<F, D>? = null
+            val feeStatus: FeeStatus<F, D> = FeeStatus.NoFee
         )
     }
 
@@ -46,6 +47,8 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
     interface Presentation<F, D> : FeeLoaderMixinV2<F, D>, SetFee<F> {
 
         suspend fun feeAsset(): Asset
+
+        val feeChainAssetFlow: Flow<Chain.Asset>
 
         suspend fun feePaymentCurrency(): FeePaymentCurrency
 
@@ -66,7 +69,7 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
             scope: CoroutineScope,
             selectedChainAssetFlow: Flow<Chain.Asset>,
             feeFormatter: FeeFormatter<F, D>,
-            feeBalanceExtractor: FeeBalanceExtractor<F>,
+            feeInspector: FeeInspector<F>,
             configuration: Configuration<F, D> =  Configuration()
         ): Presentation<F, D>
     }
@@ -83,7 +86,7 @@ fun <F : FeeBase> Factory.createDefault(
         scope = scope,
         selectedChainAssetFlow = selectedChainAssetFlow,
         feeFormatter = DefaultFeeFormatter(),
-        feeBalanceExtractor = DefaultFeeBalanceExtractor(),
+        feeInspector = DefaultFeeInspector(),
         configuration = configuration
     )
 }

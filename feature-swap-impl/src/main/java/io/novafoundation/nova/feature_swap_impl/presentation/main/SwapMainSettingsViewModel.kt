@@ -50,8 +50,8 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeBalanceExtractor
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
@@ -77,6 +77,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -173,10 +174,10 @@ class SwapMainSettingsViewModel(
         scope = viewModelScope,
         selectedChainAssetFlow = swapSettings.mapNotNull { it.assetIn },
         feeFormatter = SwapFeeFormatter(swapInteractor),
-        feeBalanceExtractor = SwapFeeBalanceExtractor(),
+        feeInspector = SwapFeeInspector(),
         configuration = Configuration(
             initialState = Configuration.InitialState(
-                feeStatus = FeeStatus.NoFee,
+                paymentCurrencySelectionMode = PaymentCurrencySelectionMode.AUTOMATIC_ONLY
             )
         )
     )
@@ -432,7 +433,6 @@ class SwapMainSettingsViewModel(
                         assetOut = assetOut,
                         amount = payload.amount,
                         swapDirection = direction,
-                        feeAsset = chainRegistry.asset(payload.feeAsset.fullChainAssetId),
                         slippage = oldSwapSettings.slippage
                     )
 
@@ -481,12 +481,14 @@ class SwapMainSettingsViewModel(
                 }
             }
             .onEach { quoteState ->
-                val swapArgs = quoteState.value.toExecuteArgs(
-                    slippage = swapSettings.first().slippage,
-                    firstSegmentFees = quoteState.firstSegmentFeeAsset
-                )
+                loadFee { feePaymentCurrency ->
+                    val swapArgs = quoteState.value.toExecuteArgs(
+                        slippage = swapSettings.first().slippage,
+                        firstSegmentFees = feePaymentCurrency
+                    )
 
-                loadFee { swapInteractor.estimateFee(swapArgs) }
+                    swapInteractor.estimateFee(swapArgs)
+                }
             }
             .inBackground()
             .launchIn(viewModelScope)
@@ -588,7 +590,7 @@ class SwapMainSettingsViewModel(
         val quote = swapInteractor.quote(swapQuoteArgs, viewModelScope)
 
         quotingState.value = quote.fold(
-            onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, swapSettings.feeAsset!!) },
+            onSuccess = { QuotingState.Loaded(it, swapQuoteArgs) },
             onFailure = {
                 if (it is CancellationException) {
                     QuotingState.Loading

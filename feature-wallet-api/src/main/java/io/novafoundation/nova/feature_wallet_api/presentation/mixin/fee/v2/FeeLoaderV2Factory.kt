@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeBalanceExtractor
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -21,7 +21,7 @@ class FeeLoaderV2Factory(
         scope: CoroutineScope,
         selectedChainAssetFlow: Flow<Chain.Asset>,
         feeFormatter: FeeFormatter<F, D>,
-        feeBalanceExtractor: FeeBalanceExtractor<F>,
+        feeInspector: FeeInspector<F>,
         configuration: FeeLoaderMixinV2.Configuration<F, D>
     ): FeeLoaderMixinV2.Presentation<F, D> {
         return FeeLoaderV2Provider(
@@ -31,7 +31,7 @@ class FeeLoaderV2Factory(
             interactor = interactor,
             feeFormatter = feeFormatter,
             configuration = configuration,
-            feeBalanceExtractor = feeBalanceExtractor,
+            feeInspector = feeInspector,
             selectedChainAssetFlow = selectedChainAssetFlow,
             coroutineScope = scope
         )

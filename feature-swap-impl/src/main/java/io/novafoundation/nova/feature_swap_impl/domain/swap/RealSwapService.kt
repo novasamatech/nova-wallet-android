@@ -299,10 +299,10 @@ internal class RealSwapService(
 
     private suspend fun SwapGraphEdge.identifySegmentCurrency(
         isFirstSegment: Boolean,
-        firstSegmentFees: Chain.Asset
+        firstSegmentFees: FeePaymentCurrency
     ): FeePaymentCurrency {
         return if (isFirstSegment) {
-            firstSegmentFees.toFeePaymentCurrency()
+            firstSegmentFees
         } else {
             // When executing intermediate segments, always pay in sending asset
             chainRegistry.asset(from).toFeePaymentCurrency()

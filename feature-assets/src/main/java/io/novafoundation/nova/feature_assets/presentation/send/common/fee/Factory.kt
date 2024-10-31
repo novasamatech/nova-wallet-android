@@ -13,11 +13,13 @@ context(BaseViewModel)
 fun FeeLoaderMixinV2.Factory.createForTransfer(
     originChainAsset: Flow<Chain.Asset>,
     formatter: TransferFeeDisplayFormatter,
+    configuration: FeeLoaderMixinV2.Configuration<TransferFee, TransferFeeDisplay> = FeeLoaderMixinV2.Configuration()
 ): TransferFeeLoaderMixin {
     return create(
         scope = viewModelScope,
         selectedChainAssetFlow = originChainAsset,
         feeFormatter = formatter,
-        feeBalanceExtractor = TransferFeeBalanceExtractor(),
+        feeInspector = TransferFeeInspector(),
+        configuration = configuration
     )
 }

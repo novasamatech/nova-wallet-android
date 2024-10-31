@@ -11,7 +11,6 @@ val DEFAULT_SLIPPAGE = 0.5.percents
 data class SwapSettings(
     val assetIn: Chain.Asset? = null,
     val assetOut: Chain.Asset? = null,
-    val feeAsset: Chain.Asset? = null,
     val amount: Balance? = null,
     val swapDirection: SwapDirection? = null,
     val slippage: Fraction

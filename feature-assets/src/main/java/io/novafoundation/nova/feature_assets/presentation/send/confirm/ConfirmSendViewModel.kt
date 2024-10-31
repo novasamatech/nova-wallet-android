@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -99,7 +100,12 @@ class ConfirmSendViewModel(
     private val formatter = TransferFeeDisplayFormatter(crossChainFeeShown = isCrossChain)
     val feeMixin = feeLoaderMixinFactory.createForTransfer(
         originChainAsset = flowOf { originAsset() },
-        formatter = formatter
+        formatter = formatter,
+        configuration = Configuration(
+            initialState = Configuration.InitialState(
+                feePaymentCurrency = transferDraft.feePaymentCurrency.toDomain()
+            )
+        )
     )
 
     val hintsMixin = hintsFactory.create(this)

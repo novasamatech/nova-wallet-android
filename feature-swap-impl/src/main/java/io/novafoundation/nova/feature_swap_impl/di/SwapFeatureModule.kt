@@ -140,9 +140,8 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideSwapSettingsStateProvider(
         computationalCache: ComputationalCache,
-        chainRegistry: ChainRegistry
     ): SwapSettingsStateProvider {
-        return RealSwapSettingsStateProvider(computationalCache, chainRegistry)
+        return RealSwapSettingsStateProvider(computationalCache)
     }
 
     @Provides

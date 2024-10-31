@@ -41,3 +41,9 @@ fun <F, D> FeeStatus<F, D>.mapProgress(map: (Boolean) -> Boolean): FeeStatus<F, 
         FeeStatus.NoFee -> FeeStatus.NoFee
     }
 }
+
+inline fun <F, D> FeeStatus<F, D>.onLoaded(action: (FeeModel<F, D>) -> Unit) {
+    if (this is FeeStatus.Loaded<F, D>) {
+        action(feeModel)
+    }
+}

@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main
 
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 sealed class QuotingState {
 
@@ -12,5 +11,5 @@ sealed class QuotingState {
 
     object NotAvailable : QuotingState()
 
-    data class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs, val firstSegmentFeeAsset: Chain.Asset) : QuotingState()
+    data class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs) : QuotingState()
 }

@@ -39,8 +39,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeBalanceExtractor
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
@@ -155,7 +155,7 @@ class SwapConfirmationViewModel(
         scope = viewModelScope,
         selectedChainAssetFlow = initialSwapState.map { it.quote.assetIn },
         feeFormatter = SwapFeeFormatter(swapInteractor),
-        feeBalanceExtractor = SwapFeeBalanceExtractor(),
+        feeInspector = SwapFeeInspector(),
     )
 
     private val maxActionProvider = createMaxActionProvider()
@@ -365,12 +365,13 @@ class SwapConfirmationViewModel(
                 .onFailure { }
                 .getOrNull() ?: return@launch
 
-            val executeArgs = swapQuote.toExecuteArgs(
-                slippage = slippageFlow.first(),
-                firstSegmentFees = initialSwapState.first().fee.intermediateSegmentFeesInAssetIn.asset
-            )
 
-            feeMixin.loadFee {
+            feeMixin.loadFee { feePaymentCurrency ->
+                val executeArgs = swapQuote.toExecuteArgs(
+                    slippage = slippageFlow.first(),
+                    firstSegmentFees = feePaymentCurrency
+                )
+
                 swapInteractor.estimateFee(executeArgs)
             }
 

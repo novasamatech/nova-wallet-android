@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -25,7 +26,7 @@ open class SwapFeeArgs(
     val slippage: Fraction,
     val executionPath: Path<SegmentExecuteArgs>,
     val direction: SwapDirection,
-    val firstSegmentFees: Chain.Asset
+    val firstSegmentFees: FeePaymentCurrency
 )
 
 class SegmentExecuteArgs(
@@ -111,7 +112,7 @@ private fun SwapLimit.SpecifiedOut.updateInAmount(newAmountInQuote: Balance): Sw
     )
 }
 
-fun SwapQuote.toExecuteArgs(slippage: Fraction, firstSegmentFees: Chain.Asset): SwapFeeArgs {
+fun SwapQuote.toExecuteArgs(slippage: Fraction, firstSegmentFees: FeePaymentCurrency): SwapFeeArgs {
     return SwapFeeArgs(
         assetIn = amountIn.chainAsset,
         slippage = slippage,
