@@ -52,14 +52,18 @@ import io.novafoundation.nova.feature_account_impl.presentation.startCreateWalle
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -381,6 +385,22 @@ class Navigator(
 
     override fun closeSendFlow() {
         navController?.navigate(R.id.action_close_send_flow)
+    }
+
+    override fun openSendNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_sendFlow_to_sendFlowNetwork, NetworkFlowFragment.createPayload(payload))
+    }
+
+    override fun openReceiveNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_receiveFlow_to_receiveFlowNetwork, NetworkFlowFragment.createPayload(payload))
+    }
+
+    override fun openSwapNetworks(payload: NetworkSwapFlowPayload) {
+        navController?.navigate(R.id.action_swapFlow_to_swapFlowNetwork, NetworkSwapFlowFragment.createPayload(payload))
+    }
+
+    override fun openBuyNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
     override fun openSwapFlow() {

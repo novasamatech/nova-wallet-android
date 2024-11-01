@@ -872,7 +872,7 @@
 
     <fragment
         android:id="@+id/sendFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.AssetSendFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.asset.AssetSendFlowFragment"
         android:label="AssetSendFlowFragment">
 
         <action
@@ -884,22 +884,79 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment" />
 
+        <action
+            android:id="@+id/action_sendFlow_to_sendFlowNetwork"
+            app:destination="@id/sendFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/receiveFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.AssetReceiveFlowFragment"
-        android:label="AssetReceiveFlowFragment" />
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.AssetReceiveFlowFragment"
+        android:label="AssetReceiveFlowFragment">
+
+        <action
+            android:id="@+id/action_receiveFlow_to_receiveFlowNetwork"
+            app:destination="@id/receiveFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/buyFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowFragment"
-        android:label="AssetBuyFlowFragment" />
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowFragment"
+        android:label="AssetBuyFlowFragment">
+
+        <action
+            android:id="@+id/action_buyFlow_to_buyFlowNetwork"
+            app:destination="@id/buyFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/swapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment" />
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
+        android:label="AssetSwapFlowFragment" >
+
+        <action
+            android:id="@+id/action_swapFlow_to_swapFlowNetwork"
+            app:destination="@id/swapFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/sendFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment"
+        android:label="NetworkSendFlowFragment" />
+
+    <fragment
+        android:id="@+id/receiveFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.network.NetworkReceiveFlowFragment"
+        android:label="NetworkReceiveFlowFragment" />
+
+    <fragment
+        android:id="@+id/buyFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowFragment"
+        android:label="NetworkBuyFlowFragment" />
+
+    <fragment
+        android:id="@+id/swapFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment"
+        android:label="NetworkBuyFlowFragment" />
 
     <fragment
         android:id="@+id/walletConnectScanFragment"

@@ -17,11 +17,11 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
@@ -77,7 +77,7 @@ class BalanceListFragment :
         balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
         balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
 
-        AssetNetworkDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
 
         walletContainer.setOnRefreshListener {
             viewModel.fullSync()
@@ -148,7 +148,7 @@ class BalanceListFragment :
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
         if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
-            viewModel.assetClicked(tokenGroup.groupType.item)
+            viewModel.assetClicked(tokenGroup.groupType.asset)
         } else {
             val itemAnimator = balanceListAssets.itemAnimator as AssetTokensItemAnimator
             itemAnimator.prepareForAnimation()

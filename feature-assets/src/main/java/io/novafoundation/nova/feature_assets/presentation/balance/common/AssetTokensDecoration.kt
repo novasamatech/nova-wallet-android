@@ -82,7 +82,7 @@ class AssetTokensDecoration(
         }
 
         // Don't draw children background if it's a single item
-        if (parentItem is TokenGroupUi && parentItem.groupWithOneItem) return
+        if (parentItem is TokenGroupUi && parentItem.singleItemGroup) return
 
         val childrenBlockBounds = getChildrenBlockBounds(animationState, recyclerView, parent, children)
         drawChildrenBlock(expandingFraction, childrenBlockBounds, canvas)

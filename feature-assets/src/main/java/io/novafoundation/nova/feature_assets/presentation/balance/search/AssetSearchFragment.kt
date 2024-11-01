@@ -18,9 +18,9 @@ import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetNetworkDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
@@ -59,7 +59,7 @@ class AssetSearchFragment :
         searchAssetList.setHasFixedSize(true)
         searchAssetList.adapter = assetsAdapter
 
-        AssetNetworkDecoration.applyDefaultTo(searchAssetList, assetsAdapter)
+        AssetBaseDecoration.applyDefaultTo(searchAssetList, assetsAdapter)
         searchAssetList.itemAnimator = null
 
         searchAssetSearch.cancel.setOnClickListener {

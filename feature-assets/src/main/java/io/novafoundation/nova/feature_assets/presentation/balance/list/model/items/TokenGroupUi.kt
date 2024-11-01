@@ -12,7 +12,7 @@ data class TokenGroupUi(
     val recentRateChange: String,
     @ColorRes val rateChangeColorRes: Int,
     val tokenSymbol: String,
-    val groupWithOneItem: Boolean,
+    val singleItemGroup: Boolean,
     val balance: AmountModel,
     val groupType: GroupType
 ) : AssetGroupRvItem, ExpandableParentItem {
@@ -20,6 +20,6 @@ data class TokenGroupUi(
     sealed interface GroupType {
         object Group : GroupType
 
-        data class SingleItem(val item: AssetModel) : GroupType
+        data class SingleItem(val asset: AssetModel) : GroupType
     }
 }
