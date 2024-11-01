@@ -21,7 +21,6 @@ class RealAssetIconProvider(
     private val whiteBaseUrl: String
 ) : AssetIconProvider {
 
-
     override fun getAssetIconOrFallback(iconName: String): Icon {
         return getAssetIconOrFallback(iconName, assetsIconModeRepository.getIconMode())
     }
