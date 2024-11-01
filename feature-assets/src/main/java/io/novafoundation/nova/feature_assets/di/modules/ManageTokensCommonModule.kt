@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_assets.domain.tokens.AssetsDataCleaner
 import io.novafoundation.nova.feature_assets.domain.tokens.RealAssetsDataCleaner
@@ -21,8 +22,9 @@ class ManageTokensCommonModule {
     @Provides
     @FeatureScope
     fun provideMultiChainTokenUiMapper(
+        assetIconProvider: AssetIconProvider,
         resourceManager: ResourceManager
-    ) = MultiChainTokenMapper(resourceManager)
+    ) = MultiChainTokenMapper(assetIconProvider, resourceManager)
 
     @Provides
     @FeatureScope

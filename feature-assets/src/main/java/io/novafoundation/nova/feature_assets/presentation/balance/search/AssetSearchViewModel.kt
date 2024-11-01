@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.search
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
@@ -19,6 +20,7 @@ class AssetSearchViewModel(
     interactorFactory: AssetSearchInteractorFactory,
     currencyInteractor: CurrencyInteractor,
     externalBalancesInteractor: ExternalBalancesInteractor,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel() {
 
     val interactor = interactorFactory.createByAssetViewMode()
@@ -36,8 +38,8 @@ class AssetSearchViewModel(
         selectedCurrency,
     ) { assets, currency ->
         when (assets) {
-            is AssetFlowSearchResult.ByNetworks -> assets.assets.mapGroupedAssetsToUi(currency)
-            is AssetFlowSearchResult.ByTokens -> assets.tokens.mapGroupedAssetsToUi()
+            is AssetFlowSearchResult.ByNetworks -> assets.assets.mapGroupedAssetsToUi(assetIconProvider, currency)
+            is AssetFlowSearchResult.ByTokens -> assets.tokens.mapGroupedAssetsToUi(assetIconProvider)
         }
     }
         .distinctUntilChanged()

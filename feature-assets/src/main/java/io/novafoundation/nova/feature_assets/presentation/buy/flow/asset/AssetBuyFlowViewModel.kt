@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.buy.flow.asset
 
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -24,6 +25,7 @@ class AssetBuyFlowViewModel(
     accountUseCase: SelectedAccountUseCase,
     buyMixinFactory: BuyMixin.Factory,
     resourceManager: ResourceManager,
+    assetIconProvider: AssetIconProvider
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -32,6 +34,7 @@ class AssetBuyFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
+    assetIconProvider
 ) {
 
     val buyMixin = buyMixinFactory.create(scope = this)

@@ -97,7 +97,7 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
         source = mapAssetSourceToLocal(asset.source),
         buyProviders = gson.toJson(asset.buyProviders),
         typeExtras = gson.toJson(typeExtras),
-        icon = asset.iconUrl,
+        icon = asset.icon,
         enabled = asset.enabled
     )
 }

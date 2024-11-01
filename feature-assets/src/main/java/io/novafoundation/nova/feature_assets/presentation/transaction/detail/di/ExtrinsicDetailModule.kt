@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -30,6 +31,7 @@ class ExtrinsicDetailModule {
         operation: OperationParcelizeModel.Extrinsic,
         externalActions: ExternalActions.Presentation,
         resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return ExtrinsicDetailViewModel(
             addressDisplayUseCase,
@@ -38,7 +40,8 @@ class ExtrinsicDetailModule {
             router,
             operation,
             externalActions,
-            resourceManager
+            resourceManager,
+            assetIconProvider
         )
     }
 

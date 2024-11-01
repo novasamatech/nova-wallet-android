@@ -3,10 +3,10 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableParentViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import kotlinx.android.synthetic.main.item_token_asset_group.view.itemAssetTokenGroupBalance
@@ -26,7 +26,7 @@ class TokenAssetGroupViewHolder(
     fun bind(tokenGroup: TokenGroupUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         expandableItem = tokenGroup
 
-        itemTokenGroupAssetImage.loadTokenIcon(tokenGroup.tokenIcon, imageLoader)
+        itemTokenGroupAssetImage.setIcon(tokenGroup.tokenIcon, imageLoader)
 
         bindPriceRate(tokenGroup)
 

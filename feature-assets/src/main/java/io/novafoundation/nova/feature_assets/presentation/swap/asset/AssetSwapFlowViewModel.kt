@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -42,7 +43,8 @@ class AssetSwapFlowViewModel(
     resourceManager: ResourceManager,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val swapFlowExecutor: SwapFlowExecutor,
-    private val swapPayload: SwapFlowPayload
+    private val swapPayload: SwapFlowPayload,
+    private val assetIconProvider: AssetIconProvider
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -51,6 +53,7 @@ class AssetSwapFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
+    assetIconProvider
 ) {
 
     init {
@@ -92,12 +95,12 @@ class AssetSwapFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
+        return assets.mapGroupedAssetsToUi(assetIconProvider, currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
     }
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 }

@@ -72,7 +72,7 @@ fun getTokenAssetGroupBaseComparator(
 }
 
 private fun mapToTokenGroup(it: AssetWithNetwork) = TokenAssetGroup.Token(
-    it.asset.token.configuration.iconUrl,
+    it.asset.token.configuration.icon,
     it.asset.token.configuration.symbol.normalize(),
     it.asset.token.currency,
     it.asset.token.coinRate
