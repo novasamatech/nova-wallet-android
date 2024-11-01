@@ -279,7 +279,7 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
     val buyProviders = local.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
 
     return Chain.Asset(
-        iconUrl = local.icon,
+        icon = local.icon,
         id = local.id,
         symbol = local.symbol.asTokenSymbol(),
         precision = local.precision.asPrecision(),

@@ -65,7 +65,7 @@ data class Chain(
     )
 
     data class Asset(
-        val iconUrl: String?,
+        val icon: String?,
         val id: ChainAssetId,
         val priceId: String?,
         val chainId: ChainId,

@@ -8,9 +8,10 @@ import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
@@ -87,8 +88,8 @@ class AmountView @JvmOverloads constructor(
         stakingAssetImage.setImageDrawable(image)
     }
 
-    fun loadAssetImage(imageUrl: String?) {
-        stakingAssetImage.load(imageUrl, imageLoader)
+    fun loadAssetImage(icon: Icon) {
+        stakingAssetImage.setIcon(icon, imageLoader)
     }
 
     fun setAssetName(name: String) {

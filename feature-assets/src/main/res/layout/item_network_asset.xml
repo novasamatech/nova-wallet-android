@@ -14,12 +14,10 @@
         android:id="@+id/itemAssetImage"
         style="@style/Widget.Nova.AssetIcon.Primary"
         android:layout_marginStart="12dp"
-        android:background="@drawable/bg_token_container"
-        android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/itemAssetToken"
-        tools:src="@drawable/ic_nova" />
+        tools:src="@drawable/ic_token_dot_colored" />
 
     <TextView
         android:id="@+id/itemAssetToken"
@@ -31,7 +29,7 @@
         android:textColor="@color/text_primary"
         app:layout_constraintStart_toEndOf="@+id/itemAssetImage"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="KSM" />
+        tools:text="DOT" />
 
     <TextView
         android:id="@+id/itemAssetRate"

@@ -16,11 +16,9 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/bg_token_container"
-        android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/icon_primary"
         tools:src="@drawable/ic_token_ksm" />
 
     <TextView

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
+import io.novafoundation.nova.feature_settings_impl.presentation.assetIcons.di.AppearanceComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.di.NetworkManagementListComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.addedNetworks.di.AddedNetworkListComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di.CloudBackupSettingsComponent
@@ -48,6 +49,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
     fun networkManagementListFactory(): NetworkManagementListComponent.Factory
 
     fun addNetworkMainFactory(): AddNetworkMainComponent.Factory
+
+    fun appearanceFactory(): AppearanceComponent.Factory
 
     fun addNetworkFactory(): AddNetworkComponent.Factory
 

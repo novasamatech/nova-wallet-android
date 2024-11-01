@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -41,8 +42,9 @@ class SwapMainSettingsModule {
     @ScreenScope
     fun provideSwapAmountMixinFactory(
         chainRegistry: ChainRegistry,
-        resourceManager: ResourceManager
-    ) = SwapAmountInputMixinFactory(chainRegistry, resourceManager)
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
+    ) = SwapAmountInputMixinFactory(chainRegistry, resourceManager, assetIconProvider)
 
     @Provides
     @ScreenScope

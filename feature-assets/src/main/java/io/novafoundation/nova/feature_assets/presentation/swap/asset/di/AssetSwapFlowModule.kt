@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -41,7 +42,8 @@ class AssetSwapFlowModule {
         resourceManager: ResourceManager,
         payload: SwapFlowPayload,
         executorFactory: SwapFlowExecutorFactory,
-        swapAvailabilityInteractor: SwapAvailabilityInteractor
+        swapAvailabilityInteractor: SwapAvailabilityInteractor,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return AssetSwapFlowViewModel(
             interactorFactory = interactorFactory,
@@ -53,7 +55,8 @@ class AssetSwapFlowModule {
             resourceManager = resourceManager,
             swapFlowExecutor = executorFactory.create(payload),
             swapPayload = payload,
-            swapAvailabilityInteractor = swapAvailabilityInteractor
+            swapAvailabilityInteractor = swapAvailabilityInteractor,
+            assetIconProvider = assetIconProvider
         )
     }
 }

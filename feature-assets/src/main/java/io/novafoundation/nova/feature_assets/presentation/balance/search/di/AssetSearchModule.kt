@@ -8,11 +8,13 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
 @Module(includes = [ViewModelModule::class])
 class AssetSearchModule {
@@ -28,12 +30,14 @@ class AssetSearchModule {
     fun provideViewModel(
         router: AssetsRouter,
         interactorFactory: AssetSearchInteractorFactory,
+        currencyInteractor: CurrencyInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
         expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
     ): ViewModel {
         return AssetSearchViewModel(
             router = router,
             interactorFactory = interactorFactory,
+            currencyInteractor = currencyInteractor,
             externalBalancesInteractor = externalBalancesInteractor,
             expandableAssetsMixinFactory = expandableAssetsMixinFactory
         )
