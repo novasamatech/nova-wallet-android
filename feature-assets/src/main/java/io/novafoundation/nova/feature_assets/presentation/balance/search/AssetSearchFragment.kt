@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
+import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_assets.R
@@ -23,7 +24,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
-import io.novafoundation.nova.feature_assets.presentation.balance.common.createAssetExpandableAnimationSettings
+import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
@@ -62,7 +63,7 @@ class AssetSearchFragment :
         searchAssetList.setHasFixedSize(true)
         searchAssetList.adapter = assetsAdapter
 
-        val animationSettings = createAssetExpandableAnimationSettings()
+        val animationSettings = ExpandableAnimationSettings.createForAssets()
         val animator = ExpandableAnimator(searchAssetList, animationSettings, assetsAdapter)
 
         searchAssetList.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))

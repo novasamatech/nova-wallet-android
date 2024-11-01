@@ -29,6 +29,7 @@ interface ExpandableAssetsMixin {
     val assetModelsFlow: Flow<List<BalanceListRvItem>>
 
     fun expandToken(tokenGroupUi: TokenGroupUi)
+
     suspend fun switchViewMode()
 }
 
