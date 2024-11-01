@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.common
 
-import android.util.Log
 import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -8,10 +7,6 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.byNetworks
 import io.novafoundation.nova.feature_assets.domain.assets.models.byTokens
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
-import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -21,7 +16,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlin.system.measureTimeMillis
 
 class AssetListMixinFactory(
     private val walletInteractor: WalletInteractor,
@@ -80,24 +74,8 @@ class RealAssetListMixin(
         assetsViewModeFlow
     ) { assets, externalBalances, viewMode ->
         when (viewMode) {
-            AssetViewMode.NETWORKS -> {
-                var networks: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>
-                val time = measureTimeMillis {
-                    networks = walletInteractor.groupAssetsByNetwork(assets, externalBalances)
-                }
-                Log.d("AssetListMixin", "tokens: $time")
-                networks.byNetworks()
-            }
-
-            AssetViewMode.TOKENS -> {
-                var networks: Map<TokenAssetGroup, List<AssetWithNetwork>>
-                val time = measureTimeMillis {
-                    networks = walletInteractor.groupAssetsByToken(assets, externalBalances)
-                }
-                Log.d("AssetListMixin", "tokens: $time")
-                networks.byTokens()
-
-            }
+            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
+            AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
         }
     }.distinctUntilChanged()
         .shareInBackground()

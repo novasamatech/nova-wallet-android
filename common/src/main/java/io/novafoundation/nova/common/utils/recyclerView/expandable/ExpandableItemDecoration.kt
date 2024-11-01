@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.utils.recyclerView.expandable
 
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.util.Log
 import android.view.View
 import androidx.core.view.children
 import androidx.recyclerview.widget.ConcatAdapter
@@ -15,7 +14,6 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.Expa
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableBaseItem
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
-import kotlin.system.measureTimeMillis
 
 private data class ItemWithViewHolder(val position: Int, val item: ExpandableBaseItem, val viewHolder: ViewHolder?)
 
