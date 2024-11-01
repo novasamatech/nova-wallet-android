@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/appearanceToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/appearance_title" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/appearance_token_assets_title"
+        android:textColor="@color/text_secondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_appearance_container"
+        android:gravity="center"
+        android:padding="4dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/appearanceWhiteButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/appearanceWhiteIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_token_container"
+                android:src="@drawable/ic_token_dot_white" />
+
+            <TextView
+                android:id="@+id/appearanceWhiteText"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="@string/appearance_white_icon_title"
+                android:textColor="@color/appearance_selectable_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/appearanceColoredButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/appearanceColoredIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_token_container"
+                android:src="@drawable/ic_token_dot_colored" />
+
+            <TextView
+                android:id="@+id/appearanceColoredText"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="@string/appearance_colored_icon_title"
+                android:textColor="@color/appearance_selectable_text" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

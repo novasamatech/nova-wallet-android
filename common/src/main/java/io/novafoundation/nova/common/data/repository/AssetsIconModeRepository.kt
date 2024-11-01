@@ -2,15 +2,13 @@ package io.novafoundation.nova.common.data.repository
 
 import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.data.storage.Preferences
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 interface AssetsIconModeRepository {
     fun assetsIconModeFlow(): Flow<AssetIconMode>
 
-    suspend fun setAssetsIconMode(assetsViewMode: AssetIconMode)
+    fun setAssetsIconMode(assetsViewMode: AssetIconMode)
 
     fun getIconMode(): AssetIconMode
 }
@@ -29,7 +27,7 @@ class RealAssetsIconModeRepository(
             }
     }
 
-    override suspend fun setAssetsIconMode(assetsViewMode: AssetIconMode) = withContext(Dispatchers.IO) {
+    override fun setAssetsIconMode(assetsViewMode: AssetIconMode) {
         preferences.putString(PREFS_ASSETS_ICON_MODE, assetsViewMode.toPrefsValue())
     }
 
