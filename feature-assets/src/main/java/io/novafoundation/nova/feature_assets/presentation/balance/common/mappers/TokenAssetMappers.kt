@@ -3,11 +3,12 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.mapper
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
@@ -42,7 +43,7 @@ fun mapTokenAssetGroupToUi(
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(
         itemId = assetGroup.groupId,
-        tokenIcon = assetIconProvider.getAssetIcon(assetGroup.token.icon),
+        tokenIcon = assetIconProvider.getAssetIconOrFallback(assetGroup.token.icon),
         rate = mapCoinRateChange(assetGroup.token.coinRate, assetGroup.token.currency),
         recentRateChange = assetGroup.token.coinRate?.recentRateChange.orZero().formatAsChange(),
         rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.token.coinRate),
@@ -66,7 +67,7 @@ private fun mapAssetsToAssetModels(
         TokenAssetUi(
             group.getId(),
             mapAssetToAssetModel(it.asset, balance(it.balanceWithOffChain)),
-            assetIconProvider.getAssetIcon(it.asset.token.configuration),
+            assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration),
             mapChainToUi(it.chain)
         )
     }

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -67,7 +67,7 @@ class ReceiveViewModel(
             TokenReceiver(
                 addressModel = addressIconGenerator.createAddressModel(chain, address, AddressIconGenerator.SIZE_BIG, it.name),
                 chain = mapChainToUi(chain),
-                chainAssetIcon = assetIconProvider.getAssetIcon(chainAsset)
+                chainAssetIcon = assetIconProvider.getAssetIconOrFallback(chainAsset)
             )
         }
         .inBackground()

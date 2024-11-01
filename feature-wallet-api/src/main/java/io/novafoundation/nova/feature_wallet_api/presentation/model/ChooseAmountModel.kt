@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.ensureSuffix
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -31,5 +31,5 @@ internal fun ChooseAmountModel(
 
 internal fun ChooseAmountInputModel(chainAsset: Chain.Asset, assetIconProvider: AssetIconProvider): ChooseAmountInputModel = ChooseAmountInputModel(
     tokenSymbol = chainAsset.symbol.value,
-    tokenIcon = assetIconProvider.getAssetIcon(chainAsset),
+    tokenIcon = assetIconProvider.getAssetIconOrFallback(chainAsset),
 )

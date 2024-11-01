@@ -5,14 +5,16 @@ import android.text.TextUtils
 import android.text.style.ImageSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getWhiteAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
@@ -276,7 +278,7 @@ fun mapOperationToOperationModel(
                     subHeader = subHeader.value,
                     subHeaderEllipsize = subHeader.elipsize,
                     statusAppearance = statusAppearance,
-                    operationIcon = assetIconProvider.getWhiteAssetIcon(operation.chainAsset)
+                    operationIcon = assetIconProvider.getAssetIconOrFallback(operation.chainAsset, AssetIconMode.WHITE)
                 )
             }
 
