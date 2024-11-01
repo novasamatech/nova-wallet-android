@@ -59,14 +59,12 @@ class BalanceListModule {
     @Provides
     @ScreenScope
     fun provideAssetListMixinFactory(
-        assetIconProvider: AssetIconProvider,
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
         expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
     ): AssetListMixinFactory {
         return AssetListMixinFactory(
-            assetIconProvider,
             walletInteractor,
             assetsListInteractor,
             externalBalancesInteractor,
