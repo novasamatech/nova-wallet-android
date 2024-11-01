@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
@@ -22,6 +21,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
@@ -71,7 +71,7 @@ class BalanceListFragment :
         balanceListAssets.setHasFixedSize(true)
         balanceListAssets.adapter = adapter
 
-        val animationSettings = ExpandableAnimationSettings(400, AccelerateDecelerateInterpolator())
+        val animationSettings = ExpandableAnimationSettings.createForAssets()
         val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
 
         balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))

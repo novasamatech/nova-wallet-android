@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -35,7 +35,7 @@ class AssetReceiveFlowViewModel(
     resourceManager,
     assetIconProvider
 ) {
-    override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
+    override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)
     }
 

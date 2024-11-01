@@ -4,46 +4,31 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 class AssetSearchViewModel(
     private val router: AssetsRouter,
     interactorFactory: AssetSearchInteractorFactory,
-    currencyInteractor: CurrencyInteractor,
     externalBalancesInteractor: ExternalBalancesInteractor,
-    private val assetIconProvider: AssetIconProvider
+    expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
 ) : BaseViewModel() {
 
     val interactor = interactorFactory.createByAssetViewMode()
 
     val query = MutableStateFlow("")
 
-    private val selectedCurrency = currencyInteractor.observeSelectCurrency()
-        .inBackground()
-        .share()
-
     private val externalBalances = externalBalancesInteractor.observeExternalBalances()
 
-    val searchResults = combine(
-        interactor.searchAssetsFlow(query, externalBalances),
-        selectedCurrency,
-    ) { assets, currency ->
-        when (assets) {
-            is AssetFlowSearchResult.ByNetworks -> assets.assets.mapGroupedAssetsToUi(assetIconProvider, currency)
-            is AssetFlowSearchResult.ByTokens -> assets.tokens.mapGroupedAssetsToUi(assetIconProvider)
-        }
-    }
-        .distinctUntilChanged()
-        .shareInBackground()
+    private val assetsFlow = interactor.searchAssetsFlow(query, externalBalances)
+
+    val assetListMixin = expandableAssetsMixinFactory.create(assetsFlow)
+
+    val searchResults = assetListMixin.assetModelsFlow
 
     fun cancelClicked() {
         router.back()

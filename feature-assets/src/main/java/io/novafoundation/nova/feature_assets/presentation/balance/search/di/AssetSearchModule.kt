@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
@@ -29,16 +30,14 @@ class AssetSearchModule {
     fun provideViewModel(
         router: AssetsRouter,
         interactorFactory: AssetSearchInteractorFactory,
-        currencyInteractor: CurrencyInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
-        assetIconProvider: AssetIconProvider
+        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
     ): ViewModel {
         return AssetSearchViewModel(
             router = router,
             interactorFactory = interactorFactory,
-            currencyInteractor = currencyInteractor,
             externalBalancesInteractor = externalBalancesInteractor,
-            assetIconProvider = assetIconProvider
+            expandableAssetsMixinFactory = expandableAssetsMixinFactory
         )
     }
 }

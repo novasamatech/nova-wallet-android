@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
@@ -48,7 +48,7 @@ class AssetSendFlowViewModel(
     assetIconProvider
 ) {
 
-    override fun searchAssetsFlow(): Flow<AssetFlowSearchResult> {
+    override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.sendAssetSearch(query, externalBalancesFlow)
     }
 

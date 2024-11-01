@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetFlowSearchResult
+import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.getAssetBaseComparator
@@ -28,7 +28,7 @@ class ByNetworkAssetSearchInteractor(
     override fun buyAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         val filter = { asset: Asset -> asset.token.configuration.buyProviders.isNotEmpty() }
 
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
@@ -37,7 +37,7 @@ class ByNetworkAssetSearchInteractor(
     override fun sendAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         val filter = { asset: Asset -> asset.transferableInPlanks.isPositive() }
 
         return searchAssetsByNetworksInternalFlow(
@@ -54,7 +54,7 @@ class ByNetworkAssetSearchInteractor(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
             val filter: AssetSearchFilter = { asset ->
                 val chainAsset = asset.token.configuration
@@ -71,14 +71,14 @@ class ByNetworkAssetSearchInteractor(
     override fun searchReceiveAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
     }
 
     override fun searchAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
     }
 
@@ -88,7 +88,7 @@ class ByNetworkAssetSearchInteractor(
         assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
         filter: AssetSearchFilter?,
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         val filterFlow = flowOf(filter)
 
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
@@ -100,7 +100,7 @@ class ByNetworkAssetSearchInteractor(
         assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator(),
         filterFlow: Flow<AssetSearchFilter?>,
-    ): Flow<AssetFlowSearchResult> {
+    ): Flow<AssetsByViewModeResult> {
         val assetsFlow = assetSearchUseCase.filteredAssetFlow(filterFlow)
 
         val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
@@ -110,7 +110,7 @@ class ByNetworkAssetSearchInteractor(
             val filtered = assetSearchUseCase.filterAssetsByQuery(query, assets, chainsById)
 
             val assetGroups = groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)
-            AssetFlowSearchResult.ByNetworks(assetGroups)
+            AssetsByViewModeResult.ByNetworks(assetGroups)
         }
     }
 }

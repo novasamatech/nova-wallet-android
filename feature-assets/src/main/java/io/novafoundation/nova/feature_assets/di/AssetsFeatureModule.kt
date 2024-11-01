@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -30,9 +31,11 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeA
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
@@ -181,5 +184,19 @@ class AssetsFeatureModule {
         swapSettingsStateProvider: SwapSettingsStateProvider
     ): SwapFlowExecutorFactory {
         return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideExpandableAssetsMixinFactory(
+        assetIconProvider: AssetIconProvider,
+        currencyInteractor: CurrencyInteractor,
+        assetsViewModeRepository: AssetsViewModeRepository
+    ): ExpandableAssetsMixinFactory {
+        return ExpandableAssetsMixinFactory(
+            assetIconProvider,
+            currencyInteractor,
+            assetsViewModeRepository
+        )
     }
 }

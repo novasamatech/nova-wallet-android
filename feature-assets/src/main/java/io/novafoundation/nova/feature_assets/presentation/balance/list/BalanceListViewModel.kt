@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
@@ -70,7 +69,6 @@ class BalanceListViewModel(
     private val router: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
-    private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val resourceManager: ResourceManager,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
@@ -139,7 +137,7 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val shouldShowPlaceholderFlow = assetListMixin.filteredAssetsFlow.map { it.isEmpty() }
+    val shouldShowPlaceholderFlow = assetListMixin.assetModelsFlow.map { it.isEmpty() }
 
     val balanceBreakdownFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()

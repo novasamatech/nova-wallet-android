@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListIntera
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -58,18 +59,16 @@ class BalanceListModule {
     @Provides
     @ScreenScope
     fun provideAssetListMixinFactory(
-        assetIconProvider: AssetIconProvider,
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
-        currencyInteractor: CurrencyInteractor,
-        externalBalancesInteractor: ExternalBalancesInteractor
+        externalBalancesInteractor: ExternalBalancesInteractor,
+        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
     ): AssetListMixinFactory {
         return AssetListMixinFactory(
-            assetIconProvider,
             walletInteractor,
             assetsListInteractor,
-            currencyInteractor,
-            externalBalancesInteractor
+            externalBalancesInteractor,
+            expandableAssetsMixinFactory
         )
     }
 
@@ -83,7 +82,6 @@ class BalanceListModule {
         router: AssetsRouter,
         currencyInteractor: CurrencyInteractor,
         balanceBreakdownInteractor: BalanceBreakdownInteractor,
-        externalBalancesInteractor: ExternalBalancesInteractor,
         resourceManager: ResourceManager,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
@@ -96,7 +94,6 @@ class BalanceListModule {
             router = router,
             currencyInteractor = currencyInteractor,
             balanceBreakdownInteractor = balanceBreakdownInteractor,
-            externalBalancesInteractor = externalBalancesInteractor,
             resourceManager = resourceManager,
             walletConnectSessionsUseCase = walletConnectSessionsUseCase,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
