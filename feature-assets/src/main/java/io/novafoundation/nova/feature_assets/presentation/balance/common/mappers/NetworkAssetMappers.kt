@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -36,7 +36,7 @@ private fun mapAssetsToAssetModels(
     return assets.map {
         NetworkAssetUi(
             mapAssetToAssetModel(it.asset, balance(it.balanceWithOffchain)),
-            assetIconProvider.getAssetIcon(it.asset.token.configuration)
+            assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration)
         )
     }
 }

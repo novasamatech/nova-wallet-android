@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -208,7 +208,7 @@ class BalanceDetailViewModel(
             total = mapAmountToAmountModel(asset.total + totalContributed, asset),
             transferable = mapAmountToAmountModel(asset.transferable, asset),
             locked = mapAmountToAmountModel(asset.locked + totalContributed, asset),
-            assetIcon = assetIconProvider.getAssetIcon(asset.token.configuration)
+            assetIcon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration)
         )
     }
 

@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.FieldValidator
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
@@ -80,7 +80,7 @@ private class RealSwapAmountInputMixin(
         val chain = chainRegistry.getChain(chainAsset.chainId)
 
         return SwapInputAssetModel(
-            assetIcon = SwapInputAssetModel.SwapAssetIcon.Chosen(assetIconProvider.getAssetIcon(chainAsset)),
+            assetIcon = SwapInputAssetModel.SwapAssetIcon.Chosen(assetIconProvider.getAssetIconOrFallback(chainAsset)),
             title = chainAsset.symbol.value,
             subtitleIcon = chain.iconOrFallback(),
             subtitle = chain.name,

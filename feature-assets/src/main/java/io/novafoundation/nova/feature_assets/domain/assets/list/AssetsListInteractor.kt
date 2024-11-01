@@ -18,13 +18,13 @@ class AssetsListInteractor(
     private val accountRepository: AccountRepository,
     private val nftRepository: NftRepository,
     private val bannerVisibilityRepository: BannerVisibilityRepository,
-    private val assetsViewModeService: AssetsViewModeRepository
+    private val assetsViewModeRepository: AssetsViewModeRepository
 ) {
 
-    fun assetsViewModeFlow() = assetsViewModeService.assetsViewModeFlow()
+    fun assetsViewModeFlow() = assetsViewModeRepository.assetsViewModeFlow()
 
     suspend fun setAssetViewMode(assetViewModel: AssetViewMode) {
-        assetsViewModeService.setAssetsViewMode(assetViewModel)
+        assetsViewModeRepository.setAssetsViewMode(assetViewModel)
     }
 
     suspend fun fullSyncNft(nft: Nft) = nftRepository.fullNftSync(nft)

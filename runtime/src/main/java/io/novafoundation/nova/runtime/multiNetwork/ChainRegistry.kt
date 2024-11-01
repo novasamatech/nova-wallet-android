@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
@@ -65,9 +66,8 @@ class ChainRegistry(
     private val gson: Gson
 ) : CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
-    val currentChains = chainDao.joinChainInfoFlow().map { chains ->
-        chains.map { mapChainLocalToChain(it, gson) }
-    }
+    val currentChains = chainDao.joinChainInfoFlow()
+        .mapList { mapChainLocalToChain(it, gson) }
         .diffed()
         .map { diff ->
             diff.removed.forEach { unregisterChain(it) }

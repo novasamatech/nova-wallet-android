@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
@@ -154,7 +154,7 @@ class SwapDetailViewModel(
         income: Boolean
     ): SwapAssetView.Model {
         return SwapAssetView.Model(
-            assetIcon = assetIconProvider.getAssetIcon(token.configuration),
+            assetIcon = assetIconProvider.getAssetIconOrFallback(token.configuration),
             amount = mapAmountToAmountModel(amount, token, estimatedFiat = true),
             chainUi = mapChainToUi(chainRegistry.getChain(token.configuration.chainId)),
             amountTextColorRes = if (income) R.color.text_positive else R.color.text_primary

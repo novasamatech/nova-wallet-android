@@ -8,9 +8,11 @@ import io.novafoundation.nova.common.utils.images.asIcon
 
 interface AssetIconProvider {
 
-    val fallbackIcon: Icon
+    companion object;
 
-    fun getAssetIcon(iconName: String?, fallback: Icon = fallbackIcon): Icon
+    fun getAssetIconOrFallback(iconName: String): Icon
+
+    fun getAssetIconOrFallback(iconName: String, iconMode: AssetIconMode): Icon
 }
 
 class RealAssetIconProvider(
@@ -19,16 +21,34 @@ class RealAssetIconProvider(
     private val whiteBaseUrl: String
 ) : AssetIconProvider {
 
-    override val fallbackIcon: Icon = R.drawable.ic_nova.asIcon()
+    override fun getAssetIconOrFallback(iconName: String): Icon {
+        return getAssetIconOrFallback(iconName, assetsIconModeRepository.getIconMode())
+    }
 
-    override fun getAssetIcon(iconName: String?, fallback: Icon): Icon {
-        if (iconName == null) return fallback
-
+    override fun getAssetIconOrFallback(iconName: String, iconMode: AssetIconMode): Icon {
         val iconUrl = when (assetsIconModeRepository.getIconMode()) {
             AssetIconMode.COLORED -> "$coloredBaseUrl/$iconName"
-            AssetIconMode.WHITE -> "$coloredBaseUrl/$whiteBaseUrl"
+            AssetIconMode.WHITE -> "$whiteBaseUrl/$iconName"
         }
 
         return iconUrl.asIcon()
     }
+}
+
+val AssetIconProvider.Companion.fallbackIcon: Icon
+    get() = R.drawable.ic_nova.asIcon()
+
+fun AssetIconProvider.getAssetIconOrFallback(
+    iconName: String?,
+    fallback: Icon = AssetIconProvider.fallbackIcon
+): Icon {
+    return iconName?.let { getAssetIconOrFallback(it) } ?: fallback
+}
+
+fun AssetIconProvider.getAssetIconOrFallback(
+    iconName: String?,
+    iconMode: AssetIconMode,
+    fallback: Icon = AssetIconProvider.fallbackIcon
+): Icon {
+    return iconName?.let { getAssetIconOrFallback(it, iconMode) } ?: fallback
 }

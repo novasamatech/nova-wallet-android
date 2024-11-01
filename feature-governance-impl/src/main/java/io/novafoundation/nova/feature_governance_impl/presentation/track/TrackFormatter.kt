@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.resources.formatListPreview
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asIcon
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_governance_api.domain.referendum.track.category.TrackType
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
 import io.novafoundation.nova.feature_governance_impl.R
@@ -37,7 +37,7 @@ class RealTrackFormatter(
         return when (trackCategorizer.typeOf(track.name)) {
             TrackType.ROOT -> TrackModel(
                 name = resourceManager.getString(R.string.referendum_track_root),
-                icon = assetIconProvider.getAssetIcon(asset, fallbackIcon = R.drawable.ic_block.asIcon()),
+                icon = assetIconProvider.getAssetIconOrFallback(asset, fallbackIcon = R.drawable.ic_block.asIcon()),
             )
 
             TrackType.WHITELISTED_CALLER -> TrackModel(

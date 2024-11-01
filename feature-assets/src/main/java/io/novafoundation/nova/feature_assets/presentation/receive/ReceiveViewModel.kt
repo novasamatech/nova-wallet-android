@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.view.QrCodeModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -78,7 +78,7 @@ class ReceiveViewModel(
             qrCodeGenerator.generateQrCode(qrInput),
             overlayBackground,
             overlayPadding,
-            assetIconProvider.getAssetIcon(chainWithAssetAsync().asset)
+            assetIconProvider.getAssetIconOrFallback(chainWithAssetAsync().asset)
         )
     }
 

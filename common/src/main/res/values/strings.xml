@@ -3,6 +3,11 @@
 
     <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
 
+    <string name="appearance_token_assets_title">token icons</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_white_icon_title">White</string>
+    <string name="appearance_colored_icon_title">Colored</string>
+
     <string name="buy_network_flow_title">Select network for buying %s</string>
     <string name="receive_network_flow_title">Select network for receiving %s</string>
     <string name="send_network_flow_title">Select network for sending %s</string>
