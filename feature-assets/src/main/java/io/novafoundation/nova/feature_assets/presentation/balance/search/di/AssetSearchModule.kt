@@ -30,14 +30,12 @@ class AssetSearchModule {
     fun provideViewModel(
         router: AssetsRouter,
         interactorFactory: AssetSearchInteractorFactory,
-        currencyInteractor: CurrencyInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
         expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
     ): ViewModel {
         return AssetSearchViewModel(
             router = router,
             interactorFactory = interactorFactory,
-            currencyInteractor = currencyInteractor,
             externalBalancesInteractor = externalBalancesInteractor,
             expandableAssetsMixinFactory = expandableAssetsMixinFactory
         )

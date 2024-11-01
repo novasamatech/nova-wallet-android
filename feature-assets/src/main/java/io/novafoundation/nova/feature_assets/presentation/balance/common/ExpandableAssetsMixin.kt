@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.data.model.switch
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -15,12 +16,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 
 class ExpandableAssetsMixinFactory(
+    private val assetIconProvider: AssetIconProvider,
     private val currencyInteractor: CurrencyInteractor,
     private val assetsViewModeRepository: AssetsViewModeRepository
 ) {
 
     fun create(assetsFlow: Flow<AssetsByViewModeResult>): ExpandableAssetsMixin {
-        return RealExpandableAssetsMixin(assetsFlow, currencyInteractor, assetsViewModeRepository)
+        return RealExpandableAssetsMixin(assetsFlow, currencyInteractor, assetIconProvider, assetsViewModeRepository)
     }
 }
 
@@ -36,6 +38,7 @@ interface ExpandableAssetsMixin {
 class RealExpandableAssetsMixin(
     assetsFlow: Flow<AssetsByViewModeResult>,
     currencyInteractor: CurrencyInteractor,
+    private val assetIconProvider: AssetIconProvider,
     private val assetsViewModeRepository: AssetsViewModeRepository,
 ) : ExpandableAssetsMixin {
 
@@ -49,8 +52,8 @@ class RealExpandableAssetsMixin(
         selectedCurrency
     ) { assetesByViewMode, expandedTokens, currency ->
         when (assetesByViewMode) {
-            is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(currency)
-            is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(
+            is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(assetIconProvider, currency)
+            is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(assetIconProvider,
                 assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
             )
         }
