@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.ForegroundColorSpan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,7 +10,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
-import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -29,6 +24,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBalanceBreakdownModel
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
@@ -89,6 +85,7 @@ class BalanceListViewModel(
         { walletInteractor.syncAssetsRates(selectedCurrency.first()) },
         walletInteractor::syncAllNfts
     )
+
     val assetListMixin = assetListMixinFactory.create(viewModelScope)
 
     private val externalBalancesFlow = assetListMixin.externalBalancesFlow
@@ -129,7 +126,7 @@ class BalanceListViewModel(
         val currency = selectedCurrency.first()
         TotalBalanceModel(
             isBreakdownAbailable = breakdown.breakdown.isNotEmpty(),
-            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatAsTotalBalance(),
+            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatBalanceWithFraction(resourceManager, R.dimen.total_balance_fraction_size),
             lockedBalanceFiat = breakdown.locksTotal.amount.formatAsCurrency(currency),
             enableSwap = swapSupported
         )
@@ -290,27 +287,6 @@ class BalanceListViewModel(
             }
 
             addAll(breakdown)
-        }
-    }
-
-    private fun String.formatAsTotalBalance(): CharSequence {
-        val amountWithFraction = toAmountWithFraction()
-
-        val textColor = resourceManager.getColor(R.color.text_secondary)
-        val colorSpan = ForegroundColorSpan(textColor)
-        val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(R.dimen.total_balance_fraction_size))
-
-        return with(amountWithFraction) {
-            val spannableBuilder = SpannableStringBuilder()
-                .append(amount)
-            if (fraction != null) {
-                spannableBuilder.append(separator + fraction)
-                val startIndex = amount.length
-                val endIndex = amount.length + separator.length + fraction!!.length
-                spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            spannableBuilder
         }
     }
 

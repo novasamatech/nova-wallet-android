@@ -48,7 +48,7 @@ class SpannableBuilder(private val resourceManager: ResourceManager) {
 
     private val builder = SpannableStringBuilder()
 
-    fun appendColored(text: String, @ColorRes color: Int) {
+    fun appendColored(text: CharSequence, @ColorRes color: Int) {
         val span = ForegroundColorSpan(resourceManager.getColor(color))
 
         append(text, span)
@@ -60,7 +60,7 @@ class SpannableBuilder(private val resourceManager: ResourceManager) {
         return appendColored(text, color)
     }
 
-    fun append(text: String) {
+    fun append(text: CharSequence) {
         builder.append(text)
     }
 
@@ -75,7 +75,7 @@ class SpannableBuilder(private val resourceManager: ResourceManager) {
 
     fun build(): SpannableString = SpannableString(builder)
 
-    private fun append(text: String, span: Any): SpannableBuilder {
+    private fun append(text: CharSequence, span: Any): SpannableBuilder {
         builder.append(text, span, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
 
         return this

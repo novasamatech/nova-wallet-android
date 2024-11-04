@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.mapper
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
@@ -15,21 +16,23 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import java.math.BigDecimal
 
 fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
+    resourceManager: ResourceManager,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal = NetworkAssetGroup::groupTotalBalanceFiat,
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
-        .mapValues { (group, assets) -> mapAssetsToAssetModels(assets, balance) }
+        .mapValues { (_, assets) -> mapAssetsToAssetModels(resourceManager, assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
 
 private fun mapAssetsToAssetModels(
+    resourceManager: ResourceManager,
     assets: List<AssetWithOffChainBalance>,
     balance: (AssetBalance) -> PricedAmount
 ): List<BalanceListRvItem> {
-    return assets.map { NetworkAssetUi(mapAssetToAssetModel(it.asset, balance(it.balanceWithOffchain))) }
+    return assets.map { NetworkAssetUi(mapAssetToAssetModel(resourceManager, it.asset, balance(it.balanceWithOffchain))) }
 }
 
 fun mapAssetGroupToUi(

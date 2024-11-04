@@ -85,11 +85,11 @@ abstract class AssetFlowViewModel(
     }
 
     open fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(currency)
+        return assets.mapGroupedAssetsToUi(resourceManager, currency)
     }
 
     open fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
-        return assets.map { mapTokenAssetGroupToUi(it.key, assets = it.value) }
+        return assets.map { mapTokenAssetGroupToUi(resourceManager, it.key, assets = it.value) }
     }
 
     internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {

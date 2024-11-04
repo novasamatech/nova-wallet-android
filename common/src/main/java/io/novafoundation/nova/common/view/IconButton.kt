@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
+import io.novafoundation.nova.common.view.shape.getMaskedRipple
 
 class IconButton @JvmOverloads constructor(
     context: Context,
@@ -18,7 +19,7 @@ class IconButton @JvmOverloads constructor(
     init {
         updatePadding(top = 6.dp, bottom = 6.dp, start = 12.dp, end = 12.dp)
 
-        background = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
+        background = context.getMaskedRipple(cornerSizeInDp = 10)
 
         attrs?.let(::applyAttributes)
     }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.data.model.switch
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -15,12 +16,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 
 class ExpandableAssetsMixinFactory(
+    private val resourceManager: ResourceManager,
     private val currencyInteractor: CurrencyInteractor,
     private val assetsViewModeRepository: AssetsViewModeRepository
 ) {
 
     fun create(assetsFlow: Flow<AssetsByViewModeResult>): ExpandableAssetsMixin {
-        return RealExpandableAssetsMixin(assetsFlow, currencyInteractor, assetsViewModeRepository)
+        return RealExpandableAssetsMixin(resourceManager, assetsFlow, currencyInteractor, assetsViewModeRepository)
     }
 }
 
@@ -33,6 +35,7 @@ interface ExpandableAssetsMixin {
 }
 
 class RealExpandableAssetsMixin(
+    private val resourceManager: ResourceManager,
     assetsFlow: Flow<AssetsByViewModeResult>,
     currencyInteractor: CurrencyInteractor,
     private val assetsViewModeRepository: AssetsViewModeRepository,
@@ -48,8 +51,9 @@ class RealExpandableAssetsMixin(
         selectedCurrency
     ) { assetesByViewMode, expandedTokens, currency ->
         when (assetesByViewMode) {
-            is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(currency)
+            is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(resourceManager, currency)
             is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(
+                resourceManager = resourceManager,
                 assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
             )
         }

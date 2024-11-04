@@ -188,10 +188,12 @@ class AssetsFeatureModule {
     @Provides
     @FeatureScope
     fun provideExpandableAssetsMixinFactory(
+        resourceManager: ResourceManager,
         currencyInteractor: CurrencyInteractor,
         assetsViewModeRepository: AssetsViewModeRepository
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
+            resourceManager,
             currencyInteractor,
             assetsViewModeRepository
         )

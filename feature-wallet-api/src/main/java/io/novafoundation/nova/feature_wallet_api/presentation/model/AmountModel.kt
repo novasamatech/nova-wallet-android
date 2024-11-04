@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
+import androidx.annotation.DimenRes
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -11,8 +13,8 @@ import java.math.BigInteger
 import java.math.RoundingMode
 
 data class AmountModel(
-    val token: String,
-    val fiat: String?
+    val token: CharSequence,
+    val fiat: CharSequence?
 )
 
 enum class AmountSign(val signSymbol: String) {
@@ -96,3 +98,10 @@ fun Asset.transferableFormat() = transferable.formatTokenAmount(token.configurat
 fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
 
 fun transferableAmountModelOf(asset: Asset) = mapAmountToAmountModel(asset.transferable, asset)
+
+fun AmountModel.formatBalanceWithFraction(resourceManager: ResourceManager, @DimenRes floatAmountSize: Int): AmountModel {
+    return AmountModel(
+        token = token.formatBalanceWithFraction(resourceManager, floatAmountSize),
+        fiat = fiat
+    )
+}
