@@ -22,7 +22,7 @@ class DelegateSearchFragment :
     BaseFragment<DelegateSearchViewModel, FragmentDelegateSearchBinding>(),
     DelegateListAdapter.Handler {
 
-    override val binder by viewBinding(FragmentDelegateSearchBinding::bind)
+    override fun createBinding() = FragmentDelegateSearchBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

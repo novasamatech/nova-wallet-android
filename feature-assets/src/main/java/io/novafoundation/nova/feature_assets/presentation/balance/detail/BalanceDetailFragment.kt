@@ -35,7 +35,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         }
     }
 
-    override val binder by viewBinding(FragmentBalanceDetailBinding::bind)
+    override fun createBinding() = FragmentBalanceDetailBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

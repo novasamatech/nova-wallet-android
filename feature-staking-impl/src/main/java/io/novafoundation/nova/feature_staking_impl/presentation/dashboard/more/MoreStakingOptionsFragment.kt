@@ -23,7 +23,7 @@ class MoreStakingOptionsFragment :
     DashboardNoStakeAdapter.Handler,
     StakingDappsAdapter.Handler {
 
-    override val binder by viewBinding(FragmentMoreStakingOptionsBinding::bind)
+    override fun createBinding() = FragmentMoreStakingOptionsBinding.inflate(layoutInflater)
 
     private val noStakeAdapter = DashboardNoStakeAdapter(this)
 

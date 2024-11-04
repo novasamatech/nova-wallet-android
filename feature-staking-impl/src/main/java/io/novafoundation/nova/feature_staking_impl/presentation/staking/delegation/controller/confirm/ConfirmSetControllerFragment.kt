@@ -23,7 +23,7 @@ class ConfirmSetControllerFragment : BaseFragment<ConfirmSetControllerViewModel,
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmSetControllerBinding::bind)
+    override fun createBinding() = FragmentConfirmSetControllerBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmSetControllerToolbar.applyStatusBarInsets()

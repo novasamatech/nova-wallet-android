@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class UserContributionsFragment : BaseFragment<UserContributionsViewModel, FragmentMyContributionsBinding>() {
 
-    override val binder by viewBinding(FragmentMyContributionsBinding::bind)
+    override fun createBinding() = FragmentMyContributionsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

@@ -31,7 +31,7 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel, FragmentConfirmSe
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmSendBinding::bind)
+    override fun createBinding() = FragmentConfirmSendBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmSendContainer.applyStatusBarInsets()

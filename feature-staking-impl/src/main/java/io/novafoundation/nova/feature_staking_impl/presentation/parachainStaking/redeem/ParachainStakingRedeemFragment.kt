@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewModel, FragmentParachainStakingRedeemBinding>() {
 
-    override val binder by viewBinding(FragmentParachainStakingRedeemBinding::bind)
+    override fun createBinding() = FragmentParachainStakingRedeemBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.parachainStakingRedeemContainer.applyStatusBarInsets()

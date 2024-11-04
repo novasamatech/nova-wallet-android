@@ -26,7 +26,7 @@ class AddNetworkFragment : BaseFragment<AddNetworkViewModel, FragmentAddNetworkB
         }
     }
 
-    override val binder: FragmentAddNetworkBinding by viewBinding(FragmentAddNetworkBinding::bind)
+    override fun createBinding() = FragmentAddNetworkBinding.inflate(layoutInflater)
 
     override fun inject() {
         FeatureUtils.getFeature<SettingsFeatureComponent>(

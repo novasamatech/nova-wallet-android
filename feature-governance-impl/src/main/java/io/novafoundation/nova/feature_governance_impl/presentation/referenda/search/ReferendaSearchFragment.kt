@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 
 class ReferendaSearchFragment : BaseReferendaListFragment<ReferendaSearchViewModel, FragmentReferendaSearchBinding>() {
 
-    override val binder by viewBinding(FragmentReferendaSearchBinding::bind)
+    override fun createBinding() = FragmentReferendaSearchBinding.inflate(layoutInflater)
 
     override val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.item_referenda_shimmering_no_groups) }
 

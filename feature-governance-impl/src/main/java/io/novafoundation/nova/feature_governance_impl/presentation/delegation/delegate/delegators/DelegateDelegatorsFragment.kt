@@ -28,7 +28,7 @@ class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel, Fra
         }
     }
 
-    override val binder by viewBinding(FragmentDelegateDelegatorsBinding::bind)
+    override fun createBinding() = FragmentDelegateDelegatorsBinding.inflate(layoutInflater)
 
     private val delegatorsAdapter = DelegatorsAdapter(this)
 

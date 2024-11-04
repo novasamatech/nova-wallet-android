@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 class DelegatedAccountUpdatesBottomSheet() : BaseBottomSheetFragment<DelegatedAccountUpdatesViewModel, BottomSheetDelegatedAccountUpdatesBinding>() {
 
-    override val binder by viewBinding(BottomSheetDelegatedAccountUpdatesBinding::bind)
+    override fun createBinding() = BottomSheetDelegatedAccountUpdatesBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

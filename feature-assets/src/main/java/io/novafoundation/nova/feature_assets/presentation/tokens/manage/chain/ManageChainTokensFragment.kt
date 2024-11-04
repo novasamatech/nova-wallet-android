@@ -23,7 +23,7 @@ class ManageChainTokensFragment :
         fun getBundle(payload: ManageChainTokensPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentManageChainTokensBinding::bind)
+    override fun createBinding() = FragmentManageChainTokensBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

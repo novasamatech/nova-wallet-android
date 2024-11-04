@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 abstract class NetworkListFragment<T : NetworkListViewModel> : BaseFragment<T, FragmentNetworkListBinding>(), NetworkManagementListAdapter.ItemHandler {
 
-    override val binder by viewBinding(FragmentNetworkListBinding::bind)
+    override fun createBinding() = FragmentNetworkListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

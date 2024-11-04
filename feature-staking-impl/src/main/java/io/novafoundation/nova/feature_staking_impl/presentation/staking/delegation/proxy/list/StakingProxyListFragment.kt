@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel, FragmentStakingProxyListBinding>(), StakingProxyListAdapter.Handler {
 
-    override val binder by viewBinding(FragmentStakingProxyListBinding::bind)
+    override fun createBinding() = FragmentStakingProxyListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

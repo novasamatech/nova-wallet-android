@@ -26,7 +26,7 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel, Fragm
         fun getBundle(payload: AddTokenEnterInfoPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentAddTokenEnterInfoBinding::bind)
+    override fun createBinding() = FragmentAddTokenEnterInfoBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

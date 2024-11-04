@@ -32,7 +32,7 @@ class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewMode
         }
     }
 
-    override val binder by viewBinding(FragmentSelectMultipleWalletsBinding::bind)
+    override fun createBinding() = FragmentSelectMultipleWalletsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

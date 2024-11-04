@@ -40,7 +40,7 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
         }
     }
 
-    override val binder by viewBinding(FragmentWelcomeBinding::bind)
+    override fun createBinding() = FragmentWelcomeBinding.inflate(layoutInflater)
 
     override fun initViews() {
         configureTermsAndPrivacy(

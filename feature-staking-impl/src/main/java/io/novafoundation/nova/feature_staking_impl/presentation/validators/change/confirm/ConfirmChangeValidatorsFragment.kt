@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class ConfirmChangeValidatorsFragment : BaseFragment<ConfirmChangeValidatorsViewModel, FragmentConfirmChangeValidatorsBinding>() {
 
-    override val binder by viewBinding(FragmentConfirmChangeValidatorsBinding::bind)
+    override fun createBinding() = FragmentConfirmChangeValidatorsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.stakingConfirmationContainer.applyStatusBarInsets()

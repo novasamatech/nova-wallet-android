@@ -13,14 +13,18 @@ abstract class BaseFragment<T : BaseViewModel, B : ViewBinding> : Fragment(), Ba
     @Inject
     override lateinit var viewModel: T
 
-    protected abstract val binder: B
+    protected lateinit var binder: B
+        private set
 
     override val fragment: Fragment
         get() = this
 
     private val delegate by lazy(LazyThreadSafetyMode.NONE) { BaseFragmentDelegate(this) }
 
+    protected abstract fun createBinding(): B
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binder = createBinding()
         return binder.root
     }
 

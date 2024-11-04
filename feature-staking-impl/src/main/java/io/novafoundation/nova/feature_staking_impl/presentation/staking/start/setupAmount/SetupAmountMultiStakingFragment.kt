@@ -29,7 +29,7 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
         }
     }
 
-    override val binder by viewBinding(FragmentStartMultiStakingAmountBinding::bind)
+    override fun createBinding() = FragmentStartMultiStakingAmountBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startMultiStakingSetupAmountToolbar.applyStatusBarInsets()

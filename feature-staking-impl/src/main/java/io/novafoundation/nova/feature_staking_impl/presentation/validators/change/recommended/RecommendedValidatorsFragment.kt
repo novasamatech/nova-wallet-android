@@ -15,7 +15,7 @@ class RecommendedValidatorsFragment :
     BaseFragment<RecommendedValidatorsViewModel, FragmentRecommendedValidatorsBinding>(),
     StakeTargetAdapter.ItemHandler<Validator> {
 
-    override val binder by viewBinding(FragmentRecommendedValidatorsBinding::bind)
+    override fun createBinding() = FragmentRecommendedValidatorsBinding.inflate(layoutInflater)
 
     val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)

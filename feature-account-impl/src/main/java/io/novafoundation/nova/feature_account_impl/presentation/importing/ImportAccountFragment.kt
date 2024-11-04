@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 class ImportAccountFragment : BaseFragment<ImportAccountViewModel, FragmentImportAccountBinding>() {
 
-    override val binder by viewBinding(FragmentImportAccountBinding::bind)
+    override fun createBinding() = FragmentImportAccountBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

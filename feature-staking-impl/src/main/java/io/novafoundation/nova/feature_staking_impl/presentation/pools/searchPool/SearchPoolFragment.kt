@@ -36,7 +36,7 @@ class SearchPoolFragment : BaseFragment<SearchPoolViewModel, FragmentSearchPoolB
         }
     }
 
-    override val binder by viewBinding(FragmentSearchPoolBinding::bind)
+    override fun createBinding() = FragmentSearchPoolBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

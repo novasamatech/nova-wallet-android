@@ -26,7 +26,7 @@ class ManualBackupAdvancedSecretsFragment : BaseFragment<ManualBackupAdvancedSec
         }
     }
 
-    override val binder by viewBinding(FragmentManualBackupAdvancedSecretsBinding::bind)
+    override fun createBinding() = FragmentManualBackupAdvancedSecretsBinding.inflate(layoutInflater)
 
     private val adapter = ManualBackupSecretsAdapter(this)
 

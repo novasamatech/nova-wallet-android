@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
 class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewModel, FragmentParachainStakingUnbondBinding>() {
 
-    override val binder by viewBinding(FragmentParachainStakingUnbondBinding::bind)
+    override fun createBinding() = FragmentParachainStakingUnbondBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.parachainStakingUnbondContainer.applyStatusBarInsets()

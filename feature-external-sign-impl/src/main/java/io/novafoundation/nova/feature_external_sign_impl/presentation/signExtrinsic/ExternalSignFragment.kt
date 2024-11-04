@@ -37,7 +37,7 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel, FragmentConfirmS
         fun getBundle(payload: ExternalSignPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    override val binder by viewBinding(FragmentConfirmSignExtrinsicBinding::bind)
+    override fun createBinding() = FragmentConfirmSignExtrinsicBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

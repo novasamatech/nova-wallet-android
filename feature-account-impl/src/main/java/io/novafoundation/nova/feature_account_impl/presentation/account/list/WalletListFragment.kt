@@ -17,7 +17,7 @@ abstract class WalletListFragment<T : WalletListViewModel> :
     BaseBottomSheetFragment<T, FragmentWalletListBinding>(),
     AccountHolder.AccountItemHandler {
 
-    override val binder by viewBinding(FragmentWalletListBinding::bind)
+    override fun createBinding() = FragmentWalletListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

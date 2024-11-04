@@ -24,7 +24,7 @@ class BalanceListFragment :
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler {
 
-    override val binder by viewBinding(FragmentBalanceListBinding::bind)
+    override fun createBinding() = FragmentBalanceListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

@@ -36,7 +36,7 @@ class AdvancedEncryptionFragment : BaseFragment<AdvancedEncryptionViewModel, Fra
         }
     }
 
-    override val binder by viewBinding(FragmentAdvancedEncryptionBinding::bind)
+    override fun createBinding() = FragmentAdvancedEncryptionBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

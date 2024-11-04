@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 
 class GovernanceLocksOverviewFragment : BaseFragment<GovernanceLocksOverviewViewModel, FragmentGovernanceLocksOverviewBinding>() {
 
-    override val binder by viewBinding(FragmentGovernanceLocksOverviewBinding::bind)
+    override fun createBinding() = FragmentGovernanceLocksOverviewBinding.inflate(layoutInflater)
 
     private val headerAdapter = TotalGovernanceLocksHeaderAdapter()
 

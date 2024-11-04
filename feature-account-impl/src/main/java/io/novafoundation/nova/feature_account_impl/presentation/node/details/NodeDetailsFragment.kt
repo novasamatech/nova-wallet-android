@@ -23,7 +23,7 @@ class NodeDetailsFragment : BaseFragment<NodeDetailsViewModel, FragmentNodeDetai
         }
     }
 
-    override val binder by viewBinding(FragmentNodeDetailsBinding::bind)
+    override fun createBinding() = FragmentNodeDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.novaToolbar.setHomeButtonListener { viewModel.backClicked() }

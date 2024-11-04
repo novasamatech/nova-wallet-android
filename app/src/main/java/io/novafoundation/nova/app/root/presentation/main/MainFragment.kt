@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
-    override val binder by viewBinding(FragmentMainBinding::bind)
+    override fun createBinding() = FragmentMainBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var stakingDashboardNavigator: StakingDashboardNavigator

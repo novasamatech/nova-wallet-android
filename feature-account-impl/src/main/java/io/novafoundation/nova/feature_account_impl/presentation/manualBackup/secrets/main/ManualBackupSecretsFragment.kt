@@ -27,7 +27,7 @@ class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel, F
         }
     }
 
-    override val binder by viewBinding(FragmentManualBackupSecretsBinding::bind)
+    override fun createBinding() = FragmentManualBackupSecretsBinding.inflate(layoutInflater)
 
     private val adapter = ManualBackupSecretsAdapter(this)
 

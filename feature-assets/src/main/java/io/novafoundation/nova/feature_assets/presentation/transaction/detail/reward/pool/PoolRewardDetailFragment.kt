@@ -27,7 +27,7 @@ class PoolRewardDetailFragment : BaseFragment<PoolRewardDetailViewModel, Fragmen
         }
     }
 
-    override val binder by viewBinding(FragmentPoolRewardDetailsBinding::bind)
+    override fun createBinding() = FragmentPoolRewardDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.poolRewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }

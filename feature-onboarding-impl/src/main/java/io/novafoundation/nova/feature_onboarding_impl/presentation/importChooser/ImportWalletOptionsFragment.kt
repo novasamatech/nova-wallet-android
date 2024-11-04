@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.Selec
 
 class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel, FragmentImportWalletOptionsBinding>() {
 
-    override val binder by viewBinding(FragmentImportWalletOptionsBinding::bind)
+    override fun createBinding() = FragmentImportWalletOptionsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.importOptionsToolbar.applyStatusBarInsets()

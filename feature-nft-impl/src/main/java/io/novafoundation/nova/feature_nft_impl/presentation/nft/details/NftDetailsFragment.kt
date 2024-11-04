@@ -35,7 +35,7 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel, FragmentNftDetailsB
         fun getBundle(nftId: String) = bundleOf(PAYLOAD to nftId)
     }
 
-    override val binder by viewBinding(FragmentNftDetailsBinding::bind)
+    override fun createBinding() = FragmentNftDetailsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

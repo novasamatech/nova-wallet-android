@@ -19,7 +19,7 @@ class FillWalletImportLedgerFragment :
     BaseFragment<FillWalletImportLedgerViewModel, FragmentImportLedgerFillWalletBinding>(),
     FillWalletImportLedgerAdapter.Handler {
 
-    override val binder by viewBinding(FragmentImportLedgerFillWalletBinding::bind)
+    override fun createBinding() = FragmentImportLedgerFillWalletBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

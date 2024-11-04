@@ -25,7 +25,7 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
         }
     }
 
-    override val binder by viewBinding(FragmentNetworkManagementBinding::bind)
+    override fun createBinding() = FragmentNetworkManagementBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.networkManagementToolbar.applyStatusBarInsets()

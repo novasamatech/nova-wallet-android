@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> : BaseFragment<V, FragmentChainAccountPreviewBinding>(), ChainAccountsAdapter.Handler {
 
-    override val binder by viewBinding(FragmentChainAccountPreviewBinding::bind)
+    override fun createBinding() = FragmentChainAccountPreviewBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

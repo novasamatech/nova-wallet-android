@@ -23,7 +23,7 @@ private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
 class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>() {
 
-    override val binder by viewBinding(FragmentReceiveBinding::bind)
+    override fun createBinding() = FragmentReceiveBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

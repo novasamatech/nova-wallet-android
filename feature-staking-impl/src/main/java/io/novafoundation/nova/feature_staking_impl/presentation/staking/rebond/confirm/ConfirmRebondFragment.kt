@@ -25,7 +25,7 @@ class ConfirmRebondFragment : BaseFragment<ConfirmRebondViewModel, FragmentConfi
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmRebondBinding::bind)
+    override fun createBinding() = FragmentConfirmRebondBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmRebondToolbar.applyStatusBarInsets()

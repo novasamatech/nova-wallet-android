@@ -23,7 +23,7 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel, FragmentExportSee
         }
     }
 
-    override val binder by viewBinding(FragmentExportSeedBinding::bind)
+    override fun createBinding() = FragmentExportSeedBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.exportSeedToolbar.setHomeButtonListener { viewModel.back() }

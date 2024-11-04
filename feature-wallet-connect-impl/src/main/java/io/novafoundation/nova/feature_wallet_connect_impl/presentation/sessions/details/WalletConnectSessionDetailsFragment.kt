@@ -30,7 +30,7 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
         fun getBundle(payload: WalletConnectSessionDetailsPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentWcSessionDetailsBinding::bind)
+    override fun createBinding() = FragmentWcSessionDetailsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

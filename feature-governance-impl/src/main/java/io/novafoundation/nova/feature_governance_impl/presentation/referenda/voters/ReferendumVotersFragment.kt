@@ -30,7 +30,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel, Fragmen
         }
     }
 
-    override val binder by viewBinding(FragmentReferendumVotersBinding::bind)
+    override fun createBinding() = FragmentReferendumVotersBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

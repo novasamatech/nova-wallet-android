@@ -20,7 +20,7 @@ private const val DATE_PICKER_TAG = "datePicker"
 
 class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel, FragmentPeriodStakingBinding>() {
 
-    override val binder by viewBinding(FragmentPeriodStakingBinding::bind)
+    override fun createBinding() = FragmentPeriodStakingBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.stakingPeriodToolbar.applyStatusBarInsets()

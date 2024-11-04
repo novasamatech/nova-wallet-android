@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class NftListFragment : BaseFragment<NftListViewModel, FragmentNftListBinding>(), NftAdapter.Handler {
 
-    override val binder by viewBinding(FragmentNftListBinding::bind)
+    override fun createBinding() = FragmentNftListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

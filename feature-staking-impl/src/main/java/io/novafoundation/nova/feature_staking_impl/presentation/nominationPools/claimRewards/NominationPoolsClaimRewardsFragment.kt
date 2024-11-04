@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class NominationPoolsClaimRewardsFragment : BaseFragment<NominationPoolsClaimRewardsViewModel, FragmentNominationPoolsClaimRewardsBinding>() {
 
-    override val binder by viewBinding(FragmentNominationPoolsClaimRewardsBinding::bind)
+    override fun createBinding() = FragmentNominationPoolsClaimRewardsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.nominationPoolsClaimRewardsToolbar.applyStatusBarInsets()

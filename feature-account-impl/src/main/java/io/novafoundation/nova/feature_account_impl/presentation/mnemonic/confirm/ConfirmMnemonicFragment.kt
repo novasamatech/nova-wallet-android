@@ -23,7 +23,7 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel, FragmentC
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmMnemonicBinding::bind)
+    override fun createBinding() = FragmentConfirmMnemonicBinding.inflate(layoutInflater)
 
     private val sourceAdapter by lazy(LazyThreadSafetyMode.NONE) {
         BackupMnemonicAdapter(itemHandler = viewModel::sourceWordClicked)

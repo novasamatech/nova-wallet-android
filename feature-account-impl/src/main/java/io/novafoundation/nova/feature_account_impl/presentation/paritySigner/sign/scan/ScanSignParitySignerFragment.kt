@@ -27,7 +27,7 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
         }
     }
 
-    override val binder by viewBinding(FragmentSignParitySignerScanBinding::bind)
+    override fun createBinding() = FragmentSignParitySignerScanBinding.inflate(layoutInflater)
 
     override val scanView: ScanView
         get() = binder.signParitySignerScanScanner

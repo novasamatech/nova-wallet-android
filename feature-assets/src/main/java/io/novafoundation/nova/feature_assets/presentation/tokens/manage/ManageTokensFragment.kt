@@ -22,7 +22,7 @@ class ManageTokensFragment :
     BaseFragment<ManageTokensViewModel, FragmentManageTokensBinding>(),
     ManageTokensAdapter.ItemHandler {
 
-    override val binder by viewBinding(FragmentManageTokensBinding::bind)
+    override fun createBinding() = FragmentManageTokensBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

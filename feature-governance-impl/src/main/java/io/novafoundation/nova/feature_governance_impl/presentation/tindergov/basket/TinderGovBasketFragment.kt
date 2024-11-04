@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.bas
 
 class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel, FragmentTinderGovBasketBinding>(), TinderGovBasketAdapter.Handler {
 
-    override val binder by viewBinding(FragmentTinderGovBasketBinding::bind)
+    override fun createBinding() = FragmentTinderGovBasketBinding.inflate(layoutInflater)
 
     private val adapter = TinderGovBasketAdapter(this)
 

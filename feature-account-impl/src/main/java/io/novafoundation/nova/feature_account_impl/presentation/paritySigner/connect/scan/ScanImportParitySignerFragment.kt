@@ -24,7 +24,7 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
         }
     }
 
-    override val binder by viewBinding(FragmentImportParitySignerScanBinding::bind)
+    override fun createBinding() = FragmentImportParitySignerScanBinding.inflate(layoutInflater)
 
     override fun inject() {
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)

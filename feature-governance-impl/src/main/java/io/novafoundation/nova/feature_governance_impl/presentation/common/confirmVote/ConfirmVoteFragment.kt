@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 abstract class ConfirmVoteFragment<T : ConfirmVoteViewModel> : BaseFragment<T, FragmentReferendumConfirmVoteBinding>() {
 
-    override val binder by viewBinding(FragmentReferendumConfirmVoteBinding::bind)
+    override fun createBinding() = FragmentReferendumConfirmVoteBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmReferendumVoteToolbar.setHomeButtonListener { viewModel.backClicked() }

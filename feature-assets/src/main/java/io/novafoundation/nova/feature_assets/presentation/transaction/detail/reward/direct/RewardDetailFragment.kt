@@ -25,7 +25,7 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel, FragmentRewardS
         }
     }
 
-    override val binder by viewBinding(FragmentRewardSlashDetailsBinding::bind)
+    override fun createBinding() = FragmentRewardSlashDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.rewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }

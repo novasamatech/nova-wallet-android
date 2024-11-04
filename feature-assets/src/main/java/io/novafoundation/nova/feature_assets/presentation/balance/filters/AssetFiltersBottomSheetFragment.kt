@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_assets.domain.assets.filters.NonZeroBalanc
 
 class AssetFiltersBottomSheetFragment : BaseBottomSheetFragment<AssetFiltersViewModel, FragmentAssetFiltersBinding>() {
 
-    override val binder by viewBinding(FragmentAssetFiltersBinding::bind)
+    override fun createBinding() = FragmentAssetFiltersBinding.inflate(layoutInflater)
 
     override fun initViews() {}
 

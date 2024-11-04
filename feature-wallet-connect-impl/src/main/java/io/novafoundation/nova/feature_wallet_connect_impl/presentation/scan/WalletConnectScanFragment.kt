@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatur
 
 class WalletConnectScanFragment : ScanQrFragment<WalletConnectScanViewModel, FragmentWcScanBinding>() {
 
-    override val binder by viewBinding(FragmentWcScanBinding::bind)
+    override fun createBinding() = FragmentWcScanBinding.inflate(layoutInflater)
 
     override fun inject() {
         FeatureUtils.getFeature<WalletConnectFeatureComponent>(requireContext(), WalletConnectFeatureApi::class.java)

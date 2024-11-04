@@ -30,7 +30,7 @@ private const val ACCOUNT_ID_KEY = "ACCOUNT_ADDRESS_KEY"
 
 class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel, FragmentWalletDetailsBinding>(), ChainAccountsAdapter.Handler {
 
-    override val binder by viewBinding(FragmentWalletDetailsBinding::bind)
+    override fun createBinding() = FragmentWalletDetailsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

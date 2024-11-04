@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
 class NominationPoolsSetupUnbondFragment : BaseFragment<NominationPoolsSetupUnbondViewModel, FragmentNominationPoolsSetupUnbondBinding>() {
 
-    override val binder by viewBinding(FragmentNominationPoolsSetupUnbondBinding::bind)
+    override fun createBinding() = FragmentNominationPoolsSetupUnbondBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.nominationPoolsUnbondContainer.applyStatusBarInsets()

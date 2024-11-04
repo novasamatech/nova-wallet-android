@@ -42,7 +42,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel, Fragm
         }
     }
 
-    override val binder by viewBinding(FragmentReferendumDetailsBinding::bind)
+    override fun createBinding() = FragmentReferendumDetailsBinding.inflate(layoutInflater)
 
     override val providedContext: Context
         get() = requireContext()

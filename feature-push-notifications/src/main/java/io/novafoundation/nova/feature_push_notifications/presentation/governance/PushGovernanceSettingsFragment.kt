@@ -28,7 +28,7 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
         }
     }
 
-    override val binder by viewBinding(FragmentPushGovernanceSettingsBinding::bind)
+    override fun createBinding() = FragmentPushGovernanceSettingsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

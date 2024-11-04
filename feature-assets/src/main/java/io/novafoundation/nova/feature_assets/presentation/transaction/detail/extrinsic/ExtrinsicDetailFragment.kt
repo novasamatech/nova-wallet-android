@@ -39,7 +39,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel, FragmentE
         }
     }
 
-    override val binder by viewBinding(FragmentExtrinsicDetailsBinding::bind)
+    override fun createBinding() = FragmentExtrinsicDetailsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

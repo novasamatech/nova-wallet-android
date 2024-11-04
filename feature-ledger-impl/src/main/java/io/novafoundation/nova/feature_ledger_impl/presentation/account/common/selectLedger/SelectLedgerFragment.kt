@@ -31,7 +31,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V,
         fun getBundle(payload: SelectLedgerPayload): Bundle = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    override val binder: FragmentSelectLedgerBinding by viewBinding(FragmentSelectLedgerBinding::bind)
+    override fun createBinding() = FragmentSelectLedgerBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var ledgerMessagePresentable: LedgerMessagePresentable

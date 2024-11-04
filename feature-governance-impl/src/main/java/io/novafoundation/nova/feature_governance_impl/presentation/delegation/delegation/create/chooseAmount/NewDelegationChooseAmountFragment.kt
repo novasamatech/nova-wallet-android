@@ -28,7 +28,7 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
         fun getBundle(payload: NewDelegationChooseAmountPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentNewDelegationChooseAmountBinding::bind)
+    override fun createBinding() = FragmentNewDelegationChooseAmountBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.newDelegationChooseAmountContainer.applyStatusBarInsets()

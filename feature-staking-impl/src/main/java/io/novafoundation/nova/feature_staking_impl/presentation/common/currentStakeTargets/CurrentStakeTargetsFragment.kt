@@ -13,7 +13,7 @@ abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> :
     BaseFragment<V, FragmentCurrentValidatorsBinding>(),
     CurrentStakeTargetAdapter.Handler {
 
-    override val binder by viewBinding(FragmentCurrentValidatorsBinding::bind)
+    override fun createBinding() = FragmentCurrentValidatorsBinding.inflate(layoutInflater)
 
     lateinit var adapter: CurrentStakeTargetAdapter
 

@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFea
 
 class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel, FragmentPushWelcomeBinding>() {
 
-    override val binder by viewBinding(FragmentPushWelcomeBinding::bind)
+    override fun createBinding() = FragmentPushWelcomeBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.pushWelcomeToolbar.applyStatusBarInsets()

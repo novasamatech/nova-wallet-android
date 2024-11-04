@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.bac
 
 class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel, FragmentBackupSettingsBinding>() {
 
-    override val binder by viewBinding(FragmentBackupSettingsBinding::bind)
+    override fun createBinding() = FragmentBackupSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.backupSettingsToolbar.applyStatusBarInsets()

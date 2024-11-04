@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSessionViewModel, FragmentWcSessionApproveBinding>() {
 
-    override val binder by viewBinding(FragmentWcSessionApproveBinding::bind)
+    override fun createBinding() = FragmentWcSessionApproveBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

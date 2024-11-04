@@ -28,7 +28,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         fun getBundle(payload: StartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentParachainStakingStartBinding::bind)
+    override fun createBinding() = FragmentParachainStakingStartBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startParachainStakingContainer.applyStatusBarInsets()

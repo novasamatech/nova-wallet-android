@@ -28,7 +28,7 @@ class AddToFavouritesFragment : BaseFragment<AddToFavouritesViewModel, FragmentA
         fun getBundle(payload: AddToFavouritesPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    override val binder by viewBinding(FragmentAddToFavouritesBinding::bind)
+    override fun createBinding() = FragmentAddToFavouritesBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

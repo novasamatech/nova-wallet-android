@@ -30,7 +30,7 @@ class SwapDetailFragment : BaseFragment<SwapDetailViewModel, FragmentSwapDetails
         }
     }
 
-    override val binder by viewBinding(FragmentSwapDetailsBinding::bind)
+    override fun createBinding() = FragmentSwapDetailsBinding.inflate(layoutInflater)
 
     override fun onCreateView(
         inflater: LayoutInflater,

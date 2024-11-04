@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDes
 
 class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationViewModel, FragmentSelectRewardDestinationBinding>() {
 
-    override val binder by viewBinding(FragmentSelectRewardDestinationBinding::bind)
+    override fun createBinding() = FragmentSelectRewardDestinationBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.selectRewardDestinationContainer.applyInsetter {

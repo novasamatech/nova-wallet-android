@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 
 class StartImportLedgerFragment : BaseFragment<StartImportLedgerViewModel, FragmentImportLedgerStartBinding>() {
 
-    override val binder by viewBinding(FragmentImportLedgerStartBinding::bind)
+    override fun createBinding() = FragmentImportLedgerStartBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }

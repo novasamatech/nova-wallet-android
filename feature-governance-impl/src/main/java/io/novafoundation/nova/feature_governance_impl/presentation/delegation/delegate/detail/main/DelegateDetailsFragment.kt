@@ -41,7 +41,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel, FragmentD
         }
     }
 
-    override val binder by viewBinding(FragmentDelegateDetailsBinding::bind)
+    override fun createBinding() = FragmentDelegateDetailsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

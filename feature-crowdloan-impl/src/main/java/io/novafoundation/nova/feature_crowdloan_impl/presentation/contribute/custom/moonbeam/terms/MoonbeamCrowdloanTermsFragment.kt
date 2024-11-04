@@ -35,7 +35,7 @@ class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewMo
         }
     }
 
-    override val binder by viewBinding(FragmentMoonbeamTermsBinding::bind)
+    override fun createBinding() = FragmentMoonbeamTermsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.moonbeamTermsContainer.applyInsetter {

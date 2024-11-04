@@ -24,7 +24,7 @@ class PincodeFragment : BaseFragment<PinCodeViewModel, FragmentPincodeBinding>()
         }
     }
 
-    override val binder by viewBinding(FragmentPincodeBinding::bind)
+    override fun createBinding() = FragmentPincodeBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

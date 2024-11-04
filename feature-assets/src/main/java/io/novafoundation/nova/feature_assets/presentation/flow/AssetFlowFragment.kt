@@ -25,7 +25,7 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
     BaseFragment<T, FragmentAssetFlowSearchBinding>(),
     BalanceListAdapter.ItemAssetHandler {
 
-    override val binder by viewBinding(FragmentAssetFlowSearchBinding::bind)
+    override fun createBinding() = FragmentAssetFlowSearchBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

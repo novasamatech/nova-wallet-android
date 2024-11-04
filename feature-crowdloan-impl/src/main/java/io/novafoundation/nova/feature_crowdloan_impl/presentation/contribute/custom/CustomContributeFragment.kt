@@ -32,7 +32,7 @@ class CustomContributeFragment : BaseFragment<CustomContributeViewModel, Fragmen
         }
     }
 
-    override val binder by viewBinding(FragmentCustomContributeBinding::bind)
+    override fun createBinding() = FragmentCustomContributeBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.customContributeContainer.applyInsetter {

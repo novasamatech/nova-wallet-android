@@ -28,7 +28,7 @@ class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmView
         fun getBundle(payload: RevokeDelegationConfirmPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentRevokeDelegationConfirmBinding::bind)
+    override fun createBinding() = FragmentRevokeDelegationConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.revokeDelegationConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }

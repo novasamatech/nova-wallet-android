@@ -27,7 +27,7 @@ class MainDAppFragment :
     DAppHeaderAdapter.Handler,
     DappCategoriesAdapter.Handler {
 
-    override val binder by viewBinding(FragmentDappMainBinding::bind)
+    override fun createBinding() = FragmentDappMainBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

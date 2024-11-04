@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class RebagFragment : BaseFragment<RebagViewModel, FragmentRebagBinding>() {
 
-    override val binder by viewBinding(FragmentRebagBinding::bind)
+    override fun createBinding() = FragmentRebagBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.rebagToolbar.setHomeButtonListener { viewModel.backClicked() }

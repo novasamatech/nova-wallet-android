@@ -21,7 +21,7 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
         ChipActionsAdapter(viewModel::walletSuggestionClicked)
     }
 
-    override val binder by viewBinding(FragmentCreateWatchWalletBinding::bind)
+    override fun createBinding() = FragmentCreateWatchWalletBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.createWatchWalletToolbar.applyStatusBarInsets()

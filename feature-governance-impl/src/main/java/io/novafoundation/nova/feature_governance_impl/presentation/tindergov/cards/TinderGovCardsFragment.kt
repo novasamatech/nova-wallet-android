@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.car
 
 class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel, FragmentTinderGovCardsBinding>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
 
-    override val binder by viewBinding(FragmentTinderGovCardsBinding::bind)
+    override fun createBinding() = FragmentTinderGovCardsBinding.inflate(layoutInflater)
 
     private val adapter = TinderGovCardsAdapter(lifecycleOwner = this, handler = this)
 

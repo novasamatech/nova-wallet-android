@@ -25,7 +25,7 @@ class PreConfiguredNetworksFragment :
     NetworkManagementListAdapter.ItemHandler,
     AddCustomNetworkAdapter.ItemHandler {
 
-    override val binder by viewBinding(FragmentPreConfiguredNetworkListBinding::bind)
+    override fun createBinding() = FragmentPreConfiguredNetworkListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

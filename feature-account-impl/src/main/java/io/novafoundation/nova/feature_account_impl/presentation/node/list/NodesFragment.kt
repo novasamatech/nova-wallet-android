@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeM
 
 class NodesFragment : BaseFragment<NodesViewModel, FragmentNodesBinding>(), NodesAdapter.NodeItemHandler {
 
-    override val binder by viewBinding(FragmentNodesBinding::bind)
+    override fun createBinding() = FragmentNodesBinding.inflate(layoutInflater)
 
     private lateinit var adapter: NodesAdapter
 

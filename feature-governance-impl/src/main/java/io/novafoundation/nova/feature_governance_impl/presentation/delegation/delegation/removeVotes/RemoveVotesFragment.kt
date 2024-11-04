@@ -23,7 +23,7 @@ class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel, FragmentRemoveVot
         fun getBundle(payload: RemoveVotesPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentRemoveVotesBinding::bind)
+    override fun createBinding() = FragmentRemoveVotesBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.removeVoteToolbar.setHomeButtonListener { viewModel.backClicked() }

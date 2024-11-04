@@ -24,7 +24,7 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel, FragmentC
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmBondMoreBinding::bind)
+    override fun createBinding() = FragmentConfirmBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmBondMoreToolbar.applyInsetter {

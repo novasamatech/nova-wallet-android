@@ -24,7 +24,7 @@ class ChangeWatchAccountFragment : BaseFragment<ChangeWatchAccountViewModel, Fra
         }
     }
 
-    override val binder by viewBinding(FragmentChangeWatchWalletBinding::bind)
+    override fun createBinding() = FragmentChangeWatchWalletBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.changeWatchAccountToolbar.applyStatusBarInsets()

@@ -27,7 +27,7 @@ class StoryFragment : BaseFragment<StoryViewModel, FragmentStoryBinding>(), Stor
         }
     }
 
-    override val binder by viewBinding(FragmentStoryBinding::bind)
+    override fun createBinding() = FragmentStoryBinding.inflate(layoutInflater)
 
     private var lastActionDown = 0L
 

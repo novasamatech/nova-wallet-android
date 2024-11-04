@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
 class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel, FragmentAddStakingProxyBinding>() {
 
-    override val binder by viewBinding(FragmentAddStakingProxyBinding::bind)
+    override fun createBinding() = FragmentAddStakingProxyBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.setStakingProxyContainer.applyStatusBarInsets(consume = false)

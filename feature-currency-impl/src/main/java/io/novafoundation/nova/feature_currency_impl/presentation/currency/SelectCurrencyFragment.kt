@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureComponent
 
 class SelectCurrencyFragment : BaseFragment<SelectCurrencyViewModel, FragmentSelectCurrencyBinding>(), CurrencyAdapter.Handler {
 
-    override val binder by viewBinding(FragmentSelectCurrencyBinding::bind)
+    override fun createBinding() = FragmentSelectCurrencyBinding.inflate(layoutInflater)
 
     private val adapter = CurrencyAdapter(this)
 

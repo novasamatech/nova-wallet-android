@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class ManualBackupSelectWalletFragment : BaseFragment<ManualBackupSelectWalletViewModel, FragmentManualBackupSelectWalletBinding>(), AccountHolder.AccountItemHandler {
 
-    override val binder by viewBinding(FragmentManualBackupSelectWalletBinding::bind)
+    override fun createBinding() = FragmentManualBackupSelectWalletBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

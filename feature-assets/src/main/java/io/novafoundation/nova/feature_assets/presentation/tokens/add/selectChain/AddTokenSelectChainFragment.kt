@@ -15,7 +15,7 @@ class AddTokenSelectChainFragment :
     BaseFragment<AddTokenSelectChainViewModel, FragmentAddTokenSelectChainBinding>(),
     SelectChainAdapter.ItemHandler {
 
-    override val binder by viewBinding(FragmentAddTokenSelectChainBinding::bind)
+    override fun createBinding() = FragmentAddTokenSelectChainBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 
 class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding>() {
 
-    override val binder by viewBinding(FragmentSettingsBinding::bind)
+    override fun createBinding() = FragmentSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.settingsContainer.applyStatusBarInsets()

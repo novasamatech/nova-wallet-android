@@ -32,7 +32,7 @@ class SelectCustomValidatorsFragment :
         }
     }
 
-    override val binder by viewBinding(FragmentSelectCustomValidatorsBinding::bind)
+    override fun createBinding() = FragmentSelectCustomValidatorsBinding.inflate(layoutInflater)
 
     val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)

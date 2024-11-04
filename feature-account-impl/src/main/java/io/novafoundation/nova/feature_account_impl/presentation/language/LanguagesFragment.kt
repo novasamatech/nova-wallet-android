@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_account_impl.databinding.FragmentLanguages
 
 class LanguagesFragment : BaseFragment<LanguagesViewModel, FragmentLanguagesBinding>(), LanguagesAdapter.LanguagesItemHandler {
 
-    override val binder by viewBinding(FragmentLanguagesBinding::bind)
+    override fun createBinding() = FragmentLanguagesBinding.inflate(layoutInflater)
 
     private lateinit var adapter: LanguagesAdapter
 

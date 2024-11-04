@@ -25,7 +25,7 @@ class VotedReferendaFragment : BaseReferendaListFragment<VotedReferendaViewModel
         }
     }
 
-    override val binder by viewBinding(FragmentVotedReferendaBinding::bind)
+    override fun createBinding() = FragmentVotedReferendaBinding.inflate(layoutInflater)
 
     override fun initViews() {
         viewModel.payload.overriddenTitle?.let { binder.votedReferendaToolbar.setTitle(it) }

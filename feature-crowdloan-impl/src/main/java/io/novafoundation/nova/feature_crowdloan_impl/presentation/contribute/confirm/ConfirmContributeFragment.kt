@@ -34,7 +34,7 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, Fragm
         }
     }
 
-    override val binder by viewBinding(FragmentContributeConfirmBinding::bind)
+    override fun createBinding() = FragmentContributeConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmContributeContainer.applyInsetter {

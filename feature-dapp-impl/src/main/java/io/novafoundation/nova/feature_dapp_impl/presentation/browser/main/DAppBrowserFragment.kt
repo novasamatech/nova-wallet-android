@@ -41,7 +41,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         fun getBundle(initialUrl: String) = bundleOf(PAYLOAD to initialUrl)
     }
 
-    override val binder by viewBinding(FragmentDappBrowserBinding::bind)
+    override fun createBinding() = FragmentDappBrowserBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var web3WebViewClientFactory: Web3WebViewClientFactory

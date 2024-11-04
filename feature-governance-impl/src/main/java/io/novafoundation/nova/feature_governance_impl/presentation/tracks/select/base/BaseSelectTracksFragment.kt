@@ -20,7 +20,7 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
     SelectTracksAdapter.Handler,
     SelectTracksPresetsAdapter.Handler {
 
-    override val binder by viewBinding(FragmentSelectTracksBinding::bind)
+    override fun createBinding() = FragmentSelectTracksBinding.inflate(layoutInflater)
 
     abstract val headerAdapter: RecyclerView.Adapter<*>
     private val presetsAdapter = NestedAdapter(

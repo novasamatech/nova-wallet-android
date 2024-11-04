@@ -27,7 +27,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
         fun getBundle(payload: SwapConfirmationPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentSwapConfirmationSettingsBinding::bind)
+    override fun createBinding() = FragmentSwapConfirmationSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.swapConfirmationToolbar.applyStatusBarInsets()

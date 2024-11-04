@@ -26,7 +26,7 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
         fun getBundle(payload: WalletConnectSessionsPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentWcSessionsBinding::bind)
+    override fun createBinding() = FragmentWcSessionsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

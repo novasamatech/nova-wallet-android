@@ -17,7 +17,7 @@ class ExternalExtrinsicDetailsFragment : BaseBottomSheetFragment<ExternalExtrins
         fun getBundle(extrinsicContent: String) = bundleOf(PAYLOAD_KEY to extrinsicContent)
     }
 
-    override val binder by viewBinding(FragmentDappExtrinsicDetailsBinding::bind)
+    override fun createBinding() = FragmentDappExtrinsicDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.signExtrinsicToolbar.setHomeButtonListener { viewModel.closeClicked() }

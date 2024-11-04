@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockViewModel, FragmentGovernanceConfirmUnlockBinding>() {
 
-    override val binder by viewBinding(FragmentGovernanceConfirmUnlockBinding::bind)
+    override fun createBinding() = FragmentGovernanceConfirmUnlockBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmGovernanceUnlockToolbar.setHomeButtonListener { viewModel.backClicked() }

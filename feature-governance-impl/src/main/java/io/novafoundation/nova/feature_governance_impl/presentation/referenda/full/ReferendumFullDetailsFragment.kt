@@ -36,7 +36,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
         }
     }
 
-    override val binder by viewBinding(FragmentReferendumFullDetailsBinding::bind)
+    override fun createBinding() = FragmentReferendumFullDetailsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

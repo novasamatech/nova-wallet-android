@@ -36,7 +36,7 @@ class ValidatorDetailsFragment : BaseFragment<ValidatorDetailsViewModel, Fragmen
         }
     }
 
-    override val binder by viewBinding(FragmentValidatorDetailsBinding::bind)
+    override fun createBinding() = FragmentValidatorDetailsBinding.inflate(layoutInflater)
 
     private val activeStakingFields by lazy(LazyThreadSafetyMode.NONE) {
         listOf(binder.validatorStakingStakers, binder.validatorStakingTotalStake, binder.validatorStakingEstimatedReward, binder.validatorStakingMinimumStake)

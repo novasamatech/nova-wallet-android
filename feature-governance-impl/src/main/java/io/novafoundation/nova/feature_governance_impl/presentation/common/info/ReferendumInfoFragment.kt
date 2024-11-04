@@ -27,7 +27,7 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel, FragmentRef
         }
     }
 
-    override val binder by viewBinding(FragmentReferendumInfoBinding::bind)
+    override fun createBinding() = FragmentReferendumInfoBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }

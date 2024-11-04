@@ -26,7 +26,7 @@ class PayoutDetailsFragment : BaseFragment<PayoutDetailsViewModel, FragmentPayou
         }
     }
 
-    override val binder by viewBinding(FragmentPayoutDetailsBinding::bind)
+    override fun createBinding() = FragmentPayoutDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.payoutDetailsContainer.applyInsetter {

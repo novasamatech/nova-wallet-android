@@ -26,7 +26,7 @@ class AssetSearchFragment :
     BaseBottomSheetFragment<AssetSearchViewModel, FragmentAssetSearchBinding>(),
     BalanceListAdapter.ItemAssetHandler {
 
-    override val binder by viewBinding(FragmentAssetSearchBinding::bind)
+    override fun createBinding() = FragmentAssetSearchBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

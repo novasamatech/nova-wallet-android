@@ -27,7 +27,7 @@ class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel, FragmentConfi
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmPayoutBinding::bind)
+    override fun createBinding() = FragmentConfirmPayoutBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmPayoutContainer.applyStatusBarInsets()

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class NominationPoolsRedeemFragment : BaseFragment<NominationPoolsRedeemViewModel, FragmentNominationPoolsRedeemBinding>() {
 
-    override val binder by viewBinding(FragmentNominationPoolsRedeemBinding::bind)
+    override fun createBinding() = FragmentNominationPoolsRedeemBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.nominationPoolsRedeemToolbar.applyStatusBarInsets()

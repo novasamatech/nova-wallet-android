@@ -27,7 +27,7 @@ class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewMo
         fun getBundle(payload: ParachainStakingRebondPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentParachainStakingRebondBinding::bind)
+    override fun createBinding() = FragmentParachainStakingRebondBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.parachainStakingRebondContainer.applyStatusBarInsets()

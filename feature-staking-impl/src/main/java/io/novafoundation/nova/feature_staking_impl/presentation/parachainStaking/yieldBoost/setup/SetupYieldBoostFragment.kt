@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFee
 
 class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel, FragmentYieldBoostSetupBinding>() {
 
-    override val binder by viewBinding(FragmentYieldBoostSetupBinding::bind)
+    override fun createBinding() = FragmentYieldBoostSetupBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.setupYieldBoostToolbar.applyStatusBarInsets()

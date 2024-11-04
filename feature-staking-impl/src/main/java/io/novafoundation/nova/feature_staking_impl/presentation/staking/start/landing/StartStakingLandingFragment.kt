@@ -35,7 +35,7 @@ class StartStakingLandingFragment :
         }
     }
 
-    override val binder by viewBinding(FragmentStartStakingLandingBinding::bind)
+    override fun createBinding() = FragmentStartStakingLandingBinding.inflate(layoutInflater)
 
     private val headerAdapter = StartStakingLandingHeaderAdapter()
     private val conditionsAdapter = StartStakingLandingAdapter()

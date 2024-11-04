@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 
 class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel, FragmentReferendaFiltersBinding>() {
 
-    override val binder by viewBinding(FragmentReferendaFiltersBinding::bind)
+    override fun createBinding() = FragmentReferendaFiltersBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.referendaFiltersToolbar.applyStatusBarInsets()

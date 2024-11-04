@@ -28,7 +28,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, Fragment
         )
     }
 
-    override val binder by viewBinding(FragmentSearchDappBinding::bind)
+    override fun createBinding() = FragmentSearchDappBinding.inflate(layoutInflater)
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 

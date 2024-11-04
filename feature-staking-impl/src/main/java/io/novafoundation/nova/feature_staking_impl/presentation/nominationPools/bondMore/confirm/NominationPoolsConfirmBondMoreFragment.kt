@@ -24,7 +24,7 @@ class NominationPoolsConfirmBondMoreFragment : BaseFragment<NominationPoolsConfi
         }
     }
 
-    override val binder by viewBinding(FragmentNominationPoolsConfirmBondMoreBinding::bind)
+    override fun createBinding() = FragmentNominationPoolsConfirmBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.nominationPoolsConfirmBondMoreToolbar.applyStatusBarInsets()

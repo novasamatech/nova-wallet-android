@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.mod
 
 class PayoutsListFragment : BaseFragment<PayoutsListViewModel, FragmentPayoutsListBinding>(), PayoutAdapter.ItemHandler {
 
-    override val binder by viewBinding(FragmentPayoutsListBinding::bind)
+    override fun createBinding() = FragmentPayoutsListBinding.inflate(layoutInflater)
 
     lateinit var adapter: PayoutAdapter
 

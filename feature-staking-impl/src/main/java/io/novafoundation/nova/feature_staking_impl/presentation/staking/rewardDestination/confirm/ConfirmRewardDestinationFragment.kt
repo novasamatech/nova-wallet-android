@@ -24,7 +24,7 @@ class ConfirmRewardDestinationFragment : BaseFragment<ConfirmRewardDestinationVi
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmRewardDestinationBinding::bind)
+    override fun createBinding() = FragmentConfirmRewardDestinationBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmRewardDestinationContainer.applyStatusBarInsets()

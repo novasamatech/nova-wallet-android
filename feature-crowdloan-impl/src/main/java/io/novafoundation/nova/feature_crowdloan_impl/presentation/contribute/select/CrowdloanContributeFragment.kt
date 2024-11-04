@@ -36,7 +36,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel, F
         }
     }
 
-    override val binder by viewBinding(FragmentContributeBinding::bind)
+    override fun createBinding() = FragmentContributeBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.crowdloanContributeContainer.applyInsetter {

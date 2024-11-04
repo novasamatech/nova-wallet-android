@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.mod
 
 class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel, FragmentAuthorizedDappsBinding>(), AuthorizedDAppAdapter.Handler {
 
-    override val binder by viewBinding(FragmentAuthorizedDappsBinding::bind)
+    override fun createBinding() = FragmentAuthorizedDappsBinding.inflate(layoutInflater)
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         AuthorizedDAppAdapter(this)

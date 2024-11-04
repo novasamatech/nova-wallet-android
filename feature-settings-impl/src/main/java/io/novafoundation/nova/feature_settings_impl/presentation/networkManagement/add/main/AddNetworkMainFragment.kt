@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -24,7 +23,7 @@ class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel, FragmentAdd
         }
     }
 
-    override val binder: FragmentAddNetworkMainBinding by viewBinding(FragmentAddNetworkMainBinding::bind)
+    override fun createBinding() = FragmentAddNetworkMainBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.addNetworkMainToolbar.applyStatusBarInsets()

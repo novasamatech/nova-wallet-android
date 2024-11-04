@@ -27,7 +27,7 @@ class CustomNodeFragment : BaseFragment<CustomNodeViewModel, FragmentCustomNodeB
         }
     }
 
-    override val binder by viewBinding(FragmentCustomNodeBinding::bind)
+    override fun createBinding() = FragmentCustomNodeBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

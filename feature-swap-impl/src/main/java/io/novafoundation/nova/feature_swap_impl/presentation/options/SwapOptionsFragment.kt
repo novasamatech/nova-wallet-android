@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 
 class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptionsBinding>() {
 
-    override val binder by viewBinding(FragmentSwapOptionsBinding::bind)
+    override fun createBinding() = FragmentSwapOptionsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.swapOptionsToolbar.applyStatusBarInsets()

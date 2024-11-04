@@ -27,7 +27,7 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel, Fragm
         }
     }
 
-    override val binder by viewBinding(FragmentStartCreateWalletBinding::bind)
+    override fun createBinding() = FragmentStartCreateWalletBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startCreateWalletToolbar.applyStatusBarInsets()

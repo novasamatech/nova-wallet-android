@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters
 
 class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel, FragmentUpdateNotificationsBinding>(), UpdateNotificationsSeeAllAdapter.SeeAllClickedListener {
 
-    override val binder by viewBinding(FragmentUpdateNotificationsBinding::bind)
+    override fun createBinding() = FragmentUpdateNotificationsBinding.inflate(layoutInflater)
 
     private val bannerAdapter = UpdateNotificationsBannerAdapter()
     private val listAdapter = UpdateNotificationsAdapter()

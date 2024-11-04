@@ -20,7 +20,7 @@ class YourDelegationsFragment :
     BaseFragment<YourDelegationsViewModel, FragmentYourDelegationsBinding>(),
     DelegateListAdapter.Handler {
 
-    override val binder by viewBinding(FragmentYourDelegationsBinding::bind)
+    override fun createBinding() = FragmentYourDelegationsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

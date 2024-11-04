@@ -27,7 +27,7 @@ abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T, Fragm
         fun getBundle(payload: SetupVotePayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentSetupVoteBinding::bind)
+    override fun createBinding() = FragmentSetupVoteBinding.inflate(layoutInflater)
 
     override fun onCreateView(
         inflater: LayoutInflater,

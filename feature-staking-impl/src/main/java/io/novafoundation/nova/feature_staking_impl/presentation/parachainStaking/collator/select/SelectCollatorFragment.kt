@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.Stake
 
 class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel, FragmentParachainStakingSelectCollatorBinding>(), StakeTargetAdapter.ItemHandler<Collator> {
 
-    override val binder by viewBinding(FragmentParachainStakingSelectCollatorBinding::bind)
+    override fun createBinding() = FragmentParachainStakingSelectCollatorBinding.inflate(layoutInflater)
 
     val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)

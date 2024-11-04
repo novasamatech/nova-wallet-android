@@ -22,7 +22,7 @@ class TransactionHistoryFilterFragment : BaseFragment<TransactionHistoryFilterVi
         fun getBundle(payload: TransactionHistoryFilterPayload) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    override val binder by viewBinding(FragmentTransactionsFilterBinding::bind)
+    override fun createBinding() = FragmentTransactionsFilterBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.transactionsFilterToolbar.setHomeButtonListener { viewModel.backClicked() }

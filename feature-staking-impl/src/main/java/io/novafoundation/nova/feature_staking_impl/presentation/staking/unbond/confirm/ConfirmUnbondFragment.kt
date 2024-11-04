@@ -24,7 +24,7 @@ class ConfirmUnbondFragment : BaseFragment<ConfirmUnbondViewModel, FragmentConfi
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmUnbondBinding::bind)
+    override fun createBinding() = FragmentConfirmUnbondBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmUnbondToolbar.applyInsetter {

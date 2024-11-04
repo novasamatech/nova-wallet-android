@@ -27,7 +27,7 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel, Fragmen
         }
     }
 
-    override val binder by viewBinding(FragmentSetupStakingTypeBinding::bind)
+    override fun createBinding() = FragmentSetupStakingTypeBinding.inflate(layoutInflater)
 
     private val adapter = SetupStakingTypeAdapter(this)
 

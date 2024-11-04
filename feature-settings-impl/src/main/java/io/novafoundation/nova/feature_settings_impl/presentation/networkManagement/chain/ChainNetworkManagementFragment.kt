@@ -42,7 +42,7 @@ class ChainNetworkManagementFragment :
         }
     }
 
-    override val binder by viewBinding(FragmentChainNetworkManagementBinding::bind)
+    override fun createBinding() = FragmentChainNetworkManagementBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

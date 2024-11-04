@@ -30,7 +30,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override val binder: FragmentImportLedgerSelectAddressBinding by viewBinding(FragmentImportLedgerSelectAddressBinding::bind)
+    override fun createBinding() = FragmentImportLedgerSelectAddressBinding.inflate(layoutInflater)
 
     private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) {
         AccountsAdapter(

@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 
 class SetControllerFragment : BaseFragment<SetControllerViewModel, FragmentSetControllerAccountBinding>() {
 
-    override val binder by viewBinding(FragmentSetControllerAccountBinding::bind)
+    override fun createBinding() = FragmentSetControllerAccountBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmSetControllerContainer.applyStatusBarInsets()

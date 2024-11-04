@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 class CrowdloanFragment : BaseFragment<CrowdloanViewModel, FragmentCrowdloansBinding>(), CrowdloanAdapter.Handler, CrowdloanHeaderAdapter.Handler {
 
-    override val binder by viewBinding(FragmentCrowdloansBinding::bind)
+    override fun createBinding() = FragmentCrowdloansBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

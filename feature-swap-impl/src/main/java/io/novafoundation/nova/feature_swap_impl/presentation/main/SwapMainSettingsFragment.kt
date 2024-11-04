@@ -40,7 +40,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
         }
     }
 
-    override val binder by viewBinding(FragmentMainSwapSettingsBinding::bind)
+    override fun createBinding() = FragmentMainSwapSettingsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var buyMixinUi: BuyMixinUi

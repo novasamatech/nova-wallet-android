@@ -35,7 +35,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel, FragmentSelectSendB
         )
     }
 
-    override val binder by viewBinding(FragmentSelectSendBinding::bind)
+    override fun createBinding() = FragmentSelectSendBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.chooseAmountContainer.applyStatusBarInsets(false)

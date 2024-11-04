@@ -30,7 +30,7 @@ class SelectCollatorSettingsFragment : BaseFragment<SelectCollatorSettingsViewMo
         fun getBundle(payload: CollatorRecommendationConfigParcelModel) = bundleOf(PAYLOAD_KEY to payload)
     }
 
-    override val binder by viewBinding(FragmentParachainStakingSelectCollatorSettingsBinding::bind)
+    override fun createBinding() = FragmentParachainStakingSelectCollatorSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.selectCollatorSettingsApply.setOnClickListener { viewModel.applyChanges() }

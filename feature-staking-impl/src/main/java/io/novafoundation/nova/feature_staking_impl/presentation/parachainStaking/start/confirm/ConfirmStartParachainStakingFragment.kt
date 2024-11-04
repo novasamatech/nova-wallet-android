@@ -27,7 +27,7 @@ class ConfirmStartParachainStakingFragment : BaseFragment<ConfirmStartParachainS
         fun getBundle(payload: ConfirmStartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentParachainStakingStartConfirmBinding::bind)
+    override fun createBinding() = FragmentParachainStakingStartConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmStartParachainStakingContainer.applyStatusBarInsets()

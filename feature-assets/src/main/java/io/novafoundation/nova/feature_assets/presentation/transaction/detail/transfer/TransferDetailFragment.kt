@@ -30,7 +30,7 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel, Fragment
         }
     }
 
-    override val binder by viewBinding(FragmentTransferDetailsBinding::bind)
+    override fun createBinding() = FragmentTransferDetailsBinding.inflate(layoutInflater)
 
     override fun onCreateView(
         inflater: LayoutInflater,

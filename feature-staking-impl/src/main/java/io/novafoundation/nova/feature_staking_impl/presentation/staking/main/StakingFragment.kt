@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>() {
 
-    override val binder by viewBinding(FragmentStakingBinding::bind)
+    override fun createBinding() = FragmentStakingBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

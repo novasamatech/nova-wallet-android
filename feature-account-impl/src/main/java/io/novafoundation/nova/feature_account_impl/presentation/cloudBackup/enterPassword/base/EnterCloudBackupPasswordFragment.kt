@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.databinding.FragmentRestoreCl
 
 abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T, FragmentRestoreCloudBackupBinding>() {
 
-    override val binder by viewBinding(FragmentRestoreCloudBackupBinding::bind)
+    override fun createBinding() = FragmentRestoreCloudBackupBinding.inflate(layoutInflater)
 
     abstract val titleRes: Int
     abstract val subtitleRes: Int

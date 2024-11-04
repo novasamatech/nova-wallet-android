@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFea
 
 class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSettingsBinding>() {
 
-    override val binder by viewBinding(FragmentPushSettingsBinding::bind)
+    override fun createBinding() = FragmentPushSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         onBackPressed { viewModel.backClicked() }

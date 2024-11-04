@@ -24,7 +24,7 @@ class DelegateListFragment :
     DelegateBannerAdapter.Handler,
     DelegateSortAndFilterAdapter.Handler {
 
-    override val binder by viewBinding(FragmentDelegateListBinding::bind)
+    override fun createBinding() = FragmentDelegateListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

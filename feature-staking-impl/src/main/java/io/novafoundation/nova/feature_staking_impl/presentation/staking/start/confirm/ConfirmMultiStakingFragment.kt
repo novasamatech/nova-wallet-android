@@ -24,7 +24,7 @@ class ConfirmMultiStakingFragment : BaseFragment<ConfirmMultiStakingViewModel, F
         }
     }
 
-    override val binder by viewBinding(FragmentStartMultiStakingConfirmBinding::bind)
+    override fun createBinding() = FragmentStartMultiStakingConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startMultiStakingConfirmToolbar.applyStatusBarInsets()

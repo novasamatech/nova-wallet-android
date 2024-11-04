@@ -28,7 +28,7 @@ class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewMo
         }
     }
 
-    override val binder by viewBinding(FragmentConfirmAddStakingProxyBinding::bind)
+    override fun createBinding() = FragmentConfirmAddStakingProxyBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmAddStakingProxyToolbar.applyStatusBarInsets()

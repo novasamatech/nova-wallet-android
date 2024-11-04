@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel, FragmentReferendaListBinding>(), ReferendaListHeaderAdapter.Handler {
 
-    override val binder by viewBinding(FragmentReferendaListBinding::bind)
+    override fun createBinding() = FragmentReferendaListBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

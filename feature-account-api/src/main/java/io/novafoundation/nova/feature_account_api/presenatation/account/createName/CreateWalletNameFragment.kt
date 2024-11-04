@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.databinding.FragmentCreateWall
 
 abstract class CreateWalletNameFragment<V : CreateWalletNameViewModel> : BaseFragment<V, FragmentCreateWalletNameBinding>() {
 
-    override val binder by viewBinding(FragmentCreateWalletNameBinding::bind)
+    override fun createBinding() = FragmentCreateWalletNameBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.createWalletNameToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }

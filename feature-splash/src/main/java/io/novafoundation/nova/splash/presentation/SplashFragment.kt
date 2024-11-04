@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class SplashFragment : BaseFragment<SplashViewModel, FragmentSplashBinding>() {
 
-    override val binder by viewBinding(FragmentSplashBinding::bind)
+    override fun createBinding() = FragmentSplashBinding.inflate(layoutInflater)
 
     @Inject lateinit var splashViewModel: SplashViewModel
 

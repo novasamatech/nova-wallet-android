@@ -25,7 +25,7 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel, FragmentBon
         }
     }
 
-    override val binder by viewBinding(FragmentBondMoreBinding::bind)
+    override fun createBinding() = FragmentBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.bondMoreContainer.applyInsetter {

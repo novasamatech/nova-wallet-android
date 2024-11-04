@@ -21,7 +21,7 @@ class DescriptionFragment : BaseFragment<DescriptionViewModel, FragmentDescripti
         }
     }
 
-    override val binder by viewBinding(FragmentDescriptionBinding::bind)
+    override fun createBinding() = FragmentDescriptionBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.descriptionToolbar.setHomeButtonListener { viewModel.backClicked() }

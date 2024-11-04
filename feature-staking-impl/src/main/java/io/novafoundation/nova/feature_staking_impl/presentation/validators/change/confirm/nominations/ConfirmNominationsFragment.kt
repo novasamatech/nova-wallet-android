@@ -14,7 +14,7 @@ class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel, Fra
 
     lateinit var adapter: StakeTargetAdapter<Validator>
 
-    override val binder by viewBinding(FragmentConfirmNominationsBinding::bind)
+    override fun createBinding() = FragmentConfirmNominationsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         adapter = StakeTargetAdapter(this)

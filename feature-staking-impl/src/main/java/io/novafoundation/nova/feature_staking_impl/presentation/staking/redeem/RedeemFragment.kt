@@ -24,7 +24,7 @@ class RedeemFragment : BaseFragment<RedeemViewModel, FragmentRedeemBinding>() {
         }
     }
 
-    override val binder by viewBinding(FragmentRedeemBinding::bind)
+    override fun createBinding() = FragmentRedeemBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.redeemContainer.applyStatusBarInsets()

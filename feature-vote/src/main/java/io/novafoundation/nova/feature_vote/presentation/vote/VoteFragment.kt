@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class VoteFragment : BaseFragment<VoteViewModel, FragmentVoteBinding>() {
 
-    override val binder by viewBinding(FragmentVoteBinding::bind)
+    override fun createBinding() = FragmentVoteBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var router: VoteRouter

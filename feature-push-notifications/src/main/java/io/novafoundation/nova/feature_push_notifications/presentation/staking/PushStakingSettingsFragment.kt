@@ -27,7 +27,7 @@ class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel, F
         }
     }
 
-    override val binder by viewBinding(FragmentPushStakingSettingsBinding::bind)
+    override fun createBinding() = FragmentPushStakingSettingsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

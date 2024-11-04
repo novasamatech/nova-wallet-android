@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.com
 
 class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel, FragmentManualBackupWarningBinding>() {
 
-    override val binder by viewBinding(FragmentManualBackupWarningBinding::bind)
+    override fun createBinding() = FragmentManualBackupWarningBinding.inflate(layoutInflater)
 
     companion object {
 

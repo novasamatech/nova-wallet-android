@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settin
 
 class CustomValidatorsSettingsFragment : BaseFragment<CustomValidatorsSettingsViewModel, FragmentCustomValidatorsSettingsBinding>() {
 
-    override val binder by viewBinding(FragmentCustomValidatorsSettingsBinding::bind)
+    override fun createBinding() = FragmentCustomValidatorsSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.customValidatorSettingsApply.setOnClickListener { viewModel.applyChanges() }

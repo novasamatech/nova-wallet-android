@@ -31,7 +31,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         }
     }
 
-    override val binder by viewBinding(FragmentReviewCustomValidatorsBinding::bind)
+    override fun createBinding() = FragmentReviewCustomValidatorsBinding.inflate(layoutInflater)
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)

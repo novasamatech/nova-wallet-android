@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
 class CustomRebondFragment : BaseFragment<CustomRebondViewModel, FragmentRebondCustomBinding>() {
 
-    override val binder by viewBinding(FragmentRebondCustomBinding::bind)
+    override fun createBinding() = FragmentRebondCustomBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.rebondToolbar.applyStatusBarInsets()

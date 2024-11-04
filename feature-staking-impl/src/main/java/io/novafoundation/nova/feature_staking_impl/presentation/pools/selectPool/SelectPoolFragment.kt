@@ -33,7 +33,7 @@ class SelectPoolFragment : BaseFragment<SelectPoolViewModel, FragmentSelectPoolB
         }
     }
 
-    override val binder by viewBinding(FragmentSelectPoolBinding::bind)
+    override fun createBinding() = FragmentSelectPoolBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

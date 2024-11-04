@@ -29,7 +29,7 @@ abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> :
         StakeTargetAdapter(this)
     }
 
-    override val binder by viewBinding(FragmentSearchCustomValidatorsBinding::bind)
+    override fun createBinding() = FragmentSearchCustomValidatorsBinding.inflate(layoutInflater)
 
     abstract val configuration: Configuration
 

@@ -29,7 +29,7 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
         }
     }
 
-    override val binder by viewBinding(FragmentImportParitySignerStartBinding::bind)
+    override fun createBinding() = FragmentImportParitySignerStartBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startImportParitySignerToolbar.setHomeButtonListener { viewModel.backClicked() }

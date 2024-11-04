@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 
 class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewModel, FragmentStartChangeValidatorsBinding>() {
 
-    override val binder by viewBinding(FragmentStartChangeValidatorsBinding::bind)
+    override fun createBinding() = FragmentStartChangeValidatorsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startChangeValidatorsContainer.applyInsetter {

@@ -29,7 +29,7 @@ class YieldBoostConfirmFragment : BaseFragment<YieldBoostConfirmViewModel, Fragm
         fun getBundle(payload: YieldBoostConfirmPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override val binder by viewBinding(FragmentYieldBoostConfirmBinding::bind)
+    override fun createBinding() = FragmentYieldBoostConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.confirmYieldBoostContainer.applyStatusBarInsets()

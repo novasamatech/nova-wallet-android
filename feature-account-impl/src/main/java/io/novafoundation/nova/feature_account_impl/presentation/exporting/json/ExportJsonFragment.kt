@@ -20,7 +20,7 @@ private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
 class ExportJsonFragment : ExportFragment<ExportJsonViewModel, FragmentExportJsonPasswordBinding>() {
 
-    override val binder by viewBinding(FragmentExportJsonPasswordBinding::bind)
+    override fun createBinding() = FragmentExportJsonPasswordBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader

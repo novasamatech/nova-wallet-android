@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
 class AddNodeFragment : BaseFragment<AddNodeViewModel, FragmentNodeAddBinding>() {
 
-    override val binder: FragmentNodeAddBinding by viewBinding(FragmentNodeAddBinding::bind)
+    override fun createBinding() = FragmentNodeAddBinding.inflate(layoutInflater)
 
     override fun onCreateView(
         inflater: LayoutInflater,

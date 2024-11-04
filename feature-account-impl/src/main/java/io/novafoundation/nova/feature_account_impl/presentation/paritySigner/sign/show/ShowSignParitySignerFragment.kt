@@ -27,7 +27,7 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel,
         }
     }
 
-    override val binder by viewBinding(FragmentSignParitySignerShowBinding::bind)
+    override fun createBinding() = FragmentSignParitySignerShowBinding.inflate(layoutInflater)
 
     override fun initViews() {
         setupExternalActions(viewModel)

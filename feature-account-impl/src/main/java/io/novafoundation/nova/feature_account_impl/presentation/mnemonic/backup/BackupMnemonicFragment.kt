@@ -29,7 +29,7 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel, FragmentBac
         }
     }
 
-    override val binder by viewBinding(FragmentBackupMnemonicBinding::bind)
+    override fun createBinding() = FragmentBackupMnemonicBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.backupMnemonicToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
