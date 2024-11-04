@@ -1,15 +1,14 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemTinderGovCardBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter.Handler
 
 class TinderGovCardsAdapter(
@@ -22,7 +21,7 @@ class TinderGovCardsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TinderGovCardViewHolder {
-        return TinderGovCardViewHolder(handler, lifecycleOwner, parent.inflateChild(R.layout.item_tinder_gov_card))
+        return TinderGovCardViewHolder(handler, lifecycleOwner, ItemTinderGovCardBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: TinderGovCardViewHolder, position: Int) {
@@ -33,23 +32,23 @@ class TinderGovCardsAdapter(
 class TinderGovCardViewHolder(
     private val handler: Handler,
     lifecycleOwner: LifecycleOwner,
-    containerView: View
-) : GroupedListHolder(containerView) {
+    private val binder: ItemTinderGovCardBinding
+) : GroupedListHolder(binder.root) {
 
     init {
-        itemView.tinderGovCardReadMore.prepareForProgress(lifecycleOwner)
+        binder.tinderGovCardReadMore.prepareForProgress(lifecycleOwner)
     }
 
     fun bind(item: TinderGovCardRvItem) {
-        itemView.itemTinderGovCardSummary.text = item.summary
-        itemView.itemTinderGovCardAmountContainer.letOrHide(item.requestedAmount) {
-            itemView.itemTinderGovCardRequestedAmount.setTextOrHide(it.token)
-            itemView.itemTinderGovCardRequestedFiat.setTextOrHide(it.fiat)
+        binder.itemTinderGovCardSummary.text = item.summary
+        binder.itemTinderGovCardAmountContainer.letOrHide(item.requestedAmount) {
+            binder.itemTinderGovCardRequestedAmount.setTextOrHide(it.token)
+            binder.itemTinderGovCardRequestedFiat.setTextOrHide(it.fiat)
         }
 
-        itemView.tinderGovCardContainer.setBackgroundResource(item.backgroundRes)
+        binder.tinderGovCardContainer.setBackgroundResource(item.backgroundRes)
 
-        itemView.tinderGovCardReadMore.setOnClickListener { handler.onReadMoreClicked(item) }
+        binder.tinderGovCardReadMore.setOnClickListener { handler.onReadMoreClicked(item) }
     }
 }
 

@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible

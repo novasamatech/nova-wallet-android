@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupSubtitleBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 
@@ -13,10 +13,10 @@ data class ManualBackupSubtitleRvItem(
     }
 }
 
-class ManualBackupSubtitleViewHolder(itemView: View) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupSubtitleViewHolder(private val binder: ItemManualBackupSubtitleBinding) : ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupSubtitleRvItem)
-        itemView.manualBackupSecretsSubtitle.text = item.text
+        binder.manualBackupSecretsSubtitle.text = item.text
     }
 }

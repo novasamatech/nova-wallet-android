@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInp
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxAvailableView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooserBase
 
-fun BaseFragment<*>.setupSwapAmountInput(
+fun BaseFragment<*, *>.setupSwapAmountInput(
     mixin: SwapAmountInputMixin,
     amountView: SwapAmountInputView,
     maxAvailableView: MaxAvailableView?

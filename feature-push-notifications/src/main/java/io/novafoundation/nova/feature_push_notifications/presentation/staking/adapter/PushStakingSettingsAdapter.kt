@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -8,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIconToTarget
-import io.novafoundation.nova.feature_push_notifications.R
+import io.novafoundation.nova.feature_push_notifications.databinding.ItemPushStakingSettingsBinding
 
 class PushStakingSettingsAdapter(
     private val imageLoader: ImageLoader,
@@ -22,7 +21,7 @@ class PushStakingSettingsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PushStakingItemViewHolder {
-        return PushStakingItemViewHolder(parent.inflateChild(R.layout.item_push_staking_settings), imageLoader, itemHandler)
+        return PushStakingItemViewHolder(ItemPushStakingSettingsBinding.inflate(parent.inflater(), parent, false), imageLoader, itemHandler)
     }
 
     override fun onBindViewHolder(holder: PushStakingItemViewHolder, position: Int) {
@@ -55,23 +54,23 @@ class PushStakingItemCallback() : DiffUtil.ItemCallback<PushStakingRVItem>() {
 }
 
 class PushStakingItemViewHolder(
-    itemView: View,
+    private val binder: ItemPushStakingSettingsBinding,
     private val imageLoader: ImageLoader,
     private val itemHandler: PushStakingSettingsAdapter.ItemHandler
-) : ViewHolder(itemView) {
+) : ViewHolder(binder.root) {
 
     init {
-        itemView.pushStakingItem.setIconTintColor(null)
+        binder.pushStakingItem.setIconTintColor(null)
     }
 
     fun bind(item: PushStakingRVItem) {
-        with(itemView) {
+        with(binder) {
             pushStakingItem.setOnClickListener {
                 itemHandler.itemClicked(item)
             }
 
             pushStakingItem.setTitle(item.chainName)
-            imageLoader.loadChainIconToTarget(item.chainIconUrl, context) {
+            imageLoader.loadChainIconToTarget(item.chainIconUrl, binder.root.context) {
                 pushStakingItem.setIcon(it)
             }
 
@@ -80,7 +79,7 @@ class PushStakingItemViewHolder(
     }
 
     fun setEnabled(item: PushStakingRVItem) {
-        itemView.pushStakingItem.setChecked(item.isEnabled)
+        binder.pushStakingItem.setChecked(item.isEnabled)
     }
 }
 

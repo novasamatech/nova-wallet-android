@@ -1,15 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.common.description
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentDescriptionBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 

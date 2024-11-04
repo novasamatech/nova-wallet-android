@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
 import androidx.core.view.isGone
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupCryptoTypeBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 
@@ -18,14 +18,14 @@ data class ManualBackupCryptoTypeRvItem(
     }
 }
 
-class ManualBackupCryptoTypeViewHolder(itemView: View) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupCryptoTypeViewHolder(private val binder: ItemManualBackupCryptoTypeBinding) : ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupCryptoTypeRvItem)
-        itemView.manualBackupSecretsCryptoType.setLabel(item.cryptoTypeTitle)
-        itemView.manualBackupSecretsCryptoType.setMessage(item.cryptoTypeSubtitle)
-        itemView.manualBackupSecretsDerivationPath.setMessage(item.derivationPath)
-        itemView.manualBackupSecretsDerivationPathLabel.isGone = item.hideDerivationPath
-        itemView.manualBackupSecretsDerivationPath.isGone = item.hideDerivationPath
+        binder.manualBackupSecretsCryptoType.setLabel(item.cryptoTypeTitle)
+        binder.manualBackupSecretsCryptoType.setMessage(item.cryptoTypeSubtitle)
+        binder.manualBackupSecretsDerivationPath.setMessage(item.derivationPath)
+        binder.manualBackupSecretsDerivationPathLabel.isGone = item.hideDerivationPath
+        binder.manualBackupSecretsDerivationPath.isGone = item.hideDerivationPath
     }
 }

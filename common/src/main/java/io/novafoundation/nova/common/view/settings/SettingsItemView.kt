@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.view.settings
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R

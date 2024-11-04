@@ -1,20 +1,17 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.search
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegationsSearchResultCountBinding
 
 class DelegateSearchCountResultAdapter : RecyclerView.Adapter<DelegationSearchCountViewHolder>() {
 
     private var countString: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationSearchCountViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegations_search_result_count)
-
-        return DelegationSearchCountViewHolder(containerView)
+        return DelegationSearchCountViewHolder(ItemDelegationsSearchResultCountBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun getItemCount(): Int {
@@ -34,10 +31,10 @@ class DelegateSearchCountResultAdapter : RecyclerView.Adapter<DelegationSearchCo
 }
 
 class DelegationSearchCountViewHolder(
-    containerView: View
-) : ViewHolder(containerView) {
+    private val binder: ItemDelegationsSearchResultCountBinding
+) : ViewHolder(binder.root) {
 
     fun bind(countString: String?) {
-        itemView.itemDelegationSearchCount.text = countString
+        binder.itemDelegationSearchCount.text = countString
     }
 }

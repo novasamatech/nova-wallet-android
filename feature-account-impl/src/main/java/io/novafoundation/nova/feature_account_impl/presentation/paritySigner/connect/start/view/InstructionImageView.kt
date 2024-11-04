@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.Connect.Instruction
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.ViewInstructionImageBinding
 
 class InstructionImageView @JvmOverloads constructor(
     context: Context,
@@ -27,14 +27,14 @@ class InstructionImageView @JvmOverloads constructor(
         }
     }
 
+    private val binder = ViewInstructionImageBinding.inflate(inflater(), this)
+
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_instruction_image, this)
     }
 
     fun setModel(model: Instruction.Image) {
-        viewInstructionImage.setImageResource(model.imageRes)
-        viewInstructionImageLabel.text = model.label
+        binder.viewInstructionImage.setImageResource(model.imageRes)
+        binder.viewInstructionImageLabel.text = model.label
     }
 }

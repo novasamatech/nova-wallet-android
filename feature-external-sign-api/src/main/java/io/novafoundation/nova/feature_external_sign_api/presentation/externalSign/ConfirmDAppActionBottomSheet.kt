@@ -4,10 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.annotation.CallSuper
-import androidx.annotation.LayoutRes
 import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.utils.DialogExtensions
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_external_sign_api.R
 import io.novafoundation.nova.feature_external_sign_api.databinding.BottomSheetConfirmDappActionBinding

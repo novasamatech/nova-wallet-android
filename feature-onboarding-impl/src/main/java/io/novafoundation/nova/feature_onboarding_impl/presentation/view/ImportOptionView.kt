@@ -4,11 +4,12 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.view.View
 import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_onboarding_impl.R
+import io.novafoundation.nova.feature_onboarding_impl.databinding.ViewImportOptionBinding
 
 class ImportOptionView @JvmOverloads constructor(
     context: Context,
@@ -22,13 +23,13 @@ class ImportOptionView @JvmOverloads constructor(
         color = context.getColor(R.color.container_border)
     }
 
+    private val binder = ViewImportOptionBinding.inflate(inflater(), this)
+
     init {
         setCardBackgroundColor(context.getColor(R.color.button_background_secondary))
         radius = 12.dpF
         cardElevation = 0.dpF
         elevation = 0.dpF
-
-        View.inflate(context, R.layout.view_import_option, this)
 
         attrs?.let(::applyAttributes)
     }
@@ -36,12 +37,12 @@ class ImportOptionView @JvmOverloads constructor(
     override fun onDrawForeground(canvas: Canvas) {
         super.onDrawForeground(canvas)
         canvas.save()
-        canvas.clipRect(importOptionImage.left, importOptionImage.top, importOptionImage.right, importOptionImage.bottom)
+        canvas.clipRect(binder.importOptionImage.left, binder.importOptionImage.top, binder.importOptionImage.right, binder.importOptionImage.bottom)
         canvas.drawRoundRect(
-            importOptionImage.left.toFloat(),
-            importOptionImage.top.toFloat(),
-            importOptionImage.right.toFloat(),
-            importOptionImage.bottom.toFloat() + radius,
+            binder.importOptionImage.left.toFloat(),
+            binder.importOptionImage.top.toFloat(),
+            binder.importOptionImage.right.toFloat(),
+            binder.importOptionImage.bottom.toFloat() + radius,
             radius,
             radius,
             strokePaint
@@ -51,10 +52,10 @@ class ImportOptionView @JvmOverloads constructor(
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.ImportOptionView) {
         if (it.hasValue(R.styleable.ImportOptionView_android_src)) {
-            importOptionImage.setImageDrawable(it.getDrawable(R.styleable.ImportOptionView_android_src))
+            binder.importOptionImage.setImageDrawable(it.getDrawable(R.styleable.ImportOptionView_android_src))
         }
 
-        importOptionName.text = it.getString(R.styleable.ImportOptionView_title)
-        importOptionDescription.text = it.getString(R.styleable.ImportOptionView_android_text)
+        binder.importOptionName.text = it.getString(R.styleable.ImportOptionView_title)
+        binder.importOptionDescription.text = it.getString(R.styleable.ImportOptionView_android_text)
     }
 }

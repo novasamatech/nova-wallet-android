@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -14,7 +11,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendumVotersBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterItemDecoration
@@ -37,7 +33,7 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel, Fragmen
     override val binder by viewBinding(FragmentReferendumVotersBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val votersAdapter by lazy(LazyThreadSafetyMode.NONE) { VotersAdapter(this, imageLoader) }
 

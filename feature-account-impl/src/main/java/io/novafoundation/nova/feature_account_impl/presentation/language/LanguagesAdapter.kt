@@ -1,14 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.language
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageModel
+import io.novafoundation.nova.feature_account_impl.databinding.ItemLanguageBinding
 
 class LanguagesAdapter(
     private val languagesItemHandler: LanguagesItemHandler
@@ -37,7 +36,7 @@ class LanguagesAdapter(
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): LanguageViewHolder {
-        return LanguageViewHolder(LayoutInflater.from(viewGroup.context).inflate(R.layout.item_language, viewGroup, false))
+        return LanguageViewHolder(ItemLanguageBinding.inflate(viewGroup.inflater(), viewGroup, false))
     }
 
     override fun onBindViewHolder(languageViewHolder: LanguageViewHolder, position: Int) {
@@ -48,17 +47,14 @@ class LanguagesAdapter(
     }
 }
 
-class LanguageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    private val languageNameTv: TextView = itemView.findViewById(R.id.languageNameTv)
-    private val languageNativeNameTv: TextView = itemView.findViewById(R.id.languageNativeNameTv)
+class LanguageViewHolder(private val binder: ItemLanguageBinding) : RecyclerView.ViewHolder(binder.root) {
 
     fun bind(language: LanguageModel, handler: LanguagesAdapter.LanguagesItemHandler, isChecked: Boolean) {
         with(itemView) {
-            languageNameTv.text = language.displayName
-            languageNativeNameTv.text = language.nativeDisplayName
+            binder.languageNameTv.text = language.displayName
+            binder.languageNativeNameTv.text = language.nativeDisplayName
 
-            languageCheck.visibility = if (isChecked) View.VISIBLE else View.INVISIBLE
+            binder.languageCheck.visibility = if (isChecked) View.VISIBLE else View.INVISIBLE
 
             setOnClickListener { handler.checkClicked(language) }
         }

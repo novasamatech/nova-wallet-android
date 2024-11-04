@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.main
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -28,7 +24,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel, FragmentCrowdloansBin
     override val binder by viewBinding(FragmentCrowdloansBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { CrowdloanHeaderAdapter(imageLoader, this) }
 

@@ -8,15 +8,19 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewVotersBinding
 
 class VotersView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
+
+    private val binder = ViewVotersBinding.inflate(inflater(), this)
 
     init {
         View.inflate(context, R.layout.view_voters, this)
@@ -25,17 +29,17 @@ class VotersView @JvmOverloads constructor(
     }
 
     fun setVoteType(@StringRes voteTypeRes: Int, @ColorRes voteColorRes: Int) {
-        votersViewVoteType.setText(voteTypeRes)
-        votersViewVoteTypeColor.background = getRoundedCornerDrawable(voteColorRes, cornerSizeDp = 3)
+        binder.votersViewVoteType.setText(voteTypeRes)
+        binder.votersViewVoteTypeColor.background = getRoundedCornerDrawable(voteColorRes, cornerSizeDp = 3)
     }
 
     fun showLoading(loading: Boolean) {
-        votersViewVotesCountShimmer.isVisible = loading
-        votersViewVotesCount.isVisible = !loading
+        binder.votersViewVotesCountShimmer.isVisible = loading
+        binder.votersViewVotesCount.isVisible = !loading
     }
 
     fun setVotesValue(value: String?) {
-        votersViewVotesCount.setTextOrHide(value)
+        binder.votersViewVotesCount.setTextOrHide(value)
     }
 }
 

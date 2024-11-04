@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.databinding.ItemLedgerBinding
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 
 class SelectLedgerAdapter(
@@ -21,7 +21,7 @@ class SelectLedgerAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectLedgerHolder {
-        return SelectLedgerHolder(parent.inflateChild(R.layout.item_ledger), handler)
+        return SelectLedgerHolder(ItemLedgerBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: SelectLedgerHolder, position: Int) {
@@ -40,30 +40,30 @@ private class DiffCallback : DiffUtil.ItemCallback<SelectLedgerModel>() {
 }
 
 class SelectLedgerHolder(
-    containerView: View,
+    private val binder: ItemLedgerBinding,
     private val eventHandler: SelectLedgerAdapter.Handler
-) : BaseViewHolder(containerView) {
+) : BaseViewHolder(binder.root) {
     init {
-        containerView.itemLedger.background = with(containerView.context) {
+        binder.itemLedger.background = with(containerView.context) {
             addRipple(getRoundedCornerDrawable(R.color.block_background))
         }
 
-        containerView.itemLedger.setProgressTint(R.color.icon_secondary)
+        binder.itemLedger.setProgressTint(R.color.icon_secondary)
     }
 
-    fun bind(model: SelectLedgerModel) = with(containerView) {
+    fun bind(model: SelectLedgerModel) = with(binder) {
         itemLedger.title.text = model.name
 
         bindConnecting(model)
     }
 
-    fun bindConnecting(model: SelectLedgerModel) = with(containerView) {
+    fun bindConnecting(model: SelectLedgerModel) = with(binder) {
         itemLedger.setInProgress(model.isConnecting)
 
         if (model.isConnecting) {
-            setOnClickListener(null)
+            root.setOnClickListener(null)
         } else {
-            setOnClickListener { eventHandler.itemClicked(model) }
+            root.setOnClickListener { eventHandler.itemClicked(model) }
         }
     }
 

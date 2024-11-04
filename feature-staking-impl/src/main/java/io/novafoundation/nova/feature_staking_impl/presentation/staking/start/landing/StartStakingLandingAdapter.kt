@@ -1,18 +1,17 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemStartStakingLandingConditionBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
 
 class StartStakingLandingAdapter : BaseListAdapter<StakingConditionRVItem, StakingConditionViewHolder>(StakingConditionDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StakingConditionViewHolder {
-        return StakingConditionViewHolder(parent.inflateChild(R.layout.item_start_staking_landing_condition))
+        return StakingConditionViewHolder(ItemStartStakingLandingConditionBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: StakingConditionViewHolder, position: Int) {
@@ -31,17 +30,17 @@ class StakingConditionDiffCallback : DiffUtil.ItemCallback<StakingConditionRVIte
     }
 }
 
-class StakingConditionViewHolder(containerView: View) : BaseViewHolder(containerView) {
+class StakingConditionViewHolder(private val binder: ItemStartStakingLandingConditionBinding) : BaseViewHolder(binder.root) {
 
     fun bind(item: StakingConditionRVItem) {
-        with(containerView) {
+        with(binder) {
             itemStakingConditionIcon.setImageResource(item.iconId)
             itemStakingConditionText.text = item.text
         }
     }
 
     override fun unbind() {
-        with(containerView) {
+        with(binder) {
             itemStakingConditionIcon.setImageDrawable(null)
             itemStakingConditionText.text = null
         }

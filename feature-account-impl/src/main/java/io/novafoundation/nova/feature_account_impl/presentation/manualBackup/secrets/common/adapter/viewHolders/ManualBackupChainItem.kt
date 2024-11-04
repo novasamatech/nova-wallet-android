@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupChainBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 
@@ -14,10 +14,10 @@ data class ManualBackupChainRvItem(
     }
 }
 
-class ManualBackupChainViewHolder(itemView: View) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupChainViewHolder(private val binder: ItemManualBackupChainBinding) : ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupChainRvItem)
-        itemView.manualBackupSecretsChain.setChain(item.chainModel)
+        binder.manualBackupSecretsChain.setChain(item.chainModel)
     }
 }

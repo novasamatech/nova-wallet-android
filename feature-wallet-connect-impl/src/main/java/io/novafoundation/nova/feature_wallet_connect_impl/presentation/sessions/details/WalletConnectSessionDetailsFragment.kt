@@ -33,7 +33,7 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
     override val binder by viewBinding(FragmentWcSessionDetailsBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,

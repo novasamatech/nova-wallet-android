@@ -2,14 +2,14 @@ package io.novafoundation.nova.feature_account_impl.presentation.node.list.accou
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.ItemAccountByNetworkBinding
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.model.AccountByNetworkModel
 
 class AccountChooserBottomSheetDialog(
@@ -25,21 +25,19 @@ class AccountChooserBottomSheetDialog(
     }
 
     override fun holderCreator(): HolderCreator<AccountByNetworkModel> = {
-        AccountHolder(it.inflateChild(R.layout.item_account_by_network))
+        AccountHolder(ItemAccountByNetworkBinding.inflate(it.inflater(), it, false))
     }
 }
 
 class AccountHolder(
-    itemView: View
-) : DynamicListSheetAdapter.Holder<AccountByNetworkModel>(itemView) {
+    private val binder: ItemAccountByNetworkBinding
+) : DynamicListSheetAdapter.Holder<AccountByNetworkModel>(binder.root) {
 
     override fun bind(item: AccountByNetworkModel, isSelected: Boolean, handler: DynamicListSheetAdapter.Handler<AccountByNetworkModel>) {
         super.bind(item, isSelected, handler)
 
-        with(itemView) {
-            accountTitle.text = item.name.orEmpty()
-            accountIcon.setImageDrawable(item.addressModel.image)
-        }
+        binder.accountTitle.text = item.name.orEmpty()
+        binder.accountIcon.setImageDrawable(item.addressModel.image)
     }
 }
 

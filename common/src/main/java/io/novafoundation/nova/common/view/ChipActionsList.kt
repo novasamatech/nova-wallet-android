@@ -2,11 +2,9 @@ package io.novafoundation.nova.common.view
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ItemChipActionBinding
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.inflater
 
 class ChipActionsModel(

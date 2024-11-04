@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentNodeAddBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
-
 class AddNodeFragment : BaseFragment<AddNodeViewModel, FragmentNodeAddBinding>() {
 
     override val binder: FragmentNodeAddBinding by viewBinding(FragmentNodeAddBinding::bind)

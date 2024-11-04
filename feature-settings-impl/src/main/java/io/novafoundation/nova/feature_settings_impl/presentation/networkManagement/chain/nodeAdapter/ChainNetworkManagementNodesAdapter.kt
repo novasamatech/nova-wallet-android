@@ -1,19 +1,20 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter
 
 import android.annotation.SuppressLint
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setShimmerShown
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.ItemChanNetworkManagementAddNodeButtonBinding
+import io.novafoundation.nova.feature_settings_impl.databinding.ItemChanNetworkManagementNodeBinding
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkConnectionRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodeRvItem
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.nodeAdapter.items.NetworkNodesAddCustomRvItem
@@ -33,10 +34,13 @@ class ChainNetworkManagementNodesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            R.layout.item_chan_network_management_node -> ChainNetworkManagementNodeViewHolder(parent.inflateChild(viewType), itemHandler)
+            R.layout.item_chan_network_management_node -> ChainNetworkManagementNodeViewHolder(
+                ItemChanNetworkManagementNodeBinding.inflate(parent.inflater(), parent, false),
+                itemHandler
+            )
 
             R.layout.item_chan_network_management_add_node_button -> ChainNetworkManagementAddNodeButtonViewHolder(
-                parent.inflateChild(viewType),
+                ItemChanNetworkManagementAddNodeButtonBinding.inflate(parent.inflater(), parent, false),
                 itemHandler
             )
 
@@ -60,9 +64,9 @@ class ChainNetworkManagementNodesAdapter(
 }
 
 class ChainNetworkManagementAddNodeButtonViewHolder(
-    view: View,
+    private val binder: ItemChanNetworkManagementAddNodeButtonBinding,
     private val itemHandler: ChainNetworkManagementNodesAdapter.ItemHandler
-) : ViewHolder(view) {
+) : ViewHolder(binder.root) {
 
     init {
         itemView.background = itemView.context.getMaskedRipple(cornerSizeInDp = 0)
@@ -73,16 +77,16 @@ class ChainNetworkManagementAddNodeButtonViewHolder(
 }
 
 class ChainNetworkManagementNodeViewHolder(
-    view: View,
+    private val binder: ItemChanNetworkManagementNodeBinding,
     private val itemHandler: ChainNetworkManagementNodesAdapter.ItemHandler
-) : ViewHolder(view) {
+) : ViewHolder(binder.root) {
 
     init {
         itemView.background = itemView.context.getMaskedRipple(cornerSizeInDp = 0)
     }
 
     fun bind(item: NetworkNodeRvItem) {
-        with(itemView) {
+        with(binder) {
             if (item.isSelectable) {
                 itemView.setOnClickListener { itemHandler.selectNode(item) }
             } else {

@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.track.unavailable
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.updatePadding
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemUnavailableTrackBinding
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemUnavailableTracksGroupBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
 
@@ -23,21 +23,13 @@ class UnavailableTracksAdapter(
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
         return UnavailableTracksGroupHolder(
-            parent.inflateChild(
-                R.layout.item_unavailable_tracks_group,
-                false
-            ),
+            ItemUnavailableTracksGroupBinding.inflate(parent.inflater(), parent, false),
             handler
         )
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return UnavailableTrackHolder(
-            parent.inflateChild(
-                R.layout.item_unavailable_track,
-                false
-            )
-        )
+        return UnavailableTrackHolder(ItemUnavailableTrackBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: UnavailableTracksGroupModel) {
@@ -52,12 +44,12 @@ class UnavailableTracksAdapter(
 }
 
 class UnavailableTracksGroupHolder(
-    containerView: View,
+    private val binder: ItemUnavailableTracksGroupBinding,
     private val removeVotesHandler: UnavailableTracksAdapter.Handler,
-) : GroupedListHolder(containerView) {
+) : GroupedListHolder(binder.root) {
 
     fun bind(item: UnavailableTracksGroupModel) {
-        with(itemView) {
+        with(binder) {
             itemUnavailableTrackGroupTitle.setText(item.textRes)
             itemUnavailableTrackGroupTitle.updatePadding(bottom = getTitleBottomPadding(item))
             itemUnavailableTrackGroupButton.isVisible = item.showRemoveTracksButton
@@ -75,11 +67,11 @@ class UnavailableTracksGroupHolder(
 }
 
 class UnavailableTrackHolder(
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemUnavailableTrackBinding,
+) : GroupedListHolder(binder.root) {
 
     fun bind(item: TrackModel) {
-        containerView.itemUnavailableTrack.setTrackModel(item)
+        binder.itemUnavailableTrack.setTrackModel(item)
     }
 }
 

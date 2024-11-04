@@ -11,10 +11,12 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.isLoading
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ViewGoToNftsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
@@ -27,17 +29,19 @@ class GoToNftsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions {
 
+    private val binder = ViewGoToNftsBinding.inflate(inflater(), this)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
     override val providedContext: Context = context
 
     private val previewViews by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(goToNftPreview1, goToNftPreview2, goToNftPreview3)
+        listOf(binder.goToNftPreview1, binder.goToNftPreview2, binder.goToNftPreview3)
     }
 
     private val previewHolders by lazy(LazyThreadSafetyMode.NONE) {
-        listOf(goToNftPreviewHolder1, goToNftPreviewHolder2, goToNftPreviewHolder3)
+        listOf(binder.goToNftPreviewHolder1, binder.goToNftPreviewHolder2, binder.goToNftPreviewHolder3)
     }
 
     init {
@@ -52,7 +56,7 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     fun setNftCount(countLabel: String?) {
-        goToNftCounter.text = countLabel
+        binder.goToNftCounter.text = countLabel
     }
 
     fun setPreviews(previews: List<NftPreviewUi>?) {
@@ -61,9 +65,9 @@ class GoToNftsView @JvmOverloads constructor(
 
         if (shouldShowLoading) {
             previewHolders.forEach(View::makeGone)
-            goToNftsShimmer.makeVisible()
+            binder.goToNftsShimmer.makeVisible()
         } else {
-            goToNftsShimmer.makeGone()
+            binder.goToNftsShimmer.makeGone()
 
             previewHolders.forEachIndexed { index, view ->
                 val previewContent = previews!!.getOrNull(index)

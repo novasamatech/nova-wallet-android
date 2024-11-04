@@ -27,7 +27,7 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
     override val binder by viewBinding(FragmentWcSessionApproveBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater,

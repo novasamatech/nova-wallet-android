@@ -1,14 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.filters
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendaFiltersBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 

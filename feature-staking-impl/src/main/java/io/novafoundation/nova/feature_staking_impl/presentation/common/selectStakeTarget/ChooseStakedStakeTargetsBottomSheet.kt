@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -10,7 +10,7 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.addAfter
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemSelectStakedCollatorBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.SelectionStyle
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.bindSelectedCollator
 
@@ -56,9 +57,9 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
         maybeAddNewCollatorButton()
     }
 
-    override fun holderCreator(): HolderCreator<SelectStakeTargetModel<T>> = { parentViewGroup ->
+    override fun holderCreator(): HolderCreator<SelectStakeTargetModel<T>> = { parent ->
         ViewHolder(
-            containerView = parentViewGroup.inflateChild(R.layout.item_select_staked_collator),
+            binder = ItemSelectStakedCollatorBinding.inflate(parent.inflater(), parent, false),
             selectionStyle = selectionStyle
         )
     }
@@ -80,9 +81,9 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
 }
 
 private class ViewHolder<T : Identifiable>(
-    containerView: View,
+    private val binder: ItemSelectStakedCollatorBinding,
     private val selectionStyle: SelectionStyle
-) : DynamicListSheetAdapter.Holder<SelectStakeTargetModel<T>>(containerView) {
+) : DynamicListSheetAdapter.Holder<SelectStakeTargetModel<T>>(binder.root) {
 
     init {
         setInitialState()
@@ -92,7 +93,7 @@ private class ViewHolder<T : Identifiable>(
         item: SelectStakeTargetModel<T>,
         isSelected: Boolean,
         handler: DynamicListSheetAdapter.Handler<SelectStakeTargetModel<T>>
-    ) = with(containerView) {
+    ) = with(binder) {
         super.bind(item, isSelected, handler)
 
         itemSelectStakedCollatorCollator.bindSelectedCollator(item)
@@ -106,8 +107,8 @@ private class ViewHolder<T : Identifiable>(
         }
     }
 
-    private fun setInitialState() = with(containerView) {
-        itemSelectStakedCollatorCollator.background = null
+    private fun setInitialState() = with(binder) {
+        itemSelectStakedCollatorCollator.root.background = null
         itemSelectStakedCollatorCollator.itemStakingTargetSubtitleLabel.makeGone()
 
         when (selectionStyle) {
@@ -126,6 +127,7 @@ private class ViewHolder<T : Identifiable>(
 
 private class DiffCallback<T : Identifiable> : DiffUtil.ItemCallback<SelectStakeTargetModel<T>>() {
 
+    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: SelectStakeTargetModel<T>, newItem: SelectStakeTargetModel<T>): Boolean {
         return oldItem.subtitle == newItem.subtitle && oldItem.active != newItem.active
     }

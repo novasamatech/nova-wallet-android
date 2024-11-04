@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.getDrawableCompat
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemTinderGovBasketBinding
 
 class TinderGovBasketAdapter(
     private val handler: Handler
@@ -29,7 +29,7 @@ class TinderGovBasketAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TinderGovBasketViewHolder {
-        return TinderGovBasketViewHolder(handler, parent.inflateChild(R.layout.item_tinder_gov_basket))
+        return TinderGovBasketViewHolder(handler, ItemTinderGovBasketBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: TinderGovBasketViewHolder, position: Int) {
@@ -39,8 +39,8 @@ class TinderGovBasketAdapter(
 
 class TinderGovBasketViewHolder(
     private val handler: TinderGovBasketAdapter.Handler,
-    containerView: View
-) : GroupedListHolder(containerView) {
+    private val binder: ItemTinderGovBasketBinding
+) : GroupedListHolder(binder.root) {
 
     init {
         itemView.background = containerView.context.getDrawableCompat(R.drawable.bg_primary_list_item)
@@ -49,13 +49,13 @@ class TinderGovBasketViewHolder(
     fun bind(item: TinderGovBasketRvItem, editMode: Boolean) {
         itemView.setOnClickListener { handler.onItemClicked(item) }
 
-        itemView.itemTinderGovBasketDelete.setOnClickListener { handler.onItemDeleteClicked(item) }
+        binder.itemTinderGovBasketDelete.setOnClickListener { handler.onItemDeleteClicked(item) }
 
-        itemView.itemTinderGovBasketDelete.isVisible = editMode
-        itemView.itemTinderGovBasketInfo.isVisible = !editMode
-        itemView.itemTinderGovBasketId.text = item.idStr
-        itemView.itemTinderGovBasketTitle.text = item.title
-        itemView.itemTinderGovBasketSubtitle.text = item.subtitle
+        binder.itemTinderGovBasketDelete.isVisible = editMode
+        binder.itemTinderGovBasketInfo.isVisible = !editMode
+        binder.itemTinderGovBasketId.text = item.idStr
+        binder.itemTinderGovBasketTitle.text = item.title
+        binder.itemTinderGovBasketSubtitle.text = item.subtitle
     }
 }
 

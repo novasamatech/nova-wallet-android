@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -19,7 +15,8 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.l
 
 import javax.inject.Inject
 
-class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewModel, FragmentImportLedgerFillWalletBinding>(),
+class FillWalletImportLedgerFragment :
+    BaseFragment<FillWalletImportLedgerViewModel, FragmentImportLedgerFillWalletBinding>(),
     FillWalletImportLedgerAdapter.Handler {
 
     override val binder by viewBinding(FragmentImportLedgerFillWalletBinding::bind)

@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setShimmerShown
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
@@ -16,6 +17,7 @@ import io.novafoundation.nova.common.utils.unsafeLazy
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardHasStakeBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -26,43 +28,45 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
+    private val binder = ItemDashboardHasStakeBinding.inflate(inflater(), this)
+
     private val rewardsLabelGroup by unsafeLazy {
         ShimmerableGroup(
-            container = itemDashboardHasStakeRewardsLabelСontainer,
-            shimmerShape = itemDashboardHasStakeRewardsLabelShimmer,
-            content = itemDashboardHasStakeRewardsLabel
+            container = binder.itemDashboardHasStakeRewardsLabelContainer,
+            shimmerShape = binder.itemDashboardHasStakeRewardsLabelShimmer,
+            content = binder.itemDashboardHasStakeRewardsLabel
         )
     }
 
     private val rewardsAmountGroup by unsafeLazy {
         ShimmerableGroup(
-            container = itemDashboardHasStakeRewardsAmountСontainer,
-            shimmerShape = itemDashboardHasStakeRewardsAmountShimmer,
-            content = itemDashboardHasStakeRewardsAmount
+            container = binder.itemDashboardHasStakeRewardsAmountContainer,
+            shimmerShape = binder.itemDashboardHasStakeRewardsAmountShimmer,
+            content = binder.itemDashboardHasStakeRewardsAmount
         )
     }
 
     private val rewardsFiatGroup by unsafeLazy {
         ShimmerableGroup(
-            container = itemDashboardHasStakeRewardsFiatContainer,
-            shimmerShape = itemDashboardHasStakeRewardsFiatShimmer,
-            content = itemDashboardHasStakeRewardsFiat
+            container = binder.itemDashboardHasStakeRewardsFiatContainer,
+            shimmerShape = binder.itemDashboardHasStakeRewardsFiatShimmer,
+            content = binder.itemDashboardHasStakeRewardsFiat
         )
     }
 
     private val stakeStatusGroup by unsafeLazy {
         ShimmerableGroup(
-            container = itemDashboardHasStakeStatusContainer,
-            shimmerShape = itemDashboardHasStakeStatusShimmer,
-            content = itemDashboardHasStakeStatus
+            container = binder.itemDashboardHasStakeStatusContainer,
+            shimmerShape = binder.itemDashboardHasStakeStatusShimmer,
+            content = binder.itemDashboardHasStakeStatus
         )
     }
 
     private val earningsGroup by unsafeLazy {
         ShimmerableGroup(
-            container = itemDashboardHasStakeEarningsContainer,
-            shimmerShape = itemDashboardHasStakeEarningsShimmer,
-            content = itemDashboardHasStakeEarnings
+            container = binder.itemDashboardHasStakeEarningsContainer,
+            shimmerShape = binder.itemDashboardHasStakeEarningsShimmer,
+            content = binder.itemDashboardHasStakeEarnings
         )
     }
 
@@ -70,7 +74,7 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
         View.inflate(context, R.layout.item_dashboard_has_stake, this)
 
         background = context.getBlockDrawable().withRippleMask()
-        itemDashboardHasStakeRightSection.background = getRoundedCornerDrawable(cornerSizeDp = 10, fillColorRes = R.color.block_background_dark)
+        binder.itemDashboardHasStakeRightSection.background = getRoundedCornerDrawable(cornerSizeDp = 10, fillColorRes = R.color.block_background_dark)
 
         layoutParams = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             setMargins(16.dp(context), 8.dp(context), 16.dp(context), 0)
@@ -78,8 +82,8 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     }
 
     fun setChainUi(chainUi: SyncingData<ChainUi>) {
-        itemDashboardHasStakeChain.setChain(chainUi.data)
-        itemDashboardHasStakeChainContainer.setShimmerShown(chainUi.isSyncing)
+        binder.itemDashboardHasStakeChain.setChain(chainUi.data)
+        binder.itemDashboardHasStakeChainContainer.setShimmerShown(chainUi.isSyncing)
     }
 
     fun setRewards(rewardsState: ExtendedLoadingState<SyncingData<AmountModel>>) {
@@ -89,11 +93,11 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     }
 
     fun setStake(stake: SyncingData<AmountModel>) {
-        itemDashboardHasStakeStakeAmount.text = stake.data.token
-        itemDashboardHasStakeStakeAmountContainer.setShimmerShown(stake.isSyncing)
+        binder.itemDashboardHasStakeStakeAmount.text = stake.data.token
+        binder.itemDashboardHasStakeStakeAmountContainer.setShimmerShown(stake.isSyncing)
 
-        itemDashboardHasStakeStakesFiat.setTextOrHide(stake.data.fiat)
-        itemDashboardHasStakeStakesFiatContainer.setShimmerShown(stake.isSyncing)
+        binder.itemDashboardHasStakeStakesFiat.setTextOrHide(stake.data.fiat)
+        binder.itemDashboardHasStakeStakesFiatContainer.setShimmerShown(stake.isSyncing)
     }
 
     fun setStatus(status: ExtendedLoadingState<SyncingData<StakeStatusModel>>) {
@@ -103,14 +107,14 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     fun setEarnings(earningsState: ExtendedLoadingState<SyncingData<String>>) {
         earningsGroup.applyState(earningsState) { text = it }
 
-        itemDashboardHasStakeEarningsSuffix.setVisible(earningsState.isLoaded())
+        binder.itemDashboardHasStakeEarningsSuffix.setVisible(earningsState.isLoaded())
     }
 
     fun setStakingTypeBadge(model: StakingTypeModel?) {
-        itemDashboardHasStakeStakingType.setModelOrHide(model)
+        binder.itemDashboardHasStakeStakingType.setModelOrHide(model)
     }
 
     fun unbind() {
-        itemDashboardHasStakeChain.unbind()
+        binder.itemDashboardHasStakeChain.unbind()
     }
 }

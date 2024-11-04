@@ -5,8 +5,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.databinding.ViewTotalAmountBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 class TotalAmountView @JvmOverloads constructor(
@@ -14,6 +16,9 @@ class TotalAmountView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
+
+    private val binder = ViewTotalAmountBinding.inflate(inflater(), this)
+
     init {
         orientation = VERTICAL
 
@@ -27,12 +32,12 @@ class TotalAmountView @JvmOverloads constructor(
     }
 
     fun setAmount(token: String?, fiat: String?) {
-        totalAmountToken.text = token
-        totalAmountFiat.text = fiat
+        binder.totalAmountToken.text = token
+        binder.totalAmountFiat.text = fiat
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.TotalAmountView) {
         val title = it.getString(R.styleable.TotalAmountView_title)
-        totalAmountTitle.text = title
+        binder.totalAmountTitle.text = title
     }
 }

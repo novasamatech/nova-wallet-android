@@ -2,13 +2,14 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleOwner
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewUnbondingsBinding
 
 class UnbondingsView @JvmOverloads constructor(
     context: Context,
@@ -18,20 +19,20 @@ class UnbondingsView @JvmOverloads constructor(
 
     private val unbondingsAdapter = UnbondingsAdapter()
 
-    init {
-        View.inflate(context, R.layout.view_unbondings, this)
+    private val binder = ViewUnbondingsBinding.inflate(inflater(), this)
 
+    init {
         background = context.getRoundedCornerDrawable(R.color.block_background)
 
-        unbondingsList.adapter = unbondingsAdapter
+        binder.unbondingsList.adapter = unbondingsAdapter
     }
 
     fun onRedeemClicked(action: () -> Unit) {
-        unbondingRedeem.setOnClickListener { action() }
+        binder.unbondingRedeem.setOnClickListener { action() }
     }
 
     fun onCancelClicked(action: () -> Unit) {
-        unbondingCancel.setOnClickListener { action() }
+        binder.unbondingCancel.setOnClickListener { action() }
     }
 
     fun setState(state: UnbondingState) {
@@ -42,13 +43,13 @@ class UnbondingsView @JvmOverloads constructor(
 
                 unbondingsAdapter.submitList(state.unbondings)
 
-                unbondingRedeem.isEnabled = state.redeemEnabled
-                unbondingCancel.setState(state.cancelState)
+                binder.unbondingRedeem.isEnabled = state.redeemEnabled
+                binder.unbondingCancel.setState(state.cancelState)
             }
         }
     }
 
     fun prepareForProgress(lifecycleOwner: LifecycleOwner) {
-        unbondingCancel.prepareForProgress(lifecycleOwner)
+        binder.unbondingCancel.prepareForProgress(lifecycleOwner)
     }
 }

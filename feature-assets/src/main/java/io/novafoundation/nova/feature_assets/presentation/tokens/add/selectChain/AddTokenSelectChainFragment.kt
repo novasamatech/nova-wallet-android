@@ -5,14 +5,14 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentAddTokenSelectChainBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 
 import javax.inject.Inject
 
-class AddTokenSelectChainFragment : BaseFragment<AddTokenSelectChainViewModel, FragmentAddTokenSelectChainBinding>(),
+class AddTokenSelectChainFragment :
+    BaseFragment<AddTokenSelectChainViewModel, FragmentAddTokenSelectChainBinding>(),
     SelectChainAdapter.ItemHandler {
 
     override val binder by viewBinding(FragmentAddTokenSelectChainBinding::bind)

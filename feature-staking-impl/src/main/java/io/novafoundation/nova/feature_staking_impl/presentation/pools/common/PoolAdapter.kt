@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.pools.common
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -9,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemPoolBinding
 
 class PoolAdapter(
     private val imageLoader: ImageLoader,
@@ -25,9 +24,7 @@ class PoolAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PoolViewHolder {
-        val view = parent.inflateChild(R.layout.item_pool)
-
-        return PoolViewHolder(view, imageLoader, itemHandler)
+        return PoolViewHolder(ItemPoolBinding.inflate(parent.inflater(), parent, false), imageLoader, itemHandler)
     }
 
     override fun onBindViewHolder(holder: PoolViewHolder, position: Int) {
@@ -38,12 +35,12 @@ class PoolAdapter(
 }
 
 class PoolViewHolder(
-    containerView: View,
+    private val binder: ItemPoolBinding,
     private val imageLoader: ImageLoader,
     private val itemHandler: PoolAdapter.ItemHandler
-) : RecyclerView.ViewHolder(containerView) {
+) : RecyclerView.ViewHolder(binder.root) {
 
-    fun bind(poolItem: PoolRvItem) = with(itemView) {
+    fun bind(poolItem: PoolRvItem) = with(binder) {
         itemPoolTitle.text = poolItem.model.title
         itemPoolSubtitle.text = poolItem.subtitle
         itemPoolMembersCount.text = poolItem.members
@@ -56,7 +53,7 @@ class PoolViewHolder(
             itemHandler.poolInfoClicked(poolItem)
         }
 
-        setOnClickListener {
+        binder.root.setOnClickListener {
             itemHandler.poolClicked(poolItem)
         }
     }

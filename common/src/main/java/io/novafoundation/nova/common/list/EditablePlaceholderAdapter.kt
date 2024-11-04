@@ -2,11 +2,8 @@ package io.novafoundation.nova.common.list
 
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ItemPlaceholderBinding
 import io.novafoundation.nova.common.utils.ViewSpace
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.PlaceholderModel

@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader

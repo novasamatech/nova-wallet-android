@@ -7,11 +7,13 @@ import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewVotingStatusBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
@@ -25,6 +27,8 @@ class VotingStatusView @JvmOverloads constructor(
 
     override val providedContext: Context = context
 
+    private val binder = ViewVotingStatusBinding.inflate(inflater(), this)
+
     init {
         orientation = VERTICAL
 
@@ -36,52 +40,52 @@ class VotingStatusView @JvmOverloads constructor(
 
     fun setTimeEstimation(timeEstimation: ReferendumTimeEstimation?) {
         if (timeEstimation == null) {
-            votingStatusTimeEstimation.makeGone()
+            binder.votingStatusTimeEstimation.makeGone()
             return
         }
 
-        votingStatusTimeEstimation.makeVisible()
-        votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation, Gravity.END)
+        binder.votingStatusTimeEstimation.makeVisible()
+        binder.votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation, Gravity.END)
     }
 
     fun setStatus(referendumStatusModel: ReferendumStatusModel) {
-        votingStatus.text = referendumStatusModel.name
-        votingStatus.setTextColorRes(referendumStatusModel.colorRes)
+        binder.votingStatus.text = referendumStatusModel.name
+        binder.votingStatus.setTextColorRes(referendumStatusModel.colorRes)
     }
 
     fun setVotingModel(thresholdModel: ReferendumVotingModel?) {
-        votingStatusThreshold.setThresholdModel(thresholdModel)
+        binder.votingStatusThreshold.setThresholdModel(thresholdModel)
     }
 
     fun setPositiveVoters(votersModel: VotersModel?) {
-        positiveVotersDetails.setVotersModel(votersModel)
+        binder.positiveVotersDetails.setVotersModel(votersModel)
     }
 
     fun setPositiveVotersClickListener(listener: OnClickListener?) {
-        positiveVotersDetails.setOnClickListener(listener)
+        binder.positiveVotersDetails.setOnClickListener(listener)
     }
 
     fun setNegativeVoters(votersModel: VotersModel?) {
-        negativeVotersDetails.setVotersModel(votersModel)
+        binder.negativeVotersDetails.setVotersModel(votersModel)
     }
 
     fun setNegativeVotersClickListener(listener: OnClickListener?) {
-        negativeVotersDetails.setOnClickListener(listener)
+        binder.negativeVotersDetails.setOnClickListener(listener)
     }
 
     fun setAbstainVoters(votersModel: VotersModel?) {
-        abstainVotersDetails.setVotersModel(votersModel)
+        binder.abstainVotersDetails.setVotersModel(votersModel)
     }
 
     fun setAbstainVotersClickListener(listener: OnClickListener?) {
-        abstainVotersDetails.setOnClickListener(listener)
+        binder.abstainVotersDetails.setOnClickListener(listener)
     }
 
     fun setStartVoteOnClickListener(listener: OnClickListener?) {
-        votingStatusStartVote.setOnClickListener(listener)
+        binder.votingStatusStartVote.setOnClickListener(listener)
     }
 
     fun setVoteButtonState(state: DescriptiveButtonState) {
-        votingStatusStartVote.setState(state)
+        binder.votingStatusStartVote.setState(state)
     }
 }

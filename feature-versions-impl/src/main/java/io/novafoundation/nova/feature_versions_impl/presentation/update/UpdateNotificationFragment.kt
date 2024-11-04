@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_versions_impl.presentation.update
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
@@ -13,7 +9,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
-import io.novafoundation.nova.feature_versions_impl.R
 import io.novafoundation.nova.feature_versions_impl.databinding.FragmentUpdateNotificationsBinding
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
 import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsAdapter

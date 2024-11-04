@@ -2,16 +2,17 @@ package io.novafoundation.nova.feature_ledger_impl.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageResource
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.databinding.ViewLedgerActionBinding
 
 class LedgerActionView @JvmOverloads constructor(
     context: Context,
@@ -19,9 +20,9 @@ class LedgerActionView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.view_ledger_action, this)
+    private val binder = ViewLedgerActionBinding.inflate(inflater(), this)
 
+    init {
         attrs?.let(::applyAttributes)
     }
 
@@ -33,8 +34,8 @@ class LedgerActionView @JvmOverloads constructor(
     }
 
     fun setIcon(@DrawableRes drawableResId: Int?, @ColorRes tint: Int? = null) {
-        viewLedgerGraphicsIcon.setImageResource(drawableResId)
-        viewLedgerGraphicsIcon.setImageTintRes(tint)
+        binder.viewLedgerGraphicsIcon.setImageResource(drawableResId)
+        binder.viewLedgerGraphicsIcon.setImageTintRes(tint)
     }
 
     fun setLedgerImage(@DrawableRes imageRes: Int) {

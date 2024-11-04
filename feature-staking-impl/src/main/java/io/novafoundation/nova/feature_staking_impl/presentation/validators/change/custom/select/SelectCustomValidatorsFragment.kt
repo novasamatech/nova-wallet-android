@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.chrisbanes.insetter.applyInsetter
@@ -20,7 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.Stake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 
-class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewModel, FragmentSelectCustomValidatorsBinding>(),
+class SelectCustomValidatorsFragment :
+    BaseFragment<SelectCustomValidatorsViewModel, FragmentSelectCustomValidatorsBinding>(),
     StakeTargetAdapter.ItemHandler<Validator> {
 
     companion object {

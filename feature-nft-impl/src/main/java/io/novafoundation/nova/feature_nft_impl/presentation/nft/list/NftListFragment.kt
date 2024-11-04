@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -11,7 +7,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
-import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.databinding.FragmentNftListBinding
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureComponent
 

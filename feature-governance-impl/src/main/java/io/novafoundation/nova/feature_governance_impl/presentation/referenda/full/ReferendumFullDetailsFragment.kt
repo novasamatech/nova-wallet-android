@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.full
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -42,7 +39,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
     override val binder by viewBinding(FragmentReferendumFullDetailsBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override fun initViews() {
         binder.referendumFullDetailsToolbar.setHomeButtonListener {

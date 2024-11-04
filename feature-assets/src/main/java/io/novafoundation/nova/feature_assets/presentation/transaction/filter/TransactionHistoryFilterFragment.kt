@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.filter
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -12,7 +9,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.bindFromMap
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentTransactionsFilterBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent

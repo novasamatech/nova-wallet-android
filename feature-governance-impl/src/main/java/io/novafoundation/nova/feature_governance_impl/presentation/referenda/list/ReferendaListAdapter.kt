@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
@@ -9,13 +8,15 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemReferendaGroupBinding
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemReferendumBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
@@ -31,11 +32,11 @@ class ReferendaListAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ReferendaGroupHolder(parent.inflateChild(R.layout.item_referenda_group))
+        return ReferendaGroupHolder(ItemReferendaGroupBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ReferendumChildHolder(handler, parent.inflateChild(R.layout.item_referendum))
+        return ReferendumChildHolder(handler, ItemReferendumBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: ReferendaGroupModel) {
@@ -104,27 +105,27 @@ private object ReferendaDiffCallback : BaseGroupedDiffCallback<ReferendaGroupMod
     }
 }
 
-private class ReferendaGroupHolder(containerView: View) : GroupedListHolder(containerView) {
+private class ReferendaGroupHolder(private val binder: ItemReferendaGroupBinding) : GroupedListHolder(binder.root) {
 
-    fun bind(item: ReferendaGroupModel) = with(containerView) {
-        itemView.itemReferendaGroupStatus.text = item.name
-        itemView.itemReferendaGroupCounter.text = item.badge
+    fun bind(item: ReferendaGroupModel) = with(binder) {
+        itemReferendaGroupStatus.text = item.name
+        itemReferendaGroupCounter.text = item.badge
     }
 }
 
 private class ReferendumChildHolder(
     private val eventHandler: ReferendaListAdapter.Handler,
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemReferendumBinding,
+) : GroupedListHolder(binder.root) {
 
     init {
         with(containerView.context) {
             containerView.background = addRipple(getBlockDrawable())
-            containerView.itemReferendumTrack.background = addRipple(
+            binder.itemReferendumTrack.background = addRipple(
                 getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8),
                 mask = getRippleMask(cornerSizeDp = 12)
             )
-            containerView.itemReferendumNumber.background = addRipple(
+            binder.itemReferendumNumber.background = addRipple(
                 getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8),
                 mask = getRippleMask(cornerSizeDp = 12)
             )
@@ -143,37 +144,37 @@ private class ReferendumChildHolder(
         itemView.setOnClickListener { eventHandler.onReferendaClick(item) }
     }
 
-    fun bindName(item: ReferendumModel) = with(containerView) {
+    fun bindName(item: ReferendumModel) = with(binder) {
         itemReferendumName.text = item.name
     }
 
-    fun bindStatus(item: ReferendumModel) = with(containerView) {
+    fun bindStatus(item: ReferendumModel) = with(binder) {
         itemReferendumStatus.text = item.status.name
         itemReferendumStatus.setTextColorRes(item.status.colorRes)
     }
 
-    fun bindTimeEstimation(item: ReferendumModel) = with(containerView) {
+    fun bindTimeEstimation(item: ReferendumModel) = with(binder) {
         itemReferendumTimeEstimate.setReferendumTimeEstimation(item.timeEstimation, Gravity.END)
     }
 
-    fun bindNumber(item: ReferendumModel) = with(containerView) {
+    fun bindNumber(item: ReferendumModel) = with(binder) {
         itemReferendumNumber.setText(item.number)
     }
 
-    fun bindTrack(item: ReferendumModel) = with(containerView) {
+    fun bindTrack(item: ReferendumModel) = with(binder) {
         itemReferendumTrack.setReferendumTrackModel(item.track)
     }
 
-    fun bindYourVote(item: ReferendumModel) = with(containerView) {
+    fun bindYourVote(item: ReferendumModel) = with(binder) {
         itemReferendumYourVote.setModel(item.yourVote)
         itermReferendumDivider.isGone = item.yourVote?.votes.isNullOrEmpty()
     }
 
-    fun bindVoting(child: ReferendumModel) = with(containerView) {
+    fun bindVoting(child: ReferendumModel) = with(binder) {
         itemReferendumThreshold.setThresholdModel(child.voting)
     }
 
     override fun unbind() {
-        containerView.itemReferendumTrack.clearIcon()
+        binder.itemReferendumTrack.clearIcon()
     }
 }

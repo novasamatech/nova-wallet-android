@@ -7,14 +7,18 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.feature_assets.databinding.ViewAssetActionsBinding
 
 class AssetActionsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
 ) : LinearLayout(context, attrs, defStyle) {
+
+    private val binder = ViewAssetActionsBinding.inflate(inflater(), this)
 
     init {
         orientation = HORIZONTAL
@@ -27,14 +31,14 @@ class AssetActionsView @JvmOverloads constructor(
     }
 
     val send: TextView
-        get() = assetActionsSend
+        get() = binder.assetActionsSend
 
     val receive: TextView
-        get() = assetActionsReceive
+        get() = binder.assetActionsReceive
 
     val swap: TextView
-        get() = assetActionsSwap
+        get() = binder.assetActionsSwap
 
     val buy: TextView
-        get() = assetActionsBuy
+        get() = binder.assetActionsBuy
 }

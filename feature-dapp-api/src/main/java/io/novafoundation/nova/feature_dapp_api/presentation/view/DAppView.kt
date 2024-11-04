@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_dapp_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes

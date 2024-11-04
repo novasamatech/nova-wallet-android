@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import android.content.Context
 import android.os.Bundle
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_staking_impl.R
@@ -11,7 +12,7 @@ class CollatorManageActionsBottomSheet(
     context: Context,
     private val itemSelected: (ManageCollatorsAction) -> Unit,
     onCancel: (() -> Unit)? = null,
-) : FixedListBottomSheet(context, onCancel) {
+) : FixedListBottomSheet<BottomSheeetFixedListBinding>(context, viewConfiguration = ViewConfiguration.default(context), onCancel) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

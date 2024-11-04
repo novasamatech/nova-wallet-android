@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -29,7 +26,7 @@ private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewModel, FragmentMoonbeamTermsBinding>() {
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     companion object {
 

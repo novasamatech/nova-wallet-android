@@ -3,16 +3,12 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
-import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentNetworkManagementBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 

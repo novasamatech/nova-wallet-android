@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment

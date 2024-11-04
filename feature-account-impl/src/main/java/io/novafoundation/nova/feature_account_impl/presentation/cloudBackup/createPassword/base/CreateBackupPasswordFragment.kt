@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.cre
 
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -11,14 +12,14 @@ import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentCreateCloudBackupPasswordBinding
 
-abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> : BaseFragment<T, FragmentCreateCloudBackupPassword>() {
+abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> : BaseFragment<T, FragmentCreateCloudBackupPasswordBinding>() {
 
-    override val binder by viewBinding(FragmentCreateCloudBackupPassword::bind)
+    override val binder by viewBinding(FragmentCreateCloudBackupPasswordBinding::bind)
 
     abstract val titleRes: Int
     abstract val subtitleRes: Int
-
 
     override fun initViews() {
         binder.createCloudBackupPasswordToolbar.applyStatusBarInsets()

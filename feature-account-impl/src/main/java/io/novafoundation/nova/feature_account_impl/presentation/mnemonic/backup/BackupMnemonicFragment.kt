@@ -2,9 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
 import android.os.Bundle
 import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.condition.setupConditions
@@ -15,6 +13,7 @@ import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentBackupMnemonicBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
 class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel, FragmentBackupMnemonicBinding>() {
@@ -42,9 +41,15 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel, FragmentBac
     }
 
     private fun buildConditions() {
-        binder.backupMnemonicCondition1.setText(buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight))
-        binder.backupMnemonicCondition2.setText(buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight))
-        binder.backupMnemonicCondition3.setText(buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight))
+        binder.backupMnemonicCondition1.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight)
+        )
+        binder.backupMnemonicCondition2.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight)
+        )
+        binder.backupMnemonicCondition3.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight)
+        )
 
         viewModel.conditionMixin.setupConditions(
             binder.backupMnemonicCondition1,

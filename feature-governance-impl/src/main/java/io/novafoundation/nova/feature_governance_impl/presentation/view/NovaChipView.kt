@@ -21,12 +21,14 @@ import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewChipBinding
 
 import kotlin.math.roundToInt
 
@@ -82,6 +84,8 @@ class NovaChipView @JvmOverloads constructor(
         )
     }
 
+    private val binder = ViewChipBinding.inflate(inflater(), this)
+
     private var size: Size = SIZE_DEFAULT
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
@@ -131,9 +135,9 @@ class NovaChipView @JvmOverloads constructor(
             R.styleable.NovaChipView_android_textColor,
             R.color.chip_text
         )
-        chipText.setTextColorRes(textColorRes)
+        binder.chipText.setTextColorRes(textColorRes)
 
-        chipText.ellipsize = typedArray.getEllipsize()
+        binder.chipText.ellipsize = typedArray.getEllipsize()
 
         typedArray.recycle()
     }
@@ -148,13 +152,13 @@ class NovaChipView @JvmOverloads constructor(
     fun setSize(size: Size, customTextAppearance: Int? = null) {
         this.size = size
 
-        val startPadding = if (chipIcon.isVisible) {
+        val startPadding = if (binder.chipIcon.isVisible) {
             size.iconHorizontalMargin.dp
         } else {
             size.textHorizontalMargin.dp
         }
 
-        val endPadding = if (chipText.isVisible) {
+        val endPadding = if (binder.chipText.isVisible) {
             size.textHorizontalMargin.dp
         } else {
             size.iconHorizontalMargin.dp
@@ -162,25 +166,25 @@ class NovaChipView @JvmOverloads constructor(
 
         updatePadding(start = startPadding, end = endPadding)
 
-        chipIcon.updateLayoutParams<MarginLayoutParams> {
+        binder.chipIcon.updateLayoutParams<MarginLayoutParams> {
             val vertical = size.iconVerticalMargin.dp
             setMargins(0, vertical, 0, vertical)
         }
 
-        chipText.updateLayoutParams<MarginLayoutParams> {
+        binder.chipText.updateLayoutParams<MarginLayoutParams> {
             val top = size.textTopMargin.dp
             val bottom = size.textBottomMargin.dp
 
             setMargins(0, top, 0, bottom)
         }
 
-        chipText.setTextAppearance(customTextAppearance ?: size.textAppearanceRes)
+        binder.chipText.setTextAppearance(customTextAppearance ?: size.textAppearanceRes)
 
-        chipDrawablePadding.layoutParams = LayoutParams(size.drawablePadding.dp, LayoutParams.MATCH_PARENT)
+        binder.chipDrawablePadding.layoutParams = LayoutParams(size.drawablePadding.dp, LayoutParams.MATCH_PARENT)
     }
 
     fun setIconSize(value: Float) {
-        chipIcon.updateLayoutParams<LayoutParams> {
+        binder.chipIcon.updateLayoutParams<LayoutParams> {
             val intValue = value.roundToInt()
             this.height = intValue
             this.width = intValue
@@ -188,58 +192,58 @@ class NovaChipView @JvmOverloads constructor(
     }
 
     fun setIconTint(tintRes: Int?) {
-        chipIcon.setImageTintRes(tintRes)
+        binder.chipIcon.setImageTintRes(tintRes)
     }
 
     fun setIcon(icon: Icon?) {
         if (icon == null) {
             setIconDrawable(drawable = null)
         } else {
-            chipIcon.setIcon(icon, imageLoader)
+            binder.chipIcon.setIcon(icon, imageLoader)
         }
         useIcon(icon != null)
         invalidateDrawablePadding()
     }
 
     fun setIconDrawable(drawable: Drawable?) {
-        chipIcon.setImageDrawable(drawable)
+        binder.chipIcon.setImageDrawable(drawable)
         useIcon(drawable != null)
         invalidateDrawablePadding()
     }
 
     fun setIcon(@DrawableRes drawableRes: Int) {
-        chipIcon.setImageResource(drawableRes)
+        binder.chipIcon.setImageResource(drawableRes)
         useIcon(true)
         invalidateDrawablePadding()
     }
 
     fun setStyle(@ColorRes backgroundColorRes: Int, @ColorRes textColorRes: Int, @ColorRes iconColorRes: Int) {
         setChipBackground(backgroundColorRes)
-        chipText.setTextColorRes(textColorRes)
+        binder.chipText.setTextColorRes(textColorRes)
         setIconTint(textColorRes)
     }
 
     fun setText(text: String?) {
-        chipText.setTextOrHide(text)
+        binder.chipText.setTextOrHide(text)
         invalidateDrawablePadding()
     }
 
     fun setTextAllCaps(value: Boolean) {
-        chipText.isAllCaps = value
+        binder.chipText.isAllCaps = value
     }
 
     private fun useIcon(useIcon: Boolean) {
-        chipIcon.isVisible = useIcon
+        binder.chipIcon.isVisible = useIcon
 
         refreshSize()
     }
 
     fun clearIcon() {
-        chipIcon.clear()
+        binder.chipIcon.clear()
     }
 
     private fun invalidateDrawablePadding() {
-        chipDrawablePadding.isVisible = chipIcon.isVisible && chipText.isVisible
+        binder.chipDrawablePadding.isVisible = binder.chipIcon.isVisible && binder.chipText.isVisible
     }
 
     private fun setChipBackground(backgroundTintColor: Int) {

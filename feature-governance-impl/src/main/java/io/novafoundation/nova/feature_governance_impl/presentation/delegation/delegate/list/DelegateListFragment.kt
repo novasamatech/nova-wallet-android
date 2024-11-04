@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -31,7 +27,7 @@ class DelegateListFragment :
     override val binder by viewBinding(FragmentDelegateListBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val bannerAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateBannerAdapter(this) }
     private val sortAndFilterAdapter by lazy(LazyThreadSafetyMode.NONE) { DelegateSortAndFilterAdapter(this) }

@@ -1,19 +1,18 @@
 package io.novafoundation.nova.feature_account_impl.presentation.pincode
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationOrDenyDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentPincodeBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
-class PincodeFragment : BaseFragment<PinCodeViewModel, FragmentPinCodeBinding>() {
+class PincodeFragment : BaseFragment<PinCodeViewModel, FragmentPincodeBinding>() {
 
     companion object {
         const val KEY_PINCODE_ACTION = "pincode_action"
@@ -25,7 +24,7 @@ class PincodeFragment : BaseFragment<PinCodeViewModel, FragmentPinCodeBinding>()
         }
     }
 
-    override val binder by viewBinding(FragmentPinCodeBinding::bind)
+    override val binder by viewBinding(FragmentPincodeBinding::bind)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

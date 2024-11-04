@@ -2,16 +2,16 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewYourPoolBinding
 
 class YourPoolView @JvmOverloads constructor(
     context: Context,
@@ -23,9 +23,9 @@ class YourPoolView @JvmOverloads constructor(
         FeatureUtils.getCommonApi(context).imageLoader()
     }
 
-    init {
-        View.inflate(context, R.layout.view_your_pool, this)
+    private val binder = ViewYourPoolBinding.inflate(inflater(), this)
 
+    init {
         with(context) {
             background = addRipple(getBlockDrawable())
         }
@@ -39,16 +39,16 @@ class YourPoolView @JvmOverloads constructor(
     }
 
     private fun showLoaded(yourPoolState: YourPoolComponentState) {
-        yourPoolContentGroup.makeVisible()
-        yourPoolLoadingGroup.makeGone()
+        binder.yourPoolContentGroup.makeVisible()
+        binder.yourPoolLoadingGroup.makeGone()
 
-        yourPoolIcon.setIcon(yourPoolState.display.icon, imageLoader)
-        yourPoolName.text = yourPoolState.display.title
-        yourPoolTitle.text = yourPoolState.title
+        binder.yourPoolIcon.setIcon(yourPoolState.display.icon, imageLoader)
+        binder.yourPoolName.text = yourPoolState.display.title
+        binder.yourPoolTitle.text = yourPoolState.title
     }
 
     private fun showLoading() {
-        yourPoolContentGroup.makeGone()
-        yourPoolLoadingGroup.makeVisible()
+        binder.yourPoolContentGroup.makeGone()
+        binder.yourPoolLoadingGroup.makeVisible()
     }
 }

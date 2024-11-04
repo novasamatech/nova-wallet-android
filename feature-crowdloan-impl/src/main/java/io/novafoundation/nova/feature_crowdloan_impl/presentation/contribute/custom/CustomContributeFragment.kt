@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.chrisbanes.insetter.applyInsetter
@@ -26,7 +23,7 @@ private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 class CustomContributeFragment : BaseFragment<CustomContributeViewModel, FragmentCustomContributeBinding>() {
 
     @Inject
-    protected lateinit var contributionManager: CustomContributeManager
+    lateinit var contributionManager: CustomContributeManager
 
     companion object {
 

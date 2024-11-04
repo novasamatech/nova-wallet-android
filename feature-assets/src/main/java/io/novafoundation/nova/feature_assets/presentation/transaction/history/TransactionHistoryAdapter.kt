@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history
 
-import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import coil.clear
@@ -11,14 +10,14 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.formatting.formatDaysSinceEpoch
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ItemDayHeaderBinding
 import io.novafoundation.nova.feature_assets.presentation.model.OperationModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationStatusAppearance
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.model.DayHeader
@@ -34,7 +33,7 @@ class TransactionHistoryAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return DayHolder(parent.inflateChild(R.layout.item_day_header))
+        return DayHolder(ItemDayHeaderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -123,10 +122,10 @@ class TransactionHolder(
     }
 }
 
-class DayHolder(view: View) : GroupedListHolder(view) {
+class DayHolder(private val binder: ItemDayHeaderBinding) : GroupedListHolder(binder.root) {
     fun bind(item: DayHeader) {
-        with(containerView) {
-            itemDayHeader.text = item.daysSinceEpoch.formatDaysSinceEpoch(context)
+        with(binder) {
+            itemDayHeader.text = item.daysSinceEpoch.formatDaysSinceEpoch(binder.root.context)
         }
     }
 }

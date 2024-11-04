@@ -27,7 +27,8 @@ class AcalaConfirmContributeCustomization(
     ) {
         require(state is AcalaConfirmContributeViewState)
 
-        val container = into.confirmContributeInjectionParent
+        val confirmContributeInjectionParent = into.findViewById<ViewGroup>(R.id.confirmContributeInjectionParent)
+        val confirmContributeAmountBottomMargin = into.findViewById<ViewGroup>(R.id.confirmContributeAmountBottomMargin)
 
         val contributionCell = TableCellView(into.context).apply {
             layoutParams = injectionLayoutParams(context, topMarginDp = 0)
@@ -39,8 +40,8 @@ class AcalaConfirmContributeCustomization(
             contributionCell.showValue(it)
         }
 
-        container.addAfter(
-            anchor = container.confirmContributeAmountBottomMargin,
+        confirmContributeInjectionParent.addAfter(
+            anchor = confirmContributeAmountBottomMargin,
             newViews = listOf(contributionCell)
         )
     }

@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -17,7 +13,6 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.moveCursorToTheEnd
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
-import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentAddToFavouritesBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon

@@ -4,12 +4,13 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemStakingManageActionBinding
 
 class ManageStakingActionView @kotlin.jvm.JvmOverloads constructor(
     context: Context,
@@ -17,8 +18,9 @@ class ManageStakingActionView @kotlin.jvm.JvmOverloads constructor(
     defStyle: Int = 0
 ) : LinearLayout(context, attrs, defStyle) {
 
+    private val binder = ItemStakingManageActionBinding.inflate(inflater(), this)
+
     init {
-        View.inflate(context, R.layout.item_staking_manage_action, this)
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
 
@@ -28,19 +30,19 @@ class ManageStakingActionView @kotlin.jvm.JvmOverloads constructor(
     }
 
     fun setLabel(label: String) {
-        itemManageStakingActionText.text = label
+        binder.itemManageStakingActionText.text = label
     }
 
     fun setIcon(icon: Drawable) {
-        itemManageStakingActionImage.setImageDrawable(icon)
+        binder.itemManageStakingActionImage.setImageDrawable(icon)
     }
 
     fun setIconRes(@DrawableRes iconRes: Int) {
-        itemManageStakingActionImage.setImageResource(iconRes)
+        binder.itemManageStakingActionImage.setImageResource(iconRes)
     }
 
     fun setBadge(content: String?) {
-        itemManageStakingActionBadge.setTextOrHide(content)
+        binder.itemManageStakingActionBadge.setTextOrHide(content)
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.ManageStakingActionView) {

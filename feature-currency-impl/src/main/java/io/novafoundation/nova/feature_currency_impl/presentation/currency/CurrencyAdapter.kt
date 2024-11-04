@@ -5,10 +5,8 @@ import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.headers.TextHeader
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_currency_api.presentation.model.CurrencyModel
-import io.novafoundation.nova.feature_currency_impl.R
 import io.novafoundation.nova.feature_currency_impl.databinding.ItemCurrencyBinding
 import io.novafoundation.nova.feature_currency_impl.databinding.ItemCurrencyTypeBinding
 

@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.view.input.chooser
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewListChooserBinding

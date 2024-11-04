@@ -11,12 +11,14 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.getRippleMask
 import io.novafoundation.nova.common.utils.getRoundedCornerDrawable
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.withRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.shape.ovalDrawable
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.ViewCloudBackupStateBinding
 
 class CloudBackupStateView @JvmOverloads constructor(
     context: Context,
@@ -24,30 +26,30 @@ class CloudBackupStateView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
+    private val binder = ViewCloudBackupStateBinding.inflate(inflater(), this, true)
+
     private val stateImage: ImageView
-        get() = backupStateImg
+        get() = binder.backupStateImg
 
     private val progress: ProgressBar
-        get() = backupStateProgress
+        get() = binder.backupStateProgress
 
     private val title: TextView
-        get() = backupStateTitle
+        get() = binder.backupStateTitle
 
     private val subtitle: TextView
-        get() = backupStateSubtitle
+        get() = binder.backupStateSubtitle
 
     private val more: View
-        get() = backupStateMore
+        get() = binder.backupStateMore
 
     private val divider: View
-        get() = backupStateDivider
+        get() = binder.backupStateDivider
 
     private val problemButton: TextView
-        get() = backupStateProblemBtn
+        get() = binder.backupStateProblemBtn
 
     init {
-        View.inflate(context, R.layout.view_cloud_backup_state, this)
-
         background = getRoundedCornerDrawable(fillColorRes = R.color.block_background).withRippleMask()
         problemButton.background = context.getRoundedCornerDrawable(fillColorRes = null).withRippleMask(getRippleMask(cornerSizeDp = 8))
     }

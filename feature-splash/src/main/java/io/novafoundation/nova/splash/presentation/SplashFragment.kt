@@ -1,13 +1,8 @@
 package io.novafoundation.nova.splash.presentation
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.splash.R
 import io.novafoundation.nova.splash.databinding.FragmentSplashBinding
 import io.novafoundation.nova.splash.di.SplashFeatureApi
 import io.novafoundation.nova.splash.di.SplashFeatureComponent

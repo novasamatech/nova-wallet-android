@@ -1,17 +1,17 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.ItemBackupAccountBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemBackupAccountHeaderBinding
 
 class ManualBackupAccountsAdapter(
     private val imageLoader: ImageLoader,
@@ -23,11 +23,11 @@ class ManualBackupAccountsAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ManualBackupGroupViewHolder(parent.inflateChild(R.layout.item_backup_account_header))
+        return ManualBackupGroupViewHolder(ItemBackupAccountHeaderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ManualBackupAccountViewHolder(parent.inflateChild(R.layout.item_backup_account), imageLoader, accountHandler)
+        return ManualBackupAccountViewHolder(ItemBackupAccountBinding.inflate(parent.inflater(), parent, false), imageLoader, accountHandler)
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: ManualBackupAccountGroupRvItem) {
@@ -39,22 +39,22 @@ class ManualBackupAccountsAdapter(
     }
 }
 
-class ManualBackupGroupViewHolder(view: View) : GroupedListHolder(view) {
+class ManualBackupGroupViewHolder(private val binder: ItemBackupAccountHeaderBinding) : GroupedListHolder(binder.root) {
 
     fun bind(item: ManualBackupAccountGroupRvItem) {
-        itemView.itemManualBackupGroupTitle.text = item.text
+        binder.itemManualBackupGroupTitle.text = item.text
     }
 }
 
 class ManualBackupAccountViewHolder(
-    view: View,
+    private val binder: ItemBackupAccountBinding,
     private val imageLoader: ImageLoader,
     private val accountHandler: ManualBackupAccountsAdapter.AccountHandler
-) : GroupedListHolder(view) {
+) : GroupedListHolder(binder.root) {
 
     fun bind(item: ManualBackupAccountRvItem) {
-        with(itemView) {
-            itemManualBackupAccountContainer.background = context.addRipple(context.getBlockDrawable())
+        with(binder) {
+            itemManualBackupAccountContainer.background = binder.root.context.addRipple(binder.root.context.getBlockDrawable())
             itemManualBackupAccountIcon.setIcon(item.icon, imageLoader)
             itemManualBackupAccountTitle.text = item.title
             itemManualBackupAccountSubtitle.setTextOrHide(item.subtitle)

@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -13,7 +10,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
-import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentCustomNodeBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import javax.inject.Inject

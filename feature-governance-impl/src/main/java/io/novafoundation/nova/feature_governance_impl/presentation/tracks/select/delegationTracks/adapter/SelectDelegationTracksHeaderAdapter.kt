@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegationTracksHeaderBinding
 
 class SelectTracksHeaderAdapter(
     private val handler: Handler
@@ -21,9 +20,7 @@ class SelectTracksHeaderAdapter(
     private var showDescription: Boolean = true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationTracksHeaderViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegation_tracks_header)
-
-        return DelegationTracksHeaderViewHolder(containerView, handler)
+        return DelegationTracksHeaderViewHolder(ItemDelegationTracksHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun getItemCount(): Int {
@@ -51,17 +48,17 @@ class SelectTracksHeaderAdapter(
 }
 
 class DelegationTracksHeaderViewHolder(
-    containerView: View,
+    private val binder: ItemDelegationTracksHeaderBinding,
     handler: SelectTracksHeaderAdapter.Handler
-) : ViewHolder(containerView) {
+) : ViewHolder(binder.root) {
 
     init {
-        with(containerView) {
+        with(binder) {
             itemDelegationTracksUnavailableTracksText.setOnClickListener { handler.unavailableTracksClicked() }
         }
     }
 
-    fun bind(showUnavailableTracks: Boolean, title: String?, showDescription: Boolean) = with(itemView) {
+    fun bind(showUnavailableTracks: Boolean, title: String?, showDescription: Boolean) = with(binder) {
         itemDelegationTracksUnavailableTracks.setVisible(showUnavailableTracks)
         selectDelegationTracksTitle.text = title
         itemDelegationTracksDescriptionGroup.setVisible(showDescription)

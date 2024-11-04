@@ -1,15 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentConfirmMnemonicBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.mnemonic.BackupMnemonicAdapter
 
@@ -29,10 +27,6 @@ class ConfirmMnemonicFragment : BaseFragment<ConfirmMnemonicViewModel, FragmentC
 
     private val sourceAdapter by lazy(LazyThreadSafetyMode.NONE) {
         BackupMnemonicAdapter(itemHandler = viewModel::sourceWordClicked)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_confirm_mnemonic, container, false)
     }
 
     override fun initViews() {

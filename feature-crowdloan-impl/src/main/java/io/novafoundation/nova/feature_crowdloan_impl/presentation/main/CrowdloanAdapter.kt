@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.main
 
-import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import coil.clear
@@ -11,13 +10,15 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.ItemCrowdloanBinding
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.ItemCrowdloanGroupBinding
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.model.CrowdloanStatusModel
 
@@ -32,11 +33,11 @@ class CrowdloanAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return CrowdloanGroupHolder(parent.inflateChild(R.layout.item_crowdloan_group))
+        return CrowdloanGroupHolder(ItemCrowdloanGroupBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return CrowdloanChildHolder(imageLoader, parent.inflateChild(R.layout.item_crowdloan))
+        return CrowdloanChildHolder(imageLoader, ItemCrowdloanBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: CrowdloanStatusModel) {
@@ -90,9 +91,9 @@ private object CrowdloanPayloadGenerator : PayloadGenerator<CrowdloanModel>(
     CrowdloanModel::raised
 )
 
-private class CrowdloanGroupHolder(containerView: View) : GroupedListHolder(containerView) {
+private class CrowdloanGroupHolder(private val binder: ItemCrowdloanGroupBinding) : GroupedListHolder(binder.root) {
 
-    fun bind(item: CrowdloanStatusModel) = with(containerView) {
+    fun bind(item: CrowdloanStatusModel) = with(binder) {
         itemCrowdloanGroupStatus.text = item.status
         itemCrowdloanGroupCounter.text = item.count
     }
@@ -100,8 +101,8 @@ private class CrowdloanGroupHolder(containerView: View) : GroupedListHolder(cont
 
 private class CrowdloanChildHolder(
     private val imageLoader: ImageLoader,
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemCrowdloanBinding,
+) : GroupedListHolder(binder.root) {
 
     init {
         with(containerView.context) {
@@ -112,7 +113,7 @@ private class CrowdloanChildHolder(
     fun bind(
         item: CrowdloanModel,
         handler: CrowdloanAdapter.Handler,
-    ) = with(containerView) {
+    ) = with(binder) {
         itemCrowdloanParaDescription.text = item.description
         itemCrowdloanParaName.text = item.title
 
@@ -123,7 +124,7 @@ private class CrowdloanChildHolder(
         bindState(item, handler)
     }
 
-    fun bindState(item: CrowdloanModel, handler: CrowdloanAdapter.Handler) = with(containerView) {
+    fun bindState(item: CrowdloanModel, handler: CrowdloanAdapter.Handler) = with(binder) {
         if (item.state is CrowdloanModel.State.Active) {
             itemCrowdloanTimeRemaining.makeVisible()
             itemCrowdloanTimeRemaining.text = item.state.timeRemaining
@@ -133,7 +134,7 @@ private class CrowdloanChildHolder(
 
             itemCrowdloanArrow.makeVisible()
 
-            setOnClickListener { handler.crowdloanClicked(item.parachainId) }
+            root.setOnClickListener { handler.crowdloanClicked(item.parachainId) }
 
             itemCrowdloanParaRaisedProgress.isEnabled = true
         } else {
@@ -145,17 +146,17 @@ private class CrowdloanChildHolder(
 
             itemCrowdloanParaRaisedProgress.isEnabled = false
 
-            setOnClickListener(null)
+            root.setOnClickListener(null)
         }
     }
 
     override fun unbind() {
-        with(containerView) {
+        with(binder) {
             itemCrowdloanIcon.clear()
         }
     }
 
-    fun bindRaised(item: CrowdloanModel) = with(containerView) {
+    fun bindRaised(item: CrowdloanModel) = with(binder) {
         itemCrowdloanParaRaised.text = item.raised.value
         itemCrowdloanParaRaisedProgress.progress = item.raised.percentage
         itemCrowdloanParaRaisedPercentage.text = item.raised.percentageDisplay

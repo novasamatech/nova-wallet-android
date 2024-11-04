@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -10,7 +7,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.databinding.FragmentChainAccountPreviewBinding
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi

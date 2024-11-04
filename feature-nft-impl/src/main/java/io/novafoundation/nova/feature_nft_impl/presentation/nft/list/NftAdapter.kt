@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
@@ -12,7 +11,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.dpF
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -20,6 +19,7 @@ import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_nft_impl.R
+import io.novafoundation.nova.feature_nft_impl.databinding.ItemNftBinding
 import kotlinx.android.extensions.LayoutContainer
 
 class NftAdapter(
@@ -35,7 +35,7 @@ class NftAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NftHolder {
-        return NftHolder(parent.inflateChild(R.layout.item_nft), imageLoader, handler)
+        return NftHolder(ItemNftBinding.inflate(parent.inflater(), parent, false), imageLoader, handler)
     }
 
     override fun onBindViewHolder(holder: NftHolder, position: Int) {
@@ -59,24 +59,26 @@ private object DiffCallback : DiffUtil.ItemCallback<NftListItem>() {
 }
 
 class NftHolder(
-    override val containerView: View,
+    private val binder: ItemNftBinding,
     private val imageLoader: ImageLoader,
     private val itemHandler: NftAdapter.Handler
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : RecyclerView.ViewHolder(binder.root), LayoutContainer {
+
+    override val containerView = binder.root
 
     init {
         with(containerView) {
-            itemNftContent.background = with(context) {
+            binder.itemNftContent.background = with(context) {
                 addRipple(getRoundedCornerDrawable(R.color.block_background, cornerSizeInDp = 12), mask = getRippleMask(cornerSizeDp = 12))
             }
         }
     }
 
-    fun unbind() = with(containerView) {
-        itemNftMedia.clear()
+    fun unbind() {
+        binder.itemNftMedia.clear()
     }
 
-    fun bind(item: NftListItem) = with(containerView) {
+    fun bind(item: NftListItem) = with(binder) {
         when (val content = item.content) {
             is LoadingState.Loading -> {
                 itemNftShimmer.makeVisible()
@@ -91,7 +93,7 @@ class NftHolder(
                 itemNftContent.makeVisible()
 
                 itemNftMedia.load(content.data.media, imageLoader) {
-                    transformations(RoundedCornersTransformation(8.dpF(context)))
+                    transformations(RoundedCornersTransformation(8.dpF(containerView.context)))
                     placeholder(R.drawable.nft_media_progress)
                     error(R.drawable.nft_media_error)
                     fallback(R.drawable.nft_media_error)
@@ -114,19 +116,19 @@ class NftHolder(
             }
         }
 
-        setOnClickListener { itemHandler.itemClicked(item) }
+        containerView.setOnClickListener { itemHandler.itemClicked(item) }
     }
 
-    private fun View.setPrice(content: LoadingState.Loaded<NftListItem.Content>) {
+    private fun setPrice(content: LoadingState.Loaded<NftListItem.Content>) {
         val price = content.data.price
 
-        itemNftPriceToken.setVisible(price != null)
-        itemNftPriceFiat.setVisible(price != null)
-        itemNftPricePlaceholder.setVisible(price == null)
+        binder.itemNftPriceToken.setVisible(price != null)
+        binder.itemNftPriceFiat.setVisible(price != null)
+        binder.itemNftPricePlaceholder.setVisible(price == null)
 
         if (price != null) {
-            itemNftPriceToken.text = price.amountInfo
-            itemNftPriceFiat.text = price.fiat
+            binder.itemNftPriceToken.text = price.amountInfo
+            binder.itemNftPriceFiat.text = price.fiat
         }
     }
 }

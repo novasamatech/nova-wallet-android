@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.management
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,13 +11,14 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentAccountsBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import javax.inject.Inject
 
-class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel, FragmentAccoutBinding>(), AccountHolder.AccountItemHandler {
+class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel, FragmentAccountsBinding>(), AccountHolder.AccountItemHandler {
 
-    override val binder by viewBinding(FragmentAccoutBinding::bind)
+    override val binder by viewBinding(FragmentAccountsBinding::bind)
 
     @Inject
     lateinit var imageLoader: ImageLoader

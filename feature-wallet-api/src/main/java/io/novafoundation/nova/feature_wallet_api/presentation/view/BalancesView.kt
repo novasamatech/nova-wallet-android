@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.showLoadingState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.databinding.ViewBalancesBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 abstract class BalancesView @JvmOverloads constructor(
@@ -23,8 +24,9 @@ abstract class BalancesView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
+    private val binder = ViewBalancesBinding.inflate(inflater(), this)
+
     init {
-        View.inflate(context, R.layout.view_balances, this)
         orientation = VERTICAL
 
         val commonPadding = 16.dp(context)
@@ -45,7 +47,7 @@ abstract class BalancesView @JvmOverloads constructor(
 
     private fun applyAttributes(attributes: AttributeSet) = context.useAttributes(attributes, R.styleable.BalancesView) {
         val title = it.getString(R.styleable.BalancesView_title)
-        viewBalancesTitle.text = title
+        binder.viewBalancesTitle.text = title
     }
 
     protected fun item(@StringRes titleRes: Int): TableCellView {

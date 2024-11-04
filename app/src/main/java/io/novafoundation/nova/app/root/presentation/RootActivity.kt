@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.NavigationHolder
@@ -21,7 +23,7 @@ import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 
 import javax.inject.Inject
 
-class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
+class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var navigationHolder: NavigationHolder
@@ -31,6 +33,8 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var contextManager: ContextManager
+
+    override val binder by viewBinding(ActivityRootBinding::bind)
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -58,7 +62,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         navigationHolder.attach(navController)
         contextManager.attachActivity(this)
 
-        rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
+        binder.rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
             view.updatePadding(top = insets.systemWindowInsetTop)
 
             insets
@@ -75,10 +79,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
         contextManager.detachActivity()
         navigationHolder.detach()
-    }
-
-    override fun layoutResource(): Int {
-        return R.layout.activity_root
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -106,7 +106,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         observeActionBottomSheet(viewModel)
 
         viewModel.showConnectingBarLiveData.observe(this) { show ->
-            rootNetworkBar.setVisible(show)
+            binder.rootNetworkBar.setVisible(show)
         }
 
         viewModel.messageLiveData.observe(

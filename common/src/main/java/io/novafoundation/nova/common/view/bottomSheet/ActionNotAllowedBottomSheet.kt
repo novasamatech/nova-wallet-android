@@ -33,7 +33,6 @@ open class ActionNotAllowedBottomSheet(
     val buttonView: PrimaryButton
         get() = binder.actionNotAllowedOk
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

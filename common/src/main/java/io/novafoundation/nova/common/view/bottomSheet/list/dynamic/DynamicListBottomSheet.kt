@@ -9,7 +9,6 @@ import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.BottomSheetDynamicListBinding
 import io.novafoundation.nova.common.utils.DialogExtensions

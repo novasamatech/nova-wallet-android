@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
@@ -24,7 +21,8 @@ import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartStak
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
-class StartStakingLandingFragment : BaseFragment<StartStakingLandingViewModel, FragmentStartStakingLandingBinding>(),
+class StartStakingLandingFragment :
+    BaseFragment<StartStakingLandingViewModel, FragmentStartStakingLandingBinding>(),
     StartStakingLandingFooterAdapter.ClickHandler {
 
     companion object {

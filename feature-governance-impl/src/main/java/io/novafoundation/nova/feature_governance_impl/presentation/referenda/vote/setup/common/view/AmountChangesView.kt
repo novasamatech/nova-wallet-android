@@ -8,6 +8,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -15,6 +16,7 @@ import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewAmountChangesBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.AmountChangeModel
 
 class AmountChangesView @JvmOverloads constructor(
@@ -24,6 +26,8 @@ class AmountChangesView @JvmOverloads constructor(
     defStyleRes: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle, defStyleRes),
     WithContextExtensions by WithContextExtensions(context) {
+
+    private val binder = ViewAmountChangesBinding.inflate(inflater(), this)
 
     init {
         View.inflate(context, R.layout.view_amount_changes, this)
@@ -35,34 +39,34 @@ class AmountChangesView @JvmOverloads constructor(
 
     fun setFrom(value: String?) {
         if (value != null) {
-            valueChangesFrom.text = value
-            valueChangesFromGroup.makeVisible()
+            binder.valueChangesFrom.text = value
+            binder.valueChangesFromGroup.makeVisible()
         } else {
-            valueChangesFromGroup.makeGone()
+            binder.valueChangesFromGroup.makeGone()
         }
     }
 
     fun setTo(value: String) {
-        valueChangesTo.text = value
+        binder.valueChangesTo.text = value
     }
 
     fun setDifference(@DrawableRes icon: Int, text: String, @ColorRes textColor: Int) {
-        valueChangesDifference.makeVisible()
+        binder.valueChangesDifference.makeVisible()
 
-        valueChangesDifference.setDrawableStart(icon, widthInDp = 16, tint = textColor)
-        valueChangesDifference.text = text
-        valueChangesDifference.setTextColorRes(textColor)
+        binder.valueChangesDifference.setDrawableStart(icon, widthInDp = 16, tint = textColor)
+        binder.valueChangesDifference.text = text
+        binder.valueChangesDifference.setTextColorRes(textColor)
     }
 
     fun hideDifference() {
-        valueChangesDifference.makeGone()
+        binder.valueChangesDifference.makeGone()
     }
 
     fun setTitle(title: String) {
-        valueChangesTitle.text = title
+        binder.valueChangesTitle.text = title
     }
 
-    fun setIcon(icon: Drawable?) = valueChangesIcon.letOrHide(icon, valueChangesIcon::setImageDrawable)
+    fun setIcon(icon: Drawable?) = binder.valueChangesIcon.letOrHide(icon, binder.valueChangesIcon::setImageDrawable)
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AmountChangesView) { typedArray ->
         val title = typedArray.getString(R.styleable.AmountChangesView_amountChanges_title)

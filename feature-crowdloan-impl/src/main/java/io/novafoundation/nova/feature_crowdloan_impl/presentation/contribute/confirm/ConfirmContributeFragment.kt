@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -16,7 +13,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
-import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.databinding.FragmentContributeConfirmBinding
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
@@ -29,7 +25,7 @@ private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, FragmentContributeConfirmBinding>() {
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     companion object {
 

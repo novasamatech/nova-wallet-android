@@ -2,9 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.advance
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -19,7 +16,6 @@ import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.common.view.LabeledTextView
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentAdvancedEncryptionBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.EncryptionTypeChooserBottomSheetDialog

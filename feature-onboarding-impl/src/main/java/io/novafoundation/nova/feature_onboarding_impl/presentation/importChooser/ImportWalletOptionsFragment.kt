@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,7 +9,6 @@ import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
-import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_onboarding_impl.databinding.FragmentImportWalletOptionsBinding
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureComponent
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.SelectHardwareWalletBottomSheet

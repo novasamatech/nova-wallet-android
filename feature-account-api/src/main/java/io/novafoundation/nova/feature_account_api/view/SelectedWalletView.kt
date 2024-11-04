@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_api.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.inflater

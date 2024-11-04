@@ -6,13 +6,14 @@ import android.view.View
 import androidx.recyclerview.widget.DiffUtil
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.databinding.ItemAssetSelectorBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
 
 class AssetSelectorBottomSheet(
@@ -34,14 +35,14 @@ class AssetSelectorBottomSheet(
     }
 
     override fun holderCreator(): HolderCreator<AssetSelectorModel> = { parent ->
-        AssetSelectorHolder(parent.inflateChild(R.layout.item_asset_selector), imageLoader)
+        AssetSelectorHolder(ItemAssetSelectorBinding.inflate(parent.inflater(), parent, false), imageLoader)
     }
 }
 
 private class AssetSelectorHolder(
-    parent: View,
+    private val binder: ItemAssetSelectorBinding,
     private val imageLoader: ImageLoader,
-) : DynamicListSheetAdapter.Holder<AssetSelectorModel>(parent) {
+) : DynamicListSheetAdapter.Holder<AssetSelectorModel>(binder.root) {
 
     override fun bind(
         item: AssetSelectorModel,
@@ -51,10 +52,10 @@ private class AssetSelectorHolder(
         super.bind(item, isSelected, handler)
 
         with(itemView) {
-            itemAssetSelectorBalance.text = item.assetModel.assetBalance
-            itemAssetSelectorTokenName.text = item.title
-            itemAssetSelectorIcon.load(item.assetModel.imageUrl, imageLoader)
-            itemAssetSelectorCheckmark.setVisible(isSelected, falseState = View.INVISIBLE)
+            binder.itemAssetSelectorBalance.text = item.assetModel.assetBalance
+            binder.itemAssetSelectorTokenName.text = item.title
+            binder.itemAssetSelectorIcon.load(item.assetModel.imageUrl, imageLoader)
+            binder.itemAssetSelectorCheckmark.setVisible(isSelected, falseState = View.INVISIBLE)
         }
     }
 }

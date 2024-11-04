@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_api.view
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.inflater

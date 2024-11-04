@@ -1,16 +1,14 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappCategoryBinding
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
-import kotlinx.android.extensions.LayoutContainer
 
 class DappCategoriesAdapter(
     private val handler: Handler,
@@ -22,7 +20,7 @@ class DappCategoriesAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappCategoryViewHolder {
-        return DappCategoryViewHolder(parent.inflateChild(R.layout.item_dapp_category), handler)
+        return DappCategoryViewHolder(ItemDappCategoryBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: DappCategoryViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -58,19 +56,19 @@ private object DappDiffCallback : DiffUtil.ItemCallback<DAppCategoryModel>() {
 }
 
 class DappCategoryViewHolder(
-    override val containerView: View,
+    private val binder: ItemDappCategoryBinding,
     private val itemHandler: DappCategoriesAdapter.Handler,
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : RecyclerView.ViewHolder(binder.root) {
 
-    fun bind(item: DAppCategoryModel) = with(containerView) {
+    fun bind(item: DAppCategoryModel) = with(binder) {
         itemDappCategory.text = item.name
 
         bindSelected(item.selected)
 
-        containerView.setOnClickListener { itemHandler.onCategoryClicked(item.id) }
+        binder.root.setOnClickListener { itemHandler.onCategoryClicked(item.id) }
     }
 
-    fun bindSelected(isSelected: Boolean) = with(containerView) {
+    fun bindSelected(isSelected: Boolean) = with(binder) {
         itemDappCategory.isSelected = isSelected
     }
 }

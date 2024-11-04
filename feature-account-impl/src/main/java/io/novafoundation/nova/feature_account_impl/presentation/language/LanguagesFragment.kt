@@ -1,15 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.language
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageModel
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentLanguagesBinding
 
 class LanguagesFragment : BaseFragment<LanguagesViewModel, FragmentLanguagesBinding>(), LanguagesAdapter.LanguagesItemHandler {
 
@@ -44,7 +42,7 @@ class LanguagesFragment : BaseFragment<LanguagesViewModel, FragmentLanguagesBind
         viewModel.selectedLanguageLiveData.observe(adapter::updateSelectedLanguage)
 
         viewModel.languageChangedEvent.observeEvent {
-            (activity as BaseActivity<*>).changeLanguage()
+            (activity as BaseActivity<*, *>).changeLanguage()
         }
     }
 

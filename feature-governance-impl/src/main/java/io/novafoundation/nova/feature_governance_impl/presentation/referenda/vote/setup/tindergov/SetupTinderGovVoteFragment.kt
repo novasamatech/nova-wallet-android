@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
-import io.novafoundation.nova.feature_governance_impl.databinding.LayoutSetupVoteControlAyeNayAbstainBinding
 import io.novafoundation.nova.feature_governance_impl.databinding.LayoutSetupVoteControlContinueBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVoteFragment

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupJsonBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupItemHandler
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
@@ -20,10 +20,11 @@ class ManualBackupJsonRvItem : ManualBackupSecretsRvItem {
     }
 }
 
-class ManualBackupJsonViewHolder(itemView: View, private val itemHandler: ManualBackupItemHandler) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupJsonViewHolder(private val binder: ItemManualBackupJsonBinding, private val itemHandler: ManualBackupItemHandler) :
+    ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupJsonRvItem)
-        itemView.manualBackupSecretsJsonButton.setOnClickListener { itemHandler.onExportJsonClick(item) }
+        binder.manualBackupSecretsJsonButton.setOnClickListener { itemHandler.onExportJsonClick(item) }
     }
 }

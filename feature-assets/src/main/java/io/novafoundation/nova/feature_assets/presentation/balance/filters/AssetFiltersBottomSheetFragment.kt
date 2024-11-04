@@ -1,12 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.filters
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.bindFromMap
 import io.novafoundation.nova.feature_assets.databinding.FragmentAssetFiltersBinding

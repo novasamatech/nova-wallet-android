@@ -29,7 +29,7 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
     override val binder by viewBinding(FragmentWcSessionsBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val sessionsAdapter = WalletConnectSessionsAdapter(handler = this)
 

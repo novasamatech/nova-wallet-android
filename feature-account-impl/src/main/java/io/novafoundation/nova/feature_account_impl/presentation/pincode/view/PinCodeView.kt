@@ -7,8 +7,10 @@ import android.view.View.OnClickListener
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.PincodeViewBinding
 
 class PinCodeView @JvmOverloads constructor(
     context: Context,
@@ -35,31 +37,31 @@ class PinCodeView @JvmOverloads constructor(
 
     private var progressView: DotsProgressView? = null
 
-    init {
-        View.inflate(context, R.layout.pincode_view, this)
+    private val binder = PincodeViewBinding.inflate(inflater(), this)
 
+    init {
         orientation = VERTICAL
 
-        btn1.setOnClickListener(pinCodeNumberClickListener)
-        btn2.setOnClickListener(pinCodeNumberClickListener)
-        btn3.setOnClickListener(pinCodeNumberClickListener)
-        btn4.setOnClickListener(pinCodeNumberClickListener)
-        btn5.setOnClickListener(pinCodeNumberClickListener)
-        btn6.setOnClickListener(pinCodeNumberClickListener)
-        btn7.setOnClickListener(pinCodeNumberClickListener)
-        btn8.setOnClickListener(pinCodeNumberClickListener)
-        btn9.setOnClickListener(pinCodeNumberClickListener)
-        btn0.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn1.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn2.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn3.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn4.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn5.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn6.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn7.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn8.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn9.setOnClickListener(pinCodeNumberClickListener)
+        binder.btn0.setOnClickListener(pinCodeNumberClickListener)
 
-        btnDelete.setOnClickListener(pinCodeDeleteClickListener)
+        binder.btnDelete.setOnClickListener(pinCodeDeleteClickListener)
 
-        biometricBtn.setOnClickListener(pinCodeFingerprintClickListener)
+        binder.biometricBtn.setOnClickListener(pinCodeFingerprintClickListener)
 
         updateProgress()
     }
 
     fun changeBimometricButtonVisibility(isVisible: Boolean) {
-        biometricBtn.setVisible(isVisible, falseState = View.INVISIBLE)
+        binder.biometricBtn.setVisible(isVisible, falseState = View.INVISIBLE)
     }
 
     fun resetInput() {
@@ -102,7 +104,7 @@ class PinCodeView @JvmOverloads constructor(
         val currentProgress = inputCode.length
         progressView?.setProgress(currentProgress)
 
-        btnDelete.isEnabled = currentProgress != 0
+        binder.btnDelete.isEnabled = currentProgress != 0
     }
 
     private fun shakeDotsAnimation() {

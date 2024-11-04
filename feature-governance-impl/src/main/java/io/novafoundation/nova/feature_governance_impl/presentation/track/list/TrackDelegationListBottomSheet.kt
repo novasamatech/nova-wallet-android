@@ -2,13 +2,13 @@ package io.novafoundation.nova.feature_governance_impl.presentation.track.list
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ReferentialEqualityDiffCallBack
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemTrackDelegationBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackDelegationModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
 
@@ -24,19 +24,19 @@ class TrackDelegationListBottomSheet(
     }
 
     override fun holderCreator(): HolderCreator<TrackDelegationModel> = {
-        TrackDelegationHolder(it.inflateChild(R.layout.item_track_delegation))
+        TrackDelegationHolder(ItemTrackDelegationBinding.inflate(it.inflater(), it, false))
     }
 }
 
 class TrackDelegationHolder(
-    itemView: View
-) : DynamicListSheetAdapter.Holder<TrackDelegationModel>(itemView) {
+    private val binder: ItemTrackDelegationBinding
+) : DynamicListSheetAdapter.Holder<TrackDelegationModel>(binder.root) {
 
     override fun bind(
         item: TrackDelegationModel,
         isSelected: Boolean,
         handler: DynamicListSheetAdapter.Handler<TrackDelegationModel>
-    ) = with(itemView) {
+    ) = with(binder) {
         itemTrackDelegationTrack.setTrackModel(item.track)
         itemTrackDelegationVotesCount.text = item.delegation.votesCount
         itemTrackDelegationVotesCountDetails.text = item.delegation.votesCountDetails

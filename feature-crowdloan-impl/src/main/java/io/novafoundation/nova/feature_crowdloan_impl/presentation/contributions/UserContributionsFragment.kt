@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
@@ -13,7 +9,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
-import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.databinding.FragmentMyContributionsBinding
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 
@@ -24,7 +19,7 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel, Fragm
     override val binder by viewBinding(FragmentMyContributionsBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val headerAdapter = TotalContributionsHeaderAdapter()
 

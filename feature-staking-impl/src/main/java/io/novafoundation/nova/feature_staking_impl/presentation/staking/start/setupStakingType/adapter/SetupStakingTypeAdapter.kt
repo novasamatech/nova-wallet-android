@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -8,9 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.doIfPositionValid
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.extensions.LayoutContainer
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemEditableStakingTypeBinding
 
 class SetupStakingTypeAdapter(
     private val handler: ItemAssetHandler
@@ -24,7 +22,7 @@ class SetupStakingTypeAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStakingTypeViewHolder {
-        return EditableStakingTypeViewHolder(handler, parent.inflateChild(R.layout.item_editable_staking_type))
+        return EditableStakingTypeViewHolder(handler, ItemEditableStakingTypeBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: EditableStakingTypeViewHolder, position: Int) {
@@ -63,10 +61,10 @@ private class SetupStakingTypeDiffUtil : DiffUtil.ItemCallback<EditableStakingTy
 
 class EditableStakingTypeViewHolder(
     private val clickHandler: SetupStakingTypeAdapter.ItemAssetHandler,
-    override val containerView: View
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    private val binder: ItemEditableStakingTypeBinding
+) : RecyclerView.ViewHolder(binder.root) {
 
-    fun bind(item: EditableStakingTypeRVItem) = with(containerView) {
+    fun bind(item: EditableStakingTypeRVItem) = with(binder) {
         setTitle(item)
         setConditions(item)
         select(item)
@@ -84,27 +82,27 @@ class EditableStakingTypeViewHolder(
     }
 
     fun setTitle(item: EditableStakingTypeRVItem) {
-        containerView.editableStakingType.setTitle(item.title)
+        binder.editableStakingType.setTitle(item.title)
     }
 
     fun setConditions(item: EditableStakingTypeRVItem) {
-        containerView.editableStakingType.setConditions(item.conditions)
+        binder.editableStakingType.setConditions(item.conditions)
     }
 
     fun select(item: EditableStakingTypeRVItem) {
-        containerView.editableStakingType.select(item.isSelected)
+        binder.editableStakingType.select(item.isSelected)
     }
 
     fun setSelectable(item: EditableStakingTypeRVItem) {
-        containerView.editableStakingType.setSelectable(item.isSelectable)
+        binder.editableStakingType.setSelectable(item.isSelectable)
     }
 
     fun setStakingTarget(item: EditableStakingTypeRVItem) {
-        containerView.editableStakingType.setStakingTarget(item.stakingTarget)
+        binder.editableStakingType.setStakingTarget(item.stakingTarget)
     }
 
     fun setImage(item: EditableStakingTypeRVItem) {
-        containerView.editableStakingType.setBackgroundRes(item.imageRes)
+        binder.editableStakingType.setBackgroundRes(item.imageRes)
     }
 }
 

@@ -1,10 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
 import android.graphics.Rect
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -34,7 +30,7 @@ class MainDAppFragment :
     override val binder by viewBinding(FragmentDappMainBinding::bind)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this) }
 
@@ -75,10 +71,12 @@ class MainDAppFragment :
                     dappsShimmering.show(false)
                     dappListAdapter.submitList(state.data)
                 }
+
                 is LoadingState.Loading -> {
                     dappsShimmering.show(true)
                     dappListAdapter.submitList(listOf())
                 }
+
                 else -> {}
             }
         }

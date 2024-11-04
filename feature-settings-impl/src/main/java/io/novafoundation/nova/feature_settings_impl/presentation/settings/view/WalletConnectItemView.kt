@@ -8,11 +8,13 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getDrawableCompat
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.themed
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.ViewWalletConnectItemBinding
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 
 class WalletConnectItemView @JvmOverloads constructor(
@@ -21,15 +23,15 @@ class WalletConnectItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    init {
-        View.inflate(context, R.layout.view_wallet_connect_item, this)
+    private val binder = ViewWalletConnectItemBinding.inflate(inflater(), this)
 
+    init {
         orientation = HORIZONTAL
         background = context.getDrawableCompat(R.drawable.bg_primary_list_item)
     }
 
     fun setValue(value: WalletConnectSessionsModel) {
-        walletConnectItemValue.setModel(value)
+        binder.walletConnectItemValue.setModel(value)
     }
 }
 

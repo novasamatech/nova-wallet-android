@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.preConfiguredNetworks
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ConcatAdapter
@@ -18,7 +14,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
-import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentPreConfiguredNetworkListBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.common.adapter.NetworkManagementListAdapter

@@ -8,14 +8,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.ItemBackupMnemonicWordBinding
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.MnemonicWord
 import kotlinx.android.extensions.LayoutContainer
-
-import kotlinx.android.synthetic.main.item_backup_mnemonic_word.view.itemConfirmMnemonicWord
 
 class BackupMnemonicAdapter(
     private val itemHandler: ItemHandler
@@ -27,7 +25,10 @@ class BackupMnemonicAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConfirmMnemonicAdapterHolder {
-        return ConfirmMnemonicAdapterHolder(parent.inflateChild(R.layout.item_backup_mnemonic_word), itemHandler)
+        return ConfirmMnemonicAdapterHolder(
+            ItemBackupMnemonicWordBinding.inflate(parent.inflater(), parent, false),
+            itemHandler
+        )
     }
 
     override fun onBindViewHolder(holder: ConfirmMnemonicAdapterHolder, position: Int) {
@@ -46,12 +47,14 @@ class BackupMnemonicAdapter(
     }
 
     class ConfirmMnemonicAdapterHolder(
-        override val containerView: View,
+        private val binder: ItemBackupMnemonicWordBinding,
         private val itemHandler: ItemHandler,
-    ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    ) : RecyclerView.ViewHolder(binder.root), LayoutContainer {
+
+        override val containerView: View = binder.root
 
         fun bind(item: MnemonicWord) = with(containerView) {
-            itemConfirmMnemonicWord.text = item.content
+            binder.itemConfirmMnemonicWord.text = item.content
 
             bindIndex(item)
             bindState(item)
@@ -62,7 +65,7 @@ class BackupMnemonicAdapter(
 
             setVisible(hasWord, falseState = View.INVISIBLE)
 
-            itemConfirmMnemonicWord.setVisible(hasWord, falseState = View.INVISIBLE)
+            binder.itemConfirmMnemonicWord.setVisible(hasWord, falseState = View.INVISIBLE)
 
             if (item.removed) {
                 setOnClickListener(null)
@@ -72,8 +75,8 @@ class BackupMnemonicAdapter(
         }
 
         fun bindIndex(item: MnemonicWord) {
-            containerView.itemConfirmMnemonicIndex.setTextOrHide(item.indexDisplay)
-            containerView.itemConfirmMnemonicWord.gravity = if (item.indexDisplay == null) Gravity.CENTER else Gravity.START
+            binder.itemConfirmMnemonicIndex.setTextOrHide(item.indexDisplay)
+            binder.itemConfirmMnemonicWord.gravity = if (item.indexDisplay == null) Gravity.CENTER else Gravity.START
         }
     }
 

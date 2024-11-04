@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import io.novafoundation.nova.common.utils.indexOfFirstOrNull
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.databinding.BottomSheetFeeSelectionBinding
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

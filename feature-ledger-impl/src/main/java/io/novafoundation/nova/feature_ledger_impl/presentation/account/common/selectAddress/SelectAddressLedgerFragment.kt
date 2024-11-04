@@ -28,7 +28,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     }
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override val binder: FragmentImportLedgerSelectAddressBinding by viewBinding(FragmentImportLedgerSelectAddressBinding::bind)
 

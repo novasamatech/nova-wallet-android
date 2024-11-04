@@ -5,8 +5,9 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_account_impl.databinding.ItemNodeBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemNodeGroupBinding
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeHeaderModel
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
 
@@ -37,11 +38,11 @@ class NodesAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return NodeGroupHolder(parent.inflateChild(R.layout.item_node_group))
+        return NodeGroupHolder(ItemNodeGroupBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return NodeHolder(parent.inflateChild(R.layout.item_node))
+        return NodeHolder(ItemNodeBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: NodeHeaderModel) {
@@ -53,13 +54,13 @@ class NodesAdapter(
     }
 }
 
-class NodeGroupHolder(view: View) : GroupedListHolder(view) {
-    fun bind(nodeHeaderModel: NodeHeaderModel) = with(containerView) {
-        nodeGroupTitle.text = nodeHeaderModel.title
+class NodeGroupHolder(private val binder: ItemNodeGroupBinding) : GroupedListHolder(binder.root) {
+    fun bind(nodeHeaderModel: NodeHeaderModel) {
+        binder.nodeGroupTitle.text = nodeHeaderModel.title
     }
 }
 
-class NodeHolder(view: View) : GroupedListHolder(view) {
+class NodeHolder(private val binder: ItemNodeBinding) : GroupedListHolder(binder.root) {
 
     fun bind(
         nodeModel: NodeModel,
@@ -67,30 +68,30 @@ class NodeHolder(view: View) : GroupedListHolder(view) {
         editMode: Boolean
     ) {
         with(containerView) {
-            nodeTitle.text = nodeModel.name
-            nodeHost.text = nodeModel.link
+            binder.nodeTitle.text = nodeModel.name
+            binder.nodeHost.text = nodeModel.link
 
             val isChecked = nodeModel.isActive
 
-            nodeCheck.visibility = if (isChecked) View.VISIBLE else View.INVISIBLE
+            binder.nodeCheck.visibility = if (isChecked) View.VISIBLE else View.INVISIBLE
 
             if (!isChecked && !nodeModel.isDefault && editMode) {
-                nodeDelete.visibility = View.VISIBLE
-                nodeDelete.setOnClickListener { handler.deleteClicked(nodeModel) }
-                nodeInfo.visibility = View.INVISIBLE
-                nodeInfo.setOnClickListener(null)
+                binder.nodeDelete.visibility = View.VISIBLE
+                binder.nodeDelete.setOnClickListener { handler.deleteClicked(nodeModel) }
+                binder.nodeInfo.visibility = View.INVISIBLE
+                binder.nodeInfo.setOnClickListener(null)
                 isEnabled = false
                 setOnClickListener(null)
             } else {
-                nodeDelete.visibility = View.GONE
-                nodeDelete.setOnClickListener(null)
-                nodeInfo.visibility = View.VISIBLE
-                nodeInfo.setOnClickListener { handler.infoClicked(nodeModel) }
+                binder.nodeDelete.visibility = View.GONE
+                binder.nodeDelete.setOnClickListener(null)
+                binder.nodeInfo.visibility = View.VISIBLE
+                binder.nodeInfo.setOnClickListener { handler.infoClicked(nodeModel) }
                 isEnabled = true
                 setOnClickListener { handler.checkClicked(nodeModel) }
             }
 
-            nodeIcon.setImageResource(nodeModel.networkModelType.icon)
+            binder.nodeIcon.setImageResource(nodeModel.networkModelType.icon)
         }
     }
 }

@@ -1,22 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.recommended
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
-import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentRecommendedValidatorsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 
-class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewModel, FragmentRecommendedValidatorsBinding>(),
+class RecommendedValidatorsFragment :
+    BaseFragment<RecommendedValidatorsViewModel, FragmentRecommendedValidatorsBinding>(),
     StakeTargetAdapter.ItemHandler<Validator> {
 
     override val binder by viewBinding(FragmentRecommendedValidatorsBinding::bind)

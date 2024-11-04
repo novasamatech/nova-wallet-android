@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_api.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.address.AddressModel

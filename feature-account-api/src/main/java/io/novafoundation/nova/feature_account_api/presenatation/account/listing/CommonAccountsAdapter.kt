@@ -7,9 +7,7 @@ import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.databinding.ItemAccountBinding
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi

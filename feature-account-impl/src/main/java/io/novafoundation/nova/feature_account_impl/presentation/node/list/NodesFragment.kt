@@ -1,14 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.node.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentNodesBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.AccountChooserBottomSheetDialog
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel

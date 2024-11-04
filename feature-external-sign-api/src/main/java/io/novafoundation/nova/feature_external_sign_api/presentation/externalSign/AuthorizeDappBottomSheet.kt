@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
-import io.novafoundation.nova.feature_external_sign_api.R
 import io.novafoundation.nova.feature_external_sign_api.databinding.BottomSheetConfirmAuthorizeBinding
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 

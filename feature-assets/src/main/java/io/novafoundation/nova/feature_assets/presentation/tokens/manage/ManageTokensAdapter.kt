@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import coil.ImageLoader
@@ -9,11 +8,12 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ItemManageTokenMultichainBinding
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenModel
 
 private val subtitleExtractor = { model: MultiChainTokenModel -> model.header.networks }
@@ -32,7 +32,7 @@ class ManageTokensAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageTokensViewHolder {
         return ManageTokensViewHolder(
-            containerView = parent.inflateChild(R.layout.item_manage_token_multichain),
+            binder = ItemManageTokenMultichainBinding.inflate(parent.inflater(), parent, false),
             itemHandler = handler,
             imageLoader = imageLoader
         )
@@ -54,14 +54,14 @@ class ManageTokensAdapter(
 }
 
 class ManageTokensViewHolder(
-    containerView: View,
+    private val binder: ItemManageTokenMultichainBinding,
     private val itemHandler: ManageTokensAdapter.ItemHandler,
     private val imageLoader: ImageLoader,
-) : BaseViewHolder(containerView) {
+) : BaseViewHolder(binder.root) {
 
     init {
-        with(containerView) {
-            setOnClickListener {
+        with(binder) {
+            binder.root.setOnClickListener {
                 itemHandler.editClocked(bindingAdapterPosition)
             }
             itemManageTokenMultichainEnabled.setOnClickListener {
@@ -70,7 +70,7 @@ class ManageTokensViewHolder(
         }
     }
 
-    fun bind(item: MultiChainTokenModel) = with(containerView) {
+    fun bind(item: MultiChainTokenModel) = with(binder) {
         bindNetworks(item)
 
         bindEnabled(item)
@@ -80,10 +80,10 @@ class ManageTokensViewHolder(
     }
 
     fun bindNetworks(item: MultiChainTokenModel) {
-        containerView.itemManageTokenMultichainNetworks.text = item.header.networks
+        binder.itemManageTokenMultichainNetworks.text = item.header.networks
     }
 
-    fun bindEnabled(item: MultiChainTokenModel) = with(containerView) {
+    fun bindEnabled(item: MultiChainTokenModel) = with(binder) {
         itemManageTokenMultichainEnabled.isChecked = item.enabled
         itemManageTokenMultichainEnabled.isEnabled = item.switchable
 
@@ -93,7 +93,7 @@ class ManageTokensViewHolder(
     }
 
     override fun unbind() {
-        containerView.itemManageTokenMultichainIcon.clear()
+        binder.itemManageTokenMultichainIcon.clear()
     }
 }
 

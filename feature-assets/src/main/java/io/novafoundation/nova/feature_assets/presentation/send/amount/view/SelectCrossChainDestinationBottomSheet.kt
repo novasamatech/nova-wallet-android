@@ -8,12 +8,14 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.BaseDynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ItemChainChooserBinding
+import io.novafoundation.nova.feature_assets.databinding.ItemChainChooserGroupBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -66,11 +68,11 @@ class CrossChainDestinationAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return GroupHolder(parent)
+        return GroupHolder(ItemChainChooserGroupBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return ItemHolder(parent)
+        return ItemHolder(ItemChainChooserBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: TextHeader) {
@@ -84,27 +86,27 @@ class CrossChainDestinationAdapter(
     }
 }
 
-private class GroupHolder(parentView: ViewGroup) : GroupedListHolder(parentView.inflateChild(R.layout.item_chain_chooser_group)) {
+private class GroupHolder(private val binder: ItemChainChooserGroupBinding) : GroupedListHolder(binder.root) {
 
     fun bind(item: TextHeader) {
-        containerView.itemChainChooserGroup.text = item.content
+        binder.itemChainChooserGroup.text = item.content
     }
 }
 
-private class ItemHolder(parent: ViewGroup) : GroupedListHolder(parent.inflateChild(R.layout.item_chain_chooser)) {
+private class ItemHolder(private val binder: ItemChainChooserBinding) : GroupedListHolder(binder.root) {
 
     fun bind(
         item: CrossChainDestinationModel,
         isSelected: Boolean,
         handler: CrossChainDestinationAdapter.Handler
-    ) = with(containerView) {
+    ) = with(binder) {
         itemChainChooserChain.setChain(item.chainUi)
         itemChainChooserCheck.isChecked = isSelected
 
         itemChainChooserAmountToken.setTextOrHide(item.balance?.token)
         itemChainChooserAmountFiat.setTextOrHide(item.balance?.fiat)
 
-        setOnClickListener { handler.itemClicked(item.chainWithAsset) }
+        binder.root.setOnClickListener { handler.itemClicked(item.chainWithAsset) }
     }
 }
 

@@ -2,12 +2,13 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view.amount
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.databinding.ViewChooseAmountBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
@@ -20,33 +21,33 @@ class ChooseAmountView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle), MaxAvailableView, AmountInputView {
 
+    val binder = ViewChooseAmountBinding.inflate(inflater(), this)
+
     override val amountInput: EditText
-        get() = chooseAmountInput.amountInput
+        get() = binder.chooseAmountInput.amountInput
 
     init {
-        View.inflate(context, R.layout.view_choose_amount, this)
-
         attrs?.let(::applyAttrs)
     }
 
     fun setBalanceLabel(label: String?) {
-        chooseAmountBalanceLabel.setTextOrHide(label)
+        binder.chooseAmountBalanceLabel.setTextOrHide(label)
     }
 
     fun loadAssetImage(imageUrl: String) {
-        chooseAmountInput.loadAssetImage(imageUrl)
+        binder.chooseAmountInput.loadAssetImage(imageUrl)
     }
 
     fun setTitle(title: String?) {
-        chooseAmountTitle.setTextOrHide(title)
+        binder.chooseAmountTitle.setTextOrHide(title)
     }
 
     fun setAssetName(name: String) {
-        chooseAmountInput.setAssetName(name)
+        binder.chooseAmountInput.setAssetName(name)
     }
 
     override fun setFiatAmount(fiat: CharSequence?) {
-        chooseAmountInput.setFiatAmount(fiat)
+        binder.chooseAmountInput.setFiatAmount(fiat)
     }
 
     override fun setError(errorState: AmountChooserMixinBase.AmountErrorState) {
@@ -54,7 +55,7 @@ class ChooseAmountView @JvmOverloads constructor(
     }
 
     override fun setMaxAmountDisplay(maxAmountDisplay: String?) {
-        chooseAmountBalance.setTextOrHide(maxAmountDisplay)
+        binder.chooseAmountBalance.setTextOrHide(maxAmountDisplay)
     }
 
     override fun setMaxActionAvailability(availability: MaxActionAvailability) {
@@ -70,5 +71,5 @@ class ChooseAmountView @JvmOverloads constructor(
 fun ChooseAmountView.setChooseAmountModel(chooseAmountModel: ChooseAmountModel) {
     setBalanceLabel(chooseAmountModel.balanceLabel)
 
-    chooseAmountInput.setChooseAmountInputModel(chooseAmountModel.input)
+    binder.chooseAmountInput.setChooseAmountInputModel(chooseAmountModel.input)
 }

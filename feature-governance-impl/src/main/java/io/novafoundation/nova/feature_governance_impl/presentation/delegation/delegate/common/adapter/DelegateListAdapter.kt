@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
@@ -8,11 +7,11 @@ import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRippleMask
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegateBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.DelegateListModel
@@ -30,9 +29,7 @@ class DelegateListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegateViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegate)
-
-        return DelegateViewHolder(containerView, imageLoader, handler)
+        return DelegateViewHolder(ItemDelegateBinding.inflate(parent.inflater(), parent, false), imageLoader, handler)
     }
 
     override fun onBindViewHolder(holder: DelegateViewHolder, position: Int) {
@@ -53,20 +50,20 @@ private class DelegateDiffCallback : ItemCallback<DelegateListModel>() {
 }
 
 class DelegateViewHolder(
-    containerView: View,
+    private val binder: ItemDelegateBinding,
     private val imageLoader: ImageLoader,
     handler: DelegateListAdapter.Handler
-) : BaseViewHolder(containerView) {
+) : BaseViewHolder(binder.root) {
 
     init {
-        with(containerView) {
-            setOnClickListener { handler.itemClicked(bindingAdapterPosition) }
+        with(binder) {
+            binder.root.setOnClickListener { handler.itemClicked(bindingAdapterPosition) }
 
             itemDelegateCardView.foreground = with(context) { addRipple(mask = getRippleMask(0)) }
         }
     }
 
-    fun bind(model: DelegateListModel) = with(containerView) {
+    fun bind(model: DelegateListModel) = with(binder) {
         itemDelegateIcon.setDelegateIcon(icon = model.icon, imageLoader = imageLoader, squareCornerRadiusDp = 8)
         itemDelegateTitle.text = model.name
         itemDelegateDescription.setTextOrHide(model.description)
@@ -92,7 +89,7 @@ class DelegateViewHolder(
         }
     }
 
-    override fun unbind() = with(containerView) {
+    override fun unbind() = with(binder) {
         itemDelegateIcon.clear()
     }
 }

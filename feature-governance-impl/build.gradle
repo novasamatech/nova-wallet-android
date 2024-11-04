@@ -67,6 +67,7 @@ dependencies {
     implementation coroutinesDep
     implementation coroutinesAndroidDep
     implementation lifeCycleKtxDep
+    implementation flexBoxDep
 
     implementation project(":core-db")
 

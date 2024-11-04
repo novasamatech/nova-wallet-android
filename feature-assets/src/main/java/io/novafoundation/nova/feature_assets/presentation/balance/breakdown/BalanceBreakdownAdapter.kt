@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.breakdown
 
-import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_assets.databinding.ItemBalanceBreakdownAmountBinding
+import io.novafoundation.nova.feature_assets.databinding.ItemBalanceBreakdownTotalBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownAmount
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
@@ -14,11 +14,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 class BalanceBreakdownAdapter : GroupedListAdapter<BalanceBreakdownTotal, BalanceBreakdownAmount>(DiffCallback) {
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return BalanceTotalHolder(parent.inflateChild(R.layout.item_balance_breakdown_total, false))
+        return BalanceTotalHolder(ItemBalanceBreakdownTotalBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return BalanceAmountHolder(parent.inflateChild(R.layout.item_balance_breakdown_amount, false))
+        return BalanceAmountHolder(ItemBalanceBreakdownAmountBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: BalanceBreakdownTotal) {
@@ -33,24 +33,24 @@ class BalanceBreakdownAdapter : GroupedListAdapter<BalanceBreakdownTotal, Balanc
 }
 
 class BalanceTotalHolder(
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemBalanceBreakdownTotalBinding,
+) : GroupedListHolder(binder.root) {
 
     fun bind(item: BalanceBreakdownTotal) {
-        itemView.itemBreakdownTotalIcon.setImageResource(item.iconRes)
-        itemView.itemBreakdownTotalName.text = item.name
-        itemView.itemBreakdownTotalPercentage.text = item.percentage
-        itemView.itemBreakdownTotal.text = item.fiatAmount
+        binder.itemBreakdownTotalIcon.setImageResource(item.iconRes)
+        binder.itemBreakdownTotalName.text = item.name
+        binder.itemBreakdownTotalPercentage.text = item.percentage
+        binder.itemBreakdownTotal.text = item.fiatAmount
     }
 }
 
 class BalanceAmountHolder(
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemBalanceBreakdownAmountBinding,
+) : GroupedListHolder(binder.root) {
 
     fun bind(item: BalanceBreakdownAmount) {
-        itemView.balanceBreakdownItemDetail.setTitle(item.name)
-        itemView.balanceBreakdownItemDetail.showAmount(item.amount)
+        binder.balanceBreakdownItemDetail.setTitle(item.name)
+        binder.balanceBreakdownItemDetail.showAmount(item.amount)
     }
 }
 

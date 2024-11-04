@@ -2,12 +2,9 @@ package io.novafoundation.nova.common.view.input.chooser
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ItemListChooserBinding
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet

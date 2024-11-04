@@ -1,14 +1,9 @@
 package io.novafoundation.nova.feature_currency_impl.presentation.currency
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
-import io.novafoundation.nova.feature_currency_impl.R
 import io.novafoundation.nova.feature_currency_impl.databinding.FragmentSelectCurrencyBinding
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureComponent
 

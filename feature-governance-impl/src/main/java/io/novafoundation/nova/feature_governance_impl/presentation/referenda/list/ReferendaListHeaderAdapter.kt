@@ -1,16 +1,15 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemReferendaHeaderBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.TinderGovBannerModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.setTextOrHide
@@ -39,7 +38,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
     private var filterIconRes: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(imageLoader, parent.inflateChild(R.layout.item_referenda_header), handler)
+        return HeaderHolder(imageLoader, ItemReferendaHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
@@ -96,13 +95,17 @@ private enum class Payload {
     ASSET, LOCKS, DELEGATIONS, TINDER_GOV, FILTERS
 }
 
-class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: ReferendaListHeaderAdapter.Handler) : RecyclerView.ViewHolder(view) {
+class HeaderHolder(
+    private val imageLoader: ImageLoader,
+    private val binder: ItemReferendaHeaderBinding,
+    handler: ReferendaListHeaderAdapter.Handler
+) : RecyclerView.ViewHolder(binder.root) {
 
     init {
-        with(view) {
+        with(binder) {
             referendaAssetHeader.setOnClickListener { handler.onClickAssetSelector() }
 
-            governanceLocksHeader.background = context.getBlockDrawable()
+            governanceLocksHeader.background = binder.root.context.getBlockDrawable()
 
             governanceLocksLocked.setOnClickListener { handler.onClickGovernanceLocks() }
             governanceLocksDelegations.setOnClickListener { handler.onClickDelegations() }
@@ -128,40 +131,40 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
     }
 
     fun bindAsset(assetModel: AssetSelectorModel?) {
-        assetModel?.let { itemView.referendaAssetHeader.setState(imageLoader, assetModel) }
+        assetModel?.let { binder.referendaAssetHeader.setState(imageLoader, assetModel) }
     }
 
     fun bindLocks(locksModel: GovernanceLocksModel?) {
-        itemView.governanceLocksLocked.letOrHide(locksModel) {
-            itemView.governanceLocksLocked.setModel(it)
+        binder.governanceLocksLocked.letOrHide(locksModel) {
+            binder.governanceLocksLocked.setModel(it)
         }
 
         updateLocksContainerVisibility()
     }
 
     fun bindDelegations(model: GovernanceLocksModel?) {
-        itemView.governanceLocksDelegations.letOrHide(model) {
-            itemView.governanceLocksDelegations.setModel(it)
+        binder.governanceLocksDelegations.letOrHide(model) {
+            binder.governanceLocksDelegations.setModel(it)
         }
 
         updateLocksContainerVisibility()
     }
 
     fun bindTinderGovBanner(model: TinderGovBannerModel?) {
-        itemView.referendaTindergovBanner.letOrHide(model) {
-            itemView.referendaTinderGovChip.setTextOrHide(it.chipText)
+        binder.referendaTindergovBanner.letOrHide(model) {
+            binder.referendaTinderGovChip.setTextOrHide(it.chipText)
         }
 
         updateLocksContainerVisibility()
     }
 
     fun bindFilters(filterIconRes: Int?) {
-        filterIconRes?.let { itemView.referendaHeaderFilter.setImageResource(filterIconRes) }
+        filterIconRes?.let { binder.referendaHeaderFilter.setImageResource(filterIconRes) }
     }
 
     private fun updateLocksContainerVisibility() {
-        val contentVisible = itemView.governanceLocksHeader.children.any { it.isVisible }
+        val contentVisible = binder.governanceLocksHeader.children.any { it.isVisible }
 
-        itemView.governanceLocksHeader.setVisible(contentVisible)
+        binder.governanceLocksHeader.setVisible(contentVisible)
     }
 }

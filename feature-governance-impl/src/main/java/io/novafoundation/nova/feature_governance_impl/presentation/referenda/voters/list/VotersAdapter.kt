@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import coil.ImageLoader
@@ -9,11 +8,12 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemReferendumVoterBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.nameOrAddress
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateIcon
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateTypeModelIcon
@@ -31,13 +31,11 @@ class VotersAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        val view = parent.inflateChild(R.layout.item_referendum_voter)
-        return ExpandableVoterHolder(handler, imageLoader, view)
+        return ExpandableVoterHolder(handler, imageLoader, ItemReferendumVoterBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        val view = parent.inflateChild(R.layout.item_referendum_voter)
-        return VoterDelegatorHolder(handler, imageLoader, view)
+        return VoterDelegatorHolder(handler, imageLoader, ItemReferendumVoterBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: ExpandableVoterRVItem) {
@@ -88,19 +86,19 @@ private class DiffCallback : BaseGroupedDiffCallback<ExpandableVoterRVItem, Dele
 class ExpandableVoterHolder(
     private val eventHandler: VotersAdapter.Handler,
     private val imageLoader: ImageLoader,
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemReferendumVoterBinding,
+) : GroupedListHolder(binder.root) {
 
     init {
         containerView.setBackgroundResource(R.drawable.bg_primary_list_item)
-        containerView.itemVoterAddressContainer.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
+        binder.itemVoterAddressContainer.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
     }
 
-    fun bind(item: ExpandableVoterRVItem) = with(containerView) {
+    fun bind(item: ExpandableVoterRVItem) = with(binder) {
         itemVoterChevron.isVisible = item.isExpandable
 
         if (item.isExpandable) {
-            itemVoterAddressContainer.background = context.addRipple()
+            itemVoterAddressContainer.background = containerView.context.addRipple()
             itemVoterAddressContainer.isClickable = true
             containerView.setOnClickListener { eventHandler.onExpandItemClick(absoluteAdapterPosition) }
             bindExpanding(item)
@@ -120,7 +118,7 @@ class ExpandableVoterHolder(
         itemVotesCountDetails.setTextOrHide(item.vote.votesCountDetails)
     }
 
-    fun bindExpanding(item: ExpandableVoterRVItem) = with(containerView) {
+    fun bindExpanding(item: ExpandableVoterRVItem) = with(binder) {
         if (item.isExpandable) {
             if (item.isExpanded) {
                 itemVoterChevron.setImageResource(R.drawable.ic_chevron_up)
@@ -136,18 +134,18 @@ class ExpandableVoterHolder(
 class VoterDelegatorHolder(
     private val eventHandler: VotersAdapter.Handler,
     private val imageLoader: ImageLoader,
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemReferendumVoterBinding,
+) : GroupedListHolder(binder.root) {
 
     init {
-        with(containerView) {
-            setBackgroundResource(R.drawable.bg_primary_list_item)
+        with(binder) {
+            containerView.setBackgroundResource(R.drawable.bg_primary_list_item)
             itemVoterChevron.makeGone()
-            setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
+            containerView.setOnClickListener { eventHandler.onVoterClick(absoluteAdapterPosition) }
         }
     }
 
-    fun bind(item: DelegatorVoterRVItem) = with(containerView) {
+    fun bind(item: DelegatorVoterRVItem) = with(binder) {
         val delegateIcon = item.metadata.icon
         itemVoterImage.setDelegateIcon(delegateIcon, imageLoader, 4)
 

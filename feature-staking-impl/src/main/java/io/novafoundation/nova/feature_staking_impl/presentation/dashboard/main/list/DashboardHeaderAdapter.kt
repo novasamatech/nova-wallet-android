@@ -1,12 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
-import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.extensions.LayoutContainer
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardHeaderBinding
 
 class DashboardHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<DashboardHeaderHolder>() {
 
@@ -23,7 +21,7 @@ class DashboardHeaderAdapter(private val handler: Handler) : RecyclerView.Adapte
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashboardHeaderHolder {
-        return DashboardHeaderHolder(parent.inflateChild(R.layout.item_dashboard_header), handler)
+        return DashboardHeaderHolder(ItemDashboardHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: DashboardHeaderHolder, position: Int, payloads: MutableList<Any>) {
@@ -52,12 +50,12 @@ private enum class Payload {
 }
 
 class DashboardHeaderHolder(
-    override val containerView: View,
+    private val binder: ItemDashboardHeaderBinding,
     handler: DashboardHeaderAdapter.Handler,
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : RecyclerView.ViewHolder(binder.root) {
 
     init {
-        with(containerView) {
+        with(binder) {
             stakingDashboardHeaderAvatar.setOnClickListener { handler.avatarClicked() }
         }
     }
@@ -67,6 +65,6 @@ class DashboardHeaderHolder(
     }
 
     fun bindAddress(walletModel: SelectedWalletModel?) = walletModel?.let {
-        containerView.stakingDashboardHeaderAvatar.setModel(it)
+        binder.stakingDashboardHeaderAvatar.setModel(it)
     }
 }

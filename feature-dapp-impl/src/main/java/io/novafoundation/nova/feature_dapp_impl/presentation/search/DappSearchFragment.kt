@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -16,10 +13,11 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentSearchDappBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 
-class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler {
+class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, FragmentSearchDappBinding>(), SearchDappAdapter.Handler {
 
     companion object {
 
@@ -30,34 +28,28 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         )
     }
 
+    override val binder by viewBinding(FragmentSearchDappBinding::bind)
+
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_search_dapp, container, false)
-    }
-
     override fun initViews() {
-        searchDappSearch.applyStatusBarInsets()
-        searchDappSearhContainer.applyInsetter {
+        binder.searchDappSearch.applyStatusBarInsets()
+        binder.searchDappSearhContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
-        searchDappList.adapter = adapter
-        searchDappList.setHasFixedSize(true)
+        binder.searchDappList.adapter = adapter
+        binder.searchDappList.setHasFixedSize(true)
 
-        searchDappSearch.cancel.setOnClickListener {
+        binder.searchDappSearch.cancel.setOnClickListener {
             viewModel.cancelClicked()
 
             hideKeyboard()
         }
 
-        searchDappSearch.searchInput.requestFocus()
-        searchDappSearch.searchInput.content.showSoftKeyboard()
+        binder.searchDappSearch.searchInput.requestFocus()
+        binder.searchDappSearch.searchInput.content.showSoftKeyboard()
     }
 
     override fun inject() {
@@ -69,12 +61,12 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
 
     override fun subscribe(viewModel: DAppSearchViewModel) {
         setupDAppNotInCatalogWarning()
-        searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
+        binder.searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe(::submitListPreservingViewPoint)
         viewModel.dAppNotInCatalogWarning
         viewModel.selectQueryTextEvent.observeEvent {
-            searchDappSearch.searchInput.content.selectAll()
+            binder.searchDappSearch.searchInput.content.selectAll()
         }
     }
 
@@ -85,14 +77,14 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
     }
 
     private fun hideKeyboard() {
-        searchDappSearch.searchInput.hideSoftKeyboard()
+        binder.searchDappSearch.searchInput.hideSoftKeyboard()
     }
 
     private fun submitListPreservingViewPoint(data: List<Any?>) {
-        val recyclerViewState = searchDappList.layoutManager!!.onSaveInstanceState()
+        val recyclerViewState = binder.searchDappList.layoutManager!!.onSaveInstanceState()
 
         adapter.submitList(data) {
-            searchDappList.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+            binder.searchDappList.layoutManager!!.onRestoreInstanceState(recyclerViewState)
         }
     }
 

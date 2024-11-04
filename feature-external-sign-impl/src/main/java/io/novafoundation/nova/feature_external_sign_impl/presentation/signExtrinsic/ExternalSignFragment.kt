@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
