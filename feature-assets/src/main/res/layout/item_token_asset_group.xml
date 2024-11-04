@@ -14,12 +14,10 @@
         android:id="@+id/itemTokenGroupAssetImage"
         style="@style/Widget.Nova.AssetIcon.Primary"
         android:layout_marginStart="12dp"
-        android:background="@drawable/bg_token_container"
-        android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_nova" />
+        tools:src="@drawable/ic_token_dot_colored" />
 
     <TextView
         android:id="@+id/itemAssetTokenGroupToken"
@@ -32,7 +30,7 @@
         app:layout_constraintStart_toEndOf="@+id/itemTokenGroupAssetImage"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="KSM" />
+        tools:text="DOT" />
 
     <TextView
         android:id="@+id/itemAssetTokenGroupRate"

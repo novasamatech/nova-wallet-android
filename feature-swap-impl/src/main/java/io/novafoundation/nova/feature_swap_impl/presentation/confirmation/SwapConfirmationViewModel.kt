@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.asPercent
@@ -26,7 +27,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_swap_core.domain.model.SwapDirection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -116,6 +117,7 @@ class SwapConfirmationViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val arbitraryAssetUseCase: ArbitraryAssetUseCase,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -290,7 +292,7 @@ class SwapConfirmationViewModel(
     ): SwapAssetView.Model {
         val amount = formatAmount(metaAccount, chainAsset, amountInPlanks)
         return SwapAssetView.Model(
-            assetIcon = chainAsset.icon(),
+            assetIcon = assetIconProvider.getAssetIconOrFallback(chainAsset),
             amount = amount,
             chainUi = mapChainToUi(chain),
         )

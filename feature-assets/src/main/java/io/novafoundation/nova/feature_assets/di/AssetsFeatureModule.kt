@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -189,11 +190,13 @@ class AssetsFeatureModule {
     @FeatureScope
     fun provideExpandableAssetsMixinFactory(
         resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider,
         currencyInteractor: CurrencyInteractor,
         assetsViewModeRepository: AssetsViewModeRepository
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
             resourceManager,
+            assetIconProvider,
             currencyInteractor,
             assetsViewModeRepository
         )

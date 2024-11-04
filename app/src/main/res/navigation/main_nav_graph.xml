@@ -318,6 +318,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_mainFragment_to_appearanceFragment"
+            app:destination="@id/appearanceFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_currenciesFragment"
             app:destination="@id/selectCurrencyFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -587,6 +595,12 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.language.LanguagesFragment"
         android:label="LanguagesFragment"
         tools:layout="@layout/fragment_languages" />
+
+    <fragment
+        android:id="@+id/appearanceFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.assetIcons.AppearanceFragment"
+        android:label="AppearanceFragment"
+        tools:layout="@layout/fragment_appearance" />
 
     <fragment
         android:id="@+id/walletDetailsFragment"

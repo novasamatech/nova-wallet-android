@@ -3,11 +3,14 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.mapper
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
@@ -21,13 +24,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanc
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
     resourceManager: ResourceManager,
+    assetIconProvider: AssetIconProvider,
     assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi> = { _, assets -> assets },
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
-    return mapKeys { (group, assets) -> mapTokenAssetGroupToUi(resourceManager, group, assets, groupBalance) }
+    return mapKeys { (group, assets) -> mapTokenAssetGroupToUi(resourceManager, assetIconProvider, group, assets, groupBalance) }
         .mapValues { (group, assets) ->
-            val assetModels = mapAssetsToAssetModels(resourceManager, group, assets, balance)
+            val assetModels = mapAssetsToAssetModels(resourceManager, assetIconProvider, group, assets, balance)
             assetFilter(group.itemId, assetModels)
         }
         .toListWithHeaders()
@@ -36,6 +40,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
 
 fun mapTokenAssetGroupToUi(
     resourceManager: ResourceManager,
+    assetIconProvider: AssetIconProvider,
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total }
@@ -43,7 +48,7 @@ fun mapTokenAssetGroupToUi(
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(
         itemId = assetGroup.groupId,
-        tokenIcon = assetGroup.token.icon,
+        tokenIcon = assetIconProvider.getAssetIconOrFallback(assetGroup.token.icon),
         rate = mapCoinRateChange(assetGroup.token.coinRate, assetGroup.token.currency),
         recentRateChange = assetGroup.token.coinRate?.recentRateChange.orZero().formatAsChange(),
         rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.token.coinRate),
@@ -59,11 +64,19 @@ fun mapTokenAssetGroupToUi(
 
 private fun mapAssetsToAssetModels(
     resourceManager: ResourceManager,
+    assetIconProvider: AssetIconProvider,
     group: TokenGroupUi,
     assets: List<AssetWithNetwork>,
     balance: (AssetBalance) -> PricedAmount
 ): List<TokenAssetUi> {
-    return assets.map { TokenAssetUi(group.getId(), mapAssetToAssetModel(resourceManager, it.asset, balance(it.balanceWithOffChain)), mapChainToUi(it.chain)) }
+    return assets.map {
+        TokenAssetUi(
+            group.getId(),
+            mapAssetToAssetModel(resourceManager, it.asset, balance(it.balanceWithOffChain)),
+            assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration),
+            mapChainToUi(it.chain)
+        )
+    }
 }
 
 private fun mapType(

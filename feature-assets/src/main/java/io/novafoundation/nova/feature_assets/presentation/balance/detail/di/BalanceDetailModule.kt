@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -64,7 +65,8 @@ class BalanceDetailModule {
         assetPayload: AssetPayload,
         addressDisplayUseCase: AddressDisplayUseCase,
         chainRegistry: ChainRegistry,
-        currencyRepository: CurrencyRepository
+        currencyRepository: CurrencyRepository,
+        assetIconProvider: AssetIconProvider
     ): TransactionHistoryMixin {
         return TransactionHistoryProvider(
             walletInteractor = walletInteractor,
@@ -76,7 +78,8 @@ class BalanceDetailModule {
             chainRegistry = chainRegistry,
             chainId = assetPayload.chainId,
             assetId = assetPayload.chainAssetId,
-            currencyRepository = currencyRepository
+            currencyRepository = currencyRepository,
+            assetIconProvider
         )
     }
 
@@ -96,7 +99,8 @@ class BalanceDetailModule {
         currencyInteractor: CurrencyInteractor,
         controllableAssetCheckMixin: ControllableAssetCheckMixin,
         externalBalancesInteractor: ExternalBalancesInteractor,
-        swapAvailabilityInteractor: SwapAvailabilityInteractor
+        swapAvailabilityInteractor: SwapAvailabilityInteractor,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -111,7 +115,8 @@ class BalanceDetailModule {
             currencyInteractor = currencyInteractor,
             controllableAssetCheck = controllableAssetCheckMixin,
             externalBalancesInteractor = externalBalancesInteractor,
-            swapAvailabilityInteractor = swapAvailabilityInteractor
+            swapAvailabilityInteractor = swapAvailabilityInteractor,
+            assetIconProvider = assetIconProvider
         )
     }
 

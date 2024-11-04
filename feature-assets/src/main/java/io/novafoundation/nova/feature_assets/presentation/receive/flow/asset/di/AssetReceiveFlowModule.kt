@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -35,7 +36,8 @@ class AssetReceiveFlowModule {
         externalBalancesInteractor: ExternalBalancesInteractor,
         controllableAssetCheck: ControllableAssetCheckMixin,
         accountUseCase: SelectedAccountUseCase,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return AssetReceiveFlowViewModel(
             interactorFactory = interactorFactory,
@@ -44,7 +46,8 @@ class AssetReceiveFlowModule {
             externalBalancesInteractor = externalBalancesInteractor,
             controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            assetIconProvider = assetIconProvider
         )
     }
 }
