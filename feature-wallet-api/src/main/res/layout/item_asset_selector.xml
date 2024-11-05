@@ -8,36 +8,30 @@
     tools:background="@color/secondary_screen_background">
 
     <ImageView
-        android:id="@+id/itemAssetSelectorCheckmark"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="16dp"
-        android:src="@drawable/ic_checkmark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/icon_primary" />
-
-    <ImageView
         android:id="@+id/itemAssetSelectorIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/itemAssetSelectorCheckmark"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_token_dot_white" />
+        tools:src="@drawable/ic_fallback_network_icon" />
 
     <TextView
         android:id="@+id/itemAssetSelectorTokenName"
         style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:lines="1"
         android:textColor="@color/text_primary"
+        app:layout_constraintEnd_toStartOf="@+id/itemAssetSelectorRadioButton"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/itemAssetSelectorIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Polkadot" />
@@ -45,24 +39,29 @@
     <TextView
         android:id="@+id/itemAssetSelectorBalance"
         style="@style/TextAppearance.NovaFoundation.Body2"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
+        android:ellipsize="end"
         android:includeFontPadding="false"
+        android:lines="1"
         android:textColor="@color/text_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemAssetSelectorRadioButton"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/itemAssetSelectorTokenName"
         app:layout_constraintTop_toBottomOf="@id/itemAssetSelectorTokenName"
         tools:text="10 DOT" />
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/divider"
+    <RadioButton
+        android:id="@+id/itemAssetSelectorRadioButton"
+        style="@style/Widget.Nova.RadioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
