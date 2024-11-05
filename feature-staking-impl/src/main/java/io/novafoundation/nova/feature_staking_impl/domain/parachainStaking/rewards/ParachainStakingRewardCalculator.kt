@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
-import io.novafoundation.nova.common.utils.percentageToFraction
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationDistributionConfig
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationInfo
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.ParachainBondConfig
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.totalPercentAsFraction
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -31,7 +31,7 @@ interface ParachainStakingRewardCalculator {
 private const val DAYS_IN_YEAR = 365
 
 class RealParachainStakingRewardCalculator(
-    private val bondConfig: ParachainBondConfig,
+    private val inflationDistributionConfig: InflationDistributionConfig,
     inflationInfo: InflationInfo,
     totalIssuance: BigInteger,
     totalStaked: BigInteger,
@@ -95,10 +95,8 @@ class RealParachainStakingRewardCalculator(
     }
 
     private fun calculatorApr(collatorStake: Double): Double {
-        return annualReturn * (1 - bondConfig.percentageAsFraction() - collatorCommission.toDouble()) * (averageStake / collatorStake)
+        return annualReturn * (1 - inflationDistributionConfig.totalPercentAsFraction() - collatorCommission.toDouble()) * (averageStake / collatorStake)
     }
-
-    private fun ParachainBondConfig.percentageAsFraction() = percent.toDouble().percentageToFraction()
 }
 
 fun ParachainStakingRewardCalculator.maximumAnnualApr() = maximumGain(DAYS_IN_YEAR)
