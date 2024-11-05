@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.wallets
 
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,7 +15,9 @@ import io.novafoundation.nova.feature_account_impl.databinding.FragmentManualBac
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import javax.inject.Inject
 
-class ManualBackupSelectWalletFragment : BaseFragment<ManualBackupSelectWalletViewModel, FragmentManualBackupSelectWalletBinding>(), AccountHolder.AccountItemHandler {
+class ManualBackupSelectWalletFragment :
+    BaseFragment<ManualBackupSelectWalletViewModel, FragmentManualBackupSelectWalletBinding>(),
+    AccountHolder.AccountItemHandler {
 
     override fun createBinding() = FragmentManualBackupSelectWalletBinding.inflate(layoutInflater)
 

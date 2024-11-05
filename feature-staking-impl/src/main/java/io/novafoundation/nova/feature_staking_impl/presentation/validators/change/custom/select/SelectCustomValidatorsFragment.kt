@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 
 import android.os.Bundle
 import android.widget.ImageView
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

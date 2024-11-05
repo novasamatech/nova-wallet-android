@@ -45,8 +45,6 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.view_go_to_nfts, this)
-
         background = addRipple(getRoundedCornerDrawable(R.color.block_background))
 
         FeatureUtils.getFeature<AssetsFeatureComponent>(

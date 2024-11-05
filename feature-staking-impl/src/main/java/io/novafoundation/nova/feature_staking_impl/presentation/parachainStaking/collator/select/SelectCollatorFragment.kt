@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select
 
 import android.widget.ImageView
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -16,7 +16,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.CollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 
-class SelectCollatorFragment : BaseFragment<SelectCollatorViewModel, FragmentParachainStakingSelectCollatorBinding>(), StakeTargetAdapter.ItemHandler<Collator> {
+class SelectCollatorFragment :
+    BaseFragment<SelectCollatorViewModel, FragmentParachainStakingSelectCollatorBinding>(),
+    StakeTargetAdapter.ItemHandler<Collator> {
 
     override fun createBinding() = FragmentParachainStakingSelectCollatorBinding.inflate(layoutInflater)
 

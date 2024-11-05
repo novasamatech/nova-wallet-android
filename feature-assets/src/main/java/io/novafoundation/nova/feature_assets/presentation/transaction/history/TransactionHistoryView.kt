@@ -81,8 +81,6 @@ class TransferHistorySheet @JvmOverloads constructor(
     private val binder = ViewTransferHistoryBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_transfer_history, this)
-
         background = context.getTopRoundedCornerDrawable(fillColorRes = R.color.secondary_screen_background, cornerSizeInDp = 16)
 
         binder.transactionHistoryList.adapter = adapter

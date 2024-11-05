@@ -94,8 +94,6 @@ buildscript {
 
         cardStackVersion = "2.3.4"
 
-        viewBindingDelegateVersion = "1.5.9"
-
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
             exclude group: "androidx.fragment", module: "fragment-ktx"
@@ -220,8 +218,6 @@ buildscript {
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
         cardStackView = "com.github.yuyakaido:cardstackview:$cardStackVersion"
-
-        viewBindingDelegate = "com.github.kirich1409:viewbindingpropertydelegate-noreflection:$viewBindingDelegateVersion"
     }
 
     repositories {

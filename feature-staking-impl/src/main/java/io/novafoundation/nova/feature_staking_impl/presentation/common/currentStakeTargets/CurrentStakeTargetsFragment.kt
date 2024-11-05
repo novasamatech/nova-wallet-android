@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets

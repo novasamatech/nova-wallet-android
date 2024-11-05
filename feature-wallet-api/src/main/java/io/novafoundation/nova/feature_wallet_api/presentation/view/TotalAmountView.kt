@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
@@ -21,8 +20,6 @@ class TotalAmountView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_total_amount, this)
 
         attrs?.let(::applyAttributes)
     }

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView

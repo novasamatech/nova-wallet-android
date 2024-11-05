@@ -4,7 +4,7 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.isVisible
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackView
 import com.yuyakaido.android.cardstackview.Direction
@@ -26,7 +26,10 @@ import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureCompon
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardRvItem
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.adapter.TinderGovCardsAdapter
 
-class TinderGovCardsFragment : BaseFragment<TinderGovCardsViewModel, FragmentTinderGovCardsBinding>(), TinderGovCardsAdapter.Handler, TinderGovCardStackListener {
+class TinderGovCardsFragment :
+    BaseFragment<TinderGovCardsViewModel, FragmentTinderGovCardsBinding>(),
+    TinderGovCardsAdapter.Handler,
+    TinderGovCardStackListener {
 
     override fun createBinding() = FragmentTinderGovCardsBinding.inflate(layoutInflater)
 

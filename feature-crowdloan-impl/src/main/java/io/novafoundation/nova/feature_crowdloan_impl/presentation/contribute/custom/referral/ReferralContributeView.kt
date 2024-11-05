@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 import android.content.Context
 import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
-import android.view.View
 import androidx.lifecycle.LifecycleCoroutineScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils

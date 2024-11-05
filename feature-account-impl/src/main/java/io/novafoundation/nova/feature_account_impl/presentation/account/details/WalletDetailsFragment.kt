@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -18,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.details.
 import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
-import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentWalletDetailsBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.ui.setupAddAccountLauncher
@@ -47,12 +43,6 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel, FragmentWalle
             }
         }
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_wallet_details, container, false)
 
     override fun initViews() {
         binder.accountDetailsToolbar.setHomeButtonListener {

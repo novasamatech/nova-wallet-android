@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
@@ -28,8 +27,6 @@ class GoNextView @JvmOverloads constructor(
     private val binder = ViewGoNextBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_go_next, this)
-
         attrs?.let(this::applyAttributes)
     }
 

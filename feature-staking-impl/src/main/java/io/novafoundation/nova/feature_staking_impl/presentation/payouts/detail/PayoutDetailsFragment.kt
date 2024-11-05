@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import io.novafoundation.nova.common.utils.WithContextExtensions

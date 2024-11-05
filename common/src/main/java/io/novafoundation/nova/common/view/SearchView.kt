@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
@@ -28,8 +27,6 @@ class SearchView @JvmOverloads constructor(
         get() = binder.searchContent
 
     init {
-        View.inflate(context, R.layout.view_search, this)
-
         background = getRoundedCornerDrawable(fillColorRes = R.color.input_background, cornerSizeDp = 10)
 
         orientation = HORIZONTAL

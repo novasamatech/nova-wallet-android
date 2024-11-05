@@ -4,7 +4,7 @@ import android.graphics.Rect
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.list.NestedAdapter
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter

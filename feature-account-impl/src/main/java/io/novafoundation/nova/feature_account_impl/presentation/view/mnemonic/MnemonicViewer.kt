@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.databinding.ViewMnemonicBinding
 
 class MnemonicViewer @JvmOverloads constructor(
@@ -20,8 +18,6 @@ class MnemonicViewer @JvmOverloads constructor(
     private val binder = ViewMnemonicBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_mnemonic, this)
-
         binder.mnemonicViewerList.adapter = adapter
     }
 

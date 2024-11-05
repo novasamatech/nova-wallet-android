@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

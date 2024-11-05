@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.flow
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment

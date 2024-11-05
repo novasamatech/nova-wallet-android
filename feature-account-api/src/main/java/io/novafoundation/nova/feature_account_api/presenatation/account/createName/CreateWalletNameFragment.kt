@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.createName
 
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard

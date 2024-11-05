@@ -2,10 +2,8 @@ package io.novafoundation.nova.feature_assets.presentation.balance.assetActions
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.updatePadding
@@ -22,8 +20,6 @@ class AssetActionsView @JvmOverloads constructor(
 
     init {
         orientation = HORIZONTAL
-
-        View.inflate(context, R.layout.view_asset_actions, this)
 
         background = context.getBlockDrawable()
 

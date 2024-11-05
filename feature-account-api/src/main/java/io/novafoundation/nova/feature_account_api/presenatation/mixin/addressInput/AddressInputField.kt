@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressIn
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.core.view.isGone
@@ -36,8 +35,6 @@ class AddressInputField @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_address_input, this)
 
         binder.addressInputW3NAddress.setDrawableStart(R.drawable.ic_checkmark_circle_16, tint = R.color.icon_positive, paddingInDp = 4)
         binder.addressInputW3NAddress.setDrawableEnd(R.drawable.ic_info, paddingInDp = 4)

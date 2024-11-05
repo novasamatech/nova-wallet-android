@@ -7,7 +7,6 @@ import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import io.novafoundation.nova.feature_external_sign_api.R
 import io.novafoundation.nova.feature_external_sign_api.databinding.BottomSheetConfirmDappActionBinding
 
 abstract class ConfirmDAppActionBottomSheet(
@@ -22,7 +21,6 @@ abstract class ConfirmDAppActionBottomSheet(
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
-        setContentView(R.layout.bottom_sheet_confirm_dapp_action)
         super.onCreate(savedInstanceState)
 
         setCancelable(false)

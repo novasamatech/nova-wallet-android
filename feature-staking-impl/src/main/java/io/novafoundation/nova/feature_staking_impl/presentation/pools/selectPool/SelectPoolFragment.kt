@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPoo
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

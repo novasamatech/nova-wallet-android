@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 import android.content.Context
 import android.os.Bundle
 import androidx.core.view.isVisible
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.dataOrNull

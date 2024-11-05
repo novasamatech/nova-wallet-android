@@ -86,8 +86,6 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.view_table_cell, this)
-
         setBackgroundResource(R.drawable.bg_primary_list_item)
         minHeight = 44.dp(context)
 

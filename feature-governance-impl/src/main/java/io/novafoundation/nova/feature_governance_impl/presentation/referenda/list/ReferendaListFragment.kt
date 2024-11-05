@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.dataOrNull

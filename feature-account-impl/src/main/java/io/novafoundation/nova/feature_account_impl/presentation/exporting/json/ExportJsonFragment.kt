@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.exporting.json
 
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations

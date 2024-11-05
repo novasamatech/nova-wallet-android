@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_api.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -35,8 +34,6 @@ class ItemChainAccount @JvmOverloads constructor(
         get() = binder.labeledTextAction
 
     init {
-        View.inflate(context, R.layout.item_chain_account, this)
-
         background = context.getDrawableCompat(R.drawable.bg_primary_list_item)
     }
 }

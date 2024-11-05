@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites
 
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

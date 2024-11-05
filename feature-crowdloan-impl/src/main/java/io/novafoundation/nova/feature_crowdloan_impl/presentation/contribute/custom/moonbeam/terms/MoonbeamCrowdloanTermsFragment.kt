@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import coil.load
 import dev.chrisbanes.insetter.applyInsetter

@@ -1,17 +1,13 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
-import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.databinding.FragmentWcSessionsBinding
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.model.SessionListModel
@@ -32,12 +28,6 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
     lateinit var imageLoader: ImageLoader
 
     private val sessionsAdapter = WalletConnectSessionsAdapter(handler = this)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_wc_sessions, container, false)
 
     override fun initViews() {
         binder.wcSessionsToolbar.setHomeButtonListener { viewModel.exit() }

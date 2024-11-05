@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_versions_impl.presentation.update
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -15,7 +14,9 @@ import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters
 import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsBannerAdapter
 import io.novafoundation.nova.feature_versions_impl.presentation.update.adapters.UpdateNotificationsSeeAllAdapter
 
-class UpdateNotificationFragment : BaseFragment<UpdateNotificationViewModel, FragmentUpdateNotificationsBinding>(), UpdateNotificationsSeeAllAdapter.SeeAllClickedListener {
+class UpdateNotificationFragment :
+    BaseFragment<UpdateNotificationViewModel, FragmentUpdateNotificationsBinding>(),
+    UpdateNotificationsSeeAllAdapter.SeeAllClickedListener {
 
     override fun createBinding() = FragmentUpdateNotificationsBinding.inflate(layoutInflater)
 

@@ -19,10 +19,13 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewBinding> :
     override val lifecycleOwner: LifecycleOwner
         get() = this
 
-    protected abstract val binder: B
+    protected lateinit var binder: B
+        private set
 
     @Inject
     override lateinit var viewModel: T
+
+    protected abstract fun createBinding(): B
 
     override fun attachBaseContext(base: Context) {
         val commonApi = (base.applicationContext as FeatureContainer).commonApi()
@@ -39,6 +42,8 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewBinding> :
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             )
+
+        binder = createBinding()
 
         setContentView(binder.root)
 

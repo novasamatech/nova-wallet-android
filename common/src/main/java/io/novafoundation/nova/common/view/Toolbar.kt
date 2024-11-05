@@ -40,8 +40,6 @@ class Toolbar @JvmOverloads constructor(
         get() = binder.titleTv
 
     init {
-        View.inflate(context, R.layout.view_toolbar, this)
-
         applyAttributes(attrs)
     }
 

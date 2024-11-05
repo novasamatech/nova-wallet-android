@@ -1,16 +1,12 @@
 package io.novafoundation.nova.app.root.presentation.main
 
 import android.graphics.RectF
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.FragmentMainBinding
 import io.novafoundation.nova.app.root.di.RootApi

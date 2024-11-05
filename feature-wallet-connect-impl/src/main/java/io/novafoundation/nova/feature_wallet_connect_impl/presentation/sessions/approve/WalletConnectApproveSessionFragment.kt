@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import by.kirich1409.viewbindingdelegate.viewBinding
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,7 +11,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.showChains
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.setupSelectWalletMixin
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
-import io.novafoundation.nova.feature_wallet_connect_impl.R
 import io.novafoundation.nova.feature_wallet_connect_impl.databinding.FragmentWcSessionApproveBinding
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureComponent
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.view.WCNetworksBottomSheet
@@ -28,12 +23,6 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
 
     @Inject
     lateinit var imageLoader: ImageLoader
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_wc_session_approve, container, false)
 
     override fun initViews() {
         onBackPressed { viewModel.exit() }

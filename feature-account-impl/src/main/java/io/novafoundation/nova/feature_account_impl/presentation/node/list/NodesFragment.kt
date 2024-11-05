@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.presentation.node.list
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

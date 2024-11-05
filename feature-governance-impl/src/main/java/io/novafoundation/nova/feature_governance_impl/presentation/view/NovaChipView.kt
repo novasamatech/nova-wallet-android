@@ -5,7 +5,6 @@ import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -99,7 +98,6 @@ class NovaChipView @JvmOverloads constructor(
     private val customTextAppearance: Int?
 
     init {
-        View.inflate(context, R.layout.view_chip, this)
         orientation = HORIZONTAL
 
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.NovaChipView)

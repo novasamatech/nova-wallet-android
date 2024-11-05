@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
@@ -11,7 +9,6 @@ import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_account_api.view.showOptionalAddress
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentTransferDetailsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -31,12 +28,6 @@ class TransferDetailFragment : BaseFragment<TransactionDetailViewModel, Fragment
     }
 
     override fun createBinding() = FragmentTransferDetailsBinding.inflate(layoutInflater)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_transfer_details, container, false)
 
     override fun initViews() {
         binder.transactionDetailToolbar.setHomeButtonListener { viewModel.backClicked() }

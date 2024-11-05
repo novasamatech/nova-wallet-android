@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.period
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import io.novafoundation.nova.common.base.BaseFragment

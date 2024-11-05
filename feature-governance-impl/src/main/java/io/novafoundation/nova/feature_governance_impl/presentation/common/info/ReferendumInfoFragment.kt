@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.Gravity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.setAddressOrHide

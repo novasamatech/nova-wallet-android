@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils

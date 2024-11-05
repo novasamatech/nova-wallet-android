@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.cre
 
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo

@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -56,8 +55,6 @@ class AlertView @JvmOverloads constructor(
     private val binder = ViewAlertBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_alert, this)
-
         updatePadding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 10.dp)
 
         attrs?.let(::applyAttrs)

@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ButtonLargeBinding
@@ -25,8 +24,6 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     private val binder = ButtonLargeBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.button_large, this)
-
         minHeight = 52.dp
 
         attrs?.let(::applyAttributes)

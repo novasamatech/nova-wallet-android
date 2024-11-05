@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.base
 
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.utils.applyStatusBarInsets

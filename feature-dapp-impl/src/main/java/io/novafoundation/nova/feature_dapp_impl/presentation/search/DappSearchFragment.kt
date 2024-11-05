@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils

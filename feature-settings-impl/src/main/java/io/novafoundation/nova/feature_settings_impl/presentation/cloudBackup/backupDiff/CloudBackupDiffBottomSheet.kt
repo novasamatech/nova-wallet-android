@@ -26,7 +26,6 @@ class CloudBackupDiffBottomSheet(
     }
 
     init {
-        setContentView(R.layout.fragment_backup_diff)
         binder.backupDiffSubtitle.text = buildSubtitleText()
         binder.backupDiffList.adapter = adapter
 

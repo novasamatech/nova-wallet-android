@@ -2,9 +2,10 @@ package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
@@ -34,7 +35,9 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
     @Inject
     lateinit var contextManager: ContextManager
 
-    override val binder by viewBinding(ActivityRootBinding::bind)
+    override fun createBinding(): ActivityRootBinding {
+        return ActivityRootBinding.inflate(LayoutInflater.from(this))
+    }
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)

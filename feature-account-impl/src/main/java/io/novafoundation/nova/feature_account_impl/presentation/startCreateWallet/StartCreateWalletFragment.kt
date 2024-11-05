@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.startCreateWall
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer

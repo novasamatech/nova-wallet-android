@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -43,12 +42,6 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel, FragmentE
 
     @Inject
     lateinit var imageLoader: ImageLoader
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_extrinsic_details, container, false)
 
     override fun initViews() {
         binder.extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }

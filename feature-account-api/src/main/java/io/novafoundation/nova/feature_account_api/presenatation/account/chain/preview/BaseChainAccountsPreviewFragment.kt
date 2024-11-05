@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview
 
 import androidx.annotation.CallSuper
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -14,7 +14,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 
 import javax.inject.Inject
 
-abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> : BaseFragment<V, FragmentChainAccountPreviewBinding>(), ChainAccountsAdapter.Handler {
+abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> :
+    BaseFragment<V, FragmentChainAccountPreviewBinding>(),
+    ChainAccountsAdapter.Handler {
 
     override fun createBinding() = FragmentChainAccountPreviewBinding.inflate(layoutInflater)
 

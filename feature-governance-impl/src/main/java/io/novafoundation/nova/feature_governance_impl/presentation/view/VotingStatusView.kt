@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -31,8 +30,6 @@ class VotingStatusView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_voting_status, this)
 
         background = getRoundedCornerDrawable(R.color.block_background)
         setPadding(0, 16.dp, 0, 16.dp)

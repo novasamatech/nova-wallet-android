@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.details
 import android.text.TextUtils
 import android.view.View
 import androidx.core.os.bundleOf
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.base.BaseFragment

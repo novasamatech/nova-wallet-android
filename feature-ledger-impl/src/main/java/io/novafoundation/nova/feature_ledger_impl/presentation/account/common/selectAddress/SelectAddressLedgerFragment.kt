@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets

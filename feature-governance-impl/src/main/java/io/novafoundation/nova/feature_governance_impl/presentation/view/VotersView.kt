@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -23,8 +22,6 @@ class VotersView @JvmOverloads constructor(
     private val binder = ViewVotersBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_voters, this)
-
         setBackgroundResource(R.drawable.bg_primary_list_item)
     }
 

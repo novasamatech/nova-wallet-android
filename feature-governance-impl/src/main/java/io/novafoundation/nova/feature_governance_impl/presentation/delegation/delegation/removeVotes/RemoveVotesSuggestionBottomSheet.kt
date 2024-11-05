@@ -16,10 +16,6 @@ class RemoveVotesSuggestionBottomSheet(
 
     override val binder: BottomRemoveVotesSuggestionBinding = BottomRemoveVotesSuggestionBinding.inflate(LayoutInflater.from(context))
 
-    init {
-        setContentView(R.layout.bottom_remove_votes_suggestion)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

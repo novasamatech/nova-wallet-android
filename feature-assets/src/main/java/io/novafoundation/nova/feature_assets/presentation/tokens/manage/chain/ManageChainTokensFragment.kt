@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain
 
 import androidx.core.os.bundleOf
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils

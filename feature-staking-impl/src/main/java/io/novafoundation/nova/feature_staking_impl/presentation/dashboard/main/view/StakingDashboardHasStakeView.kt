@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -71,8 +70,6 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.item_dashboard_has_stake, this)
-
         background = context.getBlockDrawable().withRippleMask()
         binder.itemDashboardHasStakeRightSection.background = getRoundedCornerDrawable(cornerSizeDp = 10, fillColorRes = R.color.block_background_dark)
 

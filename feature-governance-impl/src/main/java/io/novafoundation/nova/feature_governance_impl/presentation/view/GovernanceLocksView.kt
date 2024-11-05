@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.inflater
@@ -20,8 +19,6 @@ class GovernanceLocksView @JvmOverloads constructor(
     private val binder = ViewGovernanceLocksBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_governance_locks, this)
-
         setBackgroundResource(R.drawable.bg_primary_list_item)
 
         binder.governanceLockAmount.isEnabled = false

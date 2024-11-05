@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.view.settings
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
@@ -22,8 +21,6 @@ class SettingsSwitcherView @JvmOverloads constructor(
     private val binder = ViewSettingsSwitcherBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_settings_switcher, this)
-
         attrs?.let(::applyAttributes)
     }
 

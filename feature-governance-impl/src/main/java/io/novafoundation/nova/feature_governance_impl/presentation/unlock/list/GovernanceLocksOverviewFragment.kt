@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.unlock.list
 
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState

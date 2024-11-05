@@ -1,6 +1,5 @@
 package io.novafoundation.nova.splash.presentation
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.splash.databinding.FragmentSplashBinding

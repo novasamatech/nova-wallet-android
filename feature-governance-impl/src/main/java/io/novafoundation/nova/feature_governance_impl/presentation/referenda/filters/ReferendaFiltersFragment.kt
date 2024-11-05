@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.filters
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets

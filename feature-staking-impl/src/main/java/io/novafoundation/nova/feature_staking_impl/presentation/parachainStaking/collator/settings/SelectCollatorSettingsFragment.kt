@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo

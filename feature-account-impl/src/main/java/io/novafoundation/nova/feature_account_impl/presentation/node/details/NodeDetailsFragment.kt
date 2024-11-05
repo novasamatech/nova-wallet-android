@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.node.details
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.onTextChanged

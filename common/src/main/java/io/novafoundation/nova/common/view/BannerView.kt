@@ -24,7 +24,6 @@ class BannerView @JvmOverloads constructor(
     private val binder = ViewBannerBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_banner, this)
         cardElevation = 0f
         radius = 12f.dpF(context)
         strokeWidth = 1.dp(context)

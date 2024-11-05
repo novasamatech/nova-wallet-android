@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_push_notifications.presentation.governanc
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -16,7 +16,9 @@ import io.novafoundation.nova.feature_push_notifications.presentation.governance
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.adapter.PushGovernanceSettingsAdapter
 import javax.inject.Inject
 
-class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewModel, FragmentPushGovernanceSettingsBinding>(), PushGovernanceSettingsAdapter.ItemHandler {
+class PushGovernanceSettingsFragment :
+    BaseFragment<PushGovernanceSettingsViewModel, FragmentPushGovernanceSettingsBinding>(),
+    PushGovernanceSettingsAdapter.ItemHandler {
 
     companion object {
         private const val KEY_REQUEST = "KEY_REQUEST"

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setDrawableStart

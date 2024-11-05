@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 import android.graphics.Color
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents

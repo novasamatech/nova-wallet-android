@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView

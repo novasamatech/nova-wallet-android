@@ -38,7 +38,7 @@ dependencies {
     implementation project(':feature-cloud-backup-api')
     implementation project(':web3names')
 
-    implementation viewBindingDelegate
+    
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep
     implementation androidDep

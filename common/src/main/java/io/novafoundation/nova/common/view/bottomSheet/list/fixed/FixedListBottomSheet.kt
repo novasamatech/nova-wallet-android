@@ -1,12 +1,10 @@
 package io.novafoundation.nova.common.view.bottomSheet.list.fixed
 
 import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.viewbinding.ViewBinding
@@ -45,11 +43,6 @@ abstract class FixedListBottomSheet<B : ViewBinding>(
     }
 
     override val binder: B = viewConfiguration.configurationBinder
-
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     final override fun setContentView(layoutResId: Int) {
         super.setContentView(layoutResId)

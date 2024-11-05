@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.CompoundButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
@@ -26,8 +25,6 @@ class Switch @JvmOverloads constructor(
         get() = binder.viewSwitchField
 
     init {
-        View.inflate(context, R.layout.view_switch, this)
-
         attrs?.let(::applyAttributes)
     }
 

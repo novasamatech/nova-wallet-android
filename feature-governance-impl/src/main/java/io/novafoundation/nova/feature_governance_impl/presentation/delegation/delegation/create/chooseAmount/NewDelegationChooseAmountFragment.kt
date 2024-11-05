@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.delegation.d
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints

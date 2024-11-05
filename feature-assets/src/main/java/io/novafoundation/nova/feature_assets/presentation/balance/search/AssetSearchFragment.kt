@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.search
 
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment

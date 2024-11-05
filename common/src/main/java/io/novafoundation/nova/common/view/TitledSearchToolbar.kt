@@ -24,8 +24,6 @@ class TitledSearchToolbar @JvmOverloads constructor(
         get() = binder.titledSearchToolbarField
 
     init {
-        View.inflate(context, R.layout.view_titled_search_toolbar, this)
-
         applyAttributes(attrs)
     }
 

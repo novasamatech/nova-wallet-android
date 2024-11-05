@@ -51,8 +51,8 @@ dependencies {
 
     implementation kotlinDep
 
-    implementation viewBindingDelegate
-implementation viewBindingDelegate
+    
+
     implementation androidDep
     implementation materialDep
     implementation constraintDep

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.se
 
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.utils.applyImeInsetts

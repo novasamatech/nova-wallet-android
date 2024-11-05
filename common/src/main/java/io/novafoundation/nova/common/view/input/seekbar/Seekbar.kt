@@ -26,8 +26,6 @@ class Seekbar @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_seekbar, this)
     }
 
     var progress: Int

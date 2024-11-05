@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vo
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -30,8 +29,6 @@ class AmountChangesView @JvmOverloads constructor(
     private val binder = ViewAmountChangesBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_amount_changes, this)
-
         setBackgroundResource(R.drawable.bg_primary_list_item)
 
         attrs?.let { applyAttributes(it) }

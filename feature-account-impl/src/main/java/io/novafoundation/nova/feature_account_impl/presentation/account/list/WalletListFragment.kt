@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi

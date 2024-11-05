@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
@@ -10,7 +9,6 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.databinding.ViewYourVotePreviewBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourMultiVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
@@ -75,7 +73,6 @@ class YourVotePreviewView @JvmOverloads constructor(
     private val binder = ViewYourVotePreviewBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_your_vote_preview, this)
         setPadding(0, 12.dp, 0, 0)
     }
 

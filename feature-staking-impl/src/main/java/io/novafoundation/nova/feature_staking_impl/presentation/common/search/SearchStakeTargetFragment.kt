@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.search
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.SearchState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 
 typealias DoneAction = () -> Unit
 
-abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> : BaseFragment<V, FragmentSearchCustomValidatorsBinding>(), StakeTargetAdapter.ItemHandler<S> {
+abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> :
+    BaseFragment<V, FragmentSearchCustomValidatorsBinding>(),
+    StakeTargetAdapter.ItemHandler<S> {
 
     class Configuration(
         val doneAction: DoneAction?,
@@ -69,10 +71,12 @@ abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> :
                     binder.searchCustomValidatorsPlaceholder.setImage(R.drawable.ic_placeholder)
                     binder.searchCustomValidatorsPlaceholder.setText(getString(R.string.search_recipient_welcome_v2_2_0))
                 }
+
                 SearchState.NoResults -> {
                     binder.searchCustomValidatorsPlaceholder.setImage(R.drawable.ic_no_search_results)
                     binder.searchCustomValidatorsPlaceholder.setText(getString(R.string.staking_validator_search_empty_title))
                 }
+
                 SearchState.Loading -> {}
                 is SearchState.Success -> {
                     binder.searchCustomValidatorAccounts.text = it.headerTitle

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings
 import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog

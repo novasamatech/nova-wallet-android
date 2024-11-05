@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.ac
 
 import android.os.Bundle
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -16,7 +16,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.acc
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.adapter.ManualBackupAccountsAdapter
 import javax.inject.Inject
 
-class ManualBackupSelectAccountFragment : BaseFragment<ManualBackupSelectAccountViewModel, FragmentManualBackupSelectWalletBinding>(), ManualBackupAccountsAdapter.AccountHandler {
+class ManualBackupSelectAccountFragment :
+    BaseFragment<ManualBackupSelectAccountViewModel, FragmentManualBackupSelectWalletBinding>(),
+    ManualBackupAccountsAdapter.AccountHandler {
 
     companion object {
 

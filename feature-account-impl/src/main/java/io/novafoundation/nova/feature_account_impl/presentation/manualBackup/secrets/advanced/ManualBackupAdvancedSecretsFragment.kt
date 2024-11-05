@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.decoration.ExtraSpaceItemDecoration
@@ -15,7 +15,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupJsonRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
 
-class ManualBackupAdvancedSecretsFragment : BaseFragment<ManualBackupAdvancedSecretsViewModel, FragmentManualBackupAdvancedSecretsBinding>(), ManualBackupItemHandler {
+class ManualBackupAdvancedSecretsFragment :
+    BaseFragment<ManualBackupAdvancedSecretsViewModel, FragmentManualBackupAdvancedSecretsBinding>(),
+    ManualBackupItemHandler {
 
     companion object {
 

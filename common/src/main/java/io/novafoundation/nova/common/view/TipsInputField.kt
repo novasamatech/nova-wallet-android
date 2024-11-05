@@ -47,7 +47,6 @@ class TipsInputField @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-        View.inflate(context, R.layout.view_tips_input, this)
         binder.tipsInputFieldContainer.setAddStatesFromChildren(true)
         binder.tipsInputFieldContainer.background = context.getInputBackground()
 

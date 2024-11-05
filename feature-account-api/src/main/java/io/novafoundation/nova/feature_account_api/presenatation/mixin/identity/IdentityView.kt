@@ -19,8 +19,6 @@ class IdentityView @JvmOverloads constructor(
     private val binder = ViewIdentityBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_identity, this)
-
         setTitle(context.getString(R.string.identity_title))
     }
 

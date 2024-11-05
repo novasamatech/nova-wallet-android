@@ -2,7 +2,6 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
@@ -20,8 +19,6 @@ class NovaConnectView @JvmOverloads constructor(
 
     init {
         orientation = HORIZONTAL
-
-        View.inflate(context, R.layout.view_nova_connect, this)
 
         attrs?.let(::applyAttributes)
     }

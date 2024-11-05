@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.exporting.seed
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi

@@ -45,12 +45,6 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
     protected val recyclerView: RecyclerView
         get() = binder.dynamicListSheetContent
 
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setContentView(R.layout.bottom_sheet_dynamic_list)
-        super.onCreate(savedInstanceState)
-    }
-
     final override fun setTitle(title: CharSequence?) {
         binder.dynamicListSheetTitle.text = title
     }

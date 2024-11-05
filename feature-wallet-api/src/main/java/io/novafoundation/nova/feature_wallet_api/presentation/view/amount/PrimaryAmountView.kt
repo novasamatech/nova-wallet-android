@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view.amount
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.presentation.LoadingView
@@ -12,7 +11,6 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewPrimaryAmountBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
@@ -25,7 +23,6 @@ class PrimaryAmountView @JvmOverloads constructor(
     private val binder = ViewPrimaryAmountBinding.inflate(inflater(), this)
 
     init {
-        View.inflate(context, R.layout.view_primary_amount, this)
         orientation = VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
     }

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations

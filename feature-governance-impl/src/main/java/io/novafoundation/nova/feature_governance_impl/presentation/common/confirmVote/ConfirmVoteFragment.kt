@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote
 
-import by.kirich1409.viewbindingdelegate.viewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations

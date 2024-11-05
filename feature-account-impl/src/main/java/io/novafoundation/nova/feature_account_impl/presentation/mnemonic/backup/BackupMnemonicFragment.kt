@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
 import android.os.Bundle
 import android.view.ContextThemeWrapper
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.condition.setupConditions

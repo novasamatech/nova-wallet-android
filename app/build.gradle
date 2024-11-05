@@ -270,7 +270,7 @@ dependencies {
 
     implementation biometricDep
 
-    implementation viewBindingDelegate
+    
     implementation androidDep
     implementation constraintDep
 

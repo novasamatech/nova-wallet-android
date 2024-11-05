@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentSelectLedg
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import javax.inject.Inject
 
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V, FragmentSelectLedgerBinding>(), SelectLedgerAdapter.Handler {

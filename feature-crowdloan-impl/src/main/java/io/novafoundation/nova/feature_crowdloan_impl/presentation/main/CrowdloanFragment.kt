@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.main
 
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId

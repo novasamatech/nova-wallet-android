@@ -15,7 +15,8 @@ abstract class BaseListAdapter<T, VH : BaseViewHolder>(diffCallback: DiffUtil.It
 
 abstract class BaseViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
-    val context = containerView.context
+    val context
+        get() = containerView.context
 
     open fun unbind() {}
 }

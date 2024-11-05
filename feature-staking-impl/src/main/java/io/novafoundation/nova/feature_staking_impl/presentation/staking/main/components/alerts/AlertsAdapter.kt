@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemAlertBinding
-import kotlinx.android.extensions.LayoutContainer
 
 class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(AlertDiffCallback()) {
 

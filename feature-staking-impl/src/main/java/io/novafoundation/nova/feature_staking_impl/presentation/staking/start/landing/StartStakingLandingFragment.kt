@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.l
 
 import android.os.Bundle
 import androidx.recyclerview.widget.ConcatAdapter
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState

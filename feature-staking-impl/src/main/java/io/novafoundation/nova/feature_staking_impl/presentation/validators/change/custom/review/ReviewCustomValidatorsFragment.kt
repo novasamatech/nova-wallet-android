@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review
 
 import android.os.Bundle
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.Stake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 
-class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel, FragmentReviewCustomValidatorsBinding>(), StakeTargetAdapter.ItemHandler<Validator> {
+class ReviewCustomValidatorsFragment :
+    BaseFragment<ReviewCustomValidatorsViewModel, FragmentReviewCustomValidatorsBinding>(),
+    StakeTargetAdapter.ItemHandler<Validator> {
 
     companion object {
 

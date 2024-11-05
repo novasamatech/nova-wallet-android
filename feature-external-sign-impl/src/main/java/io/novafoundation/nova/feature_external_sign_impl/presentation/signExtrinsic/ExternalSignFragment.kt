@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic
 
 import androidx.core.os.bundleOf
-import by.kirich1409.viewbindingdelegate.viewBinding
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.blockBackPressing
