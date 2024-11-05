@@ -8,11 +8,13 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -56,6 +58,38 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface WalletFeatureDependencies {
+
+    val fileCache: FileCache
+
+    val storageCache: StorageCache
+
+    val evmTransactionService: EvmTransactionService
+
+    val chainAssetDao: ChainAssetDao
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val currencyRepository: CurrencyRepository
+
+    val externalBalanceDao: ExternalBalanceDao
+
+    val computationalCache: ComputationalCache
+
+    val multiLocationConverterFactory: MultiLocationConverterFactory
+
+    val extrinsicWalk: ExtrinsicWalk
+
+    val holdsDao: HoldsDao
+
+    val feePaymentProviderRegistry: FeePaymentProviderRegistry
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val customFeeCapabilityFacade: CustomFeeCapabilityFacade
+
+    val assetIconProvider: AssetIconProvider
+
+    val parachainInfoRepository: ParachainInfoRepository
 
     fun preferences(): Preferences
 
@@ -135,33 +169,5 @@ interface WalletFeatureDependencies {
 
     fun hydraDxAssetIdConverter(): HydraDxAssetIdConverter
 
-    val fileCache: FileCache
-
-    val storageCache: StorageCache
-
-    val evmTransactionService: EvmTransactionService
-
-    val chainAssetDao: ChainAssetDao
-
-    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val currencyRepository: CurrencyRepository
-
-    val externalBalanceDao: ExternalBalanceDao
-
-    val computationalCache: ComputationalCache
-
-    val multiLocationConverterFactory: MultiLocationConverterFactory
-
-    val extrinsicWalk: ExtrinsicWalk
-
-    val holdsDao: HoldsDao
-
-    val feePaymentProviderRegistry: FeePaymentProviderRegistry
-
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-
-    val customFeeCapabilityFacade: CustomFeeCapabilityFacade
-
-    val parachainInfoRepository: ParachainInfoRepository
+    fun assetsIconModeService(): AssetsIconModeRepository
 }

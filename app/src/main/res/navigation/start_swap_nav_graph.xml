@@ -55,7 +55,7 @@
 
     <fragment
         android:id="@+id/selectAssetSwapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
         android:label="AssetSwapFlowFragment" />
 
     <fragment

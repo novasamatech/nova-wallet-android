@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
@@ -40,8 +42,6 @@ interface AssetsRouter {
 
     fun openReceive(assetPayload: AssetPayload)
 
-    fun openAssetFilters()
-
     fun openAssetSearch()
 
     fun openManageTokens()
@@ -75,4 +75,12 @@ interface AssetsRouter {
     fun openStaking()
 
     fun closeSendFlow()
+
+    fun openSendNetworks(payload: NetworkFlowPayload)
+
+    fun openReceiveNetworks(payload: NetworkFlowPayload)
+
+    fun openSwapNetworks(payload: NetworkSwapFlowPayload)
+
+    fun openBuyNetworks(payload: NetworkFlowPayload)
 }

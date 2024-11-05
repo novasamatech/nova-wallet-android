@@ -304,6 +304,7 @@ class SwapMainSettingsViewModel(
                 ?.token
                 ?.configuration
             val payload = outAsset?.let { AssetPayload(it.chainId, it.id) }
+
             swapRouter.selectAssetIn(payload)
         }
     }
@@ -314,6 +315,7 @@ class SwapMainSettingsViewModel(
                 ?.token
                 ?.configuration
             val payload = inAsset?.let { AssetPayload(it.chainId, it.id) }
+
             swapRouter.selectAssetOut(payload)
         }
     }

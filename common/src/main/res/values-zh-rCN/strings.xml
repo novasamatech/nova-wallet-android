@@ -1123,7 +1123,7 @@
     <string name="settings_biometric_not_ready_message">请确保在设置中启用了生物识别</string>
     <string name="settings_biometric_not_ready_title">设置中禁用了生物识别</string>
     <string name="settings_community">社区</string>
-    <string name="settings_email">电子邮件</string>
+    <string name="settings_email">通过电子邮件获得支持</string>
     <string name="settings_general">通用</string>
     <string name="settings_pin_code_verification_confirmation_message">带有密钥对的钱包（在nova钱包中创建或导入的）上的每次签名操作都应在构造签名前要求进行PIN验证</string>
     <string name="settings_pin_code_verification_confirmation_title">请求操作签名的认证</string>
@@ -1135,7 +1135,7 @@
     <string name="settings_security">安全性</string>
     <string name="settings_support">支持和反馈</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">维基</string>
+    <string name="settings_wiki">维基百科和帮助中心</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">弃权时将把决心设置为 0.1x</string>
     <string name="setup_staking_conflict_message">不能同时使用直接质押和提名池进行质押</string>

@@ -91,7 +91,7 @@ class CustomChainFactory(
             id = 0,
             name = payload.chainName,
             enabled = true,
-            iconUrl = prefilledUtilityAsset?.iconUrl,
+            icon = prefilledUtilityAsset?.icon,
             priceId = priceId,
             chainId = chainId,
             symbol = payload.tokenSymbol.asTokenSymbol(),

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -15,7 +16,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class AmountChooserProviderFactory(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val assetIconProvider: AssetIconProvider,
 ) : AmountChooserMixin.Factory {
 
     override fun create(
@@ -29,6 +31,7 @@ class AmountChooserProviderFactory(
             usedAssetFlow = assetFlow,
             balanceLabel = balanceLabel,
             resourceManager = resourceManager,
+            assetIconProvider = assetIconProvider,
             maxActionProvider = SimpleMaxActionProvider(
                 maxAvailableForDisplay = availableBalanceFlow,
                 // TODO amount chooser max button
@@ -56,6 +59,7 @@ class AmountChooserProvider(
     coroutineScope: CoroutineScope,
     override val usedAssetFlow: Flow<Asset>,
     private val resourceManager: ResourceManager,
+    private val assetIconProvider: AssetIconProvider,
     @StringRes private val balanceLabel: Int?,
     maxActionProvider: MaxActionProvider
 ) : BaseAmountChooserProvider(
@@ -66,7 +70,7 @@ class AmountChooserProvider(
     AmountChooserMixin.Presentation {
 
     override val assetModel = usedAssetFlow.map { asset ->
-        ChooseAmountModel(asset, resourceManager, balanceLabel)
+        ChooseAmountModel(asset, assetIconProvider, resourceManager, balanceLabel)
     }
         .shareInBackground()
 }

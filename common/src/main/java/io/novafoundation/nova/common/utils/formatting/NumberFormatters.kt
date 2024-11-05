@@ -129,7 +129,6 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - time.daysFromMillis()
 
-    if (diff < 0) throw IllegalArgumentException("Past date should be less than current")
     return when (diff) {
         0L -> resourceManager.getString(R.string.today)
         1L -> resourceManager.getString(R.string.yesterday)

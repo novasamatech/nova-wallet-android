@@ -26,7 +26,7 @@ private class WrapToListSerializer : JsonDeserializer<List<*>> {
         }
 
         return json.asJsonArray.map {
-            context.deserialize<Any?>(json, valueType)
+            context.deserialize<Any?>(it, valueType)
         }
     }
 }

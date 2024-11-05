@@ -9,10 +9,9 @@ import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenModel
 import kotlinx.android.synthetic.main.item_manage_token_multichain.view.itemManageTokenMultichainEnabled
@@ -79,7 +78,7 @@ class ManageTokensViewHolder(
 
         bindEnabled(item)
 
-        itemManageTokenMultichainIcon.loadTokenIcon(item.header.icon, imageLoader)
+        itemManageTokenMultichainIcon.setIcon(item.header.icon, imageLoader)
         itemManageTokenMultichainSymbol.text = item.header.symbol
     }
 
@@ -91,8 +90,9 @@ class ManageTokensViewHolder(
         itemManageTokenMultichainEnabled.isChecked = item.enabled
         itemManageTokenMultichainEnabled.isEnabled = item.switchable
 
+        itemManageTokenMultichainIcon.alpha = if (item.enabled) 1f else 0.48f
+
         val contentColorRes = if (item.enabled) R.color.text_primary else R.color.text_secondary
-        itemManageTokenMultichainIcon.setImageTintRes(contentColorRes)
         itemManageTokenMultichainSymbol.setTextColorRes(contentColorRes)
     }
 

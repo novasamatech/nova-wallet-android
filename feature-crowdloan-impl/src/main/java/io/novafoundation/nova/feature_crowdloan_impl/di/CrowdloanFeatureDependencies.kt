@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
@@ -35,6 +36,16 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface CrowdloanFeatureDependencies {
+
+    val parachainInfoRepository: ParachainInfoRepository
+
+    val signerProvider: SignerProvider
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val externalBalanceDao: ExternalBalanceDao
+
+    val assetIconProvider: AssetIconProvider
 
     fun contributionDao(): ContributionDao
 
@@ -91,12 +102,4 @@ interface CrowdloanFeatureDependencies {
     fun customDialogDisplayer(): CustomDialogDisplayer.Presentation
 
     fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
-
-    val parachainInfoRepository: ParachainInfoRepository
-
-    val signerProvider: SignerProvider
-
-    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val externalBalanceDao: ExternalBalanceDao
 }

@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
+
+    <string name="appearance_token_assets_title">token icons</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_white_icon_title">White</string>
+    <string name="appearance_colored_icon_title">Colored</string>
+
+    <string name="buy_network_flow_title">Select network for buying %s</string>
+    <string name="receive_network_flow_title">Select network for receiving %s</string>
+    <string name="send_network_flow_title">Select network for sending %s</string>
+    <string name="swap_network_flow_title">Select network for swaping %s</string>
+
+    <string name="asset_view_tokens">Tokens</string>
+    <string name="asset_view_networks">Networks</string>
+
+    <string name="settings_wiki">Wiki &amp; Help Center</string>
+
+    <string name="settings_email">Get support via Email</string>
+
     <string name="swipe_gov_card_placeholder_basket_full_text">You have already voted for all available referenda</string>
     <string name="swipe_gov_cards_placeholder_button">Confirm your votes</string>
     <string name="swipe_gov_cards_basket_title">Vote list</string>
@@ -623,8 +642,6 @@
     <string name="deep_linking_invalid_derivation_path">Invalid derivation path</string>
 
     <string name="referendim_details_not_found_title">Referendum not found</string>
-
-    <string name="settings_wiki">Wiki</string>
 
     <string name="operations_swap_title">Swap</string>
 
@@ -2036,7 +2053,6 @@
     <string name="search_recipient_welcome_v2_2_0">Search results will be displayed here</string>
     <string name="search_result_header">Search results</string>
     <string name="settings_community">Community</string>
-    <string name="settings_email">Email</string>
     <string name="settings_general">General</string>
     <string name="settings_preferences">Preferences</string>
     <string name="settings_security">Security</string>

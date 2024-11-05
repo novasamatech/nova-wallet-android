@@ -3,6 +3,7 @@
     <!-- Colors not included in the design system -->
     <color name="address_icon_background">#eeeeee</color>
     <color name="qr_code_background">#FFFFFF</color>
+    <color name="qr_code_content">#101014</color>
 
     <!-- Splash background color -->
     <color name="splash_background_color">#05081C</color>
@@ -13,8 +14,10 @@
 
     <!-- Text Colors -->
     <color name="text_primary">#E0FFFFFF</color>
-    <color name="text_on_cloud_backup_button">#05081C</color>
+    <color name="text_primary_on_content">#000000</color>
     <color name="text_secondary">#7AFFFFFF</color>
+    <color name="text_secondary_on_content">#8F000000</color>
+    <color name="text_on_cloud_backup_button">#05081C</color>
     <color name="button_text">#E0FFFFFF</color>
     <color name="chip_text">#A3FFFFFF</color>
     <color name="button_text_inactive">#52FFFFFF</color>
@@ -61,6 +64,7 @@
     <color name="secondary_screen_background">#08090E</color>
     <color name="bottom_sheet_background">#181920</color>
     <color name="block_background">#1A999EC7</color>
+    <color name="hided_networks_block_background">#3D999EC7</color>
     <!--    TODO update name once in design system-->
     <color name="block_background_dark">#5205081C</color>
     <color name="cell_background_pressed">#291F78FF</color>

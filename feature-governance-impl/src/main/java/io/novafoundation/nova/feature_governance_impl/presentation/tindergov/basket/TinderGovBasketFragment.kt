@@ -74,7 +74,7 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
                 onNegativeClick = { event.onSuccess(false) },
                 positiveTextRes = R.string.common_remove,
                 negativeTextRes = R.string.common_cancel,
-                styleRes = R.style.AccentNegativeAlertDialogTheme,
+                styleRes = R.style.AccentNegativeAlertDialogTheme_Reversed,
             ) {
                 setTitle(event.payload)
                 setMessage(R.string.swipe_gov_basket_remove_item_confirm_message)
