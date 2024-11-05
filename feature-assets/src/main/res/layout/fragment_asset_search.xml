@@ -23,7 +23,7 @@
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/searchAssetList"
-        tools:listitem="@layout/item_asset" />
+        tools:listitem="@layout/item_network_asset" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:layout_width="match_parent"

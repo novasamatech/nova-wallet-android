@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin
 
 import android.util.Log
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.daysFromMillis
@@ -50,7 +51,8 @@ class TransactionHistoryProvider(
     private val chainRegistry: ChainRegistry,
     private val chainId: ChainId,
     private val assetId: Int,
-    private val currencyRepository: CurrencyRepository
+    private val currencyRepository: CurrencyRepository,
+    private val assetIconProvider: AssetIconProvider
 ) : TransactionHistoryMixin, CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private val domainState = singleReplaySharedFlow<State>()
@@ -237,7 +239,7 @@ class TransactionHistoryProvider(
                 val header = DayHeader(daysSinceEpoch)
 
                 val operationModels = operationsPerDay.map { operation ->
-                    mapOperationToOperationModel(chain, token, operation, accountIdentifier, resourceManager)
+                    mapOperationToOperationModel(chain, token, operation, accountIdentifier, resourceManager, assetIconProvider)
                 }
 
                 listOf(header) + operationModels

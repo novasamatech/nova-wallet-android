@@ -265,8 +265,12 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideRemoteToDomainChainMapperFacade(gson: Gson): RemoteToDomainChainMapperFacade {
-        return RemoteToDomainChainMapperFacade(gson)
+    fun provideRemoteToDomainChainMapperFacade(
+        gson: Gson
+    ): RemoteToDomainChainMapperFacade {
+        return RemoteToDomainChainMapperFacade(
+            gson
+        )
     }
 
     @Provides

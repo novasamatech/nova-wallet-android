@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -30,6 +31,7 @@ class ConfirmContributeModule {
     @IntoMap
     @ViewModelKey(ConfirmContributeViewModel::class)
     fun provideViewModel(
+        assetIconProvider: AssetIconProvider,
         interactor: CrowdloanContributeInteractor,
         router: CrowdloanRouter,
         resourceManager: ResourceManager,
@@ -44,6 +46,7 @@ class ConfirmContributeModule {
         singleAssetSharedState: CrowdloanSharedState,
     ): ViewModel {
         return ConfirmContributeViewModel(
+            assetIconProvider,
             router,
             interactor,
             resourceManager,

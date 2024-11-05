@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -18,6 +20,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -34,8 +38,9 @@ class BalanceListModule {
     fun provideInteractor(
         accountRepository: AccountRepository,
         nftRepository: NftRepository,
-        bannerVisibilityRepository: BannerVisibilityRepository
-    ) = AssetsListInteractor(accountRepository, nftRepository, bannerVisibilityRepository)
+        bannerVisibilityRepository: BannerVisibilityRepository,
+        assetsViewModeRepository: AssetsViewModeRepository
+    ) = AssetsListInteractor(accountRepository, nftRepository, bannerVisibilityRepository, assetsViewModeRepository)
 
     @Provides
     @ScreenScope
@@ -52,6 +57,22 @@ class BalanceListModule {
     }
 
     @Provides
+    @ScreenScope
+    fun provideAssetListMixinFactory(
+        walletInteractor: WalletInteractor,
+        assetsListInteractor: AssetsListInteractor,
+        externalBalancesInteractor: ExternalBalancesInteractor,
+        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
+    ): AssetListMixinFactory {
+        return AssetListMixinFactory(
+            walletInteractor,
+            assetsListInteractor,
+            externalBalancesInteractor,
+            expandableAssetsMixinFactory
+        )
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(BalanceListViewModel::class)
     fun provideViewModel(
@@ -61,10 +82,10 @@ class BalanceListModule {
         router: AssetsRouter,
         currencyInteractor: CurrencyInteractor,
         balanceBreakdownInteractor: BalanceBreakdownInteractor,
-        externalBalancesInteractor: ExternalBalancesInteractor,
         resourceManager: ResourceManager,
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
-        swapAvailabilityInteractor: SwapAvailabilityInteractor
+        swapAvailabilityInteractor: SwapAvailabilityInteractor,
+        assetListMixinFactory: AssetListMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
             walletInteractor = walletInteractor,
@@ -73,10 +94,10 @@ class BalanceListModule {
             router = router,
             currencyInteractor = currencyInteractor,
             balanceBreakdownInteractor = balanceBreakdownInteractor,
-            externalBalancesInteractor = externalBalancesInteractor,
             resourceManager = resourceManager,
             walletConnectSessionsUseCase = walletConnectSessionsUseCase,
-            swapAvailabilityInteractor = swapAvailabilityInteractor
+            swapAvailabilityInteractor = swapAvailabilityInteractor,
+            assetListMixinFactory = assetListMixinFactory
         )
     }
 

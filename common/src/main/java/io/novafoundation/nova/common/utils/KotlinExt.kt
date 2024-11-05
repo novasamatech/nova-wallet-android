@@ -23,6 +23,7 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -596,4 +597,8 @@ fun Calendar.resetDay() {
     set(Calendar.MINUTE, 0)
     set(Calendar.SECOND, 0)
     set(Calendar.MILLISECOND, 0)
+}
+
+inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
+    launch { block() }
 }

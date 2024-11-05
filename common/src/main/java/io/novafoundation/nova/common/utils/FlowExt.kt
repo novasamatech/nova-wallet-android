@@ -56,6 +56,10 @@ inline fun <T> Flow<List<T>>.filterList(crossinline handler: suspend (T) -> Bool
     list.filter { item -> handler(item) }
 }
 
+inline fun <T> Flow<Set<T>>.filterSet(crossinline handler: suspend (T) -> Boolean) = map { set ->
+    set.filter { item -> handler(item) }.toSet()
+}
+
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
 }

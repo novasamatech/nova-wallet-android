@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import com.google.zxing.qrcode.encoder.Encoder
+import com.google.zxing.qrcode.encoder.QRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,10 +23,14 @@ class QrCodeGenerator(
         const val MAX_PAYLOAD_LENGTH = 512
     }
 
+    fun generateQrCode(input: String): QRCode {
+        val hints = HashMap<EncodeHintType, String>()
+        return Encoder.encode(input, ErrorCorrectionLevel.H, hints)
+    }
+
     suspend fun generateQrBitmap(input: String): Bitmap {
         return withContext(Dispatchers.Default) {
-            val hints = HashMap<EncodeHintType, String>()
-            val qrCode = Encoder.encode(input, ErrorCorrectionLevel.H, hints)
+            val qrCode = generateQrCode(input)
             val byteMatrix = qrCode.matrix
             val width = byteMatrix.width + PADDING_SIZE
             val height = byteMatrix.height + PADDING_SIZE
