@@ -53,7 +53,8 @@ class RealExpandableAssetsMixin(
     ) { assetesByViewMode, expandedTokens, currency ->
         when (assetesByViewMode) {
             is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(assetIconProvider, currency)
-            is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(assetIconProvider,
+            is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(
+                assetIconProvider,
                 assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
             )
         }
