@@ -17,7 +17,7 @@ class RealSwapSettingsState(
 
     override val selectedOption = MutableStateFlow(initialValue)
 
-    override suspend fun setAssetInUpdatingFee(asset: Chain.Asset) {
+    override suspend fun setAssetIn(asset: Chain.Asset) {
         val current = selectedOption.value
 
         val newPlanks = current.convertedAmountForNewAssetIn(asset)

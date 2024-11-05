@@ -282,7 +282,7 @@ class SwapMainSettingsViewModel(
     init {
         initPayload()
 
-//        launch { swapInteractor.warmUpSwapCommonlyUsedChains(viewModelScope) }
+        launch { swapInteractor.warmUpSwapCommonlyUsedChains(viewModelScope) }
 
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
@@ -425,7 +425,7 @@ class SwapMainSettingsViewModel(
             val assetIn = chainRegistry.asset(payload.assetIn.fullChainAssetId)
             val swapSettingsState = swapSettingState.await()
             when (payload) {
-                is SwapSettingsPayload.DefaultFlow -> swapSettingState().setAssetInUpdatingFee(assetIn)
+                is SwapSettingsPayload.DefaultFlow -> swapSettingState().setAssetIn(assetIn)
 
                 is SwapSettingsPayload.RepeatOperation -> {
                     val assetOut = chainRegistry.asset(payload.assetOut.fullChainAssetId)

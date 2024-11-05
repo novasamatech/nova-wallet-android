@@ -82,5 +82,7 @@ interface AssetsRouter {
 
     fun openSwapNetworks(payload: NetworkSwapFlowPayload)
 
+    fun returnToMainSwapScreen()
+
     fun openBuyNetworks(payload: NetworkFlowPayload)
 }

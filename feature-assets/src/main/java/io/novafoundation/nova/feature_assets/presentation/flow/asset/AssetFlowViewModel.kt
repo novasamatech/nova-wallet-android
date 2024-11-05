@@ -57,7 +57,7 @@ abstract class AssetFlowViewModel(
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
     private val searchAssetsFlow = flowOfAll { searchAssetsFlow() }
-        .shareInBackground()
+        .shareInBackground(SharingStarted.Lazily)
 
     val searchResults = combine(
         searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self

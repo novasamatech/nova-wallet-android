@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/start_swap_graph"
+    android:id="@+id/start_swap_nav_graph"
     app:startDestination="@id/swapSettingsFragment">
 
     <fragment
@@ -19,14 +19,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_swapMainSettingsFragment_to_swapFlow"
-            app:destination="@id/selectAssetSwapFlowFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_swapMainSettingsFragment_to_swapOptionsFragment"
             app:destination="@id/swapOptionsFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -34,6 +26,13 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
+        <action
+            android:id="@+id/action_swapSettingsFragment_to_select_swap_token_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:destination="@id/select_swap_token_nav_graph" />
     </fragment>
 
     <fragment
@@ -54,13 +53,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/selectAssetSwapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment" />
-
-    <fragment
         android:id="@+id/swapOptionsFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
         android:label="SwapOptionsFragment" />
 
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
 </navigation>

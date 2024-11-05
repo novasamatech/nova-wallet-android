@@ -134,8 +134,10 @@ internal class RealSwapService(
 
     override suspend fun warmUpCommonChains(computationScope: CoroutineScope): Result<Unit> {
         return runCatching {
-            warmUpChain(Chain.Geneses.HYDRA_DX, computationScope)
-            warmUpChain(Chain.Geneses.POLKADOT_ASSET_HUB, computationScope)
+            withContext(Dispatchers.Default) {
+                warmUpChain(Chain.Geneses.HYDRA_DX, computationScope)
+                warmUpChain(Chain.Geneses.POLKADOT_ASSET_HUB, computationScope)
+            }
         }
     }
 

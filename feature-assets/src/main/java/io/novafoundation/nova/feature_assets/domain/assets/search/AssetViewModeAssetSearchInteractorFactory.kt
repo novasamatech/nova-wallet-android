@@ -12,15 +12,8 @@ class AssetViewModeAssetSearchInteractorFactory(
 
     override fun createByAssetViewMode(): AssetSearchInteractor {
         return when (assetViewModeRepository.getAssetViewMode()) {
-            AssetViewMode.TOKENS -> ByTokensAssetSearchInteractor(
-                assetSearchUseCase,
-                chainRegistry
-            )
-
-            AssetViewMode.NETWORKS -> ByNetworkAssetSearchInteractor(
-                assetSearchUseCase,
-                chainRegistry
-            )
+            AssetViewMode.TOKENS -> ByTokensAssetSearchInteractor(assetSearchUseCase, chainRegistry)
+            AssetViewMode.NETWORKS -> ByNetworkAssetSearchInteractor(assetSearchUseCase, chainRegistry)
         }
     }
 }

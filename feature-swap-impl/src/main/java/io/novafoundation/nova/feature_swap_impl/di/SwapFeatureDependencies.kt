@@ -38,7 +38,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTra
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -50,8 +49,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface SwapFeatureDependencies {
-
-    val feeLoaderMixinFactory: FeeLoaderMixin.Factory
 
     val validationExecutor: ValidationExecutor
 

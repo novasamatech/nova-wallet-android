@@ -19,6 +19,10 @@ class RealSwapAvailabilityInteractor(
         swapService.sync(coroutineScope)
     }
 
+    override suspend fun warmUpCommonlyUsedChains(computationScope: CoroutineScope) {
+        swapService.warmUpCommonChains(computationScope)
+    }
+
     override fun anySwapAvailableFlow(): Flow<Boolean> {
         return chainRegistry.enabledChainsFlow().map { it.any(Chain::isSwapSupported) }
     }
