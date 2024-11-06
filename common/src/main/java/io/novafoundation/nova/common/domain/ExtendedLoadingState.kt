@@ -42,6 +42,10 @@ val <T> ExtendedLoadingState<T>.dataOrNull: T?
         else -> null
     }
 
+@get:JvmName("isErrorProp")
+val ExtendedLoadingState<*>.isError: Boolean
+    get() = this is ExtendedLoadingState.Error
+
 fun <T> ExtendedLoadingState<T?>.loadedAndEmpty(): Boolean = when (this) {
     is ExtendedLoadingState.Loaded -> data == null
     else -> false
@@ -54,6 +58,10 @@ fun <T> loadedNothing(): ExtendedLoadingState<T?> {
 fun ExtendedLoadingState<*>.isLoading(): Boolean {
     return this is ExtendedLoadingState.Loading
 }
+
+@get:JvmName("isLoadingProp")
+val ExtendedLoadingState<*>.isLoading: Boolean
+    get() = isLoading()
 
 fun ExtendedLoadingState<*>.isError(): Boolean {
     return this is ExtendedLoadingState.Error

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -56,6 +57,7 @@ class SwapConfirmationModule {
         assetUseCase: ArbitraryAssetUseCase,
         maxActionProviderFactory: MaxActionProviderFactory,
         swapStateStoreProvider: SwapStateStoreProvider,
+        swapRouteFormatter: SwapRouteFormatter,
         assetIconProvider: AssetIconProvider
     ): ViewModel {
         return SwapConfirmationViewModel(
@@ -78,7 +80,8 @@ class SwapConfirmationModule {
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             arbitraryAssetUseCase = assetUseCase,
             maxActionProviderFactory = maxActionProviderFactory,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            swapRouteFormatter = swapRouteFormatter
         )
     }
 

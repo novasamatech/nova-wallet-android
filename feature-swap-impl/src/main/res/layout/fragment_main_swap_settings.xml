@@ -165,6 +165,12 @@
                             app:title="@string/swap_rate_title"
                             app:titleIcon="@drawable/ic_info" />
 
+                        <io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
+                            android:id="@+id/swapMainSettingsRoute"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:titleIcon="@drawable/ic_info" />
+
                         <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                             android:id="@+id/swapMainSettingsDetailsNetworkFee"
                             android:layout_width="match_parent"

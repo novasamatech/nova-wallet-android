@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
@@ -99,6 +100,7 @@ class SwapMainSettingsModule {
         swapRateFormatter: SwapRateFormatter,
         maxActionProviderFactory: MaxActionProviderFactory,
         swapStateStoreProvider: SwapStateStoreProvider,
+        swapRouteFormatter: SwapRouteFormatter
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -121,7 +123,8 @@ class SwapMainSettingsModule {
             selectedAccountUseCase = accountUseCase,
             buyMixinFactory = buyMixinFactory,
             swapStateStoreProvider = swapStateStoreProvider,
-            maxActionProviderFactory = maxActionProviderFactory
+            maxActionProviderFactory = maxActionProviderFactory,
+            swapRouteFormatter = swapRouteFormatter
         )
     }
 

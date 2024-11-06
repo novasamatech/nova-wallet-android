@@ -24,7 +24,7 @@ class LiquidityFieldValidator(
 
     override fun observe(inputStream: Flow<String>): Flow<FieldValidationResult> {
         return quotingStateFlow.map { quotingState ->
-            if (quotingState is QuotingState.NotAvailable) {
+            if (quotingState is QuotingState.Error) {
                 FieldValidationResult.Error(
                     resourceManager.getString(R.string.swap_field_validation_not_enough_liquidity)
                 )

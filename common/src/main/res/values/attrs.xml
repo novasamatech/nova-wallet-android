@@ -108,6 +108,11 @@
         <attr name="primaryValue" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="GenericTableCellView">
+        <attr name="title" />
+        <attr name="titleIcon" />
+    </declare-styleable>
+
     <declare-styleable name="TableView">
         <attr name="title" />
         <attr name="showBackground" format="boolean" />

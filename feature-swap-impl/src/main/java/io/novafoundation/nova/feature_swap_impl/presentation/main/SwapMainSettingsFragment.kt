@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
+import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsRoute
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
 import javax.inject.Inject
 
@@ -100,6 +101,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
 
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
+        viewModel.swapRouteState.observe(swapMainSettingsRoute::setSwapRouteState)
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
         viewModel.buttonState.observe(swapMainSettingsContinue::setState)
 

@@ -56,6 +56,12 @@
                 app:title="@string/swap_slippage_title"
                 app:titleIcon="@drawable/ic_info" />
 
+            <io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
+                android:id="@+id/swapConfirmationRoute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:titleIcon="@drawable/ic_info" />
+
             <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                 android:id="@+id/swapConfirmationNetworkFee"
                 android:layout_width="match_parent"

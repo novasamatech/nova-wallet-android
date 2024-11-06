@@ -52,6 +52,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
@@ -131,6 +133,7 @@ class SwapMainSettingsViewModel(
     private val buyMixinFactory: BuyMixin.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapRateFormatter: SwapRateFormatter,
+    private val swapRouteFormatter: SwapRouteFormatter,
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val swapStateStoreProvider: SwapStateStoreProvider,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
@@ -159,10 +162,14 @@ class SwapMainSettingsViewModel(
 
     private val priceImpact = quotingState.map { quoteState ->
         when (quoteState) {
-            is QuotingState.NotAvailable, QuotingState.Loading, QuotingState.Default -> null
-            is QuotingState.Loaded -> quoteState.value.priceImpact
+            is QuotingState.Error, QuotingState.Loading, QuotingState.Default -> null
+            is QuotingState.Loaded -> quoteState.quote.priceImpact
         }
     }
+
+    val swapRouteState = quotingState
+        .map { quoteState -> quoteState.toSwapRouteState() }
+        .shareInBackground()
 
     private val originChainFlow = swapSettings
         .mapNotNull { it.assetIn?.chainId }
@@ -202,7 +209,7 @@ class SwapMainSettingsViewModel(
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
         when (it) {
-            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.value))
+            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.quote))
             else -> ExtendedLoadingState.Loading
         }
     }
@@ -212,7 +219,7 @@ class SwapMainSettingsViewModel(
         when (it) {
             is QuotingState.Loaded -> true
             is QuotingState.Default,
-            is QuotingState.NotAvailable -> false
+            is QuotingState.Error -> false
 
             else -> null // Don't do anything if it's loading state
         }
@@ -326,7 +333,7 @@ class SwapMainSettingsViewModel(
             if (quotingState !is QuotingState.Loaded) return@launch
 
             val swapState = SwapState(
-                quote = quotingState.value,
+                quote = quotingState.quote,
                 fee = feeMixin.awaitFee(),
                 slippage = swapSettings.first().slippage
             )
@@ -471,7 +478,7 @@ class SwapMainSettingsViewModel(
             .onEach {
                 when (it) {
                     is QuotingState.Loading -> setFeeLoading()
-                    is QuotingState.NotAvailable -> setFeeStatus(FeeStatus.NoFee)
+                    is QuotingState.Error -> setFeeStatus(FeeStatus.NoFee)
                     else -> {}
                 }
             }
@@ -486,7 +493,7 @@ class SwapMainSettingsViewModel(
             }
             .onEach { quoteState ->
                 loadFee { feePaymentCurrency ->
-                    val swapArgs = quoteState.value.toExecuteArgs(
+                    val swapArgs = quoteState.quote.toExecuteArgs(
                         slippage = swapSettings.first().slippage,
                         firstSegmentFees = feePaymentCurrency
                     )
@@ -549,7 +556,7 @@ class SwapMainSettingsViewModel(
 
             quotingState is QuotingState.Loading -> DescriptiveButtonState.Loading
 
-            quotingState is QuotingState.NotAvailable || inputs.any { it.value.isEmpty() } -> {
+            quotingState is QuotingState.Error || inputs.any { it.value.isEmpty() } -> {
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
             }
 
@@ -599,12 +606,21 @@ class SwapMainSettingsViewModel(
                 if (it is CancellationException) {
                     QuotingState.Loading
                 } else {
-                    QuotingState.NotAvailable
+                    QuotingState.Error(it)
                 }
             }
         )
 
         handleNewQuote(quote, swapSettings)
+    }
+
+    private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
+        return when(this) {
+            QuotingState.Default -> ExtendedLoadingState.Loaded(null)
+            is QuotingState.Error -> ExtendedLoadingState.Error(error)
+            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(quote))
+            QuotingState.Loading -> ExtendedLoadingState.Loading
+        }
     }
 
     private fun handleNewQuote(quoteResult: Result<SwapQuote>, swapSettings: SwapSettings) {

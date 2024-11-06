@@ -32,6 +32,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactF
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSwapRouteFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -191,5 +193,11 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideSwapQuoteStoreProvider(computationalCache: ComputationalCache): SwapStateStoreProvider {
         return RealSwapStateStoreProvider(computationalCache)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapRouteFormatter(chainRegistry: ChainRegistry): SwapRouteFormatter {
+        return RealSwapRouteFormatter(chainRegistry)
     }
 }

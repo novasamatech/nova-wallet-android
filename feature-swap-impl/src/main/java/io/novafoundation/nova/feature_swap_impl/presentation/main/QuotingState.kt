@@ -9,7 +9,7 @@ sealed class QuotingState {
 
     object Loading : QuotingState()
 
-    object NotAvailable : QuotingState()
+    data class Error(val error: Throwable): QuotingState()
 
-    data class Loaded(val value: SwapQuote, val quoteArgs: SwapQuoteArgs) : QuotingState()
+    data class Loaded(val quote: SwapQuote, val quoteArgs: SwapQuoteArgs) : QuotingState()
 }
