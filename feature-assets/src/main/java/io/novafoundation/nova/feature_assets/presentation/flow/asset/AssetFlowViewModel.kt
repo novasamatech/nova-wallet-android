@@ -56,16 +56,15 @@ abstract class AssetFlowViewModel(
 
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
-    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() }
-        .shareInBackground()
+    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() } // lazy use searchAssetsFlow to let subclasses initialize self
+        .shareInBackground(SharingStarted.Lazily)
 
     val searchResults = combine(
-        searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self
+        searchAssetsFlow,
         selectedCurrency,
     ) { assets, currency ->
         mapAssets(assets, currency)
     }.distinctUntilChanged()
-        .shareInBackground(SharingStarted.Lazily)
 
     val placeholder = searchAssetsFlow.map { getPlaceholder(query.value, it.groupList()) }
 
