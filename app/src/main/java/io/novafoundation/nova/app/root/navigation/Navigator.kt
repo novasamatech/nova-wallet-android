@@ -403,6 +403,15 @@ class Navigator(
         navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
+    override fun backFromSwapFlow() {
+        performNavigation(
+            cases = arrayOf(
+                R.id.swapFlowFragment to R.id.action_back_swapFlowFragment,
+                R.id.swapFlowNetworkFragment to R.id.action_back_swapFlowNetworkFragment
+            )
+        )
+    }
+
     override fun openSwapFlow() {
         val payload = SwapFlowPayload.InitialSelecting
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))

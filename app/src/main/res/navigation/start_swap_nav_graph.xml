@@ -20,7 +20,7 @@
 
         <action
             android:id="@+id/action_swapMainSettingsFragment_to_swapFlow"
-            app:destination="@id/selectAssetSwapFlowFragment"
+            app:destination="@id/swap_flow_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -54,13 +54,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/selectAssetSwapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment" />
-
-    <fragment
         android:id="@+id/swapOptionsFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
         android:label="SwapOptionsFragment" />
+
+    <include app:graph="@navigation/swap_flow_graph" />
 
 </navigation>
