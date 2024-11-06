@@ -49,6 +49,7 @@ class NetworkSwapFlowModule {
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             networkFlowPayload = payload.networkFlowPayload,
+            swapFlowPayload = payload.swapFlowPayload,
             chainRegistry = chainRegistry,
             swapFlowExecutor = executorFactory.create(payload.swapFlowPayload)
         )
