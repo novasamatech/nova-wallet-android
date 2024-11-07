@@ -77,8 +77,7 @@ class RealAssetListMixin(
             AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
             AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
         }
-    }.distinctUntilChanged()
-        .shareInBackground()
+    }.shareInBackground()
 
     private val expandableAssetsMixin = expandableAssetsMixinFactory.create(assetsByViewMode)
 

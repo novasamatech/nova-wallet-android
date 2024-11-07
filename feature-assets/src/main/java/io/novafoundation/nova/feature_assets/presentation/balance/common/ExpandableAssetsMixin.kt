@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ExpandableAssetsMixinFactory(
     private val assetIconProvider: AssetIconProvider,
@@ -58,7 +59,7 @@ class RealExpandableAssetsMixin(
                 assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
             )
         }
-    }
+    }.distinctUntilChanged()
 
     override fun expandToken(tokenGroupUi: TokenGroupUi) {
         expandedTokenIdsFlow.updateValue { it.toggle(tokenGroupUi.itemId) }

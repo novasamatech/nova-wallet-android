@@ -11,11 +11,11 @@ import io.novafoundation.nova.common.utils.makeVisible
 
 sealed class Icon {
 
-    class FromLink(val data: String) : Icon()
+    data class FromLink(val data: String) : Icon()
 
-    class FromDrawable(val data: Drawable) : Icon()
+    data class FromDrawable(val data: Drawable) : Icon()
 
-    class FromDrawableRes(@DrawableRes val res: Int) : Icon()
+    data class FromDrawableRes(@DrawableRes val res: Int) : Icon()
 }
 
 typealias ExtraImageRequestBuilding = ImageRequest.Builder.() -> Unit
