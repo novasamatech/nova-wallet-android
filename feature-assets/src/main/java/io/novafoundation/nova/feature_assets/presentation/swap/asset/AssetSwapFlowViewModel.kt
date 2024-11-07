@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
@@ -44,7 +45,8 @@ class AssetSwapFlowViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val swapFlowExecutor: SwapFlowExecutor,
     private val swapPayload: SwapFlowPayload,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    assetViewModeInteractor: AssetViewModeInteractor
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -53,7 +55,8 @@ class AssetSwapFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
-    assetIconProvider
+    assetIconProvider,
+    assetViewModeInteractor
 ) {
 
     init {

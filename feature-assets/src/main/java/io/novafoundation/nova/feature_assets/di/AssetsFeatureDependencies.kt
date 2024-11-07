@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
@@ -261,4 +262,6 @@ interface AssetsFeatureDependencies {
     fun assetsIconModeRepository(): AssetsIconModeRepository
 
     fun nftRepository(): NftRepository
+
+    fun assetViewModeInteractor(): AssetViewModeInteractor
 }

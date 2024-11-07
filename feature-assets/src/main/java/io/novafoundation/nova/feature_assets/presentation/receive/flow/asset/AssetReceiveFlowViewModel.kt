@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.receive.flow.asset
 
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -24,7 +25,8 @@ class AssetReceiveFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
-    assetIconProvider: AssetIconProvider
+    assetIconProvider: AssetIconProvider,
+    assetViewModeInteractor: AssetViewModeInteractor
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -33,7 +35,8 @@ class AssetReceiveFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
-    assetIconProvider
+    assetIconProvider,
+    assetViewModeInteractor
 ) {
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)

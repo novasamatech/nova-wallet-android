@@ -86,6 +86,10 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
     override fun subscribe(viewModel: T) {
         assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
+        viewModel.searchHint.observe {
+            assetFlowToolbar.searchField.setHint(it)
+        }
+
         viewModel.searchResults.observe { assets ->
             assetFlowList.setVisible(assets.isNotEmpty())
 

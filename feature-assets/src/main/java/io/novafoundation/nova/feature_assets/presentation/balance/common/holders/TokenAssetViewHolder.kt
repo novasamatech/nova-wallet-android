@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableChildViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
@@ -29,7 +29,7 @@ class TokenAssetViewHolder(
 
         val asset = tokenAsset.asset
         itemTokenAssetImage.setIcon(tokenAsset.assetIcon, imageLoader)
-        itemTokenAssetChainIcon.loadTokenIcon(tokenAsset.chain.icon, imageLoader)
+        itemTokenAssetChainIcon.loadChainIcon(tokenAsset.chain.icon, imageLoader)
         itemTokenAssetChainName.text = tokenAsset.chain.name
 
         bindTotal(asset)

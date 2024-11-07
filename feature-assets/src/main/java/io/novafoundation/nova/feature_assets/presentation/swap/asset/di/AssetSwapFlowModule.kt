@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -43,7 +44,8 @@ class AssetSwapFlowModule {
         payload: SwapFlowPayload,
         executorFactory: SwapFlowExecutorFactory,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
-        assetIconProvider: AssetIconProvider
+        assetIconProvider: AssetIconProvider,
+        assetViewModeInteractor: AssetViewModeInteractor
     ): ViewModel {
         return AssetSwapFlowViewModel(
             interactorFactory = interactorFactory,
@@ -56,7 +58,8 @@ class AssetSwapFlowModule {
             swapFlowExecutor = executorFactory.create(payload),
             swapPayload = payload,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            assetViewModeInteractor = assetViewModeInteractor
         )
     }
 }

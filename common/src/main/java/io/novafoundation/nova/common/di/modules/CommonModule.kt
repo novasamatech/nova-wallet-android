@@ -35,6 +35,8 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesImpl
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
+import io.novafoundation.nova.common.domain.interactor.RealAssetViewModeInteractor
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
@@ -358,6 +360,12 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideAssetsViewModeRepository(preferences: Preferences): AssetsViewModeRepository = RealAssetsViewModeRepository(preferences)
+
+    @Provides
+    @ApplicationScope
+    fun provideAssetViewModeInteractor(repository: AssetsViewModeRepository): AssetViewModeInteractor {
+        return RealAssetViewModeInteractor(repository)
+    }
 
     @Provides
     @ApplicationScope

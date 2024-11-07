@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.send.flow.asset
 
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.PlaceholderModel
@@ -36,7 +37,8 @@ class AssetSendFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    assetViewModeInteractor: AssetViewModeInteractor
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -45,7 +47,8 @@ class AssetSendFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
-    assetIconProvider
+    assetIconProvider,
+    assetViewModeInteractor
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
