@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
@@ -63,6 +64,25 @@ class SwapInteractor(
     private val swapTransactionHistoryRepository: SwapTransactionHistoryRepository
 ) {
 
+    suspend fun calculateSegmentFiatPrices(swapFee: SwapFee): List<FiatAmount> {
+        return withContext(Dispatchers.Default) {
+            val basicFeesBySegment = swapFee.segments.map { it.fee.allBasicFees() }
+            val chainAssets = basicFeesBySegment.flatMap { segmentFees -> segmentFees.map { it.asset } }
+
+            val tokens = tokenRepository.getTokens(chainAssets)
+            val currency = tokens.values.first().currency
+
+            basicFeesBySegment.map { segmentBasicFees ->
+                val totalSegmentFees = segmentBasicFees.sumOf { basicFee ->
+                    val token = tokens[basicFee.asset.fullId]
+                    token?.planksToFiat(basicFee.amount) ?: BigDecimal.ZERO
+                }
+
+                FiatAmount(currency, totalSegmentFees)
+            }
+        }
+    }
+
     suspend fun calculateTotalFiatPrice(swapFee: SwapFee): FiatAmount {
         return withContext(Dispatchers.Default) {
             val basicFees = swapFee.allBasicFees()
@@ -79,7 +99,6 @@ class SwapInteractor(
                 price = totalFiat
             )
         }
-
     }
 
     suspend fun sync(coroutineScope: CoroutineScope) {

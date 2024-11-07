@@ -48,6 +48,18 @@ sealed class SwapLimit {
     ) : SwapLimit()
 }
 
+val SwapLimit.estimatedAmountIn: Balance
+    get() = when(this) {
+        is SwapLimit.SpecifiedIn -> amountIn
+        is SwapLimit.SpecifiedOut -> amountInQuote
+    }
+
+val SwapLimit.estimatedAmountOut: Balance
+    get() = when(this) {
+        is SwapLimit.SpecifiedIn -> amountOutQuote
+        is SwapLimit.SpecifiedOut -> amountOut
+    }
+
 /**
  * Adjusts SwapLimit to the [newAmountIn] based on the quoted swap rate
  * This is only suitable for small changes amount in, as it implicitly assumes the swap rate stays the same

@@ -6,4 +6,12 @@ import java.math.BigDecimal
 class FiatAmount(
     val currency: Currency,
     val price: BigDecimal
-)
+) {
+
+    companion object {
+
+        fun zero(currency: Currency): FiatAmount {
+            return FiatAmount(currency, BigDecimal.ZERO)
+        }
+    }
+}

@@ -7,6 +7,8 @@ interface SwapRouter : ReturnableRouter {
 
     fun openSwapConfirmation()
 
+    fun openSwapRoute()
+
     fun selectAssetIn(selectedAsset: AssetPayload?)
 
     fun selectAssetOut(selectedAsset: AssetPayload?)

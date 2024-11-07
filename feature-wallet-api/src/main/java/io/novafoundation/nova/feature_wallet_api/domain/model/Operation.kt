@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -81,6 +82,15 @@ data class ChainAssetWithAmount(
     val chainAsset: Chain.Asset,
     val amount: Balance,
 )
+
+data class ChainAssetIdWithAmount(
+    val chainAssetId: FullChainAssetId,
+    val amount: Balance,
+)
+
+fun FullChainAssetId.withAmount(amount: Balance): ChainAssetIdWithAmount {
+    return ChainAssetIdWithAmount(this, amount)
+}
 
 fun Chain.Asset.withAmount(amount: Balance): ChainAssetWithAmount {
     return ChainAssetWithAmount(this, amount)

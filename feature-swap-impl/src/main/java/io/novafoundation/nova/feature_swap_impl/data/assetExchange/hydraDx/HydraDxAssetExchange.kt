@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
@@ -36,6 +37,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrect
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
+import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
+import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.acceptedCurrencies
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.multiTransactionPayment
@@ -53,6 +56,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.refer
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -270,7 +274,6 @@ private class HydraDxAssetExchange(
     ) : AtomicSwapOperation {
 
         override val estimatedSwapLimit: SwapLimit = aggregatedSwapLimit()
-
         constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs)
             : this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)
 
@@ -279,6 +282,13 @@ private class HydraDxAssetExchange(
 
             // Ignore nextSwapArgs.feePaymentCurrency - we are using configuration from the very first segment
             return HydraDxOperation(segments + nextSegment, feePaymentCurrency)
+        }
+
+        override suspend fun constructDisplayData(): AtomicOperationDisplayData {
+            return AtomicOperationDisplayData.Swap(
+                from = segments.first().edge.from.withAmount(estimatedSwapLimit.estimatedAmountIn),
+                to = segments.last().edge.to.withAmount(estimatedSwapLimit.estimatedAmountOut),
+            )
         }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {

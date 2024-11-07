@@ -52,19 +52,19 @@ import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.swapSettingsFlow
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.state.swapSettingsFlow
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -238,8 +238,10 @@ class SwapMainSettingsViewModel(
         assetInFlow,
         assetOutFlow,
         ::formatButtonStates
-    ).distinctUntilChanged()
+    )
+        .distinctUntilChanged()
         .debounce(100)
+        .shareInBackground()
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
@@ -327,18 +329,12 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    fun continueButtonClicked() {
-        launch {
-            val quotingState = quotingState.value
-            if (quotingState !is QuotingState.Loaded) return@launch
+    fun routeClicked() = setSwapStateAfter {
+        swapRouter.openSwapRoute()
+    }
 
-            val swapState = SwapState(
-                quote = quotingState.quote,
-                fee = feeMixin.awaitFee(),
-                slippage = swapSettings.first().slippage
-            )
-            swapStateStoreProvider.getStore(viewModelScope).setState(swapState)
-            swapRouter.openSwapConfirmation()
+    fun continueButtonClicked() = setSwapStateAndThen {
+        swapRouter.openSwapConfirmation()
 
 //            val validationSystem = swapInteractor.validationSystem()
 //            val payload = getValidationPayload() ?: return@launch
@@ -352,7 +348,6 @@ class SwapMainSettingsViewModel(
 //                _validationProgress.value = false
 //                openSwapConfirmation(validPayload)
 //            }
-        }
     }
 
     fun rateDetailsClicked() {
@@ -389,6 +384,41 @@ class SwapMainSettingsViewModel(
 
     fun backClicked() {
         swapRouter.back()
+    }
+
+    private fun setSwapStateAndThen(action: () -> Unit): Unit {
+        launch {
+            val quotingState = quotingState.value
+            if (quotingState !is QuotingState.Loaded) return@launch
+
+            val swapState = SwapState(
+                quote = quotingState.quote,
+                fee = feeMixin.awaitFee(),
+                slippage = swapSettings.first().slippage
+            )
+            swapStateStoreProvider.getStore(viewModelScope).setState(swapState)
+            action()
+        }
+    }
+
+    private fun setSwapStateAfter(action: () -> Unit) {
+        launch {
+            val quotingState = quotingState.value
+            if (quotingState !is QuotingState.Loaded) return@launch
+
+            val store = swapStateStoreProvider.getStore(viewModelScope)
+            store.resetState()
+
+            action()
+
+            val swapState = SwapState(
+                quote = quotingState.quote,
+                fee = feeMixin.awaitFee(),
+                slippage = swapSettings.first().slippage
+            )
+
+            store.setState(swapState)
+        }
     }
 
     private fun createMaxActionProvider(): MaxActionProvider {
@@ -615,7 +645,7 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
-        return when(this) {
+        return when (this) {
             QuotingState.Default -> ExtendedLoadingState.Loaded(null)
             is QuotingState.Error -> ExtendedLoadingState.Error(error)
             is QuotingState.Loaded -> ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(quote))

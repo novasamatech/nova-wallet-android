@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation
+package io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction

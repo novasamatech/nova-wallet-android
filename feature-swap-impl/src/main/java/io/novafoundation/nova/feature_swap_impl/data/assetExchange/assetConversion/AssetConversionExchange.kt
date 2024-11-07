@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
@@ -22,6 +23,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrect
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
+import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
+import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -30,9 +33,11 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentPro
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.emptyAccountId
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
@@ -234,6 +239,13 @@ private class AssetConversionExchange(
     ) : AtomicSwapOperation {
 
         override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
+
+        override suspend fun constructDisplayData(): AtomicOperationDisplayData {
+           return AtomicOperationDisplayData.Swap(
+               from = fromAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountIn),
+               to = toAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountOut),
+           )
+        }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
             val submissionFee = extrinsicService.estimateFee(

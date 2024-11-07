@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction
+package io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction
 
 import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry

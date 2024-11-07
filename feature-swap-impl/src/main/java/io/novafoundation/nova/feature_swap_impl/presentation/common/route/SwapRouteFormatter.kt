@@ -28,11 +28,10 @@ class RealSwapRouteFormatter(
     }
 
     private fun determinePathChains(path: Path<QuotedEdge<SwapGraphEdge>>): List<ChainId>? {
-        // Do not display path of less then 2 elements
-        if (path.size < 2) return null
+        if (path.isEmpty()) return null
 
         val firstEdge = path.first().edge
-        val firstChain = firstEdge.to.chainId
+        val firstChain = firstEdge.from.chainId
 
         var currentChainId = firstChain
         val foundChains = mutableListOf(currentChainId)
@@ -45,6 +44,6 @@ class RealSwapRouteFormatter(
             }
         }
 
-        return foundChains
+        return foundChains.takeIf { foundChains.size >= 2 }
     }
 }

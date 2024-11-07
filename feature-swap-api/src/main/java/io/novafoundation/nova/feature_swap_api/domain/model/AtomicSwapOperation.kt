@@ -10,6 +10,8 @@ interface AtomicSwapOperation {
 
     val estimatedSwapLimit: SwapLimit
 
+    suspend fun constructDisplayData(): AtomicOperationDisplayData
+
     suspend fun estimateFee(): AtomicSwapOperationFee
 
     suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance

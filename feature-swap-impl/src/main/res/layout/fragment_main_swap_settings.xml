@@ -50,7 +50,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+            <io.novafoundation.nova.feature_swap_impl.presentation.common.views.SwapAmountInputView
                 android:id="@+id/swapMainSettingsPayInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsGetAssetIn" />
 
-            <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+            <io.novafoundation.nova.feature_swap_impl.presentation.common.views.SwapAmountInputView
                 android:id="@+id/swapMainSettingsReceiveInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

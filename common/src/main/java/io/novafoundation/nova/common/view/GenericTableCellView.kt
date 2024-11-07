@@ -36,6 +36,8 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
 
         View.inflate(context, R.layout.view_generic_table_cell, this)
 
+        setBackgroundResource(R.drawable.bg_primary_list_item)
+
         attrs?.let(::applyAttributes)
     }
 

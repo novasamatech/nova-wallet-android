@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.views
+package io.novafoundation.nova.feature_swap_impl.presentation.common.views
 
 import android.content.Context
 import android.util.AttributeSet

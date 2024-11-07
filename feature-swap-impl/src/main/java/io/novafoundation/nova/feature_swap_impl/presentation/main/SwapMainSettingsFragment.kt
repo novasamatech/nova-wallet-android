@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setVisible
@@ -76,6 +77,11 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
         swapMainSettingsContinue.setOnClickListener { viewModel.continueButtonClicked() }
         swapMainSettingsContinue.prepareForProgress(this)
+        swapMainSettingsRoute.setOnClickListener {
+            viewModel.routeClicked()
+
+            hideKeyboard()
+        }
 
         swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
     }

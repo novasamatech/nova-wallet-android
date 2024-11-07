@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/secondary_screen_background">
+
+    <TextView
+        android:id="@+id/itemRouteSwapTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="13dp"
+        android:text="@string/swap_route_segment_swap_title"
+        android:textColor="@color/text_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.feature_swap_impl.presentation.route.view.TokenAmountView
+        android:id="@+id/itemRouteSwapAmountFrom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/itemRouteSwapTitle"
+        app:layout_constraintTop_toBottomOf="@id/itemRouteSwapTitle" />
+
+    <ImageView
+        android:id="@+id/itemRouteSwapArrow"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_arrow_right"
+        app:layout_constraintBottom_toBottomOf="@+id/itemRouteSwapAmountFrom"
+        app:layout_constraintStart_toEndOf="@+id/itemRouteSwapAmountFrom"
+        app:layout_constraintTop_toTopOf="@+id/itemRouteSwapAmountFrom"
+        app:tint="@color/icon_secondary" />
+
+    <io.novafoundation.nova.feature_swap_impl.presentation.route.view.TokenAmountView
+        android:id="@+id/itemRouteSwapAmountTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/itemRouteSwapAmountFrom"
+        app:layout_constraintStart_toEndOf="@+id/itemRouteSwapArrow"
+        app:layout_constraintTop_toTopOf="@+id/itemRouteSwapAmountFrom" />
+
+    <TextView
+        android:id="@+id/itemRouteSwapFee"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="15dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemRouteSwapAmountFrom"
+        app:layout_constraintTop_toBottomOf="@+id/itemRouteSwapAmountFrom"
+        tools:text="Fee: $0.416" />
+
+    <TextView
+        android:id="@+id/itemRouteSwapChain"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="16dp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemRouteSwapAmountFrom"
+        tools:text="Hydration" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

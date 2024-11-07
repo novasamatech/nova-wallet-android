@@ -36,8 +36,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSw
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.state.RealSwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
