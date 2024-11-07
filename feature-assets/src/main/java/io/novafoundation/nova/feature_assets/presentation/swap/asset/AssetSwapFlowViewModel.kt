@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSw
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -44,7 +45,8 @@ class AssetSwapFlowViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val swapFlowExecutor: SwapFlowExecutor,
     private val swapPayload: SwapFlowPayload,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    private val amountFormatter: AmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -53,7 +55,8 @@ class AssetSwapFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
-    assetIconProvider
+    assetIconProvider,
+    amountFormatter
 ) {
 
     init {
@@ -95,12 +98,18 @@ class AssetSwapFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(assetIconProvider, currency, NetworkAssetGroup::groupTransferableBalanceFiat, AssetBalance::transferable)
+        return assets.mapGroupedAssetsToUi(
+            amountFormatter,
+            assetIconProvider,
+            currency,
+            NetworkAssetGroup::groupTransferableBalanceFiat,
+            AssetBalance::transferable
+        )
     }
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 }

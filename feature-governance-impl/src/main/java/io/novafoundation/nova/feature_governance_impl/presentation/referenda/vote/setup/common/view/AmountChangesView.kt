@@ -39,7 +39,7 @@ class AmountChangesView @JvmOverloads constructor(
         attrs?.let { applyAttributes(it) }
     }
 
-    fun setFrom(value: String?) {
+    fun setFrom(value: CharSequence?) {
         if (value != null) {
             valueChangesFrom.text = value
             valueChangesFromGroup.makeVisible()
@@ -48,11 +48,11 @@ class AmountChangesView @JvmOverloads constructor(
         }
     }
 
-    fun setTo(value: String) {
+    fun setTo(value: CharSequence) {
         valueChangesTo.text = value
     }
 
-    fun setDifference(@DrawableRes icon: Int, text: String, @ColorRes textColor: Int) {
+    fun setDifference(@DrawableRes icon: Int, text: CharSequence, @ColorRes textColor: Int) {
         valueChangesDifference.makeVisible()
 
         valueChangesDifference.setDrawableStart(icon, widthInDp = 16, tint = textColor)

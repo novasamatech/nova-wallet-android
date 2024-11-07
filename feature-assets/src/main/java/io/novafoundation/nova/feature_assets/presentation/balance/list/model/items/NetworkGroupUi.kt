@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 
 data class NetworkGroupUi(
     val chainUi: ChainUi,
-    val groupBalanceFiat: String
+    val groupBalanceFiat: CharSequence
 ) : AssetGroupRvItem {
 
     override val itemId: String = chainUi.id

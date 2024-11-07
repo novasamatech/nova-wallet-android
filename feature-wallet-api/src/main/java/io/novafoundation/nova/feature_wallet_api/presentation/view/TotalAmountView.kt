@@ -29,7 +29,7 @@ class TotalAmountView @JvmOverloads constructor(
         setAmount(amountModel?.token, amountModel?.fiat)
     }
 
-    fun setAmount(token: String?, fiat: String?) {
+    fun setAmount(token: CharSequence?, fiat: CharSequence?) {
         totalAmountToken.text = token
         totalAmountFiat.text = fiat
     }
