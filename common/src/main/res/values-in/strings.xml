@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Anda telah mencapai batas %s proxy yang ditambahkan dalam %s. Hapus proxy untuk menambahkan yang baru.</string>
     <string name="add_proxy_maximum_reached_error_title">Jumlah maksimum proxy telah tercapai</string>
     <string name="added_networks_empty_placeholder">Jaringan kustom yang ditambahkan\nakan muncul di sini</string>
+    <string name="appearance_colored_icon_title">Berwarna</string>
+    <string name="appearance_title">Penampilan</string>
+    <string name="appearance_token_assets_title">ikon token</string>
+    <string name="appearance_white_icon_title">Putih</string>
     <string name="asset_add_evm_token_already_exist_message">Alamat kontrak yang dimasukkan ada dalam Nova sebagai token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Alamat kontrak yang dimasukkan ada dalam Nova sebagai token %s. Apakah Anda yakin ingin memodifikasinya?</string>
     <string name="asset_add_evm_token_already_exist_title">Token ini sudah ada</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Masukkan alamat kontrak</string>
     <string name="asset_add_token_enter_decimals">Masukkan desimal</string>
     <string name="asset_add_token_enter_symbol">Masukkan simbol</string>
+    <string name="asset_view_networks">Jaringan</string>
+    <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Tambahkan token</string>
     <string name="assets_add_token_enter_info_address_label">Alamat kontrak</string>
     <string name="assets_add_token_enter_info_decimals_label">Desimal</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger tidak mendukung token ini</string>
     <string name="assets_search_hint">Cari berdasarkan jaringan atau token</string>
     <string name="assets_search_placeholder">Tidak ada jaringan atau token dengan nama yang dimasukkan ditemukan</string>
+    <string name="assets_search_token_hint">Cari berdasarkan token</string>
     <string name="assets_select_send_your_wallets">Dompet Anda</string>
     <string name="assets_send_flow_placeholder">Anda tidak memiliki token untuk dikirim. Beli atau Terima token ke akun Anda.</string>
     <string name="assets_swap_flow_pay_title">Token untuk membayar</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Cadangan</string>
     <string name="biometric_auth_title">Otentikasi Biometrik</string>
     <string name="buy_completed">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya melalui email.</string>
+    <string name="buy_network_flow_title">Pilih jaringan untuk membeli %s</string>
     <string name="buy_provider_open_confirmation_message">Untuk melanjutkan pembelian, Anda akan diarahkan dari aplikasi Nova Wallet ke %s</string>
     <string name="buy_provider_open_confirmation_title">Lanjut di browser?</string>
     <string name="chain_network_management_auto_balance">Node saldo otomatis</string>
@@ -961,6 +969,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Dengan mengaktifkan pemberitahuan push, Anda menyetujui %s dan %s kami</string>
     <string name="push_welcome_timeout_error_message">Harap coba lagi nanti dengan mengakses pengaturan pemberitahuan dari tab Pengaturan</string>
     <string name="push_welcome_title">Jangan lewatkan hal apa pun!</string>
+    <string name="receive_network_flow_title">Pilih jaringan untuk menerima %s</string>
+    <string name="receive_screen_copy_address">Salin Alamat</string>
     <string name="recover_json_hint">Tempelkan json atau unggah file...</string>
     <string name="recover_json_upload">Unggah file</string>
     <string name="recovery_json">Pulihkan JSON</string>
@@ -1117,6 +1127,7 @@
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
     <string name="send_address_hint">Address or w3n</string>
+    <string name="send_network_flow_title">Pilih jaringan untuk mengirim %s</string>
     <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual.\nAre you sure you still want to perform this transfer?</string>
     <string name="send_recipient_system_account_title">Tokens will be lost</string>
     <string name="set_staking_proxy_address_description">Give authority to</string>
@@ -1524,6 +1535,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Masukkan jumlah lain</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Untuk membayar biaya jaringan dengan %s, Nova secara otomatis akan menukar %s dengan %s untuk mempertahankan saldo minimum %s akun Anda.</string>
     <string name="swap_network_fee_description">Biaya jaringan yang dibebankan oleh blockchain untuk memproses dan memvalidasi transaksi. Bisa bervariasi tergantung pada kondisi jaringan atau kecepatan transaksi.</string>
+    <string name="swap_network_flow_title">Pilih jaringan untuk menukar %s</string>
     <string name="swap_not_enought_liquidity_failure">Pool tidak memiliki likuiditas yang cukup untuk swap</string>
     <string name="swap_price_difference_description">Perbedaan harga merujuk pada perbedaan harga antara dua aset yang berbeda. Ketika melakukan swap dalam kripto, perbedaan harga biasanya adalah perbedaan antara harga aset yang Anda tukarkan dengan harga aset yang Anda tukar.</string>
     <string name="swap_price_difference_title">Perbedaan harga</string>
@@ -1616,6 +1628,7 @@
     <string name="wallet_asset_buy_with">Beli dengan</string>
     <string name="wallet_asset_receive">Terima</string>
     <string name="wallet_asset_receive_token">Terima %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Hanya kirim token %1$s dan token di jaringan %2$s ke alamat ini, atau Anda bisa kehilangan dana Anda</string>
     <string name="wallet_asset_send">Kirim</string>
     <string name="wallet_asset_swap">Tukar</string>
     <string name="wallet_assets">Aset</string>

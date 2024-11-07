@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s\'da eklenen maksimum proxy (%s) limitine ulaştınız. Yeni eklemeler yapabilmek için proxy\'leri kaldırın.</string>
     <string name="add_proxy_maximum_reached_error_title">Maksimum proxy sayısına ulaşıldı</string>
     <string name="added_networks_empty_placeholder">Eklenen özel ağlar\nburada görünecek</string>
+    <string name="appearance_colored_icon_title">Renkli</string>
+    <string name="appearance_title">Görünüm</string>
+    <string name="appearance_token_assets_title">token simgeleri</string>
+    <string name="appearance_white_icon_title">Beyaz</string>
     <string name="asset_add_evm_token_already_exist_message">Girilen sözleşme adresi Nova\'da zaten %s tokeni olarak bulunmaktadır.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Girilen sözleşme adresi Nova\'da zaten %s tokeni olarak bulunmaktadır. Değiştirmek istediğinize emin misiniz?</string>
     <string name="asset_add_evm_token_already_exist_title">Bu token zaten var</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Sözleşme adresi girin</string>
     <string name="asset_add_token_enter_decimals">Ondalık sayısını girin</string>
     <string name="asset_add_token_enter_symbol">Sembol girin</string>
+    <string name="asset_view_networks">Ağlar</string>
+    <string name="asset_view_tokens">Tokenler</string>
     <string name="assets_add_token">Token ekle</string>
     <string name="assets_add_token_enter_info_address_label">Sözleşme adresi</string>
     <string name="assets_add_token_enter_info_decimals_label">Ondalıklar</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger bu token\'i desteklemiyor</string>
     <string name="assets_search_hint">Ağ veya token adına göre ara</string>
     <string name="assets_search_placeholder">Girilen adla herhangi bir ağ veya token bulunamadı</string>
+    <string name="assets_search_token_hint">Tokene göre ara</string>
     <string name="assets_select_send_your_wallets">Cüzdanlarınız</string>
     <string name="assets_send_flow_placeholder">Göndermek için token\'ınız yok.\nHesabınıza token alın veya alın.</string>
     <string name="assets_swap_flow_pay_title">Ödeme yapılacak Token</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Yedekleme</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
+    <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
     <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
@@ -968,6 +976,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Bildirimleri etkinleştirmekle, %s ve %s kabul etmiş olursunuz</string>
     <string name="push_welcome_timeout_error_message">Lütfen, Ayarlar sekmesinden bildirim ayarlarına erişerek daha sonra tekrar deneyin</string>
     <string name="push_welcome_title">Hiçbir şeyi kaçırmayın!</string>
+    <string name="receive_network_flow_title">Alma için ağ seçin %s</string>
+    <string name="receive_screen_copy_address">Adresi Kopyala</string>
     <string name="recover_json_hint">Json yapıştırın ya da dosya yükleyin...</string>
     <string name="recover_json_upload">Dosya yükle</string>
     <string name="recovery_json">JSON Kurtar</string>
@@ -1125,6 +1135,7 @@
     <string name="select_tracks_for">İçin şarkıları seçin</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">Adres veya w3n</string>
+    <string name="send_network_flow_title">Gönderme için ağ seçin %s</string>
     <string name="send_recipient_system_account_message">Alıcı, bir sistem hesabıdır. Bir şirket veya birey tarafından kontrol edilmez.\nBu transferi gerçekleştirmek istediğinize emin misiniz?</string>
     <string name="send_recipient_system_account_title">Token\'lar kaybolacak</string>
     <string name="set_staking_proxy_address_description">Yetki ver</string>
@@ -1534,6 +1545,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Başka bir miktar girin</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">%s ile ağ ücreti ödemek için, Nova otomatik olarak hesabınızın minimum %s bakiyesini korumak için %s\'i %s\'ye dönüştürecektir.</string>
     <string name="swap_network_fee_description">Herhangi bir işlemi işlemek ve doğrulamak için blockchain tarafından alınan ağ ücretleri. Ağ koşullarına veya işlem hızına bağlı olarak değişebilir.</string>
+    <string name="swap_network_flow_title">Takas için ağ seçin %s</string>
     <string name="swap_not_enought_liquidity_failure">Havuzda takas için yeterli likidite yok</string>
     <string name="swap_price_difference_description">Fiyat farkı, iki farklı varlık arasındaki fiyat farkını ifade eder. Kripto takas yaparken, fiyat farkı genellikle takas ettiğiniz varlığın fiyatı ile takas ettiğiniz varlığın fiyatı arasındaki farktır.</string>
     <string name="swap_price_difference_title">Fiyat farkı</string>
@@ -1626,6 +1638,7 @@
     <string name="wallet_asset_buy_with">ile Satın al</string>
     <string name="wallet_asset_receive">Al</string>
     <string name="wallet_asset_receive_token">%s al</string>
+    <string name="wallet_asset_receive_token_subtitle">Bu adrese yalnızca %1$s token ve %2$s ağındaki tokenleri gönderin, aksi takdirde paranızı kaybedebilirsiniz</string>
     <string name="wallet_asset_send">Gönder</string>
     <string name="wallet_asset_swap">Takas et</string>
     <string name="wallet_assets">Varlıklar</string>
