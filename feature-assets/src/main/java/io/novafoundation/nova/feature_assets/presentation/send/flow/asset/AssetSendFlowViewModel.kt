@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import kotlinx.coroutines.flow.Flow
 
@@ -36,7 +37,8 @@ class AssetSendFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    private val amountFormatter: AmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -45,7 +47,8 @@ class AssetSendFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
-    assetIconProvider
+    assetIconProvider,
+    amountFormatter
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
@@ -68,7 +71,7 @@ class AssetSendFlowViewModel(
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
         return assets.mapGroupedAssetsToUi(
-            resourceManager,
+            amountFormatter,
             assetIconProvider,
             currency,
             NetworkAssetGroup::groupTransferableBalanceFiat,
@@ -78,7 +81,7 @@ class AssetSendFlowViewModel(
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(resourceManager, assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 

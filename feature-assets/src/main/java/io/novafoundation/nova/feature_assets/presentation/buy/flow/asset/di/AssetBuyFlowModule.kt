@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowViewModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class AssetBuyFlowModule {
@@ -39,7 +40,8 @@ class AssetBuyFlowModule {
         accountUseCase: SelectedAccountUseCase,
         buyMixinFactory: BuyMixin.Factory,
         resourceManager: ResourceManager,
-        assetIconProvider: AssetIconProvider
+        assetIconProvider: AssetIconProvider,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return AssetBuyFlowViewModel(
             interactorFactory = interactorFactory,
@@ -50,7 +52,8 @@ class AssetBuyFlowModule {
             accountUseCase = accountUseCase,
             buyMixinFactory = buyMixinFactory,
             resourceManager = resourceManager,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            amountFormatter = amountFormatter
         )
     }
 }

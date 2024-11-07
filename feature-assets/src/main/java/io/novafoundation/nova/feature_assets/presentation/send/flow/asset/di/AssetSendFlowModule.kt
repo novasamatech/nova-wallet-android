@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.send.flow.asset.AssetSendFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class AssetSendFlowModule {
@@ -37,7 +38,8 @@ class AssetSendFlowModule {
         controllableAssetCheck: ControllableAssetCheckMixin,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
-        assetIconProvider: AssetIconProvider
+        assetIconProvider: AssetIconProvider,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return AssetSendFlowViewModel(
             interactorFactory = interactorFactory,
@@ -47,7 +49,8 @@ class AssetSendFlowModule {
             controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            amountFormatter = amountFormatter
         )
     }
 }

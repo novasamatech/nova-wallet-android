@@ -48,6 +48,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -188,17 +190,23 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideAmountFormatter(resourceManager: ResourceManager): AmountFormatter {
+        return RealAmountFormatter(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideExpandableAssetsMixinFactory(
-        resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
         currencyInteractor: CurrencyInteractor,
-        assetsViewModeRepository: AssetsViewModeRepository
+        assetsViewModeRepository: AssetsViewModeRepository,
+        amountFormatter: AmountFormatter
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
-            resourceManager,
             assetIconProvider,
             currencyInteractor,
-            assetsViewModeRepository
+            assetsViewModeRepository,
+            amountFormatter
         )
     }
 }

@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.mapper
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -15,30 +14,31 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import java.math.BigDecimal
 
 fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
-    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     assetIconProvider: AssetIconProvider,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal = NetworkAssetGroup::groupTotalBalanceFiat,
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
     return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
-        .mapValues { (_, assets) -> mapAssetsToAssetModels(resourceManager, assetIconProvider, assets, balance) }
+        .mapValues { (_, assets) -> mapAssetsToAssetModels(amountFormatter, assetIconProvider, assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
 
 private fun mapAssetsToAssetModels(
-    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     assetIconProvider: AssetIconProvider,
     assets: List<AssetWithOffChainBalance>,
     balance: (AssetBalance) -> PricedAmount
 ): List<BalanceListRvItem> {
     return assets.map {
         NetworkAssetUi(
-            mapAssetToAssetModel(resourceManager, it.asset, balance(it.balanceWithOffchain)),
+            mapAssetToAssetModel(amountFormatter, it.asset, balance(it.balanceWithOffchain)),
             assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration)
         )
     }

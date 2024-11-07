@@ -9,23 +9,37 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.feature_wallet_api.R
 
-fun CharSequence.formatBalanceWithFraction(resourceManager: ResourceManager, @DimenRes floatAmountSize: Int): CharSequence {
-    val amountWithFraction = toAmountWithFraction()
+interface AmountFormatter {
 
-    val textColor = resourceManager.getColor(R.color.text_secondary)
-    val colorSpan = ForegroundColorSpan(textColor)
-    val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(floatAmountSize))
+    fun formatBalanceWithFraction(amount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence
+}
 
-    return with(amountWithFraction) {
-        val spannableBuilder = SpannableStringBuilder()
-            .append(amount)
-        if (fraction != null) {
-            spannableBuilder.append(separator + fraction)
-            val startIndex = amount.length
-            val endIndex = amount.length + separator.length + fraction!!.length
-            spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+class RealAmountFormatter(
+    private val resourceManager: ResourceManager
+) : AmountFormatter {
+
+    override fun formatBalanceWithFraction(amount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence {
+        val amountWithFraction = amount.toAmountWithFraction()
+
+        val textColor = resourceManager.getColor(R.color.text_secondary)
+        val colorSpan = ForegroundColorSpan(textColor)
+        val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(floatAmountSize))
+
+        return with(amountWithFraction) {
+            val spannableBuilder = SpannableStringBuilder()
+                .append(amount)
+            if (fraction != null) {
+                spannableBuilder.append(separator + fraction)
+                val startIndex = amount.length
+                val endIndex = amount.length + separator.length + fraction!!.length
+                spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            spannableBuilder
         }
-        spannableBuilder
     }
+}
+
+fun CharSequence.formatBalanceWithFraction(formatter: AmountFormatter, @DimenRes floatAmountSize: Int): CharSequence {
+    return formatter.formatBalanceWithFraction(this, floatAmountSize)
 }

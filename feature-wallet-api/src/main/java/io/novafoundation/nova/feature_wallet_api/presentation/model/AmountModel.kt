@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import androidx.annotation.DimenRes
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -99,9 +98,9 @@ fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
 
 fun transferableAmountModelOf(asset: Asset) = mapAmountToAmountModel(asset.transferable, asset)
 
-fun AmountModel.formatBalanceWithFraction(resourceManager: ResourceManager, @DimenRes floatAmountSize: Int): AmountModel {
+fun AmountModel.formatBalanceWithFraction(amountFormatter: AmountFormatter, @DimenRes floatAmountSize: Int): AmountModel {
     return AmountModel(
-        token = token.formatBalanceWithFraction(resourceManager, floatAmountSize),
+        token = token.formatBalanceWithFraction(amountFormatter, floatAmountSize),
         fiat = fiat
     )
 }

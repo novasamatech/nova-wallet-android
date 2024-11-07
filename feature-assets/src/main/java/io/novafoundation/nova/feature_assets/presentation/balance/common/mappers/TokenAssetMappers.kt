@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.mapper
 
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.utils.formatTokenAmount
@@ -19,19 +18,20 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
-    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     assetIconProvider: AssetIconProvider,
     assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi> = { _, assets -> assets },
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
-    return mapKeys { (group, assets) -> mapTokenAssetGroupToUi(resourceManager, assetIconProvider, group, assets, groupBalance) }
+    return mapKeys { (group, assets) -> mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets, groupBalance) }
         .mapValues { (group, assets) ->
-            val assetModels = mapAssetsToAssetModels(resourceManager, assetIconProvider, group, assets, balance)
+            val assetModels = mapAssetsToAssetModels(amountFormatter, assetIconProvider, group, assets, balance)
             assetFilter(group.itemId, assetModels)
         }
         .toListWithHeaders()
@@ -39,7 +39,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
 }
 
 fun mapTokenAssetGroupToUi(
-    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     assetIconProvider: AssetIconProvider,
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
@@ -57,13 +57,13 @@ fun mapTokenAssetGroupToUi(
         balance = AmountModel(
             token = balance.amount.formatTokenAmount(),
             fiat = balance.fiat.formatAsCurrency(assetGroup.token.currency)
-        ).formatBalanceWithFraction(resourceManager, R.dimen.asset_balance_fraction_size),
-        groupType = mapType(resourceManager, assetGroup, assets, groupBalance)
+        ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size),
+        groupType = mapType(amountFormatter, assetGroup, assets, groupBalance)
     )
 }
 
 private fun mapAssetsToAssetModels(
-    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     assetIconProvider: AssetIconProvider,
     group: TokenGroupUi,
     assets: List<AssetWithNetwork>,
@@ -72,7 +72,7 @@ private fun mapAssetsToAssetModels(
     return assets.map {
         TokenAssetUi(
             group.getId(),
-            mapAssetToAssetModel(resourceManager, it.asset, balance(it.balanceWithOffChain)),
+            mapAssetToAssetModel(amountFormatter, it.asset, balance(it.balanceWithOffChain)),
             assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration),
             mapChainToUi(it.chain)
         )
@@ -80,14 +80,14 @@ private fun mapAssetsToAssetModels(
 }
 
 private fun mapType(
-    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
     groupBalance: (TokenAssetGroup) -> PricedAmount
 ): TokenGroupUi.GroupType {
     return if (assets.size == 1) {
         val balance = groupBalance(assetGroup)
-        TokenGroupUi.GroupType.SingleItem(mapAssetToAssetModel(resourceManager, assets.first().asset, balance))
+        TokenGroupUi.GroupType.SingleItem(mapAssetToAssetModel(amountFormatter, assets.first().asset, balance))
     } else {
         TokenGroupUi.GroupType.Group
     }

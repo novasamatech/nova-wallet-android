@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpl
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -68,7 +69,8 @@ class BalanceListViewModel(
     private val resourceManager: ResourceManager,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
-    private val assetListMixinFactory: AssetListMixinFactory
+    private val assetListMixinFactory: AssetListMixinFactory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -126,7 +128,7 @@ class BalanceListViewModel(
         val currency = selectedCurrency.first()
         TotalBalanceModel(
             isBreakdownAbailable = breakdown.breakdown.isNotEmpty(),
-            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatBalanceWithFraction(resourceManager, R.dimen.total_balance_fraction_size),
+            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatBalanceWithFraction(amountFormatter, R.dimen.total_balance_fraction_size),
             lockedBalanceFiat = breakdown.locksTotal.amount.formatAsCurrency(currency),
             enableSwap = swapSupported
         )
