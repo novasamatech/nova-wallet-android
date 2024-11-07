@@ -396,20 +396,15 @@ class Navigator(
     }
 
     override fun openSwapNetworks(payload: NetworkSwapFlowPayload) {
-        navController?.navigate(R.id.action_swapFlow_to_swapFlowNetwork, NetworkSwapFlowFragment.createPayload(payload))
+        navController?.navigate(R.id.action_selectAssetSwapFlowFragment_to_swapFlowNetworkFragment, NetworkSwapFlowFragment.createPayload(payload))
     }
 
     override fun openBuyNetworks(payload: NetworkFlowPayload) {
         navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
-    override fun backFromSwapFlow() {
-        performNavigation(
-            cases = arrayOf(
-                R.id.swapFlowFragment to R.id.action_back_swapFlowFragment,
-                R.id.swapFlowNetworkFragment to R.id.action_back_swapFlowNetworkFragment
-            )
-        )
+    override fun returnToMainSwapScreen() {
+        navController?.navigate(R.id.action_return_to_swap_settings)
     }
 
     override fun openSwapFlow() {
