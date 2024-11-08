@@ -16,6 +16,9 @@
     <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
     <string name="swap_route">Route</string>
 
+    <string name="assets_search_token_hint">Search by token</string>
+
+    <string name="receive_screen_copy_address">Copy Address</string>
     <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
 
     <string name="appearance_token_assets_title">token icons</string>

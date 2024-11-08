@@ -7,7 +7,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.capitalize
@@ -84,7 +83,7 @@ private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStat
 
 @DrawableRes
 private fun transferDirectionIcon(isIncome: Boolean): Int {
-    return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
+    return if (isIncome) R.drawable.ic_receive_history else R.drawable.ic_send_history
 }
 
 @ColorRes
@@ -235,7 +234,7 @@ fun mapOperationToOperationModel(
                     subHeader = resourceManager.getString(subtitleRes),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
+                    operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_history).asIcon(),
                 )
             }
 
@@ -295,7 +294,7 @@ fun mapOperationToOperationModel(
                     statusAppearance = statusAppearance,
                     subHeader = operationType.formatSubHeader(resourceManager),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
-                    operationIcon = R.drawable.ic_flip_swap.asIcon()
+                    operationIcon = R.drawable.ic_swap_history.asIcon()
                 )
             }
         }

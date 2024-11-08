@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import java.math.BigDecimal
 
@@ -23,6 +25,7 @@ fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): Stri
 }
 
 fun mapAssetToAssetModel(
+    amountFormatter: AmountFormatter,
     asset: Asset,
     balance: PricedAmount
 ): AssetModel {
@@ -32,7 +35,7 @@ fun mapAssetToAssetModel(
             amount = balance.amount,
             asset = asset,
             includeAssetTicker = false
-        )
+        ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size)
     )
 }
 

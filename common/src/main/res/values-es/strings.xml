@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Has alcanzado el límite de %s proxies añadidos en %s. Elimina proxies para añadir nuevos.</string>
     <string name="add_proxy_maximum_reached_error_title">Se ha alcanzado el número máximo de proxies</string>
     <string name="added_networks_empty_placeholder">Las redes personalizadas agregadas\naquí aparecerán</string>
+    <string name="appearance_colored_icon_title">Coloreado</string>
+    <string name="appearance_title">Apariencia</string>
+    <string name="appearance_token_assets_title">iconos de token</string>
+    <string name="appearance_white_icon_title">Blanco</string>
     <string name="asset_add_evm_token_already_exist_message">La dirección de contrato ingresada ya está presente en Nova como un token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">La dirección de contrato ingresada ya está presente en Nova como un token %s. ¿Estás seguro de que quieres modificarlo?</string>
     <string name="asset_add_evm_token_already_exist_title">Este token ya existe</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Ingrese la dirección del contrato</string>
     <string name="asset_add_token_enter_decimals">Ingrese los decimales</string>
     <string name="asset_add_token_enter_symbol">Ingrese el símbolo</string>
+    <string name="asset_view_networks">Redes</string>
+    <string name="asset_view_tokens">Tokens</string>
     <string name="assets_add_token">Agregar token</string>
     <string name="assets_add_token_enter_info_address_label">Dirección del contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimales</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger no admite este token</string>
     <string name="assets_search_hint">Buscar por red o token</string>
     <string name="assets_search_placeholder">No se encontraron redes o tokens con\n el nombre ingresado</string>
+    <string name="assets_search_token_hint">Buscar por token</string>
     <string name="assets_select_send_your_wallets">Sus carteras</string>
     <string name="assets_send_flow_placeholder">No tiene tokens para enviar.\nCompre o reciba tokens en su\ncuenta.</string>
     <string name="assets_swap_flow_pay_title">Token para pagar</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Respaldar</string>
     <string name="biometric_auth_title">Autenticación biométrica</string>
     <string name="buy_completed">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
+    <string name="buy_network_flow_title">Seleccionar red para comprar %s</string>
     <string name="buy_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
     <string name="buy_provider_open_confirmation_title">¿Continuar en el navegador?</string>
     <string name="chain_network_management_auto_balance">Equilibrar nodos automáticamente</string>
@@ -968,6 +976,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Al habilitar las notificaciones push, acepta nuestros %s y %s</string>
     <string name="push_welcome_timeout_error_message">Intente de nuevo más tarde accediendo a los ajustes de notificación desde la pestaña de Configuración</string>
     <string name="push_welcome_title">¡No te pierdas de nada!</string>
+    <string name="receive_network_flow_title">Seleccionar red para recibir %s</string>
+    <string name="receive_screen_copy_address">Copiar dirección</string>
     <string name="recover_json_hint">Pega el json o sube un archivo…</string>
     <string name="recover_json_upload">Subir archivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -1125,6 +1135,7 @@
     <string name="select_tracks_for">Seleccione pistas para</string>
     <string name="selected_tracks_quantity" formatted="false">%d de %d</string>
     <string name="send_address_hint">Dirección o w3n</string>
+    <string name="send_network_flow_title">Seleccionar red para enviar %s</string>
     <string name="send_recipient_system_account_message">El destinatario es una cuenta del sistema. No está controlado por ninguna empresa o individuo.\n¿Estás seguro de que aún quieres realizar esta transferencia?</string>
     <string name="send_recipient_system_account_title">Los tokens se perderán</string>
     <string name="set_staking_proxy_address_description">Otorgar autoridad a</string>
@@ -1534,6 +1545,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Ingresa otro monto</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Para pagar la comisión de red con %s, Nova intercambiará automáticamente %s por %s para mantener el balance mínimo de %s en tu cuenta.</string>
     <string name="swap_network_fee_description">Una comisión de red cobrada por la cadena de bloques para procesar y validar cualquier transacción. Puede variar dependiendo de las condiciones de la red o la velocidad de la transacción.</string>
+    <string name="swap_network_flow_title">Seleccionar red para intercambiar %s</string>
     <string name="swap_not_enought_liquidity_failure">El fondo no tiene suficiente liquidez para intercambiar</string>
     <string name="swap_price_difference_description">La diferencia de precio se refiere a la diferencia en el precio entre dos activos diferentes. Al realizar un intercambio en cripto, la diferencia de precio es generalmente la diferencia entre el precio del activo por el que estás intercambiando y el precio del activo con el que estás intercambiando.</string>
     <string name="swap_price_difference_title">Diferencia de precio</string>
@@ -1626,6 +1638,7 @@
     <string name="wallet_asset_buy_with">Comprar con</string>
     <string name="wallet_asset_receive">Recibir</string>
     <string name="wallet_asset_receive_token">Recibir %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Enviar solo el token %1$s y tokens en la red %2$s a esta dirección, o podrías perder tus fondos</string>
     <string name="wallet_asset_send">Enviar</string>
     <string name="wallet_asset_swap">Intercambiar</string>
     <string name="wallet_assets">Activos</string>

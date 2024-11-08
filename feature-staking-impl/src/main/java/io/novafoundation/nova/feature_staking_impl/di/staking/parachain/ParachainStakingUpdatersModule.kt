@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.CurrentRoundUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.DelegatorStateUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.InflationConfigUpdater
-import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ParachainBondInfoUpdater
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.InflationDistributionConfigUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ScheduledDelegationRequestsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.TotalDelegatedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
@@ -98,7 +98,7 @@ class ParachainStakingUpdatersModule {
         storageCache: StorageCache,
         stakingSharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
-    ) = ParachainBondInfoUpdater(
+    ) = InflationDistributionConfigUpdater(
         storageCache = storageCache,
         stakingSharedState = stakingSharedState,
         chainRegistry = chainRegistry
@@ -141,7 +141,7 @@ class ParachainStakingUpdatersModule {
         currentRoundCollatorsUpdater: CurrentRoundCollatorsUpdater,
         totalDelegatedUpdater: TotalDelegatedUpdater,
         inflationConfigUpdater: InflationConfigUpdater,
-        parachainBondInfoUpdater: ParachainBondInfoUpdater,
+        inflationDistributionConfigUpdater: InflationDistributionConfigUpdater,
         collatorCommissionUpdater: CollatorCommissionUpdater,
         scheduledDelegationRequestsUpdater: ScheduledDelegationRequestsUpdater,
     ) = StakingUpdaters.Group(
@@ -150,7 +150,7 @@ class ParachainStakingUpdatersModule {
         currentRoundCollatorsUpdater,
         totalDelegatedUpdater,
         inflationConfigUpdater,
-        parachainBondInfoUpdater,
+        inflationDistributionConfigUpdater,
         collatorCommissionUpdater,
         scheduledDelegationRequestsUpdater
     )

@@ -1045,4 +1045,6 @@
 
     <include app:graph="@navigation/tinder_gov_graph" />
 
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
+
 </navigation>

@@ -221,7 +221,7 @@ class NovaChipView @JvmOverloads constructor(
         setIconTint(textColorRes)
     }
 
-    fun setText(text: String?) {
+    fun setText(text: CharSequence?) {
         chipText.setTextOrHide(text)
         invalidateDrawablePadding()
     }
@@ -254,4 +254,4 @@ class NovaChipView @JvmOverloads constructor(
     }
 }
 
-fun NovaChipView.setTextOrHide(text: String?) = letOrHide(text, ::setText)
+fun NovaChipView.setTextOrHide(text: CharSequence?) = letOrHide(text, ::setText)

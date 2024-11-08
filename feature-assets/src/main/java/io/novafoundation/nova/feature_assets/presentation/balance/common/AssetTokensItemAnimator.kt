@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAni
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableItemAnimator
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 
+private const val REMOVE_SCALE = 0.9f
+
 class AssetTokensItemAnimator(
     settings: ExpandableAnimationSettings,
     expandableAnimator: ExpandableAnimator
@@ -15,7 +17,9 @@ class AssetTokensItemAnimator(
 ) {
 
     override fun preAddImpl(holder: RecyclerView.ViewHolder) {
-        resetRemoveState(holder)
+        holder.itemView.alpha = 0f
+        holder.itemView.scaleX = REMOVE_SCALE
+        holder.itemView.scaleY = REMOVE_SCALE
     }
 
     override fun getAddAnimator(holder: RecyclerView.ViewHolder): ViewPropertyAnimator {
@@ -32,8 +36,8 @@ class AssetTokensItemAnimator(
     override fun getRemoveAnimator(holder: RecyclerView.ViewHolder): ViewPropertyAnimator {
         return holder.itemView.animate()
             .alpha(0f)
-            .scaleX(0.90f)
-            .scaleY(0.90f)
+            .scaleX(REMOVE_SCALE)
+            .scaleY(REMOVE_SCALE)
     }
 
     override fun preMoveImpl(holder: RecyclerView.ViewHolder, fromY: Int, toY: Int) {
@@ -50,7 +54,6 @@ class AssetTokensItemAnimator(
         super.endAnimation(viewHolder)
 
         viewHolder.itemView.translationY = 0f
-        viewHolder.itemView.alpha = 0f
         viewHolder.itemView.alpha = 1f
         viewHolder.itemView.scaleX = 1f
         viewHolder.itemView.scaleY = 1f
@@ -63,9 +66,9 @@ class AssetTokensItemAnimator(
     }
 
     override fun resetRemoveState(holder: RecyclerView.ViewHolder) {
-        holder.itemView.alpha = 0f
-        holder.itemView.scaleX = 0.90f
-        holder.itemView.scaleY = 0.90f
+        holder.itemView.alpha = 1f
+        holder.itemView.scaleX = 1f
+        holder.itemView.scaleY = 1f
     }
 
     override fun resetMoveState(holder: RecyclerView.ViewHolder) {

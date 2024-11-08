@@ -114,7 +114,7 @@ to this address, or you might lose your funds" />
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:text="@string/common_copy_address"
+            android:text="@string/receive_screen_copy_address"
             android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1"
             android:textColor="@color/button_text_accent"
             app:icon="@drawable/ic_copy_outline"

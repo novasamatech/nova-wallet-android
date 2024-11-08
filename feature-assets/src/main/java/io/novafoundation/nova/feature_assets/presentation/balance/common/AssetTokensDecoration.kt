@@ -27,7 +27,7 @@ import kotlin.math.roundToInt
 
 class AssetTokensDecoration(
     private val context: Context,
-    adapter: ExpandableAdapter,
+    private val adapter: ExpandableAdapter,
     animator: ExpandableAnimator
 ) : ExpandableItemDecoration(
     adapter,
@@ -60,9 +60,14 @@ class AssetTokensDecoration(
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val viewHolder = parent.getChildViewHolder(view)
 
+        if (viewHolder.bindingAdapterPosition == 0) return
+
         if (viewHolder is TokenAssetGroupViewHolder) {
-            outRect.set(0, 12.dp(context), 0, 0)
-            return
+            if (viewHolder.bindingAdapterPosition == adapter.getItems().size - 1) {
+                outRect.set(0, 12.dp(context), 0, 12.dp(context))
+            } else {
+                outRect.set(0, 12.dp(context), 0, 0)
+            }
         }
     }
 
@@ -94,10 +99,10 @@ class AssetTokensDecoration(
         children.forEach {
             val childrenBottomClipInset = (it.itemView.bottom + it.itemView.translationY.roundToInt()) - childrenBlock.bottom
             val childrenTopClipInset = childrenBlock.top - (it.itemView.top + it.itemView.translationY.roundToInt())
-            if (childrenBottomClipInset > 0) {
+            if (childrenTopClipInset > 0 || childrenBottomClipInset > 0) {
                 it.itemView.clipBounds = Rect(
                     0,
-                    childrenTopClipInset.coerceAtLeast(0),
+                    childrenTopClipInset,
                     it.itemView.width,
                     it.itemView.height - childrenBottomClipInset
                 )
@@ -168,7 +173,7 @@ class AssetTokensDecoration(
         val parentTranslationY = parent?.itemView?.translationY ?: 0f
         val childTranslationY = lastChild?.itemView?.translationY ?: 0f
 
-        val top = (parent?.itemView?.bottom ?: recyclerView.top) + parentTranslationY
+        val top = (parent?.itemView?.bottom ?: 0) + parentTranslationY
         val bottom = (lastChild?.itemView?.bottom?.toFloat() ?: top).coerceAtLeast(top)
         val left = parent?.itemView?.left ?: lastChild?.itemView?.left ?: recyclerView.left
         val right = parent?.itemView?.right ?: lastChild?.itemView?.right ?: recyclerView.right

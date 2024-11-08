@@ -185,7 +185,7 @@ fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFor
     }
 }
 
-fun String.toAmountWithFraction(): AmountWithFraction {
+fun CharSequence.toAmountWithFraction(): AmountWithFraction {
     val amountAndFraction = this.split(DECIMAL_SEPARATOR)
     val amount = amountAndFraction[0]
     val fraction = amountAndFraction.getOrNull(1)

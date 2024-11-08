@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Вы достигли лимита добавленных прокси (%s) в %s . Удалите прокси, чтобы добавить новые.</string>
     <string name="add_proxy_maximum_reached_error_title">Достигнуто максимальное количество прокси</string>
     <string name="added_networks_empty_placeholder">Добавленные пользовательские сети\nпоявятся здесь</string>
+    <string name="appearance_colored_icon_title">Цветной</string>
+    <string name="appearance_title">Внешний вид</string>
+    <string name="appearance_token_assets_title">иконки токенов</string>
+    <string name="appearance_white_icon_title">Белый</string>
     <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Введенный адрес контракта присутствует в Nova как токен %s. Вы уверены, что хотите изменить его?</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Введите адрес контракта</string>
     <string name="asset_add_token_enter_decimals">Введите число десятичных знаков</string>
     <string name="asset_add_token_enter_symbol">Введите символ</string>
+    <string name="asset_view_networks">Сети</string>
+    <string name="asset_view_tokens">Токены</string>
     <string name="assets_add_token">Добавить токен</string>
     <string name="assets_add_token_enter_info_address_label">Адрес контракта</string>
     <string name="assets_add_token_enter_info_decimals_label">Число десятичных знаков</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
     <string name="assets_search_hint">Поиск по названию сети или токена</string>
     <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
+    <string name="assets_search_token_hint">Поиск по токену</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
     <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или получите токены\nна свой аккаунт.</string>
     <string name="assets_swap_flow_pay_title">Токен для оплаты</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Бэкап</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
+    <string name="buy_network_flow_title">Выберите сеть для покупки %s</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
     <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
     <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
@@ -982,6 +990,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
     <string name="push_welcome_timeout_error_message">Повторите попытку позже, открыв настройки уведомлений на вкладке «Настройки»</string>
     <string name="push_welcome_title">Не пропустите ничего!</string>
+    <string name="receive_network_flow_title">Выберите сеть для получения %s</string>
+    <string name="receive_screen_copy_address">Скопировать адрес</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
     <string name="recovery_json">JSON для восстановления</string>
@@ -1141,6 +1151,7 @@
     <string name="select_tracks_for">Выберите треки для</string>
     <string name="selected_tracks_quantity" formatted="false">%d из %d</string>
     <string name="send_address_hint">Адрес или w3n</string>
+    <string name="send_network_flow_title">Выберите сеть для отправки %s</string>
     <string name="send_recipient_system_account_message">Получатель является системным аккаунтом. Этот аккаунт не контролируется какой-либо компанией или частным лицом. \nВы уверены, что все еще хотите выполнить данный перевод?</string>
     <string name="send_recipient_system_account_title">Токены будут потеряны</string>
     <string name="set_staking_proxy_address_description">Выдать полномочия аккаунту</string>
@@ -1554,6 +1565,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Введите другую сумму</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s, Nova автоматически обменяет %s на %s, чтобы поддерживать минимальный %s баланс вашей учетной записи.</string>
     <string name="swap_network_fee_description">Комиссия сети, взимается блокчейном за обработку и проверку транзакций. Может варьироваться в зависимости от условий сети или скорости транзакции.</string>
+    <string name="swap_network_flow_title">Выберите сеть для обмена %s</string>
     <string name="swap_not_enought_liquidity_failure">В пуле недостаточно ликвидности для обмена</string>
     <string name="swap_price_difference_description">Разница в цене представляет собой разницу между двумя различными активами. При обмене криптовалюты под разницей в цене обычно имеется ввиду разница между ценой актива, которую вы получаете и ценой актива, которую вы платите.</string>
     <string name="swap_price_difference_title">Разница в цене</string>
@@ -1646,6 +1658,7 @@
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>
     <string name="wallet_asset_receive_token">Получить %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Отправляйте только токен %1$s и токены в сети %2$s на этот адрес, иначе вы можете потерять свои средства</string>
     <string name="wallet_asset_send">Перевести</string>
     <string name="wallet_asset_swap">Обменять</string>
     <string name="wallet_assets">Активы</string>

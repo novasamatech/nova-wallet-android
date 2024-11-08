@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.ex
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -55,7 +56,7 @@ class ExtrinsicDetailViewModel(
         .share()
 
     val operationIcon = flowOf {
-        assetIconProvider.getAssetIconOrFallback(chainAsset().icon)
+        assetIconProvider.getAssetIconOrFallback(chainAsset().icon, AssetIconMode.WHITE)
     }.shareInBackground()
 
     val content = flowOf {

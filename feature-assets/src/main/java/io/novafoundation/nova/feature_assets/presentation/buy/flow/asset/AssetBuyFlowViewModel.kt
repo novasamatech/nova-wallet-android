@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.buy.flow.asset
 
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFl
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 
 class AssetBuyFlowViewModel(
@@ -25,7 +27,9 @@ class AssetBuyFlowViewModel(
     accountUseCase: SelectedAccountUseCase,
     buyMixinFactory: BuyMixin.Factory,
     resourceManager: ResourceManager,
-    assetIconProvider: AssetIconProvider
+    assetIconProvider: AssetIconProvider,
+    assetViewModeInteractor: AssetViewModeInteractor,
+    amountFormatter: AmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -34,7 +38,9 @@ class AssetBuyFlowViewModel(
     accountUseCase,
     externalBalancesInteractor,
     resourceManager,
-    assetIconProvider
+    assetIconProvider,
+    assetViewModeInteractor,
+    amountFormatter
 ) {
 
     val buyMixin = buyMixinFactory.create(scope = this)

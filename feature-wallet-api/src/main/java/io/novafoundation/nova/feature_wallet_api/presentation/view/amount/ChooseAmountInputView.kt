@@ -8,9 +8,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
 import kotlinx.android.synthetic.main.view_choose_amount_input.view.chooseAmountInputFiat
@@ -40,7 +40,7 @@ class ChooseAmountInputView @JvmOverloads constructor(
     }
 
     fun loadAssetImage(icon: Icon) {
-        chooseAmountInputImage.setIcon(icon, imageLoader)
+        chooseAmountInputImage.setTokenIcon(icon, imageLoader)
     }
 
     fun setAssetName(name: String) {

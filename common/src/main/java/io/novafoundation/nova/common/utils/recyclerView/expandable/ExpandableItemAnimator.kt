@@ -121,7 +121,6 @@ abstract class ExpandableItemAnimator(
         // Reset remove state helps clear alpha and scale when animation is being to be canceled
         if (pendingRemoveAnimations.contains(holder)) {
             holder.itemView.animate().cancel()
-            resetRemoveState(holder)
         }
 
         if (pendingMoveAnimations.contains(holder)) {
@@ -219,6 +218,7 @@ abstract class ExpandableItemAnimator(
             .setDuration(settings.duration)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animator: Animator) {
+                    resetRemoveState(holder)
                     removeFinished(holder)
                     animation.setListener(null)
                 }
@@ -242,13 +242,13 @@ abstract class ExpandableItemAnimator(
     }
 
     override fun endAnimations() {
-        pendingAddAnimations.forEach { it.itemView.animate().cancel() }
+        pendingAddAnimations.iterator().forEach { it.itemView.animate().cancel() }
         pendingAddAnimations.clear()
 
-        pendingRemoveAnimations.forEach { it.itemView.animate().cancel() }
+        pendingRemoveAnimations.iterator().forEach { it.itemView.animate().cancel() }
         pendingRemoveAnimations.clear()
 
-        pendingMoveAnimations.forEach { it.itemView.animate().cancel() }
+        pendingMoveAnimations.iterator().forEach { it.itemView.animate().cancel() }
         pendingMoveAnimations.clear()
 
         addAnimations.clear()
@@ -288,5 +288,12 @@ abstract class ExpandableItemAnimator(
         if (holder in pendingMoveAnimations) return
 
         dispatchAnimationFinished(holder)
+        dispatchFinishedWhenDone()
+    }
+
+    private fun dispatchFinishedWhenDone() {
+        if (!isRunning) {
+            dispatchAnimationsFinished()
+        }
     }
 }

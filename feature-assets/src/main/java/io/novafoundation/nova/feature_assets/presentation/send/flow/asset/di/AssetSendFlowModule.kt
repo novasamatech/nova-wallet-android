@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.send.flow.asset.AssetSendFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class AssetSendFlowModule {
@@ -37,7 +39,9 @@ class AssetSendFlowModule {
         controllableAssetCheck: ControllableAssetCheckMixin,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
-        assetIconProvider: AssetIconProvider
+        assetIconProvider: AssetIconProvider,
+        assetViewModeInteractor: AssetViewModeInteractor,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return AssetSendFlowViewModel(
             interactorFactory = interactorFactory,
@@ -47,7 +51,9 @@ class AssetSendFlowModule {
             controllableAssetCheck = controllableAssetCheck,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            assetViewModeInteractor = assetViewModeInteractor,
+            amountFormatter = amountFormatter
         )
     }
 }

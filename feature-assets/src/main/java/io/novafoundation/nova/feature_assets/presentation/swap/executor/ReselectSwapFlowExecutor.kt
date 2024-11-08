@@ -21,6 +21,7 @@ class ReselectSwapFlowExecutor(
             SelectingDirection.IN -> state.setAssetIn(chainAsset)
             SelectingDirection.OUT -> state.setAssetOut(chainAsset)
         }
+
         assetsRouter.returnToMainSwapScreen()
     }
 }

@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,7 +44,9 @@ abstract class AssetFlowViewModel(
     protected val accountUseCase: SelectedAccountUseCase,
     externalBalancesInteractor: ExternalBalancesInteractor,
     protected val resourceManager: ResourceManager,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    private val assetViewModeInteractor: AssetViewModeInteractor,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     protected val interactor = interactorFactory.createByAssetViewMode()
@@ -56,8 +61,16 @@ abstract class AssetFlowViewModel(
 
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
-    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() }
+    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() } // lazy use searchAssetsFlow to let subclasses initialize self
         .shareInBackground(SharingStarted.Lazily)
+
+    val searchHint = assetViewModeInteractor.assetsViewModeFlow()
+        .map {
+            when (it) {
+                AssetViewMode.NETWORKS -> resourceManager.getString(R.string.assets_search_hint)
+                AssetViewMode.TOKENS -> resourceManager.getString(R.string.assets_search_token_hint)
+            }
+        }
 
     val searchResults = combine(
         searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self
@@ -87,11 +100,11 @@ abstract class AssetFlowViewModel(
     }
 
     open fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(assetIconProvider, currency)
+        return assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
     }
 
     open fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
-        return assets.map { mapTokenAssetGroupToUi(assetIconProvider, it.key, assets = it.value) }
+        return assets.map { mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, it.key, assets = it.value) }
     }
 
     internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {
