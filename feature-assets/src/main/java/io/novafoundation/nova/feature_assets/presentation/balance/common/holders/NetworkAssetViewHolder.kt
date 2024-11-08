@@ -24,7 +24,7 @@ class NetworkAssetViewHolder(
     fun bind(networkAsset: NetworkAssetUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         val asset = networkAsset.asset
         itemAssetImage.setTokenIcon(networkAsset.icon, imageLoader)
-        
+
         bindPriceInfo(asset)
 
         bindRecentChange(asset)
