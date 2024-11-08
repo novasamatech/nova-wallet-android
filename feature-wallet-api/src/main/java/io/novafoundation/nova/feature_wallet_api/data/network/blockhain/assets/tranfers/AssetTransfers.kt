@@ -50,6 +50,20 @@ interface AssetTransfer : AssetTransferBase {
         get() = originChainAsset.planksFromAmount(amount)
 }
 
+fun AssetTransferDirection(
+    originChain: Chain,
+    originChainAsset: Chain.Asset,
+    destinationChain: Chain,
+    destinationChainAsset: Chain.Asset
+): AssetTransferDirection {
+    return object : AssetTransferDirection {
+        override val originChain: Chain = originChain
+        override val originChainAsset: Chain.Asset = originChainAsset
+        override val destinationChain: Chain = destinationChain
+        override val destinationChainAsset: Chain.Asset = destinationChainAsset
+    }
+}
+
 fun AssetTransferBase(
     recipient: String,
     originChain: Chain,

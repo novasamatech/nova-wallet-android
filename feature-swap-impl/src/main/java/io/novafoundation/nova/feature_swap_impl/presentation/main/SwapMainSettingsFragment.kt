@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsRate
+import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsExecutionTime
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsGetAssetIn
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
@@ -108,6 +109,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.swapRouteState.observe(swapMainSettingsRoute::setSwapRouteState)
+        viewModel.swapExecutionTime.observe(swapMainSettingsExecutionTime::showLoadingValue)
         viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
         viewModel.buttonState.observe(swapMainSettingsContinue::setState)
 

@@ -66,6 +66,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -82,6 +84,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.time.Duration
 
 
 class HydraDxExchangeFactory(
@@ -91,7 +94,8 @@ class HydraDxExchangeFactory(
     private val hydraDxNovaReferral: HydraDxNovaReferral,
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val quotingFactory: HydraDxQuoting.Factory,
-    private val hydrationFeeInjector: HydrationFeeInjector
+    private val hydrationFeeInjector: HydrationFeeInjector,
+    private val chainStateRepository: ChainStateRepository
 ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost, coroutineScope: CoroutineScope): AssetExchange {
@@ -105,6 +109,7 @@ class HydraDxExchangeFactory(
             swapHost = swapHost,
             hydrationFeeInjector = hydrationFeeInjector,
             delegate = quotingFactory.create(chain),
+            chainStateRepository = chainStateRepository
         )
     }
 }
@@ -122,6 +127,7 @@ private class HydraDxAssetExchange(
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val swapHost: AssetExchange.SwapHost,
     private val hydrationFeeInjector: HydrationFeeInjector,
+    private val chainStateRepository: ChainStateRepository
 ) : AssetExchange {
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
@@ -265,6 +271,10 @@ private class HydraDxAssetExchange(
         override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
             // in HDX
             return 0.5.toBigDecimal()
+        }
+
+        override suspend fun maximumExecutionTime(): Duration {
+            return chainStateRepository.expectedBlockTime(chain.id)
         }
     }
 

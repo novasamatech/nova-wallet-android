@@ -9,4 +9,5 @@ class SwapConfirmationDetailsModel(
     val priceDifference: CharSequence?,
     val slippage: String,
     val swapRouteState: SwapRouteState,
+    val estimatedExecutionTime: String,
 )

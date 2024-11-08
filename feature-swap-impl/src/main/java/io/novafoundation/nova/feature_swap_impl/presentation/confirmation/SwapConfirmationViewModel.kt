@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
@@ -300,19 +301,23 @@ class SwapConfirmationViewModel(
 
     private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {
         val metaAccount = accountRepository.getSelectedMetaAccount()
-        val assetIn = confirmationState.swapQuote.assetIn
-        val assetOut = confirmationState.swapQuote.assetOut
+        val quote = confirmationState.swapQuote
+
+        val assetIn = quote.assetIn
+        val assetOut = quote.assetOut
         val chainIn = chainRegistry.getChain(assetIn.chainId)
         val chainOut = chainRegistry.getChain(assetOut.chainId)
+
         return SwapConfirmationDetailsModel(
             assets = SwapAssetsView.Model(
-                assetIn = formatAssetDetails(metaAccount, chainIn, assetIn, confirmationState.swapQuote.planksIn),
-                assetOut = formatAssetDetails(metaAccount, chainOut, assetOut, confirmationState.swapQuote.planksOut)
+                assetIn = formatAssetDetails(metaAccount, chainIn, assetIn, quote.planksIn),
+                assetOut = formatAssetDetails(metaAccount, chainOut, assetOut, quote.planksOut)
             ),
-            rate = formatRate(confirmationState.swapQuote.swapRate(), assetIn, assetOut),
-            priceDifference = formatPriceDifference(confirmationState.swapQuote.priceImpact),
+            rate = formatRate(quote.swapRate(), assetIn, assetOut),
+            priceDifference = formatPriceDifference(quote.priceImpact),
             slippage = slippageFlow.first().formatPercents(),
-            swapRouteState = ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(confirmationState.swapQuote))
+            swapRouteState = ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(quote)),
+            estimatedExecutionTime = resourceManager.formatDuration(quote.executionEstimate.totalTime(), estimated = true)
         )
     }
 

@@ -13,7 +13,8 @@ data class SwapQuote(
     val amountIn: ChainAssetWithAmount,
     val amountOut: ChainAssetWithAmount,
     val priceImpact: Percent,
-    val quotedPath: QuotedPath<SwapGraphEdge>
+    val quotedPath: QuotedPath<SwapGraphEdge>,
+    val executionEstimate: SwapExecutionEstimate
 ) {
 
     val assetIn: Chain.Asset

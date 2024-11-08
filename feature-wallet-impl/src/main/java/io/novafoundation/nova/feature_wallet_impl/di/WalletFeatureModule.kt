@@ -91,6 +91,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -297,14 +298,18 @@ class WalletFeatureModule {
         phishingValidationFactory: PhishingValidationFactory,
         palletXcmRepository: PalletXcmRepository,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
-        eventsRepository: EventsRepository
+        eventsRepository: EventsRepository,
+        chainRegistry: ChainRegistry,
+        chainStateRepository: ChainStateRepository
     ): CrossChainTransactor = RealCrossChainTransactor(
         weigher = weigher,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
         palletXcmRepository = palletXcmRepository,
         enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
-        eventsRepository = eventsRepository
+        eventsRepository = eventsRepository,
+        chainStateRepository = chainStateRepository,
+        chainRegistry = chainRegistry
     )
 
     @Provides

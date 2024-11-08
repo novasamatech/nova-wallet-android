@@ -42,11 +42,16 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.findRelayChainOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.getInherentEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +62,8 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withTimeout
 import java.math.BigInteger
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 
 class RealCrossChainTransactor(
@@ -65,7 +72,9 @@ class RealCrossChainTransactor(
     private val phishingValidationFactory: PhishingValidationFactory,
     private val palletXcmRepository: PalletXcmRepository,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
-    private val eventsRepository: EventsRepository
+    private val eventsRepository: EventsRepository,
+    private val chainStateRepository: ChainStateRepository,
+    private val chainRegistry: ChainRegistry,
 ) : CrossChainTransactor {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -145,6 +154,33 @@ class RealCrossChainTransactor(
 
                 balancesUpdates.awaitCrossChainArrival(transfer)
             }
+    }
+
+    override suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration {
+        val originChainId = configuration.originChainId
+        val reserveChainId = configuration.reserveFee?.to?.chainId
+        val destinationChainId = configuration.destinationFee.to.chainId
+
+        val relayId = chainRegistry.findRelayChainOrThrow(originChainId)
+
+        var totalDuration = ZERO
+
+        if (reserveChainId != null) {
+            totalDuration += maxTimeToTransmitMessage(originChainId, reserveChainId, relayId)
+            totalDuration += maxTimeToTransmitMessage(reserveChainId, destinationChainId, relayId)
+        } else {
+            totalDuration += maxTimeToTransmitMessage(originChainId, destinationChainId, relayId)
+        }
+
+        return totalDuration
+    }
+
+    private suspend fun maxTimeToTransmitMessage(from: ChainId, to: ChainId, relay: ChainId): Duration {
+        val toProduceBlockOnOrigin = chainStateRepository.expectedBlockTime(from)
+        val toProduceBlockOnDestination = chainStateRepository.expectedBlockTime(to)
+        val toProduceBlockOnRelay = if (from != relay && to != relay) chainStateRepository.expectedBlockTime(relay) else ZERO
+
+        return toProduceBlockOnOrigin + toProduceBlockOnRelay + toProduceBlockOnDestination
     }
 
     private suspend fun Flow<Result<TransferableBalanceUpdate>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {

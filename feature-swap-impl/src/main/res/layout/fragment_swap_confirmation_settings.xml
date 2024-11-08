@@ -62,6 +62,12 @@
                 android:layout_height="wrap_content"
                 app:titleIcon="@drawable/ic_info" />
 
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationExecutionTime"
+                app:title="@string/swap_execution_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                 android:id="@+id/swapConfirmationNetworkFee"
                 android:layout_width="match_parent"

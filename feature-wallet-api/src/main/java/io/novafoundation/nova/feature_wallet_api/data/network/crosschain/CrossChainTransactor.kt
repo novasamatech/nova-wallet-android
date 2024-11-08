@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlin.time.Duration
 
 interface CrossChainTransactor {
 
@@ -34,4 +35,6 @@ interface CrossChainTransactor {
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
     ): Result<Balance>
+
+    suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration
 }

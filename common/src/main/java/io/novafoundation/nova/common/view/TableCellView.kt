@@ -164,6 +164,8 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     fun showProgress() {
+        makeVisible()
+
         contentGroup.makeGone()
         valueProgress.makeVisible()
     }
@@ -323,14 +325,20 @@ fun TableCellView.setExtraInfoAvailable(available: Boolean) {
     }
 }
 
-fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T>, showData: (T) -> Unit) {
+fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T?>, showData: (T) -> Unit) {
     when (state) {
         is ExtendedLoadingState.Error -> showValue(context.getString(R.string.common_error_general_title))
-        is ExtendedLoadingState.Loaded -> showData(state.data)
+
+        is ExtendedLoadingState.Loaded -> if (state.data != null) {
+            showData(state.data)
+        } else {
+            makeGone()
+        }
+
         ExtendedLoadingState.Loading -> showProgress()
     }
 }
 
-fun TableCellView.showLoadingValue(state: ExtendedLoadingState<String>) {
+fun TableCellView.showLoadingValue(state: ExtendedLoadingState<String?>) {
     showLoadingState(state, ::showValue)
 }

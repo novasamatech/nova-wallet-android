@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationS
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionEstimate
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
@@ -108,6 +109,7 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
@@ -303,6 +305,33 @@ internal class RealSwapService(
         return finishedSwapTxs
     }
 
+    private suspend fun Path<QuotedEdge<SwapGraphEdge>>.constructAtomicOperationPrototypes(): List<AtomicSwapOperationPrototype> {
+        var currentSwapTx: AtomicSwapOperationPrototype? = null
+        val finishedSwapTxs = mutableListOf<AtomicSwapOperationPrototype>()
+
+        forEach { quotedEdge ->
+            // Initial case - begin first operation
+            if (currentSwapTx == null) {
+                currentSwapTx = quotedEdge.edge.beginOperationPrototype()
+                return@forEach
+            }
+
+            // Try to append segment to current swap tx
+            val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperationPrototype(currentSwapTx!!)
+
+            currentSwapTx = if (maybeAppendedCurrentTx == null) {
+                finishedSwapTxs.add(currentSwapTx!!)
+                quotedEdge.edge.beginOperationPrototype()
+            } else {
+                maybeAppendedCurrentTx
+            }
+        }
+
+        finishedSwapTxs.add(currentSwapTx!!)
+
+        return finishedSwapTxs
+    }
+
     private suspend fun SwapGraphEdge.identifySegmentCurrency(
         isFirstSegment: Boolean,
         firstSegmentFees: FeePaymentCurrency
@@ -331,12 +360,20 @@ internal class RealSwapService(
         val amountIn = quotedTrade.amountIn()
         val amountOut = quotedTrade.amountOut()
 
+        val atomicOperationsEstimates = quotedTrade.estimateOperationsMaximumExecutionTime()
+
         return SwapQuote(
             amountIn = args.tokenIn.configuration.withAmount(amountIn),
             amountOut = args.tokenOut.configuration.withAmount(amountOut),
             priceImpact = args.calculatePriceImpact(amountIn, amountOut),
-            quotedPath = quotedTrade
+            quotedPath = quotedTrade,
+            executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates)
         )
+    }
+
+    private suspend fun QuotedTrade.estimateOperationsMaximumExecutionTime(): List<Duration> {
+        return path.constructAtomicOperationPrototypes()
+            .map { it.maximumExecutionTime() }
     }
 
     override suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig {
@@ -575,33 +612,6 @@ internal class RealSwapService(
             }
         }
 
-        private suspend fun Path<QuotedEdge<SwapGraphEdge>>.constructAtomicOperationPrototypes(): List<AtomicSwapOperationPrototype> {
-            var currentSwapTx: AtomicSwapOperationPrototype? = null
-            val finishedSwapTxs = mutableListOf<AtomicSwapOperationPrototype>()
-
-            forEach { quotedEdge ->
-                // Initial case - begin first operation
-                if (currentSwapTx == null) {
-                    currentSwapTx = quotedEdge.edge.beginOperationPrototype()
-                    return@forEach
-                }
-
-                // Try to append segment to current swap tx
-                val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperationPrototype(currentSwapTx!!)
-
-                currentSwapTx = if (maybeAppendedCurrentTx == null) {
-                    finishedSwapTxs.add(currentSwapTx!!)
-                    quotedEdge.edge.beginOperationPrototype()
-                } else {
-                    maybeAppendedCurrentTx
-                }
-            }
-
-            finishedSwapTxs.add(currentSwapTx!!)
-
-            return finishedSwapTxs
-        }
-
         private inner class PriceBasedUsdConverter(
             private val prices: Map<FullChainAssetId, Token>,
             private val nativeAsset: FullChainAssetId,
@@ -625,6 +635,7 @@ internal class RealSwapService(
             }
         }
     }
+
 
     private inner class InnerSwapHost(
         private val computationScope: CoroutineScope

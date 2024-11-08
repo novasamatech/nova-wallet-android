@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -49,6 +50,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.time.Duration
 
 class CrossChainTransferAssetExchangeFactory(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
@@ -115,7 +117,7 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype {
-            return CrossChainTransferOperationPrototype(from.chainId, to.chainId)
+            return CrossChainTransferOperationPrototype(this)
         }
 
         override suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype? {
@@ -143,9 +145,12 @@ class CrossChainTransferAssetExchange(
     }
 
     inner class CrossChainTransferOperationPrototype(
-        override val fromChain: ChainId,
-        private val toChain: ChainId,
+        private val edge: Edge<FullChainAssetId>,
     ) : AtomicSwapOperationPrototype {
+
+        override val fromChain: ChainId = edge.from.chainId
+
+        private val toChain: ChainId = edge.to.chainId
 
         override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
             var totalAmount = BigDecimal.ZERO
@@ -165,6 +170,15 @@ class CrossChainTransferAssetExchange(
             return totalAmount
         }
 
+        override suspend fun maximumExecutionTime(): Duration {
+            val (fromChain, fromAsset) = chainRegistry.chainWithAsset(edge.from)
+            val (toChain, toAsset) = chainRegistry.chainWithAsset(edge.to)
+
+            val transferDirection = AssetTransferDirection(fromChain, fromAsset, toChain, toAsset)
+
+            return crossChainTransfersUseCase.maximumExecutionTime(transferDirection, computationalScope)
+        }
+
         private fun isChainWithExpensiveCrossChain(chainId: ChainId): Boolean {
             return (chainId == Chain.Geneses.POLKADOT) or (chainId == Chain.Geneses.POLKADOT_ASSET_HUB)
         }
@@ -179,7 +193,9 @@ class CrossChainTransferAssetExchange(
 
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Transfer(
-                from = edge.from, to = edge.to, amount = estimatedSwapLimit.estimatedAmountIn
+                from = edge.from,
+                to = edge.to,
+                amount = estimatedSwapLimit.estimatedAmountIn
             )
         }
 

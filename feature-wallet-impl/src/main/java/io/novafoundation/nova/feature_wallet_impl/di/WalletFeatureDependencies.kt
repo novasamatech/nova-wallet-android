@@ -50,6 +50,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.encrypt.Signer
@@ -90,6 +91,8 @@ interface WalletFeatureDependencies {
     val assetIconProvider: AssetIconProvider
 
     val parachainInfoRepository: ParachainInfoRepository
+
+    val chainStateRepository: ChainStateRepository
 
     fun preferences(): Preferences
 

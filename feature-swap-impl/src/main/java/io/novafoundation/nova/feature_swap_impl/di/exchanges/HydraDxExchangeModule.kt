@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stabl
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.XYKSwapSourceFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -57,7 +58,8 @@ class HydraDxExchangeModule {
         hydraDxNovaReferral: HydraDxNovaReferral,
         swapSourceFactories: Set<@JvmSuppressWildcards HydraDxSwapSource.Factory<*>>,
         quotingFactory: HydraDxQuoting.Factory,
-        hydrationFeeInjector: HydrationFeeInjector
+        hydrationFeeInjector: HydrationFeeInjector,
+        chainStateRepository: ChainStateRepository
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
@@ -66,7 +68,8 @@ class HydraDxExchangeModule {
             hydraDxNovaReferral = hydraDxNovaReferral,
             swapSourceFactories = swapSourceFactories,
             quotingFactory = quotingFactory,
-            hydrationFeeInjector = hydrationFeeInjector
+            hydrationFeeInjector = hydrationFeeInjector,
+            chainStateRepository = chainStateRepository
         )
     }
 }

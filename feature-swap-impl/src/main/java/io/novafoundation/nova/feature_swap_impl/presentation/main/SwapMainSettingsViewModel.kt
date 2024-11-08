@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
@@ -168,6 +169,10 @@ class SwapMainSettingsViewModel(
 
     val swapRouteState = quotingState
         .map { quoteState -> quoteState.toSwapRouteState() }
+        .shareInBackground()
+
+    val swapExecutionTime = quotingState
+        .map { it.toExecutionEstimate() }
         .shareInBackground()
 
     private val originChainFlow = swapSettings
@@ -644,11 +649,13 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
-        return when (this) {
-            QuotingState.Default -> ExtendedLoadingState.Loaded(null)
-            is QuotingState.Error -> ExtendedLoadingState.Error(error)
-            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(quote))
-            QuotingState.Loading -> ExtendedLoadingState.Loading
+        return toLoadingState {  swapRouteFormatter.formatSwapRoute(it) }
+    }
+
+    private fun QuotingState.toExecutionEstimate(): ExtendedLoadingState<String?> {
+        return toLoadingState {
+            val estimatedDuration = it.executionEstimate.totalTime()
+            resourceManager.formatDuration(estimatedDuration, estimated = true)
         }
     }
 

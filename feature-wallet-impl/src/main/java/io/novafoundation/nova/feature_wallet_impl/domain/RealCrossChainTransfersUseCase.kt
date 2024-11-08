@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTra
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.IncomingDirection
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.OutcomingDirection
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -39,6 +41,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 
 private const val INCOMING_DIRECTIONS = "RealCrossChainTransfersUseCase.INCOMING_DIRECTIONS"
 private const val CONFIGURATION_CACHE = "RealCrossChainTransfersUseCase.CONFIGURATION"
@@ -100,11 +103,11 @@ internal class RealCrossChainTransfersUseCase(
     }
 
     override suspend fun getConfiguration(): CrossChainTransfersConfiguration {
-       return crossChainTransfersRepository.getConfiguration()
+        return crossChainTransfersRepository.getConfiguration()
     }
 
     override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
-       return crossChainTransactor.requiredRemainingAmountAfterTransfer(sendingAsset, originChain)
+        return crossChainTransactor.requiredRemainingAmountAfterTransfer(sendingAsset, originChain)
     }
 
 
@@ -144,15 +147,29 @@ internal class RealCrossChainTransfersUseCase(
         transfer: AssetTransferBase,
         computationalScope: CoroutineScope
     ): Result<Balance> {
+        val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
+        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
+    }
+
+    override suspend fun maximumExecutionTime(
+        assetTransferDirection: AssetTransferDirection,
+        computationalScope: CoroutineScope
+    ): Duration {
+        val transferConfiguration = transferConfigurationFor(assetTransferDirection, computationalScope)
+        return crossChainTransactor.estimateMaximumExecutionTime(transferConfiguration)
+    }
+
+    private suspend fun transferConfigurationFor(
+        transfer: AssetTransferDirection,
+        computationalScope: CoroutineScope
+    ): CrossChainTransferConfiguration {
         val configuration = cachedConfigurationFlow(computationalScope).first()
-        val transferConfiguration = configuration.transferConfiguration(
+        return configuration.transferConfiguration(
             originChain = transfer.originChain,
             originAsset = transfer.originChainAsset,
             destinationChain = transfer.destinationChain,
             destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
         )!!
-
-        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
     }
 
     private fun cachedConfigurationFlow(cachingScope: CoroutineScope?): Flow<CrossChainTransfersConfiguration> {

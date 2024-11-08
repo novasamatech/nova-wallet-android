@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.MinutesDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.RoundMinutesDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.SecondsDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
@@ -260,12 +261,14 @@ fun baseDurationFormatter(
     ),
     hoursDurationFormatter: BoundedDurationFormatter = HoursDurationFormatter(context),
     minutesDurationFormatter: BoundedDurationFormatter = MinutesDurationFormatter(context),
+    secondsDurationFormatter: BoundedDurationFormatter = SecondsDurationFormatter(context),
     zeroDurationFormatter: BoundedDurationFormatter = ZeroDurationFormatter(DayDurationFormatter(context))
 ): DurationFormatter {
     val compoundFormatter = CompoundDurationFormatter(
         dayDurationFormatter,
         hoursDurationFormatter,
         minutesDurationFormatter,
+        secondsDurationFormatter,
         zeroDurationFormatter
     )
 

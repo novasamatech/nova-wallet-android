@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <string name="swap_execution_time">Execution time</string>
+
     <string name="common_total_fee">Total fee</string>
 
     <string name="common_fee_with_label">Fee: %s</string>

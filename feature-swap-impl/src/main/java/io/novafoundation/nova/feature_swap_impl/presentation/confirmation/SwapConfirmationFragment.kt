@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapCo
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssets
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationButton
+import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationExecutionTime
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationNetworkFee
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationPriceDifference
 import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationRate
@@ -77,6 +78,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
             swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
             swapConfirmationSlippage.showValue(it.slippage)
             swapConfirmationRoute.setSwapRouteState(it.swapRouteState)
+            swapConfirmationExecutionTime.showValue(it.estimatedExecutionTime)
         }
 
         viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }

@@ -366,6 +366,11 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
     return findEvmChain(addressPrefix)
 }
 
+suspend fun ChainRegistry.findRelayChainOrThrow(chainId: ChainId): ChainId {
+    val chain = getChain(chainId)
+    return chain.parentId ?: chainId
+}
+
 fun ChainRegistry.enabledChainsFlow() = currentChains
     .filterList { it.isEnabled }
 

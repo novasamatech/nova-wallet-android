@@ -47,6 +47,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMul
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -60,6 +61,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
+import kotlin.time.Duration
 
 class AssetConversionExchangeFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
@@ -229,6 +231,10 @@ private class AssetConversionExchange(
         override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
             // in DOT
             return 0.0015.toBigDecimal()
+        }
+
+        override suspend fun maximumExecutionTime(): Duration {
+            return chainStateRepository.expectedBlockTime(chain.id)
         }
     }
 
