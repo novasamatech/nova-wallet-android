@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowVi
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 
 class AssetReceiveFlowViewModel(
@@ -26,7 +27,8 @@ class AssetReceiveFlowViewModel(
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
     assetIconProvider: AssetIconProvider,
-    assetViewModeInteractor: AssetViewModeInteractor
+    assetViewModeInteractor: AssetViewModeInteractor,
+    amountFormatter: AmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -36,7 +38,8 @@ class AssetReceiveFlowViewModel(
     externalBalancesInteractor,
     resourceManager,
     assetIconProvider,
-    assetViewModeInteractor
+    assetViewModeInteractor,
+    amountFormatter
 ) {
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)

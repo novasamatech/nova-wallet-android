@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextColorRes
 
 data class ColoredText(
-    val text: String,
+    val text: CharSequence,
     @ColorRes val colorRes: Int,
 )
 

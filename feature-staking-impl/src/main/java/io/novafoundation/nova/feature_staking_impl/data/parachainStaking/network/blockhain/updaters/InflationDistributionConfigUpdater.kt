@@ -9,14 +9,18 @@ import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 
-class ParachainBondInfoUpdater(
+class InflationDistributionConfigUpdater(
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
 ) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache), ParachainStakingUpdater<Unit> {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
-        return runtime.metadata.parachainStaking().storage("ParachainBondInfo").storageKey()
+        val parachainStaking = runtime.metadata.parachainStaking()
+
+        return parachainStaking.storageOrNull("InflationDistributionInfo")?.storageKey()
+            ?: parachainStaking.storage("ParachainBondInfo").storageKey()
     }
 }

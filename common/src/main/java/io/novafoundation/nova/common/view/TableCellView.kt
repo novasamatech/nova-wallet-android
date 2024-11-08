@@ -195,7 +195,7 @@ open class TableCellView @JvmOverloads constructor(
         tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
-    fun showValue(primary: CharSequence, secondary: String? = null) {
+    fun showValue(primary: CharSequence, secondary: CharSequence? = null) {
         postToSelf {
             contentGroup.makeVisible()
 
@@ -278,7 +278,7 @@ open class TableCellView @JvmOverloads constructor(
     }
 }
 
-fun TableCellView.showValueOrHide(primary: CharSequence?, secondary: String? = null) {
+fun TableCellView.showValueOrHide(primary: CharSequence?, secondary: CharSequence? = null) {
     if (primary != null) {
         showValue(primary, secondary)
     }

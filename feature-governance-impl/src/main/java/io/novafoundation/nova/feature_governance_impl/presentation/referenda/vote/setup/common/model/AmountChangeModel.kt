@@ -6,22 +6,22 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.AmountChangeModel.DifferenceModel
 
 class AmountChangeModel(
-    val to: String,
-    val from: String?,
+    val to: CharSequence,
+    val from: CharSequence?,
     val difference: DifferenceModel?
 ) {
 
     class DifferenceModel(
         @DrawableRes val icon: Int,
-        val text: String,
+        val text: CharSequence,
         @ColorRes val color: Int
     )
 }
 
 fun AmountChangeModel(
-    from: String?,
-    to: String,
-    difference: String?,
+    from: CharSequence?,
+    to: CharSequence,
+    difference: CharSequence?,
     positive: Boolean?
 ): AmountChangeModel {
     val differenceModel = if (positive != null && difference != null) {

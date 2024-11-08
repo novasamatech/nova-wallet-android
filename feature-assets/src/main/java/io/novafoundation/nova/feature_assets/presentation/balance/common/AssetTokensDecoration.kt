@@ -99,10 +99,10 @@ class AssetTokensDecoration(
         children.forEach {
             val childrenBottomClipInset = (it.itemView.bottom + it.itemView.translationY.roundToInt()) - childrenBlock.bottom
             val childrenTopClipInset = childrenBlock.top - (it.itemView.top + it.itemView.translationY.roundToInt())
-            if (childrenBottomClipInset > 0) {
+            if (childrenTopClipInset > 0 || childrenBottomClipInset > 0) {
                 it.itemView.clipBounds = Rect(
                     0,
-                    childrenTopClipInset.coerceAtLeast(0),
+                    childrenTopClipInset,
                     it.itemView.width,
                     it.itemView.height - childrenBottomClipInset
                 )

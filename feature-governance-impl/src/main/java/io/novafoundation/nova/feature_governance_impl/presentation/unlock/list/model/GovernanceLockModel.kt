@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.formatting.TimerValue
 
 data class GovernanceLockModel(
     val index: Int,
-    val amount: String,
+    val amount: CharSequence,
     val status: StatusContent,
     @ColorRes val statusColorRes: Int,
     @DrawableRes val statusIconRes: Int?,
