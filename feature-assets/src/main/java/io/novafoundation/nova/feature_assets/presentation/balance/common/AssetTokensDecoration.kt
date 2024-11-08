@@ -173,7 +173,7 @@ class AssetTokensDecoration(
         val parentTranslationY = parent?.itemView?.translationY ?: 0f
         val childTranslationY = lastChild?.itemView?.translationY ?: 0f
 
-        val top = (parent?.itemView?.bottom ?: recyclerView.top) + parentTranslationY
+        val top = (parent?.itemView?.bottom ?: 0) + parentTranslationY
         val bottom = (lastChild?.itemView?.bottom?.toFloat() ?: top).coerceAtLeast(top)
         val left = parent?.itemView?.left ?: lastChild?.itemView?.left ?: recyclerView.left
         val right = parent?.itemView?.right ?: lastChild?.itemView?.right ?: recyclerView.right

@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asIcon
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -43,8 +44,8 @@ fun ImageLoader.loadChainIconToTarget(icon: String?, context: Context, target: (
     this.enqueue(request)
 }
 
-fun ImageView.loadTokenIcon(icon: String?, imageLoader: ImageLoader) {
-    load(icon, imageLoader) {
+fun ImageView.setTokenIcon(icon: Icon, imageLoader: ImageLoader) {
+    setIcon(icon, imageLoader) {
         fallback(ASSET_ICON_PLACEHOLDER)
     }
 }
