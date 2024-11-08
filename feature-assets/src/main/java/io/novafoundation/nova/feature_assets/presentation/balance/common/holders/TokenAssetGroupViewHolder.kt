@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableParentViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 import io.novafoundation.nova.common.utils.setTextColorRes
