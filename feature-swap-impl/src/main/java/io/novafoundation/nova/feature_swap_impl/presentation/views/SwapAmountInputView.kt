@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
@@ -83,7 +84,7 @@ class SwapAmountInputView @JvmOverloads constructor(
         return when (icon) {
             is SwapInputAssetModel.SwapAssetIcon.Chosen -> {
                 swapAmountInputImage.setImageTint(null)
-                swapAmountInputImage.setIcon(icon.assetIcon, imageLoader)
+                swapAmountInputImage.setTokenIcon(icon.assetIcon, imageLoader)
                 swapAmountInputImage.setBackgroundResource(R.drawable.bg_token_container)
             }
 

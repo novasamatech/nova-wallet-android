@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -120,7 +121,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
 
         viewModel.assetDetailsModel.observe { asset ->
-            balanceDetailTokenIcon.setIcon(asset.assetIcon, imageLoader)
+            balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.symbol.value
 
             balanceDetailRate.text = asset.token.rate

@@ -5,6 +5,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
@@ -22,8 +23,8 @@ class NetworkAssetViewHolder(
 
     fun bind(networkAsset: NetworkAssetUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
         val asset = networkAsset.asset
-        itemAssetImage.setIcon(networkAsset.icon, imageLoader)
-
+        itemAssetImage.setTokenIcon(networkAsset.icon, imageLoader)
+        
         bindPriceInfo(asset)
 
         bindRecentChange(asset)
