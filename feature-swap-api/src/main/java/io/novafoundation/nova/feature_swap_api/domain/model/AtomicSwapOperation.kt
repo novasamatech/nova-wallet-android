@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_account_api.data.model.totalPlanksEnsuringAsset
+import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 
 interface AtomicSwapOperation {
@@ -37,28 +38,7 @@ class AtomicSwapOperationArgs(
     val feePaymentCurrency: FeePaymentCurrency,
 )
 
-class AtomicSwapOperationFee(
-    /**
-     * Fee that is paid when submitting transaction
-     */
-    val submissionFee: SubmissionFeeWithLabel,
 
-    val postSubmissionFees: PostSubmissionFees = PostSubmissionFees(),
-) {
-
-    class PostSubmissionFees(
-        /**
-         * Post-submission fees paid by (some) origin account.
-         * This is typed as `SubmissionFee` as those fee might still use different accounts (e.g. delivery fees are always paid from requested account)
-         */
-        val paidByAccount: List<SubmissionFeeWithLabel> = emptyList(),
-
-        /**
-         * Post-submission fees paid from swapping amount directly. Its payment is isolated and does not involve any withdrawals from accounts
-         */
-        val paidFromAmount: List<FeeWithLabel> = emptyList()
-    )
-}
 
 fun AtomicSwapOperationFee.amountToLeaveOnOriginToPayTxFees(): Balance {
     val submissionAsset = submissionFee.asset

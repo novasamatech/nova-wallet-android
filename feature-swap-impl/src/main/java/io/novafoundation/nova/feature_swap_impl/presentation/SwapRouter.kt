@@ -9,6 +9,8 @@ interface SwapRouter : ReturnableRouter {
 
     fun openSwapRoute()
 
+    fun openSwapFee()
+
     fun selectAssetIn(selectedAsset: AssetPayload?)
 
     fun selectAssetOut(selectedAsset: AssetPayload?)

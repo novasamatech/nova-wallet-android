@@ -30,7 +30,6 @@ import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
@@ -333,6 +332,10 @@ class SwapMainSettingsViewModel(
         swapRouter.openSwapRoute()
     }
 
+    fun networkFeeClicked() = setSwapStateAndThen {
+        swapRouter.openSwapFee()
+    }
+
     fun continueButtonClicked() = setSwapStateAndThen {
         swapRouter.openSwapConfirmation()
 
@@ -352,10 +355,6 @@ class SwapMainSettingsViewModel(
 
     fun rateDetailsClicked() {
         launchSwapRateDescription()
-    }
-
-    fun networkFeeClicked() {
-        launchNetworkFeeDescription()
     }
 
     fun flipAssets() = launch {
@@ -386,7 +385,7 @@ class SwapMainSettingsViewModel(
         swapRouter.back()
     }
 
-    private fun setSwapStateAndThen(action: () -> Unit): Unit {
+    private fun setSwapStateAndThen(action: () -> Unit) {
         launch {
             val quotingState = quotingState.value
             if (quotingState !is QuotingState.Loaded) return@launch

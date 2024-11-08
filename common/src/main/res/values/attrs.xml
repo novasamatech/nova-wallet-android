@@ -106,6 +106,7 @@
         <attr name="primaryValueIconTint" format="color" />
         <attr name="titleEllipsisable" format="boolean" />
         <attr name="primaryValue" format="string" />
+        <attr name="shouldDrawDivider" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="GenericTableCellView">

@@ -33,14 +33,6 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_swapSettingsFragment_to_swapRouteFragment"
-            app:destination="@id/swapRouteFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -71,4 +63,21 @@
         android:id="@+id/swapRouteFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.route.SwapRouteFragment"
         android:label="SwapRouteFragment" />
+
+    <action
+        android:id="@+id/action_open_swapRouteFragment"
+        app:destination="@id/swapRouteFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <dialog
+        android:id="@+id/swapFeeFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.fee.SwapFeeFragment"
+        android:label="SwapFeeFragment" />
+
+    <action
+        android:id="@+id/action_open_swapFeeFragment"
+        app:destination="@id/swapFeeFragment" />
 </navigation>

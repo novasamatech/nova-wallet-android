@@ -14,17 +14,17 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
-import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
+import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.fee.SubmissionOnlyAtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -241,10 +241,10 @@ private class AssetConversionExchange(
         override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
 
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
-           return AtomicOperationDisplayData.Swap(
-               from = fromAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountIn),
-               to = toAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountOut),
-           )
+            return AtomicOperationDisplayData.Swap(
+                from = fromAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountIn),
+                to = toAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountOut),
+            )
         }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
@@ -258,7 +258,7 @@ private class AssetConversionExchange(
                 executeSwap(swapLimit = estimatedSwapLimit, sendTo = chain.emptyAccountId())
             }
 
-            return AtomicSwapOperationFee(SubmissionFeeWithLabel(submissionFee))
+            return SubmissionOnlyAtomicSwapOperationFee(submissionFee)
         }
 
         override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {

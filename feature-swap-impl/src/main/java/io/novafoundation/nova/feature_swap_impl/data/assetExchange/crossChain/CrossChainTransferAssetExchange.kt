@@ -2,13 +2,16 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
+import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.model.addPlanks
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData.SwapFeeComponentDisplay
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.FeeWithLabel
@@ -18,7 +21,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrect
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
+import io.novafoundation.nova.feature_swap_api.domain.model.crossChain
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
+import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.network
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
@@ -27,8 +33,10 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -49,8 +57,7 @@ class CrossChainTransferAssetExchangeFactory(
 ) : AssetExchange.MultiChainFactory {
 
     override suspend fun create(
-        swapHost: AssetExchange.SwapHost,
-        coroutineScope: CoroutineScope
+        swapHost: AssetExchange.SwapHost, coroutineScope: CoroutineScope
     ): AssetExchange {
 
         return CrossChainTransferAssetExchange(
@@ -172,9 +179,7 @@ class CrossChainTransferAssetExchange(
 
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Transfer(
-                from = edge.from,
-                to = edge.to,
-                amount = estimatedSwapLimit.estimatedAmountIn
+                from = edge.from, to = edge.to, amount = estimatedSwapLimit.estimatedAmountIn
             )
         }
 
@@ -185,17 +190,7 @@ class CrossChainTransferAssetExchange(
                 swapHost.extrinsicService().estimateFee(transfer, computationalScope)
             }
 
-            return AtomicSwapOperationFee(
-                submissionFee = SubmissionFeeWithLabel(crossChainFee.submissionFee),
-                postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
-                    paidByAccount = listOfNotNull(
-                        SubmissionFeeWithLabel(crossChainFee.deliveryFee, debugLabel = "Delivery"),
-                    ),
-                    paidFromAmount = listOf(
-                        FeeWithLabel(crossChainFee.executionFee, debugLabel = "Execution")
-                    )
-                ),
-            )
+            return CrossChainAtomicOperationFee(crossChainFee)
         }
 
         override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
@@ -248,5 +243,37 @@ class CrossChainTransferAssetExchange(
                 is SwapLimit.SpecifiedIn -> amountIn
                 is SwapLimit.SpecifiedOut -> amountOut
             }
+    }
+
+    private class CrossChainAtomicOperationFee(
+        private val crossChainFee: CrossChainTransferFee
+    ) : AtomicSwapOperationFee {
+
+        override val submissionFee = SubmissionFeeWithLabel(crossChainFee.submissionFee)
+
+        override val postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
+            paidByAccount = listOfNotNull(
+                SubmissionFeeWithLabel(crossChainFee.deliveryFee, debugLabel = "Delivery"),
+            ), paidFromAmount = listOf(
+                FeeWithLabel(crossChainFee.executionFee, debugLabel = "Execution")
+            )
+        )
+
+        override fun constructDisplayData(): AtomicOperationFeeDisplayData {
+            val deliveryFee = crossChainFee.deliveryFee
+            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != crossChainFee.executionFee.asset.fullId
+
+            val crossChainFeeComponentDisplay = if (shouldSeparateDeliveryFromExecution) {
+                SwapFeeComponentDisplay.crossChain(crossChainFee.executionFee, deliveryFee!!)
+            } else {
+                val totalCrossChain = crossChainFee.executionFee.addPlanks(deliveryFee?.amount.orZero())
+                SwapFeeComponentDisplay.crossChain(totalCrossChain)
+            }
+
+            val submissionFeeComponent = SwapFeeComponentDisplay.network(crossChainFee.submissionFee)
+
+            val components = listOf(submissionFeeComponent, crossChainFeeComponentDisplay)
+            return AtomicOperationFeeDisplayData(components)
+        }
     }
 }

@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import kotlinx.android.synthetic.main.view_generic_table_cell.view.genericTableCellTitle
-import kotlinx.android.synthetic.main.view_generic_table_cell.view.genericTableCellValueDivider
 import kotlinx.android.synthetic.main.view_generic_table_cell.view.genericTableCellValueProgress
 
 open class GenericTableCellView<V : View> @JvmOverloads constructor(
@@ -22,13 +21,13 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     defStyleRes: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle, defStyleRes), HasDivider {
+) : ConstraintLayout(context, attrs, defStyle, defStyleRes), TableItem {
 
     protected lateinit var valueView: V
 
     companion object {
 
-        private val SELF_IDS = listOf(R.id.genericTableCellValueDivider, R.id.genericTableCellTitle, R.id.genericTableCellValueProgress)
+        private val SELF_IDS = listOf(R.id.genericTableCellTitle, R.id.genericTableCellValueProgress)
     }
 
     init {
@@ -39,10 +38,6 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
         setBackgroundResource(R.drawable.bg_primary_list_item)
 
         attrs?.let(::applyAttributes)
-    }
-
-    override fun setDividerVisible(visible: Boolean) {
-        genericTableCellValueDivider.setVisible(visible)
     }
 
     override fun onFinishInflate() {
@@ -114,5 +109,11 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
 
         val titleIconEnd = typedArray.getResourceIdOrNull(R.styleable.GenericTableCellView_titleIcon)
         titleIconEnd?.let(::setTitleIconEnd)
+    }
+
+    override fun disableOwnDividers() {}
+
+    override fun shouldDrawDivider(): Boolean {
+        return true
     }
 }

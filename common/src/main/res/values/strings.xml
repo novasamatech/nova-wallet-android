@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_total_fee">Total fee</string>
+
     <string name="common_fee_with_label">Fee: %s</string>
 
     <string name="swap_route_segment_transfer_title">Transfer</string>

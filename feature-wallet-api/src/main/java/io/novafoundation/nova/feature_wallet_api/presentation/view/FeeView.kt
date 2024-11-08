@@ -42,6 +42,11 @@ class FeeView @JvmOverloads constructor(
         }
     }
 
+    fun setFeeDisplay(feeDisplay: FeeDisplay) {
+        setVisible(true)
+        showFeeDisplay(feeDisplay)
+    }
+
     private fun showFeeDisplay(feeDisplay: FeeDisplay) {
         showValue(feeDisplay.title, feeDisplay.subtitle)
     }

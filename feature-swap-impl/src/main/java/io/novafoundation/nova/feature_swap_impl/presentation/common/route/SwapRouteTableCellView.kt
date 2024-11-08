@@ -32,4 +32,13 @@ class SwapRouteTableCellView @JvmOverloads constructor(
             routeModel?.let(valueView::setModel)
         }
     }
+
+    fun setShowChainNames(showChainNames: Boolean) {
+        valueView.setShowChainNames(showChainNames)
+    }
+
+    fun setSwapRouteModel(model: SwapRouteModel) {
+        setVisible(true)
+        valueView.setModel(model)
+    }
 }

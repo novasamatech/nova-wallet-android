@@ -51,6 +51,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         swapConfirmationNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
         swapConfirmationAccount.setOnClickListener { viewModel.accountClicked() }
         swapConfirmationButton.setOnClickListener { viewModel.confirmButtonClicked() }
+        swapConfirmationRoute.setOnClickListener { viewModel.routeClicked() }
     }
 
     override fun inject() {

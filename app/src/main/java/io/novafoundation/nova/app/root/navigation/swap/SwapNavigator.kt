@@ -18,7 +18,9 @@ class SwapNavigator(
 
     override fun openSwapConfirmation() = performNavigation(R.id.action_swapMainSettingsFragment_to_swapConfirmationFragment)
 
-    override fun openSwapRoute() = performNavigation(R.id.action_swapSettingsFragment_to_swapRouteFragment)
+    override fun openSwapRoute() = performNavigation(R.id.action_open_swapRouteFragment)
+
+    override fun openSwapFee() = performNavigation(R.id.action_open_swapFeeFragment)
 
     override fun openSwapOptions() {
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)

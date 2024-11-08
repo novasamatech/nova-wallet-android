@@ -12,9 +12,9 @@ import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatPercents
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
-import io.novafoundation.nova.common.view.bottomSheet.description.launchNetworkFeeDescription
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -43,11 +43,12 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactF
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
+import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
-import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -63,7 +64,6 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -116,7 +116,7 @@ class SwapConfirmationViewModel(
     Validatable by validationExecutor,
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
-    private val confirmationStateFlow = MutableSharedFlow<SwapConfirmationState>()
+    private val confirmationStateFlow = singleReplaySharedFlow<SwapConfirmationState>()
 
     private val metaAccountFlow = accountRepository.selectedMetaAccountFlow()
         .shareInBackground()
@@ -202,8 +202,12 @@ class SwapConfirmationViewModel(
         )
     }
 
-    fun networkFeeClicked() {
-        launchNetworkFeeDescription()
+    fun networkFeeClicked() = setSwapStateAndThen {
+        swapRouter.openSwapFee()
+    }
+
+    fun routeClicked() = setSwapStateAfter {
+        swapRouter.openSwapRoute()
     }
 
     fun accountClicked() {
@@ -232,6 +236,36 @@ class SwapConfirmationViewModel(
 //        }
     }
 
+    private fun setSwapStateAndThen(action: () -> Unit) {
+        launch {
+            updateSwapStateInStore()
+
+            action()
+        }
+    }
+
+    private fun setSwapStateAfter(action: () -> Unit) {
+        launch {
+            val store = swapStateStoreProvider.getStore(viewModelScope)
+            store.resetState()
+
+            action()
+
+            updateSwapStateInStore()
+        }
+    }
+
+    private suspend fun updateSwapStateInStore() {
+        val quotingState = confirmationStateFlow.first()
+
+        val swapState = SwapState(
+            quote = quotingState.swapQuote,
+            fee = feeMixin.awaitFee(),
+            slippage = slippageFlow.first()
+        )
+        swapStateStoreProvider.getStore(viewModelScope).setState(swapState)
+    }
+
     private fun createMaxActionProvider(): MaxActionProvider {
         return maxActionProviderFactory.create(
             assetInFlow = assetInFlow,
@@ -242,10 +276,10 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap() = launch {
-        val fee = feeMixin.awaitFee()
-        val quote = confirmationStateFlow.first()?.swapQuote ?: return@launch
-
         _submissionInProgress.value = true
+
+        val fee = feeMixin.awaitFee()
+        val quote = confirmationStateFlow.first().swapQuote
 
         swapInteractor.executeSwap(fee)
             .onEach { progressResult ->

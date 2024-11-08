@@ -78,6 +78,10 @@ val Fee.decimalAmountByExecutingAccount: BigDecimal
         BigDecimal.ZERO
     }
 
+fun FeeBase.addPlanks(extraPlanks: BigInteger): FeeBase {
+    return SubstrateFeeBase(amount + extraPlanks, asset)
+}
+
 fun List<FeeBase>.totalAmount(chainAsset: Chain.Asset): BigInteger {
     return sumOf { it.getAmount(chainAsset) }
 }

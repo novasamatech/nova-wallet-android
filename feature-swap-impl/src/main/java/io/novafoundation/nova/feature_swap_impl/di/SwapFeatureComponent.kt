@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.di.SwapConfirmationComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.fee.di.SwapFeeComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.di.SwapMainSettingsComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.options.di.SwapOptionsComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.route.di.SwapRouteComponent
@@ -35,6 +36,8 @@ interface SwapFeatureComponent : SwapFeatureApi {
     fun swapOptions(): SwapOptionsComponent.Factory
 
     fun swapRoute(): SwapRouteComponent.Factory
+
+    fun swapFee(): SwapFeeComponent.Factory
 
     @Component.Factory
     interface Factory {

@@ -40,10 +40,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTra
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.incomingCrossChainDirectionsAvailable
 import io.novafoundation.nova.feature_wallet_api.domain.model.FiatAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -63,6 +65,13 @@ class SwapInteractor(
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val swapTransactionHistoryRepository: SwapTransactionHistoryRepository
 ) {
+
+    suspend fun getAllFeeTokens(swapFee: SwapFee): Map<FullChainAssetId, Token> {
+        val basicFees = swapFee.allBasicFees()
+        val chainAssets = basicFees.map { it.asset }
+
+        return tokenRepository.getTokens(chainAssets)
+    }
 
     suspend fun calculateSegmentFiatPrices(swapFee: SwapFee): List<FiatAmount> {
         return withContext(Dispatchers.Default) {
