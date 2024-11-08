@@ -8,8 +8,8 @@ class FeeModel<F, D>(
 )
 
 class FeeDisplay(
-    val title: String,
-    val subtitle: String?
+    val title: CharSequence,
+    val subtitle: CharSequence?
 )
 
 fun AmountModel.toFeeDisplay(): FeeDisplay {
