@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">您已达到在%s中添加的代理的上限%s。移除代理以添加新代理。</string>
     <string name="add_proxy_maximum_reached_error_title">已达到代理最大数量</string>
     <string name="added_networks_empty_placeholder">添加的自定义网络会显示在这里</string>
+    <string name="appearance_colored_icon_title">彩色图标</string>
+    <string name="appearance_title">外观</string>
+    <string name="appearance_token_assets_title">代币图标</string>
+    <string name="appearance_white_icon_title">白色图标</string>
     <string name="asset_add_evm_token_already_exist_message">输入的合约地址已作为%s代币存在于Nova中。</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">输入的合约地址已作为%s代币存在于Nova中。您确定要修改它吗？</string>
     <string name="asset_add_evm_token_already_exist_title">该代币已存在</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">输入合约地址</string>
     <string name="asset_add_token_enter_decimals">输入小数</string>
     <string name="asset_add_token_enter_symbol">输入符号</string>
+    <string name="asset_view_networks">网络</string>
+    <string name="asset_view_tokens">代币</string>
     <string name="assets_add_token">添加代币</string>
     <string name="assets_add_token_enter_info_address_label">合约地址</string>
     <string name="assets_add_token_enter_info_decimals_label">小数点</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger 不支持此代币</string>
     <string name="assets_search_hint">按网络或代币搜索</string>
     <string name="assets_search_placeholder">没有找到输入名称的网络或代币</string>
+    <string name="assets_search_token_hint">按代币搜索</string>
     <string name="assets_select_send_your_wallets">你的钱包</string>
     <string name="assets_send_flow_placeholder">你没有要发送的代币。购买或接收代币到你的账户。</string>
     <string name="assets_swap_flow_pay_title">要支付的代币</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">备份</string>
     <string name="biometric_auth_title">生物认证</string>
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
+    <string name="buy_network_flow_title">选择购买%s的网络</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
     <string name="buy_provider_open_confirmation_title">在浏览器中继续？</string>
     <string name="chain_network_management_auto_balance">自动平衡节点</string>
@@ -961,6 +969,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">启用推送通知，即表示您同意我们的 %s 和 %s</string>
     <string name="push_welcome_timeout_error_message">请稍后再试，通过设置选项卡中的通知设置访问</string>
     <string name="push_welcome_title">不要错过任何事情！</string>
+    <string name="receive_network_flow_title">选择接收%s的网络</string>
+    <string name="receive_screen_copy_address">复制地址</string>
     <string name="recover_json_hint">粘贴 json 字符串或上传文件…</string>
     <string name="recover_json_upload">上传文件</string>
     <string name="recovery_json">恢复 JSON</string>
@@ -1117,6 +1127,7 @@
     <string name="select_tracks_for">选择曲目</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">地址或w3n</string>
+    <string name="send_network_flow_title">选择发送%s的网络</string>
     <string name="send_recipient_system_account_message">收件人是一个系统账户。它不受任何公司或个人控制。您确定仍然要执行此转账吗？</string>
     <string name="send_recipient_system_account_title">代币将会丢失</string>
     <string name="set_staking_proxy_address_description">授权给</string>
@@ -1524,6 +1535,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">输入其他金额</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">为了支付网络费用，Nova将自动将%s兑换为%s，以保持您账户的最低%s余额。</string>
     <string name="swap_network_fee_description">区块链收取的网络费用，用于处理和验证任何交易。可能会根据网络状况或交易速度而变化。</string>
+    <string name="swap_network_flow_title">选择交换%s的网络</string>
     <string name="swap_not_enought_liquidity_failure">池子没有足够的流动性进行交换</string>
     <string name="swap_price_difference_description">价格差异指的是两种不同资产之间的价格差。在加密货币交换中，价格差异通常是您要交换的资产的价格与您交换的资产的价格之间的差异。</string>
     <string name="swap_price_difference_title">价格差异</string>
@@ -1616,6 +1628,7 @@
     <string name="wallet_asset_buy_with">用...购买</string>
     <string name="wallet_asset_receive">接收</string>
     <string name="wallet_asset_receive_token">接收 %s</string>
+    <string name="wallet_asset_receive_token_subtitle">仅将%1$s代币和%2$s网络中的代币发送到此地址，否则您可能会失去资金</string>
     <string name="wallet_asset_send">发送</string>
     <string name="wallet_asset_swap">兑换</string>
     <string name="wallet_assets">资产</string>
