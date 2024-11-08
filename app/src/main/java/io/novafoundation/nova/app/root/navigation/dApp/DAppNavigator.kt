@@ -42,4 +42,8 @@ class DAppNavigator(
     override fun openAuthorizedDApps() = performNavigation(
         actionId = R.id.action_mainFragment_to_authorizedDAppsFragment
     )
+
+    override fun openTabs() = performNavigation(
+        actionId = R.id.action_DAppBrowserFragment_to_browserTabsFragment
+    )
 }

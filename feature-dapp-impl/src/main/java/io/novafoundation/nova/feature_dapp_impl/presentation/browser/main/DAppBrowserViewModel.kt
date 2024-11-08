@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
+import android.graphics.Bitmap
+import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -19,6 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyz
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.tabPool.TabPoolService
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
@@ -39,6 +42,9 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.externalSig
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -69,7 +75,8 @@ class DAppBrowserViewModel(
     private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val tabPoolService: TabPoolService,
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -106,6 +113,8 @@ class DAppBrowserViewModel(
         }
         .distinctUntilChanged()
         .shareInBackground()
+
+    val currentTab = tabPoolService.currentTabFlow()
 
     init {
         dAppSearchRequester.responseFlow
@@ -285,5 +294,13 @@ class DAppBrowserViewModel(
             is ExternalSignRequest.Evm -> null
             is ExternalSignRequest.Polkadot -> payload.genesisHash()?.removeHexPrefix()
         }
+    }
+
+    fun savePageSnapshot(path: String) {
+        tabPoolService.setSnapshotForCurrentTab(path)
+    }
+
+    fun openTabs() {
+        router.openTabs()
     }
 }

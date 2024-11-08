@@ -2,17 +2,22 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
+import androidx.core.view.children
+import androidx.core.view.drawToBitmap
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.themed
+import io.novafoundation.nova.common.utils.write
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
@@ -31,6 +36,10 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.UUID
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
@@ -39,8 +48,9 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_dapp_browser.browserTabs
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
@@ -63,6 +73,16 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
+
+    private val dappBrowserWebView: WebView
+        get() {
+            return dappBrowserWebViewContainer.children.first() as WebView
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        WebView.enableSlowWholeDocumentDraw()
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,16 +115,19 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserMore.setOnClickListener { moreClicked() }
 
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+
+        browserTabs.setOnClickListener { viewModel.openTabs() }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
         dappBrowserWebView.uninjectWeb3()
-
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         webViewHolder.release()
+
+        dappBrowserWebViewContainer.removeAllViews()
     }
 
     override fun onPause() {
@@ -152,6 +175,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
                 is Action.Authorize -> {
                     showConfirmAuthorizeSheet(it as DappPendingConfirmation<Action.Authorize>)
                 }
+
                 Action.CloseScreen -> showCloseConfirmation(it)
                 Action.AcknowledgePhishingAlert -> {
                     AcknowledgePhishingBottomSheet(requireContext(), it)
@@ -182,6 +206,27 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             dappBrowserAddressBar.showSecureIcon(it.isSecure)
 
             updateButtonsState()
+        }
+
+        viewModel.currentTab.observe {
+            dappBrowserWebViewContainer.removeAllViews()
+            dappBrowserWebViewContainer.addView(it.session.webView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+            dappBrowserWebView.postDelayed({
+                val pageSnapshot = dappBrowserWebView.drawToBitmap()
+
+                val file = File(requireContext().externalCacheDir!!.absolutePath, "${UUID.randomUUID()}.jpeg")
+
+                try {
+                    val outputStream = FileOutputStream(file)
+                    pageSnapshot.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    outputStream.close()
+
+                    viewModel.savePageSnapshot(file.path)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }, 1000)
         }
     }
 

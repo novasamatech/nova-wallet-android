@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_dapp_impl.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.di.AddToFavouritesComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.di.AuthorizedDAppsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAppBrowserComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.tabs.di.BrowserTabsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
@@ -35,6 +36,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
     fun mainComponentFactory(): MainDAppComponent.Factory
 
     fun browserComponentFactory(): DAppBrowserComponent.Factory
+
+    fun browserTabsComponentFactory(): BrowserTabsComponent.Factory
 
     fun dAppSearchComponentFactory(): DAppSearchComponent.Factory
 

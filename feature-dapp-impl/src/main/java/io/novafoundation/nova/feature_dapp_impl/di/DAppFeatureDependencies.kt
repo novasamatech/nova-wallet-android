@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.di
 
+import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -25,6 +26,18 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 interface DAppFeatureDependencies {
+
+    val phishingSitesDao: PhishingSitesDao
+
+    val favouriteDAppsDao: FavouriteDAppsDao
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val walletUiUseCase: WalletUiUseCase
+
+    val walletRepository: WalletRepository
+
+    val context: Context
 
     fun currencyRepository(): CurrencyRepository
 
@@ -62,14 +75,4 @@ interface DAppFeatureDependencies {
     fun dappAuthorizationDao(): DappAuthorizationDao
 
     fun browserHostSettingsDao(): BrowserHostSettingsDao
-
-    val phishingSitesDao: PhishingSitesDao
-
-    val favouriteDAppsDao: FavouriteDAppsDao
-
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-
-    val walletUiUseCase: WalletUiUseCase
-
-    val walletRepository: WalletRepository
 }

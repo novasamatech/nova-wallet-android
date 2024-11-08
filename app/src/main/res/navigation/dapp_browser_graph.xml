@@ -36,6 +36,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_DAppBrowserFragment_to_browserTabsFragment"
+            app:destination="@id/browserTabsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -49,6 +57,13 @@
         android:id="@+id/addToFavouritesFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment"
         android:label="AddToFavouritesFragment"
-        app:useAdd="true"
         tools:layout="@layout/fragment_add_to_favourites" />
+
+    <fragment
+        android:id="@+id/browserTabsFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.browser.tabs.BrowserTabsFragment"
+        android:label="BrowserTabsFragment"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_dapp_tabs" />
+
 </navigation>

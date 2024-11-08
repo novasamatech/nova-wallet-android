@@ -14,4 +14,6 @@ interface DAppRouter : ReturnableRouter {
     fun openAddToFavourites(payload: AddToFavouritesPayload)
 
     fun openAuthorizedDApps()
+
+    fun openTabs()
 }
