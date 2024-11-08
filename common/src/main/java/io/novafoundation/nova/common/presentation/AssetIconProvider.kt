@@ -26,7 +26,7 @@ class RealAssetIconProvider(
     }
 
     override fun getAssetIconOrFallback(iconName: String, iconMode: AssetIconMode): Icon {
-        val iconUrl = when (assetsIconModeRepository.getIconMode()) {
+        val iconUrl = when (iconMode) {
             AssetIconMode.COLORED -> "$coloredBaseUrl/$iconName"
             AssetIconMode.WHITE -> "$whiteBaseUrl/$iconName"
         }

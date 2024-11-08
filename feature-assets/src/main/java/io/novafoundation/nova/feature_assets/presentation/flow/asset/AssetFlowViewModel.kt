@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -43,6 +45,7 @@ abstract class AssetFlowViewModel(
     externalBalancesInteractor: ExternalBalancesInteractor,
     protected val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
+    private val assetViewModeInteractor: AssetViewModeInteractor,
     private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
@@ -58,16 +61,23 @@ abstract class AssetFlowViewModel(
 
     protected val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
 
-    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() }
-        .shareInBackground()
+    private val searchAssetsFlow = flowOfAll { searchAssetsFlow() } // lazy use searchAssetsFlow to let subclasses initialize self
+        .shareInBackground(SharingStarted.Lazily)
+
+    val searchHint = assetViewModeInteractor.assetsViewModeFlow()
+        .map {
+            when (it) {
+                AssetViewMode.NETWORKS -> resourceManager.getString(R.string.assets_search_hint)
+                AssetViewMode.TOKENS -> resourceManager.getString(R.string.assets_search_token_hint)
+            }
+        }
 
     val searchResults = combine(
-        searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self
+        searchAssetsFlow,
         selectedCurrency,
     ) { assets, currency ->
         mapAssets(assets, currency)
     }.distinctUntilChanged()
-        .shareInBackground(SharingStarted.Lazily)
 
     val placeholder = searchAssetsFlow.map { getPlaceholder(query.value, it.groupList()) }
 

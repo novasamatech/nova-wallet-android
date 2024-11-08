@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -41,6 +42,7 @@ class AssetBuyFlowModule {
         buyMixinFactory: BuyMixin.Factory,
         resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
+        assetViewModeInteractor: AssetViewModeInteractor,
         amountFormatter: AmountFormatter
     ): ViewModel {
         return AssetBuyFlowViewModel(
@@ -53,6 +55,7 @@ class AssetBuyFlowModule {
             buyMixinFactory = buyMixinFactory,
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
+            assetViewModeInteractor = assetViewModeInteractor,
             amountFormatter = amountFormatter
         )
     }

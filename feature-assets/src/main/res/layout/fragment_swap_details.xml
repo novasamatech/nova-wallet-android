@@ -40,8 +40,7 @@
                 android:layout_height="64dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_icon_container_on_color"
-                android:padding="11dp"
-                android:src="@drawable/ic_flip_swap"
+                android:src="@drawable/ic_swap_history"
                 app:tint="@color/icon_secondary" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView

@@ -12,7 +12,7 @@
         android:id="@+id/assetFlowToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/assets_search_hint"
+        tools:hint="@string/assets_search_hint"
         tools:titleText="@string/wallet_asset_send" />
 
     <androidx.recyclerview.widget.RecyclerView

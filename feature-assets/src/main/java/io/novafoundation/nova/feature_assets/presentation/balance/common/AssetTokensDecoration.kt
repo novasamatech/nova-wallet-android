@@ -27,7 +27,7 @@ import kotlin.math.roundToInt
 
 class AssetTokensDecoration(
     private val context: Context,
-    adapter: ExpandableAdapter,
+    private val adapter: ExpandableAdapter,
     animator: ExpandableAnimator
 ) : ExpandableItemDecoration(
     adapter,
@@ -60,9 +60,14 @@ class AssetTokensDecoration(
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val viewHolder = parent.getChildViewHolder(view)
 
+        if (viewHolder.bindingAdapterPosition == 0) return
+
         if (viewHolder is TokenAssetGroupViewHolder) {
-            outRect.set(0, 12.dp(context), 0, 0)
-            return
+            if (viewHolder.bindingAdapterPosition == adapter.getItems().size - 1) {
+                outRect.set(0, 12.dp(context), 0, 12.dp(context))
+            } else {
+                outRect.set(0, 12.dp(context), 0, 0)
+            }
         }
     }
 

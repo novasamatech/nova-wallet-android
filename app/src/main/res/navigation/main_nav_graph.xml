@@ -217,7 +217,7 @@
 
     <action
         android:id="@+id/action_open_swapSetupAmount"
-        app:destination="@id/start_swap_graph"
+        app:destination="@id/start_swap_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -479,7 +479,7 @@
 
         <action
             android:id="@+id/action_mainFragment_to_swapFlow"
-            app:destination="@id/swapFlowFragment"
+            app:destination="@id/select_swap_token_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -938,21 +938,6 @@
     </fragment>
 
     <fragment
-        android:id="@+id/swapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment" >
-
-        <action
-            android:id="@+id/action_swapFlow_to_swapFlowNetwork"
-            app:destination="@id/swapFlowNetworkFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-    </fragment>
-
-    <fragment
         android:id="@+id/sendFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment"
         android:label="NetworkSendFlowFragment" />
@@ -965,11 +950,6 @@
     <fragment
         android:id="@+id/buyFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowFragment"
-        android:label="NetworkBuyFlowFragment" />
-
-    <fragment
-        android:id="@+id/swapFlowNetworkFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment"
         android:label="NetworkBuyFlowFragment" />
 
     <fragment
@@ -1061,5 +1041,7 @@
     <include app:graph="@navigation/network_management_graph" />
 
     <include app:graph="@navigation/tinder_gov_graph" />
+
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
 
 </navigation>

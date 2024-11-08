@@ -33,12 +33,12 @@ class SwapNavigator(
 
     override fun selectAssetIn(selectedAsset: AssetPayload?) {
         val payload = SwapFlowPayload.ReselectAssetIn(selectedAsset)
-        navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
+        navigationHolder.navController?.navigate(R.id.action_swapSettingsFragment_to_select_swap_token_graph, AssetSwapFlowFragment.getBundle(payload))
     }
 
     override fun selectAssetOut(selectedAsset: AssetPayload?) {
         val payload = SwapFlowPayload.ReselectAssetOut(selectedAsset)
-        navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
+        navigationHolder.navController?.navigate(R.id.action_swapSettingsFragment_to_select_swap_token_graph, AssetSwapFlowFragment.getBundle(payload))
     }
 
     override fun openSendCrossChain(destination: AssetPayload, recipientAddress: String?) {

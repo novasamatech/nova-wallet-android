@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 class AssetListMixinFactory(
     private val walletInteractor: WalletInteractor,
@@ -77,8 +76,7 @@ class RealAssetListMixin(
             AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
             AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
         }
-    }.distinctUntilChanged()
-        .shareInBackground()
+    }.shareInBackground()
 
     private val expandableAssetsMixin = expandableAssetsMixinFactory.create(assetsByViewMode)
 

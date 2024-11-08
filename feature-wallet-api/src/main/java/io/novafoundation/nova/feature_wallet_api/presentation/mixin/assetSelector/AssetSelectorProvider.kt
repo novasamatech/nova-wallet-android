@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
@@ -82,7 +83,14 @@ private class AssetSelectorProvider(
     }
 
     private fun mapAssetAndOptionToSelectorModel(assetAndOption: SelectableAssetAndOption): AssetSelectorModel {
-        val assetModel = mapAssetToAssetModel(assetIconProvider, assetAndOption.asset, resourceManager, patternId = null, retrieveAmount = amountProvider)
+        val assetModel = mapAssetToAssetModel(
+            assetIconProvider,
+            assetAndOption.asset,
+            resourceManager,
+            icon = assetAndOption.option.assetWithChain.chain.iconOrFallback(),
+            patternId = null,
+            retrieveAmount = amountProvider
+        )
         val title = assetAndOption.formatTitle()
 
         return AssetSelectorModel(assetModel, title, assetAndOption.option.additional.identifier)

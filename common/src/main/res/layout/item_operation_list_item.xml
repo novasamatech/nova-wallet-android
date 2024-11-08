@@ -14,10 +14,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_staking_filled" />
+        tools:src="@drawable/ic_send_history" />
 
     <TextView
         android:id="@+id/itemOperationHeader"

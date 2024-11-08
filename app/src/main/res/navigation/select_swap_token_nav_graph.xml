@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/selectAssetSwapFlowFragment"
+    android:id="@+id/select_swap_token_nav_graph">
+
+    <fragment
+        android:id="@+id/selectAssetSwapFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment"
+        android:label="AssetSwapFlowFragment">
+
+        <action
+            android:id="@+id/action_selectAssetSwapFlowFragment_to_swapFlowNetworkFragment"
+            app:destination="@id/swapFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/swapFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment"
+        android:label="NetworkSwapFlowFragment" />
+
+    <action
+        android:id="@+id/action_return_to_swap_settings"
+        app:popUpTo="@id/swapSettingsFragment"
+        app:enterAnim="@anim/fragment_close_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_open_exit" />
+</navigation>
