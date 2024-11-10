@@ -176,7 +176,6 @@ buildscript {
         jUnitDep = "junit:junit:$junitVersion"
         mockitoDep = "org.mockito:mockito-inline:$mockitoVersion"
         robolectricDep = "org.robolectric:robolectric:$robolectricVersion"
-        robolectricMultidexDep = "org.robolectric:shadows-multidex:$robolectricVersion"
         archCoreTestDep = "androidx.arch.core:core-testing:$architectureComponentVersion"
 
         progressButtonDep = "com.github.razir.progressbutton:progressbutton:$progressButtonsVersion"
