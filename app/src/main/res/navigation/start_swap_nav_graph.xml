@@ -42,13 +42,8 @@
         tools:layout="@layout/fragment_swap_confirmation_settings">
 
         <action
-            android:id="@+id/action_swapConfirmationFragment_to_assetDetails"
-            app:destination="@id/balanceDetailFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/mainFragment" />
+            android:id="@+id/action_swapConfirmationFragment_to_swapExecutionFragment"
+            app:destination="@id/swapExecutionFragment" />
 
     </fragment>
 
@@ -80,4 +75,20 @@
     <action
         android:id="@+id/action_open_swapFeeFragment"
         app:destination="@id/swapFeeFragment" />
+
+    <fragment
+        android:id="@+id/swapExecutionFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.execution.SwapExecutionFragment"
+        android:label="SwapExecutionFragment"
+        tools:layout="@layout/fragment_swap_execution">
+
+        <action
+            android:id="@+id/action_swapExecutionFragment_to_assetDetails"
+            app:destination="@id/balanceDetailFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/mainFragment" />
+    </fragment>
 </navigation>

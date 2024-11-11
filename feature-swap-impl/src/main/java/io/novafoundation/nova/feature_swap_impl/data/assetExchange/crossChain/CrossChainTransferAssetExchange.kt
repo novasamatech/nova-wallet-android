@@ -39,7 +39,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -216,13 +215,6 @@ class CrossChainTransferAssetExchange(
         override suspend fun additionalMaxAmountDeduction(): Balance {
             val (chain, chainAsset) = chainRegistry.chainWithAsset(edge.from)
             return crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(chainAsset, chain)
-        }
-
-        override suspend fun inProgressLabel(): String {
-            val chainTo = chainRegistry.getChain(edge.to.chainId)
-            val assetFrom = chainRegistry.asset(edge.from)
-
-            return "Transferring ${assetFrom.symbol} to ${chainTo.name}"
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {

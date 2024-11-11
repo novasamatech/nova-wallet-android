@@ -31,6 +31,7 @@ import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -624,3 +625,5 @@ fun Calendar.resetDay() {
 inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
     launch { block() }
 }
+
+fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }

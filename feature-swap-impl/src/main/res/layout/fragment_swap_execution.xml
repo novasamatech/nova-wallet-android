@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swapExecutionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/swapExecutionToolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:dividerVisible="false"
+            app:homeButtonVisible="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/swapExecutionProgressBar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_icon_container_on_color"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/bg_swap_progress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionToolbar" />
+
+
+        <ImageView
+            android:id="@+id/swapExecutionFinishedStatus"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_icon_container_on_color"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionToolbar" />
+
+        <TextView
+            android:id="@+id/swapExecutionRemainingTime"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
+            app:layout_constraintBottom_toTopOf="@+id/swapExecutionRemainingTimeLabel"
+            app:layout_constraintEnd_toEndOf="@+id/swapExecutionProgressBar"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/swapExecutionProgressBar"
+            app:layout_constraintTop_toTopOf="@+id/swapExecutionProgressBar"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="123" />
+
+        <TextView
+            android:id="@+id/swapExecutionRemainingTimeLabel"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintBottom_toBottomOf="@+id/swapExecutionProgressBar"
+            app:layout_constraintEnd_toEndOf="@+id/swapExecutionProgressBar"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/swapExecutionProgressBar"
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionRemainingTime"
+            tools:text="sec" />
+
+        <TextView
+            android:id="@+id/swapExecutionTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/text_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/swapExecutionProgressBar"
+            tools:text="Do not close the app!" />
+
+        <TextView
+            android:id="@+id/swapExecutionSubtitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionTitle"
+            tools:text="Transferring USDT to Polkadot Asset Hub..."
+            tools:textColor="@color/button_text_accent" />
+
+        <FrameLayout
+            android:id="@+id/swapExecutionStepContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionSubtitle"
+            tools:background="@color/block_background">
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:layout_width="wrap_content"
+                android:id="@+id/swapExecutionStepShimmer"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/swapExecutionStepLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="14dp"
+                    android:textColor="@color/text_secondary"
+                    tools:text="3 of 3 operations" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </FrameLayout>
+
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/swapExecutionProgressViews"
+            app:constraint_referenced_ids="swapExecutionProgressBar,swapExecutionRemainingTime, swapExecutionRemainingTimeLabel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

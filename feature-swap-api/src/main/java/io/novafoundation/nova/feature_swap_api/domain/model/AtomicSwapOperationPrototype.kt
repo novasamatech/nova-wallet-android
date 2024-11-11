@@ -9,7 +9,7 @@ interface AtomicSwapOperationPrototype {
     val fromChain: ChainId
 
     /**
-     * Roughly estimate fees for the current operation in any asset
+     * Roughly estimate fees for the current operation in native asset
      * Implementations should favour speed instead of precision as this is called for each quoting action
      */
     suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal

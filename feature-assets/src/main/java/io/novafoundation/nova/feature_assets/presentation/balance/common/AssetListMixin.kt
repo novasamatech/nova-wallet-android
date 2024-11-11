@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -72,9 +73,11 @@ class RealAssetListMixin(
         externalBalancesFlow,
         assetsViewModeFlow
     ) { assets, externalBalances, viewMode ->
-        when (viewMode) {
-            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
-            AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
+        measureExecution("Group assets") {
+            when (viewMode) {
+                AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
+                AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
+            }
         }
     }.shareInBackground()
 

@@ -15,6 +15,10 @@ interface AtomicSwapOperation {
 
     suspend fun estimateFee(): AtomicSwapOperationFee
 
+    /**
+     * Calculates how much of assetIn (of the current segment) is needed to buy given [extraOutAmount] of asset out (of the current segment)
+     * Used to estimate how much extra amount of assetIn to add to the user input to accommodate future segment fees
+     */
     suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance
 
     /**
@@ -22,9 +26,6 @@ interface AtomicSwapOperation {
      * One example is Existential Deposit in case operation executes in "keep alive" manner
      */
     suspend fun additionalMaxAmountDeduction(): Balance
-
-    // TODO this is a temporarily function until we developer Operation Manager
-    suspend fun inProgressLabel(): String
 
     suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection>
 }

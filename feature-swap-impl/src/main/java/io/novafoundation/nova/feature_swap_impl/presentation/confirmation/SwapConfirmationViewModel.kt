@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
@@ -60,8 +59,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -74,7 +71,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -276,27 +272,8 @@ class SwapConfirmationViewModel(
         )
     }
 
-    private fun executeSwap() = launch {
-        _submissionInProgress.value = true
-
-        val fee = feeMixin.awaitFee()
-        val quote = confirmationStateFlow.first().swapQuote
-
-        swapInteractor.executeSwap(fee)
-            .onEach { progressResult ->
-                when (progressResult) {
-                    SwapProgress.Done -> navigateToNextScreen(quote.assetOut)
-                    is SwapProgress.Failure -> showError(progressResult.error)
-                    is SwapProgress.StepStarted -> showMessage(progressResult.step)
-                }
-            }
-            .onCompletion {
-                _submissionInProgress.value = false
-            }.launchIn(viewModelScope)
-    }
-
-    private fun navigateToNextScreen(asset: Chain.Asset) {
-        swapRouter.openBalanceDetails(asset.fullId.toAssetPayload())
+    private fun executeSwap() {
+        swapRouter.openSwapExecution()
     }
 
     private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {

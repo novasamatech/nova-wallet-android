@@ -282,10 +282,6 @@ private class AssetConversionExchange(
             return Balance.ZERO
         }
 
-        override suspend fun inProgressLabel(): String {
-            return "Swapping ${fromAsset.symbol} to ${toAsset.symbol} on ${chain.name}"
-        }
-
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             return extrinsicService.submitExtrinsicAndAwaitExecution(
                 chain = chain,

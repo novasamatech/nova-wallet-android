@@ -110,7 +110,7 @@ class AssetSwapFlowViewModel(
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets) { it.groupBalance.transferable }
         }
     }
 

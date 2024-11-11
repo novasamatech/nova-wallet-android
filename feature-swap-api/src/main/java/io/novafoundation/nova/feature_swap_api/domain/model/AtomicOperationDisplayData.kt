@@ -6,13 +6,13 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 sealed class AtomicOperationDisplayData {
 
-    class Transfer(
+    data class Transfer(
         val from: FullChainAssetId,
         val to: FullChainAssetId,
         val amount: Balance
     ): AtomicOperationDisplayData()
 
-    class Swap(
+    data class Swap(
         val from: ChainAssetIdWithAmount,
         val to: ChainAssetIdWithAmount,
     ): AtomicOperationDisplayData()

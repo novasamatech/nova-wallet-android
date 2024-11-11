@@ -47,6 +47,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
@@ -206,14 +207,19 @@ internal class RealSwapService(
     }
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
-        val atomicOperations = calculatedFee.segments
+        val segments = calculatedFee.segments
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
 
         return flow {
-            atomicOperations.fold(initialCorrection) { prevStepCorrection, (segmentFee, operation) ->
+            segments.withIndex().fold(initialCorrection) { prevStepCorrection, (index, segment) ->
+                val (segmentFee, operation) = segment
+
                 prevStepCorrection.flatMap { correction ->
-                    emit(SwapProgress.StepStarted(operation.inProgressLabel()))
+                    val displayData = operation.constructDisplayData()
+                    val step = SwapProgressStep(index, displayData)
+
+                    emit(SwapProgress.StepStarted(step))
 
                     val newAmountIn = if (correction != null) {
                         correction.actualReceivedAmount - segmentFee.amountToLeaveOnOriginToPayTxFees()
@@ -227,12 +233,12 @@ internal class RealSwapService(
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
 
-                    Log.d("SwapSubmission", operation.inProgressLabel() + " with $actualSwapLimit")
+                    Log.d("SwapSubmission", "$displayData with $actualSwapLimit")
 
                     operation.submit(segmentSubmissionArgs).onFailure {
-                        Log.e("SwapSubmission", "Swap failed on stage '${operation.inProgressLabel()}'", it)
+                        Log.e("SwapSubmission", "Swap failed on stage '${displayData}'", it)
 
-                        emit(SwapProgress.Failure(it))
+                        emit(SwapProgress.Failure(it, attemptedStep = step))
                     }
                 }
             }.onSuccess {

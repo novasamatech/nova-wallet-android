@@ -337,16 +337,6 @@ private class HydraDxAssetExchange(
             return BigInteger.ZERO
         }
 
-        override suspend fun inProgressLabel(): String {
-            val assetInId = segments.first().edge.from.assetId
-            val assetIn = chain.assetsById.getValue(assetInId)
-
-            val assetOutId = segments.last().edge.to.assetId
-            val assetOut = chain.assetsById.getValue(assetOutId)
-
-            return "Swapping ${assetIn.symbol} to ${assetOut.symbol} on ${chain.name}"
-        }
-
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,

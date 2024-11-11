@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 import io.novafoundation.nova.common.data.model.switch
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -55,13 +56,15 @@ class RealExpandableAssetsMixin(
         expandedTokenIdsFlow,
         selectedCurrency
     ) { assetesByViewMode, expandedTokens, currency ->
-        when (assetesByViewMode) {
-            is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
-            is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(
-                amountFormatter = amountFormatter,
-                assetIconProvider = assetIconProvider,
-                assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
-            )
+        measureExecution("Map grouped assets to ui") {
+            when (assetesByViewMode) {
+                is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
+                is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(
+                    amountFormatter = amountFormatter,
+                    assetIconProvider = assetIconProvider,
+                    assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
+                )
+            }
         }
     }.distinctUntilChanged()
 

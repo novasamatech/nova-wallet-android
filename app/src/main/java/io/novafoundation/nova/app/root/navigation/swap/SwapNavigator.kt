@@ -22,12 +22,14 @@ class SwapNavigator(
 
     override fun openSwapFee() = performNavigation(R.id.action_open_swapFeeFragment)
 
+    override fun openSwapExecution() = performNavigation(R.id.action_swapConfirmationFragment_to_swapExecutionFragment)
+
     override fun openSwapOptions() {
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
     }
 
     override fun openBalanceDetails(assetPayload: AssetPayload) {
-        navigationHolder.navController?.navigate(R.id.action_swapConfirmationFragment_to_assetDetails, BalanceDetailFragment.getBundle(assetPayload))
+        navigationHolder.navController?.navigate(R.id.action_swapExecutionFragment_to_assetDetails, BalanceDetailFragment.getBundle(assetPayload))
     }
 
     override fun selectAssetIn(selectedAsset: AssetPayload?) {
