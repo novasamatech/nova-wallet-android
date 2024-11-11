@@ -141,6 +141,8 @@ inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) 
 
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
 
+fun <T1, T2, T3> combineToTriple(flow1: Flow<T1>, flow2: Flow<T2>, flow3: Flow<T3>): Flow<Triple<T1, T2, T3>> = combine(flow1, flow2, flow3, ::Triple)
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
  * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state

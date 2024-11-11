@@ -171,7 +171,7 @@ fun formatDateISO_8601_NoMs(date: Date): String {
     return dateTimeFormatISO_8601_NoMs.format(date)
 }
 
-fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFormat {
+fun decimalFormatterFor(pattern: String): DecimalFormat {
     return DecimalFormat(pattern).apply {
         val symbols = decimalFormatSymbols
 
@@ -180,7 +180,6 @@ fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFor
 
         decimalFormatSymbols = symbols
 
-        this.roundingMode = roundingMode
         decimalFormatSymbols = decimalFormatSymbols
     }
 }
