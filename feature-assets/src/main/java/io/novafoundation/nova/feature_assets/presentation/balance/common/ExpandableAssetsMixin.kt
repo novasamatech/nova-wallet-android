@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 import io.novafoundation.nova.common.data.model.switch
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.utils.combineToTriple
+import io.novafoundation.nova.common.utils.measureExecution
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -14,8 +17,9 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapLatest
+import kotlin.time.Duration.Companion.milliseconds
 
 class ExpandableAssetsMixinFactory(
     private val assetIconProvider: AssetIconProvider,
@@ -50,20 +54,22 @@ class RealExpandableAssetsMixin(
 
     private val expandedTokenIdsFlow = MutableStateFlow(setOf<String>())
 
-    override val assetModelsFlow: Flow<List<BalanceListRvItem>> = combine(
+    override val assetModelsFlow: Flow<List<BalanceListRvItem>> = combineToTriple(
         assetsFlow,
         expandedTokenIdsFlow,
         selectedCurrency
-    ) { assetesByViewMode, expandedTokens, currency ->
-        when (assetesByViewMode) {
-            is AssetsByViewModeResult.ByNetworks -> assetesByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
-            is AssetsByViewModeResult.ByTokens -> assetesByViewMode.tokens.mapGroupedAssetsToUi(
-                amountFormatter = amountFormatter,
-                assetIconProvider = assetIconProvider,
-                assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
-            )
-        }
-    }.distinctUntilChanged()
+    )
+        .throttleLast(500.milliseconds)
+        .mapLatest { (assetsByViewMode, expandedTokens, currency) ->
+            when (assetsByViewMode) {
+                is AssetsByViewModeResult.ByNetworks -> assetsByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
+                is AssetsByViewModeResult.ByTokens -> assetsByViewMode.tokens.mapGroupedAssetsToUi(
+                    amountFormatter = amountFormatter,
+                    assetIconProvider = assetIconProvider,
+                    assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
+                )
+            }
+        }.distinctUntilChanged()
 
     override fun expandToken(tokenGroupUi: TokenGroupUi) {
         expandedTokenIdsFlow.updateValue { it.toggle(tokenGroupUi.itemId) }
