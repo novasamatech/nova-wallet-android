@@ -54,7 +54,7 @@ class RealExpandableAssetsMixin(
     private val expandedTokenIdsFlow = MutableStateFlow(setOf<String>())
 
     override val assetModelsFlow: Flow<List<BalanceListRvItem>> = combineToTriple(
-        assetsFlow,
+        assetsFlow.throttleLast(300.milliseconds),
         expandedTokenIdsFlow,
         selectedCurrency
     )
@@ -67,7 +67,7 @@ class RealExpandableAssetsMixin(
                     assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
                 )
             }
-        }.throttleLast(300.milliseconds)
+        }
         .distinctUntilChanged()
 
     override fun expandToken(tokenGroupUi: TokenGroupUi) {
