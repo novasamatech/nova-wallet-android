@@ -54,7 +54,7 @@ class RealExpandableAssetsMixin(
     private val expandedTokenIdsFlow = MutableStateFlow(setOf<String>())
 
     override val assetModelsFlow: Flow<List<BalanceListRvItem>> = combineToTriple(
-        assetsFlow.throttleLast(300.milliseconds),
+        assetsFlow,
         expandedTokenIdsFlow,
         selectedCurrency
     )
