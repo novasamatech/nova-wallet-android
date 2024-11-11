@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Balance
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
 import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetList

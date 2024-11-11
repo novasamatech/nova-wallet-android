@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDec
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.TokenAssetGroupDecorationPreferences
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
