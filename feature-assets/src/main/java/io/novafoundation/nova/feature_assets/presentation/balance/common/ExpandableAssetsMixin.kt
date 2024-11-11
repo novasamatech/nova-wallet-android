@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.model.switch
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.combineToTriple
-import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
-import kotlin.time.Duration.Companion.milliseconds
 
 class ExpandableAssetsMixinFactory(
     private val assetIconProvider: AssetIconProvider,
@@ -57,17 +55,16 @@ class RealExpandableAssetsMixin(
         assetsFlow,
         expandedTokenIdsFlow,
         selectedCurrency
-    )
-        .mapLatest { (assetsByViewMode, expandedTokens, currency) ->
-            when (assetsByViewMode) {
-                is AssetsByViewModeResult.ByNetworks -> assetsByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
-                is AssetsByViewModeResult.ByTokens -> assetsByViewMode.tokens.mapGroupedAssetsToUi(
-                    amountFormatter = amountFormatter,
-                    assetIconProvider = assetIconProvider,
-                    assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
-                )
-            }
+    ).mapLatest { (assetsByViewMode, expandedTokens, currency) ->
+        when (assetsByViewMode) {
+            is AssetsByViewModeResult.ByNetworks -> assetsByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
+            is AssetsByViewModeResult.ByTokens -> assetsByViewMode.tokens.mapGroupedAssetsToUi(
+                amountFormatter = amountFormatter,
+                assetIconProvider = assetIconProvider,
+                assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
+            )
         }
+    }
         .distinctUntilChanged()
 
     override fun expandToken(tokenGroupUi: TokenGroupUi) {
