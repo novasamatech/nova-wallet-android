@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDec
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowList
 import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
@@ -113,7 +114,7 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         }
     }
 
-    override fun assetClicked(asset: AssetModel) {
+    override fun assetClicked(asset: Chain.Asset) {
         viewModel.assetClicked(asset)
 
         assetFlowToolbar.searchField.hideSoftKeyboard()

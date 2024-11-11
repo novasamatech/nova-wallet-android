@@ -61,6 +61,7 @@ fun getTokenAssetBaseComparator(
     return compareByDescending(comparing)
         .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
         .thenBy { it.asset.token.configuration.symbol.value }
+        .then(Chain.defaultComparatorFrom(AssetWithNetwork::chain))
 }
 
 fun getTokenAssetGroupBaseComparator(

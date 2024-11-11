@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="select_network_title">Select network</string>
+
     <string name="assets_search_token_hint">Search by token</string>
 
     <string name="receive_screen_copy_address">Copy Address</string>

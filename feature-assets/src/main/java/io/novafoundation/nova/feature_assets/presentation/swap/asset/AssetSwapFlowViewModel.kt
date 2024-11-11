@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -32,6 +31,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -85,10 +85,9 @@ class AssetSwapFlowViewModel(
         )
     }
 
-    override fun assetClicked(assetModel: AssetModel) {
+    override fun assetClicked(asset: Chain.Asset) {
         launch {
-            val chainAsset = assetModel.token.configuration
-            swapFlowExecutor.openNextScreen(viewModelScope, chainAsset)
+            swapFlowExecutor.openNextScreen(viewModelScope, asset)
         }
     }
 

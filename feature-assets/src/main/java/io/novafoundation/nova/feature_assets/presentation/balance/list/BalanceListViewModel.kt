@@ -35,12 +35,14 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -200,10 +202,10 @@ class BalanceListViewModel(
         }
     }
 
-    fun assetClicked(asset: AssetModel) {
+    fun assetClicked(asset: Chain.Asset) {
         val payload = AssetPayload(
-            chainId = asset.token.configuration.chainId,
-            chainAssetId = asset.token.configuration.id
+            chainId = asset.chainId,
+            chainAssetId = asset.id
         )
 
         router.openAssetDetails(payload)

@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.createF
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
 import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
@@ -142,7 +144,7 @@ class BalanceListFragment :
         viewModel.assetViewModeModelFlow.observe { headerAdapter.setAssetViewModeModel(it) }
     }
 
-    override fun assetClicked(asset: AssetModel) {
+    override fun assetClicked(asset: Chain.Asset) {
         viewModel.assetClicked(asset)
     }
 

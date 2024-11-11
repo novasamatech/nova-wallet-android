@@ -42,7 +42,7 @@ class QrCodeView @JvmOverloads constructor(
     private var overlayBackground: Drawable? = null
 
     private val overlaySize = 64.dp
-    private val overlayQuiteZone = 4.dp
+    private val overlayQuiteZone = 0
     private val qrPadding = 16.dpF
 
     private val centerRect: RectF = RectF()

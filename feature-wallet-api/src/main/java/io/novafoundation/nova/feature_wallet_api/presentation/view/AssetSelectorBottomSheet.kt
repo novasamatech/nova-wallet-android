@@ -33,7 +33,7 @@ class AssetSelectorBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle(R.string.wallet_assets)
+        setTitle(R.string.select_network_title)
         setSubtitle(null)
     }
 

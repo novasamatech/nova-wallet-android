@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFl
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 class AssetReceiveFlowViewModel(
@@ -45,9 +46,9 @@ class AssetReceiveFlowViewModel(
         return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)
     }
 
-    override fun assetClicked(assetModel: AssetModel) {
-        validate(assetModel) {
-            openNextScreen(assetModel)
+    override fun assetClicked(asset: Chain.Asset) {
+        validate(asset) {
+            openNextScreen(asset)
         }
     }
 
@@ -59,9 +60,8 @@ class AssetReceiveFlowViewModel(
         }
     }
 
-    private fun openNextScreen(assetModel: AssetModel) {
-        val chainAsset = assetModel.token.configuration
-        val assetPayload = AssetPayload(chainAsset.chainId, chainAsset.id)
+    private fun openNextScreen(asset: Chain.Asset) {
+        val assetPayload = AssetPayload(asset.chainId, asset.id)
         router.openReceive(assetPayload)
     }
 }
