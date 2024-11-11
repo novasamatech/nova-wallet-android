@@ -1124,6 +1124,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">사용할 수 없는 트랙</string>
     <string name="select_ledger_location_enable_request_message">Ledger 장치를 찾기 위해 블루투스 스캔을 수행하려면 Nova는 위치 기능을 활성화해야 합니다.</string>
     <string name="select_ledger_location_enable_request_title">기기 설정에서 지리적 위치를 활성화해주세요.</string>
+    <string name="select_network_title">네트워크 선택</string>
     <string name="select_tracks_for">트랙 선택</string>
     <string name="selected_tracks_quantity" formatted="false">%d 중 %d</string>
     <string name="send_address_hint">주소 또는 w3n</string>

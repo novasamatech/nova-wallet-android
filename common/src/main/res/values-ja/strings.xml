@@ -1124,6 +1124,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
+    <string name="select_network_title">ネットワークを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">アドレスまたはw3n</string>

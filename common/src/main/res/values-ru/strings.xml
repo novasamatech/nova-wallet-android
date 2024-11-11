@@ -1148,6 +1148,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
+    <string name="select_network_title">Выберите сеть</string>
     <string name="select_tracks_for">Выберите треки для</string>
     <string name="selected_tracks_quantity" formatted="false">%d из %d</string>
     <string name="send_address_hint">Адрес или w3n</string>

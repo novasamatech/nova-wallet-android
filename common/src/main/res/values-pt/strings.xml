@@ -1132,6 +1132,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Faixas indisponíveis</string>
     <string name="select_ledger_location_enable_request_message">Nova precisa que a localização seja ativada para poder realizar a varredura Bluetooth para encontrar seu dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Por favor, ative a localização geográfica nas configurações do dispositivo</string>
+    <string name="select_network_title">Selecionar rede</string>
     <string name="select_tracks_for">Selecione faixas para</string>
     <string name="selected_tracks_quantity" formatted="false">%d de %d</string>
     <string name="send_address_hint">Endereço ou w3n</string>
