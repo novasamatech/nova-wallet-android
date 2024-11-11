@@ -14,12 +14,4 @@ data class TokenAssetUi(
 ) : AssetRvItem, ExpandableChildItem {
 
     override val itemId: String = "token_" + asset.token.configuration.fullId.toString()
-
-    override fun equals(other: Any?): Boolean {
-        if (other is TokenAssetUi) {
-            return chain.id == other.chain.id
-        }
-
-        return false
-    }
 }
