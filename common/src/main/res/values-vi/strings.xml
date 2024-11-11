@@ -1124,6 +1124,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Track không có sẵn</string>
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
+    <string name="select_network_title">Chọn mạng</string>
     <string name="select_tracks_for">Chọn track cho</string>
     <string name="selected_tracks_quantity" formatted="false">%d trong %d</string>
     <string name="send_address_hint">Địa chỉ hoặc w3n</string>

@@ -1132,6 +1132,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Chemins non disponibles</string>
     <string name="select_ledger_location_enable_request_message">Nova a besoin que la localisation soit activée pour pouvoir effectuer un balayage Bluetooth afin de trouver votre appareil Ledger</string>
     <string name="select_ledger_location_enable_request_title">Veuillez activer la géolocalisation dans les paramètres de l\'appareil</string>
+    <string name="select_network_title">Sélectionner un réseau</string>
     <string name="select_tracks_for">Sélectionner des pistes pour</string>
     <string name="selected_tracks_quantity" formatted="false">%d sur %d</string>
     <string name="send_address_hint">Adresse ou w3n</string>

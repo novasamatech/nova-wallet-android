@@ -1124,6 +1124,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
+    <string name="select_network_title">Pilih jaringan</string>
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
     <string name="send_address_hint">Address or w3n</string>
