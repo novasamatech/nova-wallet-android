@@ -58,7 +58,7 @@ fun mapTokenAssetGroupToUi(
             token = balance.amount.formatTokenAmount(),
             fiat = balance.fiat.formatAsCurrency(assetGroup.token.currency)
         ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size),
-        groupType = mapType(amountFormatter, assetGroup, assets, groupBalance)
+        groupType = mapType(assets)
     )
 }
 
@@ -80,14 +80,10 @@ private fun mapAssetsToAssetModels(
 }
 
 private fun mapType(
-    amountFormatter: AmountFormatter,
-    assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
-    groupBalance: (TokenAssetGroup) -> PricedAmount
 ): TokenGroupUi.GroupType {
     return if (assets.size == 1) {
-        val balance = groupBalance(assetGroup)
-        TokenGroupUi.GroupType.SingleItem(mapAssetToAssetModel(amountFormatter, assets.first().asset, balance))
+        TokenGroupUi.GroupType.SingleItem(assets.first().asset.token.configuration)
     } else {
         TokenGroupUi.GroupType.Group
     }

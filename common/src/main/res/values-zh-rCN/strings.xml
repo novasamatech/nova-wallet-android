@@ -1124,6 +1124,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">不可用的轨道</string>
     <string name="select_ledger_location_enable_request_message">Nova需要启用地理位置，以便能够进行蓝牙扫描查找您的Ledger设备</string>
     <string name="select_ledger_location_enable_request_title">请在设备设置中启用地理位置</string>
+    <string name="select_network_title">选择网络</string>
     <string name="select_tracks_for">选择曲目</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">地址或w3n</string>

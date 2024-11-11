@@ -55,15 +55,16 @@ class ByTokensAssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult> {
-        val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
-            val filter: AssetSearchFilter = { asset ->
-                val chainAsset = asset.token.configuration
+        val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAsset, coroutineScope)
+            .map { availableAssetsForSwap ->
+                val filter: AssetSearchFilter = { asset ->
+                    val chainAsset = asset.token.configuration
 
-                chainAsset.fullId in availableAssetsForSwap
+                    chainAsset.fullId in availableAssetsForSwap
+                }
+
+                filter
             }
-
-            filter
-        }
 
         return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
     }

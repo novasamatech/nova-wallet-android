@@ -46,9 +46,9 @@ fun groupAndSortAssetsByToken(
         .map { asset -> AssetWithNetwork(chainsById.getValue(asset.token.configuration.chainId), asset, asset.totalWithOffChain(externalBalances)) }
         .groupBy { mapToTokenGroup(it) }
         .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
-        .mapKeys { (token, assets) ->
+        .mapKeys { (tokenWrapper, assets) ->
             TokenAssetGroup(
-                token = token,
+                token = tokenWrapper.token,
                 groupBalance = assets.fold(AssetBalance.ZERO) { acc, element -> acc + element.balanceWithOffChain },
                 itemsCount = assets.size
             )
@@ -61,6 +61,7 @@ fun getTokenAssetBaseComparator(
     return compareByDescending(comparing)
         .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
         .thenBy { it.asset.token.configuration.symbol.value }
+        .then(Chain.defaultComparatorFrom(AssetWithNetwork::chain))
 }
 
 fun getTokenAssetGroupBaseComparator(
@@ -71,9 +72,23 @@ fun getTokenAssetGroupBaseComparator(
         .then(TokenSymbol.defaultComparatorFrom { it.token.symbol })
 }
 
-private fun mapToTokenGroup(it: AssetWithNetwork) = TokenAssetGroup.Token(
-    it.asset.token.configuration.icon,
-    it.asset.token.configuration.symbol.normalize(),
-    it.asset.token.currency,
-    it.asset.token.coinRate
+private fun mapToTokenGroup(it: AssetWithNetwork) = TokenGroupWrapper(
+    TokenAssetGroup.Token(
+        it.asset.token.configuration.icon,
+        it.asset.token.configuration.symbol.normalize(),
+        it.asset.token.currency,
+        it.asset.token.coinRate
+    )
 )
+
+// Helper class to group items by symbol only
+private class TokenGroupWrapper(val token: TokenAssetGroup.Token) {
+
+    override fun equals(other: Any?): Boolean {
+        return other is TokenGroupWrapper && token.symbol == other.token.symbol
+    }
+
+    override fun hashCode(): Int {
+        return token.symbol.hashCode()
+    }
+}

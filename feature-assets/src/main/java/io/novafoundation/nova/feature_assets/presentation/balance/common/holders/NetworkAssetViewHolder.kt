@@ -32,7 +32,7 @@ class NetworkAssetViewHolder(
 
         itemAssetToken.text = asset.token.configuration.symbol.value
 
-        setOnClickListener { itemHandler.assetClicked(asset) }
+        setOnClickListener { itemHandler.assetClicked(asset.token.configuration) }
     }
 
     fun bindTotal(asset: AssetModel) {
