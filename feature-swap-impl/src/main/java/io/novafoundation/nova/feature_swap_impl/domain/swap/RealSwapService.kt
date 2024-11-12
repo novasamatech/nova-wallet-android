@@ -112,6 +112,7 @@ import java.math.BigInteger
 import java.math.MathContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
@@ -119,6 +120,7 @@ private const val EXTRINSIC_SERVICE_CACHE = "RealSwapService.ExtrinsicService"
 private const val QUOTER_CACHE = "RealSwapService.QUOTER"
 private const val NODE_VISIT_FILTER = "RealSwapService.NodeVisitFilter"
 
+private val ADDITIONAL_ESTIMATE_BUFFER = 3.seconds
 
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
@@ -373,7 +375,7 @@ internal class RealSwapService(
             amountOut = args.tokenOut.configuration.withAmount(amountOut),
             priceImpact = args.calculatePriceImpact(amountIn, amountOut),
             quotedPath = quotedTrade,
-            executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates)
+            executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER)
         )
     }
 

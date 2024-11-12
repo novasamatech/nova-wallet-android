@@ -3,13 +3,15 @@ package io.novafoundation.nova.feature_swap_api.domain.model
 import io.novafoundation.nova.common.utils.sum
 import kotlin.time.Duration
 
-@JvmInline
-value class SwapExecutionEstimate(val atomicOperationsEstimates: List<Duration>)
+class SwapExecutionEstimate(
+    val atomicOperationsEstimates: List<Duration>,
+    val additionalBuffer: Duration
+)
 
 fun SwapExecutionEstimate.totalTime(): Duration {
-    return atomicOperationsEstimates.sum()
+    return remainingTimeWhenExecuting(stepIndex = 0)
 }
 
 fun SwapExecutionEstimate.remainingTimeWhenExecuting(stepIndex: Int): Duration {
-    return atomicOperationsEstimates.drop(stepIndex).sum()
+    return atomicOperationsEstimates.drop(stepIndex).sum() + additionalBuffer
 }

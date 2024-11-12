@@ -110,7 +110,8 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
         }
 
         if (newCount <= limit) {
-            adjacencyList.getValue(lastNode).forEach { edge ->
+            val edges = adjacencyList[lastNode].orEmpty()
+            edges.forEach { edge ->
                 if (edge.to in minimumQueueElement || !actualNodeListFilter.shouldVisit(edge, predecessor)) return@forEach
 
                 val newElement = QueueElement(
@@ -137,7 +138,9 @@ private suspend fun <N, E : Edge<N>> reachabilityDfs(
     visited.add(node)
     connectedComponentState.add(node)
 
-    for (edge in adjacencyList.getValue(node)) {
+    val edges = adjacencyList[node].orEmpty()
+
+    for (edge in edges) {
         if (edge.to !in visited && nodeVisitFilter.shouldVisit(edge, predecessor)) {
             reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, predecessor = edge, visited, connectedComponentState)
         }
