@@ -24,10 +24,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -88,7 +88,7 @@ abstract class AssetFlowViewModel(
 
     abstract fun searchAssetsFlow(): Flow<AssetsByViewModeResult>
 
-    abstract fun assetClicked(assetModel: AssetModel)
+    abstract fun assetClicked(asset: Chain.Asset)
 
     abstract fun tokenClicked(tokenGroup: TokenGroupUi)
 
@@ -107,12 +107,11 @@ abstract class AssetFlowViewModel(
         return assets.map { mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, it.key, assets = it.value) }
     }
 
-    internal fun validate(assetModel: AssetModel, onAccept: (AssetModel) -> Unit) {
+    internal fun validate(asset: Chain.Asset, onAccept: (Chain.Asset) -> Unit) {
         launch {
             val metaAccount = accountUseCase.getSelectedMetaAccount()
-            val chainAsset = assetModel.token.configuration
-            controllableAssetCheck.check(metaAccount, chainAsset) {
-                onAccept(assetModel)
+            controllableAssetCheck.check(metaAccount, asset) {
+                onAccept(asset)
             }
         }
     }

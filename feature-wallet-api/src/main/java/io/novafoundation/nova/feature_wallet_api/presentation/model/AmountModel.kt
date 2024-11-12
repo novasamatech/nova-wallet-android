@@ -14,7 +14,15 @@ import java.math.RoundingMode
 data class AmountModel(
     val token: CharSequence,
     val fiat: CharSequence?
-)
+) {
+
+    // Override it since SpannableString is not equals by content
+    override fun equals(other: Any?): Boolean {
+        return other is AmountModel &&
+            other.token.toString() == token.toString() &&
+            other.fiat?.toString() == fiat?.toString()
+    }
+}
 
 enum class AmountSign(val signSymbol: String) {
     NONE(""), NEGATIVE("-"), POSITIVE("+")

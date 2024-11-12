@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.common
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
-import io.novafoundation.nova.common.utils.measureExecution
+import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
@@ -16,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlin.time.Duration.Companion.milliseconds
 
 class AssetListMixinFactory(
     private val walletInteractor: WalletInteractor,
@@ -68,16 +70,16 @@ class RealAssetListMixin(
     override val assetsViewModeFlow = assetsListInteractor.assetsViewModeFlow()
         .shareInBackground()
 
+    private val throttledBalance = combineToPair(filteredAssetsFlow, externalBalancesFlow)
+        .throttleLast(300.milliseconds)
+
     private val assetsByViewMode = combine(
-        filteredAssetsFlow,
-        externalBalancesFlow,
+        throttledBalance,
         assetsViewModeFlow
-    ) { assets, externalBalances, viewMode ->
-        measureExecution("Group assets") {
-            when (viewMode) {
-                AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
-                AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
-            }
+    ) { (assets, externalBalances), viewMode ->
+        when (viewMode) {
+            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
+            AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
         }
     }.shareInBackground()
 

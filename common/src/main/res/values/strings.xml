@@ -29,6 +29,8 @@
     <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
     <string name="swap_route">Route</string>
 
+    <string name="select_network_title">Select network</string>
+
     <string name="assets_search_token_hint">Search by token</string>
 
     <string name="receive_screen_copy_address">Copy Address</string>

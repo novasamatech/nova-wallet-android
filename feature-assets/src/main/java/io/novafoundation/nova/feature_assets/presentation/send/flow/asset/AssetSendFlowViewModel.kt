@@ -22,12 +22,12 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 class AssetSendFlowViewModel(
@@ -58,9 +58,8 @@ class AssetSendFlowViewModel(
         return interactor.sendAssetSearch(query, externalBalancesFlow)
     }
 
-    override fun assetClicked(assetModel: AssetModel) {
-        val chainAsset = assetModel.token.configuration
-        val assetPayload = AssetPayload(chainAsset.chainId, chainAsset.id)
+    override fun assetClicked(asset: Chain.Asset) {
+        val assetPayload = AssetPayload(asset.chainId, asset.id)
         router.openSend(SendPayload.SpecifiedOrigin(assetPayload))
     }
 

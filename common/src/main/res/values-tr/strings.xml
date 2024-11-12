@@ -1132,6 +1132,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Ulaşılamayan yollar</string>
     <string name="select_ledger_location_enable_request_message">Nova\'nın Bluetooth taraması yaparak Ledger cihazınızı bulabilmesi için konumun etkinleştirilmesi gerekiyor</string>
     <string name="select_ledger_location_enable_request_title">Lütfen cihaz ayarlarında coğrafi konumu etkinleştirin</string>
+    <string name="select_network_title">Ağ seç</string>
     <string name="select_tracks_for">İçin şarkıları seçin</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">Adres veya w3n</string>

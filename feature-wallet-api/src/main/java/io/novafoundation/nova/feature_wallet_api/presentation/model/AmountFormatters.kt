@@ -11,15 +11,15 @@ import io.novafoundation.nova.feature_wallet_api.R
 
 interface AmountFormatter {
 
-    fun formatBalanceWithFraction(amount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence
+    fun formatBalanceWithFraction(unformattedAmount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence
 }
 
 class RealAmountFormatter(
     private val resourceManager: ResourceManager
 ) : AmountFormatter {
 
-    override fun formatBalanceWithFraction(amount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence {
-        val amountWithFraction = amount.toAmountWithFraction()
+    override fun formatBalanceWithFraction(unformattedAmount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence {
+        val amountWithFraction = unformattedAmount.toAmountWithFraction()
 
         val textColor = resourceManager.getColor(R.color.text_secondary)
         val colorSpan = ForegroundColorSpan(textColor)

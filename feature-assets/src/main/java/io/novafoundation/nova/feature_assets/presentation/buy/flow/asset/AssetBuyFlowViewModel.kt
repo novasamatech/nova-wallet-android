@@ -12,10 +12,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
 class AssetBuyFlowViewModel(
@@ -49,10 +49,9 @@ class AssetBuyFlowViewModel(
         return interactor.buyAssetSearch(query, externalBalancesFlow)
     }
 
-    override fun assetClicked(assetModel: AssetModel) {
-        validate(assetModel) {
-            val chainAsset = assetModel.token.configuration
-            buyMixin.buyClicked(chainAsset)
+    override fun assetClicked(asset: Chain.Asset) {
+        validate(asset) {
+            buyMixin.buyClicked(asset)
         }
     }
 

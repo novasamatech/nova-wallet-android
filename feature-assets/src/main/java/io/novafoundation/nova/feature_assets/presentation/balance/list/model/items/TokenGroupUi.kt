@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.model.it
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 data class TokenGroupUi(
     override val itemId: String,
@@ -21,6 +22,6 @@ data class TokenGroupUi(
     sealed interface GroupType {
         object Group : GroupType
 
-        data class SingleItem(val asset: AssetModel) : GroupType
+        data class SingleItem(val asset: Chain.Asset) : GroupType
     }
 }

@@ -1132,6 +1132,7 @@
     <string name="select_delegation_tracks_unavailable_tracks">Pistas no disponibles</string>
     <string name="select_ledger_location_enable_request_message">Nova necesita que la ubicación esté habilitada para poder realizar el escaneo bluetooth y encontrar tu dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Por favor, habilita la geolocalización en las configuraciones del dispositivo</string>
+    <string name="select_network_title">Seleccionar red</string>
     <string name="select_tracks_for">Seleccione pistas para</string>
     <string name="selected_tracks_quantity" formatted="false">%d de %d</string>
     <string name="send_address_hint">Dirección o w3n</string>

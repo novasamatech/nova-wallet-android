@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private val priceRateExtractor = { asset: AssetModel -> asset.token.rate }
 private val recentChangeExtractor = { asset: AssetModel -> asset.token.recentRateChange }
@@ -43,7 +45,7 @@ class BalanceListAdapter(
 ) : ListAdapter<BalanceListRvItem, ViewHolder>(DiffCallback), ExpandableAdapter {
 
     interface ItemAssetHandler {
-        fun assetClicked(asset: AssetModel)
+        fun assetClicked(asset: Chain.Asset)
 
         fun tokenGroupClicked(tokenGroup: TokenGroupUi)
     }
