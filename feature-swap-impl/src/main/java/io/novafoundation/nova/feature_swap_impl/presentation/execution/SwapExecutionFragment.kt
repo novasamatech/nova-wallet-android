@@ -8,22 +8,32 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
-import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setBackgroundTintRes
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionAssets
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionContainer
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionDetails
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionFinishedStatus
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionNetworkFee
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionPriceDifference
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionProgressViews
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionRate
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionRemainingTime
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionRoute
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionSlippage
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionStepContainer
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionStepLabel
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionStepShimmer
@@ -45,6 +55,16 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
     override fun initViews() {
         swapExecutionContainer.applyStatusBarInsets()
 
+        swapExecutionToolbar.setHomeButtonListener { viewModel.onBackPressed() }
+
+        swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
+        swapExecutionPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
+        swapExecutionSlippage.setOnClickListener { viewModel.slippageClicked() }
+        swapExecutionNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
+        swapExecutionRoute.setOnClickListener { viewModel.routeClicked() }
+
+        swapExecutionDetails.collapseImmediate()
+
         onBackPressed { viewModel.onBackPressed() }
     }
 
@@ -56,9 +76,21 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
     }
 
     override fun subscribe(viewModel: SwapExecutionViewModel) {
+        observeDescription(viewModel)
+
         viewModel.backAvailableFlow.observe(swapExecutionToolbar::setHomeButtonVisibility)
 
         viewModel.swapProgressModel.observe(::setSwapProgress)
+
+        viewModel.feeMixin.setupFeeLoading(swapExecutionNetworkFee)
+
+        viewModel.confirmationDetailsFlow.observe {
+            swapExecutionAssets.setModel(it.assets)
+            swapExecutionRate.showValue(it.rate)
+            swapExecutionPriceDifference.showValueOrHide(it.priceDifference)
+            swapExecutionSlippage.showValue(it.slippage)
+            swapExecutionRoute.setSwapRouteModel(it.swapRouteModel)
+        }
     }
 
     private fun setSwapProgress(model: SwapProgressModel) {
@@ -71,24 +103,26 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
     private fun setSwapCompleted(model: SwapProgressModel.Completed) {
         swapExecutionFinishedStatus.makeVisible()
-        swapExecutionProgressViews.makeGone()
+        swapExecutionProgressViews.makeInvisible()
 
-        swapExecutionFinishedStatus.setBackgroundTintRes(R.color.icon_positive_background)
+        swapExecutionFinishedStatus.setBackgroundTintRes(R.color.icon_positive)
         swapExecutionFinishedStatus.setImageResource(R.drawable.ic_checkmark)
         swapExecutionFinishedStatus.setImageTintRes(R.color.icon_positive)
 
         swapExecutionTitle.setText(R.string.common_completed)
         swapExecutionSubtitle.text = model.at
+        swapExecutionSubtitle.setTextColorRes(R.color.text_secondary)
 
         swapExecutionStepLabel.text = model.operationsLabel
         swapExecutionStepLabel.setTextColorRes(R.color.text_secondary)
-        swapExecutionStepShimmer.stopShimmer()
+
+        swapExecutionStepShimmer.hideShimmer()
         swapExecutionStepContainer.background = requireContext().getBlockDrawable()
     }
 
     private fun setSwapFailed(model: SwapProgressModel.Failed) {
         swapExecutionFinishedStatus.makeVisible()
-        swapExecutionProgressViews.makeGone()
+        swapExecutionProgressViews.makeInvisible()
 
         swapExecutionFinishedStatus.backgroundTintList = null
         swapExecutionFinishedStatus.setImageResource(R.drawable.ic_close)
@@ -96,25 +130,29 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
         swapExecutionTitle.setText(R.string.common_failed)
         swapExecutionSubtitle.text = model.at
+        swapExecutionSubtitle.setTextColorRes(R.color.text_secondary)
 
         swapExecutionStepLabel.text = model.reason
         swapExecutionStepLabel.setTextColorRes(R.color.text_primary)
-        swapExecutionStepShimmer.stopShimmer()
+
+        swapExecutionStepShimmer.hideShimmer()
         swapExecutionStepContainer.background = requireContext().getRoundedCornerDrawable(R.color.error_block_background)
     }
 
     private fun setSwapInProgress(model: SwapProgressModel.InProgress) {
-        swapExecutionFinishedStatus.makeGone()
+        swapExecutionFinishedStatus.makeInvisible()
         swapExecutionProgressViews.makeVisible()
 
         swapExecutionRemainingTime.startTimer(model.remainingTime, durationFormatter = UnlabeledSecondsFormatter())
 
         swapExecutionTitle.setText(R.string.common_do_not_close_app)
         swapExecutionSubtitle.text = model.stepDescription
+        swapExecutionSubtitle.setTextColorRes(R.color.button_text_accent)
 
         swapExecutionStepLabel.text = model.operationsLabel
         swapExecutionStepLabel.setTextColorRes(R.color.text_secondary)
-        swapExecutionStepShimmer.startShimmer()
+
+        swapExecutionStepShimmer.showShimmer(true)
         swapExecutionStepContainer.background = requireContext().getBlockDrawable()
     }
 

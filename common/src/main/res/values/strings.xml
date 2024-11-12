@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="common_sec">sec</string>
+
     <string name="common_do_not_close_app">Do not close the app!</string>
 
     <string name="common_failed">Failed</string>
@@ -9,7 +11,7 @@
     <string name="swap_execution_progress_swap_label">Swapping %s to %s on %s</string>
     <string name="swap_execution_progress_transfer_label">Transferring %s to %s</string>
 
-    <string name="swap_execution_failure">%s of %s (%s)</string>
+    <string name="swap_execution_failure">%s of %s operations (%s)</string>
     <string name="swap_execution_failure_swap_label">%s to %s swap on %s</string>
     <string name="swap_execution_failure_transfer_label">%s transfer from %s to %s</string>
 

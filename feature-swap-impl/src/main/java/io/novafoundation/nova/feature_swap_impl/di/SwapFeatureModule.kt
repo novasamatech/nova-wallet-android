@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -32,12 +33,14 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactF
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.details.RealSwapConfirmationDetailsFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -199,5 +202,27 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideSwapRouteFormatter(chainRegistry: ChainRegistry): SwapRouteFormatter {
         return RealSwapRouteFormatter(chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideConfirmationDetailsFormatter(
+        chainRegistry: ChainRegistry,
+        assetIconProvider: AssetIconProvider,
+        tokenRepository: TokenRepository,
+        swapRouteFormatter: SwapRouteFormatter,
+        swapRateFormatter: SwapRateFormatter,
+        priceImpactFormatter: PriceImpactFormatter,
+        resourceManager: ResourceManager,
+    ): SwapConfirmationDetailsFormatter {
+        return RealSwapConfirmationDetailsFormatter(
+            chainRegistry = chainRegistry,
+            assetIconProvider = assetIconProvider,
+            tokenRepository = tokenRepository,
+            swapRouteFormatter = swapRouteFormatter,
+            swapRateFormatter = swapRateFormatter,
+            priceImpactFormatter = priceImpactFormatter,
+            resourceManager = resourceManager
+        )
     }
 }

@@ -4,61 +4,43 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.api.Validatable
-import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
-import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.editedBalance
-import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
-import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
-import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
-import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
-import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
+import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.model.SwapConfirmationDetailsModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -73,8 +55,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.math.BigInteger
 
 private data class SwapConfirmationState(
     val swapQuoteArgs: SwapQuoteArgs,
@@ -89,12 +69,8 @@ enum class MaxAction {
 class SwapConfirmationViewModel(
     private val swapRouter: SwapRouter,
     private val swapInteractor: SwapInteractor,
-    private val resourceManager: ResourceManager,
-    private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val swapRateFormatter: SwapRateFormatter,
-    private val priceImpactFormatter: PriceImpactFormatter,
     private val walletUiUseCase: WalletUiUseCase,
     private val slippageAlertMixinFactory: SlippageAlertMixinFactory,
     private val addressIconGenerator: AddressIconGenerator,
@@ -106,8 +82,7 @@ class SwapConfirmationViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val arbitraryAssetUseCase: ArbitraryAssetUseCase,
     private val maxActionProviderFactory: MaxActionProviderFactory,
-    private val swapRouteFormatter: SwapRouteFormatter,
-    private val assetIconProvider: AssetIconProvider
+    private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -127,7 +102,7 @@ class SwapConfirmationViewModel(
     private val slippageFlow = initialSwapState.map { it.slippage }
         .shareInBackground()
 
-    private val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfigFlow, slippageFlow)
+    val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfigFlow, slippageFlow)
 
     private val chainIn = initialSwapState.map {
         chainRegistry.getChain(it.quote.assetIn.chainId)
@@ -146,11 +121,9 @@ class SwapConfirmationViewModel(
 
     private val maxActionFlow = MutableStateFlow(MaxAction.DISABLED)
 
-    val feeMixin = feeLoaderMixinFactory.create(
-        scope = viewModelScope,
-        selectedChainAssetFlow = initialSwapState.map { it.quote.assetIn },
-        feeFormatter = SwapFeeFormatter(swapInteractor),
-        feeInspector = SwapFeeInspector(),
+    val feeMixin = feeLoaderMixinFactory.createForSwap(
+        chainAssetIn = initialSwapState.map { it.quote.assetIn },
+        interactor = swapInteractor
     )
 
     private val maxActionProvider = createMaxActionProvider()
@@ -160,7 +133,7 @@ class SwapConfirmationViewModel(
     val validationProgress = _submissionInProgress
 
     val swapDetails = confirmationStateFlow.map {
-        formatToSwapDetailsModel(it)
+        swapConfirmationDetailsFormatter.format(it.swapQuote, slippageFlow.first())
     }
 
     val wallet: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow()
@@ -168,8 +141,6 @@ class SwapConfirmationViewModel(
     val addressFlow: Flow<AddressModel> = combine(chainIn, metaAccountFlow) { chainId, metaAccount ->
         addressIconGenerator.createAccountAddressModel(chainId, metaAccount)
     }
-
-    val slippageAlertMessage: Flow<String?> = slippageAlertMixin.slippageAlertMessage
 
     init {
         handleMaxClick()
@@ -186,17 +157,11 @@ class SwapConfirmationViewModel(
     }
 
     fun priceDifferenceClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_price_difference_title,
-            descriptionRes = R.string.swap_price_difference_description
-        )
+        launchPriceDifferenceDescription()
     }
 
     fun slippageClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_slippage_title,
-            descriptionRes = R.string.swap_slippage_description
-        )
+        launchSlippageDescription()
     }
 
     fun networkFeeClicked() = setSwapStateAndThen {
@@ -217,8 +182,10 @@ class SwapConfirmationViewModel(
     }
 
     fun confirmButtonClicked() {
+        setSwapStateAndThen {
+            executeSwap()
+        }
         // TODO swap validations
-        executeSwap()
 //        launch {
 //            val validationSystem = swapInteractor.validationSystem()
 //            val payload = getValidationPayload() ?: return@launch
@@ -276,54 +243,6 @@ class SwapConfirmationViewModel(
         swapRouter.openSwapExecution()
     }
 
-    private suspend fun formatToSwapDetailsModel(confirmationState: SwapConfirmationState): SwapConfirmationDetailsModel {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val quote = confirmationState.swapQuote
-
-        val assetIn = quote.assetIn
-        val assetOut = quote.assetOut
-        val chainIn = chainRegistry.getChain(assetIn.chainId)
-        val chainOut = chainRegistry.getChain(assetOut.chainId)
-
-        return SwapConfirmationDetailsModel(
-            assets = SwapAssetsView.Model(
-                assetIn = formatAssetDetails(metaAccount, chainIn, assetIn, quote.planksIn),
-                assetOut = formatAssetDetails(metaAccount, chainOut, assetOut, quote.planksOut)
-            ),
-            rate = formatRate(quote.swapRate(), assetIn, assetOut),
-            priceDifference = formatPriceDifference(quote.priceImpact),
-            slippage = slippageFlow.first().formatPercents(),
-            swapRouteState = ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(quote)),
-            estimatedExecutionTime = resourceManager.formatDuration(quote.executionEstimate.totalTime(), estimated = true)
-        )
-    }
-
-    private suspend fun formatAssetDetails(
-        metaAccount: MetaAccount,
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        amountInPlanks: BigInteger
-    ): SwapAssetView.Model {
-        val amount = formatAmount(metaAccount, chainAsset, amountInPlanks)
-        return SwapAssetView.Model(
-            assetIcon = assetIconProvider.getAssetIconOrFallback(chainAsset),
-            amount = amount,
-            chainUi = mapChainToUi(chain),
-        )
-    }
-
-    private fun formatRate(rate: BigDecimal, assetIn: Chain.Asset, assetOut: Chain.Asset): String {
-        return swapRateFormatter.format(rate, assetIn, assetOut)
-    }
-
-    private fun formatPriceDifference(priceDifference: Percent): CharSequence? {
-        return priceImpactFormatter.format(priceDifference)
-    }
-
-    private suspend fun formatAmount(metaAccount: MetaAccount, chainAsset: Chain.Asset, amount: BigInteger): AmountModel {
-        val asset = walletRepository.getAsset(metaAccount.id, chainAsset)!!
-        return mapAmountToAmountModel(amount, asset.token, includeZeroFiat = false, estimatedFiat = true)
-    }
 
     // TODO swap validations
 //    private suspend fun getValidationPayload(): SwapValidationPayload? {

@@ -38,9 +38,9 @@
             android:id="@+id/swapExecutionFinishedStatus"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:padding="12dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_icon_container_on_color"
+            android:padding="12dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,14 +66,18 @@
             style="@style/TextAppearance.NovaFoundation.SemiBold.Caption1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:ellipsize="marquee"
             android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="@string/common_sec"
             android:textColor="@color/text_secondary"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@+id/swapExecutionProgressBar"
             app:layout_constraintEnd_toEndOf="@+id/swapExecutionProgressBar"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/swapExecutionProgressBar"
-            app:layout_constraintTop_toBottomOf="@+id/swapExecutionRemainingTime"
-            tools:text="sec" />
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionRemainingTime" />
 
         <TextView
             android:id="@+id/swapExecutionTitle"
@@ -115,8 +119,8 @@
             tools:background="@color/block_background">
 
             <com.facebook.shimmer.ShimmerFrameLayout
-                android:layout_width="wrap_content"
                 android:id="@+id/swapExecutionStepShimmer"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center">
 
@@ -125,15 +129,107 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="14dp"
+                    android:layout_marginHorizontal="16dp"
                     android:textColor="@color/text_secondary"
                     tools:text="3 of 3 operations" />
             </com.facebook.shimmer.ShimmerFrameLayout>
         </FrameLayout>
 
+        <io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+            android:id="@+id/swapExecutionAssets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/swapExecutionStepContainer" />
+
+        <io.novafoundation.nova.common.view.ExpandableView
+            android:id="@+id/swapExecutionDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:chevronId="@+id/swapExecutionDetailsChevron"
+            app:expandableId="@+id/swapExecutionDetailsContainer"
+            app:layout_constraintTop_toBottomOf="@+id/swapExecutionAssets">
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/fragment_swap_main_settings_details_title"
+                android:textColor="@color/text_secondary"
+                app:layout_constraintBottom_toBottomOf="@+id/swapExecutionDetailsChevron"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/swapExecutionDetailsChevron" />
+
+            <ImageView
+                android:id="@+id/swapExecutionDetailsChevron"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_chevron_up"
+                app:layout_constraintBottom_toTopOf="@+id/swapExecutionReceiveInput"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/swapExecutionPayInput"
+                app:tint="@color/icon_secondary" />
+
+            <FrameLayout
+                android:id="@+id/swapExecutionDetailsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/swapExecutionDetailsChevron">
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/swapExecutionRate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/swap_rate_title"
+                        app:titleIcon="@drawable/ic_info" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/swapExecutionPriceDifference"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/swap_price_difference_title"
+                        app:titleIcon="@drawable/ic_info" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/swapExecutionSlippage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/swap_slippage_title"
+                        app:titleIcon="@drawable/ic_info" />
+
+                    <io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
+                        android:id="@+id/swapExecutionRoute"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:titleIcon="@drawable/ic_info" />
+
+                    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                        android:id="@+id/swapExecutionNetworkFee"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:titleIcon="@drawable/ic_info" />
+
+                </io.novafoundation.nova.common.view.TableView>
+
+            </FrameLayout>
+        </io.novafoundation.nova.common.view.ExpandableView>
+
         <androidx.constraintlayout.widget.Group
+            android:id="@+id/swapExecutionProgressViews"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/swapExecutionProgressViews"
             app:constraint_referenced_ids="swapExecutionProgressBar,swapExecutionRemainingTime, swapExecutionRemainingTimeLabel" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

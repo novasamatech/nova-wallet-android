@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_swap_impl.presentation.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.R
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +21,7 @@ class SlippageAlertMixinFactory(
 }
 
 interface SlippageAlertMixin {
+
     val slippageAlertMessage: Flow<String?>
 }
 

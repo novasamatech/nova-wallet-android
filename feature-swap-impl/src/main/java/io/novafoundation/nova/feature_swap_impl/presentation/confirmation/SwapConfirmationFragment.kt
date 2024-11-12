@@ -19,18 +19,18 @@ import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAccount
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAlert
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationAssets
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationButton
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationExecutionTime
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationNetworkFee
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationPriceDifference
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationRate
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationRoute
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationSlippage
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationToolbar
-import kotlinx.android.synthetic.main.fragment_swap_confirmation_settings.swapConfirmationWallet
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationAccount
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationAlert
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationAssets
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationButton
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationExecutionTime
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationNetworkFee
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationPriceDifference
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationRate
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationRoute
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationSlippage
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationToolbar
+import kotlinx.android.synthetic.main.fragment_swap_confirmation.swapConfirmationWallet
 
 class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 
@@ -39,13 +39,14 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        return inflater.inflate(R.layout.fragment_swap_confirmation_settings, container, false)
+        return inflater.inflate(R.layout.fragment_swap_confirmation, container, false)
     }
 
     override fun initViews() {
         swapConfirmationToolbar.applyStatusBarInsets()
         swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
         swapConfirmationButton.prepareForProgress(this)
+
         swapConfirmationRate.setOnClickListener { viewModel.rateClicked() }
         swapConfirmationPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
         swapConfirmationSlippage.setOnClickListener { viewModel.slippageClicked() }
@@ -77,14 +78,14 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
             swapConfirmationRate.showValue(it.rate)
             swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
             swapConfirmationSlippage.showValue(it.slippage)
-            swapConfirmationRoute.setSwapRouteState(it.swapRouteState)
+            swapConfirmationRoute.setSwapRouteModel(it.swapRouteModel)
             swapConfirmationExecutionTime.showValue(it.estimatedExecutionTime)
         }
 
         viewModel.wallet.observe { swapConfirmationWallet.showWallet(it) }
         viewModel.addressFlow.observe { swapConfirmationAccount.showAddress(it) }
 
-        viewModel.slippageAlertMessage.observe { swapConfirmationAlert.setMessageOrHide(it) }
+        viewModel.slippageAlertMixin.slippageAlertMessage.observe { swapConfirmationAlert.setMessageOrHide(it) }
 
         viewModel.validationProgress.observe(swapConfirmationButton::setProgressState)
     }

@@ -19,8 +19,8 @@ import io.novafoundation.nova.common.utils.makeVisible
 import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
 enum class ExpandableViewState {
-    COLLAPSE,
-    EXPAND
+    COLLAPSED,
+    EXPANDED
 }
 
 class ExpandableView @JvmOverloads constructor(
@@ -64,9 +64,14 @@ class ExpandableView @JvmOverloads constructor(
 
     fun setState(state: ExpandableViewState) {
         when (state) {
-            ExpandableViewState.COLLAPSE -> collapse()
-            ExpandableViewState.EXPAND -> expand()
+            ExpandableViewState.COLLAPSED -> collapse()
+            ExpandableViewState.EXPANDED -> expand()
         }
+    }
+
+    fun collapseImmediate() {
+        expandablePart?.makeGone()
+        chevron?.rotation = -180f
     }
 
     private fun applyAttributes(attrs: AttributeSet?) {

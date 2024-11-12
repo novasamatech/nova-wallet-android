@@ -50,8 +50,7 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.SwapFeeInspector
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -181,11 +180,9 @@ class SwapMainSettingsViewModel(
         .map { chainRegistry.getChain(it) }
         .shareInBackground()
 
-    val feeMixin = feeLoaderMixinFactory.create(
-        scope = viewModelScope,
-        selectedChainAssetFlow = swapSettings.mapNotNull { it.assetIn },
-        feeFormatter = SwapFeeFormatter(swapInteractor),
-        feeInspector = SwapFeeInspector(),
+    val feeMixin = feeLoaderMixinFactory.createForSwap(
+        chainAssetIn = swapSettings.mapNotNull { it.assetIn },
+        interactor = swapInteractor,
         configuration = Configuration(
             initialState = Configuration.InitialState(
                 paymentCurrencySelectionMode = PaymentCurrencySelectionMode.AUTOMATIC_ONLY

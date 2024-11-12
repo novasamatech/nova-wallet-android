@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
@@ -50,9 +51,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import kotlin.time.Duration.Companion.seconds
 
 class SwapInteractor(
     private val swapService: SwapService,
@@ -137,7 +140,25 @@ class SwapInteractor(
     }
 
     suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = withContext(Dispatchers.IO) {
-        swapService.swap(calculatedFee)
+        flow {
+            calculatedFee.segments.onEachIndexed { index, swapSegment ->
+                val step = SwapProgressStep(
+                    index = index,
+                    displayData = swapSegment.operation.constructDisplayData()
+                )
+                val progress = SwapProgress.StepStarted(step)
+
+                emit(progress)
+
+                kotlinx.coroutines.delay(3.seconds)
+
+                if (index == calculatedFee.segments.size - 1) {
+                    emit(SwapProgress.Failure(IllegalArgumentException("Test"), step))
+                }
+            }
+        }
+
+//        swapService.swap(calculatedFee)
 //            .onSuccess { submission ->
 //                swapTransactionHistoryRepository.insertPendingSwap(
 //                    chainAsset = swapExecuteArgs.assetIn,

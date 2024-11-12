@@ -9,3 +9,17 @@ fun DescriptionBottomSheetLauncher.launchSwapRateDescription() {
         descriptionRes = R.string.swap_rate_description
     )
 }
+
+fun DescriptionBottomSheetLauncher.launchPriceDifferenceDescription() {
+    launchDescriptionBottomSheet(
+        titleRes = R.string.swap_price_difference_title,
+        descriptionRes = R.string.swap_price_difference_description
+    )
+}
+
+fun DescriptionBottomSheetLauncher.launchSlippageDescription() {
+    launchDescriptionBottomSheet(
+        titleRes = R.string.swap_slippage_title,
+        descriptionRes = R.string.swap_slippage_description
+    )
+}

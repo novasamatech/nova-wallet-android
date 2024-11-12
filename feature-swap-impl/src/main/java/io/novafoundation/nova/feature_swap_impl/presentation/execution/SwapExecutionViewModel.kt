@@ -8,16 +8,23 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.toTimerValue
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.remainingTimeWhenExecuting
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -35,7 +42,11 @@ class SwapExecutionViewModel(
     private val resourceManager: ResourceManager,
     private val router: SwapRouter,
     private val chainRegistry: ChainRegistry,
-) : BaseViewModel() {
+    private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+    private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
+    private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+) : BaseViewModel(),
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     private val swapStateFlow = flowOf { swapStateStoreProvider.getStateOrThrow(viewModelScope) }
 
@@ -49,7 +60,18 @@ class SwapExecutionViewModel(
 
     val backAvailableFlow = swapProgressFlow.map { it !is SwapProgress.StepStarted }
 
+    val feeMixin = feeLoaderMixinFactory.createForSwap(
+        chainAssetIn = swapStateFlow.map { it.quote.assetIn },
+        interactor = swapInteractor
+    )
+
+    val confirmationDetailsFlow = swapStateFlow.map {
+        confirmationDetailsFormatter.format(it.quote, it.slippage)
+    }.shareInBackground()
+
     init {
+        setFee()
+
         executeSwap()
     }
 
@@ -60,6 +82,30 @@ class SwapExecutionViewModel(
             val assetOut = swapStateFlow.first().quote.assetOut.fullId.toAssetPayload()
             router.openBalanceDetails(assetOut)
         }
+    }
+
+    fun rateClicked() {
+        launchSwapRateDescription()
+    }
+
+    fun priceDifferenceClicked() {
+        launchPriceDifferenceDescription()
+    }
+
+    fun slippageClicked() {
+        launchSlippageDescription()
+    }
+
+    fun networkFeeClicked() {
+        router.openSwapFee()
+    }
+
+    fun routeClicked() {
+        router.openSwapRoute()
+    }
+
+    private fun setFee() = launchUnit {
+        feeMixin.setFee(swapStateFlow.first().fee)
     }
 
     private fun executeSwap() = launchUnit {

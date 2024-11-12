@@ -62,7 +62,6 @@
     <color name="icon_negative">#E53450</color>
     <color name="icon_favorite">#E53450</color>
     <color name="icon_positive">#2FC864</color>
-    <color name="icon_positive_background">#1F2FC864</color>
 
     <!-- Background Colors -->
     <color name="secondary_screen_background">#08090E</color>

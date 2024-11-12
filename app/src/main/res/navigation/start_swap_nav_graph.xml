@@ -39,7 +39,7 @@
         android:id="@+id/swapConfirmationFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationFragment"
         android:label="SwapConfirmationFragment"
-        tools:layout="@layout/fragment_swap_confirmation_settings">
+        tools:layout="@layout/fragment_swap_confirmation">
 
         <action
             android:id="@+id/action_swapConfirmationFragment_to_swapExecutionFragment"

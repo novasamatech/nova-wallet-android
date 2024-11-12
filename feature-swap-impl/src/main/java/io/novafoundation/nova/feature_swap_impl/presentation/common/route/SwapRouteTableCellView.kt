@@ -26,19 +26,16 @@ class SwapRouteTableCellView @JvmOverloads constructor(
 
         showProgress(routeState.isLoading)
 
-        routeState.onLoaded { routeModel ->
-            setVisible(routeModel != null)
-
-            routeModel?.let(valueView::setModel)
-        }
+        routeState.onLoaded(::setSwapRouteModel)
     }
 
     fun setShowChainNames(showChainNames: Boolean) {
         valueView.setShowChainNames(showChainNames)
     }
 
-    fun setSwapRouteModel(model: SwapRouteModel) {
-        setVisible(true)
-        valueView.setModel(model)
+    fun setSwapRouteModel(model: SwapRouteModel?) {
+        setVisible(model != null)
+
+        model?.let(valueView::setModel)
     }
 }

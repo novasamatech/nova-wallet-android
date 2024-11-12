@@ -6,7 +6,3 @@ class TransferFeeDisplay(
     val originFee: FeeDisplay,
     val crossChainFee: FeeDisplay?
 )
-
-class TransferFeeLoading(
-    val showCrossChain: Boolean
-)
