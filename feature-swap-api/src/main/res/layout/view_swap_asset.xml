@@ -13,12 +13,10 @@
         android:layout_height="40dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_token_container"
-        android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/icon_primary"
-        tools:src="@drawable/ic_token_ksm" />
+        tools:src="@drawable/ic_token_dot_colored" />
 
     <TextView
         android:id="@+id/swapAssetAmount"

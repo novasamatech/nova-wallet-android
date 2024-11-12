@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
+import androidx.annotation.DimenRes
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -11,9 +12,17 @@ import java.math.BigInteger
 import java.math.RoundingMode
 
 data class AmountModel(
-    val token: String,
-    val fiat: String?
-)
+    val token: CharSequence,
+    val fiat: CharSequence?
+) {
+
+    // Override it since SpannableString is not equals by content
+    override fun equals(other: Any?): Boolean {
+        return other is AmountModel &&
+            other.token.toString() == token.toString() &&
+            other.fiat?.toString() == fiat?.toString()
+    }
+}
 
 enum class AmountSign(val signSymbol: String) {
     NONE(""), NEGATIVE("-"), POSITIVE("+")
@@ -96,3 +105,10 @@ fun Asset.transferableFormat() = transferable.formatTokenAmount(token.configurat
 fun Asset.transferableAmountModel() = mapAmountToAmountModel(transferable, this)
 
 fun transferableAmountModelOf(asset: Asset) = mapAmountToAmountModel(asset.transferable, asset)
+
+fun AmountModel.formatBalanceWithFraction(amountFormatter: AmountFormatter, @DimenRes floatAmountSize: Int): AmountModel {
+    return AmountModel(
+        token = token.formatBalanceWithFraction(amountFormatter, floatAmountSize),
+        fiat = fiat
+    )
+}

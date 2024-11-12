@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -128,4 +129,6 @@ interface SwapFeatureDependencies {
     val gson: Gson
 
     val customFeeCapabilityFacade: CustomFeeCapabilityFacade
+
+    val assetIconProvider: AssetIconProvider
 }

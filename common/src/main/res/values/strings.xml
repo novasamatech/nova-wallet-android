@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="select_network_title">Select network</string>
+
+    <string name="assets_search_token_hint">Search by token</string>
+
+    <string name="receive_screen_copy_address">Copy Address</string>
+    <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
+
+    <string name="appearance_token_assets_title">token icons</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_white_icon_title">White</string>
+    <string name="appearance_colored_icon_title">Colored</string>
+
+    <string name="buy_network_flow_title">Select network for buying %s</string>
+    <string name="receive_network_flow_title">Select network for receiving %s</string>
+    <string name="send_network_flow_title">Select network for sending %s</string>
+    <string name="swap_network_flow_title">Select network for swaping %s</string>
+
+    <string name="asset_view_tokens">Tokens</string>
+    <string name="asset_view_networks">Networks</string>
+
     <string name="settings_wiki">Wiki &amp; Help Center</string>
 
     <string name="settings_email">Get support via Email</string>

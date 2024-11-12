@@ -34,9 +34,8 @@
                 android:layout_height="64dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_icon_container_on_color"
-                android:padding="11dp"
                 app:tint="@color/icon_secondary"
-                tools:src="@drawable/ic_arrow_up" />
+                tools:src="@drawable/ic_send_history" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
                 android:id="@+id/transactionDetailAmount"

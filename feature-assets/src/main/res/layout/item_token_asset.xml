@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemAssetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_weight="1"
+    android:background="@drawable/bg_primary_list_item"
+    tools:background="@color/block_background">
+
+    <ImageView
+        android:id="@+id/itemTokenAssetImage"
+        style="@style/Widget.Nova.AssetIcon.Primary"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_token_dot_colored"  />
+
+    <TextView
+        android:id="@+id/itemTokenAssetToken"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/itemTokenAssetRateContainer"
+        app:layout_constraintStart_toEndOf="@+id/itemTokenAssetImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="DOT" />
+
+    <LinearLayout
+        android:id="@+id/itemTokenAssetRateContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemTokenAssetToken"
+        app:layout_constraintTop_toBottomOf="@+id/itemTokenAssetToken">
+
+        <ImageView
+            android:id="@+id/itemTokenAssetChainIcon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginEnd="4dp"
+            tools:background="@color/icon_primary" />
+
+        <TextView
+            android:id="@+id/itemTokenAssetChainName"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            tools:text="Kusama" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/itemTokenAssetPriceAmount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="@+id/itemTokenAssetRateContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/itemTokenAssetRateContainer"
+        tools:text="$1,000.05" />
+
+    <TextView
+        android:id="@+id/itemTokenAssetBalance"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemTokenAssetToken"
+        app:layout_constraintEnd_toEndOf="@+id/itemTokenAssetPriceAmount"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/itemTokenAssetToken"
+        tools:text="120.0849" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

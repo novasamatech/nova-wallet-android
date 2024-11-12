@@ -14,12 +14,15 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
+import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.interfaces.FileCache
@@ -29,6 +32,7 @@ import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -62,6 +66,36 @@ import okhttp3.OkHttpClient
 import java.util.Random
 
 interface CommonApi {
+
+    val systemCallExecutor: SystemCallExecutor
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+
+    val okHttpClient: OkHttpClient
+
+    val fileCache: FileCache
+
+    val permissionsAskerFactory: PermissionsAskerFactory
+
+    val bluetoothManager: BluetoothManager
+
+    val locationManager: LocationManager
+
+    val listChooserMixinFactory: ListChooserMixin.Factory
+
+    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val automaticInteractionGate: AutomaticInteractionGate
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
+
+    val provideActivityIntentProvider: ActivityIntentProvider
+
+    val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
+
+    val coinGeckoLinkParser: CoinGeckoLinkParser
 
     fun computationalCache(): ComputationalCache
 
@@ -154,33 +188,11 @@ interface CommonApi {
 
     fun buildTypeProvider(): BuildTypeProvider
 
-    val systemCallExecutor: SystemCallExecutor
+    fun assetsViewModeRepository(): AssetsViewModeRepository
 
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    fun assetsIconModeService(): AssetsIconModeRepository
 
-    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+    fun assetIconProvider(): AssetIconProvider
 
-    val okHttpClient: OkHttpClient
-
-    val fileCache: FileCache
-
-    val permissionsAskerFactory: PermissionsAskerFactory
-
-    val bluetoothManager: BluetoothManager
-
-    val locationManager: LocationManager
-
-    val listChooserMixinFactory: ListChooserMixin.Factory
-
-    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
-
-    val automaticInteractionGate: AutomaticInteractionGate
-
-    val bannerVisibilityRepository: BannerVisibilityRepository
-
-    val provideActivityIntentProvider: ActivityIntentProvider
-
-    val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
-
-    val coinGeckoLinkParser: CoinGeckoLinkParser
+    fun assetViewModeInteractor(): AssetViewModeInteractor
 }

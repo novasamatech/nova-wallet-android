@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -156,8 +157,9 @@ class GovernanceFeatureModule {
     @FeatureScope
     fun provideTracksFormatter(
         trackCategorizer: TrackCategorizer,
-        resourceManager: ResourceManager
-    ): TrackFormatter = RealTrackFormatter(trackCategorizer, resourceManager)
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
+    ): TrackFormatter = RealTrackFormatter(trackCategorizer, resourceManager, assetIconProvider)
 
     @Provides
     @FeatureScope

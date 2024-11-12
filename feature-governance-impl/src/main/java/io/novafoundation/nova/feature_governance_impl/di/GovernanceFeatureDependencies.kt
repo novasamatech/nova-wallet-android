@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -47,6 +48,24 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
+
+    val onChainIdentityRepository: OnChainIdentityRepository
+
+    val listChooserMixinFactory: ListChooserMixin.Factory
+
+    val identityMixinFactory: IdentityMixin.Factory
+
+    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
+
+    val chainMultiLocationConverterFactory: ChainMultiLocationConverterFactory
+
+    val assetMultiLocationConverterFactory: MultiLocationConverterFactory
+
+    val assetIconProvider: AssetIconProvider
 
     val feeLoaderMixinFactory: FeeLoaderMixin.Factory
 
@@ -118,20 +137,4 @@ interface GovernanceFeatureDependencies {
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageDataSource(): StorageDataSource
-
-    val onChainIdentityRepository: OnChainIdentityRepository
-
-    val listChooserMixinFactory: ListChooserMixin.Factory
-
-    val identityMixinFactory: IdentityMixin.Factory
-
-    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
-
-    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val bannerVisibilityRepository: BannerVisibilityRepository
-
-    val chainMultiLocationConverterFactory: ChainMultiLocationConverterFactory
-
-    val assetMultiLocationConverterFactory: MultiLocationConverterFactory
 }

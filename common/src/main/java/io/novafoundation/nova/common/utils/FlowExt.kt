@@ -56,6 +56,10 @@ inline fun <T> Flow<List<T>>.filterList(crossinline handler: suspend (T) -> Bool
     list.filter { item -> handler(item) }
 }
 
+inline fun <T> Flow<Set<T>>.filterSet(crossinline handler: suspend (T) -> Boolean) = map { set ->
+    set.filter { item -> handler(item) }.toSet()
+}
+
 inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = map { list ->
     list.map { item -> mapper(item) }
 }
@@ -140,6 +144,8 @@ inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) 
 }
 
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
+
+fun <T1, T2, T3> combineToTriple(flow1: Flow<T1>, flow2: Flow<T2>, flow3: Flow<T3>): Flow<Triple<T1, T2, T3>> = combine(flow1, flow2, flow3, ::Triple)
 
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.

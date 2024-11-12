@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%sで追加できるプロキシの上限に達しました。新しいものを追加するためには既存のプロキシを削除してください。</string>
     <string name="add_proxy_maximum_reached_error_title">プロキシの最大数に達しました</string>
     <string name="added_networks_empty_placeholder">追加されたカスタムネットワーク\nここに表示されます</string>
+    <string name="appearance_colored_icon_title">カラー</string>
+    <string name="appearance_title">外観</string>
+    <string name="appearance_token_assets_title">トークンアイコン</string>
+    <string name="appearance_white_icon_title">ホワイト</string>
     <string name="asset_add_evm_token_already_exist_message">入力されたコントラクトアドレスは%sトークンとしてNovaに存在します。</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">入力されたコントラクトアドレスは%sトークンとしてNovaに存在します。本当にそれを変更しますか?</string>
     <string name="asset_add_evm_token_already_exist_title">このトークンはすでに存在します</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">コントラクトアドレスを入力</string>
     <string name="asset_add_token_enter_decimals">小数を入力</string>
     <string name="asset_add_token_enter_symbol">シンボルを入力</string>
+    <string name="asset_view_networks">ネットワーク</string>
+    <string name="asset_view_tokens">トークン</string>
     <string name="assets_add_token">トークンを追加</string>
     <string name="assets_add_token_enter_info_address_label">コントラクトアドレス</string>
     <string name="assets_add_token_enter_info_decimals_label">小数</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledgerはこのトークンをサポートしていません</string>
     <string name="assets_search_hint">ネットワークまたはトークンで検索</string>
     <string name="assets_search_placeholder">入力した名前のネットワークやトークンが見つかりませんでした</string>
+    <string name="assets_search_token_hint">トークンで検索</string>
     <string name="assets_select_send_your_wallets">あなたのウォレット</string>
     <string name="assets_send_flow_placeholder">送信するトークンがありません。\nトークンを購入または受け取ってください\nアカウントに。</string>
     <string name="assets_swap_flow_pay_title">支払い用トークン</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">バックアップ</string>
     <string name="biometric_auth_title">生体認証</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
+    <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
     <string name="buy_provider_open_confirmation_title">ブラウザで続行しますか？</string>
     <string name="chain_network_management_auto_balance">自動バランスノード</string>
@@ -961,6 +969,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">プッシュ通知を有効にすることで、%sと%sに同意したことになります</string>
     <string name="push_welcome_timeout_error_message">設定タブから通知設定にアクセスして、後でもう一度お試しください</string>
     <string name="push_welcome_title">お見逃しなく！</string>
+    <string name="receive_network_flow_title">受信するネットワークを選択 %s</string>
+    <string name="receive_screen_copy_address">住所をコピー</string>
     <string name="recover_json_hint">jsonを貼り付けるかファイルをアップロード...</string>
     <string name="recover_json_upload">ファイルをアップロード</string>
     <string name="recovery_json">JSONを復元</string>
@@ -1114,9 +1124,11 @@
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
+    <string name="select_network_title">ネットワークを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">アドレスまたはw3n</string>
+    <string name="send_network_flow_title">送信するネットワークを選択 %s</string>
     <string name="send_recipient_system_account_message">受信者はシステムアカウントです。どの会社や個人にも管理されていません。\nそれでもこの転送を実行してもよろしいですか？</string>
     <string name="send_recipient_system_account_title">トークンが失われます</string>
     <string name="set_staking_proxy_address_description">権限を与える</string>
@@ -1524,6 +1536,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">別の金額を入力</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">ネットワーク手数料を %s で支払うため、Novaは %s を %s に自動的にスワップして、アカウントの最低 %s 残高を維持します。</string>
     <string name="swap_network_fee_description">ブロックチェーンによって取引や検証を処理するためのネットワーク手数料。ネットワークの状況や取引速度によって異なる場合があります。</string>
+    <string name="swap_network_flow_title">スワップするネットワークを選択 %s</string>
     <string name="swap_not_enought_liquidity_failure">プールにスワップするための十分な流動性がありません</string>
     <string name="swap_price_difference_description">価格差とは、二つの異なる資産間の価格差を指します。暗号通貨のスワップを行う際、価格差は通常、交換する資産の価格と交換される資産の価格の違いを意味します。</string>
     <string name="swap_price_difference_title">価格差</string>
@@ -1616,6 +1629,7 @@
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>
     <string name="wallet_asset_receive_token">受け取る %s</string>
+    <string name="wallet_asset_receive_token_subtitle">送信するのは%1$sトークンと%2$sネットワークのトークンのみ可能です、それ以外の場合、資金を失う可能性があります</string>
     <string name="wallet_asset_send">送信</string>
     <string name="wallet_asset_swap">スワップ</string>
     <string name="wallet_assets">資産</string>

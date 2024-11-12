@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s에서 추가된 프록시 수의 한도에 도달했습니다. 새로운 프록시를 추가하려면 기존 프록시를 제거하세요.</string>
     <string name="add_proxy_maximum_reached_error_title">최대 프록시 수에 도달했습니다</string>
     <string name="added_networks_empty_placeholder">추가된 사용자 정의 네트워크는 여기에 나타납니다</string>
+    <string name="appearance_colored_icon_title">컬러</string>
+    <string name="appearance_title">외관</string>
+    <string name="appearance_token_assets_title">토큰 아이콘</string>
+    <string name="appearance_white_icon_title">화이트</string>
     <string name="asset_add_evm_token_already_exist_message">입력된 계약 주소는 Nova에서 %s 토큰으로 이미 존재합니다.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">입력된 계약 주소는 Nova에서 %s 토큰으로 존재합니다. 수정하시겠습니까?</string>
     <string name="asset_add_evm_token_already_exist_title">이 토큰은 이미 존재합니다</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">계약 주소 입력</string>
     <string name="asset_add_token_enter_decimals">소수 자릿수 입력</string>
     <string name="asset_add_token_enter_symbol">심볼 입력</string>
+    <string name="asset_view_networks">네트워크</string>
+    <string name="asset_view_tokens">토큰</string>
     <string name="assets_add_token">토큰 추가</string>
     <string name="assets_add_token_enter_info_address_label">계약 주소</string>
     <string name="assets_add_token_enter_info_decimals_label">소수 자릿수</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger에서 이 토큰을 지원하지 않습니다.</string>
     <string name="assets_search_hint">네트워크 또는 토큰으로 검색</string>
     <string name="assets_search_placeholder">입력한 이름과 일치하는 네트워크 또는 토큰이 없습니다.</string>
+    <string name="assets_search_token_hint">토큰으로 검색</string>
     <string name="assets_select_send_your_wallets">당신의 지갑</string>
     <string name="assets_send_flow_placeholder">보낼 토큰이 없습니다.\n계정에 토큰을 구매하거나 수신하십시오.</string>
     <string name="assets_swap_flow_pay_title">지불할 토큰</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">백업</string>
     <string name="biometric_auth_title">생체 인증</string>
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
+    <string name="buy_network_flow_title">%s 구매를 위한 네트워크 선택</string>
     <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
     <string name="buy_provider_open_confirmation_title">브라우저에서 계속할까요?</string>
     <string name="chain_network_management_auto_balance">자동 균형 노드</string>
@@ -961,6 +969,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">푸시 알림을 활성화함으로써 귀하는 우리의 %s 및 %s에 동의하게 됩니다</string>
     <string name="push_welcome_timeout_error_message">설정 탭에서 알림 설정에 접근하여 나중에 다시 시도해주세요</string>
     <string name="push_welcome_title">중요한 것을 놓치지 마세요!</string>
+    <string name="receive_network_flow_title">%s 수신을 위한 네트워크 선택</string>
+    <string name="receive_screen_copy_address">주소 복사</string>
     <string name="recover_json_hint">json을 붙여넣거나 파일을 업로드하세요...</string>
     <string name="recover_json_upload">파일 업로드</string>
     <string name="recovery_json">JSON 복원</string>
@@ -1114,9 +1124,11 @@
     <string name="select_delegation_tracks_unavailable_tracks">사용할 수 없는 트랙</string>
     <string name="select_ledger_location_enable_request_message">Ledger 장치를 찾기 위해 블루투스 스캔을 수행하려면 Nova는 위치 기능을 활성화해야 합니다.</string>
     <string name="select_ledger_location_enable_request_title">기기 설정에서 지리적 위치를 활성화해주세요.</string>
+    <string name="select_network_title">네트워크 선택</string>
     <string name="select_tracks_for">트랙 선택</string>
     <string name="selected_tracks_quantity" formatted="false">%d 중 %d</string>
     <string name="send_address_hint">주소 또는 w3n</string>
+    <string name="send_network_flow_title">%s 전송을 위한 네트워크 선택</string>
     <string name="send_recipient_system_account_message">수신자가 시스템 계정입니다. 이 계정은 어떤 회사나 개인에 의해 제어되지 않습니다.\n여전히 이 전송을 수행하시겠습니까?</string>
     <string name="send_recipient_system_account_title">토큰이 소실됩니다</string>
     <string name="set_staking_proxy_address_description">권한 부여</string>
@@ -1524,6 +1536,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">다른 금액 입력</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">%s로 네트워크 수수료를 지불하기 위해, Nova는 계정의 최소 %s 잔액을 유지하기 위해 자동으로 %s를 %s로 교환합니다.</string>
     <string name="swap_network_fee_description">블록체인이 모든 거래를 처리하고 검증하기 위해 부과하는 네트워크 수수료입니다. 네트워크 상태나 거래 속도에 따라 다를 수 있습니다.</string>
+    <string name="swap_network_flow_title">%s 교환을 위한 네트워크 선택</string>
     <string name="swap_not_enought_liquidity_failure">풀에 교환할 수 있는 유동성이 충분하지 않습니다</string>
     <string name="swap_price_difference_description">가격 차이는 두 자산 간의 가격 차이를 나타냅니다. 암호화폐 교환 시, 가격 차이는 일반적으로 교환하는 자산의 가격과 교환받는 자산의 가격 간의 차이를 의미합니다.</string>
     <string name="swap_price_difference_title">가격 차이</string>
@@ -1616,6 +1629,7 @@
     <string name="wallet_asset_buy_with">구매 방법</string>
     <string name="wallet_asset_receive">받기</string>
     <string name="wallet_asset_receive_token">%s 수령</string>
+    <string name="wallet_asset_receive_token_subtitle">이 주소로 %1$s 토큰과 %2$s 네트워크에서의 토큰만 보내세요, 그렇지 않으면 자금을 잃을 수 있습니다.</string>
     <string name="wallet_asset_send">보내기</string>
     <string name="wallet_asset_swap">스왑</string>
     <string name="wallet_assets">자산</string>

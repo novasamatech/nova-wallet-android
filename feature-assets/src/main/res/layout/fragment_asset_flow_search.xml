@@ -12,7 +12,7 @@
         android:id="@+id/assetFlowToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/assets_search_hint"
+        tools:hint="@string/assets_search_hint"
         tools:titleText="@string/wallet_asset_send" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -24,7 +24,7 @@
         android:paddingTop="12dp"
         android:paddingBottom="24dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_asset" />
+        tools:listitem="@layout/item_network_asset" />
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/assetFlowPlaceholder"
