@@ -8,6 +8,8 @@ interface Web3Transport<REQUEST : Web3Transport.Request<*>> {
 
     interface Request<RESPONSE> {
 
+        fun updateChain(chainId: String, rpcUrl: String)
+
         fun accept(response: RESPONSE)
 
         fun reject(error: Throwable)

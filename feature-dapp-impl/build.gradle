@@ -40,11 +40,24 @@ android {
 task actualizeJsScripts(type: Exec) {
     workingDir "$rootDir/nova-wallet-dapp-js"
 
-    commandLine "yarn", "build"
+    commandLine "C:/Users/spect/AppData/Roaming/npm/yarn.cmd", "build"
 
     doLast {
         copy {
             from "$rootDir/nova-wallet-dapp-js/dist/nova_min.js"
+            into "$rootDir/feature-dapp-impl/src/main/res/raw"
+        }
+    }
+}
+
+task actualizeJsScripts2(type: Exec) {
+    workingDir "$rootDir/nova-wallet-metamask-js"
+
+    commandLine "C:/Users/spect/AppData/Roaming/npm/yarn.cmd", "build"
+
+    doLast {
+        copy {
+            from "$rootDir/nova-wallet-metamask-js/dist/metamask_min.js"
             into "$rootDir/feature-dapp-impl/src/main/res/raw"
         }
     }

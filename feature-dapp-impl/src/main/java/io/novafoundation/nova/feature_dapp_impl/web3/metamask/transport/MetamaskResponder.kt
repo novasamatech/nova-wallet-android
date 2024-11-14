@@ -20,6 +20,12 @@ sealed class MetamaskError(val errorCode: Int, message: String) : Throwable(mess
 
 class MetamaskResponder(private val webViewHolder: WebViewHolder) {
 
+    fun updateChain(chainId: String, rpcUrl: String) {
+        val js = "window.ethereum.updateChainId($chainId, '$rpcUrl');"
+
+        evaluateJs(js)
+    }
+
     fun respondResult(messageId: String, result: String) {
         val js = "window.ethereum.sendResponse($messageId, $result);"
 

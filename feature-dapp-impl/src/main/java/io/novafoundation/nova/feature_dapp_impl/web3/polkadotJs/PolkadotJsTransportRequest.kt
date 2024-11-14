@@ -46,6 +46,10 @@ sealed class PolkadotJsTransportRequest<R>(
             web3Responder.respondResult(identifier.id, serializeResponse(response))
         }
 
+        override fun updateChain(chainId: String, rpcUrl: String) {
+            // TODO
+        }
+
         class AuthorizeTab(
             web3Responder: Web3Responder,
             url: String
@@ -138,6 +142,10 @@ sealed class PolkadotJsTransportRequest<R>(
                 .onEach { web3Responder.respondSubscription(requestId, it) }
                 .inBackground()
                 .launchIn(scope)
+        }
+
+        override fun updateChain(chainId: String, rpcUrl: String) {
+            // TODO
         }
 
         class SubscribeAccounts(
