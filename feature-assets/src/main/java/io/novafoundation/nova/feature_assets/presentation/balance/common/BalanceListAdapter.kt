@@ -87,7 +87,7 @@ class BalanceListAdapter(
                 val item = getItem(position) as TokenAssetUi
                 resolvePayload(holder, position, payloads) {
                     when (it) {
-                        AssetModel::amount -> holder.bindTotal(item.asset)
+                        amountExtractor -> holder.bindTotal(item.asset)
                     }
                 }
             }
