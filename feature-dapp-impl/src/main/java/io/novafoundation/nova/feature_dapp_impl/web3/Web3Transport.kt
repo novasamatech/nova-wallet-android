@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3
 
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.EthereumAddress
 import kotlinx.coroutines.flow.Flow
 
 interface Web3Transport<REQUEST : Web3Transport.Request<*>> {
@@ -13,6 +14,8 @@ interface Web3Transport<REQUEST : Web3Transport.Request<*>> {
         fun accept(response: RESPONSE)
 
         fun reject(error: Throwable)
+
+        fun updateAddress(selectedAddress: EthereumAddress)
     }
 }
 

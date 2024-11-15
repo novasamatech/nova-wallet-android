@@ -57,7 +57,8 @@ class DefaultMetamaskState(
 
     private val knownChains = mapOf(
         MetamaskChain.ETHEREUM.chainId to MetamaskChain.ETHEREUM,
-        MetamaskChain.MOONBEAM.chainId to MetamaskChain.MOONBEAM
+        MetamaskChain.MOONBEAM.chainId to MetamaskChain.MOONBEAM,
+        MetamaskChain.BIFROST.chainId to MetamaskChain.BIFROST,
     )
 
     override suspend fun acceptRequest(request: MetamaskTransportRequest<*>, transition: StateMachineTransition<MetamaskState>) {
@@ -214,9 +215,8 @@ class DefaultMetamaskState(
                 val nextState = stateFactory.default(hostApi, request.chain, selectedAccountAddress)
                 transition.emitState(nextState)
 
+                request.updateChain(request.chain.chainId, request.chain.rpcUrls.first())
                 request.accept()
-
-                hostApi.reloadPage()
             }
         },
         ifDenied = {
@@ -243,11 +243,12 @@ class DefaultMetamaskState(
             val newState = stateFactory.default(hostApi, chain, selectedAddress)
             transition.emitState(newState)
 
+            if (selectedAddress != selectedAccountAddress) {
+                request.updateAddress(selectedAddress)
+            }
+
             request.accept(addresses)
 
-            if (selectedAddress != selectedAccountAddress) {
-                hostApi.reloadPage()
-            }
         } else {
             request.reject(MetamaskError.Rejected())
         }

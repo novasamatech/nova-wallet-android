@@ -36,6 +36,10 @@ sealed class MetamaskTransportRequest<R>(
         responder.updateChain(chainId, rpcUrl)
     }
 
+    override fun updateAddress(selectedAddress: EthereumAddress) {
+        responder.setAddress(selectedAddress)
+    }
+
     enum class Identifier(val id: String) {
         REQUEST_ACCOUNTS("requestAccounts"),
         ADD_ETHEREUM_CHAIN("addEthereumChain"),

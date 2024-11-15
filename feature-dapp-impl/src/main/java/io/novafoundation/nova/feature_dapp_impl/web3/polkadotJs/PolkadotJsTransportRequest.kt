@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Transport
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.EthereumAddress
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.SignerPayload
@@ -47,6 +48,10 @@ sealed class PolkadotJsTransportRequest<R>(
         }
 
         override fun updateChain(chainId: String, rpcUrl: String) {
+            // TODO
+        }
+
+        override fun updateAddress(selectedAddress: EthereumAddress) {
             // TODO
         }
 
@@ -145,6 +150,10 @@ sealed class PolkadotJsTransportRequest<R>(
         }
 
         override fun updateChain(chainId: String, rpcUrl: String) {
+            // TODO
+        }
+
+        override fun updateAddress(selectedAddress: EthereumAddress) {
             // TODO
         }
 

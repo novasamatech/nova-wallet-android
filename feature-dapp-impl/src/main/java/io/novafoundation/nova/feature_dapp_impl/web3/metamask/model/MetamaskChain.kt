@@ -33,6 +33,15 @@ data class MetamaskChain(
             blockExplorerUrls = null,
             iconUrls = null
         )
+
+        val BIFROST = MetamaskChain(
+            chainId = "0x3e4",
+            chainName = "Bifrost Network",
+            nativeCurrency = NativeCurrency(name = "Bifrost", symbol = "BNC", decimals = 12),
+            rpcUrls = listOf("https://public-02.mainnet.bifrostnetwork.com/rpc"),
+            blockExplorerUrls = null,
+            iconUrls = null
+        )
     }
 
     @Parcelize
