@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.di.app
 import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.app.App
-import io.novafoundation.nova.app.di.app.modules.BrowserTabsModule
 import io.novafoundation.nova.app.di.app.navigation.NavigationModule
 import io.novafoundation.nova.app.di.deps.ComponentHolderModule
 import io.novafoundation.nova.common.di.CommonApi
@@ -21,8 +20,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
         NetworkModule::class,
         NavigationModule::class,
         ComponentHolderModule::class,
-        FeatureManagerModule::class,
-        BrowserTabsModule::class
+        FeatureManagerModule::class
     ]
 )
 interface AppComponent : CommonApi {

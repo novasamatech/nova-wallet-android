@@ -1,13 +1,13 @@
-package io.novafoundation.nova.common.utils.browser.tabs
+package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
 import android.content.Context
 import io.novafoundation.nova.common.utils.Urls
-import io.novafoundation.nova.common.utils.browser.tabs.models.BrowserTab
-import io.novafoundation.nova.common.utils.browser.tabs.models.CurrentTabState
-import io.novafoundation.nova.common.utils.browser.tabs.models.PageSession
-import io.novafoundation.nova.common.utils.browser.tabs.models.PageSnapshot
-import io.novafoundation.nova.common.utils.browser.tabs.models.stateId
-import io.novafoundation.nova.common.utils.browser.tabs.models.withNameOnly
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.stateId
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.withNameOnly
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -90,7 +90,7 @@ class RealBrowserTabPoolService(
 
         if (currentTab is CurrentTabState.Selected) {
             val snapshot = pageSnapshotBuilder.getPageSnapshot(currentTab.pageSession)
-            browserTabStorage.savePageSnapshot(snapshot)
+            browserTabStorage.savePageSnapshot(currentTab.tab.id, snapshot)
         }
     }
 

@@ -1,10 +1,10 @@
-package io.novafoundation.nova.common.utils.browser.tabs
+package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
 import android.graphics.Bitmap
 import androidx.core.view.drawToBitmap
 import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.common.utils.browser.tabs.models.PageSession
-import io.novafoundation.nova.common.utils.browser.tabs.models.PageSnapshot
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers

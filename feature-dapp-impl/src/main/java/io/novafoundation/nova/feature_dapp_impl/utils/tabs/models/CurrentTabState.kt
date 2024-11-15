@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.utils.browser.tabs.models
+package io.novafoundation.nova.feature_dapp_impl.utils.tabs.models
 
 sealed interface CurrentTabState {
 

@@ -1,7 +1,7 @@
-package io.novafoundation.nova.common.utils.browser.tabs
+package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
-import io.novafoundation.nova.common.utils.browser.tabs.models.BrowserTab
-import io.novafoundation.nova.common.utils.browser.tabs.models.PageSnapshot
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import kotlinx.coroutines.flow.Flow
 
 interface BrowserTabStorage {
