@@ -2,6 +2,12 @@ package io.novafoundation.nova.common.utils.browser.tabs
 
 import android.content.Context
 import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.common.utils.browser.tabs.models.BrowserTab
+import io.novafoundation.nova.common.utils.browser.tabs.models.CurrentTabState
+import io.novafoundation.nova.common.utils.browser.tabs.models.PageSession
+import io.novafoundation.nova.common.utils.browser.tabs.models.PageSnapshot
+import io.novafoundation.nova.common.utils.browser.tabs.models.stateId
+import io.novafoundation.nova.common.utils.browser.tabs.models.withNameOnly
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow

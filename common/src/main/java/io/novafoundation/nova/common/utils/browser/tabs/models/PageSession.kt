@@ -1,4 +1,4 @@
-package io.novafoundation.nova.common.utils.browser.tabs
+package io.novafoundation.nova.common.utils.browser.tabs.models
 
 import android.content.Context
 import android.webkit.WebView
