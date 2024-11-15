@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -140,4 +141,6 @@ interface SwapFeatureDependencies {
     val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 
     val assetIconProvider: AssetIconProvider
+
+    val assetsValidationContextFactory: AssetsValidationContext.Factory
 }

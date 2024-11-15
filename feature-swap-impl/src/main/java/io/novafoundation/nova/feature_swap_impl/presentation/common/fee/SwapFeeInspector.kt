@@ -12,6 +12,6 @@ class SwapFeeInspector : FeeInspector<SwapFee> {
     }
 
     override fun getSubmissionFeeAsset(fee: SwapFee): Chain.Asset {
-        return fee.asset
+        return fee.initialSubmissionFee.asset
     }
 }

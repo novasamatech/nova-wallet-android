@@ -15,21 +15,17 @@ interface AssetExchange {
 
     interface SingleChainFactory {
 
-        suspend fun create(
-            chain: Chain,
-            swapHost: SwapHost,
-            coroutineScope: CoroutineScope
-        ): AssetExchange?
+        suspend fun create(chain: Chain, swapHost: SwapHost): AssetExchange
     }
 
     interface MultiChainFactory {
 
-        suspend fun create(
-            swapHost: SwapHost,
-            coroutineScope: CoroutineScope
-        ): AssetExchange?
+        suspend fun create(swapHost: SwapHost): AssetExchange
     }
+
     interface SwapHost {
+
+        val scope: CoroutineScope
 
         suspend fun quote(quoteArgs: ParentQuoterArgs): Balance
 

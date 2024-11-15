@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.data.conversion.assethub.asset
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
@@ -20,6 +19,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
+import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
@@ -40,6 +41,7 @@ import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
@@ -56,7 +58,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.Bo
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.call
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -67,26 +68,24 @@ class AssetConversionExchangeFactory(
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val remoteStorageSource: StorageDataSource,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
-    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val chainStateRepository: ChainStateRepository,
+    private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
 ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(
         chain: Chain,
         swapHost: AssetExchange.SwapHost,
-        coroutineScope: CoroutineScope
     ): AssetExchange {
-        val converter = multiLocationConverterFactory.defaultAsync(chain, coroutineScope)
+        val converter = multiLocationConverterFactory.defaultAsync(chain, swapHost.scope)
 
         return AssetConversionExchange(
             chain = chain,
             multiLocationConverter = converter,
             remoteStorageSource = remoteStorageSource,
             multiChainRuntimeCallsApi = runtimeCallsApi,
-            coroutineScope = coroutineScope,
             chainStateRepository = chainStateRepository,
             swapHost = swapHost,
-            extrinsicServiceFactory = extrinsicServiceFactory
+            deductionUseCase = deductionUseCase
         )
     }
 }
@@ -96,13 +95,10 @@ private class AssetConversionExchange(
     private val multiLocationConverter: MultiLocationConverter,
     private val remoteStorageSource: StorageDataSource,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
-    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val chainStateRepository: ChainStateRepository,
     private val swapHost: AssetExchange.SwapHost,
-    coroutineScope: CoroutineScope
+    private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
 ) : AssetExchange {
-
-    private val extrinsicService = extrinsicServiceFactory.createDefault(coroutineScope)
 
     override suspend fun sync() {
         // nothing to sync
@@ -246,6 +242,8 @@ private class AssetConversionExchange(
 
         override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
 
+        override val assetOut: FullChainAssetId = toAsset.fullId
+
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Swap(
                 from = fromAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountIn),
@@ -254,7 +252,7 @@ private class AssetConversionExchange(
         }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            val submissionFee = extrinsicService.estimateFee(
+            val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
@@ -278,12 +276,14 @@ private class AssetConversionExchange(
             return swapHost.quote(quoteArgs)
         }
 
-        override suspend fun additionalMaxAmountDeduction(): Balance {
-            return Balance.ZERO
+        override suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction {
+            return SwapMaxAdditionalAmountDeduction(
+                fromCountedTowardsEd = deductionUseCase.invoke(fromAsset, toAsset)
+            )
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
-            return extrinsicService.submitExtrinsicAndAwaitExecution(
+            return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(

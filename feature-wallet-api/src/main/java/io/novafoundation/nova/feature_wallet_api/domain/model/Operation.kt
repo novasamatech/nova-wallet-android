@@ -83,6 +83,9 @@ data class ChainAssetWithAmount(
     val amount: Balance,
 )
 
+val ChainAssetWithAmount.decimalAmount: BigDecimal
+    get() = chainAsset.amountFromPlanks(amount)
+
 data class ChainAssetIdWithAmount(
     val chainAssetId: FullChainAssetId,
     val amount: Balance,

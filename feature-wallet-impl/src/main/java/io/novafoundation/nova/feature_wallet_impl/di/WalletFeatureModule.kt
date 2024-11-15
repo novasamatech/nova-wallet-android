@@ -56,6 +56,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -86,6 +87,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPrice
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealCustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -421,4 +423,14 @@ class WalletFeatureModule {
         walletRepository,
         extrinsicService
     )
+
+    @Provides
+    @FeatureScope
+    fun provideAssetsValidationContextFactory(
+        arbitraryAssetUseCase: ArbitraryAssetUseCase,
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry,
+    ): AssetsValidationContext.Factory {
+        return AssetValidationContextFactory(arbitraryAssetUseCase, chainRegistry, assetSourceRegistry)
+    }
 }

@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLab
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.crossChain
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
@@ -43,7 +44,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -58,14 +58,13 @@ class CrossChainTransferAssetExchangeFactory(
 ) : AssetExchange.MultiChainFactory {
 
     override suspend fun create(
-        swapHost: AssetExchange.SwapHost, coroutineScope: CoroutineScope
+        swapHost: AssetExchange.SwapHost
     ): AssetExchange {
 
         return CrossChainTransferAssetExchange(
             crossChainTransfersUseCase = crossChainTransfersUseCase,
             chainRegistry = chainRegistry,
             accountRepository = accountRepository,
-            computationalScope = coroutineScope,
             swapHost = swapHost
         )
     }
@@ -75,7 +74,6 @@ class CrossChainTransferAssetExchange(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val computationalScope: CoroutineScope,
     private val swapHost: AssetExchange.SwapHost,
 ) : AssetExchange {
 
@@ -175,7 +173,7 @@ class CrossChainTransferAssetExchange(
 
             val transferDirection = AssetTransferDirection(fromChain, fromAsset, toChain, toAsset)
 
-            return crossChainTransfersUseCase.maximumExecutionTime(transferDirection, computationalScope)
+            return crossChainTransfersUseCase.maximumExecutionTime(transferDirection, swapHost.scope)
         }
 
         private fun isChainWithExpensiveCrossChain(chainId: ChainId): Boolean {
@@ -185,10 +183,12 @@ class CrossChainTransferAssetExchange(
 
     inner class CrossChainTransferOperation(
         private val transactionArgs: AtomicSwapOperationArgs,
-        private val edge: Edge<FullChainAssetId>,
+        private val edge: Edge<FullChainAssetId>
     ) : AtomicSwapOperation {
 
         override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
+
+        override val assetOut: FullChainAssetId = edge.to
 
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Transfer(
@@ -202,7 +202,7 @@ class CrossChainTransferAssetExchange(
             val transfer = createTransfer(amount = estimatedSwapLimit.crossChainTransferAmount)
 
             val crossChainFee = with(crossChainTransfersUseCase) {
-                swapHost.extrinsicService().estimateFee(transfer, computationalScope)
+                swapHost.extrinsicService().estimateFee(transfer, swapHost.scope)
             }
 
             return CrossChainAtomicOperationFee(crossChainFee)
@@ -212,16 +212,19 @@ class CrossChainTransferAssetExchange(
             return extraOutAmount
         }
 
-        override suspend fun additionalMaxAmountDeduction(): Balance {
+        override suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction {
             val (chain, chainAsset) = chainRegistry.chainWithAsset(edge.from)
-            return crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(chainAsset, chain)
+
+            return SwapMaxAdditionalAmountDeduction(
+                fromCountedTowardsEd = crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(chainAsset, chain)
+            )
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
             val outcome = with(crossChainTransfersUseCase) {
-                swapHost.extrinsicService().performTransfer(transfer, computationalScope)
+                swapHost.extrinsicService().performTransfer(transfer, swapHost.scope)
             }
 
             return outcome.map { receivedAmount ->

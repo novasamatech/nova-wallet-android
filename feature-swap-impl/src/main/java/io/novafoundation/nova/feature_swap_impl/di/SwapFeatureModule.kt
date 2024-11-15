@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionH
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.AssetConversionExchangeModule
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.CrossChainTransferExchangeModule
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.HydraDxExchangeModule
+import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
+import io.novafoundation.nova.feature_swap_impl.domain.RealAssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.RealSwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
@@ -45,6 +47,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -100,24 +103,22 @@ class SwapFeatureModule {
     @FeatureScope
     fun provideSwapInteractor(
         swapService: SwapService,
-        assetSourceRegistry: AssetSourceRegistry,
-        chainRegistry: ChainRegistry,
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
         buyTokenRegistry: BuyTokenRegistry,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
         swapTransactionHistoryRepository: SwapTransactionHistoryRepository,
-        swapUpdateSystemFactory: SwapUpdateSystemFactory
+        swapUpdateSystemFactory: SwapUpdateSystemFactory,
+        assetsValidationContextFactory: AssetsValidationContext.Factory
     ): SwapInteractor {
         return SwapInteractor(
             swapService = swapService,
             buyTokenRegistry = buyTokenRegistry,
             crossChainTransfersUseCase = crossChainTransfersUseCase,
-            assetSourceRegistry = assetSourceRegistry,
             accountRepository = accountRepository,
-            chainRegistry = chainRegistry,
             swapTransactionHistoryRepository = swapTransactionHistoryRepository,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
+            assetsValidationContextFactory = assetsValidationContextFactory,
             tokenRepository = tokenRepository
         )
     }
@@ -182,14 +183,8 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMaxActionProviderFactory(
-        assetSourceRegistry: AssetSourceRegistry,
-        chainRegistry: ChainRegistry,
-    ): MaxActionProviderFactory {
-        return MaxActionProviderFactory(
-            assetSourceRegistry = assetSourceRegistry,
-            chainRegistry = chainRegistry
-        )
+    fun provideMaxActionProviderFactory(): MaxActionProviderFactory {
+        return MaxActionProviderFactory()
     }
 
     @Provides
@@ -224,5 +219,14 @@ class SwapFeatureModule {
             priceImpactFormatter = priceImpactFormatter,
             resourceManager = resourceManager
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAssetInAdditionalSwapDeductionUseCase(
+        assetSourceRegistry: AssetSourceRegistry,
+        chainRegistry: ChainRegistry
+    ): AssetInAdditionalSwapDeductionUseCase {
+        return RealAssetInAdditionalSwapDeductionUseCase(assetSourceRegistry, chainRegistry)
     }
 }

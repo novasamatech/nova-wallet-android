@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.common.state
 
+import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.flowOfAll
 import kotlinx.coroutines.CoroutineScope
@@ -31,4 +33,9 @@ suspend fun SwapStateStoreProvider.getStateOrThrow(computationScope: CoroutineSc
 
 fun SwapStateStoreProvider.stateFlow(computationScope: CoroutineScope): Flow<SwapState> {
     return flowOfAll { getStore(computationScope).stateFlow() }
+}
+
+context(BaseViewModel)
+suspend fun SwapStateStoreProvider.setState(state: SwapState) {
+    getStore(viewModelScope).setState(state)
 }

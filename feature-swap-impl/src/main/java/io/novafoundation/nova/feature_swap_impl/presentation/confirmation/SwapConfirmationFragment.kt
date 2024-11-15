@@ -87,6 +87,6 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel>() {
 
         viewModel.slippageAlertMixin.slippageAlertMessage.observe { swapConfirmationAlert.setMessageOrHide(it) }
 
-        viewModel.validationProgress.observe(swapConfirmationButton::setProgressState)
+        viewModel.validationInProgress.observe(swapConfirmationButton::setProgressState)
     }
 }

@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validatio
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -24,7 +25,7 @@ class ContributeValidationsModule {
 
     @Provides
     @FeatureScope
-    fun provideFeesValidation() = ContributeEnoughToPayFeesValidation(
+    fun provideFeesValidation(): ContributeEnoughToPayFeesValidation = EnoughAmountToTransferValidationGeneric(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
         extraAmountExtractor = { it.contributionAmount },

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.presentation.common.details
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -76,7 +75,7 @@ class RealSwapConfirmationDetailsFormatter(
         return swapRateFormatter.format(rate, assetIn, assetOut)
     }
 
-    private fun formatPriceDifference(priceDifference: Percent): CharSequence? {
+    private fun formatPriceDifference(priceDifference: Fraction): CharSequence? {
         return priceImpactFormatter.format(priceDifference)
     }
 

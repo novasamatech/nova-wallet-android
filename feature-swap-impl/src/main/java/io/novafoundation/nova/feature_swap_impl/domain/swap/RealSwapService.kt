@@ -2,8 +2,8 @@ package io.novafoundation.nova.feature_swap_impl.domain.swap
 
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
-import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.common.utils.asPerbill
+import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
@@ -21,7 +21,6 @@ import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.toPercent
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
@@ -204,7 +203,7 @@ internal class RealSwapService(
         return SwapFee(
             segments = fees,
             intermediateSegmentFeesInAssetIn = convertedFees,
-            additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction()
+            additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction(),
         ).also(::logFee)
     }
 
@@ -375,7 +374,8 @@ internal class RealSwapService(
             amountOut = args.tokenOut.configuration.withAmount(amountOut),
             priceImpact = args.calculatePriceImpact(amountIn, amountOut),
             quotedPath = quotedTrade,
-            executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER)
+            executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER),
+            direction = args.swapDirection,
         )
     }
 
@@ -398,7 +398,7 @@ internal class RealSwapService(
         }.debounce(500.milliseconds)
     }
 
-    private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Percent {
+    private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Fraction {
         val fiatIn = tokenIn.planksToFiat(amountIn)
         val fiatOut = tokenOut.planksToFiat(amountOut)
 
@@ -426,12 +426,12 @@ internal class RealSwapService(
         }
     }
 
-    private fun calculatePriceImpact(fiatIn: BigDecimal, fiatOut: BigDecimal): Percent {
-        if (fiatIn.isZero || fiatOut.isZero) return Percent.zero()
+    private fun calculatePriceImpact(fiatIn: BigDecimal, fiatOut: BigDecimal): Fraction {
+        if (fiatIn.isZero || fiatOut.isZero) return Fraction.ZERO
 
         val priceImpact = (BigDecimal.ONE - fiatOut / fiatIn).atLeastZero()
 
-        return priceImpact.asPerbill().toPercent()
+        return priceImpact.fractions
     }
 
     private suspend fun directionsGraph(computationScope: CoroutineScope): Flow<SwapGraph> {
@@ -481,7 +481,7 @@ internal class RealSwapService(
         return ExchangeRegistry(
             singleChainExchanges = createIndividualChainExchanges(coroutineScope),
             multiChainExchanges = listOf(
-                crossChainTransferFactory.create(InnerSwapHost(coroutineScope), coroutineScope)
+                crossChainTransferFactory.create(InnerSwapHost(coroutineScope))
             )
         )
     }
@@ -512,7 +512,7 @@ internal class RealSwapService(
             else -> null
         }
 
-        return factory?.create(chain, InnerSwapHost(computationScope), computationScope)
+        return factory?.create(chain, InnerSwapHost(computationScope))
     }
 
     // Assumes each flow will have only single element
@@ -646,7 +646,7 @@ internal class RealSwapService(
 
 
     private inner class InnerSwapHost(
-        private val computationScope: CoroutineScope
+        override val scope: CoroutineScope
     ) : AssetExchange.SwapHost {
 
         override suspend fun quote(quoteArgs: ParentQuoterArgs): Balance {
@@ -655,13 +655,13 @@ internal class RealSwapService(
                 chainAssetOut = quoteArgs.chainAssetOut,
                 amount = quoteArgs.amount,
                 swapDirection = quoteArgs.swapDirection,
-                computationSharingScope = computationScope,
+                computationSharingScope = scope,
                 logQuotes = false
             ).finalQuote()
         }
 
         override suspend fun extrinsicService(): ExtrinsicService {
-            return extrinsicService(computationScope)
+            return extrinsicService(scope)
         }
     }
 

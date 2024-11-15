@@ -29,6 +29,12 @@ val QuotedPath<*>.quote: BigInteger
         SwapDirection.SPECIFIED_OUT -> firstSegmentQuote
     }
 
+val QuotedPath<*>.quotedAmount: BigInteger
+    get() = when(direction) {
+        SwapDirection.SPECIFIED_IN -> firstSegmentQuotedAmount
+        SwapDirection.SPECIFIED_OUT-> lastSegmentQuotedAmount
+    }
+
 val QuotedPath<*>.lastSegmentQuotedAmount: BigInteger
     get() = path.last().quotedAmount
 

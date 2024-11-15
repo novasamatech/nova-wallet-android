@@ -61,22 +61,11 @@ class SubstrateFeeBase(
     override val asset: Chain.Asset
 ) : FeeBase
 
-val Fee.executingAccountPaysFee: Boolean
-    get() = submissionOrigin.executingAccount.contentEquals(submissionFeesPayer)
-
 val Fee.amountByExecutingAccount: BigInteger
-    get() = if (executingAccountPaysFee) {
-        amount
-    } else {
-        BigInteger.ZERO
-    }
+    get() = getAmount(asset, submissionOrigin.executingAccount)
 
 val Fee.decimalAmountByExecutingAccount: BigDecimal
-    get() = if (executingAccountPaysFee) {
-        decimalAmount
-    } else {
-        BigDecimal.ZERO
-    }
+    get() = amountByExecutingAccount.amountFromPlanks(asset.precision)
 
 fun FeeBase.addPlanks(extraPlanks: BigInteger): FeeBase {
     return SubstrateFeeBase(amount + extraPlanks, asset)

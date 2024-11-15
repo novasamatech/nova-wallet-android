@@ -114,6 +114,10 @@ fun Percent.format(): String {
     return value.toBigDecimal().formatAsPercentage()
 }
 
+fun Fraction.formatPercents(): String {
+    return inPercents.toBigDecimal().formatAsPercentage()
+}
+
 fun Perbill.format(): String {
     return toPercent().format()
 }

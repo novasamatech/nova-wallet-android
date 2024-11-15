@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -48,7 +49,8 @@ class SwapConfirmationModule {
         assetUseCase: ArbitraryAssetUseCase,
         maxActionProviderFactory: MaxActionProviderFactory,
         swapStateStoreProvider: SwapStateStoreProvider,
-        confirmationDetailsFormatter: SwapConfirmationDetailsFormatter
+        confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
+        resourceManager: ResourceManager
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter = swapRouter,
@@ -66,7 +68,8 @@ class SwapConfirmationModule {
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             arbitraryAssetUseCase = assetUseCase,
             maxActionProviderFactory = maxActionProviderFactory,
-            swapConfirmationDetailsFormatter = confirmationDetailsFormatter
+            swapConfirmationDetailsFormatter = confirmationDetailsFormatter,
+            resourceManager = resourceManager
         )
     }
 

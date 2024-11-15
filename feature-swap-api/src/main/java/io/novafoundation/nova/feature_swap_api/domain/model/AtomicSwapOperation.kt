@@ -6,10 +6,15 @@ import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_account_api.data.model.totalPlanksEnsuringAsset
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 interface AtomicSwapOperation {
 
     val estimatedSwapLimit: SwapLimit
+
+    val assetOut: FullChainAssetId
 
     suspend fun constructDisplayData(): AtomicOperationDisplayData
 
@@ -25,7 +30,7 @@ interface AtomicSwapOperation {
      * Additional amount that max amount calculation should leave aside for the **first** operation in the swap
      * One example is Existential Deposit in case operation executes in "keep alive" manner
      */
-    suspend fun additionalMaxAmountDeduction(): Balance
+    suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction
 
     suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection>
 }
@@ -62,6 +67,12 @@ fun AtomicSwapOperationFee.allBasicFees(): List<FeeBase> {
         postSubmissionFees.paidByAccount.onEach(::add)
         postSubmissionFees.paidFromAmount.onEach(::add)
     }
+}
+
+fun AtomicSwapOperationFee.allFeeAssets(): List<Chain.Asset> {
+    return allBasicFees()
+        .map { it.asset }
+        .distinctBy { it.fullId }
 }
 
 class SwapExecutionCorrection(

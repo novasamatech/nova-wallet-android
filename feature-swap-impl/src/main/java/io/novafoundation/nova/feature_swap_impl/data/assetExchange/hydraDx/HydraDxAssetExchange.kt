@@ -34,7 +34,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
+import io.novafoundation.nova.feature_swap_api.domain.model.createAggregated
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
@@ -55,6 +57,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterA
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.linkedAccounts
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.referralsOrNull
+import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilder
@@ -83,7 +86,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigDecimal
-import java.math.BigInteger
 import kotlin.time.Duration
 
 
@@ -95,10 +97,11 @@ class HydraDxExchangeFactory(
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val quotingFactory: HydraDxQuoting.Factory,
     private val hydrationFeeInjector: HydrationFeeInjector,
-    private val chainStateRepository: ChainStateRepository
+    private val chainStateRepository: ChainStateRepository,
+    private val swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
 ) : AssetExchange.SingleChainFactory {
 
-    override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost, coroutineScope: CoroutineScope): AssetExchange {
+    override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost): AssetExchange {
         return HydraDxAssetExchange(
             remoteStorageSource = remoteStorageSource,
             chain = chain,
@@ -109,7 +112,8 @@ class HydraDxExchangeFactory(
             swapHost = swapHost,
             hydrationFeeInjector = hydrationFeeInjector,
             delegate = quotingFactory.create(chain),
-            chainStateRepository = chainStateRepository
+            chainStateRepository = chainStateRepository,
+            swapDeductionUseCase = swapDeductionUseCase
         )
     }
 }
@@ -127,7 +131,8 @@ private class HydraDxAssetExchange(
     private val swapSourceFactories: Iterable<HydraDxSwapSource.Factory<*>>,
     private val swapHost: AssetExchange.SwapHost,
     private val hydrationFeeInjector: HydrationFeeInjector,
-    private val chainStateRepository: ChainStateRepository
+    private val chainStateRepository: ChainStateRepository,
+    private val swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
 ) : AssetExchange {
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
@@ -280,10 +285,15 @@ private class HydraDxAssetExchange(
 
     inner class HydraDxOperation private constructor(
         val segments: List<HydraDxSwapTransactionSegment>,
-        val feePaymentCurrency: FeePaymentCurrency,
+        val feePaymentCurrency: FeePaymentCurrency
     ) : AtomicSwapOperation {
 
         override val estimatedSwapLimit: SwapLimit = aggregatedSwapLimit()
+
+        override val assetOut: FullChainAssetId = segments.last().edge.to
+
+        private val assetIn: FullChainAssetId = segments.first().edge.from
+
         constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs)
             : this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)
 
@@ -296,8 +306,8 @@ private class HydraDxAssetExchange(
 
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Swap(
-                from = segments.first().edge.from.withAmount(estimatedSwapLimit.estimatedAmountIn),
-                to = segments.last().edge.to.withAmount(estimatedSwapLimit.estimatedAmountOut),
+                from = assetIn.withAmount(estimatedSwapLimit.estimatedAmountIn),
+                to = assetOut.withAmount(estimatedSwapLimit.estimatedAmountOut),
             )
         }
 
@@ -317,10 +327,10 @@ private class HydraDxAssetExchange(
         }
 
         override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
-            val assetInId = segments.first().edge.from.assetId
+            val assetInId = assetIn.assetId
             val assetIn = chain.assetsById.getValue(assetInId)
 
-            val assetOutId = segments.last().edge.to.assetId
+            val assetOutId = assetOut.assetId
             val assetOut = chain.assetsById.getValue(assetOutId)
 
             val quoteArgs = ParentQuoterArgs(
@@ -333,8 +343,16 @@ private class HydraDxAssetExchange(
             return swapHost.quote(quoteArgs)
         }
 
-        override suspend fun additionalMaxAmountDeduction(): Balance {
-            return BigInteger.ZERO
+        override suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction {
+            val assetInId = assetIn.assetId
+            val assetIn = chain.assetsById.getValue(assetInId)
+
+            val assetOutId = assetOut.assetId
+            val assetOut = chain.assetsById.getValue(assetOutId)
+
+            return SwapMaxAdditionalAmountDeduction(
+                fromCountedTowardsEd = swapDeductionUseCase.invoke(assetIn, assetOut)
+            )
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
@@ -483,30 +501,10 @@ private class HydraDxAssetExchange(
         }
 
         private fun aggregatedSwapLimit(): SwapLimit {
-            val firstSegment = segments.first()
-            val lastSegment = segments.last()
+            val firstLimit = segments.first().swapLimit
+            val lastLimit = segments.last().swapLimit
 
-            return when (val firstLimit = firstSegment.swapLimit) {
-                is SwapLimit.SpecifiedIn -> {
-                    val lastLimit = lastSegment.swapLimit as SwapLimit.SpecifiedIn
-
-                    SwapLimit.SpecifiedIn(
-                        amountIn = firstLimit.amountIn,
-                        amountOutQuote = lastLimit.amountOutQuote,
-                        amountOutMin = lastLimit.amountOutMin
-                    )
-                }
-
-                is SwapLimit.SpecifiedOut -> {
-                    val lastLimit = lastSegment.swapLimit as SwapLimit.SpecifiedOut
-
-                    SwapLimit.SpecifiedOut(
-                        amountOut = lastLimit.amountOut,
-                        amountInQuote = firstLimit.amountInQuote,
-                        amountInMax = firstLimit.amountInMax
-                    )
-                }
-            }
+            return SwapLimit.createAggregated(firstLimit, lastLimit)
         }
     }
 
@@ -523,7 +521,7 @@ private class HydraDxAssetExchange(
         }
 
         private suspend fun fetchAcceptedCurrencies(): Set<ChainAssetId> {
-             val acceptedOnChainIds = remoteStorageSource.query(chain.id) {
+            val acceptedOnChainIds = remoteStorageSource.query(chain.id) {
                 metadata.multiTransactionPayment.acceptedCurrencies.keys()
             }
 
@@ -575,7 +573,7 @@ private class HydraDxAssetExchange(
 
     private inner class HydrationFastLookupFeeCapability(
         private val acceptedCurrencies: Set<ChainAssetId>
-    ): FastLookupCustomFeeCapability {
+    ) : FastLookupCustomFeeCapability {
 
         private var acceptedCurrenciesCache: Set<HydraDxAssetId>? = null
 
