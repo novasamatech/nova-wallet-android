@@ -57,8 +57,7 @@ class DefaultMetamaskState(
 
     private val knownChains = mapOf(
         MetamaskChain.ETHEREUM.chainId to MetamaskChain.ETHEREUM,
-        MetamaskChain.MOONBEAM.chainId to MetamaskChain.MOONBEAM,
-        MetamaskChain.BIFROST.chainId to MetamaskChain.BIFROST,
+        MetamaskChain.MOONBEAM.chainId to MetamaskChain.MOONBEAM
     )
 
     override suspend fun acceptRequest(request: MetamaskTransportRequest<*>, transition: StateMachineTransition<MetamaskState>) {
