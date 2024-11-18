@@ -46,11 +46,10 @@ private fun bindInterior(instance: Any?): MultiLocation.Interior {
 }
 
 private fun bindJunctions(instance: Any?): List<Junction> {
+    // Note that Interior.X1 is encoded differently in XCM v3 (a single junction) and V4 (single-element list)
     if (instance is List<*>) {
-        // For XCM V4 or Interior.X2 and higher
         return bindList(instance, ::bindJunction)
     } else {
-        // For XCM V3 and Interior.X1
         return listOf(bindJunction(instance))
     }
 }
