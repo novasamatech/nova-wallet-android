@@ -24,6 +24,15 @@ data class MetamaskChain(
             blockExplorerUrls = null,
             iconUrls = null
         )
+
+        val MOONBEAM = MetamaskChain(
+            chainId = "0x504",
+            chainName = "Moonbeam Network",
+            nativeCurrency = NativeCurrency(name = "GLMR", symbol = "GLMR", decimals = 18),
+            rpcUrls = listOf("https://endpoints.omniatech.io/v1/moonbeam/mainnet/public"),
+            blockExplorerUrls = null,
+            iconUrls = null
+        )
     }
 
     @Parcelize

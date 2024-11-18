@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport
 
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.EthereumAddress
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -19,6 +20,12 @@ sealed class MetamaskError(val errorCode: Int, message: String) : Throwable(mess
 }
 
 class MetamaskResponder(private val webViewHolder: WebViewHolder) {
+
+    fun updateChain(chainId: String, rpcUrl: String) {
+        val js = "window.ethereum.updateChainId($chainId, '$rpcUrl');"
+
+        evaluateJs(js)
+    }
 
     fun respondResult(messageId: String, result: String) {
         val js = "window.ethereum.sendResponse($messageId, $result);"
@@ -46,5 +53,11 @@ class MetamaskResponder(private val webViewHolder: WebViewHolder) {
 
     private fun log(message: String) {
         Log.d(LOG_TAG, message)
+    }
+
+    fun setAddress(selectedAddress: EthereumAddress) {
+        val js = "window.ethereum.setAddress('$selectedAddress');"
+
+        evaluateJs(js)
     }
 }
