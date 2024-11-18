@@ -35,8 +35,11 @@ interface BrowserTabPoolService {
 class RealBrowserTabPoolService(
     private val context: Context,
     private val browserTabStorage: BrowserTabStorage,
-    private val pageSnapshotBuilder: PageSnapshotBuilder
+    private val pageSnapshotBuilder: PageSnapshotBuilder,
+    private val tabMemoryRestrictionService: TabMemoryRestrictionService
 ) : BrowserTabPoolService {
+
+    private val availableSessionsCount = tabMemoryRestrictionService.getMaximumActiveSessions()
 
     private val selectedTabIdFlow = MutableStateFlow<String?>(null)
 
@@ -95,8 +98,18 @@ class RealBrowserTabPoolService(
     }
 
     private fun addNewSession(tab: BrowserTab): PageSession {
-        val session = PageSession(tab.id, tab.currentUrl, context)
+        if (activeSessions.size >= availableSessionsCount) {
+            removeOldestSession()
+        }
+
+        val session = PageSession(tabId = tab.id, sessionStartTime = Date(), startUrl = tab.currentUrl, context = context)
         activeSessions[tab.id] = session
         return session
+    }
+
+    private fun removeOldestSession() {
+        val sessionToDestroy = activeSessions.values.minBy { it.sessionStartTime.time }
+        sessionToDestroy.destroySession()
+        activeSessions.remove(sessionToDestroy.tabId)
     }
 }
