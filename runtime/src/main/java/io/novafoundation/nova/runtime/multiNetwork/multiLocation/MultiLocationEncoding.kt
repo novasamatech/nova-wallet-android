@@ -37,14 +37,19 @@ private fun bindInterior(instance: Any?): MultiLocation.Interior {
 
     return when (asDictEnum.name) {
         "Here" -> MultiLocation.Interior.Here
-        "X1" -> {
-            val junction = bindJunction(asDictEnum.value)
-            MultiLocation.Interior.Junctions(listOf(junction))
-        }
+
         else -> {
-            val junctions = bindList(asDictEnum.value, ::bindJunction)
+            val junctions = bindJunctions(asDictEnum.value)
             MultiLocation.Interior.Junctions(junctions)
         }
+    }
+}
+
+private fun bindJunctions(instance: Any?): List<Junction> {
+    if (instance is List<*>) {
+        return bindList(instance, ::bindJunction)
+    } else {
+        return listOf(bindJunction(instance))
     }
 }
 
@@ -56,6 +61,7 @@ private fun bindJunction(instance: Any?): Junction {
             val keyBytes = bindByteArray(asDictEnum.value)
             Junction.GeneralKey(keyBytes.toHexString(withPrefix = true))
         }
+
         "PalletInstance" -> Junction.PalletInstance(bindNumber(asDictEnum.value))
         "Parachain" -> Junction.ParachainId(bindNumber(asDictEnum.value))
         "GeneralIndex" -> Junction.GeneralIndex(bindNumber(asDictEnum.value))
@@ -81,6 +87,7 @@ private fun bindGlobalConsensusJunction(instance: Any?): Junction {
             val genesis = bindByteArray(asDictEnum.value).toHexString(withPrefix = false)
             Junction.GlobalConsensus(chainId = genesis)
         }
+
         "Polkadot" -> Junction.GlobalConsensus(chainId = Chain.Geneses.POLKADOT)
         "Kusama" -> Junction.GlobalConsensus(chainId = Chain.Geneses.KUSAMA)
         "Westend" -> Junction.GlobalConsensus(chainId = Chain.Geneses.WESTEND)
