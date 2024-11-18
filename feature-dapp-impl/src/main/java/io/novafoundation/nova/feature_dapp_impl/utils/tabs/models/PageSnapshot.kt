@@ -14,4 +14,3 @@ fun PageSnapshot.Companion.withNameOnly(name: String) = PageSnapshot(
     pageIconPath = null,
     pagePicturePath = null
 )
-

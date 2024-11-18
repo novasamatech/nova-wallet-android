@@ -40,7 +40,6 @@ class RealBrowserTabStorage(
     }
 }
 
-
 private fun BrowserTabLocal.fromLocal(): BrowserTab {
     return BrowserTab(
         id = id,

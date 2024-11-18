@@ -34,7 +34,7 @@ class PageSnapshotBuilder(
         if (bitmap == null) return null
 
         // Use this pattern to don't create a new image everytime when we rewrite the page snapshot
-        val fileName = "tab_${pageSession.tabId}_${filePrefix}.jpeg"
+        val fileName = "tab_${pageSession.tabId}_$filePrefix.jpeg"
         val file = fileProvider.getFileInExternalCacheStorage(fileName)
 
         try {
