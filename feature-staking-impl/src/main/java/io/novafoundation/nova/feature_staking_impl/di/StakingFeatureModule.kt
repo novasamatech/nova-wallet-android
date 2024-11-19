@@ -70,9 +70,9 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
-import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
 import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
+import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -177,7 +177,8 @@ class StakingFeatureModule {
         stakingStoriesDataSource: StakingStoriesDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
-        storageCache: StorageCache
+        storageCache: StorageCache,
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
     ): StakingRepository = StakingRepositoryImpl(
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
@@ -185,7 +186,8 @@ class StakingFeatureModule {
         stakingStoriesDataSource = stakingStoriesDataSource,
         walletConstants = walletConstants,
         chainRegistry = chainRegistry,
-        storageCache = storageCache
+        storageCache = storageCache,
+        multiChainRuntimeCallsApi = multiChainRuntimeCallsApi
     )
 
     @Provides
