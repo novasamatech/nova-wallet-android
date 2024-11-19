@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.divideToDecimal
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -39,7 +40,7 @@ class InflationPredictionInfo(
 }
 
 fun InflationPredictionInfo.calculateStakersInflation(totalIssuance: Balance, eraDuration: Duration): Double {
-    val periodsInYear = 365.days / eraDuration
+    val periodsInYear = (365.days / eraDuration).roundToInt()
     val inflationPerMint = nextMint.toStakers.divideToDecimal(totalIssuance)
 
     return inflationPerMint.toDouble() * periodsInYear
