@@ -42,8 +42,8 @@
         android:max="100"
         tools:progress="45" />
 
-    <WebView
-        android:id="@+id/dappBrowserWebView"
+    <FrameLayout
+        android:id="@+id/dappBrowserWebViewContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
-import android.content.Context
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSessionFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.stateId
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.withNameOnly
@@ -19,9 +19,11 @@ import kotlinx.coroutines.flow.map
 
 interface BrowserTabPoolService {
 
-    fun currentTabFlow(): Flow<CurrentTabState>
+    val currentTabFlow: Flow<CurrentTabState>
 
-    fun selectTab(tabId: String)
+    fun selectTab(tabId: String?)
+
+    fun detachCurrentSession()
 
     suspend fun makeCurrentTabSnapshot()
 
@@ -33,10 +35,10 @@ interface BrowserTabPoolService {
 }
 
 class RealBrowserTabPoolService(
-    private val context: Context,
     private val browserTabStorage: BrowserTabStorage,
     private val pageSnapshotBuilder: PageSnapshotBuilder,
-    private val tabMemoryRestrictionService: TabMemoryRestrictionService
+    private val tabMemoryRestrictionService: TabMemoryRestrictionService,
+    private val pageSessionFactory: PageSessionFactory
 ) : BrowserTabPoolService {
 
     private val availableSessionsCount = tabMemoryRestrictionService.getMaximumActiveSessions()
@@ -48,7 +50,7 @@ class RealBrowserTabPoolService(
 
     private val activeSessions = mutableMapOf<String, PageSession>()
 
-    private val currentTabSession = combine(
+    override val currentTabFlow = combine(
         selectedTabIdFlow,
         allTabsFlow
     ) { selectedTabId, allTabs ->
@@ -60,12 +62,15 @@ class RealBrowserTabPoolService(
         )
     }.distinctUntilChangedBy { it.stateId() }
 
-    override fun currentTabFlow(): Flow<CurrentTabState> {
-        return currentTabSession
+    override fun selectTab(tabId: String?) {
+        val oldTabId = selectedTabIdFlow.value
+        detachSession(oldTabId)
+
+        selectedTabIdFlow.value = tabId
     }
 
-    override fun selectTab(tabId: String) {
-        selectedTabIdFlow.value = tabId
+    override fun detachCurrentSession() {
+        selectTab(null)
     }
 
     override suspend fun createNewTabAsCurrentTab(url: String) {
@@ -77,19 +82,24 @@ class RealBrowserTabPoolService(
         )
 
         browserTabStorage.saveTab(tab)
-        selectedTabIdFlow.value = tab.id
+        selectTab(tab.id)
     }
 
     override suspend fun removeTab(tabId: String) {
+        if (tabId == selectedTabIdFlow.value) {
+            selectTab(null)
+        }
+
         browserTabStorage.removeTab(tabId)
     }
 
     override suspend fun removeAllTabs() {
+        selectTab(null)
         browserTabStorage.removeAllTabs()
     }
 
     override suspend fun makeCurrentTabSnapshot() {
-        val currentTab = currentTabSession.first()
+        val currentTab = currentTabFlow.first()
 
         if (currentTab is CurrentTabState.Selected) {
             val snapshot = pageSnapshotBuilder.getPageSnapshot(currentTab.pageSession)
@@ -102,7 +112,7 @@ class RealBrowserTabPoolService(
             removeOldestSession()
         }
 
-        val session = PageSession(tabId = tab.id, sessionStartTime = Date(), startUrl = tab.currentUrl, context = context)
+        val session = pageSessionFactory.create(tabId = tab.id, sessionStartTime = Date(), startUrl = tab.currentUrl)
         activeSessions[tab.id] = session
         return session
     }
@@ -111,5 +121,10 @@ class RealBrowserTabPoolService(
         val sessionToDestroy = activeSessions.values.minBy { it.sessionStartTime.time }
         sessionToDestroy.destroySession()
         activeSessions.remove(sessionToDestroy.tabId)
+    }
+
+    private fun detachSession(tabId: String?) {
+        val sessionToDetach = activeSessions[tabId]
+        sessionToDetach?.detachSession()
     }
 }

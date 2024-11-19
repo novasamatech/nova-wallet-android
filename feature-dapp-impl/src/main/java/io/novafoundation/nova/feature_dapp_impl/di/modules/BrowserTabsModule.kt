@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_dapp_impl.utils.tabs.PageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabPoolService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabStorage
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.TabMemoryRestrictionService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSessionFactory
 
 @Module
 class BrowserTabsModule {
@@ -38,17 +39,23 @@ class BrowserTabsModule {
 
     @FeatureScope
     @Provides
+    fun providePageSessionFactory(): PageSessionFactory {
+        return PageSessionFactory()
+    }
+
+    @FeatureScope
+    @Provides
     fun provideBrowserTabPoolService(
-        context: Context,
         browserTabStorage: BrowserTabStorage,
         pageSnapshotBuilder: PageSnapshotBuilder,
-        tabMemoryRestrictionService: TabMemoryRestrictionService
+        tabMemoryRestrictionService: TabMemoryRestrictionService,
+        pageSessionFactory: PageSessionFactory
     ): BrowserTabPoolService {
         return RealBrowserTabPoolService(
-            context = context,
             browserTabStorage = browserTabStorage,
             pageSnapshotBuilder = pageSnapshotBuilder,
-            tabMemoryRestrictionService = tabMemoryRestrictionService
+            tabMemoryRestrictionService = tabMemoryRestrictionService,
+            pageSessionFactory = pageSessionFactory
         )
     }
 }

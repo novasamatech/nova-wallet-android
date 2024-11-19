@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAp
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
@@ -43,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -69,7 +72,8 @@ class DAppBrowserViewModel(
     private val initialUrl: String,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val browserTabPoolService: BrowserTabPoolService
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -107,6 +111,10 @@ class DAppBrowserViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
+    val currentTabFlow = browserTabPoolService.currentTabFlow
+        .filterIsInstance<CurrentTabState.Selected>()
+        .shareInBackground()
+
     init {
         dAppSearchRequester.responseFlow
             .onEach { it.newUrl?.let(::forceLoad) }
@@ -114,7 +122,10 @@ class DAppBrowserViewModel(
 
         watchDangerousWebsites()
 
-        forceLoad(initialUrl)
+        launch {
+            // TODO: We should create tab before this screen open
+            browserTabPoolService.createNewTabAsCurrentTab(initialUrl)
+        }
     }
 
     override suspend fun authorizeDApp(payload: AuthorizeDappBottomSheet.Payload): State {
@@ -145,6 +156,10 @@ class DAppBrowserViewModel(
 
     override fun reloadPage() {
         _browserCommandEvent.postValue(BrowserCommand.Reload.event())
+    }
+
+    fun detachCurrentSession() {
+        browserTabPoolService.detachCurrentSession()
     }
 
     fun onPageChanged(url: String, title: String?) {

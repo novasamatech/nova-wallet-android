@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
@@ -71,7 +72,8 @@ class DAppBrowserModule {
         extensionStoreFactory: ExtensionStoreFactory,
         dAppInteractor: DappInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        browserTabPoolService: BrowserTabPoolService
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -83,7 +85,8 @@ class DAppBrowserModule {
             initialUrl = initialUrl,
             extensionStoreFactory = extensionStoreFactory,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            browserTabPoolService = browserTabPoolService
         )
     }
 }
