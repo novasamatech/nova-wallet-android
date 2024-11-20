@@ -27,11 +27,11 @@ internal class HydrationConversionFeePayment(
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
-        val baseCall = extrinsicBuilder.getCall()
+        val baseCalls = extrinsicBuilder.getCalls()
         extrinsicBuilder.resetCalls()
 
         extrinsicBuilder.setFeeCurrency(hydraDxAssetIdConverter.toOnChainIdOrThrow(paymentAsset))
-        extrinsicBuilder.call(baseCall)
+        extrinsicBuilder.calls(baseCalls)
         extrinsicBuilder.setFeeCurrency(hydraDxAssetIdConverter.systemAssetId)
     }
 

@@ -8,8 +8,6 @@ import io.novafoundation.nova.feature_staking_impl.data.components
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.DAYS_IN_YEAR
-import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxPeriodReturns
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -63,7 +61,7 @@ class RelaychainStakingTypeDetailsInteractor(
         val (chain, chainAsset, stakingType) = stakingOption.components
 
         return stakingSharedComputation.rewardCalculator(chain, chainAsset, stakingType, coroutineScope)
-            .calculateMaxPeriodReturns(DAYS_IN_YEAR)
+            .maxAPY
             .asPerbill()
     }
 }

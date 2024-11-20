@@ -95,6 +95,7 @@ class RealCrossChainTransactor(
             XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
             XcmTransferType.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, crossChainFee)
             XcmTransferType.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, crossChainFee)
+            XcmTransferType.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, crossChainFee)
             XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
         }
     }
@@ -126,6 +127,20 @@ class RealCrossChainTransactor(
     }
 
     private fun destWeightEncodable(weight: Weight): Any = weight
+
+    private suspend fun ExtrinsicBuilder.xcmPalletTransferAssets(
+        configuration: CrossChainTransferConfiguration,
+        assetTransfer: AssetTransfer,
+        crossChainFee: Balance
+    ) {
+        xcmPalletTransfer(
+            configuration = configuration,
+            assetTransfer = assetTransfer,
+            crossChainFee = crossChainFee,
+            callName = "transfer_assets"
+        )
+    }
+
     private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
         configuration: CrossChainTransferConfiguration,
         assetTransfer: AssetTransfer,

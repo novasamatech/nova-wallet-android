@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.multiNetwork.runtime
 
 import android.util.Log
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.network.rpc.StateCallRequest
 import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.metadata.GetMetadataRequest
@@ -13,6 +12,7 @@ import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.state.StateCallRequest
 
 private const val LATEST_SUPPORTED_METADATA_VERSION = 15
 
