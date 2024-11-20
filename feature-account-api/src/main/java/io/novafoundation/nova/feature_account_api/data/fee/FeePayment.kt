@@ -18,7 +18,7 @@ interface FeePaymentProvider {
 
     suspend fun feePaymentFor(feePaymentCurrency: FeePaymentCurrency, coroutineScope: CoroutineScope?): FeePayment
 
-    suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability?
+    suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?>
 }
 
 interface FeePaymentProviderRegistry {

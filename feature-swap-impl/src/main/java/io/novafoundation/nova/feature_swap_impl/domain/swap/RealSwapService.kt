@@ -443,7 +443,7 @@ internal class RealSwapService(
                     .catch {
                         emit(emptyList())
 
-                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class}", it)
+                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class.simpleName}", it)
                     }
             }
 
@@ -838,6 +838,8 @@ internal class RealSwapService(
         private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability? {
             val feePaymentRegistry = exchangeRegistry(computationScope).getFeePaymentRegistry()
             return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
+                .onFailure { Log.e("Swap", "Failed to construct fast custom fee lookup for chain $chainId", it) }
+                .getOrNull()
         }
     }
 

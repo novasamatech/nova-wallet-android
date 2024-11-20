@@ -14,8 +14,8 @@ class DefaultFeePaymentProvider : FeePaymentProvider {
         return NativeFeePayment()
     }
 
-    override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability {
-        return DefaultFastLookupCustomFeeCapability()
+    override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability> {
+        return Result.success(DefaultFastLookupCustomFeeCapability())
     }
 }
 

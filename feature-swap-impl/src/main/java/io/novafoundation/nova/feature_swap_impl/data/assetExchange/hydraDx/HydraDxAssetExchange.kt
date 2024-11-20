@@ -515,9 +515,11 @@ private class HydraDxAssetExchange(
             return ReusableQuoteFeePayment(customFeeAsset)
         }
 
-        override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability {
-            val acceptedCurrencies = fetchAcceptedCurrencies()
-            return HydrationFastLookupFeeCapability(acceptedCurrencies)
+        override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?> {
+            return runCatching {
+                val acceptedCurrencies = fetchAcceptedCurrencies()
+                HydrationFastLookupFeeCapability(acceptedCurrencies)
+            }
         }
 
         private suspend fun fetchAcceptedCurrencies(): Set<ChainAssetId> {

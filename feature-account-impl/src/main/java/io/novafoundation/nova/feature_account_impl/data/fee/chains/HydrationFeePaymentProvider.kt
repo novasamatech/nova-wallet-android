@@ -29,7 +29,7 @@ class HydrationFeePaymentProvider(
         )
     }
 
-    override suspend fun fastLookupCustomFeeCapability(): FastLookupCustomFeeCapability? {
-        return null
+    override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?> {
+        return Result.success(null)
     }
 }
