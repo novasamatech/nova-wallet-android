@@ -300,7 +300,7 @@ class RealCrossChainTransactor(
 
     private suspend fun ExtrinsicBuilder.xcmPalletTransferAssets(
         configuration: CrossChainTransferConfiguration,
-        assetTransfer: AssetTransfer,
+        assetTransfer: AssetTransferBase,
         crossChainFee: Balance
     ) {
         xcmPalletTransfer(
