@@ -40,6 +40,7 @@ import io.novasama.substrate_sdk_android.wsrpc.request.runtime.author.SubmitAndW
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.author.SubmitExtrinsicRequest
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionFull
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionRequest
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.state.StateCallRequest
 import io.novasama.substrate_sdk_android.wsrpc.subscriptionFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
