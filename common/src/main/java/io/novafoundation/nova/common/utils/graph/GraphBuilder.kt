@@ -6,10 +6,10 @@ class GraphBuilder<N, E : Edge<N>> {
 
     private val adjacencyList: MutableMap<N, MutableList<E>> = mutableMapOf()
 
-    fun addEdge(to: E) {
-        val fromEdges = adjacencyList.getOrPut(to.from) { mutableListOf() }
-        initializeVertex(to.to)
-        fromEdges.add(to)
+    fun addEdge(edge: E) {
+        val fromEdges = adjacencyList.getOrPut(edge.from) { mutableListOf() }
+        initializeVertex(edge.to)
+        fromEdges.add(edge)
     }
 
     fun addEdges(from: N, to: List<E>) {

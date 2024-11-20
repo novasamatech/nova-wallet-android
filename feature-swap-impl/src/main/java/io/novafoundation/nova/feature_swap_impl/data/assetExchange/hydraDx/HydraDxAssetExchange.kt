@@ -261,12 +261,16 @@ private class HydraDxAssetExchange(
             return sourceQuotableEdge.debugLabel()
         }
 
-        override fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+        override fun predecessorHandlesFees(predecessor: SwapGraphEdge): Boolean {
             // When chaining multiple hydra edges together, the fee is always paid with the starting edge
             return predecessor is HydraDxSwapEdge
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
+            return true
+        }
+
+        override suspend fun canTransferOutWholeAccountBalance(): Boolean {
             return true
         }
     }

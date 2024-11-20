@@ -196,11 +196,15 @@ private class AssetConversionExchange(
             return "AssetConversion"
         }
 
-        override fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+        override fun predecessorHandlesFees(predecessor: SwapGraphEdge): Boolean {
             return false
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
+            return true
+        }
+
+        override suspend fun canTransferOutWholeAccountBalance(): Boolean {
             return true
         }
 

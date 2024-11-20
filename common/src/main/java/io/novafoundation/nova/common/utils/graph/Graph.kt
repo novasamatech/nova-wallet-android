@@ -23,7 +23,6 @@ class Graph<N, E : Edge<N>>(
     companion object;
 }
 
-typealias ConnectedComponent<N> = List<N>
 typealias Path<E> = List<E>
 
 fun <N> Graph<N, *>.vertices(): Set<N> {
@@ -90,7 +89,6 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
     val paths = mutableListOf<Path<E>>()
 
     val count = mutableMapOf<N, Int>()
-    adjacencyList.keys.forEach { count[it] = 0 }
 
     val heap = PriorityQueue<QueueElement>()
     heap.add(QueueElement(currentPath = emptyList(), score = 0))
@@ -99,7 +97,7 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
         val minimumQueueElement = heap.poll()!!
         val lastNode = minimumQueueElement.lastNode()
 
-        val newCount = count.getValue(lastNode) + 1
+        val newCount = count.getOrElse(lastNode) { 0 } + 1
         count[lastNode] = newCount
 
         val predecessor = minimumQueueElement.currentPath.lastOrNull()
@@ -148,63 +146,3 @@ private suspend fun <N, E : Edge<N>> reachabilityDfs(
 
     return connectedComponentState
 }
-
-
-// TODO the commented code below doesn't work in a context of directed graphs !!!
-
-///**
-// * Find all connected components of the graph.
-// * Time Complexity is O(V+E)
-// * Space Complexity is O(V)
-// */
-//fun <N, E : Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedComponent<N>> {
-//    val visited = mutableSetOf<N>()
-//    val result = mutableListOf<ConnectedComponent<N>>()
-//
-//    for (vertex in adjacencyList.keys) {
-//        if (vertex in visited) continue
-//
-//        val reachableNodes = reachabilityDfs(vertex, adjacencyList, visited)
-//        result.add(reachableNodes)
-//    }
-//
-//    return result
-//}
-
-//fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
-//    val result = mutableMapOf<N, List<N>>()
-//
-//    forEach { connectedComponent ->
-//        connectedComponent.forEach { node ->
-//            // in the connected component every node is connected to every other except itself
-//            result[node] = connectedComponent - node
-//        }
-//    }
-//
-//    return result
-//}
-
-//fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
-//    val connectedComponents = findConnectedComponents()
-//    return connectedComponents.findAllPossibleDirections()
-//}
-
-//fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
-//    val connectedComponents = findConnectedComponents()
-//    return connectedComponents.findAllPossibleDirectionsToList()
-//}
-
-//fun <N> List<ConnectedComponent<N>>.findAllPossibleDirections(): MultiMap<N, N> {
-//    val result = mutableMapOf<N, Set<N>>()
-//
-//    forEach { connectedComponent ->
-//        val asSet = connectedComponent.toSet()
-//
-//        asSet.forEach { node ->
-//            // in the connected component every node is connected to every other except itself
-//            result[node] = asSet - node
-//        }
-//    }
-//
-//    return result
-//}

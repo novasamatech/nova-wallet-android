@@ -32,20 +32,31 @@ interface SwapGraphEdge : QuotableEdge {
     suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype?
 
 
+    /**
+     * Debug label to describe this edge for logging
+     */
     suspend fun debugLabel(): String
 
     /**
      * Whether this Edge fee check should be skipped when adding to after a specified [predecessor]
+     * The main purpose is to mirror the behavior of [appendToOperation] - multiple segments appended together
+     * most likely will only use fee configuration from the first segment in the batch
      * Note that returning true here means that [canPayNonNativeFeesInIntermediatePosition] wont be called and checked
-     *
      */
-    fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean
+    fun predecessorHandlesFees(predecessor: SwapGraphEdge): Boolean
 
     /**
      * Can be used to define additional restrictions on top of default one, "is able to pay submission fee on origin"
      * This will only be called for intermediate hops for non-utility assets since other cases are always payable
      */
     suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean
+
+    /**
+     * Determines whether it is possible to spend whole asset-in to receive asset-out
+     * This has to be true for edge to be considered a valid intermediate segment
+     * since we don't want dust leftovers across intermediate segments
+     */
+    suspend fun canTransferOutWholeAccountBalance(): Boolean
 }
 
 

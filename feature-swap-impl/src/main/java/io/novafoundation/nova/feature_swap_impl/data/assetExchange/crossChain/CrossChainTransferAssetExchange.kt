@@ -125,15 +125,26 @@ class CrossChainTransferAssetExchange(
             return "To ${chainRegistry.getChain(delegate.to.chainId).name}"
         }
 
-        override fun shouldIgnoreFeeRequirementAfter(predecessor: SwapGraphEdge): Boolean {
+        override fun predecessorHandlesFees(predecessor: SwapGraphEdge): Boolean {
             return false
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
-            val config = crossChainConfig.value ?: return false
-
             // Delivery fees cannot be paid in non-native assets
-            return delegate.from.chainId !in config.deliveryFeeConfigurations
+            return !hasDeliveryFees()
+        }
+
+        override suspend fun canTransferOutWholeAccountBalance(): Boolean {
+            // Precisely speaking just checking for delivery fees is not enough
+            // AssetTransactor on origin should also use Preserve transfers when executing TransferAssets instruction
+            // However it is much harder to check and there are no chains yet that have limitations on AssetTransactor level
+            // but don't have delivery fees, so we only check for delivery fees
+            return !hasDeliveryFees()
+        }
+
+        private fun hasDeliveryFees(): Boolean {
+            val config = crossChainConfig.value ?: return false
+            return delegate.from.chainId in config.deliveryFeeConfigurations
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {

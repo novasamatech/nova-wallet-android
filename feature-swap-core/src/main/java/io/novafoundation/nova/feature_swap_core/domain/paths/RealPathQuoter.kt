@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.findDijkstraPathsBetween
+import io.novafoundation.nova.common.utils.graph.numberOfEdges
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathFeeEstimator
@@ -21,6 +22,8 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.math.BigInteger
 
 private const val PATHS_LIMIT = 4
@@ -31,18 +34,18 @@ class RealPathQuoterFactory(
 ) : PathQuoter.Factory {
 
     override fun <E : QuotableEdge> create(
-        graph: Graph<FullChainAssetId, E>,
+        graphFlow: Flow<Graph<FullChainAssetId, E>>,
         computationalScope: CoroutineScope,
         pathFeeEstimation: PathFeeEstimator<E>?,
         filter: EdgeVisitFilter<E>?
     ): PathQuoter<E> {
-        return RealPathQuoter(computationalCache, graph, computationalScope, pathFeeEstimation, filter)
+        return RealPathQuoter(computationalCache, graphFlow, computationalScope, pathFeeEstimation, filter)
     }
 }
 
 private class RealPathQuoter<E : QuotableEdge>(
     private val computationalCache: ComputationalCache,
-    private val graph: Graph<FullChainAssetId, E>,
+    private val graphFlow: Flow<Graph<FullChainAssetId, E>>,
     private val computationalScope: CoroutineScope,
     private val pathFeeEstimation: PathFeeEstimator<E>?,
     private val filter: EdgeVisitFilter<E>?,
@@ -57,7 +60,7 @@ private class RealPathQuoter<E : QuotableEdge>(
         val from = chainAssetIn.fullId
         val to = chainAssetOut.fullId
 
-        val paths = pathsFromCacheOrCompute(from, to, computationalScope) {
+        val paths = pathsFromCacheOrCompute(from, to, computationalScope) { graph ->
             val paths = measureExecution("Finding ${chainAssetIn.symbol} -> ${chainAssetOut.symbol} paths") {
                 graph.findDijkstraPathsBetween(from, to, limit = PATHS_LIMIT, filter)
             }
@@ -79,12 +82,14 @@ private class RealPathQuoter<E : QuotableEdge>(
         from: FullChainAssetId,
         to: FullChainAssetId,
         scope: CoroutineScope,
-        computation: suspend () -> List<Path<E>>
+        computation: suspend (graph: Graph<FullChainAssetId, E>) -> List<Path<E>>
     ): List<Path<E>> {
-        val cacheKey = "$QUOTES_CACHE:${pathsCacheKey(from, to)}"
+        val graph = graphFlow.first()
+
+        val cacheKey = "$QUOTES_CACHE:${pathsCacheKey(from, to)}:${graph.numberOfEdges()}"
 
         return computationalCache.useCache(cacheKey, scope) {
-            computation()
+            computation(graph)
         }
     }
 

@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 
 class HydraDxQuoteSharedComputation(
@@ -35,7 +36,7 @@ class HydraDxQuoteSharedComputation(
             val edges = assetConversion.availableSwapDirections()
             val graph = Graph.create(edges)
 
-            pathQuoterFactory.create(graph, scope)
+            pathQuoterFactory.create(flowOf(graph), scope)
         }
     }
 

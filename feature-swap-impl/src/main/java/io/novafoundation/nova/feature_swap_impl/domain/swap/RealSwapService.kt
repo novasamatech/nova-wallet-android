@@ -542,10 +542,10 @@ internal class RealSwapService(
 
     private suspend fun getPathQuoter(computationScope: CoroutineScope): PathQuoter<SwapGraphEdge> {
         return computationalCache.useCache(QUOTER_CACHE, computationScope) {
-            val graph = directionsGraph(computationScope).first()
+            val graphFlow = directionsGraph(computationScope)
             val filter = canPayFeeNodeFilter(computationScope)
 
-            quoterFactory.create(graph, this, SwapPathFeeEstimator(), filter)
+            quoterFactory.create(graphFlow, this, SwapPathFeeEstimator(), filter)
         }
     }
 
@@ -798,19 +798,25 @@ internal class RealSwapService(
         }
 
         override suspend fun shouldVisit(edge: SwapGraphEdge, pathPredecessor: SwapGraphEdge?): Boolean {
-            // Utility payments and first path segments are always allowed
-            if (edge.from.isUtility || pathPredecessor == null) return true
-
             val chainAndAssetOut = chainsById.chainWithAssetOrNull(edge.to) ?: return false
 
             // User should have account on destination
             if (!selectedAccount.hasAccountIn(chainAndAssetOut.chain)) return false
 
+            // First path segments don't have any extra restrictions
+            if (pathPredecessor == null) return true
+
+            // We don't (yet) handle edges that doesn't allow to transfer whole account balance out
+            if (!edge.canTransferOutWholeAccountBalance()) return false
+
+            // Besides checks above, utility assets don't have any other restrictions
+            if (edge.from.isUtility) return true
+
             // Destination asset must be sufficient
             if (!isSufficient(chainAndAssetOut)) return false
 
             // Edge might request us to ignore the default requirement based on its direct predecessor
-            if (edge.shouldIgnoreFeeRequirementAfter(pathPredecessor)) return true
+            if (edge.predecessorHandlesFees(pathPredecessor)) return true
 
             val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
 
@@ -820,11 +826,7 @@ internal class RealSwapService(
 
         private fun isSufficient(chainAndAsset: ChainWithAsset): Boolean {
             val balance = assetSourceRegistry.sourceFor(chainAndAsset.asset).balance
-            return balance.isSelfSufficient(chainAndAsset.asset).also { isSufficient ->
-                if (!isSufficient) {
-                    Log.d("Swaps", "${chainAndAsset.asset.symbol} (${chainAndAsset.chain.name} is not sufficient)")
-                }
-            }
+            return balance.isSelfSufficient(chainAndAsset.asset)
         }
 
         private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability? {
