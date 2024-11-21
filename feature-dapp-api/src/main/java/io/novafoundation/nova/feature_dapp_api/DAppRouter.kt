@@ -11,9 +11,13 @@ interface DAppRouter : ReturnableRouter {
 
     fun openDappSearch()
 
+    fun finishDappSearch()
+
     fun openAddToFavourites(payload: AddToFavouritesPayload)
 
     fun openAuthorizedDApps()
 
     fun openTabs()
+
+    fun finishTabs()
 }

@@ -31,17 +31,14 @@ class DAppNavigator(
     }
 
     override fun openDappSearch() {
-        val currentDestination = rootNavigationHolder.navController?.currentDestination
-
-        val destinationId = when (currentDestination?.id) {
-            R.id.dappTabsFragment -> R.id.action_dappTabsFragment_to_dapp_search_graph
-            else -> R.id.action_mainFragment_to_dappSearchGraph
-        }
-
         performNavigation(
-            actionId = destinationId,
-            args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null))
+            actionId = R.id.action_open_dappSearch,
+            args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL))
         )
+    }
+
+    override fun finishDappSearch() {
+        performNavigation(R.id.action_finish_dapp_search)
     }
 
     override fun openAddToFavourites(payload: AddToFavouritesPayload) = performNavigation(
@@ -55,5 +52,9 @@ class DAppNavigator(
 
     override fun openTabs() = performNavigation(
         actionId = R.id.action_DAppBrowserFragment_to_browserTabsFragment
+    )
+
+    override fun finishTabs() = performNavigation(
+        actionId = R.id.action_finish_tabs_fragment
     )
 }

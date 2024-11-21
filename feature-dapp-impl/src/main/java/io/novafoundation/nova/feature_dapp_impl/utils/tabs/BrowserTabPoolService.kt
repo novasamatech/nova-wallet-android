@@ -57,7 +57,7 @@ class RealBrowserTabPoolService(
             tabs = allTabs.values.toList(),
             selectedTab = currentTabState(selectedTabId, allTabs)
         )
-    }.distinctUntilChangedBy { it.stateId() }
+    }
 
     override fun selectTab(tabId: String?) {
         val oldTabId = selectedTabIdFlow.value

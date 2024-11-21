@@ -22,15 +22,15 @@
             app:popUpToInclusive="true" />
 
         <action
-            android:id="@+id/action_dappTabsFragment_to_dapp_search_graph"
-            app:destination="@id/dapp_search_graph"
+            android:id="@+id/action_finish_tabs_fragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_slide_out" />
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/dapp_tabs_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <include app:graph="@navigation/dapp_browser_graph" />
 
-    <include app:graph="@navigation/dapp_search_graph" />
 </navigation>

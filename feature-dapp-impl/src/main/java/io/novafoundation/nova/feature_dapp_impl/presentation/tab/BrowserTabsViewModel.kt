@@ -6,8 +6,9 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -15,6 +16,7 @@ class BrowserTabsViewModel(
     private val router: DAppRouter,
     private val browserTabPoolService: BrowserTabPoolService,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val dAppSearchRequester: DAppSearchRequester,
 ) : BaseViewModel() {
 
     val closeAllTabsConfirmation = actionAwaitableMixinFactory.confirmingAction<Unit>()
@@ -31,9 +33,7 @@ class BrowserTabsViewModel(
         }
 
     fun openTab(tabId: String) = launch {
-        val tab = browserTabPoolService.tabStateFlow.first().tabs.first { it.id == tabId }
         browserTabPoolService.selectTab(tabId)
-        router.openDAppBrowser(tab.currentUrl)
     }
 
     fun closeTab(tabId: String) = launch {
@@ -44,13 +44,14 @@ class BrowserTabsViewModel(
         closeAllTabsConfirmation.awaitAction()
 
         browserTabPoolService.removeAllTabs()
+        router.finishTabs()
     }
 
     fun addTab() {
-        router.openDappSearch()
+        dAppSearchRequester.openRequest(SearchPayload(initialUrl = null, SearchPayload.Request.CREATE_NEW_TAB))
     }
 
     fun done() {
-        router.back()
+        router.finishTabs()
     }
 }

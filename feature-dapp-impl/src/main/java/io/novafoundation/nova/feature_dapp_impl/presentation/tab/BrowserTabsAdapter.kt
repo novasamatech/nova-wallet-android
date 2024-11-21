@@ -47,7 +47,7 @@ private object DiffCallback : DiffUtil.ItemCallback<BrowserTabRvItem>() {
     }
 
     override fun areContentsTheSame(oldItem: BrowserTabRvItem, newItem: BrowserTabRvItem): Boolean {
-        return true
+        return oldItem == newItem
     }
 }
 

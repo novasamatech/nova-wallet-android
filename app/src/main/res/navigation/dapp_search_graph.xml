@@ -20,6 +20,7 @@
             app:popExitAnim="@anim/fragment_slide_out"
             app:popUpTo="@id/dapp_search_graph"
             app:popUpToInclusive="true" />
+
     </fragment>
 
     <include app:graph="@navigation/dapp_browser_graph" />

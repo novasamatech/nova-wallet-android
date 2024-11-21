@@ -20,10 +20,12 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserIntera
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.stateId
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
@@ -44,6 +46,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -113,12 +116,14 @@ class DAppBrowserViewModel(
 
     val currentTabFlow = browserTabPoolService.tabStateFlow
         .map { it.selectedTab }
+        .distinctUntilChangedBy { it.stateId() }
         .filterIsInstance<CurrentTabState.Selected>()
         .shareInBackground()
 
     init {
         dAppSearchRequester.responseFlow
-            .onEach { it.newUrl?.let(::forceLoad) }
+            .filterIsInstance<DAppSearchCommunicator.Response.NewUrl>()
+            .onEach { forceLoad(it.url) }
             .launchIn(this)
 
         watchDangerousWebsites()
@@ -174,7 +179,7 @@ class DAppBrowserViewModel(
     fun openSearch() = launch {
         val currentPage = currentPage.first()
 
-        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url))
+        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url, SearchPayload.Request.GO_TO_URL))
     }
 
     fun onMoreClicked() {

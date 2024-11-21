@@ -39,6 +39,8 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
     override fun initViews() {
         requireView().applyStatusBarInsets()
 
+        onBackPressed { viewModel.done() }
+
         browserTabsList.layoutManager = GridLayoutManager(requireContext(), 2)
         browserTabsList.adapter = adapter
 
@@ -69,7 +71,6 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
     override fun tabCloseClicked(item: BrowserTabRvItem) {
         viewModel.closeTab(item.tabId)
     }
-
 
     private fun setupCloseAllTabsDialogue() {
         viewModel.closeAllTabsConfirmation.awaitableActionLiveData.observeEvent { event ->

@@ -11,8 +11,10 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayloa
 class DAppSearchCommunicatorImpl(navigationHolder: RootNavigationHolder) :
     NavStackInterScreenCommunicator<SearchPayload, Response>(navigationHolder),
     DAppSearchCommunicator {
+
     override fun openRequest(request: SearchPayload) {
         super.openRequest(request)
-        navController.navigate(R.id.action_DAppBrowserFragment_to_dappSearchFragment, DappSearchFragment.getBundle(request))
+
+        navController.navigate(R.id.action_open_dappSearch_from_browser, DappSearchFragment.getBundle(request))
     }
 }

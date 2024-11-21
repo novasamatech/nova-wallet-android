@@ -60,12 +60,12 @@ class PageSession(
         chromeClient: Web3ChromeClient,
         pageCallback: PageCallback
     ) {
-        webView.webChromeClient = chromeClient
+        _webView?.webChromeClient = chromeClient
         this.nestedPageCallback = pageCallback
     }
 
     fun detachSession() {
-        webView.webChromeClient = null
+        _webView?.webChromeClient = null
         nestedPageCallback = null
     }
 

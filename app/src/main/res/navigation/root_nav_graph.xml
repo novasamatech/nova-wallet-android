@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_root_nav_graph"
+    android:id="@+id/root_nav_graph"
     app:startDestination="@id/splashFragment">
 
     <include app:graph="@navigation/main_nav_graph" />
@@ -13,6 +13,8 @@
 
     <include app:graph="@navigation/dapp_browser_graph" />
 
+    <include app:graph="@navigation/dapp_search_graph" />
+
     <action
         android:id="@+id/action_open_main"
         app:destination="@id/splitScreenFragment"
@@ -20,7 +22,7 @@
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit"
-        app:popUpTo="@id/main_root_nav_graph"
+        app:popUpTo="@id/root_nav_graph"
         app:popUpToInclusive="true" />
 
     <action
@@ -74,6 +76,14 @@
     <action
         android:id="@+id/action_open_dappBrowser"
         app:destination="@id/dapp_browser_graph"
+        app:enterAnim="@anim/fragment_slide_in"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_slide_out" />
+
+    <action
+        android:id="@+id/action_open_dappSearch"
+        app:destination="@id/dapp_search_graph"
         app:enterAnim="@anim/fragment_slide_in"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
