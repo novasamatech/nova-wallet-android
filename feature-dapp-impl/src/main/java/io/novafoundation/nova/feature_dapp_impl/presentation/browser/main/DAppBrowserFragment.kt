@@ -201,12 +201,17 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             webView.loadUrl(session.startUrl)
         }
 
+        clearProgress()
         session.attachSession(createChromeClient(), this)
         webViewHolder.set(session.webView)
         webViewClient = session.webViewClient
 
         dappBrowserWebViewContainer.removeAllViews()
         dappBrowserWebViewContainer.addView(session.webView)
+    }
+
+    private fun clearProgress() {
+        dappBrowserProgress.progress = 0
     }
 
     private fun createChromeClient() = Web3ChromeClient(fileChooser, dappBrowserProgress)
