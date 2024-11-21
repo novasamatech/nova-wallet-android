@@ -120,6 +120,7 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
         swapExecutionStepShimmer.hideShimmer()
         swapExecutionStepContainer.background = requireContext().getBlockDrawable()
 
+        swapExecutionActionButton.makeVisible()
         swapExecutionActionButton.setText(R.string.common_done)
         swapExecutionActionButton.setOnClickListener { viewModel.doneClicked() }
     }

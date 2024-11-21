@@ -97,7 +97,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
@@ -209,22 +208,6 @@ internal class RealSwapService(
     }
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
-        return flow {
-            calculatedFee.segments.forEachIndexed { index, segment ->
-                val operation = segment.operation
-                val displayData = operation.constructDisplayData()
-                val step = SwapProgressStep(index, displayData, operation)
-
-                emit(SwapProgress.StepStarted(step))
-
-                delay(2.seconds)
-
-                if (index == calculatedFee.segments.size - 1) {
-                    emit(SwapProgress.Failure(IllegalArgumentException("Test error"), step))
-                }
-            }
-        }
-
         val segments = calculatedFee.segments
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
