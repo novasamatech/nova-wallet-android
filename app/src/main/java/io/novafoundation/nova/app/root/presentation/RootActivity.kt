@@ -56,7 +56,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         super.onCreate(savedInstanceState)
 
         rootNavigationHolder.attach(rootNavController)
-        // setupBackNavigation(mainNavController, dappNavController)
 
         contextManager.attachActivity(this)
 
