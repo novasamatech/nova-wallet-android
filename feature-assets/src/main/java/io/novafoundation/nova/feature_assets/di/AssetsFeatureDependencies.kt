@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.d
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
@@ -175,6 +176,8 @@ interface AssetsFeatureDependencies {
     val coinGeckoLinkParser: CoinGeckoLinkParser
 
     val assetIconProvider: AssetIconProvider
+
+    val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -91,10 +92,13 @@ class SwapConfirmationViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val resourceManager: ResourceManager,
+    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
+
+    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 
     private val confirmationStateFlow = singleReplaySharedFlow<SwapConfirmationState>()
 
@@ -105,7 +109,7 @@ class SwapConfirmationViewModel(
         .mapNotNull { swapInteractor.slippageConfig(it.swapQuote.assetIn.chainId) }
         .shareInBackground()
 
-    private val initialSwapState = flowOf { swapStateStoreProvider.getStateOrThrow(viewModelScope) }
+    private val initialSwapState = flowOf { swapStateStoreProvider.getStateOrThrow(swapFlowScope) }
 
     private val slippageFlow = initialSwapState.map { it.slippage }
         .shareInBackground()
@@ -216,7 +220,7 @@ class SwapConfirmationViewModel(
 
     private fun setSwapStateAfter(action: () -> Unit) {
         launch {
-            val store = swapStateStoreProvider.getStore(viewModelScope)
+            val store = swapStateStoreProvider.getStore(swapFlowScope)
             store.resetState()
 
             action()
@@ -288,7 +292,7 @@ class SwapConfirmationViewModel(
     private fun calculateQuote(newSwapQuoteArgs: SwapQuoteArgs) {
         launch {
             val confirmationState = confirmationStateFlow.first()
-            val swapQuote = swapInteractor.quote(newSwapQuoteArgs, viewModelScope)
+            val swapQuote = swapInteractor.quote(newSwapQuoteArgs, swapFlowScope)
                 .onFailure { }
                 .getOrNull() ?: return@launch
 

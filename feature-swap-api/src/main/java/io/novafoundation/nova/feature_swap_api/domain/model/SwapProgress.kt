@@ -12,4 +12,5 @@ sealed class SwapProgress {
 class SwapProgressStep(
     val index: Int,
     val displayData: AtomicOperationDisplayData,
+    val operation: AtomicSwapOperation
 )

@@ -248,6 +248,8 @@ private class AssetConversionExchange(
 
         override val assetOut: FullChainAssetId = toAsset.fullId
 
+        override val assetIn: FullChainAssetId = fromAsset.fullId
+
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Swap(
                 from = fromAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountIn),

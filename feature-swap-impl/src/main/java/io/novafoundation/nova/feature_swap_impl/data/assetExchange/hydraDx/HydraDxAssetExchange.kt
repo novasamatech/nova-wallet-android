@@ -296,7 +296,7 @@ private class HydraDxAssetExchange(
 
         override val assetOut: FullChainAssetId = segments.last().edge.to
 
-        private val assetIn: FullChainAssetId = segments.first().edge.from
+        override val assetIn: FullChainAssetId = segments.first().edge.from
 
         constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs)
             : this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)

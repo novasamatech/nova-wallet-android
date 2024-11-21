@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSw
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -48,6 +49,7 @@ class AssetSwapFlowViewModel(
     private val swapPayload: SwapFlowPayload,
     private val assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
+    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val amountFormatter: AmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
@@ -61,6 +63,8 @@ class AssetSwapFlowViewModel(
     assetViewModeInteractor,
     amountFormatter
 ) {
+
+    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 
     init {
         launchInitialSwapSync()
@@ -79,13 +83,13 @@ class AssetSwapFlowViewModel(
             forAsset = swapPayload.constraintDirectionsAsset?.fullChainAssetId,
             queryFlow = query,
             externalBalancesFlow = externalBalancesFlow,
-            coroutineScope = viewModelScope
+            coroutineScope = swapFlowScope
         )
     }
 
     override fun assetClicked(asset: Chain.Asset) {
         launch {
-            swapFlowExecutor.openNextScreen(viewModelScope, asset)
+            swapFlowExecutor.openNextScreen(swapFlowScope, asset)
         }
     }
 
@@ -115,9 +119,9 @@ class AssetSwapFlowViewModel(
 
     private fun launchInitialSwapSync() {
         if (swapPayload is SwapFlowPayload.InitialSelecting) {
-            launch { swapAvailabilityInteractor.warmUpCommonlyUsedChains(viewModelScope) }
+            launch { swapAvailabilityInteractor.warmUpCommonlyUsedChains(swapFlowScope) }
 
-            launch { swapAvailabilityInteractor.sync(viewModelScope) }
+            launch { swapAvailabilityInteractor.sync(swapFlowScope) }
         }
     }
 }

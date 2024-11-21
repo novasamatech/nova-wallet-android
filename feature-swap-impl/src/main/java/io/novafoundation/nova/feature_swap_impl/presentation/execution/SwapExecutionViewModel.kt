@@ -11,7 +11,13 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
+import io.novafoundation.nova.feature_swap_api.domain.model.quotedAmount
 import io.novafoundation.nova.feature_swap_api.domain.model.remainingTimeWhenExecuting
+import io.novafoundation.nova.feature_swap_api.domain.model.swapDirection
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -45,10 +51,14 @@ class SwapExecutionViewModel(
     private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
+    private val swapSettingsStateProvider: SwapSettingsStateProvider
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
-    private val swapStateFlow = flowOf { swapStateStoreProvider.getStateOrThrow(viewModelScope) }
+    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+
+    private val swapStateFlow = flowOf { swapStateStoreProvider.getStateOrThrow(swapFlowScope) }
 
     private val swapProgressFlow = singleReplaySharedFlow<SwapProgress>()
 
@@ -58,7 +68,7 @@ class SwapExecutionViewModel(
         swapProgress.toUi(swapState)
     }.shareInBackground()
 
-    val backAvailableFlow = swapProgressFlow.map { it !is SwapProgress.StepStarted }
+    val backAvailableFlow = swapProgressFlow.map { it is SwapProgress.Done }
 
     val feeMixin = feeLoaderMixinFactory.createForSwap(
         chainAssetIn = swapStateFlow.map { it.quote.assetIn },
@@ -102,6 +112,34 @@ class SwapExecutionViewModel(
 
     fun routeClicked() {
         router.openSwapRoute()
+    }
+
+    fun retryClicked() = launchUnit {
+        val swapFailure = swapProgressFlow.first() as? SwapProgress.Failure ?: return@launchUnit
+        val failedStep = swapFailure.attemptedStep
+
+        val retrySwapSettings = retrySwapSettings(failedStep)
+        swapSettingsStateProvider.getSwapSettingsState(swapFlowScope).setSwapSettings(retrySwapSettings)
+
+        // return to swap main settings with updated data
+        router.back()
+    }
+
+    fun doneClicked() {
+        onBackPressed()
+    }
+
+    private suspend fun retrySwapSettings(failedStep: SwapProgressStep): SwapSettings {
+        val swapState = swapStateFlow.first()
+        val failedOperation = failedStep.operation
+
+        return SwapSettings(
+            assetIn = chainRegistry.asset(failedOperation.assetIn),
+            assetOut = chainRegistry.asset(failedOperation.assetOut),
+            amount = failedOperation.estimatedSwapLimit.quotedAmount,
+            swapDirection = failedOperation.estimatedSwapLimit.swapDirection,
+            slippage = swapState.slippage
+        )
     }
 
     private fun setFee() = launchUnit {

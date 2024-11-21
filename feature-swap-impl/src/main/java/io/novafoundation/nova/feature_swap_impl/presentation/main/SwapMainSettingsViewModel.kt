@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -145,6 +146,7 @@ class SwapMainSettingsViewModel(
     private val swapRouteFormatter: SwapRouteFormatter,
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val swapStateStoreProvider: SwapStateStoreProvider,
+    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -152,11 +154,13 @@ class SwapMainSettingsViewModel(
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     Validatable by validationExecutor {
 
+    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+
     private val swapSettingState = async {
-        swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
+        swapSettingsStateProvider.getSwapSettingsState(swapFlowScope)
     }
 
-    private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(viewModelScope)
+    private val swapSettings = swapSettingsStateProvider.swapSettingsFlow(swapFlowScope)
         .share()
 
     private val chainAssetIn = swapSettings
@@ -304,7 +308,7 @@ class SwapMainSettingsViewModel(
     init {
         initPayload()
 
-        launch { swapInteractor.warmUpSwapCommonlyUsedChains(viewModelScope) }
+        launch { swapInteractor.warmUpSwapCommonlyUsedChains(swapFlowScope) }
 
         handleInputChanges(amountInInput, SwapSettings::assetIn, SwapDirection.SPECIFIED_IN)
         handleInputChanges(amountOutInput, SwapSettings::assetOut, SwapDirection.SPECIFIED_OUT)
@@ -316,7 +320,7 @@ class SwapMainSettingsViewModel(
         feeMixin.setupFees()
 
         launch {
-            swapInteractor.sync(viewModelScope)
+            swapInteractor.sync(swapFlowScope)
         }
     }
 
@@ -415,7 +419,7 @@ class SwapMainSettingsViewModel(
                 fee = feeMixin.awaitFee(),
                 slippage = swapSettings.first().slippage
             )
-            swapStateStoreProvider.getStore(viewModelScope).setState(swapState)
+            swapStateStoreProvider.getStore(swapFlowScope).setState(swapState)
             action()
         }
     }
@@ -425,7 +429,7 @@ class SwapMainSettingsViewModel(
             val quotingState = quotingState.value
             if (quotingState !is QuotingState.Loaded) return@launch
 
-            val store = swapStateStoreProvider.getStore(viewModelScope)
+            val store = swapStateStoreProvider.getStore(swapFlowScope)
             store.resetState()
 
             action()
@@ -515,7 +519,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupUpdateSystem() = launch {
-        swapInteractor.getUpdateSystem(originChainFlow, viewModelScope)
+        swapInteractor.getUpdateSystem(originChainFlow, swapFlowScope)
             .start()
             .launchIn(viewModelScope)
     }
@@ -647,7 +651,7 @@ class SwapMainSettingsViewModel(
                 quotingState.value = QuotingState.Loading
             }
 
-            val quote = swapInteractor.quote(swapQuoteArgs, viewModelScope)
+            val quote = swapInteractor.quote(swapQuoteArgs, swapFlowScope)
 
             quotingState.value = quote.fold(
                 onSuccess = { QuotingState.Loaded(it, swapQuoteArgs) },

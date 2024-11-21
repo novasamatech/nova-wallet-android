@@ -14,6 +14,8 @@ interface AtomicSwapOperation {
 
     val estimatedSwapLimit: SwapLimit
 
+    val assetIn: FullChainAssetId
+
     val assetOut: FullChainAssetId
 
     suspend fun constructDisplayData(): AtomicOperationDisplayData

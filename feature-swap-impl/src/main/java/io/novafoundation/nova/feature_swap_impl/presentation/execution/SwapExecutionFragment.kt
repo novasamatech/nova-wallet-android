@@ -8,9 +8,9 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.setBackgroundTintRes
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
+import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionActionButton
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionAssets
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionContainer
 import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionDetails
@@ -105,11 +106,11 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
         swapExecutionFinishedStatus.makeVisible()
         swapExecutionProgressViews.makeInvisible()
 
-        swapExecutionFinishedStatus.setBackgroundTintRes(R.color.icon_positive)
-        swapExecutionFinishedStatus.setImageResource(R.drawable.ic_checkmark)
+        swapExecutionFinishedStatus.setImageResource(R.drawable.ic_checkmark_circle_16)
         swapExecutionFinishedStatus.setImageTintRes(R.color.icon_positive)
 
         swapExecutionTitle.setText(R.string.common_completed)
+        swapExecutionTitle.setTextColorRes(R.color.text_positive)
         swapExecutionSubtitle.text = model.at
         swapExecutionSubtitle.setTextColorRes(R.color.text_secondary)
 
@@ -118,17 +119,20 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
         swapExecutionStepShimmer.hideShimmer()
         swapExecutionStepContainer.background = requireContext().getBlockDrawable()
+
+        swapExecutionActionButton.setText(R.string.common_done)
+        swapExecutionActionButton.setOnClickListener { viewModel.doneClicked() }
     }
 
     private fun setSwapFailed(model: SwapProgressModel.Failed) {
         swapExecutionFinishedStatus.makeVisible()
         swapExecutionProgressViews.makeInvisible()
 
-        swapExecutionFinishedStatus.backgroundTintList = null
-        swapExecutionFinishedStatus.setImageResource(R.drawable.ic_close)
+        swapExecutionFinishedStatus.setImageResource(R.drawable.ic_close_circle)
         swapExecutionFinishedStatus.setImageTintRes(R.color.icon_negative)
 
         swapExecutionTitle.setText(R.string.common_failed)
+        swapExecutionTitle.setTextColorRes(R.color.text_negative)
         swapExecutionSubtitle.text = model.at
         swapExecutionSubtitle.setTextColorRes(R.color.text_secondary)
 
@@ -137,6 +141,10 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
         swapExecutionStepShimmer.hideShimmer()
         swapExecutionStepContainer.background = requireContext().getRoundedCornerDrawable(R.color.error_block_background)
+
+        swapExecutionActionButton.makeVisible()
+        swapExecutionActionButton.setText(R.string.common_retry)
+        swapExecutionActionButton.setOnClickListener { viewModel.retryClicked() }
     }
 
     private fun setSwapInProgress(model: SwapProgressModel.InProgress) {
@@ -146,6 +154,7 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
         swapExecutionRemainingTime.startTimer(model.remainingTime, durationFormatter = UnlabeledSecondsFormatter())
 
         swapExecutionTitle.setText(R.string.common_do_not_close_app)
+        swapExecutionTitle.setTextColorRes(R.color.text_primary)
         swapExecutionSubtitle.text = model.stepDescription
         swapExecutionSubtitle.setTextColorRes(R.color.button_text_accent)
 
@@ -154,6 +163,8 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
         swapExecutionStepShimmer.showShimmer(true)
         swapExecutionStepContainer.background = requireContext().getBlockDrawable()
+
+        swapExecutionActionButton.makeGone()
     }
 
     private class UnlabeledSecondsFormatter : DurationFormatter {

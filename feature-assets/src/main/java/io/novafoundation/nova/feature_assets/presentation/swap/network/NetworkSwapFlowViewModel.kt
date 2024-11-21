@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_assets.presentation.flow.network.model.Net
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.constraintDirectionsAsset
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -33,7 +34,8 @@ class NetworkSwapFlowViewModel(
     networkFlowPayload: NetworkFlowPayload,
     chainRegistry: ChainRegistry,
     private val swapFlowPayload: SwapFlowPayload,
-    private val swapFlowExecutor: SwapFlowExecutor
+    private val swapFlowExecutor: SwapFlowExecutor,
+    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
 ) : NetworkFlowViewModel(
     interactor,
     router,
@@ -45,6 +47,8 @@ class NetworkSwapFlowViewModel(
     chainRegistry
 ) {
 
+    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+
     override fun getAssetBalance(asset: AssetWithNetwork): PricedAmount {
         return asset.balanceWithOffChain.transferable
     }
@@ -54,14 +58,14 @@ class NetworkSwapFlowViewModel(
             forAssetId = swapFlowPayload.constraintDirectionsAsset?.fullChainAssetId,
             tokenSymbol = tokenSymbol,
             externalBalancesFlow = externalBalancesFlow,
-            coroutineScope = viewModelScope
+            coroutineScope = swapFlowScope
         )
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
         launch {
             val chainAsset = chainRegistry.asset(network.chainId, network.assetId)
-            swapFlowExecutor.openNextScreen(coroutineScope, chainAsset)
+            swapFlowExecutor.openNextScreen(swapFlowScope, chainAsset)
         }
     }
 

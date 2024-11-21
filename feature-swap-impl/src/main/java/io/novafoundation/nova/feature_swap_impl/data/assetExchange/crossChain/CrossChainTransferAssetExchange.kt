@@ -201,6 +201,8 @@ class CrossChainTransferAssetExchange(
 
         override val assetOut: FullChainAssetId = edge.to
 
+        override val assetIn: FullChainAssetId = edge.from
+
         override suspend fun constructDisplayData(): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Transfer(
                 from = edge.from,

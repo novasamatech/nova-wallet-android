@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
@@ -38,6 +39,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAler
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.RealSwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.navigation.RealSwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
@@ -228,5 +230,11 @@ class SwapFeatureModule {
         chainRegistry: ChainRegistry
     ): AssetInAdditionalSwapDeductionUseCase {
         return RealAssetInAdditionalSwapDeductionUseCase(assetSourceRegistry, chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapFlowScopeAggregator(): SwapFlowScopeAggregator {
+        return RealSwapFlowScopeAggregator()
     }
 }

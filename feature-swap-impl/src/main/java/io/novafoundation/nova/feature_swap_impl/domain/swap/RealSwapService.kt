@@ -218,7 +218,7 @@ internal class RealSwapService(
 
                 prevStepCorrection.flatMap { correction ->
                     val displayData = operation.constructDisplayData()
-                    val step = SwapProgressStep(index, displayData)
+                    val step = SwapProgressStep(index, displayData, operation)
 
                     emit(SwapProgress.StepStarted(step))
 
