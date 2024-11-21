@@ -8,13 +8,14 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.di.AddToFavouritesComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.di.AuthorizedDAppsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAppBrowserComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.tab.di.BrowserTabsComponent
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -35,6 +36,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
     fun mainComponentFactory(): MainDAppComponent.Factory
 
     fun browserComponentFactory(): DAppBrowserComponent.Factory
+
+    fun browserTabsComponentFactory(): BrowserTabsComponent.Factory
 
     fun dAppSearchComponentFactory(): DAppSearchComponent.Factory
 

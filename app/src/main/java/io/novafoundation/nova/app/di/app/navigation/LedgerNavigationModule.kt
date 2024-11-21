@@ -2,10 +2,10 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.ledger.LedgerNavigator
-import io.novafoundation.nova.app.root.navigation.ledger.LedgerSignCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.ledger.SelectLedgerAddressCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.ledger.LedgerNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.ledger.LedgerSignCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.ledger.SelectLedgerAddressCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -17,17 +17,17 @@ class LedgerNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideSelectLedgerAddressCommunicator(navigationHolder: NavigationHolder): SelectLedgerAddressInterScreenCommunicator {
+    fun provideSelectLedgerAddressCommunicator(navigationHolder: MainNavigationHolder): SelectLedgerAddressInterScreenCommunicator {
         return SelectLedgerAddressCommunicatorImpl(navigationHolder)
     }
 
     @Provides
     @ApplicationScope
     fun provideLedgerSignerCommunicator(
-        navigationHolder: NavigationHolder
+        navigationHolder: MainNavigationHolder
     ): LedgerSignCommunicator = LedgerSignCommunicatorImpl(navigationHolder)
 
     @ApplicationScope
     @Provides
-    fun provideRouter(router: AccountRouter, navigationHolder: NavigationHolder): LedgerRouter = LedgerNavigator(router, navigationHolder)
+    fun provideRouter(router: AccountRouter, navigationHolder: MainNavigationHolder): LedgerRouter = LedgerNavigator(router, navigationHolder)
 }

@@ -1,8 +1,9 @@
 package io.novafoundation.nova.app.root.di
 
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.app.root.navigation.staking.StakingDashboardNavigator
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.Navigator
+import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -14,7 +15,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -29,7 +30,8 @@ import javax.inject.Inject
 
 @ApplicationScope
 class RootFeatureHolder @Inject constructor(
-    private val navigationHolder: NavigationHolder,
+    private val mainNavigationHolder: MainNavigationHolder,
+    private val rootNavigationHolder: RootNavigationHolder,
     private val navigator: Navigator,
     private val governanceRouter: GovernanceRouter,
     private val dAppRouter: DAppRouter,
@@ -60,6 +62,16 @@ class RootFeatureHolder @Inject constructor(
             .build()
 
         return DaggerRootComponent.factory()
-            .create(navigationHolder, navigator, governanceRouter, dAppRouter, assetsRouter, accountRouter, stakingDashboardNavigator, rootFeatureDependencies)
+            .create(
+                mainNavigationHolder,
+                rootNavigationHolder,
+                navigator,
+                governanceRouter,
+                dAppRouter,
+                assetsRouter,
+                accountRouter,
+                stakingDashboardNavigator,
+                rootFeatureDependencies
+            )
     }
 }

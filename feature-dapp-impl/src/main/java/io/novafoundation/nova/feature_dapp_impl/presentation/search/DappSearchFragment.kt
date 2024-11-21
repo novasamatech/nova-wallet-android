@@ -75,7 +75,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe(::submitListPreservingViewPoint)
-        viewModel.dAppNotInCatalogWarning
+
         viewModel.selectQueryTextEvent.observeEvent {
             searchDappSearch.searchInput.content.selectAll()
         }

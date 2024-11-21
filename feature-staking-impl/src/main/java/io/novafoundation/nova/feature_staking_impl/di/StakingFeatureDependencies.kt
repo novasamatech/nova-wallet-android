@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
@@ -66,6 +67,60 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface StakingFeatureDependencies {
+
+    val amountChooserMixinFactory: AmountChooserMixin.Factory
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val walletUiUseCase: WalletUiUseCase
+
+    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
+
+    val selectedAccountUseCase: SelectedAccountUseCase
+
+    val chainStateRepository: ChainStateRepository
+
+    val sampledBlockTimeStorage: SampledBlockTimeStorage
+
+    val timestampRepository: TimestampRepository
+
+    val totalIssuanceRepository: TotalIssuanceRepository
+
+    val onChainIdentityRepository: OnChainIdentityRepository
+
+    val identityMixinFactory: IdentityMixin.Factory
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val stakingDashboardDao: StakingDashboardDao
+
+    val dAppMetadataRepository: DAppMetadataRepository
+
+    val runtimeCallsApi: MultiChainRuntimeCallsApi
+
+    val arbitraryAssetUseCase: ArbitraryAssetUseCase
+
+    val locksRepository: BalanceLocksRepository
+
+    val externalBalanceDao: ExternalBalanceDao
+
+    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val proxyDepositCalculator: ProxyDepositCalculator
+
+    val getProxyRepository: GetProxyRepository
+
+    val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
+
+    val proxyConstantsRepository: ProxyConstantsRepository
+
+    val proxySyncService: ProxySyncService
+
+    val dappRouter: DAppRouter
 
     fun contextManager(): ContextManager
 
@@ -138,58 +193,7 @@ interface StakingFeatureDependencies {
 
     fun addressInputMixinFactory(): AddressInputMixinFactory
 
-    val amountChooserMixinFactory: AmountChooserMixin.Factory
-
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-
     @Caching
     fun cachingIconGenerator(): AddressIconGenerator
 
-    val walletUiUseCase: WalletUiUseCase
-
-    val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
-
-    val selectedAccountUseCase: SelectedAccountUseCase
-
-    val chainStateRepository: ChainStateRepository
-
-    val sampledBlockTimeStorage: SampledBlockTimeStorage
-
-    val timestampRepository: TimestampRepository
-
-    val totalIssuanceRepository: TotalIssuanceRepository
-
-    val onChainIdentityRepository: OnChainIdentityRepository
-
-    val identityMixinFactory: IdentityMixin.Factory
-
-    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val stakingDashboardDao: StakingDashboardDao
-
-    val dAppMetadataRepository: DAppMetadataRepository
-
-    val runtimeCallsApi: MultiChainRuntimeCallsApi
-
-    val arbitraryAssetUseCase: ArbitraryAssetUseCase
-
-    val locksRepository: BalanceLocksRepository
-
-    val externalBalanceDao: ExternalBalanceDao
-
-    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
-
-    val proxyDepositCalculator: ProxyDepositCalculator
-
-    val getProxyRepository: GetProxyRepository
-
-    val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
-
-    val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
-
-    val selectAddressMixinFactory: SelectAddressMixin.Factory
-
-    val proxyConstantsRepository: ProxyConstantsRepository
-
-    val proxySyncService: ProxySyncService
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
@@ -25,9 +26,9 @@ class MoreStakingOptionsViewModel(
     private val interactor: StakingDashboardInteractor,
     private val startStakingRouter: StartMultiStakingRouter,
     private val dashboardRouter: StakingDashboardRouter,
-    private val router: StakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
+    private val dappRouter: DAppRouter
 ) : BaseViewModel() {
 
     init {
@@ -53,7 +54,7 @@ class MoreStakingOptionsViewModel(
     }
 
     fun onBrowserStakingItemClicked(item: StakingDAppModel) = launch {
-        router.openDAppBrowser(item.url)
+        dappRouter.openDAppBrowser(item.url)
     }
 
     private fun syncDApps() = launch {

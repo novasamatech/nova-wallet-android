@@ -3,8 +3,9 @@ package io.novafoundation.nova.app.di.app.navigation
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.di.app.navigation.staking.StakingNavigationModule
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.Navigator
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.resources.ContextManager
@@ -40,17 +41,24 @@ class NavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideNavigatorHolder(
+    fun provideMainNavigatorHolder(
         contextManager: ContextManager
-    ): NavigationHolder = NavigationHolder(contextManager)
+    ): MainNavigationHolder = MainNavigationHolder(contextManager)
+
+    @ApplicationScope
+    @Provides
+    fun provideDappNavigatorHolder(
+        contextManager: ContextManager
+    ): RootNavigationHolder = RootNavigationHolder(contextManager)
 
     @ApplicationScope
     @Provides
     fun provideNavigator(
-        navigatorHolder: NavigationHolder,
+        rootNavigatorHolder: RootNavigationHolder,
+        mainNavigatorHolder: MainNavigationHolder,
         walletConnectRouter: WalletConnectRouter,
         stakingDashboardRouter: StakingDashboardRouter,
-    ): Navigator = Navigator(navigatorHolder, walletConnectRouter, stakingDashboardRouter)
+    ): Navigator = Navigator(rootNavigatorHolder, mainNavigatorHolder, walletConnectRouter, stakingDashboardRouter)
 
     @Provides
     @ApplicationScope

@@ -25,8 +25,8 @@ class PageSnapshotBuilder(
 
         return PageSnapshot(
             pageName = pageName,
-            pageIconPath = pagePicturePath,
-            pagePicturePath = pageIconPath
+            pageIconPath = pageIconPath,
+            pagePicturePath = pagePicturePath
         )
     }
 

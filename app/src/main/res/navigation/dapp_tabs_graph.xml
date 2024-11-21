@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dapp_tabs_graph"
+    app:startDestination="@id/dappTabsFragment">
+
+    <fragment
+        android:id="@+id/dappTabsFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.tab.BrowserTabsFragment"
+        android:label="BrowserTabsFragment"
+        tools:layout="@layout/fragment_browser_tabs">
+
+        <action
+            android:id="@+id/action_dappTabsFragment_to_dapp_browser_graph"
+            app:destination="@id/dapp_browser_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_slide_out"
+            app:popUpTo="@id/dapp_tabs_graph"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_dappTabsFragment_to_dapp_search_graph"
+            app:destination="@id/dapp_search_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_slide_out" />
+    </fragment>
+
+    <include app:graph="@navigation/dapp_browser_graph" />
+
+    <include app:graph="@navigation/dapp_search_graph" />
+</navigation>

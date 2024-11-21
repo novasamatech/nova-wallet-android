@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.moveCursorToTheEnd
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon

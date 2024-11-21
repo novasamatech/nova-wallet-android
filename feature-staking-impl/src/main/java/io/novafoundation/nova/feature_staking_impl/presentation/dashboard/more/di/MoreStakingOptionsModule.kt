@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
@@ -26,7 +27,7 @@ class MoreStakingOptionsModule {
     fun provideViewModel(
         interactor: StakingDashboardInteractor,
         dashboardRouter: StakingDashboardRouter,
-        router: StakingRouter,
+        dappRouter: DAppRouter,
         stakingSharedState: StakingSharedState,
         presentationMapper: StakingDashboardPresentationMapper,
         startMultiStakingRouter: StartMultiStakingRouter,
@@ -35,7 +36,7 @@ class MoreStakingOptionsModule {
             interactor = interactor,
             startStakingRouter = startMultiStakingRouter,
             dashboardRouter = dashboardRouter,
-            router = router,
+            dappRouter = dappRouter,
             stakingSharedState = stakingSharedState,
             presentationMapper = presentationMapper
         )

@@ -12,12 +12,12 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
@@ -111,7 +111,8 @@ class DAppBrowserViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val currentTabFlow = browserTabPoolService.currentTabFlow
+    val currentTabFlow = browserTabPoolService.tabStateFlow
+        .map { it.selectedTab }
         .filterIsInstance<CurrentTabState.Selected>()
         .shareInBackground()
 
@@ -167,11 +168,7 @@ class DAppBrowserViewModel(
     }
 
     fun closeClicked() = launch {
-        val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.CloseScreen)
-
-        if (confirmationState == ConfirmationState.ALLOWED) {
-            exitBrowser()
-        }
+        exitBrowser()
     }
 
     fun openSearch() = launch {
@@ -214,6 +211,14 @@ class DAppBrowserViewModel(
             isDesktopModeEnabledFlow.value = newDesktopMode
             _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
         }
+    }
+
+    fun openTabs() {
+        router.openTabs()
+    }
+
+    fun makePageSnapshot() = launch {
+        browserTabPoolService.makeCurrentTabSnapshot()
     }
 
     private fun watchDangerousWebsites() {
