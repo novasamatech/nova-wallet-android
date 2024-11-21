@@ -137,21 +137,6 @@ class SwapInteractor(
 
     suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = withContext(Dispatchers.IO) {
         swapService.swap(calculatedFee)
-//            .onSuccess { submission ->
-//                swapTransactionHistoryRepository.insertPendingSwap(
-//                    chainAsset = swapExecuteArgs.assetIn,
-//                    swapArgs = swapExecuteArgs,
-//                    fee = decimalFee,
-//                    txSubmission = submission
-//                )
-//
-//                swapTransactionHistoryRepository.insertPendingSwap(
-//                    chainAsset = swapExecuteArgs.assetOut,
-//                    swapArgs = swapExecuteArgs,
-//                    fee = decimalFee,
-//                    txSubmission = submission
-//                )
-//            }
     }
 
     suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {

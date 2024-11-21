@@ -92,5 +92,14 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment" />
+
+        <action
+            android:id="@+id/action_swapExecutionFragment_to_swapSettingsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/start_swap_nav_graph"
+            app:destination="@id/swapSettingsFragment" />
     </fragment>
 </navigation>

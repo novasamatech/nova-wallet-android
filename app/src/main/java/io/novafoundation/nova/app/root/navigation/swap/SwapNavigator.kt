@@ -8,7 +8,9 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 class SwapNavigator(
@@ -27,6 +29,11 @@ class SwapNavigator(
     override fun openSwapOptions() {
         navigationHolder.navController?.navigate(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
     }
+
+    override fun openRetrySwap(payload: SwapSettingsPayload) = performNavigation(
+        actionId = R.id.action_swapExecutionFragment_to_swapSettingsFragment,
+        args = SwapMainSettingsFragment.getBundle(payload)
+    )
 
     override fun openBalanceDetails(assetPayload: AssetPayload) {
         navigationHolder.navController?.navigate(R.id.action_swapExecutionFragment_to_assetDetails, BalanceDetailFragment.getBundle(assetPayload))

@@ -11,12 +11,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.SwapExecutionViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -38,7 +35,6 @@ class SwapExecutionModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
-        swapSettingsStateProvider: SwapSettingsStateProvider
     ): ViewModel {
         return SwapExecutionViewModel(
             swapStateStoreProvider = swapStateStoreProvider,
@@ -50,7 +46,6 @@ class SwapExecutionModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapFlowScopeAggregator = swapFlowScopeAggregator,
-            swapSettingsStateProvider = swapSettingsStateProvider
         )
     }
 

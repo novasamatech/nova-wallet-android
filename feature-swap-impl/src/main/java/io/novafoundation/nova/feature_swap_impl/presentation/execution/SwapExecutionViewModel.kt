@@ -15,9 +15,9 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedAmount
 import io.novafoundation.nova.feature_swap_api.domain.model.remainingTimeWhenExecuting
 import io.novafoundation.nova.feature_swap_api.domain.model.swapDirection
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_api.presentation.model.toParcel
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -52,7 +52,6 @@ class SwapExecutionViewModel(
     private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    private val swapSettingsStateProvider: SwapSettingsStateProvider
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
@@ -118,27 +117,23 @@ class SwapExecutionViewModel(
         val swapFailure = swapProgressFlow.first() as? SwapProgress.Failure ?: return@launchUnit
         val failedStep = swapFailure.attemptedStep
 
-        val retrySwapSettings = retrySwapSettings(failedStep)
-        swapSettingsStateProvider.getSwapSettingsState(swapFlowScope).setSwapSettings(retrySwapSettings)
+        val retrySwapPayload = retrySwapPayload(failedStep)
 
-        // return to swap main settings with updated data
-        router.back()
+        router.openRetrySwap(retrySwapPayload)
     }
 
     fun doneClicked() {
         onBackPressed()
     }
 
-    private suspend fun retrySwapSettings(failedStep: SwapProgressStep): SwapSettings {
-        val swapState = swapStateFlow.first()
+    private fun retrySwapPayload(failedStep: SwapProgressStep): SwapSettingsPayload {
         val failedOperation = failedStep.operation
 
-        return SwapSettings(
-            assetIn = chainRegistry.asset(failedOperation.assetIn),
-            assetOut = chainRegistry.asset(failedOperation.assetOut),
+        return SwapSettingsPayload.RepeatOperation(
+            assetIn = failedOperation.assetIn.toAssetPayload(),
+            assetOut = failedOperation.assetOut.toAssetPayload(),
             amount = failedOperation.estimatedSwapLimit.quotedAmount,
-            swapDirection = failedOperation.estimatedSwapLimit.swapDirection,
-            slippage = swapState.slippage
+            direction = failedOperation.estimatedSwapLimit.swapDirection.toParcel(),
         )
     }
 
