@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.navigators.versions
 
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_versions_api.presentation.VersionsRouter

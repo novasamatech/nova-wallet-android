@@ -64,7 +64,7 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
         }
     }
 
-    override fun tabClicked(item: BrowserTabRvItem) {
+    override fun tabClicked(item: BrowserTabRvItem, view: View) {
         viewModel.openTab(item.tabId)
     }
 

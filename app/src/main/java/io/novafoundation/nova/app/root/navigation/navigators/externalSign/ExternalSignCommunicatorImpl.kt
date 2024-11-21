@@ -2,7 +2,6 @@ package io.novafoundation.nova.app.root.navigation.navigators.externalSign
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.FlowInterScreenCommunicator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed

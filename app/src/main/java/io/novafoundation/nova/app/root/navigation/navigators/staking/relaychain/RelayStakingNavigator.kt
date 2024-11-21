@@ -1,11 +1,9 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter

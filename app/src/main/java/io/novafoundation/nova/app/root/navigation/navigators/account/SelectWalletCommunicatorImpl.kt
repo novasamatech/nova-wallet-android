@@ -2,7 +2,6 @@ package io.novafoundation.nova.app.root.navigation.navigators.account
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator.Payload

@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.MoreStakingOptionsModel

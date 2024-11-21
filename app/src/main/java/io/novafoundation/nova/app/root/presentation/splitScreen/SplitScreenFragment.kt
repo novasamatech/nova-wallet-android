@@ -43,11 +43,9 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     }
 
     override fun initViews() {
-
     }
 
     override fun subscribe(viewModel: SplitScreenViewModel) {
-
     }
 
     private val mainNavController: NavController by lazy {

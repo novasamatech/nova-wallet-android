@@ -26,7 +26,7 @@ class BrowserTabsAdapter(
 
     interface Handler {
 
-        fun tabClicked(item: BrowserTabRvItem)
+        fun tabClicked(item: BrowserTabRvItem, view: View)
 
         fun tabCloseClicked(item: BrowserTabRvItem)
     }
@@ -58,7 +58,7 @@ class BrowserTabViewHolder(
 ) : BaseViewHolder(view) {
 
     fun bind(item: BrowserTabRvItem) = with(itemView) {
-        browserTabCard.setOnClickListener { itemHandler.tabClicked(item) }
+        browserTabCard.setOnClickListener { itemHandler.tabClicked(item, browserTabScreenshot) }
         browserTabClose.setOnClickListener { itemHandler.tabCloseClicked(item) }
         browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader) {
             transformations(TopCropTransformation())

@@ -26,23 +26,26 @@ fun NavController.getBackStackEntryBefore(@IdRes id: Int): NavBackStackEntry {
 }
 
 fun AppCompatActivity.setupBackNavigation(mainNavController: NavController, dAppNavController: NavController) {
-    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            // Firstly handle dapp back navigation
-            if (dAppNavController.popBackStack()) {
-                // If back navigation is handled - return
-                return
-            }
+    onBackPressedDispatcher.addCallback(
+        this,
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Firstly handle dapp back navigation
+                if (dAppNavController.popBackStack()) {
+                    // If back navigation is handled - return
+                    return
+                }
 
-            // Secondly handle main back navigation
-            if (mainNavController.popBackStack()) {
-                // If back navigation is handled - return
-                return
-            }
+                // Secondly handle main back navigation
+                if (mainNavController.popBackStack()) {
+                    // If back navigation is handled - return
+                    return
+                }
 
-            isEnabled = false
-            onBackPressedDispatcher.onBackPressed()
-            isEnabled = true
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
         }
-    })
+    )
 }

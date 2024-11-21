@@ -157,7 +157,6 @@ class Navigator(
             }
 
             is BackDelayedNavigation -> {
-
                 // TODO: need to pass a controller
                 rootNavController?.popBackStack()
             }

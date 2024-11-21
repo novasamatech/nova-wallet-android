@@ -195,5 +195,4 @@ interface StakingFeatureDependencies {
 
     @Caching
     fun cachingIconGenerator(): AddressIconGenerator
-
 }

@@ -5,7 +5,6 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.coroutines.flow.Flow

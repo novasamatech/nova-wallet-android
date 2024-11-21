@@ -34,6 +34,7 @@ class BrowserTabsViewModel(
 
     fun openTab(tabId: String) = launch {
         browserTabPoolService.selectTab(tabId)
+        router.back()
     }
 
     fun closeTab(tabId: String) = launch {
