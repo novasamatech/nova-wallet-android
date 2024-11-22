@@ -97,7 +97,7 @@ private class RealPathQuoter<E : QuotableEdge>(
         val fromKey = "${from.chainId}:${from.assetId}"
         val toKey = "${to.chainId}:${to.assetId}"
 
-        return "${fromKey}:${toKey}"
+        return "$fromKey:$toKey"
     }
 
     private suspend fun quotePath(
@@ -149,5 +149,3 @@ private class RealPathQuoter<E : QuotableEdge>(
             .getOrNull()
     }
 }
-
-

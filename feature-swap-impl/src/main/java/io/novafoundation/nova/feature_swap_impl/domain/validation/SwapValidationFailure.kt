@@ -41,7 +41,7 @@ sealed class SwapValidationFailure {
         val asset: Chain.Asset,
         val existentialDeposit: Balance,
         val amount: Balance
-    ): SwapValidationFailure()
+    ) : SwapValidationFailure()
 
     sealed class InsufficientBalance : SwapValidationFailure() {
 

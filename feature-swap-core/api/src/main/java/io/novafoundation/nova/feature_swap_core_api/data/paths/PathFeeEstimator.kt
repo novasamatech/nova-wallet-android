@@ -8,4 +8,3 @@ interface PathFeeEstimator<E> {
 
     suspend fun roughlyEstimateFee(path: Path<QuotedEdge<E>>): PathRoughFeeEstimation
 }
-

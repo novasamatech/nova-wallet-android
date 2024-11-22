@@ -44,7 +44,6 @@ value class Percent(val value: Double) : Comparable<Percent> {
     }
 }
 
-
 inline fun BigDecimal.asPerbill(): Perbill = Perbill(this.toDouble())
 
 inline fun Double.asPerbill(): Perbill = Perbill(this)

@@ -10,10 +10,10 @@ sealed class AtomicOperationDisplayData {
         val from: FullChainAssetId,
         val to: FullChainAssetId,
         val amount: Balance
-    ): AtomicOperationDisplayData()
+    ) : AtomicOperationDisplayData()
 
     data class Swap(
         val from: ChainAssetIdWithAmount,
         val to: ChainAssetIdWithAmount,
-    ): AtomicOperationDisplayData()
+    ) : AtomicOperationDisplayData()
 }

@@ -57,10 +57,10 @@ fun <N, E : Edge<N>> Graph.Companion.create(edges: List<E>): Graph<N, E> {
     }
 }
 
-inline fun <N, E: Edge<N>> Graph.Companion.build(building: GraphBuilder<N, E>.() -> Unit): Graph<N, E> {
+inline fun <N, E : Edge<N>> Graph.Companion.build(building: GraphBuilder<N, E>.() -> Unit): Graph<N, E> {
     return GraphBuilder<N, E>().apply(building).build()
 }
 
-inline fun <N, E: Edge<N>> Graph.Companion.buildAdjacencyList(building: GraphBuilder<N, E>.() -> Unit): MultiMapList<N, E> {
+inline fun <N, E : Edge<N>> Graph.Companion.buildAdjacencyList(building: GraphBuilder<N, E>.() -> Unit): MultiMapList<N, E> {
     return build(building).adjacencyList
 }

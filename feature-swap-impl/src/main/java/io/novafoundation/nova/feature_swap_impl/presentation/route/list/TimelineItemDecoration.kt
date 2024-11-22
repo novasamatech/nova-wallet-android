@@ -14,13 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.feature_swap_impl.R
 
-
 class TimelineItemDecoration(
     context: Context,
     private val shouldDecorate: (RecyclerView.ViewHolder) -> Boolean
 ) : RecyclerView.ItemDecoration(),
     WithContextExtensions by WithContextExtensions(context) {
-
 
     private val linePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.timeline_line_color)

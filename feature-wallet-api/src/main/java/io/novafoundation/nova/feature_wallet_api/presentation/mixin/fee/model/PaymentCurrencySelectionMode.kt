@@ -24,7 +24,6 @@ fun PaymentCurrencySelectionMode.automaticChangeEnabled(): Boolean {
     return this != PaymentCurrencySelectionMode.DISABLED
 }
 
-
 fun PaymentCurrencySelectionMode.userCanChangeFee(): Boolean {
     return this == PaymentCurrencySelectionMode.ENABLED
 }

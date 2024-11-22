@@ -26,14 +26,14 @@ internal class RealHydrationFeeInjector(
     }
 
     private fun getSetPhase(mode: HydrationFeeInjector.SetMode): SetPhase {
-        return when(mode) {
+        return when (mode) {
             HydrationFeeInjector.SetMode.Always -> AlwaysSetPhase()
             is HydrationFeeInjector.SetMode.Lazy -> LazySetPhase(mode.currentlySetFeeAsset)
         }
     }
 
     private fun getResetPhase(mode: HydrationFeeInjector.ResetMode): ResetPhase {
-        return when(mode) {
+        return when (mode) {
             HydrationFeeInjector.ResetMode.ToNative -> AlwaysResetPhase()
             is HydrationFeeInjector.ResetMode.ToNativeLazily -> LazyResetPhase(mode.feeAssetBeforeTransaction)
         }

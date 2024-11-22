@@ -105,11 +105,9 @@ fun SwapValidationSystemBuilder.enoughAssetInToPayForSwapAndFee(
     }
 )
 
-
 fun SwapValidationSystemBuilder.sufficientAmountOutToStayAboveED(
     assetsValidationContext: AssetsValidationContext
 ) = sufficientAmountOutToStayAboveEDValidation(assetsValidationContext)
-
 
 fun SwapValidationSystemBuilder.positiveAmountIn() = positiveAmount(
     amount = { it.amountIn.decimalAmount },

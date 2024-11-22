@@ -70,7 +70,7 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
             selectedChainAssetFlow: Flow<Chain.Asset>,
             feeFormatter: FeeFormatter<F, D>,
             feeInspector: FeeInspector<F>,
-            configuration: Configuration<F, D> =  Configuration()
+            configuration: Configuration<F, D> = Configuration()
         ): Presentation<F, D>
     }
 }

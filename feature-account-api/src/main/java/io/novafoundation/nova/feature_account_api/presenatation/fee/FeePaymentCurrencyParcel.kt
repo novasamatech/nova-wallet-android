@@ -11,18 +11,18 @@ sealed class FeePaymentCurrencyParcel : Parcelable {
     object Native : FeePaymentCurrencyParcel()
 
     @Parcelize
-    class Asset(val asset: ChainAssetParcel): FeePaymentCurrencyParcel()
+    class Asset(val asset: ChainAssetParcel) : FeePaymentCurrencyParcel()
 }
 
 fun FeePaymentCurrency.toParcel(): FeePaymentCurrencyParcel {
-    return when(this) {
+    return when (this) {
         is FeePaymentCurrency.Asset -> FeePaymentCurrencyParcel.Asset(ChainAssetParcel(asset))
         FeePaymentCurrency.Native -> FeePaymentCurrencyParcel.Native
     }
 }
 
 fun FeePaymentCurrencyParcel.toDomain(): FeePaymentCurrency {
-    return when(this) {
+    return when (this) {
         is FeePaymentCurrencyParcel.Asset -> FeePaymentCurrency.Asset(asset.value)
         FeePaymentCurrencyParcel.Native -> FeePaymentCurrency.Native
     }

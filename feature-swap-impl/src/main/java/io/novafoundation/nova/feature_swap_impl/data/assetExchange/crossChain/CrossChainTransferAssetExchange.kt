@@ -60,7 +60,6 @@ class CrossChainTransferAssetExchangeFactory(
     override suspend fun create(
         swapHost: AssetExchange.SwapHost
     ): AssetExchange {
-
         return CrossChainTransferAssetExchange(
             crossChainTransfersUseCase = crossChainTransfersUseCase,
             chainRegistry = chainRegistry,
@@ -278,7 +277,8 @@ class CrossChainTransferAssetExchange(
         override val postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
             paidByAccount = listOfNotNull(
                 SubmissionFeeWithLabel(crossChainFee.deliveryFee, debugLabel = "Delivery"),
-            ), paidFromAmount = listOf(
+            ),
+            paidFromAmount = listOf(
                 FeeWithLabel(crossChainFee.executionFee, debugLabel = "Execution")
             )
         )

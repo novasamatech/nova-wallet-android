@@ -88,7 +88,6 @@ import kotlinx.coroutines.flow.onEach
 import java.math.BigDecimal
 import kotlin.time.Duration
 
-
 class HydraDxExchangeFactory(
     private val remoteStorageSource: StorageDataSource,
     private val sharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
@@ -190,7 +189,6 @@ private class HydraDxAssetExchange(
         }
     }
 
-
     @Suppress("IfThenToElvis")
     private suspend fun subscribeUserReferral(
         userAccountId: AccountId,
@@ -209,13 +207,11 @@ private class HydraDxAssetExchange(
         }
     }
 
-
     private suspend fun HydraDxAssetIdConverter.toOnChainIdOrThrow(localId: FullChainAssetId): HydraDxAssetId {
         val chainAsset = chain.assetsById.getValue(localId.assetId)
 
         return toOnChainIdOrThrow(chainAsset)
     }
-
 
     private enum class ReferralState {
         SET, NOT_SET, NOT_AVAILABLE
@@ -298,8 +294,8 @@ private class HydraDxAssetExchange(
 
         override val assetIn: FullChainAssetId = segments.first().edge.from
 
-        constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs)
-            : this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)
+        constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs) :
+            this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)
 
         fun appendSegment(nextEdge: HydraDxSourceEdge, nextSwapArgs: AtomicSwapOperationArgs): HydraDxOperation {
             val nextSegment = HydraDxSwapTransactionSegment(nextEdge, nextSwapArgs.estimatedSwapLimit)

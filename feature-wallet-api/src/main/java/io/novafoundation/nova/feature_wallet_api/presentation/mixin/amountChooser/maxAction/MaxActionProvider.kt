@@ -23,7 +23,7 @@ object MaxActionProviderDsl {
         return AssetMaxActionProvider(this, field, allowMaxAction)
     }
 
-    fun <F: MaxAvailableDeduction> MaxActionProvider.deductFee(
+    fun <F : MaxAvailableDeduction> MaxActionProvider.deductFee(
         feeLoaderMixin: FeeLoaderMixinV2<F, *>,
     ): MaxActionProvider {
         return ComplexFeeAwareMaxActionProvider(feeLoaderMixin, inner = this)

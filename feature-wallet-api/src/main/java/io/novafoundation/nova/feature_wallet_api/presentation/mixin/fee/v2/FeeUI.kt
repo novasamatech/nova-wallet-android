@@ -35,7 +35,7 @@ fun <F, V : BaseViewModel> FeeLoaderMixinV2<F, FeeDisplay>.setupFeeLoading(feeVi
     setupFeeLoading(
         setFeeStatus = { feeView.setFeeStatus(it) },
         setUserCanChangeFeeAsset = {
-            feeView.setFeeEditable(it)  {
+            feeView.setFeeEditable(it) {
                 changePaymentCurrencyClicked()
             }
         }

@@ -30,7 +30,6 @@ class StatemineAssetEventDetectorFactory(
     }
 }
 
-
 class StatemineAssetEventDetector(
     private val runtimeSnapshot: RuntimeSnapshot,
     private val assetType: Chain.Asset.Type.Statemine,
@@ -39,7 +38,7 @@ class StatemineAssetEventDetector(
     private val targetAssetId = assetType.id.stringAssetId()
 
     override fun detectDeposit(event: GenericEvent.Instance): DepositEvent? {
-       return detectTokensDeposited(event)
+        return detectTokensDeposited(event)
     }
 
     private fun detectTokensDeposited(event: GenericEvent.Instance): DepositEvent? {

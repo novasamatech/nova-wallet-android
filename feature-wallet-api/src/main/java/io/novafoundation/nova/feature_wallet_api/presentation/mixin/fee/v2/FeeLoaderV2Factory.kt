@@ -15,7 +15,7 @@ class FeeLoaderV2Factory(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
     private val interactor: CustomFeeInteractor,
-): FeeLoaderMixinV2.Factory {
+) : FeeLoaderMixinV2.Factory {
 
     override fun <F, D> create(
         scope: CoroutineScope,

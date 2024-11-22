@@ -264,7 +264,6 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-
     protected class StorageUpdate(
         val value: String?,
         // Might be null in case the source does not support identifying the block at which value was changed

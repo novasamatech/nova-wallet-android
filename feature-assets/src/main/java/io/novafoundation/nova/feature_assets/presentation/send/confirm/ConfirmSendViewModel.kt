@@ -289,7 +289,6 @@ class ConfirmSendViewModel(
         )
     }
 
-
     private suspend fun createTransferDirectionModel() = if (transferDraft.isCrossChain) {
         ConfirmSendChainsModel(
             origin = mapChainToUi(originChain()),

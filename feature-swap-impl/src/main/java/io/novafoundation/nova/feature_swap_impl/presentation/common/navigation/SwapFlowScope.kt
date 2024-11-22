@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlin.coroutines.EmptyCoroutineContext
 
-
 class RealSwapFlowScopeAggregator : SwapFlowScopeAggregator {
 
     private var aggregatedScope: CoroutineScope? = null

@@ -26,7 +26,7 @@ class InMemorySwapStateStore() : SwapStateStore {
     private var swapState = MutableStateFlow<SwapState?>(null)
 
     override fun setState(state: SwapState) {
-       this.swapState.value = state
+        this.swapState.value = state
     }
 
     override fun resetState() {
@@ -41,5 +41,3 @@ class InMemorySwapStateStore() : SwapStateStore {
         return swapState.filterNotNull()
     }
 }
-
-

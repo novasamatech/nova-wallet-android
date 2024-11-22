@@ -9,7 +9,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.ErrorMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module as RuntimeModule
 
-sealed class DispatchError: Throwable() {
+sealed class DispatchError : Throwable() {
 
     data class Module(val module: RuntimeModule, val error: ErrorMetadata) : DispatchError() {
 

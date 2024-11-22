@@ -110,7 +110,6 @@ internal class RealCrossChainTransfersUseCase(
         return crossChainTransactor.requiredRemainingAmountAfterTransfer(sendingAsset, originChain)
     }
 
-
     override suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,
         cachingScope: CoroutineScope?

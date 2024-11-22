@@ -31,7 +31,6 @@ interface SwapGraphEdge : QuotableEdge {
      */
     suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype?
 
-
     /**
      * Debug label to describe this edge for logging
      */
@@ -58,7 +57,5 @@ interface SwapGraphEdge : QuotableEdge {
      */
     suspend fun canTransferOutWholeAccountBalance(): Boolean
 }
-
-
 
 typealias SwapGraph = Graph<FullChainAssetId, SwapGraphEdge>

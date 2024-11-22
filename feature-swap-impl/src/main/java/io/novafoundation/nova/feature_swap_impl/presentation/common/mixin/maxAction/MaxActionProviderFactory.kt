@@ -14,7 +14,7 @@ class MaxActionProviderFactory {
         assetInFlow: Flow<Asset?>,
         feeLoaderMixin: FeeLoaderMixinV2<F, *>,
     ): MaxActionProvider {
-        return assetInFlow.providingMaxOf(Asset::transferableInPlanks, allowMaxAction=true)
+        return assetInFlow.providingMaxOf(Asset::transferableInPlanks, allowMaxAction = true)
             .deductFee(feeLoaderMixin)
     }
 }

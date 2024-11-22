@@ -11,7 +11,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import kotlinx.coroutines.flow.Flow
 
-class XYKSwapSourceFactory: HydraDxSwapSource.Factory<XYKSwapQuotingSource> {
+class XYKSwapSourceFactory : HydraDxSwapSource.Factory<XYKSwapQuotingSource> {
 
     override val identifier: String = XYKSwapQuotingSourceFactory.ID
 
@@ -41,7 +41,7 @@ private class XYKSwapSource(
 
     inner class XYKSwapEdge(
         private val delegate: XYKSwapQuotingSource.Edge
-    ) : HydraDxSourceEdge, QuotableEdge by delegate  {
+    ) : HydraDxSourceEdge, QuotableEdge by delegate {
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("XYK", null)

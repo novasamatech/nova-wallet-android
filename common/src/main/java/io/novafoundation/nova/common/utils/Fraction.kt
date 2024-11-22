@@ -3,7 +3,7 @@ package io.novafoundation.nova.common.utils
 import java.math.BigDecimal
 
 @JvmInline
-value class Fraction private constructor(private val value: Double): Comparable<Fraction> {
+value class Fraction private constructor(private val value: Double) : Comparable<Fraction> {
 
     companion object {
 
