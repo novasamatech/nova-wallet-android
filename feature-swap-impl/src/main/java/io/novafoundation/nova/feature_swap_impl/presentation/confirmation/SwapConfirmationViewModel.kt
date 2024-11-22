@@ -235,6 +235,7 @@ class SwapConfirmationViewModel(
 
     private fun createMaxActionProvider(): MaxActionProvider {
         return maxActionProviderFactory.create(
+            viewModelScope = viewModelScope,
             assetInFlow = assetInFlow,
             feeLoaderMixin = feeMixin,
         )
@@ -334,9 +335,9 @@ class SwapConfirmationViewModel(
     }
 
     private fun handleMaxClick() {
-        combineToPair(maxActionFlow, maxActionProvider.maxAvailableForAction)
+        combineToPair(maxActionFlow, maxActionProvider.maxAvailableBalance)
             .filter { (maxAction, _) -> maxAction == MaxAction.ACTIVE }
-            .mapNotNull { it.second?.balance }
+            .mapNotNull { it.second.actualBalance }
             .distinctUntilChanged()
             .onEach {
                 val confirmationState = confirmationStateFlow.first()

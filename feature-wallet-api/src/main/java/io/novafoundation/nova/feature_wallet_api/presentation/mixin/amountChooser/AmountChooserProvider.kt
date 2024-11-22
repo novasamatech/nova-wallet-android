@@ -6,11 +6,10 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.SimpleMaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -32,11 +31,12 @@ class AmountChooserProviderFactory(
             balanceLabel = balanceLabel,
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
-            maxActionProvider = SimpleMaxActionProvider(
-                maxAvailableForDisplay = availableBalanceFlow,
-                // TODO amount chooser max button
-                maxAvailableForAction = flowOf(null)
-            )
+            // TODO allow that once tested
+            allowMaxAction = false,
+            maxActionProvider = MaxActionProvider.create(scope) {
+                val chainAssetFlow = assetFlow.map { it.token.configuration }
+                chainAssetFlow.providingBalance(availableBalanceFlow)
+            }
         )
     }
 
@@ -61,13 +61,14 @@ class AmountChooserProvider(
     private val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     @StringRes private val balanceLabel: Int?,
+    private val allowMaxAction: Boolean,
     maxActionProvider: MaxActionProvider
 ) : BaseAmountChooserProvider(
     coroutineScope = coroutineScope,
     tokenFlow = usedAssetFlow.map { it.token },
     maxActionProvider = maxActionProvider,
-),
-    AmountChooserMixin.Presentation {
+    allowMaxAction = allowMaxAction
+), AmountChooserMixin.Presentation {
 
     override val assetModel = usedAssetFlow.map { asset ->
         ChooseAmountModel(asset, assetIconProvider, resourceManager, balanceLabel)

@@ -187,6 +187,18 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
         .onCompletion { state = InnerState.SECONDARY_START }
 }
 
+fun <T> Flow<T>.zipWithLastNonNull(): Flow<Pair<T?, T>> = flow {
+    var lastNonNull: T? = null
+
+    collect {
+        emit(lastNonNull to it)
+
+        if (it != null) {
+            lastNonNull = it
+        }
+    }
+}
+
 suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
 
 suspend fun <T> Flow<ExtendedLoadingState<T>>.firstIfLoaded(): T? = first().dataOrNull

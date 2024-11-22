@@ -20,18 +20,18 @@ import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.nullOnStart
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.skipFirst
 import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.common.validation.isErrorWithTag
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -59,6 +59,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapFieldValidator
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
@@ -79,7 +80,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
@@ -206,11 +206,13 @@ class SwapMainSettingsViewModel(
 
     val buyMixin = buyMixinFactory.create(viewModelScope)
 
+    private val maxAssetInProvider = createMaxActionProvider()
+
     val amountInInput = swapAmountInputMixinFactory.create(
         coroutineScope = viewModelScope,
         tokenFlow = assetInFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_from_title,
-        maxActionProvider = createMaxActionProvider(),
+        maxActionProvider = maxAssetInProvider,
         fieldValidator = getAmountInFieldValidator()
     )
 
@@ -264,17 +266,14 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     val getAssetInOptionsButtonState = combine(
-        assetInFlow,
+        chainAssetIn.filterNotNull(),
         getAssetInOptions,
-        amountInInput.amountState
-    ) { assetIn, getAssetInOptions, amountState ->
-        if (assetIn == null) return@combine DescriptiveButtonState.Gone
-        val amount = amountState.value.orZero()
+        amountInInput.fieldError
+    ) { assetIn, getAssetInOptions, fieldError ->
+        val hasBalanceFieldError = fieldError.isErrorWithTag(EnoughAmountToSwapFieldValidator.ERROR_TAG)
 
-        val balanceOverTransferable = amount > assetIn.transferable || assetIn.transferable.isZero
-
-        if (balanceOverTransferable && getAssetInOptions.isNotEmpty()) {
-            val symbol = assetIn.token.configuration.symbol
+        if (hasBalanceFieldError && getAssetInOptions.isNotEmpty()) {
+            val symbol = assetIn.symbol
             DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_get_token_format, symbol))
         } else {
             DescriptiveButtonState.Gone
@@ -446,7 +445,8 @@ class SwapMainSettingsViewModel(
 
     private fun createMaxActionProvider(): MaxActionProvider {
         return maxActionProviderFactory.create(
-            assetInFlow = assetInFlow,
+            viewModelScope = viewModelScope,
+            assetInFlow = assetInFlow.filterNotNull(),
             feeLoaderMixin = feeMixin,
         )
     }
@@ -583,7 +583,7 @@ class SwapMainSettingsViewModel(
 
     private fun formatButtonStates(
         quotingState: QuotingState,
-        errorStates: List<AmountErrorState>,
+        errorStates: List<FieldValidationResult>,
         inputs: List<InputState<String>>,
         assetIn: Asset?,
         assetOut: Asset?,
@@ -601,7 +601,7 @@ class SwapMainSettingsViewModel(
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
             }
 
-            errorStates.any { it is AmountErrorState.Invalid } -> {
+            errorStates.any { it is FieldValidationResult.Error } -> {
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
             }
 
@@ -753,7 +753,7 @@ class SwapMainSettingsViewModel(
 
     private fun getAmountInFieldValidator(): FieldValidator {
         return CompoundFieldValidator(
-            enoughAmountToSwapValidatorFactory.create(assetInFlow),
+            enoughAmountToSwapValidatorFactory.create(maxAssetInProvider),
             liquidityFieldValidatorFactory.create(quotingState)
         )
     }

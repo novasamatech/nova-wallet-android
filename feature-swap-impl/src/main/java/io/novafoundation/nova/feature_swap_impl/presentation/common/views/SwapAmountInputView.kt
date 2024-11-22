@@ -11,14 +11,14 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.utils.setImageTint
+import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.common.validation.getReasonOrNull
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.getMessageOrNull
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputContainer
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputError
 import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
@@ -65,9 +65,9 @@ class SwapAmountInputView @JvmOverloads constructor(
         swapAmountInputFiat.text = fiat
     }
 
-    override fun setError(errorState: AmountErrorState) {
-        swapAmountInputError.text = errorState.getMessageOrNull()
-        setErrorEnabled(errorState is AmountErrorState.Invalid)
+    override fun setError(errorState: FieldValidationResult) {
+        swapAmountInputError.text = errorState.getReasonOrNull()
+        setErrorEnabled(errorState is FieldValidationResult.Error)
     }
 
     private fun setTitle(title: CharSequence) {
