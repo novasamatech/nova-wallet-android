@@ -66,8 +66,6 @@ class SwapExecutionViewModel(
         swapProgress.toUi(swapState)
     }.shareInBackground()
 
-    val backAvailableFlow = swapProgressFlow.map { it is SwapProgress.Done }
-
     val feeMixin = feeLoaderMixinFactory.createForSwap(
         chainAssetIn = swapStateFlow.map { it.quote.assetIn },
         interactor = swapInteractor
@@ -81,15 +79,6 @@ class SwapExecutionViewModel(
         setFee()
 
         executeSwap()
-    }
-
-    fun onBackPressed() = launchUnit {
-        val backAvailable = backAvailableFlow.first()
-
-        if (backAvailable) {
-            val assetOut = swapStateFlow.first().quote.assetOut.fullId.toAssetPayload()
-            router.openBalanceDetails(assetOut)
-        }
     }
 
     fun rateClicked() {
@@ -121,8 +110,9 @@ class SwapExecutionViewModel(
         router.openRetrySwap(retrySwapPayload)
     }
 
-    fun doneClicked() {
-        onBackPressed()
+    fun doneClicked() = launchUnit {
+        val assetOut = swapStateFlow.first().quote.assetOut.fullId.toAssetPayload()
+        router.openBalanceDetails(assetOut)
     }
 
     private fun retrySwapPayload(failedStep: SwapProgressStep): SwapSettingsPayload {
@@ -175,7 +165,7 @@ class SwapExecutionViewModel(
 
     private suspend fun createCompletedStatus(): SwapProgressModel.Completed {
         val totalSteps = totalSteps.first()
-        val stepsLabel = resourceManager.getString(R.string.swap_execution_operations_completed, totalSteps)
+        val stepsLabel = resourceManager.getQuantityString(R.plurals.swap_execution_operations_completed, totalSteps, totalSteps)
 
         return SwapProgressModel.Completed(at = createAtLabel(), operationsLabel = stepsLabel)
     }
@@ -193,14 +183,12 @@ class SwapExecutionViewModel(
     }
 
     private suspend fun SwapProgress.Failure.createSwapFailureMessage(): String {
-        val totalSteps = totalSteps.first()
         val failedStepNumber = attemptedStep.index + 1
-
         val label = attemptedStep.displayData.createErrorLabel()
+
         return resourceManager.getString(
             R.string.swap_execution_failure,
             failedStepNumber.format(),
-            totalSteps.format(),
             label
         )
     }
@@ -250,7 +238,7 @@ class SwapExecutionViewModel(
             }
 
             is AtomicOperationDisplayData.Transfer -> {
-                val (chainFrom, assetFrom) = chainRegistry.chainWithAsset(from)
+                val (_, assetFrom) = chainRegistry.chainWithAsset(from)
                 val chainTo = chainRegistry.getChain(to.chainId)
 
                 resourceManager.getString(

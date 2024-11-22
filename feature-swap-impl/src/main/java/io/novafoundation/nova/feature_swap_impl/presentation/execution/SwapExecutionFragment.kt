@@ -56,8 +56,6 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
     override fun initViews() {
         swapExecutionContainer.applyStatusBarInsets()
 
-        swapExecutionToolbar.setHomeButtonListener { viewModel.onBackPressed() }
-
         swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
         swapExecutionPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
         swapExecutionSlippage.setOnClickListener { viewModel.slippageClicked() }
@@ -66,13 +64,15 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
         swapExecutionDetails.collapseImmediate()
 
-        onBackPressed { viewModel.onBackPressed() }
+        onBackPressed { /* suppress back presses */ }
 
         swapExecutionTitleSwitcher.applyTitleFactory()
         swapExecutionSubtitleSwitcher.applySubtitleFactory()
 
         swapExecutionTitleSwitcher.applyAnimators()
         swapExecutionSubtitleSwitcher.applyAnimators()
+
+        swapExecutionToolbar.setHomeButtonVisibility(false)
     }
 
     override fun inject() {
@@ -84,8 +84,6 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
     override fun subscribe(viewModel: SwapExecutionViewModel) {
         observeDescription(viewModel)
-
-        viewModel.backAvailableFlow.observe(swapExecutionToolbar::setHomeButtonVisibility)
 
         viewModel.swapProgressModel.observe(::setSwapProgress)
 
@@ -138,7 +136,7 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
         swapExecutionStepContainer.background = requireContext().getRoundedCornerDrawable(R.color.error_block_background)
 
         swapExecutionActionButton.makeVisible()
-        swapExecutionActionButton.setText(R.string.common_retry)
+        swapExecutionActionButton.setText(R.string.common_try_again)
         swapExecutionActionButton.setOnClickListener { viewModel.retryClicked() }
     }
 
