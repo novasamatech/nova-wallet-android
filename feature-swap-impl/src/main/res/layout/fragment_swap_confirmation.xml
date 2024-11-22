@@ -63,6 +63,8 @@
                 app:titleIcon="@drawable/ic_info" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/swapConfirmationExecutionTime"
                 app:title="@string/swap_execution_time"
                 android:layout_width="match_parent"
