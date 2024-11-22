@@ -82,6 +82,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_favorite_heart_filled" />
+        tools:src="@drawable/ic_favorite_heart_filled_20" />
 
 </merge>

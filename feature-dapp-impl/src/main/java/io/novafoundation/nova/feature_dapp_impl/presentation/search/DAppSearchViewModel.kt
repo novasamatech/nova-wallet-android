@@ -83,7 +83,7 @@ class DAppSearchViewModel(
                 description = searchResult.dapp.description,
                 icon = searchResult.dapp.iconLink,
                 searchResult = searchResult,
-                actionIcon = R.drawable.ic_favorite_heart_filled.takeIf { searchResult.dapp.isFavourite }
+                actionIcon = R.drawable.ic_favorite_heart_filled_20.takeIf { searchResult.dapp.isFavourite }
             )
 
             is DappSearchResult.Search -> DappSearchModel(

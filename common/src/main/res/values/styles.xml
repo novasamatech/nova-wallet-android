@@ -64,6 +64,11 @@
         <item name="lineHeight">11sp</item>
     </style>
 
+    <style name="TextAppearance.NovaFoundation.SemiBold.Caption1">
+        <item name="android:textSize">12sp</item>
+        <item name="lineHeight">11sp</item>
+    </style>
+
     <!-- Bold -->
 
     <style name="TextAppearance.NovaFoundation.Bold" parent="TextAppearance.AppCompat.Title">

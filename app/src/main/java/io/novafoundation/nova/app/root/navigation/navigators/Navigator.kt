@@ -186,7 +186,7 @@ class Navigator(
     override fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload) {
         val bundle = ConfirmMnemonicFragment.getBundle(confirmMnemonicPayload)
 
-        mainNavController?.navigate(
+        rootNavController?.navigate(
             R.id.action_backupMnemonicFragment_to_confirmMnemonicFragment,
             bundle
         )
@@ -199,7 +199,7 @@ class Navigator(
             R.id.splashFragment -> R.id.action_splashFragment_to_import_nav_graph
             else -> R.id.action_import_nav_graph
         }
-        mainNavController?.navigate(actionId, ImportAccountFragment.getBundle(payload))
+        rootNavController?.navigate(actionId, ImportAccountFragment.getBundle(payload))
     }
 
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
@@ -211,7 +211,7 @@ class Navigator(
         }
 
         val payload = BackupMnemonicPayload.Create(accountName, addAccountPayload)
-        mainNavController?.navigate(destination, BackupMnemonicFragment.getBundle(payload))
+        rootNavController?.navigate(destination, BackupMnemonicFragment.getBundle(payload))
     }
 
     override fun openContribute(payload: ContributePayload) {
@@ -641,7 +641,7 @@ class Navigator(
     }
 
     override fun openCreateWatchWallet() {
-        mainNavController?.navigate(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
+        rootNavController?.navigate(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
     }
 
     override fun openStartImportParitySigner() {
@@ -653,9 +653,9 @@ class Navigator(
     }
 
     override fun openImportOptionsScreen() {
-        when (mainNavController?.currentDestination?.id) {
-            R.id.welcomeFragment -> mainNavController?.navigate(R.id.action_welcomeFragment_to_importWalletOptionsFragment)
-            else -> mainNavController?.navigate(R.id.action_importWalletOptionsFragment)
+        when (rootNavController?.currentDestination?.id) {
+            R.id.welcomeFragment -> rootNavController?.navigate(R.id.action_welcomeFragment_to_importWalletOptionsFragment)
+            else -> rootNavController?.navigate(R.id.action_importWalletOptionsFragment)
         }
     }
 
