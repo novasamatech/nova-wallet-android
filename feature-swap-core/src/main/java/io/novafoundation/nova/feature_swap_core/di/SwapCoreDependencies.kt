@@ -20,5 +20,4 @@ interface SwapCoreDependencies {
     fun remoteStorageSource(): StorageDataSource
 
     val computationalCache: ComputationalCache
-
 }

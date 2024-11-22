@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 
 class AssetHubFastLookupFeeCapability(
     private val allowedPaymentAssets: Set<Int>,
-): FastLookupCustomFeeCapability {
+) : FastLookupCustomFeeCapability {
 
     override fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
         return chainAssetId in allowedPaymentAssets

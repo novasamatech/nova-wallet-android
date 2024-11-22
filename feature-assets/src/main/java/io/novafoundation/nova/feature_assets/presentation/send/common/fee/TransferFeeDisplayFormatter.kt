@@ -13,7 +13,6 @@ class TransferFeeDisplayFormatter(
     private val componentDelegate: FeeFormatter<FeeBase, FeeDisplay> = DefaultFeeFormatter()
 ) : FeeFormatter<TransferFee, TransferFeeDisplay> {
 
-
     override suspend fun formatFee(
         fee: TransferFee,
         configuration: FeeFormatter.Configuration,

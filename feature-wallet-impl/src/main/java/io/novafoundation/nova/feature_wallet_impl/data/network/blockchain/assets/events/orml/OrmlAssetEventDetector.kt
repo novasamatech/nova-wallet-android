@@ -30,12 +30,12 @@ class OrmlAssetEventDetectorFactory(
 private class OrmlAssetEventDetector(
     private val runtimeSnapshot: RuntimeSnapshot,
     private val ormlType: Chain.Asset.Type.Orml,
-): AssetEventDetector {
+) : AssetEventDetector {
 
     private val targetCurrencyId = ormlType.currencyIdScale.requireHexPrefix()
 
     override fun detectDeposit(event: GenericEvent.Instance): DepositEvent? {
-       return detectTokensDeposited(event)
+        return detectTokensDeposited(event)
     }
 
     private fun detectTokensDeposited(event: GenericEvent.Instance): DepositEvent? {

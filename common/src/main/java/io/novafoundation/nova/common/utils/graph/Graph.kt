@@ -62,7 +62,6 @@ fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
     return vertices.isNotEmpty()
 }
 
-
 suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
     from: N,
     to: N,

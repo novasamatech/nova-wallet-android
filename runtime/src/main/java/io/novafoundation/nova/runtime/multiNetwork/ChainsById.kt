@@ -18,7 +18,6 @@ inline fun Map<ChainId, Chain>.asChainsById(): ChainsById {
     return ChainsById(this)
 }
 
-
 fun ChainsById.assetOrNull(id: FullChainAssetId): Chain.Asset? {
     return get(id.chainId)?.assetsById?.get(id.assetId)
 }

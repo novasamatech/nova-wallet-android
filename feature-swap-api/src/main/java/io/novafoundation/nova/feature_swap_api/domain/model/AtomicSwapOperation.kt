@@ -46,8 +46,6 @@ class AtomicSwapOperationArgs(
     val feePaymentCurrency: FeePaymentCurrency,
 )
 
-
-
 fun AtomicSwapOperationFee.amountToLeaveOnOriginToPayTxFees(): Balance {
     val submissionAsset = submissionFee.asset
     return submissionFee.amount + postSubmissionFees.paidByAccount.totalAmount(submissionAsset, submissionFee.submissionOrigin.executingAccount)

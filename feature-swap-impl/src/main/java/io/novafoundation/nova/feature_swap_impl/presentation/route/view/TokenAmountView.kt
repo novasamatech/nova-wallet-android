@@ -23,7 +23,7 @@ class TokenAmountModel(
 
     companion object {
 
-        fun from(chainAsset: Chain.Asset, assetIcon: Icon, amount: Balance) : TokenAmountModel {
+        fun from(chainAsset: Chain.Asset, assetIcon: Icon, amount: Balance): TokenAmountModel {
             return TokenAmountModel(
                 amount = amount.formatPlanks(chainAsset),
                 tokenIcon = assetIcon

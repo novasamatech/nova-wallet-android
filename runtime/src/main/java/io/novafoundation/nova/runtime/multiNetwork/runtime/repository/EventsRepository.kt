@@ -41,7 +41,7 @@ class InherentEvents(
     val finalization: List<GenericEvent.Instance>
 )
 
-suspend fun EventsRepository.getInherentEvents(chainId: ChainId, at: BlockHash) : InherentEvents {
+suspend fun EventsRepository.getInherentEvents(chainId: ChainId, at: BlockHash): InherentEvents {
     val allEvents = getEventsInBlock(chainId, at)
 
     return InherentEvents(

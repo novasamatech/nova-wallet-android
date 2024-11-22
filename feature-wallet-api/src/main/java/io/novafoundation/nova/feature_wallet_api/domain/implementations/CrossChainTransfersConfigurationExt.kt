@@ -86,7 +86,7 @@ fun CrossChainTransfersConfiguration.availableInDestinations(): List<Edge<FullCh
     return chains.flatMap { (originChainId, chainTransfers) ->
         chainTransfers.flatMap { originAssetTransfers ->
             originAssetTransfers.xcmTransfers.mapNotNull {
-                if (it.type == XcmTransferType.UNKNOWN ) return@mapNotNull null
+                if (it.type == XcmTransferType.UNKNOWN) return@mapNotNull null
 
                 val from = FullChainAssetId(originChainId, originAssetTransfers.assetId)
                 val to = FullChainAssetId(it.destination.chainId, it.destination.assetId)

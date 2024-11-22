@@ -43,7 +43,7 @@ class SwapRouteAdapter : BaseListAdapter<SwapRouteItemModel, SwapRouteViewHolder
     }
 }
 
-sealed class SwapRouteViewHolder(itemView: View) : BaseViewHolder(itemView)  {
+sealed class SwapRouteViewHolder(itemView: View) : BaseViewHolder(itemView) {
 
     init {
         with(itemView) {
@@ -53,7 +53,6 @@ sealed class SwapRouteViewHolder(itemView: View) : BaseViewHolder(itemView)  {
 }
 
 class SwapRouteTransferViewHolder(parentView: ViewGroup) : SwapRouteViewHolder(parentView.inflateChild(R.layout.item_route_transfer)) {
-
 
     fun bind(model: SwapRouteItemModel.Transfer) = with(containerView) {
         itemRouteTransferAmount.setModel(model.amount)
@@ -67,8 +66,7 @@ class SwapRouteTransferViewHolder(parentView: ViewGroup) : SwapRouteViewHolder(p
 
 class SwapRouteSwapViewHolder(parentView: ViewGroup) : SwapRouteViewHolder(parentView.inflateChild(R.layout.item_route_swap)) {
 
-
-    fun bind(model: SwapRouteItemModel.Swap)  = with(containerView) {
+    fun bind(model: SwapRouteItemModel.Swap) = with(containerView) {
         itemRouteSwapAmountFrom.setModel(model.amountFrom)
         itemRouteSwapAmountTo.setModel(model.amountTo)
         itemRouteSwapFee.text = model.fee

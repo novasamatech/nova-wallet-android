@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.toTimerValue
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -163,7 +162,7 @@ class SwapExecutionViewModel(
 
         return SwapProgressModel.InProgress(
             stepDescription = stepDescription,
-            remainingTime = remainingExecutionTime.toTimerValue(),
+            remainingTime = remainingExecutionTime,
             operationsLabel = swapState.inProgressLabelForStep(step.index)
         )
     }

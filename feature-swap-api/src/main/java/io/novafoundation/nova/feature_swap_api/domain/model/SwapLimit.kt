@@ -28,13 +28,13 @@ sealed class SwapLimit {
 }
 
 val SwapLimit.swapDirection: SwapDirection
-    get() = when(this) {
+    get() = when (this) {
         is SwapLimit.SpecifiedIn -> SwapDirection.SPECIFIED_IN
         is SwapLimit.SpecifiedOut -> SwapDirection.SPECIFIED_OUT
     }
 
 val SwapLimit.quotedAmount: Balance
-    get() = when(this) {
+    get() = when (this) {
         is SwapLimit.SpecifiedIn -> amountIn
         is SwapLimit.SpecifiedOut -> amountOut
     }
@@ -46,7 +46,7 @@ val SwapLimit.estimatedAmountIn: Balance
     }
 
 val SwapLimit.amountOutMin: Balance
-    get() = when(this) {
+    get() = when (this) {
         is SwapLimit.SpecifiedIn -> amountOutMin
         is SwapLimit.SpecifiedOut -> amountOut
     }

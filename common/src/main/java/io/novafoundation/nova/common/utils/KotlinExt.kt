@@ -128,7 +128,6 @@ suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> Collection
     }.awaitAll().flatten()
 }
 
-
 suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
     mapAsync(operation)
 }

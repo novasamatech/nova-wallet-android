@@ -213,10 +213,5 @@ private class RealOmniPoolQuotingSource(
             return omniPool.quote(fromAsset.first, toAsset.first, amount, direction)
                 ?: throw SwapQuoteException.NotEnoughLiquidity
         }
-
     }
 }
-
-
-
-

@@ -27,4 +27,3 @@ open class SwapFeeArgs(
 class SegmentExecuteArgs(
     val quotedSwapEdge: QuotedEdge<SwapGraphEdge>,
 )
-

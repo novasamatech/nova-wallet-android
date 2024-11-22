@@ -12,7 +12,7 @@ sealed class SwapRouteItemModel {
         val fee: String,
         val originChainName: String,
         val destinationChainName: String,
-    ): SwapRouteItemModel()
+    ) : SwapRouteItemModel()
 
     data class Swap(
         override val id: Int,
@@ -20,5 +20,5 @@ sealed class SwapRouteItemModel {
         val amountTo: TokenAmountModel,
         val fee: String,
         val chain: String
-    ): SwapRouteItemModel()
+    ) : SwapRouteItemModel()
 }

@@ -237,7 +237,7 @@ internal class RealSwapService(
                     Log.d("SwapSubmission", "$displayData with $actualSwapLimit")
 
                     operation.submit(segmentSubmissionArgs).onFailure {
-                        Log.e("SwapSubmission", "Swap failed on stage '${displayData}'", it)
+                        Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
 
                         emit(SwapProgress.Failure(it, attemptedStep = step))
                     }
@@ -351,7 +351,6 @@ internal class RealSwapService(
         }
     }
 
-
     private suspend fun quoteInternal(
         args: SwapQuoteArgs,
         computationSharingScope: CoroutineScope
@@ -460,7 +459,6 @@ internal class RealSwapService(
         }
     }
 
-
     private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): CanPayFeeNodeVisitFilter {
         return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
             CanPayFeeNodeVisitFilter(
@@ -520,7 +518,6 @@ internal class RealSwapService(
         return mergeIfMultiple()
             .runningFold(emptyList()) { acc, directions -> acc + directions }
     }
-
 
     private suspend fun quoteTrade(
         chainAssetIn: Chain.Asset,
@@ -644,7 +641,6 @@ internal class RealSwapService(
         }
     }
 
-
     private inner class InnerSwapHost(
         override val scope: CoroutineScope
     ) : AssetExchange.SwapHost {
@@ -718,7 +714,7 @@ internal class RealSwapService(
                         val roughFeesInAssetIn = trade.roughFeeEstimation.inAssetIn
                         val roughFeesInAssetInAmount = roughFeesInAssetIn.formatPlanks(assetIn)
 
-                        append(" (+${roughFeesInAssetInAmount} fees) ")
+                        append(" (+$roughFeesInAssetInAmount fees) ")
                     }
                 }
 
@@ -734,7 +730,7 @@ internal class RealSwapService(
                         val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
                         val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
 
-                        append(" (-${roughFeesInAssetOutAmount} fees)")
+                        append(" (-$roughFeesInAssetOutAmount fees)")
                     }
                 }
             }
@@ -820,8 +816,8 @@ internal class RealSwapService(
 
             val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
 
-            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId)
-                && edge.canPayNonNativeFeesInIntermediatePosition()
+            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId) &&
+                edge.canPayNonNativeFeesInIntermediatePosition()
         }
 
         private fun isSufficient(chainAndAsset: ChainWithAsset): Boolean {

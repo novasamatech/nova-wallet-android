@@ -40,7 +40,6 @@ class HydraDxQuoteSharedComputation(
         }
     }
 
-
     suspend fun getSwapQuoting(
         chain: Chain,
         accountId: AccountId,

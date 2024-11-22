@@ -11,7 +11,7 @@ data class ExtrinsicExecutionResult(
 
 sealed interface ExtrinsicDispatch {
 
-    data class Ok(val emittedEvents: List<GenericEvent.Instance>): ExtrinsicDispatch
+    data class Ok(val emittedEvents: List<GenericEvent.Instance>) : ExtrinsicDispatch
 
     data class Failed(val error: DispatchError) : ExtrinsicDispatch
 
@@ -19,7 +19,7 @@ sealed interface ExtrinsicDispatch {
 }
 
 fun ExtrinsicExecutionResult.requireOk(): ExtrinsicDispatch.Ok {
-    return when(outcome) {
+    return when (outcome) {
         is ExtrinsicDispatch.Failed -> throw outcome.error
         is ExtrinsicDispatch.Ok -> outcome
         ExtrinsicDispatch.Unknown -> throw IllegalArgumentException("Unknown extrinsic execution result")
@@ -32,14 +32,13 @@ fun Result<ExtrinsicExecutionResult>.requireOk(): Result<ExtrinsicDispatch.Ok> {
     }
 }
 
-
 fun ExtrinsicDispatch.isOk(): Boolean {
     return this is ExtrinsicDispatch.Ok
 }
 
 fun ExtrinsicDispatch.isModuleError(moduleName: String, errorName: String): Boolean {
-    return this is ExtrinsicDispatch.Failed
-        && error is DispatchError.Module
-        && error.module.name == moduleName
-        && error.error.name == errorName
+    return this is ExtrinsicDispatch.Failed &&
+        error is DispatchError.Module &&
+        error.module.name == moduleName &&
+        error.error.name == errorName
 }

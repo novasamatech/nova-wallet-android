@@ -16,7 +16,6 @@ import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
-
 class RealHydraDxQuotingFactory(
     private val remoteStorageSource: StorageDataSource,
     private val conversionSourceFactories: Iterable<HydraDxQuotingSource.Factory<*>>,
@@ -72,7 +71,7 @@ private class RealHydraDxQuoting(
         }.mergeIfMultiple()
     }
 
-    private fun createSources(): Map<String, HydraDxQuotingSource<*>>  {
+    private fun createSources(): Map<String, HydraDxQuotingSource<*>> {
         return quotingSourceFactories.map { it.create(chain) }
             .associateBy { it.identifier }
     }

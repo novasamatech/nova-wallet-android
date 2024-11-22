@@ -21,4 +21,3 @@ fun <F : FeeBase> mapFeeToFeeModel(
     ).toFeeDisplay(),
     fee = fee
 )
-

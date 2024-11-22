@@ -1,16 +1,16 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution.model
 
-import io.novafoundation.nova.common.utils.formatting.TimerValue
+import kotlin.time.Duration
 
 sealed class SwapProgressModel {
 
     class InProgress(
         val stepDescription: String,
-        val remainingTime: TimerValue,
+        val remainingTime: Duration,
         val operationsLabel: String
-    ): SwapProgressModel()
+    ) : SwapProgressModel()
 
     class Completed(val at: String, val operationsLabel: String) : SwapProgressModel()
 
-    class Failed(val reason: String, val at: String): SwapProgressModel()
+    class Failed(val reason: String, val at: String) : SwapProgressModel()
 }

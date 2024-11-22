@@ -155,7 +155,7 @@ internal class FeeLoaderV2Provider<F, D>(
             require(requestedFeePaymentCurrency == actualPaymentCurrency) {
                 """
                     Fee with loaded with different fee payment currency that was requested.
-                    Requested: ${requestedFeePaymentCurrency}. Actual: $actualPaymentCurrency.
+                    Requested: $requestedFeePaymentCurrency. Actual: $actualPaymentCurrency.
                     Please check you are using the passed FeePaymentCurrency to load the fee.
                 """.trimIndent()
             }

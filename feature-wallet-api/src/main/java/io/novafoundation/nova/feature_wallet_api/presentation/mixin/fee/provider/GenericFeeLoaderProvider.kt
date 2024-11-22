@@ -32,7 +32,8 @@ internal class GenericFeeLoaderProviderPresentation(
     configuration = configuration,
     tokenFlow = tokenFlow,
     feeFormatter = DefaultFeeFormatter()
-), FeeLoaderMixin.Presentation
+),
+    FeeLoaderMixin.Presentation
 
 @Deprecated("Use ChangeableFeeLoaderProvider instead")
 internal open class GenericFeeLoaderProvider<F>(
@@ -90,7 +91,7 @@ internal open class GenericFeeLoaderProvider<F>(
     }
 
     override suspend fun setFee(fee: F) {
-       setFeeOrHide(fee as F?)
+        setFeeOrHide(fee as F?)
     }
 
     override suspend fun setFeeStatus(feeStatus: FeeStatus<F, FeeDisplay>) {

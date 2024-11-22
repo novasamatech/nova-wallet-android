@@ -18,8 +18,8 @@ class SwapKeepsNecessaryAmountOfAssetIn(
 ) : SwapValidation {
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
-       val chainAssetIn = value.amountIn.chainAsset
-       val chainAssetOut = value.amountOut.chainAsset
+        val chainAssetIn = value.amountIn.chainAsset
+        val chainAssetOut = value.amountOut.chainAsset
 
         val amount = value.amountIn.amount
 

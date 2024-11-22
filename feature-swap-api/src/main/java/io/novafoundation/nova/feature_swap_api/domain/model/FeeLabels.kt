@@ -10,7 +10,7 @@ interface WithDebugLabel {
 class SubmissionFeeWithLabel(
     val fee: SubmissionFee,
     override val debugLabel: String = "Submission"
-): WithDebugLabel, SubmissionFee by fee
+) : WithDebugLabel, SubmissionFee by fee
 
 fun SubmissionFeeWithLabel(fee: SubmissionFee?, debugLabel: String): SubmissionFeeWithLabel? {
     return fee?.let { SubmissionFeeWithLabel(it, debugLabel) }
@@ -19,4 +19,4 @@ fun SubmissionFeeWithLabel(fee: SubmissionFee?, debugLabel: String): SubmissionF
 class FeeWithLabel(
     val fee: FeeBase,
     override val debugLabel: String
-): WithDebugLabel, FeeBase by fee
+) : WithDebugLabel, FeeBase by fee

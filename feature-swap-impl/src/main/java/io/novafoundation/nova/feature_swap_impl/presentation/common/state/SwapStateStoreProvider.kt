@@ -14,7 +14,7 @@ interface SwapStateStoreProvider {
 
 class RealSwapStateStoreProvider(
     private val computationalCache: ComputationalCache
-): SwapStateStoreProvider {
+) : SwapStateStoreProvider {
 
     companion object {
         private const val CACHE_TAG = "RealSwapQuoteStoreProvider"
