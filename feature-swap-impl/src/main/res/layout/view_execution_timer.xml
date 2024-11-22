@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    tools:background="@color/secondary_screen_background"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <View
+        android:id="@+id/executionBackground"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_container_with_border_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/executionProgress"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_container_timer_animated"
+        app:layout_constraintBottom_toBottomOf="@+id/executionBackground"
+        app:layout_constraintEnd_toEndOf="@+id/executionBackground"
+        app:layout_constraintStart_toStartOf="@+id/executionBackground"
+        app:layout_constraintTop_toTopOf="@+id/executionBackground" />
+
+    <ImageView
+        android:id="@+id/executionResult"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_execution_result_success"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/executionBackground"
+        app:layout_constraintEnd_toEndOf="@+id/executionBackground"
+        app:layout_constraintStart_toStartOf="@+id/executionBackground"
+        app:layout_constraintTop_toTopOf="@+id/executionBackground" />
+
+    <TextSwitcher
+        android:id="@+id/executionTimeSwitcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="20dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/executionTimeSeconds"
+        app:layout_constraintEnd_toEndOf="@+id/executionProgress"
+        app:layout_constraintStart_toStartOf="@+id/executionProgress"
+        app:layout_constraintTop_toTopOf="@+id/executionProgress"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/executionTimeSeconds"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:text="@string/common_sec"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="@+id/executionProgress"
+        app:layout_constraintEnd_toEndOf="@+id/executionProgress"
+        app:layout_constraintStart_toStartOf="@+id/executionProgress"
+        app:layout_constraintTop_toBottomOf="@+id/executionTimeSwitcher" />
+
+</merge>
