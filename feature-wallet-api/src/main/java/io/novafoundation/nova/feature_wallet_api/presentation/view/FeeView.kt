@@ -15,7 +15,11 @@ class FeeView @JvmOverloads constructor(
 ) : TableCellView(context, attrs, defStyle) {
 
     init {
-        setTitle(R.string.network_fee)
+        // Super constructor might have set the title based on attrs
+        // We want to obey to attrs so only set the default fee label if attr value was not supplied
+        if (title.text.isNullOrBlank()) {
+            setTitle(R.string.network_fee)
+        }
     }
 
     fun setFeeStatus(feeStatus: FeeStatus<*, FeeDisplay>) {

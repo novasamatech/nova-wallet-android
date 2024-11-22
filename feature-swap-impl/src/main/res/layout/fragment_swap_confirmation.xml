@@ -72,6 +72,7 @@
                 android:id="@+id/swapConfirmationNetworkFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:title="@string/common_total_fee"
                 app:titleIcon="@drawable/ic_info" />
 
         </io.novafoundation.nova.common.view.TableView>
