@@ -47,6 +47,8 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsConte
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsIcon
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
 
+private const val OVERFLOW_TABS_COUNT = 100
+
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
     companion object {
@@ -197,7 +199,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         }
 
         viewModel.tabsCountFlow.observe {
-            if (it > 99) {
+            if (it >= OVERFLOW_TABS_COUNT) {
                 dappBrowserTabsIcon.makeVisible()
                 dappBrowserTabsContent.text = null
             } else {
