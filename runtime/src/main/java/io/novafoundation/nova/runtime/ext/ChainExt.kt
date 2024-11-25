@@ -264,7 +264,7 @@ fun Chain.accountIdOf(address: String): ByteArray {
 }
 
 fun String.anyAddressToAccountId(): ByteArray {
-    return  runCatching {
+    return runCatching {
         // Substrate
         toAccountId()
     }.recoverCatching {
