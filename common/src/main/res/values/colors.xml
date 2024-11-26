@@ -86,6 +86,7 @@
     <color name="critical_update_chip_background">#1FEDCE36</color>
     <color name="major_update_chip_background">#1F2AB0F2</color>
     <color name="blur_navigation_background">#66151D27</color>
+    <color name="dapp_blur_navigation_background">#CC151D27</color>
     <color name="solid_navigation_background">#0F111A</color>
     <color name="dim_background">#7A08090E</color>
     <color name="waiting_status_background">#3D999EC7</color>

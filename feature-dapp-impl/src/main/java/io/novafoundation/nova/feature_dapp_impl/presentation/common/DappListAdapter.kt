@@ -51,10 +51,10 @@ class DappViewHolder(
         setOnActionClickListener { itemHandler.onItemFavouriteClicked(item) }
 
         if (item.isFavourite) {
-            setActionResource(R.drawable.ic_favorite_heart_filled)
+            setActionResource(R.drawable.ic_favorite_heart_filled_20)
             setActionTintRes(null)
         } else {
-            setActionResource(R.drawable.ic_favorite_heart_outline)
+            setActionResource(R.drawable.ic_favorite_heart_outline_20)
             setActionTintRes(R.color.icon_secondary)
         }
 

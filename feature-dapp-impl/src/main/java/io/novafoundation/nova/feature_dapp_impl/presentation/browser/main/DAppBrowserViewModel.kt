@@ -114,10 +114,16 @@ class DAppBrowserViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val currentTabFlow = browserTabPoolService.tabStateFlow
-        .map { it.selectedTab }
+    private val tabsState = browserTabPoolService.tabStateFlow
+        .distinctUntilChangedBy { it.stateId() }
+        .shareInBackground()
+
+    val currentTabFlow = tabsState.map { it.selectedTab }
         .distinctUntilChangedBy { it.stateId() }
         .filterIsInstance<CurrentTabState.Selected>()
+        .shareInBackground()
+
+    val tabsCountFlow = tabsState.map { it.tabs.size }
         .shareInBackground()
 
     init {
@@ -189,16 +195,20 @@ class DAppBrowserViewModel(
         }
     }
 
-    fun onFavoriteClick(optionsPayload: DAppOptionsPayload) {
+    fun onFavoriteClick() {
         launch {
-            if (optionsPayload.isFavorite) {
-                removeFromFavouritesConfirmation.awaitAction(optionsPayload.currentPageTitle)
+            val page = currentPageAnalyzed.first()
+            val currentPageTitle = page.title ?: page.display
+            val isCurrentPageFavorite = page.isFavourite
 
-                dAppInteractor.removeDAppFromFavourites(optionsPayload.url)
+            if (isCurrentPageFavorite) {
+                removeFromFavouritesConfirmation.awaitAction(currentPageTitle)
+
+                dAppInteractor.removeDAppFromFavourites(page.url)
             } else {
                 val payload = AddToFavouritesPayload(
-                    url = optionsPayload.url,
-                    label = optionsPayload.currentPageTitle,
+                    url = page.url,
+                    label = currentPageTitle,
                     iconLink = null
                 )
 
@@ -247,14 +257,8 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun getCurrentPageOptionsPayload(): DAppOptionsPayload {
-        val page = currentPageAnalyzed.first()
-        val currentPageTitle = page.title ?: page.display
-        val isCurrentPageFavorite = page.isFavourite
         return DAppOptionsPayload(
-            currentPageTitle,
-            isCurrentPageFavorite,
-            isDesktopModeEnabled = desktopModeChangedModel.first().desktopModeEnabled,
-            url = page.url
+            isDesktopModeEnabled = desktopModeChangedModel.first().desktopModeEnabled
         )
     }
 

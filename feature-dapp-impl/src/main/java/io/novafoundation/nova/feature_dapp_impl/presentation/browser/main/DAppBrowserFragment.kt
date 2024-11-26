@@ -14,15 +14,14 @@ import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.themed
-import io.novafoundation.nova.common.view.dialog.dialog
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
@@ -36,14 +35,19 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.externalSig
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserClose
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserHide
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavorite
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabs
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsContent
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsIcon
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
+
+private const val OVERFLOW_TABS_COUNT = 100
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
@@ -92,7 +96,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     override fun initViews() {
         dappBrowserAddressBarGroup.applyStatusBarInsets()
 
-        dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
+        dappBrowserHide.setOnClickListener { viewModel.closeClicked() }
 
         dappBrowserBack.setOnClickListener { backClicked() }
 
@@ -103,7 +107,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserForward.setOnClickListener { forwardClicked() }
         dappBrowserTabs.setOnClickListener { viewModel.openTabs() }
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
-
+        dappBrowserFavorite.setOnClickListener { viewModel.onFavoriteClick() }
         dappBrowserMore.setOnClickListener { moreClicked() }
 
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
@@ -162,7 +166,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
                     showConfirmAuthorizeSheet(it as DappPendingConfirmation<Action.Authorize>)
                 }
 
-                Action.CloseScreen -> showCloseConfirmation(it)
                 Action.AcknowledgePhishingAlert -> {
                     AcknowledgePhishingBottomSheet(requireContext(), it)
                         .show()
@@ -189,9 +192,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
         viewModel.currentPageAnalyzed.observe {
             dappBrowserAddressBar.setAddress(it.display)
-            dappBrowserAddressBar.showSecureIcon(it.isSecure)
+            dappBrowserAddressBar.showSecure(it.isSecure)
+            dappBrowserFavorite.setImageResource(favoriteIcon(it.isFavourite))
 
             updateButtonsState()
+        }
+
+        viewModel.tabsCountFlow.observe {
+            if (it >= OVERFLOW_TABS_COUNT) {
+                dappBrowserTabsIcon.makeVisible()
+                dappBrowserTabsContent.text = null
+            } else {
+                dappBrowserTabsIcon.makeGone()
+                dappBrowserTabsContent.text = it.toString()
+            }
         }
     }
 
@@ -215,16 +229,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun createChromeClient() = Web3ChromeClient(fileChooser, dappBrowserProgress)
-
-    private fun showCloseConfirmation(pendingConfirmation: DappPendingConfirmation<*>) {
-        dialog(requireContext().themed(R.style.AccentNegativeAlertDialogTheme_Reversed)) {
-            setPositiveButton(R.string.common_close) { _, _ -> pendingConfirmation.onConfirm() }
-            setNegativeButton(R.string.common_cancel) { _, _ -> pendingConfirmation.onCancel() }
-
-            setTitle(R.string.common_confirmation_title)
-            setMessage(R.string.common_close_confirmation_message)
-        }
-    }
 
     private fun updateButtonsState() {
         dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false
@@ -276,10 +280,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         backCallback = null
     }
 
-    override fun onFavoriteClick(payload: DAppOptionsPayload) {
-        viewModel.onFavoriteClick(payload)
-    }
-
     override fun onDesktopModeClick() {
         viewModel.onDesktopClick()
     }
@@ -299,5 +299,13 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     override fun onPageChanged(webView: WebView, url: String, title: String?) {
         viewModel.onPageChanged(url, title)
+    }
+
+    private fun favoriteIcon(isFavorite: Boolean): Int {
+        return if (isFavorite) {
+            R.drawable.ic_favorite_heart_filled
+        } else {
+            R.drawable.ic_favorite_heart_outline
+        }
     }
 }
