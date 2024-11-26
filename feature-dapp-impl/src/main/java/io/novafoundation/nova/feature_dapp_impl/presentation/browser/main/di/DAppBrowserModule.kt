@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
 import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.RealBrowserHostSettingsRepository
@@ -68,7 +69,7 @@ class DAppBrowserModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         signRequester: ExternalSignCommunicator,
         searchRequester: DAppSearchCommunicator,
-        initialUrl: String,
+        payload: DAppBrowserPayload,
         extensionStoreFactory: ExtensionStoreFactory,
         dAppInteractor: DappInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -82,7 +83,7 @@ class DAppBrowserModule {
             selectedAccountUseCase = selectedAccountUseCase,
             signRequester = signRequester,
             dAppSearchRequester = searchRequester,
-            initialUrl = initialUrl,
+            payload = payload,
             extensionStoreFactory = extensionStoreFactory,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             chainRegistry = chainRegistry,

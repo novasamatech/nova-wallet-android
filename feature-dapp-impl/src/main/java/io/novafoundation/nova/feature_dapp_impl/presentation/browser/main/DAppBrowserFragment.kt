@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
@@ -55,7 +56,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
         private const val PAYLOAD = "DAppBrowserFragment.Payload"
 
-        fun getBundle(initialUrl: String) = bundleOf(PAYLOAD to initialUrl)
+        fun getBundle(payload: DAppBrowserPayload) = bundleOf(PAYLOAD to payload)
     }
 
     @Inject

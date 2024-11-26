@@ -13,6 +13,8 @@
 
     <include app:graph="@navigation/dapp_browser_graph" />
 
+    <include app:graph="@navigation/dapp_tabs_graph" />
+
     <include app:graph="@navigation/dapp_search_graph" />
 
     <action
@@ -84,6 +86,14 @@
     <action
         android:id="@+id/action_open_dappSearch"
         app:destination="@id/dapp_search_graph"
+        app:enterAnim="@anim/fragment_slide_in"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_slide_out" />
+
+    <action
+        android:id="@+id/action_open_dappTabs"
+        app:destination="@id/dapp_tabs_graph"
         app:enterAnim="@anim/fragment_slide_in"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"

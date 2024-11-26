@@ -6,9 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.app.root.data.browser.TabsRepository
+import io.novafoundation.nova.app.root.domain.SplitScreenInteractor
 import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.core_db.dao.BrowserTabsDao
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 
 @Module(
     includes = [
@@ -18,10 +23,24 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 class SplitScreenFragmentModule {
 
     @Provides
+    fun provideTabQuantityRepository(tabsDao: BrowserTabsDao): TabsRepository {
+        return TabsRepository(tabsDao)
+    }
+
+    @Provides
+    fun provideInteractor(repository: TabsRepository): SplitScreenInteractor {
+        return SplitScreenInteractor(repository)
+    }
+
+    @Provides
     @IntoMap
     @ViewModelKey(SplitScreenViewModel::class)
-    fun provideViewModel(): ViewModel {
-        return SplitScreenViewModel()
+    fun provideViewModel(
+        interactor: SplitScreenInteractor,
+        dAppRouter: DAppRouter,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    ): ViewModel {
+        return SplitScreenViewModel(interactor, dAppRouter, actionAwaitableMixinFactory)
     }
 
     @Provides
