@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
@@ -72,7 +73,7 @@ class DAppBrowserViewModel(
     private val dAppInteractor: DappInteractor,
     private val interactor: DappBrowserInteractor,
     private val dAppSearchRequester: DAppSearchRequester,
-    private val initialUrl: String,
+    private val payload: DAppBrowserPayload,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val chainRegistry: ChainRegistry,
@@ -135,8 +136,11 @@ class DAppBrowserViewModel(
         watchDangerousWebsites()
 
         launch {
-            // TODO: We should create tab before this screen open
-            browserTabPoolService.createNewTabAsCurrentTab(initialUrl)
+            when (payload) {
+                is DAppBrowserPayload.Tab -> browserTabPoolService.selectTab(payload.id)
+
+                is DAppBrowserPayload.Address -> browserTabPoolService.createNewTabAsCurrentTab(payload.address)
+            }
         }
     }
 

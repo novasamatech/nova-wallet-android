@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
@@ -33,8 +34,7 @@ class BrowserTabsViewModel(
         }
 
     fun openTab(tabId: String) = launch {
-        browserTabPoolService.selectTab(tabId)
-        router.back()
+        router.openDAppBrowser(DAppBrowserPayload.Tab(tabId))
     }
 
     fun closeTab(tabId: String) = launch {

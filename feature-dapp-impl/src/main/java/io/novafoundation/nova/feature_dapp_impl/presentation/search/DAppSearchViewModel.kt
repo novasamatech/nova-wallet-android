@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
@@ -124,7 +125,7 @@ class DAppSearchViewModel(
                     router.finishDappSearch()
                 }
 
-                SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(newUrl)
+                SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(DAppBrowserPayload.Address(newUrl))
             }
         }
     }

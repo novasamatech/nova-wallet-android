@@ -6,6 +6,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.common.utils.showBrowser
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_governance_impl.BuildConfig
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -207,9 +208,9 @@ class GovernanceNavigator(
         args = DescriptionFragment.getBundle(payload)
     )
 
-    override fun openDAppBrowser(initialUrl: String) = performNavigation(
+    override fun openDAppBrowser(url: String) = performNavigation(
         actionId = R.id.action_referendumDetailsFragment_to_DAppBrowserGraph,
-        args = DAppBrowserFragment.getBundle(initialUrl)
+        args = DAppBrowserFragment.getBundle(DAppBrowserPayload.Address(url))
     )
 
     override fun openReferendumDescription(payload: DescriptionPayload) = performNavigation(

@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappModelToDApp
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
@@ -104,7 +105,7 @@ class MainDAppViewModel(
     }
 
     fun dappClicked(dapp: DappModel) {
-        router.openDAppBrowser(dapp.url)
+        router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url))
     }
 
     fun searchClicked() {
