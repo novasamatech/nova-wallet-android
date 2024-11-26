@@ -13,9 +13,11 @@
 
     <include app:graph="@navigation/dapp_browser_graph" />
 
+    <include app:graph="@navigation/dapp_search_graph" />
+
     <action
         android:id="@+id/action_open_main"
-        app:destination="@id/main_nav_graph"
+        app:destination="@id/splitScreenFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -64,14 +66,6 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_dappBrowserGraph"
-        app:destination="@id/dapp_browser_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
         android:id="@+id/action_root_to_balanceDetailFragment"
         app:destination="@id/balanceDetailFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -79,6 +73,21 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_dappBrowser"
+        app:destination="@id/dapp_browser_graph"
+        app:enterAnim="@anim/fragment_slide_in"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_slide_out" />
+
+    <action
+        android:id="@+id/action_open_dappSearch"
+        app:destination="@id/dapp_search_graph"
+        app:enterAnim="@anim/fragment_slide_in"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_slide_out" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -138,5 +147,11 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment"
         android:label="BalanceDetailFragment"
         tools:layout="@layout/fragment_balance_detail" />
+
+    <fragment
+        android:id="@+id/splitScreenFragment"
+        android:name="io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenFragment"
+        android:label="SplitScreenFragment"
+        tools:layout="@layout/fragment_split_screen" />
 
 </navigation>

@@ -12,18 +12,20 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.stateId
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
@@ -44,6 +46,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -111,13 +114,16 @@ class DAppBrowserViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val currentTabFlow = browserTabPoolService.currentTabFlow
+    val currentTabFlow = browserTabPoolService.tabStateFlow
+        .map { it.selectedTab }
+        .distinctUntilChangedBy { it.stateId() }
         .filterIsInstance<CurrentTabState.Selected>()
         .shareInBackground()
 
     init {
         dAppSearchRequester.responseFlow
-            .onEach { it.newUrl?.let(::forceLoad) }
+            .filterIsInstance<DAppSearchCommunicator.Response.NewUrl>()
+            .onEach { forceLoad(it.url) }
             .launchIn(this)
 
         watchDangerousWebsites()
@@ -167,17 +173,13 @@ class DAppBrowserViewModel(
     }
 
     fun closeClicked() = launch {
-        val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.CloseScreen)
-
-        if (confirmationState == ConfirmationState.ALLOWED) {
-            exitBrowser()
-        }
+        exitBrowser()
     }
 
     fun openSearch() = launch {
         val currentPage = currentPage.first()
 
-        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url))
+        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url, SearchPayload.Request.GO_TO_URL))
     }
 
     fun onMoreClicked() {
@@ -214,6 +216,14 @@ class DAppBrowserViewModel(
             isDesktopModeEnabledFlow.value = newDesktopMode
             _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
         }
+    }
+
+    fun openTabs() {
+        router.openTabs()
+    }
+
+    fun makePageSnapshot() = launch {
+        browserTabPoolService.makeCurrentTabSnapshot()
     }
 
     private fun watchDangerousWebsites() {

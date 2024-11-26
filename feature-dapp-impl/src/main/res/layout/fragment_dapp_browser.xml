@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/secondary_screen_background">
+    android:background="@color/secondary_screen_background">
 
     <LinearLayout
         android:id="@+id/dappBrowserAddressBarGroup"
@@ -74,6 +74,16 @@
             android:paddingTop="11dp"
             android:paddingBottom="11dp"
             android:src="@drawable/ic_chevron_right"
+            app:tint="@color/actions_color" />
+
+        <ImageView
+            android:id="@+id/dappBrowserTabs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
+            android:src="@drawable/ic_copy_outline"
             app:tint="@color/actions_color" />
 
         <ImageView

@@ -42,6 +42,7 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabs
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
@@ -71,6 +72,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             return dappBrowserWebViewContainer.getChildAt(0) as? WebView
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        WebView.enableSlowWholeDocumentDraw()
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -95,6 +101,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         }
 
         dappBrowserForward.setOnClickListener { forwardClicked() }
+        dappBrowserTabs.setOnClickListener { viewModel.openTabs() }
         dappBrowserRefresh.setOnClickListener { refreshClicked() }
 
         dappBrowserMore.setOnClickListener { moreClicked() }
@@ -103,6 +110,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     override fun onDestroyView() {
+        dappBrowserWebViewContainer.removeAllViews()
         viewModel.detachCurrentSession()
         super.onDestroyView()
 
@@ -111,6 +119,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     override fun onPause() {
         super.onPause()
+        viewModel.makePageSnapshot()
+
         detachBackCallback()
     }
 
@@ -191,12 +201,17 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             webView.loadUrl(session.startUrl)
         }
 
+        clearProgress()
         session.attachSession(createChromeClient(), this)
         webViewHolder.set(session.webView)
         webViewClient = session.webViewClient
 
         dappBrowserWebViewContainer.removeAllViews()
         dappBrowserWebViewContainer.addView(session.webView)
+    }
+
+    private fun clearProgress() {
+        dappBrowserProgress.progress = 0
     }
 
     private fun createChromeClient() = Web3ChromeClient(fileChooser, dappBrowserProgress)

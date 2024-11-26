@@ -12,12 +12,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_api.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
@@ -31,7 +32,8 @@ class DAppSearchViewModel(
     private val payload: SearchPayload,
     private val dAppSearchResponder: DAppSearchResponder,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val browserTabPoolService: BrowserTabPoolService
 ) : BaseViewModel() {
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
@@ -59,7 +61,7 @@ class DAppSearchViewModel(
 
     fun cancelClicked() {
         if (shouldReportResult()) {
-            dAppSearchResponder.respond(DAppSearchCommunicator.Response(newUrl = null))
+            dAppSearchResponder.respond(DAppSearchCommunicator.Response.Cancel)
         }
 
         router.back()
@@ -110,14 +112,27 @@ class DAppSearchViewModel(
                 dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
             }
 
-            if (shouldReportResult()) {
-                dAppSearchResponder.respond(DAppSearchCommunicator.Response(newUrl))
-                router.back()
-            } else {
-                router.openDAppBrowser(newUrl)
+            when (payload.request) {
+                SearchPayload.Request.CREATE_NEW_TAB -> {
+                    browserTabPoolService.createNewTabAsCurrentTab(newUrl)
+                    dAppSearchResponder.respond(DAppSearchCommunicator.Response.TabChanged)
+                    router.finishDappSearch()
+                }
+
+                SearchPayload.Request.GO_TO_URL -> {
+                    dAppSearchResponder.respond(DAppSearchCommunicator.Response.NewUrl(newUrl))
+                    router.finishDappSearch()
+                }
+
+                SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(newUrl)
             }
         }
     }
 
-    private fun shouldReportResult() = payload.initialUrl != null
+    private fun shouldReportResult() = when (payload.request) {
+        SearchPayload.Request.CREATE_NEW_TAB,
+        SearchPayload.Request.GO_TO_URL -> true
+
+        SearchPayload.Request.OPEN_NEW_URL -> false
+    }
 }

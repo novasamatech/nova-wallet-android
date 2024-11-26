@@ -80,8 +80,6 @@ interface StakingRouter {
 
     fun openRebag()
 
-    fun openDAppBrowser(url: String)
-
     fun openStakingPeriods()
 
     fun openSetupStakingType()

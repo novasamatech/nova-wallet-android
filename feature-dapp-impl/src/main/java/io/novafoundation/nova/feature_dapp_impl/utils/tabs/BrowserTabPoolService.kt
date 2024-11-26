@@ -6,20 +6,19 @@ import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabStat
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSessionFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.stateId
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.TabsState
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.withNameOnly
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface BrowserTabPoolService {
 
-    val currentTabFlow: Flow<CurrentTabState>
+    val tabStateFlow: Flow<TabsState>
 
     fun selectTab(tabId: String?)
 
@@ -50,17 +49,15 @@ class RealBrowserTabPoolService(
 
     private val activeSessions = mutableMapOf<String, PageSession>()
 
-    override val currentTabFlow = combine(
+    override val tabStateFlow = combine(
         selectedTabIdFlow,
         allTabsFlow
     ) { selectedTabId, allTabs ->
-        val tabId = selectedTabId ?: return@combine CurrentTabState.NotSelected
-        val tab = allTabs[tabId] ?: return@combine CurrentTabState.NotSelected
-        CurrentTabState.Selected(
-            tab,
-            activeSessions[tabId] ?: addNewSession(tab)
+        TabsState(
+            tabs = allTabs.values.toList(),
+            selectedTab = currentTabState(selectedTabId, allTabs)
         )
-    }.distinctUntilChangedBy { it.stateId() }
+    }
 
     override fun selectTab(tabId: String?) {
         val oldTabId = selectedTabIdFlow.value
@@ -99,11 +96,12 @@ class RealBrowserTabPoolService(
     }
 
     override suspend fun makeCurrentTabSnapshot() {
-        val currentTab = currentTabFlow.first()
+        val currentTab = selectedTabIdFlow.first()
+        val pageSession = activeSessions[currentTab]
 
-        if (currentTab is CurrentTabState.Selected) {
-            val snapshot = pageSnapshotBuilder.getPageSnapshot(currentTab.pageSession)
-            browserTabStorage.savePageSnapshot(currentTab.tab.id, snapshot)
+        if (pageSession != null) {
+            val snapshot = pageSnapshotBuilder.getPageSnapshot(pageSession)
+            browserTabStorage.savePageSnapshot(pageSession.tabId, snapshot)
         }
     }
 
@@ -126,5 +124,14 @@ class RealBrowserTabPoolService(
     private fun detachSession(tabId: String?) {
         val sessionToDetach = activeSessions[tabId]
         sessionToDetach?.detachSession()
+    }
+
+    private fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
+        val tabId = selectedTabId ?: return CurrentTabState.NotSelected
+        val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
+        return CurrentTabState.Selected(
+            tab,
+            activeSessions[tabId] ?: addNewSession(tab)
+        )
     }
 }
