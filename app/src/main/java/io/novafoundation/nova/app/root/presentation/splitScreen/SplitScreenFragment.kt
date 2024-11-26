@@ -1,13 +1,9 @@
 package io.novafoundation.nova.app.root.presentation.splitScreen
 
-import android.graphics.Outline
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RoundRectShape
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -55,7 +51,6 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     override fun initViews() {
         dappEntryPoint.setOnClickListener { viewModel.onTabsClicked() }
         dappEntryPointClose.setOnClickListener { viewModel.onTabsCloseClicked() }
-
     }
 
     override fun subscribe(viewModel: SplitScreenViewModel) {
