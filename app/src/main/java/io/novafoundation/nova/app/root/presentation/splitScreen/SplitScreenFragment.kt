@@ -1,9 +1,13 @@
 package io.novafoundation.nova.app.root.presentation.splitScreen
 
+import android.graphics.Outline
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -18,6 +22,7 @@ import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPoint
 import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPointClose
 import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPointText
+import kotlinx.android.synthetic.main.fragment_split_screen.mainNavHost
 
 class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
 
@@ -50,12 +55,20 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     override fun initViews() {
         dappEntryPoint.setOnClickListener { viewModel.onTabsClicked() }
         dappEntryPointClose.setOnClickListener { viewModel.onTabsCloseClicked() }
+
     }
 
     override fun subscribe(viewModel: SplitScreenViewModel) {
         setupCloseAllDappTabsDialogue(viewModel.closeAllTabsConfirmation)
 
         viewModel.dappTabsQuantity.observe {
+            val shouldBeVisible = it > 0
+            val isVisibilityChanged = dappEntryPoint.isVisible != shouldBeVisible
+
+            if (isVisibilityChanged) {
+                mainNavHost.outlineProvider = RoundCornersOutlineProvider(getOutlineCornerRadius(shouldBeVisible))
+            }
+
             dappEntryPoint.isVisible = it > 0
             dappEntryPointText.text = getString(R.string.dapp_entry_point_title, it)
         }
@@ -65,5 +78,13 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
         val navHostFragment = childFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
 
         navHostFragment.navController
+    }
+
+    private fun getOutlineCornerRadius(isRounded: Boolean): Float {
+        return if (isRounded) {
+            12f
+        } else {
+            0f
+        }
     }
 }
