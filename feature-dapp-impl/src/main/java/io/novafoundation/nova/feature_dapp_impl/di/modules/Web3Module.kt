@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.states.PolkadotJ
 import io.novafoundation.nova.feature_dapp_impl.web3.session.DbWeb3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3InjectorPool
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
 
@@ -35,10 +35,10 @@ class Web3Module {
 
     @Provides
     @FeatureScope
-    fun provideWeb3ClientFactory(
+    fun provideWeb3InjectorPool(
         polkadotJsInjector: PolkadotJsInjector,
         metamaskInjector: MetamaskInjector,
-    ) = Web3WebViewClientFactory(
+    ) = Web3InjectorPool(
         injectors = listOf(
             polkadotJsInjector,
             metamaskInjector

@@ -2,10 +2,12 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
@@ -23,13 +25,13 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3InjectorPool
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
@@ -39,8 +41,8 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebView
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
@@ -52,7 +54,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     @Inject
-    lateinit var web3WebViewClientFactory: Web3WebViewClientFactory
+    lateinit var web3InjectorPool: Web3InjectorPool
 
     @Inject
     lateinit var webViewHolder: WebViewHolder
@@ -63,6 +65,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
+
+    private val dappBrowserWebView: WebView?
+        get() {
+            return dappBrowserWebViewContainer.getChildAt(0) as? WebView
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,8 +84,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     override fun initViews() {
-        webViewHolder.set(dappBrowserWebView)
-
         dappBrowserAddressBarGroup.applyStatusBarInsets()
 
         dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
@@ -98,13 +103,10 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     override fun onDestroyView() {
+        viewModel.detachCurrentSession()
         super.onDestroyView()
 
-        dappBrowserWebView.uninjectWeb3()
-
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        webViewHolder.release()
     }
 
     override fun onPause() {
@@ -136,12 +138,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
-        webViewClient = web3WebViewClientFactory.create(dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged, this)
-        dappBrowserWebView.injectWeb3(
-            progressBar = dappBrowserProgress,
-            fileChooser = fileChooser,
-            web3Client = webViewClient!!
-        )
+        viewModel.currentTabFlow.observe { currentTab ->
+            attachSession(currentTab.pageSession)
+        }
 
         viewModel.desktopModeChangedModel.observe {
             webViewClient?.desktopMode = it.desktopModeEnabled
@@ -152,6 +151,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
                 is Action.Authorize -> {
                     showConfirmAuthorizeSheet(it as DappPendingConfirmation<Action.Authorize>)
                 }
+
                 Action.CloseScreen -> showCloseConfirmation(it)
                 Action.AcknowledgePhishingAlert -> {
                     AcknowledgePhishingBottomSheet(requireContext(), it)
@@ -162,12 +162,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
         viewModel.browserCommandEvent.observeEvent {
             when (it) {
-                BrowserCommand.Reload -> dappBrowserWebView.reload()
+                BrowserCommand.Reload -> dappBrowserWebView?.reload()
                 BrowserCommand.GoBack -> backClicked()
-                is BrowserCommand.OpenUrl -> dappBrowserWebView.loadUrl(it.url)
+                is BrowserCommand.OpenUrl -> dappBrowserWebView?.loadUrl(it.url)
                 is BrowserCommand.ChangeDesktopMode -> {
                     webViewClient?.desktopMode = it.enabled
-                    dappBrowserWebView.reload()
+                    dappBrowserWebView?.reload()
                 }
             }
         }
@@ -185,6 +185,22 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         }
     }
 
+    private fun attachSession(session: PageSession) {
+        session.initialize(requireContext()) { webView ->
+            web3InjectorPool.initialInject(webView)
+            webView.loadUrl(session.startUrl)
+        }
+
+        session.attachSession(createChromeClient(), this)
+        webViewHolder.set(session.webView)
+        webViewClient = session.webViewClient
+
+        dappBrowserWebViewContainer.removeAllViews()
+        dappBrowserWebViewContainer.addView(session.webView)
+    }
+
+    private fun createChromeClient() = Web3ChromeClient(fileChooser, dappBrowserProgress)
+
     private fun showCloseConfirmation(pendingConfirmation: DappPendingConfirmation<*>) {
         dialog(requireContext().themed(R.style.AccentNegativeAlertDialogTheme_Reversed)) {
             setPositiveButton(R.string.common_close) { _, _ -> pendingConfirmation.onConfirm() }
@@ -196,8 +212,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun updateButtonsState() {
-        dappBrowserForward.isEnabled = dappBrowserWebView.canGoForward()
-        dappBrowserBack.isEnabled = dappBrowserWebView.canGoBack()
+        dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false
+        dappBrowserBack.isEnabled = dappBrowserWebView?.canGoBack() ?: false
     }
 
     private fun showConfirmAuthorizeSheet(pendingConfirmation: DappPendingConfirmation<Action.Authorize>) {
@@ -210,19 +226,19 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun backClicked() {
-        if (dappBrowserWebView.canGoBack()) {
-            dappBrowserWebView.goBack()
+        if (dappBrowserWebView?.canGoBack() == true) {
+            dappBrowserWebView?.goBack()
         } else {
             viewModel.closeClicked()
         }
     }
 
     private fun forwardClicked() {
-        dappBrowserWebView.goForward()
+        dappBrowserWebView?.goForward()
     }
 
     private fun refreshClicked() {
-        dappBrowserWebView.reload()
+        dappBrowserWebView?.reload()
     }
 
     private fun attachBackCallback() {
@@ -253,6 +269,10 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         viewModel.onDesktopClick()
     }
 
+    override fun onPageStarted(webView: WebView, url: String, favicon: Bitmap?) {
+        web3InjectorPool.injectForPage(webView, viewModel.extensionsStore)
+    }
+
     override fun handleBrowserIntent(intent: Intent) {
         try {
             startActivity(intent)
@@ -260,5 +280,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             Toast.makeText(requireContext(), R.string.common_no_app_to_handle_intent, Toast.LENGTH_LONG)
                 .show()
         }
+    }
+
+    override fun onPageChanged(webView: WebView, url: String, title: String?) {
+        viewModel.onPageChanged(url, title)
     }
 }
