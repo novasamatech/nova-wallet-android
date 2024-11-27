@@ -805,11 +805,11 @@ internal class RealSwapService(
             // We don't (yet) handle edges that doesn't allow to transfer whole account balance out
             if (!edge.canTransferOutWholeAccountBalance()) return false
 
-            // Besides checks above, utility assets don't have any other restrictions
-            if (edge.from.isUtility) return true
-
             // Destination asset must be sufficient
             if (!isSufficient(chainAndAssetOut)) return false
+
+            // Besides checks above, utility assets don't have any other restrictions
+            if (edge.from.isUtility) return true
 
             // Edge might request us to ignore the default requirement based on its direct predecessor
             if (edge.predecessorHandlesFees(pathPredecessor)) return true
