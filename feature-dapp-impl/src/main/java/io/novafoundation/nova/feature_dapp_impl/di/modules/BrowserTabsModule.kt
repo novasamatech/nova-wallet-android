@@ -5,14 +5,19 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabStorage
+import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
+import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabInternalRepository
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealPageSnapshotBuilder
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabService
+import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.RealBrowserTabRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.PageSnapshotBuilder
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabPoolService
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabStorage
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealTabMemoryRestrictionService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.TabMemoryRestrictionService
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSessionFactory
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSessionFactory
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
 
 @Module
 class BrowserTabsModule {
@@ -21,41 +26,53 @@ class BrowserTabsModule {
     @Provides
     fun provideBrowserTabStorage(
         browserTabsDao: BrowserTabsDao,
-    ): BrowserTabStorage {
-        return RealBrowserTabStorage(browserTabsDao = browserTabsDao)
+    ): BrowserTabInternalRepository {
+        return RealBrowserTabRepository(browserTabsDao = browserTabsDao)
     }
 
     @FeatureScope
     @Provides
+    fun provideBrowserTabRepository(
+        repository: BrowserTabInternalRepository,
+    ): BrowserTabExternalRepository {
+        return repository
+    }
+
+
+    @FeatureScope
+    @Provides
     fun providePageSnapshotBuilder(fileProvider: FileProvider): PageSnapshotBuilder {
-        return PageSnapshotBuilder(fileProvider)
+        return RealPageSnapshotBuilder(fileProvider)
     }
 
     @FeatureScope
     @Provides
     fun provideTabMemoryRestrictionService(context: Context): TabMemoryRestrictionService {
-        return TabMemoryRestrictionService(context)
+        return RealTabMemoryRestrictionService(context)
     }
 
     @FeatureScope
     @Provides
-    fun providePageSessionFactory(): PageSessionFactory {
-        return PageSessionFactory()
+    fun providePageSessionFactory(
+        contextManager: ContextManager,
+        compoundWeb3Injector: CompoundWeb3Injector
+    ): BrowserTabSessionFactory {
+        return BrowserTabSessionFactory(contextManager, compoundWeb3Injector)
     }
 
     @FeatureScope
     @Provides
     fun provideBrowserTabPoolService(
-        browserTabStorage: BrowserTabStorage,
+        browserTabInternalRepository: BrowserTabInternalRepository,
         pageSnapshotBuilder: PageSnapshotBuilder,
         tabMemoryRestrictionService: TabMemoryRestrictionService,
-        pageSessionFactory: PageSessionFactory
-    ): BrowserTabPoolService {
-        return RealBrowserTabPoolService(
-            browserTabStorage = browserTabStorage,
+        browserTabSessionFactory: BrowserTabSessionFactory
+    ): BrowserTabService {
+        return RealBrowserTabService(
+            browserTabInternalRepository = browserTabInternalRepository,
             pageSnapshotBuilder = pageSnapshotBuilder,
             tabMemoryRestrictionService = tabMemoryRestrictionService,
-            pageSessionFactory = pageSessionFactory
+            browserTabSessionFactory = browserTabSessionFactory
         )
     }
 }

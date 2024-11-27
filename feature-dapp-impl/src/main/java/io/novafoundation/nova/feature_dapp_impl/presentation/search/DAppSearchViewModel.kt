@@ -12,14 +12,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
-import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
@@ -34,7 +34,7 @@ class DAppSearchViewModel(
     private val dAppSearchResponder: DAppSearchResponder,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val appLinksProvider: AppLinksProvider,
-    private val browserTabPoolService: BrowserTabPoolService
+    private val browserTabService: BrowserTabService
 ) : BaseViewModel() {
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
@@ -115,7 +115,7 @@ class DAppSearchViewModel(
 
             when (payload.request) {
                 SearchPayload.Request.CREATE_NEW_TAB -> {
-                    browserTabPoolService.createNewTabAsCurrentTab(newUrl)
+                    browserTabService.createNewTab(newUrl)
                     dAppSearchResponder.respond(DAppSearchCommunicator.Response.TabChanged)
                     router.finishDappSearch()
                 }

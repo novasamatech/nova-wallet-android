@@ -1,4 +1,4 @@
-package io.novafoundation.nova.app.root.presentation.splitScreen
+package io.novafoundation.nova.common.utils
 
 import android.graphics.Outline
 import android.view.View

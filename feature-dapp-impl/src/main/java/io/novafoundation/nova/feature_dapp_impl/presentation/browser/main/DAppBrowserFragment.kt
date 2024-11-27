@@ -25,10 +25,10 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPe
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3InjectorPool
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
@@ -60,7 +60,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     @Inject
-    lateinit var web3InjectorPool: Web3InjectorPool
+    lateinit var compoundWeb3Injector: CompoundWeb3Injector
 
     @Inject
     lateinit var webViewHolder: WebViewHolder
@@ -154,7 +154,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
         viewModel.currentTabFlow.observe { currentTab ->
-            attachSession(currentTab.pageSession)
+            attachSession(currentTab.browserTabSession)
         }
 
         viewModel.desktopModeChangedModel.observe {
@@ -210,14 +210,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         }
     }
 
-    private fun attachSession(session: PageSession) {
-        session.initialize(requireContext()) { webView ->
-            web3InjectorPool.initialInject(webView)
-            webView.loadUrl(session.startUrl)
-        }
-
+    private fun attachSession(session: BrowserTabSession) {
         clearProgress()
-        session.attachSession(createChromeClient(), this)
+        session.attachToHost(createChromeClient(), this)
         webViewHolder.set(session.webView)
         webViewClient = session.webViewClient
 
@@ -226,6 +221,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     private fun clearProgress() {
+        dappBrowserProgress.makeGone()
         dappBrowserProgress.progress = 0
     }
 
@@ -286,7 +282,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     }
 
     override fun onPageStarted(webView: WebView, url: String, favicon: Bitmap?) {
-        web3InjectorPool.injectForPage(webView, viewModel.extensionsStore)
+        compoundWeb3Injector.injectForPage(webView, viewModel.extensionsStore)
     }
 
     override fun handleBrowserIntent(intent: Intent) {

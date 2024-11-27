@@ -4,59 +4,52 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.webkit.WebView
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
-import java.util.Date
 
-class PageSessionFactory {
+class BrowserTabSessionFactory(
+    private val contextManager: ContextManager,
+    private val compoundWeb3Injector: CompoundWeb3Injector
+) {
 
-    fun create(tabId: String, sessionStartTime: Date, startUrl: String): PageSession {
-        return PageSession(
+    fun create(tabId: String, startUrl: String): BrowserTabSession {
+        return BrowserTabSession(
             tabId = tabId,
-            sessionStartTime = sessionStartTime,
-            startUrl = startUrl
+            startUrl = startUrl,
+            context = contextManager.getActivity()!!,
+            compoundWeb3Injector = compoundWeb3Injector
         )
     }
 }
 
-class PageSession(
+class BrowserTabSession(
     val tabId: String,
-    val sessionStartTime: Date,
-    val startUrl: String
+    val startUrl: String,
+    private val context: Context,
+    private val compoundWeb3Injector: CompoundWeb3Injector
 ) : PageCallback {
 
     private var _webView: WebView? = null
-    val webView: WebView
-        get() {
-            return _webView ?: throw IllegalStateException("WebView is not initialized")
-        }
+    val webView: WebView by lazy {
+        initialize()
+        _webView!!.loadUrl(startUrl)
+        _webView!!
+    }
 
     private var _webViewClient: Web3WebViewClient? = null
-    val webViewClient: Web3WebViewClient
-        get() {
-            return _webViewClient ?: throw IllegalStateException("WebViewClient is not initialized")
-        }
+    val webViewClient: Web3WebViewClient by lazy {
+        initialize()
+        _webViewClient!!
+    }
 
     private var nestedPageCallback: PageCallback? = null
 
-    fun initialize(context: Context, onInitialized: (WebView) -> Unit) {
-        if (_webView == null) {
-            _webView = WebView(context)
-            _webViewClient = Web3WebViewClient(
-                webView = _webView!!,
-                pageCallback = this
-            )
-
-            webView.injectWeb3(webViewClient)
-
-            onInitialized(webView)
-        }
-    }
-
-    fun attachSession(
+    fun attachToHost(
         chromeClient: Web3ChromeClient,
         pageCallback: PageCallback
     ) {
@@ -64,7 +57,7 @@ class PageSession(
         this.nestedPageCallback = pageCallback
     }
 
-    fun detachSession() {
+    fun detachFromHost() {
         _webView?.webChromeClient = null
         nestedPageCallback = null
     }
@@ -81,8 +74,21 @@ class PageSession(
         nestedPageCallback?.onPageChanged(view, url, title)
     }
 
-    fun destroySession() {
+    fun destroy() {
         webView.uninjectWeb3()
         webView.destroy()
+    }
+
+    private fun initialize() {
+        if (_webView == null) {
+            _webView = WebView(context)
+            _webViewClient = Web3WebViewClient(
+                webView = _webView!!,
+                pageCallback = this
+            )
+
+            webView.injectWeb3(webViewClient)
+            compoundWeb3Injector.initialInject(webView)
+        }
     }
 }

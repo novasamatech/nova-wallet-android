@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 @JvmInline
-value class InformationSize(private val sizeInBytes: Long) : Comparable<InformationSize> {
+value class InformationSize(val sizeInBytes: Long) : Comparable<InformationSize> {
 
     companion object {
 

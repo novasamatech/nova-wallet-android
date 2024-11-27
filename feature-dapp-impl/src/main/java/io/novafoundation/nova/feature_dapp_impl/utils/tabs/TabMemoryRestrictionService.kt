@@ -2,14 +2,22 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
 import android.app.ActivityManager
 import android.content.Context
+import io.novafoundation.nova.common.utils.InformationSize
+import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
+import io.novafoundation.nova.common.utils.InformationSizeUnit
+import io.novafoundation.nova.common.utils.toInformationSize
 
 private const val MIN_TABS = 3
-private const val MEMORY_STEP = 100L * 1024L * 1024L // 100 Mb
+private val MEMORY_STEP = 100.toInformationSize(InformationSizeUnit.MEGABYTES).sizeInBytes
 
-class TabMemoryRestrictionService(val context: Context) {
+interface TabMemoryRestrictionService {
+    fun getMaximumActiveSessions(): Int
+}
+
+class RealTabMemoryRestrictionService(val context: Context) : TabMemoryRestrictionService {
 
     // The linear function that starts from 3 and adds 1 tab each MEMORY_STEP of available memory
-    fun getMaximumActiveSessions(): Int {
+    override fun getMaximumActiveSessions(): Int {
         val availableMemory = getAvailableMemory()
         return MIN_TABS + (availableMemory / MEMORY_STEP).toInt()
     }

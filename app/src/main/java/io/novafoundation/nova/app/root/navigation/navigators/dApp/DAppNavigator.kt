@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.dApp
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
@@ -62,7 +62,7 @@ class DAppNavigator(
         performNavigation(destinationId)
     }
 
-    override fun finishTabs() = performNavigation(
+    override fun closeTabsScreen() = performNavigation(
         actionId = R.id.action_finish_tabs_fragment
     )
 }
