@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.intFromHex
@@ -27,6 +26,7 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSig
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.anyAddressToAccountId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
@@ -38,6 +38,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.EraType
@@ -104,12 +105,13 @@ class PolkadotExternalSignInteractor(
     override val validationSystem: ConfirmDAppOperationValidationSystem = EmptyValidationSystem()
 
     override suspend fun createAccountAddressModel(): AddressModel {
-        return addressIconGenerator.createAddressModel(
-            accountAddress = signPayload.address,
+        val icon = addressIconGenerator.createAddressIcon(
+            accountId = signPayload.accountId(),
             sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            accountName = null,
-            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+            backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
+
+        return AddressModel(signPayload.address, icon, name = null)
     }
 
     override suspend fun chainUi(): Result<ChainUi?> {
@@ -290,6 +292,18 @@ class PolkadotExternalSignInteractor(
                 call = callRepresentation(runtime),
                 metadataHash = metadataHash?.fromHex()
             )
+        }
+    }
+
+    private suspend fun PolkadotSignPayload.accountId(): AccountId {
+        return when (this) {
+            is PolkadotSignPayload.Json -> {
+                val chain = chainOrNull()
+
+                chain?.accountIdOf(address) ?: address.anyAddressToAccountId()
+            }
+
+            is PolkadotSignPayload.Raw -> address.anyAddressToAccountId()
         }
     }
 
