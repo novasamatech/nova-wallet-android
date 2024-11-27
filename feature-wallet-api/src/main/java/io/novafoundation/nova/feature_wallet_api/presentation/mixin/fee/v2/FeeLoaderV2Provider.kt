@@ -82,28 +82,33 @@ internal class FeeLoaderV2Provider<F, D>(
 
     private val userModifiedFeeInCurrentAsset = MutableStateFlow(false)
 
-    private val canSwitchToSelectedToken = combine(selectedTokenInfo, feeChainAssetFlow) { selectedTokenInfo, feeAsset ->
-        val canSwitchToSelected = feeAsset.fullId != selectedTokenInfo.chainAsset.fullId
-        val selectedCanBeUsed = selectedTokenInfo.feePaymentSupported
+    private val feeSwitchCapabilityFlow = combine(selectedTokenInfo, feeChainAssetFlow) { selectedTokenInfo, feeAsset ->
+        val selectedSupported = selectedTokenInfo.feePaymentSupported
 
-        canSwitchToSelected && selectedCanBeUsed
+        val feeInNative = feeAsset.fullId == selectedTokenInfo.chain.utilityAsset.fullId
+        val feeInSelected = feeAsset.fullId == selectedTokenInfo.chainAsset.fullId
+
+        FeeSwitchCapability(
+            canSwitchToSelected = selectedSupported && !feeInSelected,
+            canSwitchToNative = !feeInNative
+        )
     }
         .distinctUntilChanged()
         .shareInBackground()
 
-    private val canChangeFeeAutomatically = combine(
+    private val canChangeFeeToSelectedAutomatically = combine(
         userModifiedFeeInCurrentAsset,
         paymentCurrencySelectionModeFlow,
-        canSwitchToSelectedToken
-    ) { userModifiedFee, selectionMode, canSwitchToSelected ->
-        canSwitchToSelected && selectionMode.automaticChangeEnabled() && !userModifiedFee
+        feeSwitchCapabilityFlow
+    ) { userModifiedFee, selectionMode, feeSwitchCapability ->
+        feeSwitchCapability.canSwitchToSelected && selectionMode.automaticChangeEnabled() && !userModifiedFee
     }.shareInBackground()
 
     override val userCanChangeFeeAsset: Flow<Boolean> = combine(
         paymentCurrencySelectionModeFlow,
-        selectedTokenInfo
-    ) { selectionMode, tokenInfo ->
-        selectionMode.userCanChangeFee() && tokenInfo.feePaymentSupported
+        feeSwitchCapabilityFlow
+    ) { selectionMode, feeSwitchCapability ->
+        feeSwitchCapability.canSwitch && selectionMode.userCanChangeFee()
     }.shareInBackground()
 
     override val chooseFeeAsset = actionAwaitableMixinFactory.create<ChooseFeeCurrencyPayload, Chain.Asset>()
@@ -234,7 +239,7 @@ internal class FeeLoaderV2Provider<F, D>(
     ) {
         val feeStatus = feeFormatter.formatFeeStatus(newFee, feeFormatterConfiguration)
 
-        val canChangeFeeAutomatically = canChangeFeeAutomatically.first()
+        val canChangeFeeAutomatically = canChangeFeeToSelectedAutomatically.first()
         if (!canChangeFeeAutomatically) {
             fee.value = feeStatus
             return
@@ -324,4 +329,12 @@ internal class FeeLoaderV2Provider<F, D>(
         val chain: Chain,
         val feePaymentSupported: Boolean
     )
+
+    private class FeeSwitchCapability(
+        val canSwitchToSelected: Boolean,
+        val canSwitchToNative: Boolean
+    ) {
+
+        val canSwitch = canSwitchToSelected || canSwitchToNative
+    }
 }
