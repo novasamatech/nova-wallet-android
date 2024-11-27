@@ -263,6 +263,16 @@ fun Chain.accountIdOf(address: String): ByteArray {
     }
 }
 
+fun String.anyAddressToAccountId(): ByteArray {
+    return runCatching {
+        // Substrate
+        toAccountId()
+    }.recoverCatching {
+        // Evm
+        asEthereumAddress().toAccountId().value
+    }.getOrThrow()
+}
+
 fun Chain.accountIdOrNull(address: String): ByteArray? {
     return runCatching { accountIdOf(address) }.getOrNull()
 }
