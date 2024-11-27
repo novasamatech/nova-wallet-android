@@ -38,7 +38,6 @@ class BrowserTabsModule {
         return repository
     }
 
-
     @FeatureScope
     @Provides
     fun providePageSnapshotBuilder(fileProvider: FileProvider): PageSnapshotBuilder {

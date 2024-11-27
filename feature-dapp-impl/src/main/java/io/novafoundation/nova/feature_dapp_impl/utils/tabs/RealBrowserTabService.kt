@@ -103,7 +103,6 @@ class RealBrowserTabService(
         return session
     }
 
-
     private fun detachSession(tabId: String?) {
         if (tabId == null) return
 

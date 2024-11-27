@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
 import android.app.ActivityManager
 import android.content.Context
-import io.novafoundation.nova.common.utils.InformationSize
-import io.novafoundation.nova.common.utils.InformationSize.Companion.bytes
 import io.novafoundation.nova.common.utils.InformationSizeUnit
 import io.novafoundation.nova.common.utils.toInformationSize
 
