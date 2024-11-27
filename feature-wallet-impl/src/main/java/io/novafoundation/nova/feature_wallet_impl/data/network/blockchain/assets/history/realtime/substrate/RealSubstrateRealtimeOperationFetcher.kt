@@ -65,9 +65,9 @@ private class RealSubstrateRealtimeOperationFetcher(
         chainAsset: Chain.Asset,
         blockHash: String
     ): List<RealtimeHistoryUpdate> {
-        val extrinsics = repository.getExtrinsicsWithEvents(chain.id, blockHash)
+        val extrinsicWithEvents = repository.getBlockEvents(chain.id, blockHash).applyExtrinsic
 
-        return extrinsics.flatMap { extrinsic ->
+        return extrinsicWithEvents.flatMap { extrinsic ->
             val visits = runCatching { callWalk.walkToList(extrinsic, chain.id) }.getOrElse { emptyList() }
 
             visits.flatMap { extrinsicVisit ->

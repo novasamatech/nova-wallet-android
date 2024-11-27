@@ -159,9 +159,8 @@ class RuntimeModule {
     @ApplicationScope
     fun provideEventsRepository(
         rpcCalls: RpcCalls,
-        chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
-    ): EventsRepository = RemoteEventsRepository(rpcCalls, chainRegistry, remoteStorageSource)
+    ): EventsRepository = RemoteEventsRepository(rpcCalls, remoteStorageSource)
 
     @Provides
     @ApplicationScope

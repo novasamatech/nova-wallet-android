@@ -2,7 +2,9 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMap
+import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.transformResult
 import io.novafoundation.nova.common.utils.wrapInResult
@@ -47,8 +49,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findRelayChainOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.BlockEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.getInherentEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
@@ -196,10 +198,11 @@ class RealCrossChainTransactor(
                         return@transformResult
                     }
 
-                    val inherentEvents = eventsRepository.getInherentEvents(transfer.destinationChain.id, updatedAt)
+                    val blockEvents = eventsRepository.getBlockEvents(transfer.destinationChain.id, updatedAt)
 
-                    val xcmArrivedDeposit = searchForXcmArrival(inherentEvents.initialization, transfer)
-                        ?: searchForXcmArrival(inherentEvents.finalization, transfer)
+                    val xcmArrivedDeposit = searchForXcmArrival(blockEvents.initialization, transfer)
+                        ?: searchForXcmArrival(blockEvents.finalization, transfer)
+                        ?: searchForXcmArrival(blockEvents.findSetValidationDataEvents(), transfer)
 
                     if (xcmArrivedDeposit != null) {
                         Log.d("CrossChain", "Found destination xcm arrival event, amount is $xcmArrivedDeposit")
@@ -215,11 +218,17 @@ class RealCrossChainTransactor(
         }
     }
 
+    private fun BlockEvents.findSetValidationDataEvents(): List<GenericEvent.Instance> {
+        val setValidationDataExtrinsic = applyExtrinsic.find { it.extrinsic.call.instanceOf(Modules.PARACHAIN_SYSTEM, "set_validation_data") }
+
+        return setValidationDataExtrinsic?.events.orEmpty()
+    }
+
     private suspend fun searchForXcmArrival(
         events: List<GenericEvent.Instance>,
         transfer: AssetTransferBase
     ): Balance? {
-        if (!events.hasEvent("MessageQueue", "Processed")) return null
+        if (!events.hasXcmArrivalEvent()) return null
 
         val eventDetector = assetSourceRegistry.getEventDetector(transfer.destinationChainAsset)
 
@@ -227,6 +236,10 @@ class RealCrossChainTransactor(
             .find { it.destination.contentEquals(transfer.recipientAccountId) }
 
         return depositEvent?.amount
+    }
+
+    private fun List<GenericEvent.Instance>.hasXcmArrivalEvent(): Boolean {
+        return hasEvent("MessageQueue", "Processed") or hasEvent("XcmpQueue", "Success")
     }
 
     private suspend fun ExtrinsicService.performTransferOfExactAmount(
