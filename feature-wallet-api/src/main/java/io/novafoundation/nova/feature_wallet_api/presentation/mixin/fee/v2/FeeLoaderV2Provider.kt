@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
@@ -55,7 +55,7 @@ internal class FeeLoaderV2Provider<F, D>(
     private val chainRegistry: ChainRegistry,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val interactor: CustomFeeInteractor,
+    private val interactor: FeeInteractor,
 
     private val feeFormatter: FeeFormatter<F, D>,
     private val configuration: FeeLoaderMixinV2.Configuration<F, D>,
@@ -305,8 +305,10 @@ internal class FeeLoaderV2Provider<F, D>(
         )
     }
 
-    private fun Asset.canPayFee(fee: F): Boolean {
-        return transferableInPlanks >= feeInspector.requiredBalanceToPayFee(fee, token.configuration)
+    private suspend fun Asset.canPayFee(fee: F): Boolean {
+        val inspectedFeeAmount = feeInspector.inspectFeeAmount(fee)
+
+        return interactor.hasEnoughBalanceToPayFee(this, inspectedFeeAmount)
     }
 
     private suspend fun constructSelectedTokenInfo(chainAsset: Chain.Asset): SelectedAssetInfo {

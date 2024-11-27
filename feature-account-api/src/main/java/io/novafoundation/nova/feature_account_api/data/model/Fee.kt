@@ -97,6 +97,10 @@ fun SubmissionFee.getAmount(chainAsset: Chain.Asset, origin: AccountId): BigInte
     }
 }
 
+fun SubmissionFee.getAmountByExecutingAccount(chainAsset: Chain.Asset): BigInteger {
+    return getAmount(chainAsset, submissionOrigin.executingAccount)
+}
+
 fun FeeBase.getAmount(expectedAsset: Chain.Asset): BigInteger {
     return if (expectedAsset.fullId == asset.fullId) amount else BigInteger.ZERO
 }

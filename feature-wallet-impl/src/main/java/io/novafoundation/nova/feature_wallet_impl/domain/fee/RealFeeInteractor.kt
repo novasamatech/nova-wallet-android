@@ -5,23 +5,24 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeC
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import java.math.BigInteger
 
-class RealCustomFeeInteractor(
+class RealFeeInteractor(
     private val feePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val customFeeCapabilityFacade: CustomFeeCapabilityFacade,
-) : CustomFeeInteractor {
+) : FeeInteractor {
 
     override suspend fun canPayFeeInNonUtilityAsset(chainAsset: Chain.Asset, coroutineScope: CoroutineScope): Boolean {
         val feePaymentCurrency = chainAsset.toFeePaymentCurrency()
@@ -37,13 +38,15 @@ class RealCustomFeeInteractor(
         return walletRepository.assetFlow(selectedMetaAccount.id, asset)
     }
 
-    override suspend fun hasEnoughBalanceToPayFee(commissionAsset: Asset, feeAmount: BigInteger): Boolean {
-        val assetSource = assetSourceRegistry.sourceFor(commissionAsset.token.configuration)
-        val assetBalance = assetSource.balance
+    override suspend fun hasEnoughBalanceToPayFee(feeAsset: Asset, inspectedFeeAmount: FeeInspector.InspectedFeeAmount): Boolean {
+        val feeChainAsset = feeAsset.token.configuration
+        val chain = chainRegistry.getChain(feeChainAsset.chainId)
 
-        val chain = chainRegistry.getChain(commissionAsset.token.configuration.chainId)
-        val existentialDeposit = assetBalance.existentialDeposit(chain, commissionAsset.token.configuration)
+        val existentialBalance = assetSourceRegistry.existentialDepositInPlanks(chain, feeChainAsset)
+        val passEdFeeCheck = feeAsset.balanceCountedTowardsEDInPlanks - inspectedFeeAmount.checkedAgainstMinimumBalance >= existentialBalance
 
-        return commissionAsset.transferableInPlanks - feeAmount >= existentialDeposit
+        val hasEnoughTransferable = feeAsset.transferableInPlanks >= inspectedFeeAmount.deductedFromTransferable
+
+        return passEdFeeCheck && hasEnoughTransferable
     }
 }

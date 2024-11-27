@@ -46,7 +46,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -86,7 +86,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletReposito
 import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
-import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealCustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
@@ -234,8 +234,8 @@ class WalletFeatureModule {
         accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry,
         customFeeCapabilityFacade: CustomFeeCapabilityFacade
-    ): CustomFeeInteractor {
-        return RealCustomFeeInteractor(
+    ): FeeInteractor {
+        return RealFeeInteractor(
             feePaymentProviderRegistry,
             chainRegistry,
             walletRepository,
@@ -259,7 +259,7 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
-        interactor: CustomFeeInteractor,
+        interactor: FeeInteractor,
     ): FeeLoaderMixinV2.Factory {
         return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor)
     }

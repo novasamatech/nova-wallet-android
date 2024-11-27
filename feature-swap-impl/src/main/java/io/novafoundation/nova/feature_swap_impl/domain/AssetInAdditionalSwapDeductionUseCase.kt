@@ -27,8 +27,9 @@ class RealAssetInAdditionalSwapDeductionUseCase(
         val assetOutCanProvideSufficiency = sameChain && assetSourceRegistry.isSelfSufficientAsset(assetOut)
 
         val canDustAssetIn = assetInBalanceCanDropBelowEd || assetOutCanProvideSufficiency
+        val shouldKeepEdForAssetIn = !canDustAssetIn
 
-        return if (canDustAssetIn) {
+        return if (shouldKeepEdForAssetIn) {
             val chainIn = chainRegistry.getChain(assetIn.chainId)
             assetSourceRegistry.existentialDepositInPlanks(chainIn, assetIn)
         } else {

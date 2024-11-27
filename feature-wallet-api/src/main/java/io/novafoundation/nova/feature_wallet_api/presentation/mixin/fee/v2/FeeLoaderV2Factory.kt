@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2
 
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -14,7 +14,7 @@ class FeeLoaderV2Factory(
     private val chainRegistry: ChainRegistry,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val interactor: CustomFeeInteractor,
+    private val interactor: FeeInteractor,
 ) : FeeLoaderMixinV2.Factory {
 
     override fun <F, D> create(

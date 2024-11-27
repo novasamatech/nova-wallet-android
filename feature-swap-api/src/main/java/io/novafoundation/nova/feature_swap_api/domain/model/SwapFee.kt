@@ -66,9 +66,4 @@ class SwapFee(
 
         return SubstrateFeeBase(totalFutureFeeInAssetIn, assetIn)
     }
-
-//    // TODO remove this after reworking swap validations
-//    override val submissionOrigin: SubmissionOrigin = initialSubmissionFee.submissionOrigin
-//    override val amount: BigInteger = totalFeeAmount(initialSubmissionFee.asset)
-//    override val asset: Chain.Asset = initialSubmissionFee.asset
 }

@@ -25,14 +25,6 @@ suspend fun <F> FeeLoaderMixinV2<F, *>.awaitOptionalFee(): F? = fee
         }
     }.first()
 
-suspend fun <F> FeeLoaderMixinV2.Presentation<F, *>.setFeeOrHide(fee: F?) {
-    if (fee != null) {
-        setFee(fee)
-    } else {
-        setFeeStatus(FeeStatus.NoFee)
-    }
-}
-
 context(BaseViewModel)
 fun <F, I1, I2, I3, I4> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
     inputSource1: Flow<I1>,

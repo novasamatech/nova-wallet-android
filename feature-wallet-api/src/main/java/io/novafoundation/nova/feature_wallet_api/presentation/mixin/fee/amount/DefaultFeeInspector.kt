@@ -1,14 +1,18 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount
 
-import io.novafoundation.nova.feature_account_api.data.model.FeeBase
-import io.novafoundation.nova.feature_account_api.data.model.getAmount
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
+import io.novafoundation.nova.feature_account_api.data.model.amountByExecutingAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-class DefaultFeeInspector<F : FeeBase> : FeeInspector<F> {
+class DefaultFeeInspector<F : SubmissionFee> : FeeInspector<F> {
 
-    override fun requiredBalanceToPayFee(fee: F, chainAsset: Chain.Asset): Balance {
-        return fee.getAmount(chainAsset)
+    override fun inspectFeeAmount(fee: F): FeeInspector.InspectedFeeAmount {
+        val amount = fee.amountByExecutingAccount
+
+        return FeeInspector.InspectedFeeAmount(
+            checkedAgainstMinimumBalance = amount,
+            deductedFromTransferable = amount
+        )
     }
 
     override fun getSubmissionFeeAsset(fee: F): Chain.Asset {
