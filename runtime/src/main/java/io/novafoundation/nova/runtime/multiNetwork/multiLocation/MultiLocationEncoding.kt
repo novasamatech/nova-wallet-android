@@ -111,7 +111,7 @@ private fun MultiLocation.Interior.toEncodableInstance(xcmVersion: XcmVersion) =
         // X1 is encoded as a single junction in V3 and prior
         DictEnum.Entry(
             name = "X1",
-            value =junctions.single().toEncodableInstance()
+            value = junctions.single().toEncodableInstance()
         )
     } else {
         DictEnum.Entry(

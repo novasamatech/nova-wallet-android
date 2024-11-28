@@ -285,7 +285,6 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry
     ): CrossChainWeigher = RealCrossChainWeigher(storageDataSource, extrinsicService, chainRegistry)
 
-
     @Provides
     @FeatureScope
     fun provideCrossChainTransactor(

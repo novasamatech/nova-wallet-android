@@ -72,7 +72,7 @@ class AssetConversionExchangeFactory(
     private val chainStateRepository: ChainStateRepository,
     private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
     private val xcmVersionDetector: XcmVersionDetector,
-    ) : AssetExchange.SingleChainFactory {
+) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(
         chain: Chain,
@@ -88,7 +88,7 @@ class AssetConversionExchangeFactory(
             chainStateRepository = chainStateRepository,
             swapHost = swapHost,
             deductionUseCase = deductionUseCase,
-            xcmVersionDetector=xcmVersionDetector
+            xcmVersionDetector = xcmVersionDetector
         )
     }
 }

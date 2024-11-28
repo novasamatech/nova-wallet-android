@@ -24,7 +24,6 @@ interface EventsRepository {
      */
     suspend fun getBlockEvents(chainId: ChainId, blockHash: BlockHash? = null): BlockEvents
 
-
     suspend fun getExtrinsicWithEvents(chainId: ChainId, extrinsicHash: String, blockHash: BlockHash? = null): ExtrinsicWithEvents?
 }
 

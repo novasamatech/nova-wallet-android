@@ -68,7 +68,8 @@ class AmountChooserProvider(
     tokenFlow = usedAssetFlow.map { it.token },
     maxActionProvider = maxActionProvider,
     allowMaxAction = allowMaxAction
-), AmountChooserMixin.Presentation {
+),
+    AmountChooserMixin.Presentation {
 
     override val assetModel = usedAssetFlow.map { asset ->
         ChooseAmountModel(asset, assetIconProvider, resourceManager, balanceLabel)

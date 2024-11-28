@@ -1,6 +1,5 @@
 package io.novafoundation.nova.runtime.multiNetwork.multiLocation
 
-
 import android.util.Log
 import io.novafoundation.nova.common.utils.enumValueOfOrNull
 import io.novafoundation.nova.common.utils.xcmPalletName
@@ -14,7 +13,6 @@ import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
-
 
 interface XcmVersionDetector {
 
@@ -65,7 +63,6 @@ class RealXcmVersionDetector(
 
                 return null
             }
-
 
         return enumValueOfOrNull<XcmVersion>(matchingEnumEntry.name)?.also {
             Log.d("RealPalletXcmRepository", "Identified xcm version for ${actualCheckedType.name} to be ${it.name}")

@@ -56,7 +56,7 @@ private const val ALCHEMY_ERROR_CODE = 429
 private const val BLUST_CAPACITY_ERROR_CODE = -32098
 private const val BLUST_RATE_LIMIT_ERROR_CODE = -32097
 
-private const val ON_FINALITY_RATE_LIMIT_ERROR_CODE =- 32029
+private const val ON_FINALITY_RATE_LIMIT_ERROR_CODE = -32029
 
 private val RATE_LIMIT_ERROR_CODES = listOf(
     INFURA_ERROR_CODE,

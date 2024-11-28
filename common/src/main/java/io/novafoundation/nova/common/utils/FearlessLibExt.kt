@@ -359,7 +359,7 @@ fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == thi
 fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
     val runtimeApi = runtimeApiOrNull("AssetConversionApi") ?: return null
 
-        return runtimeApi.method("quote_price_tokens_for_exact_tokens")
+    return runtimeApi.method("quote_price_tokens_for_exact_tokens")
         .inputs.first().type
 }
 

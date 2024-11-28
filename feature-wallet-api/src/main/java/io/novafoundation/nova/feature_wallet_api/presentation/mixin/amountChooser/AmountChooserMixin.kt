@@ -96,8 +96,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
     }
 }
 
-
-
 fun AmountChooserMixinBase.Presentation.setAmount(amount: BigDecimal, initiatedByUser: Boolean = false) {
     inputState.value = InputState(value = amount.toStripTrailingZerosString(), initiatedByUser, inputKind = InputKind.REGULAR)
 }
