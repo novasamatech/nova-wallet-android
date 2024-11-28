@@ -101,6 +101,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
                         dappBrowserTransitionImage.animate()
                             .setDuration(300)
                             .alpha(0f)
+                            .withEndAction { dappBrowserTransitionImage.makeGone() }
                             .start()
                     }
                 )
