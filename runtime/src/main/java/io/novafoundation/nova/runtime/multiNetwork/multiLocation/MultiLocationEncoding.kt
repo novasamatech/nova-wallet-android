@@ -99,18 +99,19 @@ private fun bindGlobalConsensusJunction(instance: Any?): Junction {
 
 // ------ Encode ------
 
-fun MultiLocation.toEncodableInstance() = structOf(
+fun MultiLocation.toEncodableInstance(xcmVersion: XcmVersion) = structOf(
     "parents" to parents,
-    "interior" to interior.toEncodableInstance()
+    "interior" to interior.toEncodableInstance(xcmVersion)
 )
 
-private fun MultiLocation.Interior.toEncodableInstance() = when (this) {
+private fun MultiLocation.Interior.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
     MultiLocation.Interior.Here -> DictEnum.Entry("Here", null)
 
-    is MultiLocation.Interior.Junctions -> if (junctions.size == 1) {
+    is MultiLocation.Interior.Junctions -> if (junctions.size == 1 && xcmVersion <= XcmVersion.V3) {
+        // X1 is encoded as a single junction in V3 and prior
         DictEnum.Entry(
             name = "X1",
-            value = junctions.first().toEncodableInstance()
+            value =junctions.single().toEncodableInstance()
         )
     } else {
         DictEnum.Entry(

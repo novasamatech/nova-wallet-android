@@ -40,6 +40,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
+import io.novasama.substrate_sdk_android.runtime.metadata.method
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
@@ -48,6 +49,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunctio
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
@@ -353,6 +355,13 @@ fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
 
 fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == this.event.index
+
+fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
+    val runtimeApi = runtimeApiOrNull("AssetConversionApi") ?: return null
+
+        return runtimeApi.method("quote_price_tokens_for_exact_tokens")
+        .inputs.first().type
+}
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 

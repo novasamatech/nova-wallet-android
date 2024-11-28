@@ -68,10 +68,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSub
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.PalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealPalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
@@ -91,6 +89,7 @@ import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.Asse
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -286,11 +285,6 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry
     ): CrossChainWeigher = RealCrossChainWeigher(storageDataSource, extrinsicService, chainRegistry)
 
-    @Provides
-    @FeatureScope
-    fun provideXcmPalletRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
-    ): PalletXcmRepository = RealPalletXcmRepository(storageDataSource)
 
     @Provides
     @FeatureScope
@@ -298,7 +292,7 @@ class WalletFeatureModule {
         weigher: CrossChainWeigher,
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory,
-        palletXcmRepository: PalletXcmRepository,
+        xcmVersionDetector: XcmVersionDetector,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
         eventsRepository: EventsRepository,
         chainRegistry: ChainRegistry,
@@ -307,7 +301,7 @@ class WalletFeatureModule {
         weigher = weigher,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
-        palletXcmRepository = palletXcmRepository,
+        xcmVersionDetector = xcmVersionDetector,
         enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
         eventsRepository = eventsRepository,
         chainStateRepository = chainStateRepository,

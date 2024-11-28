@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.assetConversionAssetIdType
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -12,15 +12,15 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersion
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.orDefault
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
-import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
-import io.novasama.substrate_sdk_android.runtime.metadata.call
-import io.novasama.substrate_sdk_android.runtime.metadata.module
 import java.math.BigInteger
 
 internal class AssetConversionFeePayment(
@@ -28,10 +28,12 @@ internal class AssetConversionFeePayment(
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val multiLocationConverter: MultiLocationConverter,
     private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcher,
+    private val xcmVersionDetector: XcmVersionDetector
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
-        return extrinsicBuilder.assetTxPayment(encodableAssetId())
+        val xcmVersion = detectAssetIdXcmVersion(extrinsicBuilder.runtime)
+        return extrinsicBuilder.assetTxPayment(encodableAssetId(xcmVersion))
     }
 
     override suspend fun convertNativeFee(nativeFee: Fee): Fee {
@@ -50,15 +52,15 @@ internal class AssetConversionFeePayment(
         return chainAsset.id in availableFeeAssets
     }
 
-    private suspend fun encodableAssetId(): Any {
-        return multiLocationConverter.toMultiLocationOrThrow(paymentAsset).toEncodableInstance()
+    private suspend fun encodableAssetId(xcmVersion: XcmVersion): Any {
+        return multiLocationConverter.toMultiLocationOrThrow(paymentAsset).toEncodableInstance(xcmVersion)
     }
 
-    private fun encodableNativeAssetId(): Any {
+    private fun encodableNativeAssetId(xcmVersion: XcmVersion): Any {
         return MultiLocation(
             parents = BigInteger.ONE,
             interior = MultiLocation.Interior.Here
-        ).toEncodableInstance()
+        ).toEncodableInstance(xcmVersion)
     }
 
     private fun ExtrinsicBuilder.assetTxPayment(assetId: Any?, tip: BigInteger = BigInteger.ZERO) {
@@ -78,31 +80,23 @@ internal class AssetConversionFeePayment(
     }
 
     private suspend fun RuntimeCallsApi.convertNativeFee(amount: BigInteger): BigInteger? {
-        val method = "quote_price_tokens_for_exact_tokens"
-
-        val includeFee = true
-
-        val multiLocationTypeName = runtime.metadata.assetIdTypeName()
+        val xcmVersion = detectAssetIdXcmVersion(runtime)
 
         return call(
             section = "AssetConversionApi",
-            method = method,
-            arguments = listOf(
-                encodableAssetId() to multiLocationTypeName,
-                encodableNativeAssetId() to multiLocationTypeName,
-                amount to "Balance",
-                includeFee to BooleanType.name
+            method = "quote_price_tokens_for_exact_tokens",
+            arguments = mapOf(
+                "asset1" to encodableAssetId(xcmVersion),
+                "asset2" to encodableNativeAssetId(xcmVersion),
+                "amount" to amount,
+                "include_fee" to true
             ),
-            returnType = "Option<Balance>",
             returnBinding = ::bindNumberOrNull
         )
     }
 
-    private fun RuntimeMetadata.assetIdTypeName(): String {
-        val (assetIdArgument) = module(Modules.ASSET_CONVERSION).call("add_liquidity").arguments
-
-        val assetIdType = assetIdArgument.type!!
-
-        return assetIdType.name
+    private suspend fun detectAssetIdXcmVersion(runtime: RuntimeSnapshot): XcmVersion {
+        val assetIdType = runtime.metadata.assetConversionAssetIdType()
+        return xcmVersionDetector.detectMultiLocationVersion(paymentAsset.chainId, assetIdType).orDefault()
     }
 }

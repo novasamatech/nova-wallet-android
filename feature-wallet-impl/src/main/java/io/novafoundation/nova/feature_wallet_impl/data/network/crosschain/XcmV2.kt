@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersion
 import java.math.BigInteger
 
 typealias XcmMultiAssets = List<XcmMultiAsset>
@@ -62,24 +63,23 @@ sealed class VersionedMultiAsset {
 }
 
 sealed class VersionedMultiLocation {
+
     class V1(val multiLocation: MultiLocation) : VersionedMultiLocation()
+
     class V2(val multiLocation: MultiLocation) : VersionedMultiLocation()
 }
 
-fun XcmMultiAssets.versioned(lowestAllowedVersion: XcmVersion?) = when {
-    lowestAllowedVersion == null -> VersionedMultiAssets.V2(this) // try out best with latest known version
+fun XcmMultiAssets.versioned(lowestAllowedVersion: XcmVersion) = when {
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAssets.V1(this)
     else -> VersionedMultiAssets.V2(this)
 }
 
-fun XcmMultiAsset.versioned(lowestAllowedVersion: XcmVersion?) = when {
-    lowestAllowedVersion == null -> VersionedMultiAsset.V2(this) // try out best with latest known version
+fun XcmMultiAsset.versioned(lowestAllowedVersion: XcmVersion) = when {
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAsset.V1(this)
     else -> VersionedMultiAsset.V2(this)
 }
 
-fun MultiLocation.versioned(lowestAllowedVersion: XcmVersion?) = when {
-    lowestAllowedVersion == null -> VersionedMultiLocation.V2(this) // try out best with latest known version
+fun MultiLocation.versioned(lowestAllowedVersion: XcmVersion) = when {
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiLocation.V1(this)
     else -> VersionedMultiLocation.V2(this)
 }

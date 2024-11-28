@@ -49,6 +49,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findRelayChainOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.orDefault
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.BlockEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
@@ -72,7 +74,7 @@ class RealCrossChainTransactor(
     private val weigher: CrossChainWeigher,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val phishingValidationFactory: PhishingValidationFactory,
-    private val palletXcmRepository: PalletXcmRepository,
+    private val xcmVersionDetector: XcmVersionDetector,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val eventsRepository: EventsRepository,
     private val chainStateRepository: ChainStateRepository,
@@ -292,8 +294,8 @@ class RealCrossChainTransactor(
         val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
         val requiredDestWeight = weigher.estimateRequiredDestWeight(configuration)
 
-        val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
-        val lowestMultiAssetVersion = palletXcmRepository.lowestPresentMultiAssetVersion(assetTransfer.originChain.id)
+        val lowestMultiLocationVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(assetTransfer.originChain.id).orDefault()
+        val lowestMultiAssetVersion = xcmVersionDetector.lowestPresentMultiAssetVersion(assetTransfer.originChain.id).orDefault()
 
         call(
             moduleName = runtime.metadata.xTokensName(),
@@ -356,8 +358,8 @@ class RealCrossChainTransactor(
         crossChainFee: Balance,
         callName: String
     ) {
-        val lowestMultiLocationVersion = palletXcmRepository.lowestPresentMultiLocationVersion(assetTransfer.originChain.id)
-        val lowestMultiAssetsVersion = palletXcmRepository.lowestPresentMultiAssetsVersion(assetTransfer.originChain.id)
+        val lowestMultiLocationVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(assetTransfer.originChain.id).orDefault()
+        val lowestMultiAssetsVersion = xcmVersionDetector.lowestPresentMultiAssetsVersion(assetTransfer.originChain.id).orDefault()
 
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
 

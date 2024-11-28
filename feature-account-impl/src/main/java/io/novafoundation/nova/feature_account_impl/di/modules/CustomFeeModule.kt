@@ -22,6 +22,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -75,12 +76,14 @@ class CustomFeeModule {
         multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
         multiLocationConverterFactory: MultiLocationConverterFactory,
         assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        xcmVersionDetector: XcmVersionDetector
     ) = AssetHubFeePaymentProviderFactory(
         multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
         multiLocationConverterFactory = multiLocationConverterFactory,
         assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher,
-        chainRegistry = chainRegistry
+        chainRegistry = chainRegistry,
+        xcmVersionDetector = xcmVersionDetector
     )
 
     @Provides

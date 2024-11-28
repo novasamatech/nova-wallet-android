@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import kotlinx.coroutines.CoroutineScope
 
@@ -17,12 +18,19 @@ class AssetHubFeePaymentProviderFactory(
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val xcmVersionDetector: XcmVersionDetector
 ) {
 
     suspend fun create(chainId: ChainId): AssetHubFeePaymentProvider {
         val chain = chainRegistry.getChain(chainId)
-        return AssetHubFeePaymentProvider(chain, multiChainRuntimeCallsApi, multiLocationConverterFactory, assetHubFeePaymentAssetsFetcher)
+        return AssetHubFeePaymentProvider(
+            chain = chain,
+            multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
+            multiLocationConverterFactory = multiLocationConverterFactory,
+            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher,
+            xcmVersionDetector = xcmVersionDetector
+        )
     }
 }
 
@@ -30,7 +38,8 @@ class AssetHubFeePaymentProvider(
     private val chain: Chain,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
-    private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory
+    private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
+    private val xcmVersionDetector: XcmVersionDetector
 ) : CustomOrNativeFeePaymentProvider() {
 
     override suspend fun feePaymentFor(customFeeAsset: Chain.Asset, coroutineScope: CoroutineScope?): FeePayment {
@@ -40,7 +49,8 @@ class AssetHubFeePaymentProvider(
             paymentAsset = customFeeAsset,
             multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
             multiLocationConverter = multiLocationConverter,
-            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher.create(chain, multiLocationConverter)
+            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher.create(chain, multiLocationConverter),
+            xcmVersionDetector = xcmVersionDetector
         )
     }
 

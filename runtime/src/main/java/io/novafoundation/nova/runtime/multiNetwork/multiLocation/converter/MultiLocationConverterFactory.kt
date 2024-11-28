@@ -3,10 +3,14 @@ package io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 
-class MultiLocationConverterFactory(private val chainRegistry: ChainRegistry) {
+class MultiLocationConverterFactory(
+    private val chainRegistry: ChainRegistry,
+    private val xcmVersionDetector: XcmVersionDetector,
+) {
 
     fun defaultAsync(chain: Chain, coroutineScope: CoroutineScope): MultiLocationConverter {
         val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chain.id) }
@@ -15,7 +19,7 @@ class MultiLocationConverterFactory(private val chainRegistry: ChainRegistry) {
         return CompoundMultiLocationConverter(
             NativeAssetLocationConverter(chain),
             LocalAssetsLocationConverter(chain, runtimeSource),
-            ForeignAssetsLocationConverter(chain, runtimeSource)
+            ForeignAssetsLocationConverter(chain, runtimeSource, xcmVersionDetector)
         )
     }
 
@@ -26,7 +30,7 @@ class MultiLocationConverterFactory(private val chainRegistry: ChainRegistry) {
         return CompoundMultiLocationConverter(
             NativeAssetLocationConverter(chain),
             LocalAssetsLocationConverter(chain, runtimeSource),
-            ForeignAssetsLocationConverter(chain, runtimeSource)
+            ForeignAssetsLocationConverter(chain, runtimeSource, xcmVersionDetector)
         )
     }
 

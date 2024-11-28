@@ -6,8 +6,9 @@ import io.novafoundation.nova.common.utils.requireActualType
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersion
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
@@ -60,18 +61,18 @@ fun VersionedXcm.toEncodableInstance() = when (this) {
     )
 }
 
-private fun XcmV2.toEncodableInstance(): Any = instructions.map(XcmV2Instruction::toEncodableInstance)
+private fun XcmV2.toEncodableInstance(): Any = instructions.map { it.toEncodableInstance(XcmVersion.V2) }
 
-private fun XcmMultiAssets.toEncodableInstance() = map(XcmMultiAsset::toEncodableInstance)
-private fun XcmMultiAsset.toEncodableInstance() = structOf(
+private fun XcmMultiAssets.toEncodableInstance(xcmVersion: XcmVersion) = map { it.toEncodableInstance(xcmVersion) }
+private fun XcmMultiAsset.toEncodableInstance(xcmVersion: XcmVersion) = structOf(
     "fun" to fungibility.toEncodableInstance(),
-    "id" to id.toEncodableInstance()
+    "id" to id.toEncodableInstance(xcmVersion)
 )
 
-private fun XcmMultiAsset.Id.toEncodableInstance() = when (this) {
+private fun XcmMultiAsset.Id.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
     is XcmMultiAsset.Id.Concrete -> DictEnum.Entry(
         name = "Concrete",
-        value = multiLocation.toEncodableInstance()
+        value = multiLocation.toEncodableInstance(xcmVersion)
     )
 }
 
@@ -82,10 +83,10 @@ private fun Fungibility.toEncodableInstance() = when (this) {
     )
 }
 
-private fun XcmV2Instruction.toEncodableInstance() = when (this) {
+private fun XcmV2Instruction.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
     is XcmV2Instruction.WithdrawAsset -> DictEnum.Entry(
         name = "WithdrawAsset",
-        value = assets.toEncodableInstance()
+        value = assets.toEncodableInstance(xcmVersion)
     )
 
     is XcmV2Instruction.DepositAsset -> DictEnum.Entry(
@@ -93,14 +94,14 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
         value = structOf(
             "assets" to assets.toEncodableInstance(),
             "max_assets" to maxAssets,
-            "beneficiary" to beneficiary.toEncodableInstance()
+            "beneficiary" to beneficiary.toEncodableInstance(xcmVersion)
         )
     )
 
     is XcmV2Instruction.BuyExecution -> DictEnum.Entry(
         name = "BuyExecution",
         value = structOf(
-            "fees" to fees.toEncodableInstance(),
+            "fees" to fees.toEncodableInstance(xcmVersion),
             // xcm v2 always uses v1 weights
             "weight_limit" to weightLimit.toV1EncodableInstance()
         )
@@ -113,7 +114,7 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
 
     is XcmV2Instruction.ReserveAssetDeposited -> DictEnum.Entry(
         name = "ReserveAssetDeposited",
-        value = assets.toEncodableInstance()
+        value = assets.toEncodableInstance(xcmVersion)
     )
 
     is XcmV2Instruction.DepositReserveAsset -> DictEnum.Entry(
@@ -121,14 +122,14 @@ private fun XcmV2Instruction.toEncodableInstance() = when (this) {
         value = structOf(
             "assets" to assets.toEncodableInstance(),
             "max_assets" to maxAssets,
-            "dest" to dest.toEncodableInstance(),
+            "dest" to dest.toEncodableInstance(xcmVersion),
             "xcm" to xcm.toEncodableInstance()
         )
     )
 
     is XcmV2Instruction.ReceiveTeleportedAsset -> DictEnum.Entry(
         name = "ReceiveTeleportedAsset",
-        value = assets.toEncodableInstance()
+        value = assets.toEncodableInstance(xcmVersion)
     )
 }
 
@@ -155,35 +156,35 @@ private fun XcmMultiAssetFilter.toEncodableInstance() = when (this) {
 fun VersionedMultiAssets.toEncodableInstance() = when (this) {
     is VersionedMultiAssets.V1 -> DictEnum.Entry(
         name = "V1",
-        value = assets.toEncodableInstance()
+        value = assets.toEncodableInstance(XcmVersion.V1)
     )
 
     is VersionedMultiAssets.V2 -> DictEnum.Entry(
         name = "V2",
-        value = assets.toEncodableInstance()
+        value = assets.toEncodableInstance(XcmVersion.V2)
     )
 }
 
 fun VersionedMultiAsset.toEncodableInstance() = when (this) {
     is VersionedMultiAsset.V1 -> DictEnum.Entry(
         name = "V1",
-        value = asset.toEncodableInstance()
+        value = asset.toEncodableInstance(XcmVersion.V1)
     )
 
     is VersionedMultiAsset.V2 -> DictEnum.Entry(
         name = "V2",
-        value = asset.toEncodableInstance()
+        value = asset.toEncodableInstance(XcmVersion.V2)
     )
 }
 
 fun VersionedMultiLocation.toEncodableInstance() = when (this) {
     is VersionedMultiLocation.V1 -> DictEnum.Entry(
         name = "V1",
-        value = multiLocation.toEncodableInstance()
+        value = multiLocation.toEncodableInstance(XcmVersion.V1)
     )
 
     is VersionedMultiLocation.V2 -> DictEnum.Entry(
         name = "V2",
-        value = multiLocation.toEncodableInstance()
+        value = multiLocation.toEncodableInstance(XcmVersion.V2)
     )
 }

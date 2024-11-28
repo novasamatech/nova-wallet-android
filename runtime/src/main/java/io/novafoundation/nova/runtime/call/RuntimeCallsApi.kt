@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.call
 
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -19,6 +20,8 @@ typealias RuntimeTypeName = String
 typealias RuntimeTypeValue = Any?
 
 interface RuntimeCallsApi {
+
+    val chainId: ChainId
 
     val runtime: RuntimeSnapshot
 
@@ -48,6 +51,7 @@ interface RuntimeCallsApi {
 
 internal class RealRuntimeCallsApi(
     override val runtime: RuntimeSnapshot,
+    override val chainId: ChainId,
     private val socketService: SocketService,
 ) : RuntimeCallsApi {
 

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -22,14 +23,16 @@ class AssetConversionExchangeModule {
         runtimeCallsApi: MultiChainRuntimeCallsApi,
         multiLocationConverterFactory: MultiLocationConverterFactory,
         chainStateRepository: ChainStateRepository,
-        deductionUseCase: AssetInAdditionalSwapDeductionUseCase
+        deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
+        xcmVersionDetector: XcmVersionDetector
     ): AssetConversionExchangeFactory {
         return AssetConversionExchangeFactory(
             chainStateRepository = chainStateRepository,
             remoteStorageSource = remoteStorageSource,
             runtimeCallsApi = runtimeCallsApi,
             multiLocationConverterFactory = multiLocationConverterFactory,
-            deductionUseCase = deductionUseCase
+            deductionUseCase = deductionUseCase,
+            xcmVersionDetector = xcmVersionDetector
         )
     }
 }

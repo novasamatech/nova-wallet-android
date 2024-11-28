@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConvers
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.assetConversion
+import io.novafoundation.nova.common.utils.assetConversionAssetIdType
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.assetConversionOrNull
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -43,9 +43,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersion
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.orDefault
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -53,11 +56,9 @@ import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.call
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -70,7 +71,8 @@ class AssetConversionExchangeFactory(
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
     private val chainStateRepository: ChainStateRepository,
     private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
-) : AssetExchange.SingleChainFactory {
+    private val xcmVersionDetector: XcmVersionDetector,
+    ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(
         chain: Chain,
@@ -85,7 +87,8 @@ class AssetConversionExchangeFactory(
             multiChainRuntimeCallsApi = runtimeCallsApi,
             chainStateRepository = chainStateRepository,
             swapHost = swapHost,
-            deductionUseCase = deductionUseCase
+            deductionUseCase = deductionUseCase,
+            xcmVersionDetector=xcmVersionDetector
         )
     }
 }
@@ -98,6 +101,7 @@ private class AssetConversionExchange(
     private val chainStateRepository: ChainStateRepository,
     private val swapHost: AssetExchange.SwapHost,
     private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
+    private val xcmVersionDetector: XcmVersionDetector,
 ) : AssetExchange {
 
     override suspend fun sync() {
@@ -134,6 +138,11 @@ private class AssetConversionExchange(
         }
     }
 
+    private suspend fun detectAssetIdXcmVersion(runtime: RuntimeSnapshot): XcmVersion {
+        val assetIdType = runtime.metadata.assetConversionAssetIdType()
+        return xcmVersionDetector.detectMultiLocationVersion(chain.id, assetIdType).orDefault()
+    }
+
     private suspend fun RuntimeCallsApi.quote(
         swapDirection: SwapDirection,
         assetIn: Chain.Asset,
@@ -145,33 +154,22 @@ private class AssetConversionExchange(
             SwapDirection.SPECIFIED_OUT -> "quote_price_tokens_for_exact_tokens"
         }
 
-        val asset1 = multiLocationConverter.toMultiLocationOrThrow(assetIn).toEncodableInstance()
-        val asset2 = multiLocationConverter.toMultiLocationOrThrow(assetOut).toEncodableInstance()
+        val assetIdXcmVersion = detectAssetIdXcmVersion(runtime)
 
-        val includeFee = true
-
-        val multiLocationTypeName = runtime.metadata.assetIdTypeName()
+        val asset1 = multiLocationConverter.toMultiLocationOrThrow(assetIn).toEncodableInstance(assetIdXcmVersion)
+        val asset2 = multiLocationConverter.toMultiLocationOrThrow(assetOut).toEncodableInstance(assetIdXcmVersion)
 
         return call(
             section = "AssetConversionApi",
             method = method,
-            arguments = listOf(
-                asset1 to multiLocationTypeName,
-                asset2 to multiLocationTypeName,
-                amount to "Balance",
-                includeFee to BooleanType.name
+            arguments = mapOf(
+                "asset1" to asset1,
+                "asset2" to asset2,
+                "amount" to amount,
+                "include_fee" to true
             ),
-            returnType = "Option<Balance>",
             returnBinding = ::bindNumberOrNull
         )
-    }
-
-    private fun RuntimeMetadata.assetIdTypeName(): String {
-        val (assetIdArgument) = assetConversion().call("add_liquidity").arguments
-
-        val assetIdType = assetIdArgument.type!!
-
-        return assetIdType.name
     }
 
     private inner class AssetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset) : BaseSwapGraphEdge(fromAsset, toAsset) {
@@ -316,8 +314,10 @@ private class AssetConversionExchange(
             swapLimit: SwapLimit,
             sendTo: AccountId
         ) {
+            val assetIdXcmVersion = detectAssetIdXcmVersion(runtime)
+
             val path = listOf(fromAsset, toAsset)
-                .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset) }
+                .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset, assetIdXcmVersion) }
 
             val keepAlive = false
 
@@ -348,8 +348,11 @@ private class AssetConversionExchange(
             }
         }
 
-        private suspend fun MultiLocationConverter.encodableMultiLocationOf(chainAsset: Chain.Asset): Any? {
-            return toMultiLocationOrThrow(chainAsset).toEncodableInstance()
+        private suspend fun MultiLocationConverter.encodableMultiLocationOf(
+            chainAsset: Chain.Asset,
+            xcmVersion: XcmVersion
+        ): Any {
+            return toMultiLocationOrThrow(chainAsset).toEncodableInstance(xcmVersion)
         }
     }
 }

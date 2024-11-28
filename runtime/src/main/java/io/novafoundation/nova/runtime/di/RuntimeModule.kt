@@ -30,6 +30,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainC
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.RealXcmVersionDetector
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
@@ -219,8 +221,11 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideMultiLocationConverterFactory(chainRegistry: ChainRegistry): MultiLocationConverterFactory {
-        return MultiLocationConverterFactory(chainRegistry)
+    fun provideMultiLocationConverterFactory(
+        chainRegistry: ChainRegistry,
+        xcmVersionDetector: XcmVersionDetector,
+    ): MultiLocationConverterFactory {
+        return MultiLocationConverterFactory(chainRegistry, xcmVersionDetector)
     }
 
     @Provides
@@ -297,4 +302,10 @@ class RuntimeModule {
             gson
         )
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideXcmPalletRepository(
+        chainRegistry: ChainRegistry
+    ): XcmVersionDetector = RealXcmVersionDetector(chainRegistry)
 }
