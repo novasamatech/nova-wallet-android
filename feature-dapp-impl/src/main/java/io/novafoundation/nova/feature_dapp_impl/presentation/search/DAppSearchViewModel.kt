@@ -114,12 +114,6 @@ class DAppSearchViewModel(
             }
 
             when (payload.request) {
-                SearchPayload.Request.CREATE_NEW_TAB -> {
-                    browserTabService.createNewTab(newUrl)
-                    dAppSearchResponder.respond(DAppSearchCommunicator.Response.TabChanged)
-                    router.finishDappSearch()
-                }
-
                 SearchPayload.Request.GO_TO_URL -> {
                     dAppSearchResponder.respond(DAppSearchCommunicator.Response.NewUrl(newUrl))
                     router.finishDappSearch()
@@ -131,7 +125,6 @@ class DAppSearchViewModel(
     }
 
     private fun shouldReportResult() = when (payload.request) {
-        SearchPayload.Request.CREATE_NEW_TAB,
         SearchPayload.Request.GO_TO_URL -> true
 
         SearchPayload.Request.OPEN_NEW_URL -> false

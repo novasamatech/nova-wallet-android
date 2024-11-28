@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.webkit.WebView
-import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
@@ -13,7 +12,6 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
 
 class BrowserTabSessionFactory(
-    private val contextManager: ContextManager,
     private val compoundWeb3Injector: CompoundWeb3Injector
 ) {
 
@@ -21,7 +19,6 @@ class BrowserTabSessionFactory(
         return BrowserTabSession(
             tabId = tabId,
             startUrl = startUrl,
-            context = contextManager.getActivity()!!,
             compoundWeb3Injector = compoundWeb3Injector
         )
     }
@@ -30,24 +27,34 @@ class BrowserTabSessionFactory(
 class BrowserTabSession(
     val tabId: String,
     val startUrl: String,
-    private val context: Context,
     private val compoundWeb3Injector: CompoundWeb3Injector
 ) : PageCallback {
 
     private var _webView: WebView? = null
     val webView: WebView by lazy {
-        initialize()
-        _webView!!.loadUrl(startUrl)
         _webView!!
     }
 
     private var _webViewClient: Web3WebViewClient? = null
     val webViewClient: Web3WebViewClient by lazy {
-        initialize()
         _webViewClient!!
     }
 
     private var nestedPageCallback: PageCallback? = null
+
+    fun initialize(context: Context) {
+        if (_webView == null) {
+            _webView = WebView(context)
+            _webViewClient = Web3WebViewClient(
+                webView = _webView!!,
+                pageCallback = this
+            )
+
+            webView.injectWeb3(webViewClient)
+            webView.loadUrl(startUrl)
+            compoundWeb3Injector.initialInject(webView)
+        }
+    }
 
     fun attachToHost(
         chromeClient: Web3ChromeClient,
@@ -75,20 +82,7 @@ class BrowserTabSession(
     }
 
     fun destroy() {
-        webView.uninjectWeb3()
-        webView.destroy()
-    }
-
-    private fun initialize() {
-        if (_webView == null) {
-            _webView = WebView(context)
-            _webViewClient = Web3WebViewClient(
-                webView = _webView!!,
-                pageCallback = this
-            )
-
-            webView.injectWeb3(webViewClient)
-            compoundWeb3Injector.initialInject(webView)
-        }
+        _webView?.uninjectWeb3()
+        _webView?.destroy()
     }
 }

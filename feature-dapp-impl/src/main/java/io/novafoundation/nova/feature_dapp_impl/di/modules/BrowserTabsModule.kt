@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
@@ -53,10 +52,9 @@ class BrowserTabsModule {
     @FeatureScope
     @Provides
     fun providePageSessionFactory(
-        contextManager: ContextManager,
         compoundWeb3Injector: CompoundWeb3Injector
     ): BrowserTabSessionFactory {
-        return BrowserTabSessionFactory(contextManager, compoundWeb3Injector)
+        return BrowserTabSessionFactory(compoundWeb3Injector)
     }
 
     @FeatureScope

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:background="@color/blur_navigation_background"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/dappBrowserHide"
@@ -44,19 +45,28 @@
             app:tint="@color/actions_color" />
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/dappBrowserWebViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/dappBrowserBottomNavigation"
+        app:layout_constraintTop_toBottomOf="@+id/dappBrowserAddressBarGroup" />
+
+    <io.novafoundation.nova.common.view.TopCropImageView
+        android:id="@+id/dappBrowserTransitionImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/dappBrowserBottomNavigation"
+        app:layout_constraintTop_toBottomOf="@+id/dappBrowserAddressBarGroup" />
+
     <ProgressBar
         android:id="@+id/dappBrowserProgress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:max="100"
+        app:layout_constraintTop_toBottomOf="@+id/dappBrowserAddressBarGroup"
         tools:progress="45" />
-
-    <FrameLayout
-        android:id="@+id/dappBrowserWebViewContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 
     <LinearLayout
         android:id="@+id/dappBrowserBottomNavigation"
@@ -64,7 +74,8 @@
         android:layout_height="46dp"
         android:background="@color/dapp_blur_navigation_background"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
             android:id="@+id/dappBrowserBack"
@@ -137,4 +148,4 @@
             app:tint="@color/actions_color" />
 
     </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

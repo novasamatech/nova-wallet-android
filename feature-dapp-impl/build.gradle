@@ -85,6 +85,8 @@ dependencies {
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep
 
+    implementation navigationFragmentDep
+
     implementation retrofitDep
 
     implementation web3jDep

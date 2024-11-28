@@ -4,13 +4,18 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.SharedElementCallback
 import androidx.core.os.bundleOf
+import androidx.core.transition.addListener
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -46,9 +51,12 @@ import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavorite
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabs
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsContent
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsIcon
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTransitionImage
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
 
 private const val OVERFLOW_TABS_COUNT = 100
+
+const val DAPP_SHARED_ELEMENT_ID_IMAGE_TAB = "DAPP_SHARED_ELEMENT_ID_IMAGE_TAB"
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
@@ -68,6 +76,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     @Inject
     lateinit var fileChooser: WebViewFileChooser
 
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
     private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
@@ -80,6 +91,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     override fun onCreate(savedInstanceState: Bundle?) {
         WebView.enableSlowWholeDocumentDraw()
         super.onCreate(savedInstanceState)
+
+        sharedElementEnterTransition = TransitionInflater.from(requireContext())
+            .inflateTransition(android.R.transition.move).apply {
+                addListener(
+                    onStart = { dappBrowserWebViewContainer.makeGone() }, // Hide WebView during transition animation
+                    onEnd = {
+                        dappBrowserWebViewContainer.makeVisible()
+                        dappBrowserTransitionImage.animate()
+                            .setDuration(300)
+                            .alpha(0f)
+                            .start()
+                    }
+                )
+            }
     }
 
     override fun onCreateView(
@@ -112,6 +137,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserMore.setOnClickListener { moreClicked() }
 
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+
+        dappBrowserTransitionImage.transitionName = DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
+
+        setEnterSharedElementCallback(object : SharedElementCallback() {
+            override fun onSharedElementStart(
+                sharedElementNames: MutableList<String>?,
+                sharedElements: MutableList<View>?,
+                sharedElementSnapshots: MutableList<View>?
+            ) {
+                val sharedView = sharedElements?.firstOrNull { it.transitionName == DAPP_SHARED_ELEMENT_ID_IMAGE_TAB }
+                val sharedImageView = sharedView as? ImageView
+                dappBrowserTransitionImage.setImageDrawable(sharedImageView?.drawable) // Set image from shared element
+            }
+        })
     }
 
     override fun onDestroyView() {
@@ -212,6 +251,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     private fun attachSession(session: BrowserTabSession) {
         clearProgress()
+        session.initialize(requireContext())
         session.attachToHost(createChromeClient(), this)
         webViewHolder.set(session.webView)
         webViewClient = session.webViewClient
