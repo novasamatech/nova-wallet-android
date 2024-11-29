@@ -17,7 +17,6 @@
         <item quantity="other">%s operations</item>
     </plurals>
 
-    <string name="swap_execution_operations_completed">%s operations</string>
     <string name="swap_execution_progress_swap_label">Swapping %s to %s on %s</string>
     <string name="swap_execution_progress_transfer_label">Transferring %s to %s</string>
 

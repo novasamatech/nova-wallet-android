@@ -356,6 +356,7 @@
     <string name="common_details">세부 사항</string>
     <string name="common_disabled">비활성화됨</string>
     <string name="common_disconnect">연결 끊기</string>
+    <string name="common_do_not_close_app">앱을 닫지 마세요!</string>
     <string name="common_done">완료</string>
     <string name="common_dont_show_again">다시 표시하지 않기</string>
     <string name="common_edit">편집</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">작업이 계정을 제거합니다</string>
     <string name="common_expired">만료됨</string>
     <string name="common_explore">탐색</string>
+    <string name="common_failed">실패</string>
     <string name="common_fee_changed_message" formatted="false">예상 네트워크 수수료 %s가 기본 네트워크 수수료(%s)보다 훨씬 높습니다. 이는 일시적인 네트워크 혼잡으로 인해 발생할 수 있습니다. 더 낮은 네트워크 수수료를 기다리기 위해 새로 고칠 수 있습니다.</string>
     <string name="common_fee_changed_title">네트워크 수수료가 너무 높습니다</string>
+    <string name="common_fee_with_label">수수료: %s</string>
     <string name="common_filter_sort_header">정렬 기준:</string>
     <string name="common_filters">필터</string>
     <string name="common_find_out_more">더 알아보기</string>
@@ -427,6 +430,7 @@
     <string name="common_not_available">이용 불가</string>
     <string name="common_not_enough_funds_message">죄송합니다. 네트워크 수수료를 지불할 충분한 자금이 없습니다.</string>
     <string name="common_not_enough_funds_title">잔액 부족</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">네트워크 수수료 %s를 지불할 잔액이 부족합니다. 현재 잔액은 %s입니다</string>
     <string name="common_not_now">지금은 안 함</string>
     <string name="common_off">끔</string>
     <string name="common_ok">OK</string>
@@ -466,6 +470,10 @@
     <string name="common_search">검색</string>
     <string name="common_search_placeholder_default">검색 결과가 여기에 표시됩니다</string>
     <string name="common_search_results_number">검색 결과: %d</string>
+    <string name="common_sec">초</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d초</item>
+    </plurals>
     <string name="common_secret_derivation_path">비밀 경로 도출</string>
     <string name="common_settings">설정</string>
     <string name="common_share">공유</string>
@@ -489,6 +497,7 @@
     <string name="common_to_settings">설정 열기</string>
     <string name="common_too_small_balance_title">잔액이 너무 적습니다</string>
     <string name="common_total">총합</string>
+    <string name="common_total_fee">총 수수료</string>
     <string name="common_transaction_id">거래 ID</string>
     <string name="common_transaction_submitted">트랜잭션이 제출되었습니다</string>
     <string name="common_try_again">다시 시도하십시오</string>
@@ -1509,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">네트워크 수수료를 지불할 토큰</string>
     <string name="swap_custom_fee_selector_footer">입력한 금액 외에 네트워크 수수료가 추가됩니다</string>
     <string name="swap_error_pair_not_supported">이 페어는 지원되지 않습니다</string>
+    <string name="swap_execution_failure" formatted="false">작업 #%s (%s) 실패</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s에서 %s로의 스왑 %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%s에서 %s로의 전송</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s 작업</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s of %s 작업</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%s에서 %s로 %s에서 스왑 중</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%s에서 %s로 전송 중</string>
+    <string name="swap_execution_time">실행 시간</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">충분하지 않은 토큰을 보유하고 있으므로 %s의 네트워크 수수료를 지불한 후 최소 %s을(를) 유지해야 합니다</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s 토큰을 받기 위해 최소 %s을(를) 유지해야 합니다</string>
     <string name="swap_failure_insufficient_balance_message">네트워크 수수료로 %2$s를 지불해야 하므로 최대 %1$s까지 교환할 수 있습니다.</string>
@@ -1528,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">다른 네트워크에서 %s 전송</string>
     <string name="swap_get_token_receive_description">QR 또는 주소로 %s 받기</string>
     <string name="swap_get_token_using">%s 받기</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">스왑 실행 중 중간 수령 금액이 %s로 최소 잔액 %s보다 적습니다. 더 큰 스왑 금액을 지정해보세요.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">슬리피지는 %s에서 %s 사이로 지정해야 합니다</string>
     <string name="swap_invalid_slippage_failure_title">잘못된 슬리피지</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">지불할 토큰 선택</string>
@@ -1546,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">이전 환율: %1$s ≈ %2$s.\n새 환율: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">교환 비율이 업데이트되었습니다</string>
     <string name="swap_repeat_operation">작업 반복</string>
+    <string name="swap_route">경로</string>
+    <string name="swap_route_description">당신의 토큰이 원하는 토큰을 얻기 위해 다른 네트워크를 통해 이동하는 방식입니다.</string>
+    <string name="swap_route_segment_swap_title">스왑</string>
+    <string name="swap_route_segment_transfer_title">전송</string>
     <string name="swap_settings_title">교환 설정</string>
     <string name="swap_slippage">슬리페이지</string>
     <string name="swap_slippage_description">슬리페이지는 분산형 거래에서 흔히 발생하는 현상으로, 교환 거래의 최종 가격이 시장 상황 변화로 인해 예상 가격과 다를 수 있습니다.</string>

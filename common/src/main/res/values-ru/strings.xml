@@ -356,6 +356,7 @@
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
+    <string name="common_do_not_close_app">Не закрывайте приложение!</string>
     <string name="common_done">Готово</string>
     <string name="common_dont_show_again">Больше не показывать это</string>
     <string name="common_edit">Редактировать</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
     <string name="common_expired">Истекла</string>
     <string name="common_explore">Исследуй</string>
+    <string name="common_failed">Не удалось</string>
     <string name="common_fee_changed_message" formatted="false">Предполагаемая комиссия %s намного выше, чем комиссия по умолчанию (%s). Это может быть связано с временной перегрузкой сети. Вы можете обновить комиссию, чтобы дождаться более низкой суммы.</string>
     <string name="common_fee_changed_title">Комиссия сети слишком высокая</string>
+    <string name="common_fee_with_label">Комиссия: %s</string>
     <string name="common_filter_sort_header">Сортировать по:</string>
     <string name="common_filters">Фильтры</string>
     <string name="common_find_out_more">Узнать больше</string>
@@ -439,6 +442,7 @@
     <string name="common_not_available">Не доступно</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">У вас недостаточно средств для оплаты сетевой комиссии в размере %s. Текущий баланс: %s</string>
     <string name="common_not_now">Не сейчас</string>
     <string name="common_off">Выкл</string>
     <string name="common_ok">OK</string>
@@ -478,6 +482,13 @@
     <string name="common_search">Поиск</string>
     <string name="common_search_placeholder_default">Результаты поиска будут отображаться здесь</string>
     <string name="common_search_results_number">Результаты поиска: %d</string>
+    <string name="common_sec">сек</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d секунда</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">%d секунд</item>
+    </plurals>
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
     <string name="common_settings">Настройки</string>
     <string name="common_share">Поделиться</string>
@@ -501,6 +512,7 @@
     <string name="common_to_settings">Открыть Настройки</string>
     <string name="common_too_small_balance_title">Ваш баланс слишком мал</string>
     <string name="common_total">Всего</string>
+    <string name="common_total_fee">Общая комиссия</string>
     <string name="common_transaction_id">ID транзакции</string>
     <string name="common_transaction_submitted">Транзакция отправлена</string>
     <string name="common_try_again">Попробовать снова</string>
@@ -1539,6 +1551,19 @@
     <string name="swap_custom_fee_selector_description">Токен для оплаты комиссии сети</string>
     <string name="swap_custom_fee_selector_footer">Комиссия сети добавится к введенной сумме</string>
     <string name="swap_error_pair_not_supported">Эта пара не поддерживается</string>
+    <string name="swap_execution_failure" formatted="false">Не удалось выполнить операцию #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Обмен %s на %s в %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Перевод %s из %s в %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s операция</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">%s операций</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s из %s операций</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Обмен %s на %s в %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Перевод %s в %s</string>
+    <string name="swap_execution_time">Время выполнения</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Вы должны сохранить как минимум %s после оплаты сетевой комиссии %s, поскольку вы храните не самодостаточные токены</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Вы должны сохранить как минимум %s, чтобы получить %s токены</string>
     <string name="swap_failure_insufficient_balance_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s.</string>
@@ -1558,6 +1583,7 @@
     <string name="swap_get_token_cross_chain_description">Перевести %s из другой сети</string>
     <string name="swap_get_token_receive_description">Получить %s по QR или вашему адресу</string>
     <string name="swap_get_token_using">Получить %s с помощью</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Во время выполнения обмена промежуточная полученная сумма равна %s, что меньше минимального баланса %s. Попробуйте указать большую сумму обмена.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Проскальзывание должно быть указано в диапазоне от %s до %s</string>
     <string name="swap_invalid_slippage_failure_title">Недопустимое проскальзывание</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Выберите токен для оплаты</string>
@@ -1576,6 +1602,10 @@
     <string name="swap_rate_was_updated_failure_message">Старый курс: %1$s ≈ %2$s.\nНовый курс: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Обменный курс изменился</string>
     <string name="swap_repeat_operation">Повторить операцию</string>
+    <string name="swap_route">Маршрут</string>
+    <string name="swap_route_description">Путь, по которому ваш токен пройдет через разные сети, чтобы получить желаемый токен.</string>
+    <string name="swap_route_segment_swap_title">Обмен</string>
+    <string name="swap_route_segment_transfer_title">Перевод</string>
     <string name="swap_settings_title">Настройки обмена</string>
     <string name="swap_slippage">Проскальзывание</string>
     <string name="swap_slippage_description">Проскальзывание - распространенное явление в децентрализованной торговле, когда конечная цена сделки по обмену может незначительно отличаться от ожидаемой в связи с изменением рыночных условий.</string>
