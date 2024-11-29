@@ -135,9 +135,7 @@ class SwapInteractor(
         return swapService.quote(quoteArgs, computationalScope)
     }
 
-    suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = withContext(Dispatchers.IO) {
-        swapService.swap(calculatedFee)
-    }
+    suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = swapService.swap(calculatedFee)
 
     suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {
         swapService.warmUpCommonChains(computationalScope)
