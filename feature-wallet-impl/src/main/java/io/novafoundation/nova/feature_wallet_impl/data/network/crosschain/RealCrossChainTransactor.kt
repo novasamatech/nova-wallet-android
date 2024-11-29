@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.instanceOf
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.transformResult
 import io.novafoundation.nova.common.utils.wrapInResult
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.tryDetectDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -115,7 +117,12 @@ class RealCrossChainTransactor(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
         ) {
-            crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
+            // Starting from XCM V3, Fungible assets cannot have zero amount, this restriction is checked on Decoding level
+            // So even fee calculation will fail with zero amount on V3+
+            // We only modify it for fees - the positive amount check for the transfer itself happens as a part of validation process
+            val alwaysPositiveTransfer = transfer.ensurePositiveAmount()
+
+            crossChainTransfer(configuration, alwaysPositiveTransfer, crossChainFee = Balance.ZERO)
         }
     }
 
@@ -390,5 +397,13 @@ class RealCrossChainTransactor(
         val accountId = destinationChain.accountIdOrDefault(recipient)
 
         return accountId.accountIdToMultiLocation()
+    }
+
+    private fun AssetTransferBase.ensurePositiveAmount(): AssetTransferBase {
+        return if (amountPlanks.isZero) {
+            replaceAmount(newAmount = BigInteger.ONE)
+        } else {
+            this
+        }
     }
 }

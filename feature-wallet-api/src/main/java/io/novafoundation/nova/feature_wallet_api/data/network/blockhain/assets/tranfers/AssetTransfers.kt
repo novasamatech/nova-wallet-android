@@ -39,6 +39,10 @@ interface AssetTransferBase : AssetTransferDirection {
     val amountPlanks: Balance
 }
 
+fun AssetTransferBase.replaceAmount(newAmount: Balance): AssetTransferBase {
+    return AssetTransferBase(recipient, originChain, originChainAsset, destinationChain, destinationChainAsset, feePaymentCurrency, newAmount)
+}
+
 // TODO this is too specialized for this module
 interface AssetTransfer : AssetTransferBase {
 
