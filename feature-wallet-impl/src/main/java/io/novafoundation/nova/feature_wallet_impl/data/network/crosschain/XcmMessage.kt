@@ -12,7 +12,7 @@ sealed class VersionedXcm {
 
     class V2(val message: XcmMessage) : VersionedXcm()
 
-    class V3(val message: XcmMessage): VersionedXcm()
+    class V3(val message: XcmMessage) : VersionedXcm()
 }
 
 class XcmMessage(val instructions: List<XcmVInstruction>)
@@ -56,7 +56,7 @@ sealed class VersionedMultiAssets {
 
     class V2(val assets: XcmMultiAssets) : VersionedMultiAssets()
 
-    class V3(val assets: XcmMultiAssets): VersionedMultiAssets()
+    class V3(val assets: XcmMultiAssets) : VersionedMultiAssets()
 }
 
 sealed class VersionedMultiAsset {
@@ -65,7 +65,7 @@ sealed class VersionedMultiAsset {
 
     class V2(val asset: XcmMultiAsset) : VersionedMultiAsset()
 
-    class V3(val asset: XcmMultiAsset): VersionedMultiAsset()
+    class V3(val asset: XcmMultiAsset) : VersionedMultiAsset()
 }
 
 sealed class VersionedMultiLocation {
@@ -74,7 +74,7 @@ sealed class VersionedMultiLocation {
 
     class V2(val multiLocation: MultiLocation) : VersionedMultiLocation()
 
-    class V3(val multiLocation: MultiLocation): VersionedMultiLocation()
+    class V3(val multiLocation: MultiLocation) : VersionedMultiLocation()
 }
 
 fun XcmMessage.versioned(lowestAllowedVersion: XcmVersion) = when {

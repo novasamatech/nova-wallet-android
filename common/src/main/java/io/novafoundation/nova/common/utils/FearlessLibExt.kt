@@ -387,7 +387,6 @@ fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()
 
-
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
     ?: fallbacks.firstOrNull { modules[it] != null }
         ?.let { modules[it] } ?: throw NoSuchElementException()
