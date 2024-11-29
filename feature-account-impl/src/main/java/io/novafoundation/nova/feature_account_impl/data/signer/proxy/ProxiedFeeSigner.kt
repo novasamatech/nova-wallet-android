@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
-import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -42,19 +41,14 @@ class ProxiedFeeSigner(
     override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         val delegator = getDelegator()
 
-        val callInstance = payloadExtrinsic.call.toCallInstance()
-        return if (callInstance == null) {
-            delegator.signExtrinsic(payloadExtrinsic)
-        } else {
-            val modifiedPayloadExtrinsic = payloadExtrinsic.wrapIntoProxyPayload(
-                proxyAccountId = getProxyAccountId(),
-                currentProxyNonce = BigInteger.ZERO,
-                proxyType = ProxyType.Any,
-                callInstance = callInstance
-            )
+        val modifiedPayloadExtrinsic = payloadExtrinsic.wrapIntoProxyPayload(
+            proxyAccountId = getProxyAccountId(),
+            currentProxyNonce = BigInteger.ZERO,
+            proxyType = ProxyType.Any,
+            call = payloadExtrinsic.call
+        )
 
-            delegator.signExtrinsic(modifiedPayloadExtrinsic)
-        }
+        return delegator.signExtrinsic(modifiedPayloadExtrinsic)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {

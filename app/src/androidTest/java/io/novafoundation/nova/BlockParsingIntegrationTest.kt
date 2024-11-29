@@ -50,7 +50,7 @@ class BlockParsingIntegrationTest {
             keyBuilder = { it.metadata.system().storage("Events").storageKey() },
             binding = { scale, runtime ->
                 Log.d(logTag, scale!!)
-                bindEventRecords(scale, runtime)
+                bindEventRecords(scale)
             }
         )
 

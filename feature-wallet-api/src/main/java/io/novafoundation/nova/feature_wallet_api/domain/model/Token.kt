@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.planksFromAmount
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -31,6 +32,13 @@ data class Token(
     fun BigInteger.toAmount() = amountFromPlanks(this)
 }
 
+fun Token.fiatAmountOf(planks: Balance): FiatAmount {
+    return FiatAmount(
+        currency = currency,
+        price = planksToFiat(planks)
+    )
+}
+
 data class HistoricalToken(
     override val currency: Currency,
     override val coinRate: HistoricalCoinRate?,
@@ -38,6 +46,8 @@ data class HistoricalToken(
 ) : TokenBase
 
 fun TokenBase.toFiatOrNull(tokenAmount: BigDecimal): BigDecimal? = coinRate?.convertAmount(tokenAmount)
+
+fun TokenBase.planksFromFiatOrZero(fiat: BigDecimal): Balance = coinRate?.convertFiatToPlanks(configuration, fiat).orZero()
 
 fun TokenBase.planksToFiatOrNull(tokenAmountPlanks: BigInteger): BigDecimal? = coinRate?.convertPlanks(configuration, tokenAmountPlanks)
 

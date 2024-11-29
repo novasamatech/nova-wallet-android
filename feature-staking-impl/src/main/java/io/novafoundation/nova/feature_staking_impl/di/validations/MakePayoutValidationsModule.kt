@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.validation.Prof
 import io.novafoundation.nova.feature_staking_impl.domain.validations.payout.MakePayoutPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.payout.PayoutFeeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.payout.PayoutValidationFailure
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 
 typealias ProfitablePayoutValidation = ProfitableActionValidation<MakePayoutPayload, PayoutValidationFailure>
 
@@ -19,7 +19,7 @@ class MakePayoutValidationsModule {
     @Provides
     @FeatureScope
     fun provideFeeValidation(): PayoutFeeValidation {
-        return EnoughAmountToTransferValidation(
+        return EnoughAmountToTransferValidationGeneric(
             feeExtractor = { it.fee },
             availableBalanceProducer = { it.asset.transferable },
             errorProducer = { PayoutValidationFailure.CannotPayFee }

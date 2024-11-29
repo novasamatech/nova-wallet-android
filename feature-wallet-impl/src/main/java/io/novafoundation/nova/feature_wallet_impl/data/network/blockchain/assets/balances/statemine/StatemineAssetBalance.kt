@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
+import io.novafoundation.nova.common.domain.balance.TransferableMode
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -10,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
@@ -49,8 +52,8 @@ class StatemineAssetBalance(
         return emptyFlow()
     }
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
-        return queryAssetDetails(chainAsset).isSufficient
+    override fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+        return chainAsset.requireStatemine().isSufficient
     }
 
     override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
@@ -70,26 +73,47 @@ class StatemineAssetBalance(
             )
         }
 
-        val frozenBalance = if (assetAccount.isBalanceFrozen) {
-            assetAccount.balance
-        } else {
-            BigInteger.ZERO
-        }
-
-        return AccountBalance(
-            free = assetAccount.balance,
-            reserved = BigInteger.ZERO,
-            frozen = frozenBalance
-        )
+        return assetAccount.toAccountBalance()
     }
 
     override suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Balance> {
-        TODO("Not yet implemented")
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
+        val statemineType = chainAsset.requireStatemine()
+
+        return remoteStorage.subscribe(chain.id, sharedSubscriptionBuilder) {
+            val encodableId = statemineType.prepareIdForEncoding(runtime)
+
+            runtime.metadata.statemineModule(statemineType).storage("Account").observeWithRaw(
+                encodableId,
+                accountId,
+                binding = ::bindAssetAccountOrEmpty
+            ).map {
+                val transferable = it.value.transferableBalance()
+                TransferableBalanceUpdate(transferable, updatedAt = it.at)
+            }
+        }
+    }
+
+    private fun AssetAccount.transferableBalance(): Balance {
+        return TransferableMode.REGULAR.calculateTransferable(toAccountBalance())
+    }
+
+    private fun AssetAccount.toAccountBalance(): AccountBalance {
+        val frozenBalance = if (isBalanceFrozen) {
+            balance
+        } else {
+            BigInteger.ZERO
+        }
+
+        return AccountBalance(
+            free = balance,
+            reserved = BigInteger.ZERO,
+            frozen = frozenBalance
+        )
     }
 
     override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {

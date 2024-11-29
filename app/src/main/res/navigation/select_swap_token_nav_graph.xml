@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:startDestination="@id/selectAssetSwapFlowFragment"
-    android:id="@+id/select_swap_token_nav_graph">
+    android:id="@+id/select_swap_token_nav_graph"
+    app:startDestination="@id/selectAssetSwapFlowFragment">
 
     <fragment
         android:id="@+id/selectAssetSwapFlowFragment"
@@ -25,9 +25,19 @@
 
     <action
         android:id="@+id/action_return_to_swap_settings"
-        app:popUpTo="@id/swapSettingsFragment"
         app:enterAnim="@anim/fragment_close_enter"
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
-        app:popExitAnim="@anim/fragment_open_exit" />
+        app:popExitAnim="@anim/fragment_open_exit"
+        app:popUpTo="@id/swapSettingsFragment" />
+
+    <action
+        android:id="@+id/action_finish_and_open_swap_settings"
+        app:destination="@+id/start_swap_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"
+        app:popUpToInclusive="true"
+        app:popUpTo="@id/select_swap_token_nav_graph" />
 </navigation>

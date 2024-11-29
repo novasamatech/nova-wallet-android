@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.input.modifyInput
 import io.novafoundation.nova.common.utils.input.valueOrNull
 import io.novafoundation.nova.common.view.InsertableInputField
 import io.novafoundation.nova.common.view.input.seekbar.Seekbar
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,12 +45,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
 
 inline fun <T> Flow<List<T>>.filterList(crossinline handler: suspend (T) -> Boolean) = map { list ->
@@ -130,11 +131,6 @@ fun <T> List<Flow<T>>.mergeIfMultiple(): Flow<T> = when (size) {
     else -> merge()
 }
 
-fun <K, V> List<Flow<Map<K, V>>>.accumulateMaps(): Flow<Map<K, V>> {
-    return mergeIfMultiple()
-        .runningFold(emptyMap()) { acc, directions -> acc + directions }
-}
-
 inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) -> Flow<T>): Flow<T> {
     return flowOfAll {
         val flowScope = CoroutineScope(coroutineContext)
@@ -191,6 +187,18 @@ fun <T, R> Flow<T>.withLoadingShared(sourceSupplier: suspend (T) -> Flow<R>): Fl
         .onCompletion { state = InnerState.SECONDARY_START }
 }
 
+fun <T> Flow<T>.zipWithLastNonNull(): Flow<Pair<T?, T>> = flow {
+    var lastNonNull: T? = null
+
+    collect {
+        emit(lastNonNull to it)
+
+        if (it != null) {
+            lastNonNull = it
+        }
+    }
+}
+
 suspend inline fun <reified T> Flow<ExtendedLoadingState<T>>.firstLoaded(): T = first { it.dataOrNull != null }.dataOrNull as T
 
 suspend fun <T> Flow<ExtendedLoadingState<T>>.firstIfLoaded(): T? = first().dataOrNull
@@ -244,6 +252,37 @@ fun <T, R> Flow<T>.withLoadingSingle(sourceSupplier: suspend (T) -> R): Flow<Loa
     }
 }
 
+fun <T> Flow<T>.wrapInResult(): Flow<Result<T>> {
+    return map { Result.success(it) }
+        .catch { emit(Result.failure(it)) }
+}
+
+@Suppress("UNCHECKED_CAST")
+@OptIn(ExperimentalTypeInference::class)
+inline fun <reified T, reified R> Flow<Result<T>>.transformResult(
+    @BuilderInference crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
+): Flow<Result<R>> {
+    return transform { upstream ->
+        upstream.onFailure {
+            emit(upstream as Result<R>)
+        }.onSuccess {
+            val innerCollector = FlowCollector<R> {
+                emit(Result.success(it))
+            }
+
+            runCatching {
+                transform(innerCollector, it)
+            }.onFailure {
+                if (it is CancellationException) {
+                    throw it
+                }
+
+                emit(Result.failure(it))
+            }
+        }
+    }
+}
+
 fun <T, R> Flow<T>.withLoadingResult(source: suspend (T) -> Result<R>): Flow<ExtendedLoadingState<R>> {
     return transformLatest { item ->
         emit(ExtendedLoadingState.Loading)
@@ -268,6 +307,10 @@ fun <T : Identifiable> Flow<List<T>>.diffed(): Flow<CollectionDiffer.Diff<T>> {
     return zipWithPrevious().map { (previous, new) ->
         CollectionDiffer.findDiff(newItems = new, oldItems = previous.orEmpty(), forceUseNewItems = false)
     }
+}
+
+suspend inline fun Flow<Boolean>.awaitTrue() {
+    first { it }
 }
 
 fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {

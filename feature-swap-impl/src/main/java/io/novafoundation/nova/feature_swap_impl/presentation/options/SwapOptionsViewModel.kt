@@ -6,10 +6,11 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disabled
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Percent
+import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.common.utils.flowOfAll
-import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.formatWithoutSymbol
+import io.novafoundation.nova.common.utils.formatting.formatPercents
+import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -19,7 +20,7 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SlippageFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -75,17 +76,17 @@ class SwapOptionsViewModel(
     }
 
     val defaultSlippage = slippageConfig.map { it.defaultSlippage }
-        .map { it.format() }
+        .map { it.formatPercents() }
 
     val slippageTips = slippageConfig.map { it.slippageTips }
-        .map { it.map { it.format() } }
+        .mapList { it.formatPercents() }
 
     init {
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
             if (selectedSlippage != defaultSlippage) {
-                slippageInput.value = selectedSlippage.formatWithoutSymbol()
+                slippageInput.value = selectedSlippage.formatPercents(includeSymbol = false)
             }
         }
     }
@@ -100,7 +101,7 @@ class SwapOptionsViewModel(
     fun tipClicked(index: Int) {
         launch {
             val slippageTips = slippageConfig.first().slippageTips
-            slippageInput.value = slippageTips[index].formatWithoutSymbol()
+            slippageInput.value = slippageTips[index].formatPercents(includeSymbol = false)
         }
     }
 
@@ -120,12 +121,13 @@ class SwapOptionsViewModel(
         swapRouter.back()
     }
 
-    private suspend fun String.formatToPercent(): Percent? {
+    private suspend fun String.formatToPercent(): Fraction? {
         val defaultSlippage = slippageConfig.first().defaultSlippage
+
         return if (isEmpty()) {
             defaultSlippage
         } else {
-            return this.toDoubleOrNull()?.let { Percent(it) }
+            return toDoubleOrNull()?.percents
         }
     }
 

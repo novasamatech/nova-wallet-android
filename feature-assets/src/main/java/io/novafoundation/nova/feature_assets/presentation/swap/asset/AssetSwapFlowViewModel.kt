@@ -11,15 +11,15 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
-import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
-import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenAssetGroupToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenAssetGroupToUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSw
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -48,6 +49,7 @@ class AssetSwapFlowViewModel(
     private val swapPayload: SwapFlowPayload,
     private val assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
+    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val amountFormatter: AmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
@@ -62,10 +64,10 @@ class AssetSwapFlowViewModel(
     amountFormatter
 ) {
 
+    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+
     init {
-        launch {
-            swapAvailabilityInteractor.sync(viewModelScope)
-        }
+        launchInitialSwapSync()
     }
 
     @StringRes
@@ -81,13 +83,13 @@ class AssetSwapFlowViewModel(
             forAsset = swapPayload.constraintDirectionsAsset?.fullChainAssetId,
             queryFlow = query,
             externalBalancesFlow = externalBalancesFlow,
-            coroutineScope = viewModelScope
+            coroutineScope = swapFlowScope
         )
     }
 
     override fun assetClicked(asset: Chain.Asset) {
         launch {
-            swapFlowExecutor.openNextScreen(viewModelScope, asset)
+            swapFlowExecutor.openNextScreen(swapFlowScope, asset)
         }
     }
 
@@ -111,7 +113,15 @@ class AssetSwapFlowViewModel(
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
+            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets) { it.groupBalance.transferable }
+        }
+    }
+
+    private fun launchInitialSwapSync() {
+        if (swapPayload is SwapFlowPayload.InitialSelecting) {
+            launch { swapAvailabilityInteractor.warmUpCommonlyUsedChains(swapFlowScope) }
+
+            launch { swapAvailabilityInteractor.sync(swapFlowScope) }
         }
     }
 }

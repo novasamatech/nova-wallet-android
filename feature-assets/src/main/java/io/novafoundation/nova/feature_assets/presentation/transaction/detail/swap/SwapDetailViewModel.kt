@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAm
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_swap_api.domain.model.rateAgainst
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
-import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionModel
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionParcel
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -124,11 +124,10 @@ class SwapDetailViewModel(
 
     fun repeatOperationClicked() {
         val amount = if (operation.amountIsAssetIn) operation.amountIn.amount else operation.amountOut.amount
-        val direction = if (operation.amountIsAssetIn) SwapDirectionModel.SPECIFIED_IN else SwapDirectionModel.SPECIFIED_OUT
+        val direction = if (operation.amountIsAssetIn) SwapDirectionParcel.SPECIFIED_IN else SwapDirectionParcel.SPECIFIED_OUT
         val payload = SwapSettingsPayload.RepeatOperation(
             assetIn = operation.amountIn.assetId,
             assetOut = operation.amountOut.assetId,
-            feeAsset = operation.amountFee.assetId,
             amount = amount,
             direction = direction
         )

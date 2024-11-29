@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendViewModel
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -51,7 +51,7 @@ class ConfirmSendModule {
         externalActions: ExternalActions.Presentation,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressDisplayUseCase: AddressDisplayUseCase,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         resourceManager: ResourceManager,
         transferDraft: TransferDraft,
         chainRegistry: ChainRegistry,

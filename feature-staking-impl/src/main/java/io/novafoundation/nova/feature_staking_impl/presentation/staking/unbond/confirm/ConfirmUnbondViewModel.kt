@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.h
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -80,7 +80,7 @@ class ConfirmUnbondViewModel(
         .shareInBackground()
 
     val feeStatusLiveData = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }

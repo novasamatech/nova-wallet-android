@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimR
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -103,7 +103,7 @@ class NominationPoolsClaimRewardsViewModel(
         val pendingRewards = pendingRewards.first()
 
         val payload = NominationPoolsClaimRewardsValidationPayload(
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             pendingRewardsPlanks = pendingRewards.amount,
             asset = assetFlow.first(),
             chain = stakingSharedState.chain(),

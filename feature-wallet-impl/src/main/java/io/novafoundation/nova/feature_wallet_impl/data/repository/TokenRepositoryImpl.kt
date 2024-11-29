@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -38,6 +39,28 @@ class TokenRepositoryImpl(
                 }
             )
         }
+    }
+
+    override suspend fun getTokens(chainAssets: List<Chain.Asset>): Map<FullChainAssetId, Token> {
+        if (chainAssets.isEmpty()) return emptyMap()
+
+        val symbols = chainAssets.mapToSet { it.symbol.value }.toList()
+
+        val tokens = tokenDao.getTokensWithCurrency(symbols)
+
+        val tokensBySymbol = tokens.associateBy { it.token?.tokenSymbol }
+        val currency = tokens.first().currency
+
+        return chainAssets.associateBy(
+            keySelector = { chainAsset -> chainAsset.fullId },
+            valueTransform = { chainAsset ->
+                mapTokenLocalToToken(
+                    tokenLocal = tokensBySymbol[chainAsset.symbol.value]?.token,
+                    currencyLocal = currency,
+                    chainAsset = chainAsset
+                )
+            }
+        )
     }
 
     override suspend fun getToken(chainAsset: Chain.Asset): Token = getTokenOrNull(chainAsset)!!

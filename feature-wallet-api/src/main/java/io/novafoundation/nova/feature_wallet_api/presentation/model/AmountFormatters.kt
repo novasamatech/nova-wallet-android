@@ -26,12 +26,14 @@ class RealAmountFormatter(
         val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(floatAmountSize))
 
         return with(amountWithFraction) {
+            val decimalAmount = amountWithFraction.amount
+
             val spannableBuilder = SpannableStringBuilder()
-                .append(amount)
+                .append(decimalAmount)
             if (fraction != null) {
                 spannableBuilder.append(separator + fraction)
-                val startIndex = amount.length
-                val endIndex = amount.length + separator.length + fraction!!.length
+                val startIndex = decimalAmount.length
+                val endIndex = decimalAmount.length + separator.length + fraction!!.length
                 spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }

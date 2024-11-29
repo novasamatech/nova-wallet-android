@@ -13,10 +13,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.accountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.handleVoteTinderGovValidationFailure
@@ -26,11 +26,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -39,6 +37,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
 
 class ConfirmTinderGovVoteViewModel(
     private val router: GovernanceRouter,
@@ -111,13 +110,8 @@ class ConfirmTinderGovVoteViewModel(
         launch {
             originFeeMixin.loadFeeSuspending(
                 retryScope = this,
-                feeConstructor = {
-                    val fee = interactor.estimateFee(votesFlow.first())
-                    SimpleFee(fee)
-                },
-                onRetryCancelled = {
-                    router.back()
-                }
+                feeConstructor = { interactor.estimateFee(votesFlow.first()) },
+                onRetryCancelled = router::back
             )
         }
     }
@@ -175,7 +169,7 @@ class ConfirmTinderGovVoteViewModel(
             onChainReferenda = voteAssistant.onChainReferenda,
             asset = assetFlow.first(),
             trackVoting = voteAssistant.trackVoting,
-            fee = originFeeMixin.awaitDecimalFee(),
+            fee = originFeeMixin.awaitFee(),
             basket = basket
         )
     }

@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.VoteValidationPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import java.math.BigDecimal
 
@@ -16,5 +16,5 @@ data class VoteReferendaValidationPayload(
     override val maxAmount: BigDecimal,
     val voteType: VoteType?,
     val conviction: Conviction?,
-    override val fee: DecimalFee
+    override val fee: Fee
 ) : VoteValidationPayload

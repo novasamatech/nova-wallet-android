@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
@@ -158,7 +158,7 @@ class SetupAmountMultiStakingViewModel(
         val payload = StartMultiStakingValidationPayload(
             recommendableSelection = recommendableSelection,
             asset = currentAssetFlow.first(),
-            fee = feeLoaderMixin.awaitDecimalFee()
+            fee = feeLoaderMixin.awaitFee()
         )
 
         validationExecutor.requireValid(

@@ -69,7 +69,7 @@ class ConfirmAddStakingProxyViewModel(
         .flatMapLatest { assetUseCase.assetFlow(it) }
         .shareInBackground()
 
-    private val decimalFeeFlow = flowOf { mapFeeFromParcel(payload.fee) }
+    private val feeFlow = flowOf { mapFeeFromParcel(payload.fee) }
         .shareInBackground()
 
     val chainModel = chainFlow.map { chain ->
@@ -88,8 +88,8 @@ class ConfirmAddStakingProxyViewModel(
         mapAmountToAmountModel(payload.deltaDeposit, asset)
     }
 
-    val feeModelFlow = combine(assetFlow, decimalFeeFlow) { asset, decimalFee ->
-        mapAmountToAmountModel(decimalFee.networkFee.amount, asset)
+    val feeModelFlow = combine(assetFlow, feeFlow) { asset, fee ->
+        mapAmountToAmountModel(fee.amount, asset)
     }
 
     val proxyAccountModel = chainFlow.map { chain ->
@@ -110,7 +110,7 @@ class ConfirmAddStakingProxyViewModel(
             asset = assetFlow.first(),
             proxyAddress = payload.proxyAddress,
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
-            fee = decimalFeeFlow.first(),
+            fee = feeFlow.first(),
             deltaDeposit = payload.deltaDeposit,
             currentQuantity = payload.currentQuantity
         )

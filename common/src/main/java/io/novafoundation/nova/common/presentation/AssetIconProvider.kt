@@ -10,9 +10,9 @@ interface AssetIconProvider {
 
     companion object;
 
-    fun getAssetIconOrFallback(iconName: String): Icon
+    fun getAssetIcon(iconName: String): Icon
 
-    fun getAssetIconOrFallback(iconName: String, iconMode: AssetIconMode): Icon
+    fun getAssetIcon(iconName: String, iconMode: AssetIconMode): Icon
 }
 
 class RealAssetIconProvider(
@@ -21,11 +21,11 @@ class RealAssetIconProvider(
     private val whiteBaseUrl: String
 ) : AssetIconProvider {
 
-    override fun getAssetIconOrFallback(iconName: String): Icon {
-        return getAssetIconOrFallback(iconName, assetsIconModeRepository.getIconMode())
+    override fun getAssetIcon(iconName: String): Icon {
+        return getAssetIcon(iconName, assetsIconModeRepository.getIconMode())
     }
 
-    override fun getAssetIconOrFallback(iconName: String, iconMode: AssetIconMode): Icon {
+    override fun getAssetIcon(iconName: String, iconMode: AssetIconMode): Icon {
         val iconUrl = when (iconMode) {
             AssetIconMode.COLORED -> "$coloredBaseUrl/$iconName"
             AssetIconMode.WHITE -> "$whiteBaseUrl/$iconName"
@@ -42,7 +42,7 @@ fun AssetIconProvider.getAssetIconOrFallback(
     iconName: String?,
     fallback: Icon = AssetIconProvider.fallbackIcon
 ): Icon {
-    return iconName?.let { getAssetIconOrFallback(it) } ?: fallback
+    return iconName?.let { getAssetIcon(it) } ?: fallback
 }
 
 fun AssetIconProvider.getAssetIconOrFallback(
@@ -50,5 +50,5 @@ fun AssetIconProvider.getAssetIconOrFallback(
     iconMode: AssetIconMode,
     fallback: Icon = AssetIconProvider.fallbackIcon
 ): Icon {
-    return iconName?.let { getAssetIconOrFallback(it, iconMode) } ?: fallback
+    return iconName?.let { getAssetIcon(it, iconMode) } ?: fallback
 }

@@ -19,6 +19,8 @@ import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.common.utils.fromHex
+import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
+import io.novafoundation.nova.common.utils.hexBytesSize
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.feeViaRuntimeCall
@@ -29,7 +31,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
-import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.scale.dataType.DataType
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
@@ -56,31 +59,21 @@ class RpcCalls(
     private val runtimeCallsApi: MultiChainRuntimeCallsApi
 ) {
 
-    suspend fun getExtrinsicFee(chain: Chain, extrinsic: String): FeeResponse {
+    suspend fun getExtrinsicFee(chain: Chain, extrinsic: SendableExtrinsic): FeeResponse {
         val chainId = chain.id
         val runtime = chainRegistry.getRuntime(chainId)
 
-        return if (chain.additional.feeViaRuntimeCall() && runtime.typeRegistry[FEE_DECODE_TYPE] != null) {
-            val lengthInBytes = extrinsic.fromHex().size
+        return when {
+            chain.additional.feeViaRuntimeCall() && runtime.metadata.hasRuntimeApisMetadata() -> queryFeeViaRuntimeApiV15(chainId, extrinsic)
 
-            runtimeCallsApi.forChain(chainId).call(
-                section = "TransactionPaymentApi",
-                method = "query_info",
-                arguments = listOf(
-                    extrinsic to null,
-                    lengthInBytes.toBigInteger() to "u32"
-                ),
-                returnType = FEE_DECODE_TYPE,
-                returnBinding = ::bindPartialFee
-            )
-        } else {
-            val request = FeeCalculationRequest(extrinsic)
-            socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())
+            chain.additional.feeViaRuntimeCall() && runtime.hasFeeDecodeType() -> queryFeeViaRuntimeApiPreV15(chainId, extrinsic)
+
+            else -> queryFeeViaRpcCall(chainId, extrinsic)
         }
     }
 
-    suspend fun submitExtrinsic(chainId: ChainId, extrinsic: String): String {
-        val request = SubmitExtrinsicRequest(extrinsic)
+    suspend fun submitExtrinsic(chainId: ChainId, extrinsic: SendableExtrinsic): String {
+        val request = SubmitExtrinsicRequest(extrinsic.extrinsicHex)
 
         return socketFor(chainId).executeAsync(
             request,
@@ -89,13 +82,13 @@ class RpcCalls(
         )
     }
 
-    fun submitAndWatchExtrinsic(chainId: ChainId, extrinsic: String): Flow<ExtrinsicStatus> {
+    fun submitAndWatchExtrinsic(chainId: ChainId, extrinsic: SendableExtrinsic): Flow<ExtrinsicStatus> {
         return flow {
-            val hash = extrinsic.extrinsicHash()
-            val request = SubmitAndWatchExtrinsicRequest(extrinsic)
+            val extrinsicHash = extrinsic.extrinsicHex.extrinsicHash()
+            val request = SubmitAndWatchExtrinsicRequest(extrinsic.extrinsicHex)
 
             val inner = socketFor(chainId).subscriptionFlow(request, unsubscribeMethod = "author_unwatchExtrinsic")
-                .map { it.asExtrinsicStatus(hash) }
+                .map { it.asExtrinsicStatus(extrinsicHash) }
 
             emitAll(inner)
         }
@@ -154,6 +147,43 @@ class RpcCalls(
     }
 
     private suspend fun socketFor(chainId: ChainId) = chainRegistry.getSocket(chainId)
+
+    private suspend fun queryFeeViaRpcCall(chainId: ChainId, extrinsic: SendableExtrinsic): FeeResponse {
+        val request = FeeCalculationRequest(extrinsic.extrinsicHex)
+        return socketFor(chainId).executeAsync(request, mapper = pojo<FeeResponse>().nonNull())
+    }
+
+    private suspend fun queryFeeViaRuntimeApiPreV15(chainId: ChainId, extrinsic: SendableExtrinsic): FeeResponse {
+        val lengthInBytes = extrinsic.extrinsicHex.hexBytesSize()
+
+        return runtimeCallsApi.forChain(chainId).call(
+            section = "TransactionPaymentApi",
+            method = "query_info",
+            arguments = listOf(
+                extrinsic.extrinsicHex to null,
+                lengthInBytes.toBigInteger() to "u32"
+            ),
+            returnType = FEE_DECODE_TYPE,
+            returnBinding = ::bindPartialFee
+        )
+    }
+
+    private suspend fun queryFeeViaRuntimeApiV15(chainId: ChainId, extrinsic: SendableExtrinsic): FeeResponse {
+        return runtimeCallsApi.forChain(chainId).call(
+            section = "TransactionPaymentApi",
+            method = "query_info",
+            arguments = mapOf(
+                // rpc needs bytes without length as it adds length in bytes during "uxt" encoding
+                "uxt" to extrinsic.bytesWithoutLength,
+                "len" to extrinsic.extrinsicHex.hexBytesSize().toBigInteger()
+            ),
+            returnBinding = ::bindPartialFee
+        )
+    }
+
+    private fun RuntimeSnapshot.hasFeeDecodeType(): Boolean {
+        return typeRegistry[FEE_DECODE_TYPE] != null
+    }
 
     private fun bindPartialFee(decoded: Any?): FeeResponse {
         val asStruct = decoded.castToStruct()

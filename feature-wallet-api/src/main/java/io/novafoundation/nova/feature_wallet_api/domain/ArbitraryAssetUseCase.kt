@@ -17,6 +17,8 @@ interface ArbitraryAssetUseCase {
     fun assetFlow(chainId: ChainId, assetId: ChainAssetId): Flow<Asset>
 
     fun assetFlow(chainAsset: Chain.Asset): Flow<Asset>
+
+    suspend fun getAsset(chainAsset: Chain.Asset): Asset?
 }
 
 class RealArbitraryAssetUseCase(
@@ -37,5 +39,10 @@ class RealArbitraryAssetUseCase(
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             walletRepository.assetFlow(metaAccount.id, chainAsset)
         }
+    }
+
+    override suspend fun getAsset(chainAsset: Chain.Asset): Asset? {
+        val account = accountRepository.getSelectedMetaAccount()
+        return walletRepository.getAsset(account.id, chainAsset)
     }
 }

@@ -14,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.assetTxFeePaidEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findAllOfType
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -85,7 +86,7 @@ class AssetConversionSwapExtractor(
         return when {
             // successful swap, extract from event
             swapExecutedEvent != null -> {
-                val (_, _, _, amountIn, amountOut) = swapExecutedEvent.arguments
+                val (_, _, amountIn, amountOut) = swapExecutedEvent.arguments
 
                 bindNumber(amountIn) to bindNumber(amountOut)
             }

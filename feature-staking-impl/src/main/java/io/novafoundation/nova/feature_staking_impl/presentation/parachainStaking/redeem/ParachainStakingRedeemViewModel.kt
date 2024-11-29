@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redee
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -109,7 +109,7 @@ class ParachainStakingRedeemViewModel(
         _showNextProgress.value = true
 
         val payload = ParachainStakingRedeemValidationPayload(
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             asset = assetFlow.first()
         )
 

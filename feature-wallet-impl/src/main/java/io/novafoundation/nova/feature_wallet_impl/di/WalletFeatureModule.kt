@@ -23,11 +23,11 @@ import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -46,7 +46,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.fee.CustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -56,19 +56,20 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider.FeeLoaderProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.PalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealPalletXcmRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
@@ -83,12 +84,16 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletReposito
 import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
-import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealCustomFeeInteractor
+import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
+import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -227,32 +232,38 @@ class WalletFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry,
-        customFeeCapabilityFacade: CustomFeeCapabilityFacade
-    ): CustomFeeInteractor {
-        return RealCustomFeeInteractor(
-            feePaymentProviderRegistry,
-            chainRegistry,
-            walletRepository,
-            accountRepository,
-            assetSourceRegistry,
-            customFeeCapabilityFacade
+        customFeeCapabilityFacade: CustomFeeCapabilityFacade,
+        tokenRepository: TokenRepository,
+    ): FeeInteractor {
+        return RealFeeInteractor(
+            feePaymentProviderRegistry = feePaymentProviderRegistry,
+            chainRegistry = chainRegistry,
+            walletRepository = walletRepository,
+            accountRepository = accountRepository,
+            tokenRepository = tokenRepository,
+            assetSourceRegistry = assetSourceRegistry,
+            customFeeCapabilityFacade = customFeeCapabilityFacade,
         )
     }
 
     @Provides
     @FeatureScope
     fun provideFeeLoaderMixinFactory(
-        customFeeInteractor: CustomFeeInteractor,
-        chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        feeInteractor: FeeInteractor
     ): FeeLoaderMixin.Factory {
-        return FeeLoaderProviderFactory(
-            customFeeInteractor,
-            chainRegistry,
-            resourceManager,
-            actionAwaitableMixinFactory
-        )
+        return FeeLoaderProviderFactory(resourceManager, feeInteractor)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideFeeLoaderV2MixinFactory(
+        chainRegistry: ChainRegistry,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        resourceManager: ResourceManager,
+        interactor: FeeInteractor,
+    ): FeeLoaderMixinV2.Factory {
+        return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor)
     }
 
     @Provides
@@ -274,31 +285,30 @@ class WalletFeatureModule {
     fun provideCrossChainWeigher(
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
         extrinsicService: ExtrinsicService,
-        chainRegistry: ChainRegistry
-    ): CrossChainWeigher = RealCrossChainWeigher(storageDataSource, extrinsicService, chainRegistry)
-
-    @Provides
-    @FeatureScope
-    fun provideXcmPalletRepository(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
-    ): PalletXcmRepository = RealPalletXcmRepository(storageDataSource)
+        chainRegistry: ChainRegistry,
+        xcmVersionDetector: XcmVersionDetector
+    ): CrossChainWeigher = RealCrossChainWeigher(storageDataSource, extrinsicService, chainRegistry, xcmVersionDetector)
 
     @Provides
     @FeatureScope
     fun provideCrossChainTransactor(
         weigher: CrossChainWeigher,
-        extrinsicService: ExtrinsicService,
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory,
-        palletXcmRepository: PalletXcmRepository,
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+        xcmVersionDetector: XcmVersionDetector,
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        eventsRepository: EventsRepository,
+        chainRegistry: ChainRegistry,
+        chainStateRepository: ChainStateRepository
     ): CrossChainTransactor = RealCrossChainTransactor(
         weigher = weigher,
-        extrinsicService = extrinsicService,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
-        palletXcmRepository = palletXcmRepository,
-        enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory
+        xcmVersionDetector = xcmVersionDetector,
+        enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
+        eventsRepository = eventsRepository,
+        chainStateRepository = chainStateRepository,
+        chainRegistry = chainRegistry
     )
 
     @Provides
@@ -367,13 +377,19 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry,
         accountRepository: AccountRepository,
         computationalCache: ComputationalCache,
+        crossChainWeigher: CrossChainWeigher,
+        crossChainTransactor: CrossChainTransactor,
+        parachainInfoRepository: ParachainInfoRepository,
     ): CrossChainTransfersUseCase {
         return RealCrossChainTransfersUseCase(
             crossChainTransfersRepository = crossChainTransfersRepository,
             walletRepository = walletRepository,
             chainRegistry = chainRegistry,
             accountRepository = accountRepository,
-            computationalCache = computationalCache
+            computationalCache = computationalCache,
+            crossChainWeigher = crossChainWeigher,
+            crossChainTransactor = crossChainTransactor,
+            parachainInfoRepository = parachainInfoRepository
         )
     }
 
@@ -404,4 +420,14 @@ class WalletFeatureModule {
         walletRepository,
         extrinsicService
     )
+
+    @Provides
+    @FeatureScope
+    fun provideAssetsValidationContextFactory(
+        arbitraryAssetUseCase: ArbitraryAssetUseCase,
+        chainRegistry: ChainRegistry,
+        assetSourceRegistry: AssetSourceRegistry,
+    ): AssetsValidationContext.Factory {
+        return AssetValidationContextFactory(arbitraryAssetUseCase, chainRegistry, assetSourceRegistry)
+    }
 }

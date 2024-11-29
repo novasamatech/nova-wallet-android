@@ -5,57 +5,48 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.totalCanBeDroppedBelowMinimumBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.domain.validation.context.getExistentialDeposit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class SufficientBalanceConsideringConsumersValidation<P, E>(
-    private val assetSourceRegistry: AssetSourceRegistry,
-    private val chainExtractor: (P) -> Chain,
+    private val assetsValidationContext: AssetsValidationContext,
     private val assetExtractor: (P) -> Chain.Asset,
-    private val balanceCountedTowardsEdExtractor: (P) -> Balance,
     private val feeExtractor: (P) -> Balance,
     private val amountExtractor: (P) -> Balance,
     private val error: (P, existentialDeposit: Balance) -> E
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
-        val chain = chainExtractor(value)
-        val asset = assetExtractor(value)
+        val chainAsset = assetExtractor(value)
 
-        val totalCanDropBelowMinimumBalance = assetSourceRegistry.totalCanBeDroppedBelowMinimumBalance(asset)
+        val totalCanDropBelowMinimumBalance = assetsValidationContext.canTotalDropBelowEd(chainAsset)
+        if (totalCanDropBelowMinimumBalance) return valid()
 
-        return if (totalCanDropBelowMinimumBalance) {
-            valid()
-        } else {
-            val balance = balanceCountedTowardsEdExtractor(value)
-            val amount = amountExtractor(value)
-            val fee = feeExtractor(value)
+        val balance = assetsValidationContext.getAsset(chainAsset).balanceCountedTowardsEDInPlanks
+        val amount = amountExtractor(value)
+        val fee = feeExtractor(value)
 
-            val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(chain, asset)
-            validOrError(balance - existentialDeposit >= amount + fee) { error(value, existentialDeposit) }
+        val existentialDeposit = assetsValidationContext.getExistentialDeposit(chainAsset)
+        return validOrError(balance - existentialDeposit >= amount + fee) {
+            error(value, existentialDeposit)
         }
     }
 }
 
 fun <P, E> ValidationSystemBuilder<P, E>.sufficientBalanceConsideringConsumersValidation(
-    assetSourceRegistry: AssetSourceRegistry,
-    chainExtractor: (P) -> Chain,
+    assetsValidationContext: AssetsValidationContext,
     assetExtractor: (P) -> Chain.Asset,
-    balanceCountedTowardsEdExtractor: (P) -> Balance,
     feeExtractor: (P) -> Balance,
     amountExtractor: (P) -> Balance,
     error: (P, existentialDeposit: Balance) -> E
 ) = validate(
     SufficientBalanceConsideringConsumersValidation(
-        assetSourceRegistry,
-        chainExtractor,
-        assetExtractor,
-        balanceCountedTowardsEdExtractor,
-        feeExtractor,
-        amountExtractor,
-        error,
+        assetsValidationContext = assetsValidationContext,
+        assetExtractor = assetExtractor,
+        feeExtractor = feeExtractor,
+        amountExtractor = amountExtractor,
+        error = error
     )
 )

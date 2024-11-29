@@ -18,21 +18,23 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payload.SwapConfirmationPayloadFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.EnoughAmountToSwapValidatorFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.LiquidityFieldValidatorFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -85,7 +87,7 @@ class SwapMainSettingsModule {
         swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
         enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
@@ -97,8 +99,10 @@ class SwapMainSettingsModule {
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
-        swapConfirmationPayloadFormatter: SwapConfirmationPayloadFormatter,
-        maxActionProviderFactory: MaxActionProviderFactory
+        maxActionProviderFactory: MaxActionProviderFactory,
+        swapStateStoreProvider: SwapStateStoreProvider,
+        swapRouteFormatter: SwapRouteFormatter,
+        swapFlowScopeAggregator: SwapFlowScopeAggregator,
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -118,10 +122,12 @@ class SwapMainSettingsModule {
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapRateFormatter = swapRateFormatter,
-            swapConfirmationPayloadFormatter = swapConfirmationPayloadFormatter,
             selectedAccountUseCase = accountUseCase,
             buyMixinFactory = buyMixinFactory,
-            maxActionProviderFactory = maxActionProviderFactory
+            swapStateStoreProvider = swapStateStoreProvider,
+            maxActionProviderFactory = maxActionProviderFactory,
+            swapRouteFormatter = swapRouteFormatter,
+            swapFlowScopeAggregator = swapFlowScopeAggregator
         )
     }
 

@@ -11,6 +11,6 @@ class InitialSwapFlowExecutor(private val assetsRouter: AssetsRouter) : SwapFlow
 
     override suspend fun openNextScreen(coroutineScope: CoroutineScope, chainAsset: Chain.Asset) {
         val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload())
-        assetsRouter.openSwapSetupAmount(payload)
+        assetsRouter.finishSelectAndOpenSwapSetupAmount(payload)
     }
 }

@@ -73,11 +73,12 @@ abstract class AssetFlowViewModel(
         }
 
     val searchResults = combine(
-        searchAssetsFlow,
+        searchAssetsFlow, // lazy use searchAssetsFlow to let subclasses initialize self
         selectedCurrency,
     ) { assets, currency ->
         mapAssets(assets, currency)
     }.distinctUntilChanged()
+        .shareInBackground(SharingStarted.Lazily)
 
     val placeholder = searchAssetsFlow.map { getPlaceholder(query.value, it.groupList()) }
 

@@ -6,16 +6,16 @@ import io.novafoundation.nova.common.validation.TransformedFailure.Default
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.validation.handleSystemAccountValidationFailure
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
-import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +24,7 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<AssetTransferValidationFailure>,
     actions: ValidationFlowActions<*>,
-    feeLoaderMixin: GenericFeeLoaderMixin.Presentation<OriginGenericFee>,
+    setFee: SetFee<SubmissionFee>,
 ): TransformedFailure? {
     return when (val reason = status.reason) {
         is AssetTransferValidationFailure.DeadRecipient.InCommissionAsset -> Default(
@@ -98,7 +98,7 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
         is AssetTransferValidationFailure.FeeChangeDetected -> handleFeeSpikeDetected(
             error = reason,
             resourceManager = resourceManager,
-            feeLoaderMixin = feeLoaderMixin,
+            setFee = setFee,
             actions = actions,
         )
 
@@ -120,7 +120,7 @@ fun autoFixSendValidationPayload(
 
     is AssetTransferValidationFailure.FeeChangeDetected -> payload.copy(
         transfer = payload.transfer.copy(
-            decimalFee = failureReason.payload.newFee
+            fee = payload.transfer.fee.replaceSubmissionFee(failureReason.payload.newFee)
         )
     )
 

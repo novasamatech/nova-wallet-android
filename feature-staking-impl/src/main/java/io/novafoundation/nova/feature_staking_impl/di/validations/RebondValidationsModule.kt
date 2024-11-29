@@ -9,13 +9,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.rebond.Not
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rebond.RebondFeeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rebond.RebondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rebond.RebondValidationSystem
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 
 @Module
 class RebondValidationsModule {
 
     @FeatureScope
     @Provides
-    fun provideFeeValidation() = RebondFeeValidation(
+    fun provideFeeValidation(): RebondFeeValidation = EnoughAmountToTransferValidationGeneric(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.controllerAsset.transferable },
         errorProducer = { RebondValidationFailure.CANNOT_PAY_FEE }
