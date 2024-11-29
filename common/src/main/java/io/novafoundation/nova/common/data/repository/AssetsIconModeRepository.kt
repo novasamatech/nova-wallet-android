@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface AssetsIconModeRepository {
+
     fun assetsIconModeFlow(): Flow<AssetIconMode>
 
     fun setAssetsIconMode(assetsViewMode: AssetIconMode)
@@ -32,7 +33,6 @@ class RealAssetsIconModeRepository(
     }
 
     override fun getIconMode(): AssetIconMode {
-        return ASSET_ICON_MODE_DEFAULT
         return preferences.getString(PREFS_ASSETS_ICON_MODE)?.fromPrefsValue() ?: ASSET_ICON_MODE_DEFAULT
     }
 
