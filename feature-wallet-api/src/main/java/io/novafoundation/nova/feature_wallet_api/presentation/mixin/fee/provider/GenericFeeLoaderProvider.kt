@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatte
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.formatFeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,11 +26,13 @@ import kotlinx.coroutines.withContext
 
 @Deprecated("Use ChangeableFeeLoaderProviderPresentation instead")
 internal class GenericFeeLoaderProviderPresentation(
+    interactor: FeeInteractor,
     resourceManager: ResourceManager,
     configuration: GenericFeeLoaderMixin.Configuration<Fee>,
     tokenFlow: Flow<Token?>
 ) : GenericFeeLoaderProvider<Fee>(
     resourceManager = resourceManager,
+    interactor = interactor,
     configuration = configuration,
     tokenFlow = tokenFlow,
     feeFormatter = DefaultFeeFormatter()
@@ -38,6 +42,7 @@ internal class GenericFeeLoaderProviderPresentation(
 @Deprecated("Use ChangeableFeeLoaderProvider instead")
 internal open class GenericFeeLoaderProvider<F>(
     private val resourceManager: ResourceManager,
+    private val interactor: FeeInteractor,
     private val configuration: GenericFeeLoaderMixin.Configuration<F>,
     private val tokenFlow: Flow<Token?>,
     private val feeFormatter: FeeFormatter<F, FeeDisplay>,
@@ -48,6 +53,7 @@ internal open class GenericFeeLoaderProvider<F>(
     final override val feeLiveData = MutableLiveData<FeeStatus<F, FeeDisplay>>()
 
     override val retryEvent = MutableLiveData<Event<RetryPayload>>()
+
     init {
         configuration.initialState.feeStatus?.let(feeLiveData::postValue)
     }
@@ -130,7 +136,7 @@ internal open class GenericFeeLoaderProvider<F>(
         return FeeFormatter.Configuration(showZeroFiat)
     }
 
-    override suspend fun feeToken(): Token {
-        return tokenFlow.firstNotNull()
+    override suspend fun token(chainAsset: Chain.Asset): Token {
+        return interactor.getToken(chainAsset)
     }
 }

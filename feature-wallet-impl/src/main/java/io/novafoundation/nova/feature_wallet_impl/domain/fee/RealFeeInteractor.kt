@@ -7,8 +7,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -20,6 +22,7 @@ class RealFeeInteractor(
     private val chainRegistry: ChainRegistry,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
+    private val tokenRepository: TokenRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val customFeeCapabilityFacade: CustomFeeCapabilityFacade,
 ) : FeeInteractor {
@@ -48,5 +51,9 @@ class RealFeeInteractor(
         val hasEnoughTransferable = feeAsset.transferableInPlanks >= inspectedFeeAmount.deductedFromTransferable
 
         return passEdFeeCheck && hasEnoughTransferable
+    }
+
+    override suspend fun getToken(chainAsset: Chain.Asset): Token {
+        return tokenRepository.getToken(chainAsset)
     }
 }

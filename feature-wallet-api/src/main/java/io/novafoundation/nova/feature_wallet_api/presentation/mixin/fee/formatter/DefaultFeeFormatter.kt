@@ -15,7 +15,7 @@ class DefaultFeeFormatter<F : FeeBase> : FeeFormatter<F, FeeDisplay> {
     ): FeeDisplay {
         return mapAmountToAmountModel(
             amountInPlanks = fee.amount,
-            token = context.feeToken(),
+            token = context.token(fee.asset),
             includeZeroFiat = configuration.showZeroFiat
         ).toFeeDisplay()
     }

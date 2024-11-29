@@ -190,8 +190,13 @@ internal class FeeLoaderV2Provider<F, D>(
         return feeAsset.first()
     }
 
-    override suspend fun feeToken(): Token {
-        return feeAsset.first().token
+    override suspend fun token(chainAsset: Chain.Asset): Token {
+        val submissionFeeToken = feeAsset().token
+        if (submissionFeeToken.configuration.fullId == chainAsset.fullId) {
+            return submissionFeeToken
+        }
+
+        return interactor.getToken(chainAsset)
     }
 
     override suspend fun feePaymentCurrency(): FeePaymentCurrency {

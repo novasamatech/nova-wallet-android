@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter.Context
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface FeeFormatter<F, D> {
 
@@ -13,7 +14,7 @@ interface FeeFormatter<F, D> {
 
     interface Context {
 
-        suspend fun feeToken(): Token
+        suspend fun token(chainAsset: Chain.Asset): Token
     }
 
     suspend fun formatFee(

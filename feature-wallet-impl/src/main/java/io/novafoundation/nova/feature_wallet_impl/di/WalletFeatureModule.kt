@@ -232,15 +232,17 @@ class WalletFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry,
-        customFeeCapabilityFacade: CustomFeeCapabilityFacade
+        customFeeCapabilityFacade: CustomFeeCapabilityFacade,
+        tokenRepository: TokenRepository,
     ): FeeInteractor {
         return RealFeeInteractor(
-            feePaymentProviderRegistry,
-            chainRegistry,
-            walletRepository,
-            accountRepository,
-            assetSourceRegistry,
-            customFeeCapabilityFacade
+            feePaymentProviderRegistry = feePaymentProviderRegistry,
+            chainRegistry = chainRegistry,
+            walletRepository = walletRepository,
+            accountRepository = accountRepository,
+            tokenRepository = tokenRepository,
+            assetSourceRegistry = assetSourceRegistry,
+            customFeeCapabilityFacade = customFeeCapabilityFacade,
         )
     }
 
@@ -248,8 +250,9 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideFeeLoaderMixinFactory(
         resourceManager: ResourceManager,
+        feeInteractor: FeeInteractor
     ): FeeLoaderMixin.Factory {
-        return FeeLoaderProviderFactory(resourceManager)
+        return FeeLoaderProviderFactory(resourceManager, feeInteractor)
     }
 
     @Provides

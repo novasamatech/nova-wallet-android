@@ -33,7 +33,7 @@ class FeeLoaderV2Factory(
             configuration = configuration,
             feeInspector = feeInspector,
             selectedChainAssetFlow = selectedChainAssetFlow,
-            coroutineScope = scope
+            coroutineScope = scope,
         )
     }
 }
