@@ -29,7 +29,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Defa
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
@@ -187,7 +186,7 @@ fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
+fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
@@ -388,9 +387,6 @@ fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()
 
-fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
-    return (this as? CallRepresentation.Instance)
-}
 
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
     ?: fallbacks.firstOrNull { modules[it] != null }
@@ -402,6 +398,20 @@ fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEnt
 
 suspend fun SocketService.awaitConnected() {
     networkStateFlow().first { it is SocketStateMachine.State.Connected }
+}
+
+fun String.hexBytesSize(): Int {
+    val contentLength = if (startsWith("0x")) {
+        length - 2
+    } else {
+        length
+    }
+
+    return contentLength / 2
+}
+
+fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
+    return apis != null
 }
 
 object Modules {

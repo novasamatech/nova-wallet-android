@@ -7,7 +7,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.encodeNonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.replaceBaseNone
@@ -18,7 +18,7 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     proxyAccountId: AccountId,
     currentProxyNonce: BigInteger,
     proxyType: ProxyType,
-    callInstance: CallRepresentation.Instance
+    call: GenericCall.Instance
 ): SignerPayloadExtrinsic {
     val proxiedAccountId = accountId
     val callBuilder = SimpleCallBuilder(runtime)
@@ -28,7 +28,7 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
         arguments = mapOf(
             "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
             "force_proxy_type" to DictEnum.Entry(proxyType.name, null),
-            "call" to callInstance.call
+            "call" to call
         )
     )
 
@@ -36,7 +36,7 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
 
     return copy(
         accountId = proxyAccountId,
-        call = CallRepresentation.Instance(callBuilder.calls.first()),
+        call = callBuilder.calls.first(),
         signedExtras = signedExtras.modifyNonce(runtime, newNonce.nonce),
         nonce = newNonce
     )

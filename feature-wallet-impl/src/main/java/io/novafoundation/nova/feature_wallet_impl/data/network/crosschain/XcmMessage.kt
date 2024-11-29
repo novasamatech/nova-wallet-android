@@ -10,34 +10,36 @@ typealias XcmMultiAssets = List<XcmMultiAsset>
 
 sealed class VersionedXcm {
 
-    class V2(val message: XcmV2) : VersionedXcm()
+    class V2(val message: XcmMessage) : VersionedXcm()
+
+    class V3(val message: XcmMessage): VersionedXcm()
 }
 
-class XcmV2(val instructions: List<XcmV2Instruction>)
+class XcmMessage(val instructions: List<XcmVInstruction>)
 
-sealed class XcmV2Instruction {
+sealed class XcmVInstruction {
 
-    class WithdrawAsset(val assets: XcmMultiAssets) : XcmV2Instruction()
+    class WithdrawAsset(val assets: XcmMultiAssets) : XcmVInstruction()
 
     class DepositAsset(
         val assets: XcmMultiAssetFilter,
         val maxAssets: BigInteger,
         val beneficiary: MultiLocation
-    ) : XcmV2Instruction()
+    ) : XcmVInstruction()
 
-    class BuyExecution(val fees: XcmMultiAsset, val weightLimit: WeightLimit) : XcmV2Instruction()
+    class BuyExecution(val fees: XcmMultiAsset, val weightLimit: WeightLimit) : XcmVInstruction()
 
-    object ClearOrigin : XcmV2Instruction()
+    object ClearOrigin : XcmVInstruction()
 
-    class ReserveAssetDeposited(val assets: XcmMultiAssets) : XcmV2Instruction()
-    class ReceiveTeleportedAsset(val assets: XcmMultiAssets) : XcmV2Instruction()
+    class ReserveAssetDeposited(val assets: XcmMultiAssets) : XcmVInstruction()
+    class ReceiveTeleportedAsset(val assets: XcmMultiAssets) : XcmVInstruction()
 
     class DepositReserveAsset(
         val assets: XcmMultiAssetFilter,
         val maxAssets: BigInteger,
         val dest: MultiLocation,
-        val xcm: XcmV2
-    ) : XcmV2Instruction()
+        val xcm: XcmMessage
+    ) : XcmVInstruction()
 }
 
 sealed class XcmMultiAssetFilter {
@@ -53,6 +55,8 @@ sealed class VersionedMultiAssets {
     class V1(val assets: XcmMultiAssets) : VersionedMultiAssets()
 
     class V2(val assets: XcmMultiAssets) : VersionedMultiAssets()
+
+    class V3(val assets: XcmMultiAssets): VersionedMultiAssets()
 }
 
 sealed class VersionedMultiAsset {
@@ -60,6 +64,8 @@ sealed class VersionedMultiAsset {
     class V1(val asset: XcmMultiAsset) : VersionedMultiAsset()
 
     class V2(val asset: XcmMultiAsset) : VersionedMultiAsset()
+
+    class V3(val asset: XcmMultiAsset): VersionedMultiAsset()
 }
 
 sealed class VersionedMultiLocation {
@@ -67,21 +73,31 @@ sealed class VersionedMultiLocation {
     class V1(val multiLocation: MultiLocation) : VersionedMultiLocation()
 
     class V2(val multiLocation: MultiLocation) : VersionedMultiLocation()
+
+    class V3(val multiLocation: MultiLocation): VersionedMultiLocation()
+}
+
+fun XcmMessage.versioned(lowestAllowedVersion: XcmVersion) = when {
+    lowestAllowedVersion <= XcmVersion.V2 -> VersionedXcm.V2(this)
+    else -> VersionedXcm.V3(this)
 }
 
 fun XcmMultiAssets.versioned(lowestAllowedVersion: XcmVersion) = when {
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAssets.V1(this)
-    else -> VersionedMultiAssets.V2(this)
+    lowestAllowedVersion == XcmVersion.V2 -> VersionedMultiAssets.V2(this)
+    else -> VersionedMultiAssets.V3(this)
 }
 
 fun XcmMultiAsset.versioned(lowestAllowedVersion: XcmVersion) = when {
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiAsset.V1(this)
-    else -> VersionedMultiAsset.V2(this)
+    lowestAllowedVersion == XcmVersion.V2 -> VersionedMultiAsset.V2(this)
+    else -> VersionedMultiAsset.V3(this)
 }
 
 fun MultiLocation.versioned(lowestAllowedVersion: XcmVersion) = when {
     lowestAllowedVersion <= XcmVersion.V1 -> VersionedMultiLocation.V1(this)
-    else -> VersionedMultiLocation.V2(this)
+    lowestAllowedVersion == XcmVersion.V2 -> VersionedMultiLocation.V2(this)
+    else -> VersionedMultiLocation.V3(this)
 }
 
 class XcmMultiAsset(

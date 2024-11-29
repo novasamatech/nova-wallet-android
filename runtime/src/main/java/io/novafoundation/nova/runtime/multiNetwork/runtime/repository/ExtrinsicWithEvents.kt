@@ -17,7 +17,7 @@ enum class ExtrinsicStatus {
 }
 
 class ExtrinsicWithEvents(
-    val extrinsic: Extrinsic.DecodedInstance,
+    val extrinsic: Extrinsic.Instance,
     val extrinsicHash: String,
     val events: List<GenericEvent.Instance>
 )
@@ -40,7 +40,7 @@ fun ExtrinsicWithEvents.isSuccess(): Boolean {
     return status == ExtrinsicStatus.SUCCESS
 }
 
-fun Extrinsic.DecodedInstance.signer(): AccountId {
+fun Extrinsic.Instance.signer(): AccountId {
     val accountIdentifier = requireNotNull(signature?.accountIdentifier) {
         "Extrinsic is unsigned"
     }
