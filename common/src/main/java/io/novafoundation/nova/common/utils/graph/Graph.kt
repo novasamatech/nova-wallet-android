@@ -66,7 +66,7 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
     from: N,
     to: N,
     limit: Int,
-    nodeVisitFilter: EdgeVisitFilter<E>?
+    nodeVisitFilter: EdgeVisitFilter<E>? = null
 ): List<Path<E>> {
     val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 

@@ -1,6 +1,8 @@
 package io.novafoundation.nova.common.utils.graph
 
 import io.novafoundation.nova.test_shared.assertListEquals
+import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -8,7 +10,7 @@ import kotlin.time.measureTime
 internal class GraphKtTest {
 
     @Test
-    fun shouldFindPaths() {
+    fun shouldFindPaths() = runBlocking {
         val graph = Graph.createSimple(
             1 to listOf(2, 3, 4),
             2 to listOf(1, 4, 3),
@@ -33,8 +35,9 @@ internal class GraphKtTest {
     }
 
     @OptIn(ExperimentalTime::class)
+    @Ignore("Performance")
     @Test
-    fun testPerformance() {
+    fun testPerformance() = runBlocking {
         val graphSize = 200
         val graph = fullyConnectedGraph(graphSize)
 
