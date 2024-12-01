@@ -22,7 +22,7 @@ class SplitScreenViewModel(
 
     val closeAllTabsConfirmation = actionAwaitableMixinFactory.confirmingAction<Unit>()
 
-    private val tabsFlow = interactor.observeTabsWithNames()
+    private val tabsFlow = interactor.observeTabNamesById()
         .shareInBackground()
 
     val tabsTitle = tabsFlow.map { tabs ->

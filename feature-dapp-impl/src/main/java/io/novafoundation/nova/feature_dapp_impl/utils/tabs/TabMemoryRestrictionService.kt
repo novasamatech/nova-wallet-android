@@ -2,11 +2,12 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
 import android.app.ActivityManager
 import android.content.Context
+import io.novafoundation.nova.common.utils.InformationSize.Companion.megabytes
 import io.novafoundation.nova.common.utils.InformationSizeUnit
 import io.novafoundation.nova.common.utils.toInformationSize
 
 private const val MIN_TABS = 3
-private val MEMORY_STEP = 100.toInformationSize(InformationSizeUnit.MEGABYTES).sizeInBytes
+private val MEMORY_STEP = 100.megabytes.inWholeBytes()
 
 interface TabMemoryRestrictionService {
     fun getMaximumActiveSessions(): Int
