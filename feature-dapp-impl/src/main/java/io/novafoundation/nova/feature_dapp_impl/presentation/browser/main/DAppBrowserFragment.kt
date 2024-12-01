@@ -252,7 +252,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     private fun attachSession(session: BrowserTabSession) {
         clearProgress()
-        session.initialize(requireContext())
         session.attachToHost(createChromeClient(), this)
         webViewHolder.set(session.webView)
         webViewClient = session.webViewClient
