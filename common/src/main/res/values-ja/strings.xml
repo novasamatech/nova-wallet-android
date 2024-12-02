@@ -356,6 +356,7 @@
     <string name="common_details">詳細</string>
     <string name="common_disabled">無効</string>
     <string name="common_disconnect">切断する</string>
+    <string name="common_do_not_close_app">アプリを閉じないでください！</string>
     <string name="common_done">完了</string>
     <string name="common_dont_show_again">これを再表示しない</string>
     <string name="common_edit">編集</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">操作によりアカウントが削除されます</string>
     <string name="common_expired">期限切れ</string>
     <string name="common_explore">探索する</string>
+    <string name="common_failed">失敗しました</string>
     <string name="common_fee_changed_message" formatted="false">推定ネットワーク手数料%sがデフォルトのネットワーク手数料(%s)よりも大幅に高くなっています。これは一時的なネットワーク渋滞が原因かもしれません。ネットワーク手数料をリフレッシュして、より低い手数料を待つことができます。</string>
     <string name="common_fee_changed_title">ネットワーク手数料が高すぎます</string>
+    <string name="common_fee_with_label">手数料: %s</string>
     <string name="common_filter_sort_header">ソート順:</string>
     <string name="common_filters">フィルター</string>
     <string name="common_find_out_more">詳しく知る</string>
@@ -427,6 +430,7 @@
     <string name="common_not_available">利用できません</string>
     <string name="common_not_enough_funds_message">申し訳ありませんが、ネットワーク手数料を支払うための十分な資金がありません。</string>
     <string name="common_not_enough_funds_title">残高不足</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">ネットワーク手数料%sを支払うには残高が不足しています。現在の残高は%sです</string>
     <string name="common_not_now">今はしません</string>
     <string name="common_off">オフ</string>
     <string name="common_ok">OK</string>
@@ -466,6 +470,10 @@
     <string name="common_search">検索</string>
     <string name="common_search_placeholder_default">検索結果がここに表示されます</string>
     <string name="common_search_results_number">検索結果：%d</string>
+    <string name="common_sec">秒</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d秒</item>
+    </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
@@ -489,6 +497,7 @@
     <string name="common_to_settings">設定を開く</string>
     <string name="common_too_small_balance_title">残高が少なすぎます</string>
     <string name="common_total">合計</string>
+    <string name="common_total_fee">合計手数料</string>
     <string name="common_transaction_id">取引ID</string>
     <string name="common_transaction_submitted">取引が送信されました</string>
     <string name="common_try_again">もう一度試してください</string>
@@ -1509,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">ネットワーク手数料を支払うトークン</string>
     <string name="swap_custom_fee_selector_footer">入力された金額の上にネットワーク手数料が追加されます</string>
     <string name="swap_error_pair_not_supported">このペアはサポートされていません</string>
+    <string name="swap_execution_failure" formatted="false">操作 #%s (%s) が失敗しました</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%sから%sへの%s転送</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s操作</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s/%sの操作</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%sを%sに転送</string>
+    <string name="swap_execution_time">実行時間</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">十分なトークンを保持していないため、%sのネットワーク手数料を支払った後に少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%sトークンを受け取るために少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_insufficient_balance_message">ネットワーク手数料として%2$sを支払うため、最大%1$sをスワップできます。</string>
@@ -1528,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">他のネットワークから %s を転送</string>
     <string name="swap_get_token_receive_description">QRコードまたはあなたのアドレスで %s を受け取る</string>
     <string name="swap_get_token_using">%s を使って取得</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">スワップ実行中に中間受取額が%sで、これは最小残高%sを下回っています。より大きなスワップ額を指定してみてください。</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">スリッページは %s から %s の間で指定する必要があります</string>
     <string name="swap_invalid_slippage_failure_title">無効なスリッページ</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">支払うトークンを選択</string>
@@ -1546,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">旧レート: %1$s ≈ %2$s。\n新レート: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">交換レートが更新されました</string>
     <string name="swap_repeat_operation">操作を繰り返す</string>
+    <string name="swap_route">ルート</string>
+    <string name="swap_route_description">異なるネットワークを通じて希望するトークンを得るためにトークンが通る経路です。</string>
+    <string name="swap_route_segment_swap_title">スワップ</string>
+    <string name="swap_route_segment_transfer_title">転送</string>
     <string name="swap_settings_title">スワップ設定</string>
     <string name="swap_slippage">スリッページ</string>
     <string name="swap_slippage_description">スワップのスリッページは、分散型取引でよく見られる現象で、取引の最終価格が市場状況の変化により予想価格から少し異なる場合があります。</string>
