@@ -63,6 +63,7 @@ class DappInteractor(
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
             val favouritesCategory = DappCategory(
+                iconUrl = null,
                 id = "favourites",
                 name = resourceManager.getString(R.string.dapp_favourites)
             )
@@ -76,6 +77,7 @@ class DappInteractor(
             }
 
             val categoryAll = DappCategory(
+                iconUrl = null,
                 id = "all",
                 name = resourceManager.getString(R.string.common_all)
             )

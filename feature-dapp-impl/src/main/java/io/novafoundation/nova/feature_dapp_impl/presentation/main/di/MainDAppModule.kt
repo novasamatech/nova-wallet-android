@@ -27,7 +27,6 @@ class MainDAppModule {
     @IntoMap
     @ViewModelKey(MainDAppViewModel::class)
     fun provideViewModel(
-        addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: DAppRouter,
@@ -35,7 +34,6 @@ class MainDAppModule {
     ): ViewModel {
         return MainDAppViewModel(
             router = router,
-            addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             dappInteractor = dappInteractor

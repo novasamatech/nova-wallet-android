@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="32dp"
+    android:layout_marginHorizontal="4dp"
+    android:layout_weight="1"
+    android:background="@drawable/dapp_tab_background"
+    android:gravity="center_vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="12dp">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/bg_shimmering" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="32dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_shimmering" />
+
+</LinearLayout>

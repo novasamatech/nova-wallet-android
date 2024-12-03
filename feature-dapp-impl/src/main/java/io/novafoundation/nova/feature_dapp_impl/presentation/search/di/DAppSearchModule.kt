@@ -46,8 +46,7 @@ class DAppSearchModule {
         searchResponder: DAppSearchCommunicator,
         payload: SearchPayload,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        appLinksProvider: AppLinksProvider,
-        browserTabService: BrowserTabService
+        appLinksProvider: AppLinksProvider
     ): ViewModel {
         return DAppSearchViewModel(
             router = router,
@@ -56,8 +55,7 @@ class DAppSearchModule {
             dAppSearchResponder = searchResponder,
             payload = payload,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            appLinksProvider = appLinksProvider,
-            browserTabService = browserTabService
+            appLinksProvider = appLinksProvider
         )
     }
 }

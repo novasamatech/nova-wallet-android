@@ -49,6 +49,7 @@
 
     <!-- Icon Colors -->
     <color name="icon_primary">#E0FFFFFF</color>
+    <color name="icon_primary_on_content">#05081C</color>
     <color name="icon_secondary">#52FFFFFF</color>
     <color name="icon_inactive">#29FFFFFF</color>
     <color name="chip_icon">#7AFFFFFF</color>
@@ -76,6 +77,7 @@
     <color name="segmented_background">#5208090E</color>
     <color name="segmented_background_on_black">#1A999EC7</color>
     <color name="cloud_backup_button_background">#FFFFFF</color>
+    <color name="selected_dapp_category">#E0FFFFFF</color>
 
     <color name="segmented_tab_active">#3D999EC7</color>
     <color name="switch_background">#3D999EC7</color>

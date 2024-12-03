@@ -11,8 +11,8 @@ fun createDAppComparator() = compareByDescending<DApp> { it.isFavourite }
 
 // Build mapping in O(Metadatas + Favourites) in case of HashMap. It allows constant time access later
 internal fun buildUrlToDappMapping(
-    dAppMetadatas: List<DappMetadata>,
-    favourites: List<FavouriteDApp>
+    dAppMetadatas: Collection<DappMetadata>,
+    favourites: Collection<FavouriteDApp>
 ): Map<String, DApp> {
     val favouritesUrls: Set<String> = favourites.mapToSet { it.url }
 

@@ -13,6 +13,7 @@ fun mapDAppMetadataResponseToDAppMetadatas(
 ): DappCatalog {
     val categories = response.categories.map {
         DappCategory(
+            iconUrl = it.icon,
             name = it.name,
             id = it.id
         )

@@ -34,9 +34,13 @@ class DAppNavigator(
     }
 
     override fun openDappSearch() {
+        openDappSearchWithCategory(categoryId = null)
+    }
+
+    override fun openDappSearchWithCategory(categoryId: String?) {
         performNavigation(
             actionId = R.id.action_open_dappSearch,
-            args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL))
+            args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL, preselectedCategoryId = categoryId))
         )
     }
 
