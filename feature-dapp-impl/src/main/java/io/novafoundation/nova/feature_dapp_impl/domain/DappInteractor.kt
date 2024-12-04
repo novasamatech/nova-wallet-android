@@ -1,12 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.domain
 
 import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
@@ -26,7 +24,6 @@ class DappInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
     private val favouritesDAppRepository: FavouritesDAppRepository,
     private val phishingSitesRepository: PhishingSitesRepository,
-    private val resourceManager: ResourceManager,
 ) {
 
     private val dAppComparator by lazy {
@@ -44,12 +41,8 @@ class DappInteractor(
         favouritesDAppRepository.removeFavourite(dAppUrl)
     }
 
-    suspend fun toggleDAppFavouritesState(dApp: DApp) = withContext(Dispatchers.Default) {
-        if (dApp.isFavourite) {
-            favouritesDAppRepository.removeFavourite(dApp.url)
-        } else {
-            favouritesDAppRepository.addFavourite(dAppToFavourite(dApp))
-        }
+    fun observeFavoriteDApps(): Flow<List<FavouriteDApp>> {
+        return favouritesDAppRepository.observeFavourites()
     }
 
     fun observeDAppsByCategory(): Flow<GroupedList<DappCategory, DApp>> {
@@ -62,36 +55,11 @@ class DappInteractor(
 
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
-            val favouritesCategory = DappCategory(
-                iconUrl = null,
-                id = "favourites",
-                name = resourceManager.getString(R.string.dapp_favourites)
-            )
-            val favouritesCategoryItems = favourites.map { urlToDAppMapping.getValue(it.url) }
-
             // Regrouping in O(Categories * Dapps)
             // Complexity should be fine for expected amount of dApps
-            val derivedCategories = categories.associateWith { category ->
+            categories.associateWith { category ->
                 dapps.filter { category in it.categories }
                     .map { urlToDAppMapping.getValue(it.url) }
-            }
-
-            val categoryAll = DappCategory(
-                iconUrl = null,
-                id = "all",
-                name = resourceManager.getString(R.string.common_all)
-            )
-
-            buildMap {
-                putCategory(categoryAll, urlToDAppMapping.values.toList())
-
-                if (favouritesCategoryItems.isNotEmpty()) {
-                    putCategory(favouritesCategory, favouritesCategoryItems)
-                }
-
-                derivedCategories.forEach { (category, items) ->
-                    putCategory(category, items)
-                }
             }
         }
     }
@@ -107,19 +75,11 @@ class DappInteractor(
         }
     }
 
-    private fun MutableMap<DappCategory, List<DApp>>.putCategory(category: DappCategory, items: Collection<DApp>) {
-        put(category, items.sortedWith(dAppComparator))
-    }
-
-    private fun dAppToFavourite(dApp: DApp): FavouriteDApp {
-        return FavouriteDApp(
-            url = dApp.url,
-            label = dApp.name,
-            icon = dApp.iconLink
-        )
-    }
-
     private inline fun CoroutineScope.runSync(crossinline sync: suspend () -> Unit): Job {
         return async { runCatching { sync() } }
+    }
+
+    suspend fun updateFavoriteDapps(favoriteDapps: List<FavouriteDApp>) {
+        favouritesDAppRepository.updateFavoriteDapps(favoriteDapps)
     }
 }

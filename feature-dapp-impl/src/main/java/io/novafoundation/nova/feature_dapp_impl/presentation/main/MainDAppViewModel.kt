@@ -12,20 +12,19 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
-import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappModelToDApp
-import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappToDappModel
+import io.novafoundation.nova.feature_dapp_impl.data.model.mapFavoriteDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoryToDappCategoryModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
-private const val INITIAL_SELECTED_CATEGORY_ID = "all"
 
 class MainDAppViewModel(
     private val router: DAppRouter,
@@ -36,9 +35,10 @@ class MainDAppViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
-    val removeFavouriteConfirmationAwaitable = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
-
     val selectedWalletFlow = selectedAccountUseCase.selectedWalletModelFlow()
+        .shareInBackground()
+
+    private val favoriteDAppsFlow = dappInteractor.observeFavoriteDApps()
         .shareInBackground()
 
     private val groupedDAppsFlow = dappInteractor.observeDAppsByCategory()
@@ -47,15 +47,16 @@ class MainDAppViewModel(
 
     private val groupedDAppsUiFlow = groupedDAppsFlow
         .map {
-            it
-                .mapValues { (_, dapps) -> dapps.map(::mapDappToDappModel) }
-                .mapKeys { (category, _) -> category.id }
+            it.map { (category, dapps) -> mapDappCategoryToDappCategoryModel(category, dapps) }
         }
         .inBackground()
         .share()
 
+    val favoriteDAppsUIFlow = favoriteDAppsFlow
+        .map { dapps -> dapps.map { mapFavoriteDappToDappModel(it) } }
+        .shareInBackground()
+
     val shownDAppsStateFlow = groupedDAppsUiFlow
-        .map { it[INITIAL_SELECTED_CATEGORY_ID] }
         .filterNotNull()
         .withLoading()
         .share()
@@ -90,16 +91,6 @@ class MainDAppViewModel(
 
     fun searchClicked() {
         router.openDappSearch()
-    }
-
-    fun dappFavouriteClicked(item: DappModel) = launch {
-        val dApp = mapDappModelToDApp(item)
-
-        if (item.isFavourite) {
-            removeFavouriteConfirmationAwaitable.awaitAction(item.name)
-        }
-
-        dappInteractor.toggleDAppFavouritesState(dApp)
     }
 
     fun manageClicked() {

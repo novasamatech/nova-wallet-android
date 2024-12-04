@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="dapp_favorites">Favorites</string>
     <string name="dapp_entry_point_title">%d DApps</string>
 
     <string name="close_dapp_tabs_title">Close All DApps?</string>

@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_dapp_impl.domain.common
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
-import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappCategoriesToDescription
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoriesToDescription
 
 fun createDAppComparator() = compareByDescending<DApp> { it.isFavourite }
     .thenBy { it.name }
@@ -32,7 +32,7 @@ internal fun buildUrlToDappMapping(
     }
 }
 
-private fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
+fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
     return DApp(
         name = favouriteDApp.label,
         description = favouriteDApp.url,

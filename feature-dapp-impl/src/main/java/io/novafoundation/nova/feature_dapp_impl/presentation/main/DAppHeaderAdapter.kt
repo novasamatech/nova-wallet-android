@@ -7,12 +7,15 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.DAppClickHandler
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
-import kotlinx.android.synthetic.main.item_dapp_header.view.categorizedDappsCategories
+import kotlinx.android.synthetic.main.item_dapp_header.view.mainDappCategories
 import kotlinx.android.synthetic.main.item_dapp_header.view.categorizedDappsCategoriesShimmering
+import kotlinx.android.synthetic.main.item_dapp_header.view.dAppMainFavoriteDAppList
+import kotlinx.android.synthetic.main.item_dapp_header.view.dAppMainFavoriteDAppTitle
 import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainManage
 import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSearch
 import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSelectedWallet
@@ -20,11 +23,13 @@ import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSelectedWall
 class DAppHeaderAdapter(
     val imageLoader: ImageLoader,
     val headerHandler: Handler,
-    val categoriesHandler: DappCategoriesAdapter.Handler
+    val categoriesHandler: DappCategoriesAdapter.Handler,
+    val dAppClickHandler: DAppClickHandler
 ) : RecyclerView.Adapter<HeaderHolder>() {
 
     private var walletModel: SelectedWalletModel? = null
-    private var categories: List<DAppCategoryModel>? = null
+    private var categories: List<DAppCategoryModel> = emptyList()
+    private var favoritesDApps: List<DappModel> = emptyList()
     private var showCategoriesShimmering: Boolean = false
 
     interface Handler {
@@ -34,15 +39,28 @@ class DAppHeaderAdapter(
 
         fun onManageClick()
 
+        fun onManageFavoritesClick()
+
         fun onCategoryClicked(id: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(imageLoader, parent.inflateChild(R.layout.item_dapp_header), headerHandler, categoriesHandler)
+        return HeaderHolder(
+            imageLoader,
+            parent.inflateChild(R.layout.item_dapp_header),
+            headerHandler,
+            categoriesHandler,
+            dAppClickHandler
+        )
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
-        holder.bind(walletModel, categories, showCategoriesShimmering)
+        holder.bind(
+            walletModel,
+            categories,
+            favoritesDApps,
+            showCategoriesShimmering
+        )
     }
 
     override fun getItemCount(): Int {
@@ -51,6 +69,11 @@ class DAppHeaderAdapter(
 
     fun setWallet(walletModel: SelectedWalletModel) {
         this.walletModel = walletModel
+        notifyItemChanged(0, true)
+    }
+
+    fun setFavorites(favoritesDApps: List<DappModel>) {
+        this.favoritesDApps = favoritesDApps
         notifyItemChanged(0, true)
     }
 
@@ -69,22 +92,34 @@ class HeaderHolder(
     imageLoader: ImageLoader,
     view: View,
     headerHandler: DAppHeaderAdapter.Handler,
-    categoriesHandler: DappCategoriesAdapter.Handler
+    categoriesHandler: DappCategoriesAdapter.Handler,
+    dAppClickHandler: DAppClickHandler
 ) : RecyclerView.ViewHolder(view) {
 
     private val categoriesAdapter = DappCategoriesAdapter(imageLoader, categoriesHandler)
+    private val favoritesAdapter = DappFavoritesAdapter(imageLoader, dAppClickHandler)
 
     init {
         view.dappMainSelectedWallet.setOnClickListener { headerHandler.onWalletClick() }
         view.dappMainSearch.setOnClickListener { headerHandler.onSearchClick() }
         view.dappMainManage.setOnClickListener { headerHandler.onManageClick() }
-        view.categorizedDappsCategories.adapter = categoriesAdapter
+        view.mainDappCategories.adapter = categoriesAdapter
+        view.dAppMainFavoriteDAppList.adapter = favoritesAdapter
     }
 
-    fun bind(walletModel: SelectedWalletModel?, categoriesState: List<DAppCategoryModel>?, showCategoriesShimmering: Boolean) {
-        walletModel?.let { itemView.dappMainSelectedWallet.setModel(walletModel) }
+    fun bind(
+        walletModel: SelectedWalletModel?,
+        categoriesState: List<DAppCategoryModel>,
+        favoritesDApps: List<DappModel>,
+        showCategoriesShimmering: Boolean
+    ) = with(itemView) {
+        walletModel?.let { dappMainSelectedWallet.setModel(walletModel) }
         categoriesAdapter.submitList(categoriesState)
-        itemView.categorizedDappsCategoriesShimmering.isVisible = showCategoriesShimmering
-        itemView.categorizedDappsCategories.isGone = showCategoriesShimmering
+        categorizedDappsCategoriesShimmering.isVisible = showCategoriesShimmering
+        mainDappCategories.isGone = showCategoriesShimmering
+
+        favoritesAdapter.submitList(favoritesDApps)
+        dAppMainFavoriteDAppList.isGone = favoritesDApps.isEmpty()
+        dAppMainFavoriteDAppTitle.isGone = favoritesDApps.isEmpty()
     }
 }

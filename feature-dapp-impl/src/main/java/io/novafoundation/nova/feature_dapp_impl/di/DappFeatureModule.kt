@@ -22,12 +22,10 @@ class DappFeatureModule {
     fun provideCommonInteractor(
         dAppMetadataRepository: DAppMetadataRepository,
         favouritesDAppRepository: FavouritesDAppRepository,
-        phishingSitesRepository: PhishingSitesRepository,
-        resourceManager: ResourceManager
+        phishingSitesRepository: PhishingSitesRepository
     ) = DappInteractor(
         dAppMetadataRepository = dAppMetadataRepository,
         favouritesDAppRepository = favouritesDAppRepository,
-        phishingSitesRepository = phishingSitesRepository,
-        resourceManager = resourceManager
+        phishingSitesRepository = phishingSitesRepository
     )
 }

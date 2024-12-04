@@ -50,16 +50,16 @@
         app:tint="@color/chip_icon" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/categorizedDappsCategories"
+        android:id="@+id/mainDappCategories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:clipToPadding="false"
         android:orientation="horizontal"
         android:overScrollMode="never"
+        android:paddingVertical="8dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingVertical="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@+id/dappMainSearch"
         tools:listitem="@layout/item_dapp_category"
@@ -75,16 +75,16 @@
         android:paddingVertical="8dp"
         app:layout_constraintTop_toBottomOf="@+id/dappMainSearch">
 
-        <include layout="@layout/item_dapp_categories_shimmering"/>
+        <include layout="@layout/item_dapp_categories_shimmering" />
 
     </FrameLayout>
 
     <androidx.constraintlayout.widget.Barrier
-    android:id="@+id/categorizedDappsCategoriesBarrier"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:barrierDirection="bottom"
-    app:constraint_referenced_ids="categorizedDappsCategories,categorizedDappsCategoriesShimmering" />
+        android:id="@+id/categorizedDappsCategoriesBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="mainDappCategories,categorizedDappsCategoriesShimmering" />
 
     <io.novafoundation.nova.common.view.BannerView
         android:id="@+id/dappMainWelcomeGroup"
@@ -128,5 +128,34 @@
         </LinearLayout>
 
     </io.novafoundation.nova.common.view.BannerView>
+
+    <TextView
+        android:id="@+id/dAppMainFavoriteDAppTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:drawablePadding="8dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:text="@string/dapp_favorites"
+        android:textColor="@color/text_primary"
+        app:drawableStartCompat="@drawable/ic_favorite_heart_filled_20"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeGroup" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dAppMainFavoriteDAppList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        android:paddingVertical="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/dAppMainFavoriteDAppTitle"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

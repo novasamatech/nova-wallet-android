@@ -9,7 +9,7 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <ImageView
-        android:id="@+id/itemDAppIcon"
+        android:id="@+id/itemFavoriteDAppIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
@@ -24,7 +24,7 @@
         tools:src="@drawable/ic_sub_id" />
 
     <TextView
-        android:id="@+id/itemDAppTitle"
+        android:id="@+id/itemFavoriteDAppTitle"
         style="@style/TextAppearance.NovaFoundation.Regular.Body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -35,65 +35,53 @@
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="@color/text_primary"
-        app:layout_constraintBottom_toTopOf="@+id/itemDAppSubtitle"
-        app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
+        app:layout_constraintBottom_toTopOf="@+id/itemFavoriteDAppSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/itemFavoriteDappFavoriteIcon"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@id/itemDAppIcon"
-        app:layout_constraintTop_toTopOf="@+id/itemDAppIcon"
+        app:layout_constraintStart_toEndOf="@id/itemFavoriteDAppIcon"
+        app:layout_constraintTop_toTopOf="@+id/itemFavoriteDAppIcon"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Astar" />
 
-    <ImageView
-        android:id="@+id/itemDAppSubtitleIcon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginTop="2dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@+id/itemDAppTitle"
-        app:layout_constraintTop_toBottomOf="@+id/itemDAppTitle"
-        tools:visibility="visible" />
-
     <TextView
-        android:id="@+id/itemDAppSubtitle"
+        android:id="@+id/itemFavoriteDAppSubtitle"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="24dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:maxLines="1"
         android:textColor="@color/text_secondary"
-        app:layout_constraintBottom_toBottomOf="@+id/itemDAppIcon"
-        app:layout_constraintEnd_toStartOf="@+id/itemDappAction"
+        app:layout_constraintBottom_toBottomOf="@+id/itemFavoriteDAppIcon"
+        app:layout_constraintEnd_toStartOf="@+id/itemFavoriteDappFavoriteIcon"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/itemDAppSubtitleIcon"
-        app:layout_constraintTop_toBottomOf="@+id/itemDAppTitle"
+        app:layout_constraintStart_toStartOf="@+id/itemFavoriteDAppTitle"
+        app:layout_constraintTop_toBottomOf="@+id/itemFavoriteDAppTitle"
         app:layout_goneMarginStart="0dp"
         tools:text="Staking" />
 
     <ImageView
-        android:id="@+id/itemDappFavorite"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginBottom="38dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/itemDAppIcon"
-        app:layout_constraintStart_toStartOf="@+id/itemDAppIcon"
-        app:tint="@color/mimi_icon_favorite"
-        tools:src="@drawable/ic_favorite_heart_filled_20"
-        tools:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/itemDappAction"
+        android:id="@+id/itemFavoriteDappFavoriteIcon"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="20dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:src="@drawable/ic_favorite_heart_filled_20"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemFavoriteDappDragHandle"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/itemFavoriteDappDragHandle"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:src="@drawable/ic_list_drag"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_close" />
+        app:tint="@color/icon_secondary" />
 </merge>
