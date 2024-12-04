@@ -356,6 +356,7 @@
     <string name="common_details">Szczegóły</string>
     <string name="common_disabled">Wyłączony</string>
     <string name="common_disconnect">Odłącz</string>
+    <string name="common_do_not_close_app">Nie zamykaj aplikacji!</string>
     <string name="common_done">Gotowe</string>
     <string name="common_dont_show_again">Nie pokazuj tego ponownie</string>
     <string name="common_edit">Edytuj</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">Operacja usunie konto</string>
     <string name="common_expired">Wygasło</string>
     <string name="common_explore">Odkryj</string>
+    <string name="common_failed">Niepowodzenie</string>
     <string name="common_fee_changed_message" formatted="false">Szacowana opłata sieciowa %s jest znacznie wyższa niż domyślna opłata sieciowa (%s). Może to być spowodowane przejściowym przeciążeniem sieci. Możesz odświeżyć stronę, aby poczekać na niższą opłatę.</string>
     <string name="common_fee_changed_title">Opłata sieciowa jest zbyt wysoka</string>
+    <string name="common_fee_with_label">Opłata: %s</string>
     <string name="common_filter_sort_header">Sortuj według:</string>
     <string name="common_filters">Filtry</string>
     <string name="common_find_out_more">Dowiedz się więcej</string>
@@ -439,6 +442,7 @@
     <string name="common_not_available">Niedostępne</string>
     <string name="common_not_enough_funds_message">Przepraszamy, nie masz wystarczających środków na opłatę sieciową.</string>
     <string name="common_not_enough_funds_title">Niewystarczające saldo</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Nie masz wystarczającego salda, aby zapłacić opłatę sieciową w wysokości %s. Obecne saldo to %s</string>
     <string name="common_not_now">Nie teraz</string>
     <string name="common_off">Wył</string>
     <string name="common_ok">OK</string>
@@ -478,6 +482,13 @@
     <string name="common_search">Szukaj</string>
     <string name="common_search_placeholder_default">Wyniki wyszukiwania będą wyświetlane tutaj</string>
     <string name="common_search_results_number">Wyniki wyszukiwania: %d</string>
+    <string name="common_sec">sek</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d sekunda</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">%d sekund</item>
+    </plurals>
     <string name="common_secret_derivation_path">Ścieżka pochodzenia sekretu</string>
     <string name="common_settings">Ustawienia</string>
     <string name="common_share">Udostępnij</string>
@@ -501,6 +512,7 @@
     <string name="common_to_settings">Otwórz Ustawienia</string>
     <string name="common_too_small_balance_title">Twój balans jest zbyt mały</string>
     <string name="common_total">Razem</string>
+    <string name="common_total_fee">Łączna opłata</string>
     <string name="common_transaction_id">ID transakcji</string>
     <string name="common_transaction_submitted">Transakcja wysłana</string>
     <string name="common_try_again">Spróbuj ponownie</string>
@@ -1539,6 +1551,19 @@
     <string name="swap_custom_fee_selector_description">Token do opłacenia opłaty sieciowej</string>
     <string name="swap_custom_fee_selector_footer">Opłata sieciowa jest dodawana do wprowadzonej kwoty</string>
     <string name="swap_error_pair_not_supported">Ta para nie jest obsługiwana</string>
+    <string name="swap_execution_failure" formatted="false">Niepowodzenie w operacji #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Zamiana %s na %s na %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transfer %s z %s do %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operacja</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">%s operacji</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s z %s operacji</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Zamiana %s na %s na %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Transfer %s do %s</string>
+    <string name="swap_execution_time">Czas wykonania</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Powinieneś zachować co najmniej %s po opłaceniu %s opłaty sieciowej, ponieważ posiadasz niewystarczającą ilość tokenów</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Musisz zachować co najmniej %s, aby otrzymać token %s</string>
     <string name="swap_failure_insufficient_balance_message">Możesz zamienić do %1$s, ponieważ musisz zapłacić %2$s jako opłatę sieciową.</string>
@@ -1558,6 +1583,7 @@
     <string name="swap_get_token_cross_chain_description">Przenieś %s z innej sieci</string>
     <string name="swap_get_token_receive_description">Otrzymaj %s za pomocą QR lub swojego adresu</string>
     <string name="swap_get_token_using">Otrzymaj %s za pomocą</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Podczas wykonywania swapu pośrednia ilość odbierana wynosi %s co jest mniej niż minimalne saldo %s. Spróbuj określić większą kwotę swapu.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Poślizg musi być określony między %s a %s</string>
     <string name="swap_invalid_slippage_failure_title">Niedozwolony poślizg</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Wybierz token do zapłaty</string>
@@ -1576,6 +1602,10 @@
     <string name="swap_rate_was_updated_failure_message">Stary kurs: %1$s ≈ %2$s.\nNowy kurs: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Kurs wymiany został zaktualizowany</string>
     <string name="swap_repeat_operation">Powtórz operację</string>
+    <string name="swap_route">Trasa</string>
+    <string name="swap_route_description">Droga, którą twoje tokeny przejdą przez różne sieci, aby uzyskać żądany token.</string>
+    <string name="swap_route_segment_swap_title">Swap</string>
+    <string name="swap_route_segment_transfer_title">Transfer</string>
     <string name="swap_settings_title">Ustawienia wymiany</string>
     <string name="swap_slippage">Poślizg</string>
     <string name="swap_slippage_description">Poślizg wymiany jest powszechnym zjawiskiem w zdecentralizowanym handlu, gdzie ostateczna cena transakcji wymiany może nieznacznie różnić się od oczekiwanej ceny, z powodu zmieniających się warunków rynkowych.</string>

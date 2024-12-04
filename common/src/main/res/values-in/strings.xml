@@ -356,6 +356,7 @@
     <string name="common_details">Detail</string>
     <string name="common_disabled">Nonaktif</string>
     <string name="common_disconnect">Putus</string>
+    <string name="common_do_not_close_app">Jangan tutup aplikasinya!</string>
     <string name="common_done">Selesai</string>
     <string name="common_dont_show_again">Jangan tampilkan ini lagi</string>
     <string name="common_edit">Edit</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">Operasi akan menghapus akun</string>
     <string name="common_expired">Kedaluwarsa</string>
     <string name="common_explore">Jelajahi</string>
+    <string name="common_failed">Gagal</string>
     <string name="common_fee_changed_message" formatted="false">Biaya jaringan yang diperkirakan %s jauh lebih tinggi dari biaya jaringan default (%s). Hal ini mungkin disebabkan oleh kemacetan jaringan sementara. Anda dapat menyegarkan untuk menunggu biaya jaringan yang lebih rendah.</string>
     <string name="common_fee_changed_title">Biaya jaringan terlalu tinggi</string>
+    <string name="common_fee_with_label">Biaya: %s</string>
     <string name="common_filter_sort_header">Urutkan berdasarkan:</string>
     <string name="common_filters">Penyaring</string>
     <string name="common_find_out_more">Temukan lebih lanjut</string>
@@ -427,6 +430,7 @@
     <string name="common_not_available">Tidak tersedia</string>
     <string name="common_not_enough_funds_message">Maaf, Anda tidak memiliki cukup dana untuk membayar biaya jaringan.</string>
     <string name="common_not_enough_funds_title">Saldo tidak mencukupi</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Saldo Anda tidak cukup untuk membayar biaya jaringan sebesar %s. Saldo saat ini adalah %s</string>
     <string name="common_not_now">Tidak sekarang</string>
     <string name="common_off">Mati</string>
     <string name="common_ok">OK</string>
@@ -466,6 +470,10 @@
     <string name="common_search">Cari</string>
     <string name="common_search_placeholder_default">Hasil pencarian akan ditampilkan di sini</string>
     <string name="common_search_results_number">Hasil pencarian: %d</string>
+    <string name="common_sec">detik</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d detik</item>
+    </plurals>
     <string name="common_secret_derivation_path">Jalur derivasi rahasia</string>
     <string name="common_settings">Pengaturan</string>
     <string name="common_share">Bagikan</string>
@@ -489,6 +497,7 @@
     <string name="common_to_settings">Buka Pengaturan</string>
     <string name="common_too_small_balance_title">Saldo Anda terlalu kecil</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Biaya total</string>
     <string name="common_transaction_id">ID Transaksi</string>
     <string name="common_transaction_submitted">Transaksi dikirim</string>
     <string name="common_try_again">Coba lagi</string>
@@ -1509,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">Token untuk membayar biaya jaringan</string>
     <string name="swap_custom_fee_selector_footer">Biaya jaringan ditambahkan di atas jumlah yang dimasukkan</string>
     <string name="swap_error_pair_not_supported">Pasangan ini tidak didukung</string>
+    <string name="swap_execution_failure" formatted="false">Gagal dalam operasi #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s ke %s swap pada %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transfer %s dari %s ke %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s operasi</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s dari %s operasi</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Menukarkan %s ke %s pada %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Mentransfer %s ke %s</string>
+    <string name="swap_execution_time">Waktu eksekusi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Anda harus menyisihkan setidaknya %s setelah membayar biaya jaringan %s karena Anda memegang token yang tidak mencukupi</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Anda harus menyisihkan setidaknya %s untuk menerima token %s</string>
     <string name="swap_failure_insufficient_balance_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan.</string>
@@ -1528,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">Transfer %s dari jaringan lain</string>
     <string name="swap_get_token_receive_description">Terima %s dengan QR atau alamat Anda</string>
     <string name="swap_get_token_using">Dapatkan %s menggunakan</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Selama eksekusi swap, jumlah terima sementara adalah %s yang lebih rendah dari saldo minimum %s. Coba tentukan jumlah swap yang lebih besar.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Prosentase pergeseran harus ditentukan antara %s dan %s</string>
     <string name="swap_invalid_slippage_failure_title">Pergeseran tidak valid</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Pilih token untuk membayar</string>
@@ -1546,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">Kurs lama: %1$s ≈ %2$s.\nKurs baru: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Kurs pertukaran telah diperbarui</string>
     <string name="swap_repeat_operation">Ulangi operasi</string>
+    <string name="swap_route">Rute</string>
+    <string name="swap_route_description">Jalur yang akan diambil token Anda melalui berbagai jaringan untuk mendapatkan token yang diinginkan.</string>
+    <string name="swap_route_segment_swap_title">Tukar</string>
+    <string name="swap_route_segment_transfer_title">Transfer</string>
     <string name="swap_settings_title">Pengaturan swap</string>
     <string name="swap_slippage">Slippage</string>
     <string name="swap_slippage_description">Slippage adalah kejadian umum dalam perdagangan terdesentralisasi di mana harga akhir dari transaksi swap mungkin sedikit berbeda dari harga yang diharapkan, karena kondisi pasar yang berubah.</string>

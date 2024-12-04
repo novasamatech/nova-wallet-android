@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_assets.domain.networks
 
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.filterList
-import io.novafoundation.nova.common.utils.filterSet
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchFilter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
@@ -20,7 +18,6 @@ import io.novafoundation.nova.runtime.ext.normalize
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
-import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -59,11 +56,12 @@ class AssetNetworksInteractor(
     }
 
     fun swapAssetsFlow(
+        forAssetId: FullChainAssetId?,
         tokenSymbol: TokenSymbol,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<List<AssetWithNetwork>> {
-        val filterFlow = getSwapAssetsFilter(tokenSymbol, coroutineScope)
+        val filterFlow = getSwapAssetsFilter(forAssetId, coroutineScope)
 
         return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filterFlow = filterFlow)
     }
@@ -95,8 +93,8 @@ class AssetNetworksInteractor(
         }
     }
 
-    private fun getSwapAssetsFilter(tokenSymbol: TokenSymbol, coroutineScope: CoroutineScope): Flow<AssetSearchFilter> {
-        return getAvailableSwapAssets(tokenSymbol, coroutineScope)
+    private fun getSwapAssetsFilter(sourceAsset: FullChainAssetId?, coroutineScope: CoroutineScope): Flow<AssetSearchFilter> {
+        return assetSearchUseCase.getAvailableSwapAssets(sourceAsset, coroutineScope)
             .map { availableAssetsForSwap ->
                 val assetFilter: suspend (Asset) -> Boolean = { asset: Asset ->
                     asset.token.configuration.fullId in availableAssetsForSwap
@@ -104,19 +102,6 @@ class AssetNetworksInteractor(
 
                 assetFilter
             }
-    }
-
-    private fun getAvailableSwapAssets(tokenSymbol: TokenSymbol, coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {
-        return flowOfAll {
-            val assetsSupportedTokenSymbol = chainRegistry.enabledChains()
-                .flatMap { chain ->
-                    chain.assets.filter { it.symbol.normalize() == tokenSymbol }
-                        .map { it.fullId }
-                }
-
-            swapService.assetsAvailableForSwap(coroutineScope)
-                .filterSet { fullAssetId -> fullAssetId in assetsSupportedTokenSymbol }
-        }
     }
 }
 

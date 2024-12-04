@@ -3,16 +3,13 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
-import io.novafoundation.nova.feature_account_api.data.model.amountByRequestedAccount
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.AmountOutIsTooLowToStayAboveED
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.FeeChangeDetected
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InsufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InvalidSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.NewRateExceededSlippage
@@ -23,35 +20,29 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
-import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
-import io.novafoundation.nova.feature_wallet_api.domain.validation.notSufficientBalanceToPayFeeErrorMessage
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.CoroutineScope
 import java.math.BigDecimal
 import java.math.BigInteger
 
-fun CoroutineScope.mapSwapValidationFailureToUI(
+fun mapSwapValidationFailureToUI(
     resourceManager: ResourceManager,
     status: ValidationStatus.NotValid<SwapValidationFailure>,
     actions: ValidationFlowActions<*>,
-    setNewFee: (SwapFee) -> Unit,
     amountInSwapMaxAction: () -> Unit,
     amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit
-): TransformedFailure? {
+): TransformedFailure {
     return when (val reason = status.reason) {
         is NotEnoughFunds.ToPayFeeAndStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
 
         NotEnoughFunds.InUsedAsset -> resourceManager.amountIsTooBig().asDefault()
 
-        NotEnoughFunds.ToPayFee -> resourceManager.notSufficientBalanceToPayFeeErrorMessage().asDefault()
-
         is InvalidSlippage -> TitleAndMessage(
             resourceManager.getString(R.string.swap_invalid_slippage_failure_title),
-            resourceManager.getString(R.string.swap_invalid_slippage_failure_message, reason.minSlippage.format(), reason.maxSlippage.format())
+            resourceManager.getString(R.string.swap_invalid_slippage_failure_message, reason.minSlippage.formatPercents(), reason.maxSlippage.formatPercents())
         ).asDefault()
 
         is NewRateExceededSlippage -> TitleAndMessage(
@@ -70,54 +61,12 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
 
         is AmountOutIsTooLowToStayAboveED -> handleErrorToSwapMin(reason, resourceManager, amountOutSwapMinAction)
 
-        is TooSmallRemainingBalance.NoNeedsToBuyMainAssetED -> handleTooSmallRemainingBalance(
-            title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
-            message = resourceManager.getString(
-                R.string.swap_failure_too_small_remaining_balance_message,
-                reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
-                reason.remainingBalance.formatPlanks(reason.assetIn)
-            ),
-            resourceManager = resourceManager,
-            actions = actions,
-            positiveButtonClick = amountInSwapMaxAction
-        )
-
-        is TooSmallRemainingBalance.NeedsToBuyMainAssetED -> handleTooSmallRemainingBalance(
-            title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
-            message = resourceManager.getString(
-                R.string.swap_failure_too_small_remaining_balance_with_buy_ed_message,
-                reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
-                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset),
-                reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
-                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
-                reason.nativeAsset.symbol,
-                reason.remainingBalance.formatPlanks(reason.assetIn)
-            ),
-            resourceManager = resourceManager,
-            actions = actions,
-            positiveButtonClick = amountInSwapMaxAction
-        )
-
-        is InsufficientBalance.NoNeedsToBuyMainAssetED -> handleInsufficientBalance(
+        is InsufficientBalance.CannotPayFeeDueToAmount -> handleInsufficientBalance(
             title = resourceManager.getString(R.string.common_not_enough_funds_title),
             message = resourceManager.getString(
                 R.string.swap_failure_insufficient_balance_message,
-                reason.maxSwapAmount.formatPlanks(reason.assetIn),
-                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset)
-            ),
-            resourceManager = resourceManager,
-            positiveButtonClick = amountInSwapMaxAction
-        )
-
-        is InsufficientBalance.NeedsToBuyMainAssetED -> handleInsufficientBalance(
-            title = resourceManager.getString(R.string.common_not_enough_funds_title),
-            message = resourceManager.getString(
-                R.string.swap_failure_insufficient_balance_with_buy_ed_message,
-                reason.maxSwapAmount.formatPlanks(reason.assetIn),
-                reason.fee.amountByRequestedAccount.formatPlanks(reason.feeAsset),
-                reason.toSellAmountToKeepEDUsingAssetIn.formatPlanks(reason.assetIn),
-                reason.toBuyAmountToKeepEDInCommissionAsset.formatPlanks(reason.nativeAsset),
-                reason.nativeAsset.symbol
+                reason.maxSwapAmount.formatTokenAmount(reason.assetIn),
+                reason.feeAmount.formatTokenAmount(reason.assetIn)
             ),
             resourceManager = resourceManager,
             positiveButtonClick = amountInSwapMaxAction
@@ -127,8 +76,8 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             resourceManager.getString(R.string.common_not_enough_funds_title),
             resourceManager.getString(
                 R.string.swap_failure_balance_not_consider_consumers,
-                reason.existentialDeposit.formatPlanks(reason.nativeAsset),
-                reason.swapFee.networkFee.amountByRequestedAccount.formatPlanks(reason.feeAsset)
+                reason.assetInED.formatPlanks(reason.assetIn),
+                reason.fee.formatPlanks(reason.feeAsset)
             )
         ).asDefault()
 
@@ -141,16 +90,39 @@ fun CoroutineScope.mapSwapValidationFailureToUI(
             )
         ).asDefault()
 
-        is FeeChangeDetected -> handleFeeSpikeDetected(
-            error = reason,
+        is TooSmallRemainingBalance -> handleTooSmallRemainingBalance(
+            title = resourceManager.getString(R.string.swap_failure_too_small_remaining_balance_title),
+            message = resourceManager.getString(
+                R.string.swap_failure_too_small_remaining_balance_message,
+                reason.assetInExistentialDeposit.formatPlanks(reason.assetIn),
+                reason.remainingBalance.formatPlanks(reason.assetIn)
+            ),
             resourceManager = resourceManager,
             actions = actions,
-            setFee = { setNewFee(it.newFee.genericFee) },
+            positiveButtonClick = amountInSwapMaxAction
         )
+
+        is InsufficientBalance.CannotPayFee -> TitleAndMessage(
+            resourceManager.getString(R.string.common_not_enough_funds_title),
+            resourceManager.getString(
+                R.string.common_not_enough_to_pay_fee_message,
+                reason.fee.formatPlanks(reason.feeAsset),
+                reason.balance.formatPlanks(reason.feeAsset)
+            )
+        ).asDefault()
+
+        is SwapValidationFailure.IntermediateAmountOutIsTooLowToStayAboveED -> TitleAndMessage(
+            resourceManager.getString(R.string.swap_too_low_amount_to_stay_abow_ed_title),
+            resourceManager.getString(
+                R.string.swap_intermediate_too_low_amount_to_stay_abow_ed_message,
+                reason.amount.formatPlanks(reason.asset),
+                reason.existentialDeposit.formatPlanks(reason.asset)
+            )
+        ).asDefault()
     }
 }
 
-fun CoroutineScope.handleInsufficientBalance(
+fun handleInsufficientBalance(
     title: String,
     message: String,
     resourceManager: ResourceManager,
@@ -166,7 +138,7 @@ fun CoroutineScope.handleInsufficientBalance(
     )
 }
 
-fun CoroutineScope.handleTooSmallRemainingBalance(
+fun handleTooSmallRemainingBalance(
     title: String,
     message: String,
     resourceManager: ResourceManager,
@@ -183,7 +155,7 @@ fun CoroutineScope.handleTooSmallRemainingBalance(
     )
 }
 
-fun CoroutineScope.handleErrorToSwapMax(
+fun handleErrorToSwapMax(
     title: String,
     message: String,
     resourceManager: ResourceManager,
@@ -208,7 +180,7 @@ fun CoroutineScope.handleErrorToSwapMax(
     )
 }
 
-fun CoroutineScope.handleErrorToSwapMin(
+fun handleErrorToSwapMin(
     reason: AmountOutIsTooLowToStayAboveED,
     resourceManager: ResourceManager,
     swapMinAmountAction: (Chain.Asset, BigInteger) -> Unit

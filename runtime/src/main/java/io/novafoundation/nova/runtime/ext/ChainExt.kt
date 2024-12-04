@@ -198,11 +198,16 @@ val Chain.Asset.isUtilityAsset: Boolean
 inline val Chain.Asset.isCommissionAsset: Boolean
     get() = isUtilityAsset
 
+inline val FullChainAssetId.isUtility: Boolean
+    get() = assetId == UTILITY_ASSET_ID
+
 private const val XC_PREFIX = "xc"
 
 fun Chain.Asset.normalizeSymbol(): String {
     return normalizeTokenSymbol(this.symbol.value)
 }
+
+private const val MOONBEAM_XC_PREFIX = "xc"
 
 fun TokenSymbol.normalize(): TokenSymbol {
     return normalizeTokenSymbol(value).asTokenSymbol()
@@ -540,3 +545,5 @@ fun Chain.hasReferendaSummaryApi(): Boolean {
 fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
     return externalApi<Chain.ExternalApi.ReferendumSummary>()
 }
+
+fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

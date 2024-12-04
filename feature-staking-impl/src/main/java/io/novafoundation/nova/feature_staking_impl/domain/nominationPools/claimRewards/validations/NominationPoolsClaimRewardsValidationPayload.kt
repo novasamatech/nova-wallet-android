@@ -4,12 +4,12 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 class NominationPoolsClaimRewardsValidationPayload(
-    val fee: DecimalFee,
+    val fee: Fee,
     val pendingRewardsPlanks: Balance,
     val asset: Asset,
     val chain: Chain,

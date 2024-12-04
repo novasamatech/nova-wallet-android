@@ -15,7 +15,10 @@ typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 typealias BuyProviderId = String
 typealias BuyProviderArguments = Map<String, Any?>
 
-data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
+data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId) {
+
+    companion object
+}
 
 data class Chain(
     val id: ChainId,
@@ -88,7 +91,8 @@ data class Chain(
 
             data class Statemine(
                 val id: StatemineAssetId,
-                val palletName: String?
+                val palletName: String?,
+                val isSufficient: Boolean,
             ) : Type()
 
             data class Orml(

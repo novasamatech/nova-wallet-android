@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
+
+    <string name="common_not_enough_to_pay_fee_message">You don\'t hae enough balance to pay network fee of %s. Current balance is %s</string>
+
+    <string name="common_sec">sec</string>
+
+    <string name="common_do_not_close_app">Do not close the app!</string>
+
+    <string name="common_failed">Failed</string>
+
+    <string name="swap_execution_operations_progress">%s of %s operations</string>
+
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operation</item>
+        <item quantity="other">%s operations</item>
+    </plurals>
+
+    <string name="swap_execution_progress_swap_label">Swapping %s to %s on %s</string>
+    <string name="swap_execution_progress_transfer_label">Transferring %s to %s</string>
+
+    <string name="swap_execution_failure">Failed on operation #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label">%s to %s swap on %s</string>
+    <string name="swap_execution_failure_transfer_label">%s transfer from %s to %s</string>
+
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <string name="swap_execution_time">Execution time</string>
+
+    <string name="common_total_fee">Total fee</string>
+
+    <string name="common_fee_with_label">Fee: %s</string>
+
+    <string name="swap_route_segment_transfer_title">Transfer</string>
+    <string name="swap_route_segment_swap_title">Swap</string>
+    <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
+    <string name="swap_route">Route</string>
 
     <string name="select_network_title">Select network</string>
 

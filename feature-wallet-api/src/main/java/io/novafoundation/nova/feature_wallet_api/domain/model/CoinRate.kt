@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
 import io.novafoundation.nova.common.utils.binarySearchFloor
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -14,6 +15,16 @@ data class CoinRateChange(val recentRateChange: BigDecimal, override val rate: B
 class HistoricalCoinRate(val timestamp: Long, override val rate: BigDecimal) : CoinRate
 
 fun CoinRate.convertAmount(amount: BigDecimal) = amount * rate
+
+fun CoinRate.convertFiatToAmount(fiat: BigDecimal): BigDecimal {
+    if (rate.isZero) return BigDecimal.ZERO
+
+    return fiat / rate
+}
+
+fun CoinRate.convertFiatToPlanks(asset: Chain.Asset, fiat: BigDecimal): BigInteger {
+    return asset.planksFromAmount(convertFiatToAmount(fiat))
+}
 
 fun CoinRate.convertPlanks(asset: Chain.Asset, amount: BigInteger) = convertAmount(asset.amountFromPlanks(amount))
 

@@ -47,7 +47,7 @@ class NetworkInfoHolder(override val containerView: TableCellView) : BaseViewHol
             .onLoaded { showValue(it.primary, it.secondary) }
             .onNotLoaded { showProgress() }
 
-        setDividerVisible(!isLast)
+        setOwnDividerVisible(!isLast)
     }
 
     override fun unbind() {}

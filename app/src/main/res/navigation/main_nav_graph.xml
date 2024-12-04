@@ -937,6 +937,7 @@
 
     </fragment>
 
+
     <fragment
         android:id="@+id/sendFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment"
@@ -1003,6 +1004,8 @@
         tools:layout="@layout/fragment_select_tracks" />
 
     <include app:graph="@navigation/start_swap_nav_graph" />
+
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
 
     <include app:graph="@navigation/manage_tokens_graph" />
 

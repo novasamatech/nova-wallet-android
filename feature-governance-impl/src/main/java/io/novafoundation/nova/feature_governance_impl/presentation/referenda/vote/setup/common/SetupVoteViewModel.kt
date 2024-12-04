@@ -31,12 +31,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
-import java.math.BigDecimal
-import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -44,6 +42,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.BigInteger
 
 abstract class SetupVoteViewModel(
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
@@ -159,7 +159,7 @@ abstract class SetupVoteViewModel(
             maxAmount = amount,
             voteType = voteType,
             conviction = conviction,
-            fee = originFeeMixin.awaitDecimalFee()
+            fee = originFeeMixin.awaitFee()
         )
 
         validationExecutor.requireValid(

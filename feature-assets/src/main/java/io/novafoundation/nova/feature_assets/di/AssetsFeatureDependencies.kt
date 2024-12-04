@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.d
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
@@ -72,6 +73,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -90,6 +92,8 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 
     val assetsSourceRegistry: AssetSourceRegistry
 
@@ -172,6 +176,8 @@ interface AssetsFeatureDependencies {
     val coinGeckoLinkParser: CoinGeckoLinkParser
 
     val assetIconProvider: AssetIconProvider
+
+    val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

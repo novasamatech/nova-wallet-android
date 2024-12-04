@@ -356,6 +356,7 @@
     <string name="common_details">Detalles</string>
     <string name="common_disabled">Deshabilitado</string>
     <string name="common_disconnect">Desconectar</string>
+    <string name="common_do_not_close_app">¡No cierres la aplicación!</string>
     <string name="common_done">Hecho</string>
     <string name="common_dont_show_again">No mostrar esto de nuevo</string>
     <string name="common_edit">Editar</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">La operación eliminará la cuenta</string>
     <string name="common_expired">Expirado</string>
     <string name="common_explore">Explorar</string>
+    <string name="common_failed">Fallido</string>
     <string name="common_fee_changed_message" formatted="false">La tarifa de red estimada %s es mucho mayor que la tarifa de red predeterminada (%s). Esto podría deberse a la congestión temporal de la red. Puedes actualizar para esperar una tarifa de red más baja.</string>
     <string name="common_fee_changed_title">La tarifa de red es demasiado alta</string>
+    <string name="common_fee_with_label">Tarifa: %s</string>
     <string name="common_filter_sort_header">Ordenar por:</string>
     <string name="common_filters">Filtros</string>
     <string name="common_find_out_more">Descubrir más</string>
@@ -431,6 +434,7 @@
     <string name="common_not_available">No disponible</string>
     <string name="common_not_enough_funds_message">Lo sentimos, no tiene fondos suficientes para pagar la tarifa de red.</string>
     <string name="common_not_enough_funds_title">Saldo insuficiente</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">No tienes suficiente saldo para pagar la tarifa de red de %s. El saldo actual es %s</string>
     <string name="common_not_now">No ahora</string>
     <string name="common_off">Apagado</string>
     <string name="common_ok">Aceptar</string>
@@ -470,6 +474,11 @@
     <string name="common_search">Buscar</string>
     <string name="common_search_placeholder_default">Los resultados de la búsqueda se mostrarán aquí</string>
     <string name="common_search_results_number">Resultados de la búsqueda: %d</string>
+    <string name="common_sec">seg</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
     <string name="common_secret_derivation_path">Ruta de derivación secreta</string>
     <string name="common_settings">Configuraciones</string>
     <string name="common_share">Compartir</string>
@@ -493,6 +502,7 @@
     <string name="common_to_settings">Abrir configuración</string>
     <string name="common_too_small_balance_title">Tu saldo es demasiado pequeño</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Tarifa total</string>
     <string name="common_transaction_id">ID de transacción</string>
     <string name="common_transaction_submitted">Transacción enviada</string>
     <string name="common_try_again">Intentar de nuevo</string>
@@ -1519,6 +1529,17 @@
     <string name="swap_custom_fee_selector_description">Token para pagar la tasa de red</string>
     <string name="swap_custom_fee_selector_footer">La tasa de red se agrega al monto ingresado</string>
     <string name="swap_error_pair_not_supported">Este par no es compatible</string>
+    <string name="swap_execution_failure" formatted="false">Fallido en la operación #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Intercambio %s a %s en %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transferencia de %s de %s a %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operación</item>
+        <item quantity="other">%s operaciones</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s de %s operaciones</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Intercambiando %s a %s en %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Transfiriendo %s a %s</string>
+    <string name="swap_execution_time">Tiempo de ejecución</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Deberías mantener al menos %s después de pagar %s de tasa de red ya que estás sosteniendo tokens insuficientes</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Debes mantener al menos %s para recibir el token %s</string>
     <string name="swap_failure_insufficient_balance_message">Puedes intercambiar hasta %1$s ya que necesitas pagar %2$s por la tasa de red.</string>
@@ -1538,6 +1559,7 @@
     <string name="swap_get_token_cross_chain_description">Transferir %s desde otra red</string>
     <string name="swap_get_token_receive_description">Recibir %s con QR o tu dirección</string>
     <string name="swap_get_token_using">Obtener %s usando</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Durante la ejecución del intercambio, la cantidad intermedia recibida es %s, lo cual es menos que el saldo mínimo de %s. Intenta especificar una cantidad de intercambio mayor.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">El deslizamiento debe estar especificado entre %s y %s</string>
     <string name="swap_invalid_slippage_failure_title">Deslizamiento inválido</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Selecciona un token para pagar</string>
@@ -1556,6 +1578,10 @@
     <string name="swap_rate_was_updated_failure_message">Tasa antigua: %1$s ≈ %2$s.\nNueva tasa: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">La tasa de intercambio fue actualizada</string>
     <string name="swap_repeat_operation">Repetir la operación</string>
+    <string name="swap_route">Ruta</string>
+    <string name="swap_route_description">La manera en que tu token pasará a través de diferentes redes para obtener el token deseado.</string>
+    <string name="swap_route_segment_swap_title">Intercambio</string>
+    <string name="swap_route_segment_transfer_title">Transferencia</string>
     <string name="swap_settings_title">Configuraciones de intercambio</string>
     <string name="swap_slippage">Deslizamiento</string>
     <string name="swap_slippage_description">El deslizamiento de intercambio es una ocurrencia común en el comercio descentralizado donde el precio final de una transacción de intercambio podría diferir ligeramente del precio esperado, debido a las cambiantes condiciones del mercado.</string>

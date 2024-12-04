@@ -21,7 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
@@ -112,7 +112,7 @@ class NominationPoolsSetupUnbondViewModel(
         val stakedBalance = asset.token.amountFromPlanks(stakedBalance.first())
 
         val payload = NominationPoolsUnbondValidationPayload(
-            fee = originFeeMixin.awaitDecimalFee(),
+            fee = originFeeMixin.awaitFee(),
             poolMember = poolMemberFlow.first(),
             stakedBalance = stakedBalance,
             asset = asset,

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/swapConfirmationToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/wallet_asset_swap" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/swapConfirmationToolbar">
+
+        <io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+            android:id="@+id/swapConfirmationAssets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp" />
+
+        <io.novafoundation.nova.common.view.TableView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp">
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationRate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/swap_rate_title"
+                app:titleIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationPriceDifference"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/swap_price_difference_title"
+                app:titleIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationSlippage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/swap_slippage_title"
+                app:titleIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
+                android:id="@+id/swapConfirmationRoute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:titleIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:clickable="true"
+                android:focusable="true"
+                android:id="@+id/swapConfirmationExecutionTime"
+                app:title="@string/swap_execution_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:id="@+id/swapConfirmationNetworkFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/common_total_fee"
+                app:titleIcon="@drawable/ic_info" />
+
+        </io.novafoundation.nova.common.view.TableView>
+
+        <io.novafoundation.nova.common.view.TableView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp">
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationWallet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/common_wallet" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryValueEndIcon="@drawable/ic_info"
+                app:title="@string/common_account" />
+
+        </io.novafoundation.nova.common.view.TableView>
+
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/swapConfirmationAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:alertMode="warning"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/swapConfirmationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/common_confirm"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

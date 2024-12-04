@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -56,7 +57,7 @@ class EvmErc20AssetBalance(
         return emptyFlow<Nothing>()
     }
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+    override fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
         return true
     }
 
@@ -83,8 +84,8 @@ class EvmErc20AssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Balance> {
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
         TODO("Not yet implemented")
     }
 

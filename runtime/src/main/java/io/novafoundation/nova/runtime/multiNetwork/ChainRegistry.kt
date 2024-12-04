@@ -36,6 +36,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -305,6 +306,12 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
     }
 }
 
+suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeSnapshot.() -> R): R {
+    return with(getRuntime(chainId)) {
+        action()
+    }
+}
+
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List<Chain> = currentChains.first().filter(predicate)
 
@@ -364,6 +371,11 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
     val addressPrefix = evmChainIdHex.removeHexPrefix().toIntOrNull(radix = 16) ?: return null
 
     return findEvmChain(addressPrefix)
+}
+
+suspend fun ChainRegistry.findRelayChainOrThrow(chainId: ChainId): ChainId {
+    val chain = getChain(chainId)
+    return chain.parentId ?: chainId
 }
 
 fun ChainRegistry.enabledChainsFlow() = currentChains

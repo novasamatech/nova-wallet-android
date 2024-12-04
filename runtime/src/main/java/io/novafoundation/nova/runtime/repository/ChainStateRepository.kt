@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
-import io.novafoundation.nova.common.utils.babe
 import io.novafoundation.nova.common.utils.babeOrNull
 import io.novafoundation.nova.common.utils.isParachain
 import io.novafoundation.nova.common.utils.numberConstant
@@ -24,6 +23,8 @@ import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 private val FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN = (6 * 1000).toBigInteger()
 private val FALLBACK_BLOCK_TIME_MILLIS_PARACHAIN = 2.toBigInteger() * FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN
@@ -40,8 +41,9 @@ class ChainStateRepository(
 
     suspend fun expectedBlockTimeInMillis(chainId: ChainId): BigInteger {
         val runtime = chainRegistry.getRuntime(chainId)
+        val chain = chainRegistry.getChain(chainId)
 
-        return runtime.metadata.babe().numberConstant("ExpectedBlockTime", runtime)
+        return blockTimeFromConstants(chain, runtime)
     }
 
     suspend fun predictedBlockTime(chainId: ChainId): BigInteger {
@@ -81,8 +83,15 @@ class ChainStateRepository(
             ?: runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
             // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
             // Use a low minimum validity threshold to check these against
-            ?: runtime.metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)?.takeIf { it > PERIOD_VALIDITY_THRESHOLD }
+            ?: blockTimeFromTimestampPallet(runtime)
             ?: fallbackBlockTime(runtime)
+    }
+
+    private fun blockTimeFromTimestampPallet(runtime: RuntimeSnapshot): BigInteger? {
+        val blockTime = runtime.metadata.timestampOrNull()?.numberConstant("MinimumPeriod", runtime)?.takeIf { it > PERIOD_VALIDITY_THRESHOLD }
+            ?: return null
+
+        return blockTime * 2.toBigInteger()
     }
 
     suspend fun blockHashCount(chainId: ChainId): BigInteger? {
@@ -112,4 +121,8 @@ class ChainStateRepository(
             FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN
         }
     }
+}
+
+suspend fun ChainStateRepository.expectedBlockTime(chainId: ChainId): Duration {
+    return expectedBlockTimeInMillis(chainId).toLong().milliseconds
 }

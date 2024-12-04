@@ -99,33 +99,34 @@ private fun bindGlobalConsensusJunction(instance: Any?): Junction {
 
 // ------ Encode ------
 
-fun MultiLocation.toEncodableInstance() = structOf(
+fun MultiLocation.toEncodableInstance(xcmVersion: XcmVersion) = structOf(
     "parents" to parents,
-    "interior" to interior.toEncodableInstance()
+    "interior" to interior.toEncodableInstance(xcmVersion)
 )
 
-private fun MultiLocation.Interior.toEncodableInstance() = when (this) {
+private fun MultiLocation.Interior.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
     MultiLocation.Interior.Here -> DictEnum.Entry("Here", null)
 
-    is MultiLocation.Interior.Junctions -> if (junctions.size == 1) {
+    is MultiLocation.Interior.Junctions -> if (junctions.size == 1 && xcmVersion <= XcmVersion.V3) {
+        // X1 is encoded as a single junction in V3 and prior
         DictEnum.Entry(
             name = "X1",
-            value = junctions.first().toEncodableInstance()
+            value = junctions.single().toEncodableInstance(xcmVersion)
         )
     } else {
         DictEnum.Entry(
             name = "X${junctions.size}",
-            value = junctions.map(Junction::toEncodableInstance)
+            value = junctions.map { it.toEncodableInstance(xcmVersion) }
         )
     }
 }
 
-private fun Junction.toEncodableInstance() = when (this) {
+private fun Junction.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
     is Junction.GeneralKey -> DictEnum.Entry("GeneralKey", key.fromHex())
     is Junction.PalletInstance -> DictEnum.Entry("PalletInstance", index)
     is Junction.ParachainId -> DictEnum.Entry("Parachain", id)
-    is Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key"))
-    is Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance(accountIdKey = "id"))
+    is Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key", xcmVersion))
+    is Junction.AccountId32 -> DictEnum.Entry("AccountId32", accountId.toJunctionAccountIdInstance(accountIdKey = "id", xcmVersion))
     is Junction.GeneralIndex -> DictEnum.Entry("GeneralIndex", index)
     is Junction.GlobalConsensus -> toEncodableInstance()
     Junction.Unsupported -> error("Unsupported junction")
@@ -143,7 +144,17 @@ private fun Junction.GlobalConsensus.toEncodableInstance(): Any {
     return DictEnum.Entry("GlobalConsensus", innerValue)
 }
 
-private fun AccountId.toJunctionAccountIdInstance(accountIdKey: String) = structOf(
-    "network" to DictEnum.Entry("Any", null),
+private fun AccountId.toJunctionAccountIdInstance(accountIdKey: String, xcmVersion: XcmVersion) = structOf(
+    "network" to emptyNetworkField(xcmVersion),
     accountIdKey to this
 )
+
+private fun emptyNetworkField(xcmVersion: XcmVersion): Any? {
+    return if (xcmVersion >= XcmVersion.V3) {
+        // Network in V3+ is encoded as Option<NetworkId>
+        null
+    } else {
+        // Network in V2- is encoded as Enum with Any variant
+        DictEnum.Entry("Any", null)
+    }
+}

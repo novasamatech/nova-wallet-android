@@ -399,12 +399,12 @@ class Navigator(
         navController?.navigate(R.id.action_selectAssetSwapFlowFragment_to_swapFlowNetworkFragment, NetworkSwapFlowFragment.createPayload(payload))
     }
 
-    override fun openBuyNetworks(payload: NetworkFlowPayload) {
-        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
-    }
-
     override fun returnToMainSwapScreen() {
         navController?.navigate(R.id.action_return_to_swap_settings)
+    }
+
+    override fun openBuyNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
     }
 
     override fun openSwapFlow() {
@@ -414,6 +414,10 @@ class Navigator(
 
     override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navController?.navigate(R.id.action_open_swapSetupAmount, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
+    }
+
+    override fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
+        navController?.navigate(R.id.action_finish_and_open_swap_settings, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
     }
 
     override fun openNfts() {

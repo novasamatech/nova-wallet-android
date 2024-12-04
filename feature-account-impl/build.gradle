@@ -45,7 +45,7 @@ dependencies {
     implementation project(':feature-versions-api')
     implementation project(':feature-proxy-api')
     implementation project(':feature-cloud-backup-api')
-    implementation project(":feature-swap-core")
+    implementation project(":feature-swap-core:api")
     implementation project(':web3names')
 
     implementation kotlinDep

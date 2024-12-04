@@ -56,7 +56,7 @@ class EvmErc20AssetTransfers(
     override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
         return evmTransactionService.transact(
             chainId = transfer.originChain.id,
-            presetFee = transfer.decimalFee.networkFee,
+            presetFee = transfer.fee.submissionFee,
             fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT
         ) {
             transfer(transfer)

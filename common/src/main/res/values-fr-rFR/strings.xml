@@ -356,6 +356,7 @@
     <string name="common_details">Détails</string>
     <string name="common_disabled">Désactivé</string>
     <string name="common_disconnect">Déconnecter</string>
+    <string name="common_do_not_close_app">Ne fermez pas l\'application!</string>
     <string name="common_done">Terminé</string>
     <string name="common_dont_show_again">Ne plus afficher ceci</string>
     <string name="common_edit">Modifier</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">L\'opération supprimera le compte</string>
     <string name="common_expired">Expiré</string>
     <string name="common_explore">Explorer</string>
+    <string name="common_failed">Échoué</string>
     <string name="common_fee_changed_message" formatted="false">Le coût estimé du réseau %s est beaucoup plus élevé que le coût par défaut (%s). Cela pourrait être dû à une congestion temporaire du réseau. Vous pouvez actualiser pour attendre un coût réseau plus bas.</string>
     <string name="common_fee_changed_title">Le coût du réseau est trop élevé</string>
+    <string name="common_fee_with_label">Frais: %s</string>
     <string name="common_filter_sort_header">Trier par :</string>
     <string name="common_filters">Filtres</string>
     <string name="common_find_out_more">En savoir plus</string>
@@ -431,6 +434,7 @@
     <string name="common_not_available">Indisponible</string>
     <string name="common_not_enough_funds_message">Désolé, vous n’avez pas assez de fonds pour payer les frais de réseau.</string>
     <string name="common_not_enough_funds_title">Solde insuffisant</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Vous n\'avez pas assez de solde pour payer les frais de réseau de %s. Le solde actuel est de %s</string>
     <string name="common_not_now">Pas maintenant</string>
     <string name="common_off">Désactivé</string>
     <string name="common_ok">D\'ACCORD</string>
@@ -470,6 +474,11 @@
     <string name="common_search">Rechercher</string>
     <string name="common_search_placeholder_default">Le résultat de la recherche sera affiché ici</string>
     <string name="common_search_results_number">Résultats de la recherche : %d</string>
+    <string name="common_sec">sec</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d seconde</item>
+        <item quantity="other">%d secondes</item>
+    </plurals>
     <string name="common_secret_derivation_path">Chemin de dérivation du secret</string>
     <string name="common_settings">Paramètres</string>
     <string name="common_share">Partager</string>
@@ -493,6 +502,7 @@
     <string name="common_to_settings">Ouvrir les paramètres</string>
     <string name="common_too_small_balance_title">Votre solde est trop faible</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Frais totaux</string>
     <string name="common_transaction_id">ID de la transaction</string>
     <string name="common_transaction_submitted">Envoi de la transaction</string>
     <string name="common_try_again">Réessayez</string>
@@ -1519,6 +1529,17 @@
     <string name="swap_custom_fee_selector_description">Token pour le paiement des frais de réseau</string>
     <string name="swap_custom_fee_selector_footer">Les frais de réseau sont ajoutés en plus du montant saisi</string>
     <string name="swap_error_pair_not_supported">Cette paire n\'est pas prise en charge</string>
+    <string name="swap_execution_failure" formatted="false">Échec de l\'opération #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Échange de %s à %s sur %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transfert de %s de %s à %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s opération</item>
+        <item quantity="other">%s opérations</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s sur %s opérations</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Échange de %s à %s sur %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Transfert de %s à %s</string>
+    <string name="swap_execution_time">Temps d\'exécution</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Vous devez conserver au moins %s après avoir payé %s de frais de réseau car vous détenez des tokens insuffisants</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Vous devez conserver au moins %s pour recevoir des tokens %s</string>
     <string name="swap_failure_insufficient_balance_message">Vous pouvez échanger jusqu\'à %1$s car vous devez payer %2$s pour les frais de réseau.</string>
@@ -1538,6 +1559,7 @@
     <string name="swap_get_token_cross_chain_description">Transférer %s depuis un autre réseau</string>
     <string name="swap_get_token_receive_description">Recevoir %s avec un QR ou votre adresse</string>
     <string name="swap_get_token_using">Obtenir %s en utilisant</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Pendant l\'exécution de l\'échange, le montant intermédiaire reçu est de %s, ce qui est inférieur au solde minimum de %s. Essayez de spécifier un montant d\'échange plus important.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">La glissement doit être spécifiée entre %s et %s</string>
     <string name="swap_invalid_slippage_failure_title">Glissement non valide</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Sélectionnez un token pour payer</string>
@@ -1556,6 +1578,10 @@
     <string name="swap_rate_was_updated_failure_message">Ancien taux : %1$st∻%2$s.\nNouveau taux : %1$st∻%3$s</string>
     <string name="swap_rate_was_updated_failure_title">Le taux d\'échange a été mis à jour</string>
     <string name="swap_repeat_operation">Répétez l\'opération</string>
+    <string name="swap_route">Itinéraire</string>
+    <string name="swap_route_description">La voie que prendra votre jeton à travers différents réseaux pour obtenir le jeton souhaité.</string>
+    <string name="swap_route_segment_swap_title">Échange</string>
+    <string name="swap_route_segment_transfer_title">Transfert</string>
     <string name="swap_settings_title">Paramètres d\'échange</string>
     <string name="swap_slippage">Slippage</string>
     <string name="swap_slippage_description">Le slippage est un phénomène courant dans le trading décentralisé où le prix final d\'une transaction d\'échange peut légèrement différer du prix attendu, en raison des conditions changeantes du marché.</string>
