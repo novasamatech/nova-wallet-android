@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.common.utils.fromHex
+import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
 import io.novafoundation.nova.common.utils.hexBytesSize
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -149,7 +150,7 @@ class RpcCalls(
     }
 
     private fun RuntimeMetadata.hasDetectedPaymentApi(): Boolean {
-        return runtimeApiOrNull("TransactionPaymentApi")?.methodOrNull("query_info") != null
+        return hasRuntimeApisMetadata() && runtimeApiOrNull("TransactionPaymentApi")?.methodOrNull("query_info") != null
     }
 
     private suspend fun socketFor(chainId: ChainId) = chainRegistry.getSocket(chainId)
