@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.firstExistingModuleName
+import io.novafoundation.nova.common.utils.firstExistingCall
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -50,10 +50,15 @@ class OrmlAssetTransfers(
         target: AccountId,
         amount: BigInteger
     ) {
+        val (moduleIndex, callIndex) = runtime.metadata.firstExistingCall(
+            Modules.TOKENS to "transfer",
+            Modules.CURRENCIES to "transfer"
+        ).index
+
         call(
-            moduleName = runtime.metadata.firstExistingModuleName(Modules.TOKENS, Modules.CURRENCIES),
-            callName = "transfer",
-            arguments = mapOf(
+            moduleIndex = moduleIndex,
+            callIndex = callIndex,
+            args = mapOf(
                 "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),
                 "currency_id" to chainAsset.ormlCurrencyId(runtime),
                 "amount" to amount
