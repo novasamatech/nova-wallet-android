@@ -53,10 +53,10 @@ class BrowserTabsModule {
     @FeatureScope
     @Provides
     fun providePageSessionFactory(
-        contextManager: ContextManager,
-        compoundWeb3Injector: CompoundWeb3Injector
+        compoundWeb3Injector: CompoundWeb3Injector,
+        contextManager: ContextManager
     ): BrowserTabSessionFactory {
-        return BrowserTabSessionFactory(contextManager, compoundWeb3Injector)
+        return BrowserTabSessionFactory(compoundWeb3Injector, contextManager)
     }
 
     @FeatureScope

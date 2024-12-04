@@ -97,7 +97,7 @@ class RealBrowserTabService(
         }
     }
 
-    private fun addNewSession(tab: BrowserTab): BrowserTabSession {
+    private suspend fun addNewSession(tab: BrowserTab): BrowserTabSession {
         val session = browserTabSessionFactory.create(tabId = tab.id, startUrl = tab.currentUrl)
         activeSessions.put(tab.id, session)
         return session
@@ -110,7 +110,7 @@ class RealBrowserTabService(
         sessionToDetach?.detachFromHost()
     }
 
-    private fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
+    private suspend fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
         val tabId = selectedTabId ?: return CurrentTabState.NotSelected
         val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
         return CurrentTabState.Selected(

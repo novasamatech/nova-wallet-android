@@ -5,6 +5,7 @@ import androidx.core.view.drawToBitmap
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.fromName
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,8 @@ class RealPageSnapshotBuilder(
 
     override suspend fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot {
         val webView = browserTabSession.webView
+        if (!webView.isLaidOut) return PageSnapshot.fromName(browserTabSession.startUrl)
+
         val pageName = webView.title
         val icon = webView.favicon
         val pageBitmap = webView.drawToBitmap()

@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
-import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.BrowserTabsViewModel
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 
@@ -28,14 +27,12 @@ class BrowserTabsModule {
     fun provideViewModel(
         router: DAppRouter,
         browserTabService: BrowserTabService,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        searchRequester: DAppSearchCommunicator,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return BrowserTabsViewModel(
             router = router,
             browserTabService = browserTabService,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            dAppSearchRequester = searchRequester
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 }
