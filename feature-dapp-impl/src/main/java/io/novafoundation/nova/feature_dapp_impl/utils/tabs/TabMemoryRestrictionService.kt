@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.InformationSizeUnit
 import io.novafoundation.nova.common.utils.toInformationSize
 
 private const val MIN_TABS = 3
-private val MEMORY_STEP = 100.megabytes.inWholeBytes()
+private val MEMORY_STEP = 100.megabytes.inWholeBytes
 
 interface TabMemoryRestrictionService {
     fun getMaximumActiveSessions(): Int
