@@ -2,6 +2,7 @@ package io.novafoundation.nova.core_db.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import io.novafoundation.nova.common.utils.Identifiable
 
@@ -15,5 +16,6 @@ class FavouriteDAppLocal(
     val orderingIndex: Int
 ) : Identifiable {
 
+    @Ignore
     override val identifier: String = url
 }
