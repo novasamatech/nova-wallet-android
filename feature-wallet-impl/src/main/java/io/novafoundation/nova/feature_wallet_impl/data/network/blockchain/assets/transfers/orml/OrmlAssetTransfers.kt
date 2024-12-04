@@ -51,7 +51,7 @@ class OrmlAssetTransfers(
         amount: BigInteger
     ) {
         call(
-            moduleName = runtime.metadata.firstExistingModuleName(Modules.CURRENCIES, Modules.TOKENS),
+            moduleName = runtime.metadata.firstExistingModuleName(Modules.TOKENS, Modules.CURRENCIES),
             callName = "transfer",
             arguments = mapOf(
                 "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),
