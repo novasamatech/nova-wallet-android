@@ -11,11 +11,11 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
-import io.novafoundation.nova.feature_dapp_impl.data.model.mapFavoriteDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoryToDappCategoryModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapFavoriteDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map

@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.common
 
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
+import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
+import io.novafoundation.nova.feature_dapp_impl.domain.common.dappToFavorite
+import io.novafoundation.nova.feature_dapp_impl.domain.common.favouriteToDApp
 
 data class DappModel(
     val name: String,
@@ -36,4 +39,14 @@ fun mapDappModelToDApp(dApp: DappModel) = with(dApp) {
         url = url,
         isFavourite = isFavourite
     )
+}
+
+fun mapFavoriteDappToDappModel(favoriteDapp: FavouriteDApp): DappModel {
+    val dapp = favouriteToDApp(favoriteDapp)
+    return mapDappToDappModel(dapp)
+}
+
+fun mapDAppModelToFavorite(model: DappModel, orderingIndex: Int): FavouriteDApp {
+    val dapp = mapDappModelToDApp(model)
+    return dappToFavorite(dapp, orderingIndex)
 }
