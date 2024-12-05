@@ -3,10 +3,12 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.main
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DAppClickHandler
@@ -117,8 +119,8 @@ class HeaderHolder(
     ) = with(itemView) {
         walletModel?.let { dappMainSelectedWallet.setModel(walletModel) }
         categoriesAdapter.submitList(categoriesState)
-        categorizedDappsCategoriesShimmering.isVisible = showCategoriesShimmering
-        mainDappCategories.isGone = showCategoriesShimmering
+        categorizedDappsCategoriesShimmering.setVisible(showCategoriesShimmering, falseState = View.INVISIBLE)
+        mainDappCategories.isInvisible = showCategoriesShimmering
 
         favoritesAdapter.submitList(favoritesDApps)
         dAppMainFavoriteDAppList.isGone = favoritesDApps.isEmpty()
