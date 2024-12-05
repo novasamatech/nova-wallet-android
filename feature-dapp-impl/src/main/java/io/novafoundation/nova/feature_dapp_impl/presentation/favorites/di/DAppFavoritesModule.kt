@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DAppFavoritesViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
@@ -34,7 +35,14 @@ class DAppFavoritesModule {
     @IntoMap
     @ViewModelKey(DAppFavoritesViewModel::class)
     fun provideViewModel(
+        router: DAppRouter,
+        interactor: DappInteractor,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {
-        return DAppFavoritesViewModel()
+        return DAppFavoritesViewModel(
+            router,
+            interactor,
+            actionAwaitableMixinFactory
+        )
     }
 }

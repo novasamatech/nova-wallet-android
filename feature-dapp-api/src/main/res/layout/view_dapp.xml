@@ -79,11 +79,11 @@
         android:layout_height="12dp"
         android:layout_marginStart="40dp"
         android:layout_marginBottom="38dp"
+        android:src="@drawable/ic_favorite_heart_filled_20"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/itemDAppIcon"
         app:layout_constraintStart_toStartOf="@+id/itemDAppIcon"
         app:tint="@color/mimi_icon_favorite"
-        tools:src="@drawable/ic_favorite_heart_filled_20"
         tools:visibility="visible" />
 
     <ImageView

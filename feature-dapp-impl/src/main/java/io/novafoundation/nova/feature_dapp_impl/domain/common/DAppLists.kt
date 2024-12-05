@@ -32,6 +32,15 @@ internal fun buildUrlToDappMapping(
     }
 }
 
+fun dappToFavorite(dapp: DApp, orderingIndex: Int): FavouriteDApp {
+    return FavouriteDApp(
+        label = dapp.name,
+        icon = dapp.iconLink,
+        url = dapp.url,
+        orderingIndex = orderingIndex
+    )
+}
+
 fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
     return DApp(
         name = favouriteDApp.label,

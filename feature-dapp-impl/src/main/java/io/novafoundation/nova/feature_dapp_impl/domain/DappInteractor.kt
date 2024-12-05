@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.withContext
 
@@ -41,8 +42,13 @@ class DappInteractor(
         favouritesDAppRepository.removeFavourite(dAppUrl)
     }
 
+    suspend fun getFavoriteDApps(): List<FavouriteDApp> {
+        return favouritesDAppRepository.getFavourites().sortDApps()
+    }
+
     fun observeFavoriteDApps(): Flow<List<FavouriteDApp>> {
         return favouritesDAppRepository.observeFavourites()
+            .map { it.sortDApps() }
     }
 
     fun observeDAppsByCategory(): Flow<GroupedList<DappCategory, DApp>> {
@@ -81,5 +87,9 @@ class DappInteractor(
 
     suspend fun updateFavoriteDapps(favoriteDapps: List<FavouriteDApp>) {
         favouritesDAppRepository.updateFavoriteDapps(favoriteDapps)
+    }
+
+    private fun List<FavouriteDApp>.sortDApps(): List<FavouriteDApp> {
+        return sortedBy { it.orderingIndex }
     }
 }

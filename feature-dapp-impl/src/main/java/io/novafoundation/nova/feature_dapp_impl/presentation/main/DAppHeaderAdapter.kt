@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.item_dapp_header.view.mainDappCategories
 import kotlinx.android.synthetic.main.item_dapp_header.view.categorizedDappsCategoriesShimmering
 import kotlinx.android.synthetic.main.item_dapp_header.view.dAppMainFavoriteDAppList
 import kotlinx.android.synthetic.main.item_dapp_header.view.dAppMainFavoriteDAppTitle
+import kotlinx.android.synthetic.main.item_dapp_header.view.dAppMainFavoriteDAppsShow
 import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainManage
 import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSearch
 import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSelectedWallet
@@ -105,6 +106,7 @@ class HeaderHolder(
         view.dappMainManage.setOnClickListener { headerHandler.onManageClick() }
         view.mainDappCategories.adapter = categoriesAdapter
         view.dAppMainFavoriteDAppList.adapter = favoritesAdapter
+        view.dAppMainFavoriteDAppsShow.setOnClickListener { headerHandler.onManageFavoritesClick() }
     }
 
     fun bind(

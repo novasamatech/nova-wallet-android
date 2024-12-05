@@ -33,13 +33,7 @@ class AddToFavouritesViewModel(
     }
 
     fun saveClicked() = launch {
-        val favouriteDApp = FavouriteDApp(
-            url = urlFlow.value,
-            label = labelFlow.first(),
-            icon = iconLink.first()
-        )
-
-        interactor.addToFavourites(favouriteDApp)
+        interactor.addToFavourites(urlFlow.value, labelFlow.first(), iconLink.first())
 
         router.back()
     }

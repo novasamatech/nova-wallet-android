@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayloa
 
 @Subcomponent(
     modules = [
-        DAppFavoritesViewModel::class
+        DAppFavoritesModule::class
     ]
 )
 @ScreenScope

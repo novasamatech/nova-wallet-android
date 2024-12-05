@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.dApp
 
 import androidx.navigation.fragment.FragmentNavigator
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
@@ -14,9 +15,12 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayloa
 
 class DAppNavigator(
     private val rootNavigationHolder: RootNavigationHolder,
+    private val mainNavigationHolder: MainNavigationHolder
 ) : BaseNavigator(rootNavigationHolder), DAppRouter {
 
-    override fun openChangeAccount() = performNavigation(R.id.action_open_switch_wallet)
+    override fun openChangeAccount() {
+        mainNavigationHolder.navController?.performNavigation(R.id.action_open_switch_wallet)
+    }
 
     override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
         // Close deapp browser if it is already opened
@@ -53,9 +57,11 @@ class DAppNavigator(
         args = AddToFavouritesFragment.getBundle(payload)
     )
 
-    override fun openAuthorizedDApps() = performNavigation(
-        actionId = R.id.action_mainFragment_to_authorizedDAppsFragment
-    )
+    override fun openAuthorizedDApps() {
+        mainNavigationHolder.navController?.performNavigation(
+            actionId = R.id.action_mainFragment_to_authorizedDAppsFragment
+        )
+    }
 
     override fun openTabs() {
         val currentDestination = rootNavigationHolder.navController?.currentDestination
@@ -71,4 +77,8 @@ class DAppNavigator(
     override fun closeTabsScreen() = performNavigation(
         actionId = R.id.action_finish_tabs_fragment
     )
+
+    override fun openDAppFavorites() {
+        mainNavigationHolder.navController?.performNavigation(R.id.action_open_dapp_favorites)
+    }
 }

@@ -21,6 +21,8 @@ interface FavouritesDAppRepository {
     suspend fun removeFavourite(dAppUrl: String)
 
     suspend fun updateFavoriteDapps(favoriteDapps: List<FavouriteDApp>)
+
+    suspend fun getNextOrderingIndex(): Int
 }
 
 class DbFavouritesDAppRepository(
@@ -56,5 +58,9 @@ class DbFavouritesDAppRepository(
         val currentDapps = favouriteDAppsDao.getFavouriteDApps()
         val diff = CollectionDiffer.findDiff(newDapps, currentDapps, false)
         favouriteDAppsDao.updateFavourites(diff.updated)
+    }
+
+    override suspend fun getNextOrderingIndex(): Int {
+        return favouriteDAppsDao.getMaxOrderingIndex() + 1
     }
 }

@@ -28,4 +28,7 @@ interface FavouriteDAppsDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateFavourites(dapps: List<FavouriteDAppLocal>)
+
+    @Query("SELECT MAX(orderingIndex) FROM favourite_dapps")
+    suspend fun getMaxOrderingIndex(): Int
 }

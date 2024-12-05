@@ -10,7 +10,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.recyclerView.dragging.OnItemDragCallback
 import io.novafoundation.nova.common.utils.recyclerView.dragging.SimpleItemDragHelperCallback
 import io.novafoundation.nova.common.utils.recyclerView.dragging.StartDragListener
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -22,14 +21,14 @@ import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_favorites_dapp.favoritesDappList
 import kotlinx.android.synthetic.main.fragment_favorites_dapp.favoritesDappToolbar
 
-class DappFavoritesFragment : BaseBottomSheetFragment<DAppFavoritesViewModel>(), DappDraggableFavoritesAdapter.Handler, StartDragListener, OnItemDragCallback {
+class DappFavoritesFragment : BaseBottomSheetFragment<DAppFavoritesViewModel>(), DappDraggableFavoritesAdapter.Handler, StartDragListener {
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { DappDraggableFavoritesAdapter(imageLoader, this, this) }
 
-    private val itemDragHelper = ItemTouchHelper(SimpleItemDragHelperCallback(this))
+    private val itemDragHelper by lazy(LazyThreadSafetyMode.NONE) { ItemTouchHelper(SimpleItemDragHelperCallback(adapter)) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,11 +67,11 @@ class DappFavoritesFragment : BaseBottomSheetFragment<DAppFavoritesViewModel>(),
         viewModel.onFavoriteClicked(dapp)
     }
 
-    override fun requestDrag(viewHolder: RecyclerView.ViewHolder) {
-        itemDragHelper.startDrag(viewHolder)
+    override fun onItemOrderingChanged(dapps: List<DappModel>) {
+        viewModel.changeDAppOrdering(dapps)
     }
 
-    override fun onItemMove(fromPosition: Int, toPosition: Int) {
-        viewModel.swapDAppOrdering(fromPosition, toPosition)
+    override fun requestDrag(viewHolder: RecyclerView.ViewHolder) {
+        itemDragHelper.startDrag(viewHolder)
     }
 }

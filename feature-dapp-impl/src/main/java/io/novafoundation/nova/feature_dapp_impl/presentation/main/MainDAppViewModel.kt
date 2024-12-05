@@ -100,4 +100,8 @@ class MainDAppViewModel(
     private fun syncDApps() = launch {
         dappInteractor.dAppsSync()
     }
+
+    fun openFavorites() {
+        router.openDAppFavorites()
+    }
 }

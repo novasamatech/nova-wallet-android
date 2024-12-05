@@ -111,6 +111,6 @@ class MainDAppFragment :
     }
 
     override fun onManageFavoritesClick() {
-        TODO("Not yet implemented")
+        viewModel.openFavorites()
     }
 }

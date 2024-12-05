@@ -24,4 +24,6 @@ interface DAppRouter : ReturnableRouter {
     fun openTabs()
 
     fun closeTabsScreen()
+
+    fun openDAppFavorites()
 }
