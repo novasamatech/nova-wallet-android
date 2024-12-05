@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.main
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
@@ -16,12 +15,8 @@ import io.novafoundation.nova.feature_dapp_impl.data.model.mapFavoriteDappToDapp
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoryToDappCategoryModel
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch

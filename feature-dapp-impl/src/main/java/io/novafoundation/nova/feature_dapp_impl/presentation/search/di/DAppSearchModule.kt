@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteract
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 
 @Module(includes = [ViewModelModule::class])
 class DAppSearchModule {

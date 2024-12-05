@@ -26,5 +26,4 @@ class SimpleItemDragHelperCallback(
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
 }

@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.common
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
 
 class DappListAdapter(
