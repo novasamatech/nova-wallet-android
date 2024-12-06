@@ -14,10 +14,20 @@
         <action
             android:id="@+id/action_dappTabsFragment_to_dapp_browser_graph"
             app:destination="@id/dapp_browser_graph"
-            app:enterAnim="@anim/fragment_open_enter"
+            app:enterAnim="@anim/fragment_fade_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_slide_out"
+            app:popUpTo="@id/dapp_tabs_graph"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_open_dappSearch"
+            app:destination="@id/dapp_search_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/dapp_tabs_graph"
             app:popUpToInclusive="true" />
 

@@ -8,7 +8,6 @@ import coil.ImageLoader
 import coil.clear
 import coil.load
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.coil.transformation.TopCropTransformation
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.loadOrHide
 import io.novafoundation.nova.feature_dapp_impl.R
@@ -60,9 +59,7 @@ class BrowserTabViewHolder(
     fun bind(item: BrowserTabRvItem) = with(itemView) {
         browserTabCard.setOnClickListener { itemHandler.tabClicked(item, browserTabScreenshot) }
         browserTabClose.setOnClickListener { itemHandler.tabCloseClicked(item) }
-        browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader) {
-            transformations(TopCropTransformation())
-        }
+        browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
         browserTabFavicon.loadOrHide(item.tabFaviconPath?.asFile(), imageLoader)
         browserTabSiteName.text = item.tabName
     }

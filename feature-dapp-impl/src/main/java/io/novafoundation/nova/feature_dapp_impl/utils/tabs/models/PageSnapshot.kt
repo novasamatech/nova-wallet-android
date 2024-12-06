@@ -9,7 +9,7 @@ class PageSnapshot(
     companion object;
 }
 
-fun PageSnapshot.Companion.withNameOnly(name: String) = PageSnapshot(
+fun PageSnapshot.Companion.fromName(name: String) = PageSnapshot(
     pageName = name,
     pageIconPath = null,
     pagePicturePath = null

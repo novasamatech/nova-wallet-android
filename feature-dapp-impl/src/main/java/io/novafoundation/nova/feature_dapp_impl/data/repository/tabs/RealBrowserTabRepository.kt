@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.utils.tabs
+package io.novafoundation.nova.feature_dapp_impl.data.repository.tabs
 
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
@@ -7,10 +7,11 @@ import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class RealBrowserTabStorage(
+class RealBrowserTabRepository(
     private val browserTabsDao: BrowserTabsDao
-) : BrowserTabStorage {
+) : BrowserTabInternalRepository {
 
     override suspend fun saveTab(tab: BrowserTab) {
         browserTabsDao.insertTab(tab.toLocal())
@@ -18,6 +19,11 @@ class RealBrowserTabStorage(
 
     override suspend fun removeTab(tabId: String) {
         browserTabsDao.removeTab(tabId)
+    }
+
+    override fun observeTabsWithNames(): Flow<Map<String, String?>> {
+        return browserTabsDao.observeAllTabs()
+            .map { tabs -> tabs.associate { it.id to it.pageName } }
     }
 
     override suspend fun removeAllTabs() {

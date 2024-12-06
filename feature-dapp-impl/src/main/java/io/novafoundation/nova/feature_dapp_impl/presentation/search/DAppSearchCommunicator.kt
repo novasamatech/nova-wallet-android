@@ -15,9 +15,6 @@ interface DAppSearchCommunicator : DAppSearchRequester, DAppSearchResponder {
     sealed interface Response : Parcelable {
 
         @Parcelize
-        object TabChanged : Response
-
-        @Parcelize
         class NewUrl(val url: String) : Response
 
         @Parcelize

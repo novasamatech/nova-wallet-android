@@ -13,13 +13,13 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabPoolService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 
 @Module(includes = [ViewModelModule::class])
 class DAppSearchModule {
@@ -47,7 +47,7 @@ class DAppSearchModule {
         payload: SearchPayload,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         appLinksProvider: AppLinksProvider,
-        browserTabPoolService: BrowserTabPoolService
+        browserTabService: BrowserTabService
     ): ViewModel {
         return DAppSearchViewModel(
             router = router,
@@ -57,7 +57,7 @@ class DAppSearchModule {
             payload = payload,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             appLinksProvider = appLinksProvider,
-            browserTabPoolService = browserTabPoolService
+            browserTabService = browserTabService
         )
     }
 }

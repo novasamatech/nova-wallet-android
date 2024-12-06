@@ -13,6 +13,7 @@ import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.RoundCornersOutlineProvider
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.setupCloseAllDappTabsDialogue
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPoint
@@ -56,16 +57,18 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     override fun subscribe(viewModel: SplitScreenViewModel) {
         setupCloseAllDappTabsDialogue(viewModel.closeAllTabsConfirmation)
 
-        viewModel.dappTabsQuantity.observe {
-            val shouldBeVisible = it > 0
+        viewModel.dappTabsVisible.observe { shouldBeVisible ->
             val isVisibilityChanged = dappEntryPoint.isVisible != shouldBeVisible
 
             if (isVisibilityChanged) {
                 mainNavHost.outlineProvider = RoundCornersOutlineProvider(getOutlineCornerRadius(shouldBeVisible))
             }
 
-            dappEntryPoint.isVisible = it > 0
-            dappEntryPointText.text = getString(R.string.dapp_entry_point_title, it)
+            dappEntryPoint.isVisible = shouldBeVisible
+        }
+
+        viewModel.tabsTitle.observe {
+            dappEntryPointText.text = it
         }
     }
 

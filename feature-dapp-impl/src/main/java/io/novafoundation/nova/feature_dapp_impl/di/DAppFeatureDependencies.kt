@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
@@ -44,6 +45,8 @@ interface DAppFeatureDependencies {
     val walletRepository: WalletRepository
 
     val fileProvider: FileProvider
+
+    val contextManager: ContextManager
 
     fun currencyRepository(): CurrencyRepository
 

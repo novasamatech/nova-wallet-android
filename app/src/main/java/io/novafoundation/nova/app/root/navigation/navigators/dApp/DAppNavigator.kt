@@ -1,9 +1,10 @@
 package io.novafoundation.nova.app.root.navigation.navigators.dApp
 
+import androidx.navigation.fragment.FragmentNavigator
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
@@ -17,7 +18,7 @@ class DAppNavigator(
 
     override fun openChangeAccount() = performNavigation(R.id.action_open_switch_wallet)
 
-    override fun openDAppBrowser(payload: DAppBrowserPayload) {
+    override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
         // Close deapp browser if it is already opened
         // TODO it's better to provide new url to existing browser
         val currentDestination = rootNavigationHolder.navController?.currentDestination
@@ -28,7 +29,8 @@ class DAppNavigator(
             R.id.dappTabsFragment -> R.id.action_dappTabsFragment_to_dapp_browser_graph
             else -> R.id.action_open_dappBrowser
         }
-        performNavigation(destinationId, DAppBrowserFragment.getBundle(payload))
+
+        performNavigation(destinationId, DAppBrowserFragment.getBundle(payload), extras)
     }
 
     override fun openDappSearch() {
@@ -62,7 +64,7 @@ class DAppNavigator(
         performNavigation(destinationId)
     }
 
-    override fun finishTabs() = performNavigation(
+    override fun closeTabsScreen() = performNavigation(
         actionId = R.id.action_finish_tabs_fragment
     )
 }

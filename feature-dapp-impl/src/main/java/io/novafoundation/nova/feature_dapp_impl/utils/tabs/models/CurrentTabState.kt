@@ -4,10 +4,10 @@ sealed interface CurrentTabState {
 
     object NotSelected : CurrentTabState
 
-    data class Selected(val tab: BrowserTab, val pageSession: PageSession) : CurrentTabState
+    data class Selected(val tab: BrowserTab, val browserTabSession: BrowserTabSession) : CurrentTabState
 }
 
 fun CurrentTabState.stateId() = when (this) {
-    CurrentTabState.NotSelected -> "not_selected"
+    CurrentTabState.NotSelected -> null
     is CurrentTabState.Selected -> tab.id
 }

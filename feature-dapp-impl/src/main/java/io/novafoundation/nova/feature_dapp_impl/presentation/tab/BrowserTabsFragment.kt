@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.GridLayoutManager
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -12,6 +13,7 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_browser_tabs.browserTabsAddTab
 import kotlinx.android.synthetic.main.fragment_browser_tabs.browserTabsCloseTabs
@@ -64,7 +66,12 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
     }
 
     override fun tabClicked(item: BrowserTabRvItem, view: View) {
-        viewModel.openTab(item.tabId)
+        view.transitionName = DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
+
+        val extras = FragmentNavigatorExtras(
+            view to DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
+        )
+        viewModel.openTab(item, extras)
     }
 
     override fun tabCloseClicked(item: BrowserTabRvItem) {

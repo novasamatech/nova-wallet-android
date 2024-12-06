@@ -4,6 +4,8 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -239,5 +241,9 @@ class RelayStakingNavigator(
     override fun openConfirmRemoveStakingProxy(payload: ConfirmRemoveStakingProxyPayload) {
         val arguments = ConfirmRemoveStakingProxyFragment.getBundle(payload)
         performNavigation(R.id.action_open_confirmRemoveStakingProxyFragment, arguments)
+    }
+
+    override fun openDAppBrowser(url: String) {
+        performNavigation(R.id.action_open_dappBrowser, DAppBrowserFragment.getBundle(DAppBrowserPayload.Address(url)))
     }
 }

@@ -10,13 +10,13 @@ interface Web3Injector {
     fun injectForPage(into: WebView, extensionStore: ExtensionsStore)
 }
 
-class Web3InjectorPool(val injectors: List<Web3Injector>) {
+class CompoundWeb3Injector(val injectors: List<Web3Injector>) : Web3Injector {
 
-    fun initialInject(into: WebView) {
+    override fun initialInject(into: WebView) {
         injectors.forEach { it.initialInject(into) }
     }
 
-    fun injectForPage(into: WebView, extensionStore: ExtensionsStore) {
+    override fun injectForPage(into: WebView, extensionStore: ExtensionsStore) {
         injectors.forEach { it.injectForPage(into, extensionStore) }
     }
 }

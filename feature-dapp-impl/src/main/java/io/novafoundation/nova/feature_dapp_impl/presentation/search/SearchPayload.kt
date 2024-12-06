@@ -10,7 +10,6 @@ class SearchPayload(
 ) : Parcelable {
 
     enum class Request {
-        CREATE_NEW_TAB,
         GO_TO_URL,
         OPEN_NEW_URL,
     }

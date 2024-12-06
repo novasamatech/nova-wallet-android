@@ -18,6 +18,9 @@ value class InformationSize(private val sizeInBytes: Long) : Comparable<Informat
         val Long.megabytes: InformationSize get() = toInformationSize(InformationSizeUnit.MEGABYTES)
     }
 
+    val inWholeBytes
+        get() = sizeInBytes
+
     override fun compareTo(other: InformationSize): Int {
         return sizeInBytes.compareTo(other.sizeInBytes)
     }
