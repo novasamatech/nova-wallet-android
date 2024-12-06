@@ -4,13 +4,13 @@ import android.util.LruCache
 
 class CallbackLruCache<K, V>(maxSize: Int) : LruCache<K, V>(maxSize) {
 
-    private var entryRevoewCallback: ((V) -> Unit)? = null
+    private var entryRemovedCallback: ((V) -> Unit)? = null
 
     fun setCallback(callback: (V) -> Unit) {
-        this.entryRevoewCallback = callback
+        this.entryRemovedCallback = callback
     }
 
     override fun entryRemoved(evicted: Boolean, key: K, oldValue: V, newValue: V) {
-        entryRevoewCallback?.invoke(oldValue)
+        entryRemovedCallback?.invoke(oldValue)
     }
 }
