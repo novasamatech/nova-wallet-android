@@ -13,6 +13,8 @@ interface DAppRouter : ReturnableRouter {
 
     fun openDappSearch()
 
+    fun openDappSearchWithCategory(categoryId: String?)
+
     fun finishDappSearch()
 
     fun openAddToFavourites(payload: AddToFavouritesPayload)
@@ -22,4 +24,6 @@ interface DAppRouter : ReturnableRouter {
     fun openTabs()
 
     fun closeTabsScreen()
+
+    fun openDAppFavorites()
 }

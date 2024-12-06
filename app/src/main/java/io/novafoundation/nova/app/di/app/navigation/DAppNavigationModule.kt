@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.dApp.DAppNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.dApp.DAppSearchCommunicatorImpl
@@ -14,7 +15,8 @@ class DAppNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: RootNavigationHolder): DAppRouter = DAppNavigator(navigationHolder)
+    fun provideRouter(rootNavigationHolder: RootNavigationHolder, mainNavigationHolder: MainNavigationHolder): DAppRouter =
+        DAppNavigator(rootNavigationHolder, mainNavigationHolder)
 
     @ApplicationScope
     @Provides

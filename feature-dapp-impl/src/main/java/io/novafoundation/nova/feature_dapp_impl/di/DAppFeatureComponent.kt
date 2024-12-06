@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.di.AddToFavouritesComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.di.AuthorizedDAppsComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.di.DAppBrowserComponent
+import io.novafoundation.nova.feature_dapp_impl.presentation.favorites.di.DAppFavoritesComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
@@ -31,8 +32,6 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 @FeatureScope
 interface DAppFeatureComponent : DAppFeatureApi {
 
-    // Screens
-
     fun mainComponentFactory(): MainDAppComponent.Factory
 
     fun browserComponentFactory(): DAppBrowserComponent.Factory
@@ -40,6 +39,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
     fun browserTabsComponentFactory(): BrowserTabsComponent.Factory
 
     fun dAppSearchComponentFactory(): DAppSearchComponent.Factory
+
+    fun dAppFavoritesComponentFactory(): DAppFavoritesComponent.Factory
 
     fun addToFavouritesComponentFactory(): AddToFavouritesComponent.Factory
 

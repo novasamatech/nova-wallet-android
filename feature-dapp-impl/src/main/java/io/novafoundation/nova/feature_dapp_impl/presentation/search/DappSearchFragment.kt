@@ -5,10 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -18,11 +23,15 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
+import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
+import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappCategories
+import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappCategoriesShimmering
 import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappList
 import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearch
 import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhContainer
 
-class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler {
+class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler, DappCategoriesAdapter.Handler {
 
     companion object {
 
@@ -32,6 +41,11 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
             PAYLOAD to payload
         )
     }
+
+    @Inject
+    protected lateinit var imageLoader: ImageLoader
+
+    private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(imageLoader, this) }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 
@@ -50,6 +64,8 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
                 padding()
             }
         }
+
+        searchDappCategories.adapter = categoriesAdapter
         searchDappList.adapter = adapter
         searchDappList.setHasFixedSize(true)
 
@@ -78,6 +94,15 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
 
         viewModel.selectQueryTextEvent.observeEvent {
             searchDappSearch.searchInput.content.selectAll()
+        }
+
+        viewModel.categoriesFlow.observe {
+            searchDappCategoriesShimmering.isVisible = it.isLoading()
+            searchDappCategories.isVisible = it.isLoaded()
+
+            if (it is ExtendedLoadingState.Loaded) {
+                categoriesAdapter.submitList(it.data)
+            }
         }
     }
 
@@ -114,5 +139,9 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
                 setMessage(requireContext().getString(R.string.dapp_url_warning_subtitle, event.payload.supportEmail))
             }
         }
+    }
+
+    override fun onCategoryClicked(id: String) {
+        viewModel.onCategoryClicked(id)
     }
 }

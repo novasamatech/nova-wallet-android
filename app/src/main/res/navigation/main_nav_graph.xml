@@ -287,6 +287,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_dapp_favorites"
+        app:destination="@id/dappFavorites"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -991,6 +999,12 @@
         android:name="io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.governanceTracks.SelectGovernanceTracksFragment"
         android:label="SelectGovernanceTracksFragment"
         tools:layout="@layout/fragment_select_tracks" />
+
+    <fragment
+        android:id="@+id/dappFavorites"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DappFavoritesFragment"
+        android:label="fragment_favorites"
+        tools:layout="@layout/fragment_favorites_dapp"/>
 
     <include app:graph="@navigation/start_swap_nav_graph" />
 
