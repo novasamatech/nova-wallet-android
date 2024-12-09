@@ -18,7 +18,7 @@ class BrowserTabSessionFactory(
     private val contextManager: ContextManager
 ) {
 
-    suspend fun create(tabId: String, startUrl: String): BrowserTabSession {
+    suspend fun create(tabId: String, startUrl: String, onPageChangedCallback: OnPageChangedCallback): BrowserTabSession {
         return withContext(Dispatchers.Main) {
             val context = contextManager.getActivity()!!
             val webView = WebView(context)
@@ -27,7 +27,8 @@ class BrowserTabSessionFactory(
                 tabId = tabId,
                 startUrl = startUrl,
                 webView = webView,
-                compoundWeb3Injector = compoundWeb3Injector
+                compoundWeb3Injector = compoundWeb3Injector,
+                onPageChangedCallback = onPageChangedCallback
             )
         }
     }
@@ -37,7 +38,8 @@ class BrowserTabSession(
     val tabId: String,
     val startUrl: String,
     val webView: WebView,
-    compoundWeb3Injector: CompoundWeb3Injector
+    compoundWeb3Injector: CompoundWeb3Injector,
+    private val onPageChangedCallback: OnPageChangedCallback
 ) : PageCallback {
 
     val webViewClient: Web3WebViewClient = Web3WebViewClient(
@@ -59,11 +61,14 @@ class BrowserTabSession(
     ) {
         webView.webChromeClient = chromeClient
         this.nestedPageCallback = pageCallback
+
+        // To provide initial state
+        pageCallback.onPageChanged(webView, webView.url ?: startUrl, webView.title)
     }
 
     fun detachFromHost() {
-        webView.webChromeClient = null
         nestedPageCallback = null
+        webView.webChromeClient = null
     }
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
@@ -76,6 +81,7 @@ class BrowserTabSession(
 
     override fun onPageChanged(view: WebView, url: String, title: String?) {
         nestedPageCallback?.onPageChanged(view, url, title)
+        onPageChangedCallback.onPageChanged(tabId, url, title)
     }
 
     fun destroy() {

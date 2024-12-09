@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_dapp_api.domain.BrowserSessionInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -58,7 +59,8 @@ class RootActivityModule {
         compoundRequestBusHandler: CompoundRequestBusHandler,
         pushNotificationsInteractor: PushNotificationsInteractor,
         externalServiceInitializer: ExternalServiceInitializer,
-        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher
+        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        browserSessionInteractor: BrowserSessionInteractor
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -78,7 +80,8 @@ class RootActivityModule {
             compoundRequestBusHandler,
             pushNotificationsInteractor,
             externalServiceInitializer,
-            actionBottomSheetLauncher
+            actionBottomSheetLauncher,
+            browserSessionInteractor
         )
     }
 

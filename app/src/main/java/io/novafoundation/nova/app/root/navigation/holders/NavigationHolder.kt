@@ -8,6 +8,10 @@ abstract class NavigationHolder(val contextManager: ContextManager) {
     var navController: NavController? = null
         private set
 
+    fun isAttached(): Boolean {
+        return navController != null
+    }
+
     fun attach(navController: NavController) {
         this.navController = navController
     }
@@ -26,5 +30,6 @@ abstract class NavigationHolder(val contextManager: ContextManager) {
         if (!popped) {
             contextManager.getActivity()!!.finish()
         }
+
     }
 }
