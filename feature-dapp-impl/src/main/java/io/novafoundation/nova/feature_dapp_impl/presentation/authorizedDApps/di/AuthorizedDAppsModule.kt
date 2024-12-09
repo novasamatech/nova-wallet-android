@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_api.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.authorizedDApps.AuthorizedDAppsInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.AuthorizedDAppsViewModel
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session

@@ -1,13 +1,15 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 
+import io.novafoundation.nova.common.utils.CallbackLruCache
 import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabInternalRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSessionFactory
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSessionFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.TabsState
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.withNameOnly
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.fromName
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,21 +17,21 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-class RealBrowserTabPoolService(
-    private val browserTabStorage: BrowserTabStorage,
+class RealBrowserTabService(
+    private val browserTabInternalRepository: BrowserTabInternalRepository,
     private val pageSnapshotBuilder: PageSnapshotBuilder,
     private val tabMemoryRestrictionService: TabMemoryRestrictionService,
-    private val pageSessionFactory: PageSessionFactory
-) : BrowserTabPoolService {
+    private val browserTabSessionFactory: BrowserTabSessionFactory
+) : BrowserTabService {
 
     private val availableSessionsCount = tabMemoryRestrictionService.getMaximumActiveSessions()
 
     private val selectedTabIdFlow = MutableStateFlow<String?>(null)
 
-    private val allTabsFlow = browserTabStorage.observeTabs()
+    private val allTabsFlow = browserTabInternalRepository.observeTabs()
         .map { tabs -> tabs.associateBy { it.id } }
 
-    private val activeSessions = mutableMapOf<String, PageSession>()
+    private val activeSessions = CallbackLruCache<String, BrowserTabSession>(availableSessionsCount)
 
     override val tabStateFlow = combine(
         selectedTabIdFlow,
@@ -39,6 +41,13 @@ class RealBrowserTabPoolService(
             tabs = allTabs.values.toList(),
             selectedTab = currentTabState(selectedTabId, allTabs)
         )
+    }
+
+    init {
+        activeSessions.setCallback {
+            it.detachFromHost()
+            it.destroy()
+        }
     }
 
     override fun selectTab(tabId: String?) {
@@ -52,16 +61,17 @@ class RealBrowserTabPoolService(
         selectTab(null)
     }
 
-    override suspend fun createNewTabAsCurrentTab(url: String) {
+    override suspend fun createNewTab(url: String): BrowserTab {
         val tab = BrowserTab(
             id = UUID.randomUUID().toString(),
-            pageSnapshot = PageSnapshot.withNameOnly(Urls.domainOf(url)),
+            pageSnapshot = PageSnapshot.fromName(Urls.domainOf(url)),
             currentUrl = url,
             creationTime = Date()
         )
 
-        browserTabStorage.saveTab(tab)
-        selectTab(tab.id)
+        browserTabInternalRepository.saveTab(tab)
+
+        return tab
     }
 
     override suspend fun removeTab(tabId: String) {
@@ -69,46 +79,38 @@ class RealBrowserTabPoolService(
             selectTab(null)
         }
 
-        browserTabStorage.removeTab(tabId)
+        browserTabInternalRepository.removeTab(tabId)
     }
 
     override suspend fun removeAllTabs() {
         selectTab(null)
-        browserTabStorage.removeAllTabs()
+        browserTabInternalRepository.removeAllTabs()
     }
 
     override suspend fun makeCurrentTabSnapshot() {
         val currentTab = selectedTabIdFlow.first()
-        val pageSession = activeSessions[currentTab]
+        val pageSession = activeSessions.get(currentTab)
 
         if (pageSession != null) {
             val snapshot = pageSnapshotBuilder.getPageSnapshot(pageSession)
-            browserTabStorage.savePageSnapshot(pageSession.tabId, snapshot)
+            browserTabInternalRepository.savePageSnapshot(pageSession.tabId, snapshot)
         }
     }
 
-    private fun addNewSession(tab: BrowserTab): PageSession {
-        if (activeSessions.size >= availableSessionsCount) {
-            removeOldestSession()
-        }
-
-        val session = pageSessionFactory.create(tabId = tab.id, sessionStartTime = Date(), startUrl = tab.currentUrl)
-        activeSessions[tab.id] = session
+    private suspend fun addNewSession(tab: BrowserTab): BrowserTabSession {
+        val session = browserTabSessionFactory.create(tabId = tab.id, startUrl = tab.currentUrl)
+        activeSessions.put(tab.id, session)
         return session
     }
 
-    private fun removeOldestSession() {
-        val sessionToDestroy = activeSessions.values.minBy { it.sessionStartTime.time }
-        sessionToDestroy.destroySession()
-        activeSessions.remove(sessionToDestroy.tabId)
-    }
-
     private fun detachSession(tabId: String?) {
+        if (tabId == null) return
+
         val sessionToDetach = activeSessions[tabId]
-        sessionToDetach?.detachSession()
+        sessionToDetach?.detachFromHost()
     }
 
-    private fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
+    private suspend fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
         val tabId = selectedTabId ?: return CurrentTabState.NotSelected
         val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
         return CurrentTabState.Selected(

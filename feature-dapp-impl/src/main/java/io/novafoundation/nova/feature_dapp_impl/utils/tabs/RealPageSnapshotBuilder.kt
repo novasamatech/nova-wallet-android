@@ -3,25 +3,33 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import android.graphics.Bitmap
 import androidx.core.view.drawToBitmap
 import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSession
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.fromName
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class PageSnapshotBuilder(
-    private val fileProvider: FileProvider
-) {
+interface PageSnapshotBuilder {
 
-    suspend fun getPageSnapshot(pageSession: PageSession): PageSnapshot {
-        val webView = pageSession.webView
+    suspend fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot
+}
+
+class RealPageSnapshotBuilder(
+    private val fileProvider: FileProvider
+) : PageSnapshotBuilder {
+
+    override suspend fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot {
+        val webView = browserTabSession.webView
+        if (!webView.isLaidOut) return PageSnapshot.fromName(browserTabSession.startUrl)
+
         val pageName = webView.title
         val icon = webView.favicon
         val pageBitmap = webView.drawToBitmap()
 
-        val pageIconPath = saveBitmap(pageSession, icon, "icon")
-        val pagePicturePath = saveBitmap(pageSession, pageBitmap, "page")
+        val pageIconPath = saveBitmap(browserTabSession, icon, "icon")
+        val pagePicturePath = saveBitmap(browserTabSession, pageBitmap, "page")
 
         return PageSnapshot(
             pageName = pageName,
@@ -30,11 +38,11 @@ class PageSnapshotBuilder(
         )
     }
 
-    private suspend fun saveBitmap(pageSession: PageSession, bitmap: Bitmap?, filePrefix: String): String? {
+    private suspend fun saveBitmap(browserTabSession: BrowserTabSession, bitmap: Bitmap?, filePrefix: String): String? {
         if (bitmap == null) return null
 
         // Use this pattern to don't create a new image everytime when we rewrite the page snapshot
-        val fileName = "tab_${pageSession.tabId}_$filePrefix.jpeg"
+        val fileName = "tab_${browserTabSession.tabId}_$filePrefix.jpeg"
         val file = fileProvider.getFileInExternalCacheStorage(fileName)
 
         try {

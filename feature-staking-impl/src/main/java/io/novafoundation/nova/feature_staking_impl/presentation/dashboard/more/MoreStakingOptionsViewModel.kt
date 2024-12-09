@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
-import io.novafoundation.nova.feature_dapp_api.DAppRouter
-import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
@@ -11,6 +9,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.model.MoreStakingOptionsModel
@@ -28,7 +27,7 @@ class MoreStakingOptionsViewModel(
     private val dashboardRouter: StakingDashboardRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
-    private val dappRouter: DAppRouter
+    private val stakingRouter: StakingRouter,
 ) : BaseViewModel() {
 
     init {
@@ -54,7 +53,7 @@ class MoreStakingOptionsViewModel(
     }
 
     fun onBrowserStakingItemClicked(item: StakingDAppModel) = launch {
-        dappRouter.openDAppBrowser(DAppBrowserPayload.Address(item.url))
+        stakingRouter.openDAppBrowser(item.url)
     }
 
     private fun syncDApps() = launch {

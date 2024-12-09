@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
@@ -68,6 +69,8 @@ interface RootDependencies {
     val balancesUpdateSystem: BalancesUpdateSystem
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val browserTabExternalRepository: BrowserTabExternalRepository
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
