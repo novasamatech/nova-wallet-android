@@ -18,7 +18,7 @@
 
     <View
         android:id="@+id/itemDappShimerringTitle"
-        android:layout_width="66dp"
+        android:layout_width="96dp"
         android:layout_height="12dp"
         android:layout_marginStart="12dp"
         android:background="@drawable/bg_shimmering"
@@ -29,7 +29,7 @@
 
     <View
         android:id="@id/itemDappShimerringSubTitle"
-        android:layout_width="120dp"
+        android:layout_width="64dp"
         android:layout_height="8dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="10dp"

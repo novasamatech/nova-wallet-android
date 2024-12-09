@@ -3,16 +3,16 @@ package io.novafoundation.nova.feature_dapp_impl.domain.common
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
-import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappCategoriesToDescription
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoriesToDescription
 
 fun createDAppComparator() = compareByDescending<DApp> { it.isFavourite }
     .thenBy { it.name }
 
 // Build mapping in O(Metadatas + Favourites) in case of HashMap. It allows constant time access later
 internal fun buildUrlToDappMapping(
-    dAppMetadatas: List<DappMetadata>,
-    favourites: List<FavouriteDApp>
+    dAppMetadatas: Collection<DappMetadata>,
+    favourites: Collection<FavouriteDApp>
 ): Map<String, DApp> {
     val favouritesUrls: Set<String> = favourites.mapToSet { it.url }
 
@@ -32,7 +32,16 @@ internal fun buildUrlToDappMapping(
     }
 }
 
-private fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
+fun dappToFavorite(dapp: DApp, orderingIndex: Int): FavouriteDApp {
+    return FavouriteDApp(
+        label = dapp.name,
+        icon = dapp.iconLink,
+        url = dapp.url,
+        orderingIndex = orderingIndex
+    )
+}
+
+fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
     return DApp(
         name = favouriteDApp.label,
         description = favouriteDApp.url,

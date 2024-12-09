@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -27,7 +26,6 @@ class MainDAppModule {
     @IntoMap
     @ViewModelKey(MainDAppViewModel::class)
     fun provideViewModel(
-        addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: DAppRouter,
@@ -35,7 +33,6 @@ class MainDAppModule {
     ): ViewModel {
         return MainDAppViewModel(
             router = router,
-            addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             dappInteractor = dappInteractor

@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemDappCategory"
-    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
     android:layout_marginEnd="8dp"
-    android:layout_marginBottom="12dp"
     android:background="@drawable/dapp_tab_background"
-    android:includeFontPadding="false"
-    android:paddingStart="12dp"
-    android:paddingTop="9dp"
-    android:paddingEnd="12dp"
-    android:paddingBottom="9dp"
-    android:textColor="@color/dapp_tab_text_color"
-    tools:background="@color/chips_background"
-    tools:text="All" />
+    android:orientation="horizontal"
+    android:paddingStart="4dp"
+    android:paddingEnd="8dp">
+
+    <ImageView
+        android:id="@+id/itemDappCategoryIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="4dp"
+        tools:src="@drawable/ic_favorite_heart_filled_20" />
+
+    <TextView
+        android:id="@+id/itemDappCategoryText"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="4dp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp"
+        android:textColor="@color/dapp_category_text_tint"
+        tools:text="All" />
+
+</LinearLayout>

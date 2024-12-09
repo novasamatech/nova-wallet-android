@@ -6,7 +6,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class SearchPayload(
     val initialUrl: String?,
-    val request: Request
+    val request: Request,
+    val preselectedCategoryId: String? = null
 ) : Parcelable {
 
     enum class Request {
