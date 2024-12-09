@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.onEach
 class RealBrowserSessionInteractor(
     private val browserTabService: BrowserTabService,
     private val accountRepository: AccountRepository
-): BrowserSessionInteractor {
+) : BrowserSessionInteractor {
 
     override fun destroyActiveSessionsOnAccountChange(): Flow<Unit> {
         return accountRepository.selectedMetaAccountFlow()

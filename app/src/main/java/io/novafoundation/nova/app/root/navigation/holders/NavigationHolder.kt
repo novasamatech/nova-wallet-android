@@ -30,6 +30,5 @@ abstract class NavigationHolder(val contextManager: ContextManager) {
         if (!popped) {
             contextManager.getActivity()!!.finish()
         }
-
     }
 }
