@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
@@ -47,6 +48,8 @@ interface DAppFeatureDependencies {
     val fileProvider: FileProvider
 
     val contextManager: ContextManager
+
+    val rootScope: RootScope
 
     fun currencyRepository(): CurrencyRepository
 

@@ -44,6 +44,10 @@ class RealBrowserTabRepository(
             tab.fromLocal()
         }
     }
+
+    override suspend fun changeCurrentUrl(tabId: String, url: String) {
+        browserTabsDao.updateCurrentUrl(tabId, url)
+    }
 }
 
 private fun BrowserTabLocal.fromLocal(): BrowserTab {

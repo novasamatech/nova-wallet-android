@@ -14,4 +14,6 @@ interface BrowserTabInternalRepository : BrowserTabExternalRepository {
     suspend fun savePageSnapshot(tabId: String, snapshot: PageSnapshot)
 
     fun observeTabs(): Flow<List<BrowserTab>>
+
+    suspend fun changeCurrentUrl(tabId: String, url: String)
 }
