@@ -14,7 +14,6 @@ import android.view.animation.RotateAnimation
 import android.widget.TextSwitcher
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import io.novafoundation.nova.common.databinding.ViewChooseAmountOldBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone

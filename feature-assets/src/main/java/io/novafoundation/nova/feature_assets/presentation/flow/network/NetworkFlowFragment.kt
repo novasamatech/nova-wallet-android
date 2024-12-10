@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.network
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -39,7 +35,6 @@ abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         ConcatAdapter(titleAdapter, networkAdapter)
     }
-
 
     override fun initViews() {
         binder.networkFlowToolbar.applyStatusBarInsets()

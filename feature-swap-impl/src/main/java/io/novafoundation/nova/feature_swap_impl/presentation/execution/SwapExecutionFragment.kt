@@ -1,11 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution
 
-import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextSwitcher
 import android.widget.TextView
@@ -23,7 +19,6 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapConfirmationBinding
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapExecutionBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel

@@ -1,15 +1,9 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.assetIcons
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_assets.databinding.FragmentManageTokensBinding
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
-import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentAppearanceBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 

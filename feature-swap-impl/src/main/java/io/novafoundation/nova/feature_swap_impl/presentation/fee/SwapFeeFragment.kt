@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.fee
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout.LayoutParams
 import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -13,8 +10,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapConfirmationBinding
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapFeeBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView

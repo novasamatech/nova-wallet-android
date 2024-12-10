@@ -20,7 +20,6 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
 
     override fun createBinding() = FragmentSwapConfirmationBinding.inflate(layoutInflater)
 
-
     override fun initViews() {
         binder.swapConfirmationToolbar.applyStatusBarInsets()
         binder.swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
