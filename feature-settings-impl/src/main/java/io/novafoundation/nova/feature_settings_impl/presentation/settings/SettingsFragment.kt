@@ -15,6 +15,32 @@ import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentSettingsBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
+import kotlinx.android.synthetic.main.fragment_settings.accountView
+import kotlinx.android.synthetic.main.fragment_settings.settingsAppVersion
+import kotlinx.android.synthetic.main.fragment_settings.settingsAppearance
+import kotlinx.android.synthetic.main.fragment_settings.settingsAvatar
+import kotlinx.android.synthetic.main.fragment_settings.settingsBiometricAuth
+import kotlinx.android.synthetic.main.fragment_settings.settingsCloudBackup
+import kotlinx.android.synthetic.main.fragment_settings.settingsContainer
+import kotlinx.android.synthetic.main.fragment_settings.settingsCurrency
+import kotlinx.android.synthetic.main.fragment_settings.settingsEmail
+import kotlinx.android.synthetic.main.fragment_settings.settingsGithub
+import kotlinx.android.synthetic.main.fragment_settings.settingsLanguage
+import kotlinx.android.synthetic.main.fragment_settings.settingsNetworks
+import kotlinx.android.synthetic.main.fragment_settings.settingsPin
+import kotlinx.android.synthetic.main.fragment_settings.settingsPinCodeVerification
+import kotlinx.android.synthetic.main.fragment_settings.settingsPrivacy
+import kotlinx.android.synthetic.main.fragment_settings.settingsPushNotifications
+import kotlinx.android.synthetic.main.fragment_settings.settingsRateUs
+import kotlinx.android.synthetic.main.fragment_settings.settingsSafeMode
+import kotlinx.android.synthetic.main.fragment_settings.settingsTelegram
+import kotlinx.android.synthetic.main.fragment_settings.settingsTerms
+import kotlinx.android.synthetic.main.fragment_settings.settingsTwitter
+import kotlinx.android.synthetic.main.fragment_settings.settingsWalletConnect
+import kotlinx.android.synthetic.main.fragment_settings.settingsWallets
+import kotlinx.android.synthetic.main.fragment_settings.settingsWebsite
+import kotlinx.android.synthetic.main.fragment_settings.settingsWiki
+import kotlinx.android.synthetic.main.fragment_settings.settingsYoutube
 
 class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding>() {
 
@@ -30,6 +56,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
         binder.settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
         binder.settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
         binder.settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
+        binder.settingsAppearance.setOnClickListener { viewModel.appearanceClicked() }
 
         binder.settingsTelegram.setOnClickListener { viewModel.telegramClicked() }
         binder.settingsTwitter.setOnClickListener { viewModel.twitterClicked() }

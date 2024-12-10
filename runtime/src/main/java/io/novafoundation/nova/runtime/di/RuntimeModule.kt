@@ -30,6 +30,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainC
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.RealXcmVersionDetector
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
@@ -159,9 +161,8 @@ class RuntimeModule {
     @ApplicationScope
     fun provideEventsRepository(
         rpcCalls: RpcCalls,
-        chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
-    ): EventsRepository = RemoteEventsRepository(rpcCalls, chainRegistry, remoteStorageSource)
+    ): EventsRepository = RemoteEventsRepository(rpcCalls, remoteStorageSource)
 
     @Provides
     @ApplicationScope
@@ -220,8 +221,11 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideMultiLocationConverterFactory(chainRegistry: ChainRegistry): MultiLocationConverterFactory {
-        return MultiLocationConverterFactory(chainRegistry)
+    fun provideMultiLocationConverterFactory(
+        chainRegistry: ChainRegistry,
+        xcmVersionDetector: XcmVersionDetector,
+    ): MultiLocationConverterFactory {
+        return MultiLocationConverterFactory(chainRegistry, xcmVersionDetector)
     }
 
     @Provides
@@ -265,8 +269,12 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideRemoteToDomainChainMapperFacade(gson: Gson): RemoteToDomainChainMapperFacade {
-        return RemoteToDomainChainMapperFacade(gson)
+    fun provideRemoteToDomainChainMapperFacade(
+        gson: Gson
+    ): RemoteToDomainChainMapperFacade {
+        return RemoteToDomainChainMapperFacade(
+            gson
+        )
     }
 
     @Provides
@@ -294,4 +302,10 @@ class RuntimeModule {
             gson
         )
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideXcmPalletRepository(
+        chainRegistry: ChainRegistry
+    ): XcmVersionDetector = RealXcmVersionDetector(chainRegistry)
 }

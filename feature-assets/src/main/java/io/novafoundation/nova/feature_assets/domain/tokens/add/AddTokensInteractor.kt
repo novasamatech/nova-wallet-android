@@ -77,7 +77,7 @@ class RealAddTokensInteractor(
         val priceId = coinGeckoLinkParser.parse(customErc20Token.priceLink).getOrNull()?.priceId
 
         val asset = Chain.Asset(
-            iconUrl = null,
+            icon = null,
             id = chainAssetIdOfErc20Token(customErc20Token.contract),
             priceId = priceId,
             chainId = customErc20Token.chainId,

@@ -48,7 +48,7 @@ class ParachainStakingRewardCalculatorFactory(
         val circulating = additionalIssuance + totalIssuance
 
         return RealParachainStakingRewardCalculator(
-            bondConfig = rewardsRepository.getParachainBondConfig(chainId),
+            inflationDistributionConfig = rewardsRepository.getInflationDistributionConfig(chainId),
             inflationInfo = rewardsRepository.getInflationInfo(chainId),
             totalIssuance = circulating,
             totalStaked = currentRoundRepository.totalStaked(chainId),
@@ -61,7 +61,7 @@ class ParachainStakingRewardCalculatorFactory(
         chainId: ChainId,
         snapshots: AccountIdMap<CollatorSnapshot>
     ) = RealParachainStakingRewardCalculator(
-        bondConfig = rewardsRepository.getParachainBondConfig(chainId),
+        inflationDistributionConfig = rewardsRepository.getInflationDistributionConfig(chainId),
         inflationInfo = rewardsRepository.getInflationInfo(chainId),
         totalIssuance = commonStakingRepository.getTotalIssuance(chainId),
         totalStaked = currentRoundRepository.totalStaked(chainId),

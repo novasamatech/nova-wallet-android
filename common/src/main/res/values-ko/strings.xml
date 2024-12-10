@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s에서 추가된 프록시 수의 한도에 도달했습니다. 새로운 프록시를 추가하려면 기존 프록시를 제거하세요.</string>
     <string name="add_proxy_maximum_reached_error_title">최대 프록시 수에 도달했습니다</string>
     <string name="added_networks_empty_placeholder">추가된 사용자 정의 네트워크는 여기에 나타납니다</string>
+    <string name="appearance_colored_icon_title">컬러</string>
+    <string name="appearance_title">외관</string>
+    <string name="appearance_token_assets_title">토큰 아이콘</string>
+    <string name="appearance_white_icon_title">화이트</string>
     <string name="asset_add_evm_token_already_exist_message">입력된 계약 주소는 Nova에서 %s 토큰으로 이미 존재합니다.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">입력된 계약 주소는 Nova에서 %s 토큰으로 존재합니다. 수정하시겠습니까?</string>
     <string name="asset_add_evm_token_already_exist_title">이 토큰은 이미 존재합니다</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">계약 주소 입력</string>
     <string name="asset_add_token_enter_decimals">소수 자릿수 입력</string>
     <string name="asset_add_token_enter_symbol">심볼 입력</string>
+    <string name="asset_view_networks">네트워크</string>
+    <string name="asset_view_tokens">토큰</string>
     <string name="assets_add_token">토큰 추가</string>
     <string name="assets_add_token_enter_info_address_label">계약 주소</string>
     <string name="assets_add_token_enter_info_decimals_label">소수 자릿수</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger에서 이 토큰을 지원하지 않습니다.</string>
     <string name="assets_search_hint">네트워크 또는 토큰으로 검색</string>
     <string name="assets_search_placeholder">입력한 이름과 일치하는 네트워크 또는 토큰이 없습니다.</string>
+    <string name="assets_search_token_hint">토큰으로 검색</string>
     <string name="assets_select_send_your_wallets">당신의 지갑</string>
     <string name="assets_send_flow_placeholder">보낼 토큰이 없습니다.\n계정에 토큰을 구매하거나 수신하십시오.</string>
     <string name="assets_swap_flow_pay_title">지불할 토큰</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">백업</string>
     <string name="biometric_auth_title">생체 인증</string>
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
+    <string name="buy_network_flow_title">%s 구매를 위한 네트워크 선택</string>
     <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
     <string name="buy_provider_open_confirmation_title">브라우저에서 계속할까요?</string>
     <string name="chain_network_management_auto_balance">자동 균형 노드</string>
@@ -348,6 +356,7 @@
     <string name="common_details">세부 사항</string>
     <string name="common_disabled">비활성화됨</string>
     <string name="common_disconnect">연결 끊기</string>
+    <string name="common_do_not_close_app">앱을 닫지 마세요!</string>
     <string name="common_done">완료</string>
     <string name="common_dont_show_again">다시 표시하지 않기</string>
     <string name="common_edit">편집</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">작업이 계정을 제거합니다</string>
     <string name="common_expired">만료됨</string>
     <string name="common_explore">탐색</string>
+    <string name="common_failed">실패</string>
     <string name="common_fee_changed_message" formatted="false">예상 네트워크 수수료 %s가 기본 네트워크 수수료(%s)보다 훨씬 높습니다. 이는 일시적인 네트워크 혼잡으로 인해 발생할 수 있습니다. 더 낮은 네트워크 수수료를 기다리기 위해 새로 고칠 수 있습니다.</string>
     <string name="common_fee_changed_title">네트워크 수수료가 너무 높습니다</string>
+    <string name="common_fee_with_label">수수료: %s</string>
     <string name="common_filter_sort_header">정렬 기준:</string>
     <string name="common_filters">필터</string>
     <string name="common_find_out_more">더 알아보기</string>
@@ -419,6 +430,7 @@
     <string name="common_not_available">이용 불가</string>
     <string name="common_not_enough_funds_message">죄송합니다. 네트워크 수수료를 지불할 충분한 자금이 없습니다.</string>
     <string name="common_not_enough_funds_title">잔액 부족</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">네트워크 수수료 %s를 지불할 잔액이 부족합니다. 현재 잔액은 %s입니다</string>
     <string name="common_not_now">지금은 안 함</string>
     <string name="common_off">끔</string>
     <string name="common_ok">OK</string>
@@ -458,6 +470,10 @@
     <string name="common_search">검색</string>
     <string name="common_search_placeholder_default">검색 결과가 여기에 표시됩니다</string>
     <string name="common_search_results_number">검색 결과: %d</string>
+    <string name="common_sec">초</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d초</item>
+    </plurals>
     <string name="common_secret_derivation_path">비밀 경로 도출</string>
     <string name="common_settings">설정</string>
     <string name="common_share">공유</string>
@@ -481,6 +497,7 @@
     <string name="common_to_settings">설정 열기</string>
     <string name="common_too_small_balance_title">잔액이 너무 적습니다</string>
     <string name="common_total">총합</string>
+    <string name="common_total_fee">총 수수료</string>
     <string name="common_transaction_id">거래 ID</string>
     <string name="common_transaction_submitted">트랜잭션이 제출되었습니다</string>
     <string name="common_try_again">다시 시도하십시오</string>
@@ -564,8 +581,8 @@
     <string name="crowdloan_ended_title">크라우드론 종료됨</string>
     <string name="crowdloan_enter_referral">추천 코드를 입력하세요</string>
     <string name="crowdloan_info">크라우드론 정보</string>
-    <string name="crowdloan_learn"><![CDATA[<font>크라우드론</font> %s 배우기]]></string>
-    <string name="crowdloan_learn_v2_2_0"><![CDATA[%s의 <font>크라우드론</font> 웹사이트]]></string>
+    <string name="crowdloan_learn">크라우드론 %s 배우기</string>
+    <string name="crowdloan_learn_v2_2_0">%s의 크라우드론 웹사이트</string>
     <string name="crowdloan_leasing_period">임대 기간</string>
     <string name="crowdloan_main_description_v2_2_0">파라체인을 선택하여 %s을(를) 기여하세요. 기여한 토큰을 돌려받게 되며, 파라체인이 슬롯에 당선되면 경매 종료 후 보상을 받게 됩니다.</string>
     <string name="crowdloan_missing_account_message">기여를 위해 지갑에 %s 계정을 추가해야 합니다.</string>
@@ -821,7 +838,7 @@
     <string name="manual_backup_warning_title">비밀번호 구절을 공유하지 마세요!</string>
     <string name="mnemonic_card_reveal_subtitle">아무도 화면을 볼 수 없도록 하고\n스크린샷을 찍지 마세요</string>
     <string name="mnemonic_card_title">아무에게도 %s 하지 마세요</string>
-    <string name="mnemonic_card_title_highlight"><font>공유하지 마세요</font></string>
+    <string name="mnemonic_card_title_highlight">공유하지 마세요</string>
     <string name="mnemonic_error_try_another_one">다른 것을 시도해 보세요.</string>
     <string name="mnemonic_error_try_another_one_v2_2_0">유효하지 않은 니모닉 구절입니다. 단어 순서를 다시 한번 확인하세요</string>
     <string name="multiple_wallets_selection_max_message">%d 개 이상의 지갑을 선택할 수 없습니다</string>
@@ -961,6 +978,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">푸시 알림을 활성화함으로써 귀하는 우리의 %s 및 %s에 동의하게 됩니다</string>
     <string name="push_welcome_timeout_error_message">설정 탭에서 알림 설정에 접근하여 나중에 다시 시도해주세요</string>
     <string name="push_welcome_title">중요한 것을 놓치지 마세요!</string>
+    <string name="receive_network_flow_title">%s 수신을 위한 네트워크 선택</string>
+    <string name="receive_screen_copy_address">주소 복사</string>
     <string name="recover_json_hint">json을 붙여넣거나 파일을 업로드하세요...</string>
     <string name="recover_json_upload">파일 업로드</string>
     <string name="recovery_json">JSON 복원</string>
@@ -1114,16 +1133,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">사용할 수 없는 트랙</string>
     <string name="select_ledger_location_enable_request_message">Ledger 장치를 찾기 위해 블루투스 스캔을 수행하려면 Nova는 위치 기능을 활성화해야 합니다.</string>
     <string name="select_ledger_location_enable_request_title">기기 설정에서 지리적 위치를 활성화해주세요.</string>
+    <string name="select_network_title">네트워크 선택</string>
     <string name="select_tracks_for">트랙 선택</string>
     <string name="selected_tracks_quantity" formatted="false">%d 중 %d</string>
     <string name="send_address_hint">주소 또는 w3n</string>
+    <string name="send_network_flow_title">%s 전송을 위한 네트워크 선택</string>
     <string name="send_recipient_system_account_message">수신자가 시스템 계정입니다. 이 계정은 어떤 회사나 개인에 의해 제어되지 않습니다.\n여전히 이 전송을 수행하시겠습니까?</string>
     <string name="send_recipient_system_account_title">토큰이 소실됩니다</string>
     <string name="set_staking_proxy_address_description">권한 부여</string>
     <string name="settings_biometric_not_ready_message">설정에서 생체 인식이 활성화되었는지 확인하세요</string>
     <string name="settings_biometric_not_ready_title">설정에서 생체 인식이 비활성화되었습니다</string>
     <string name="settings_community">커뮤니티</string>
-    <string name="settings_email">이메일</string>
+    <string name="settings_email">이메일을 통해 지원 받기</string>
     <string name="settings_general">일반</string>
     <string name="settings_pin_code_verification_confirmation_message">키 페어가 있는 지갑(Nova Wallet에서 생성 또는 가져옴)에 대한 각 서명 작업은 서명을 생성하기 전에 PIN 확인이 필요합니다</string>
     <string name="settings_pin_code_verification_confirmation_title">작업 서명을 위해 인증 요청</string>
@@ -1135,9 +1156,9 @@
     <string name="settings_security">보안</string>
     <string name="settings_support">지원 및 피드백</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">위키</string>
+    <string name="settings_wiki">위키 및 도움말 센터</string>
     <string name="settings_youtube">Youtube</string>
-    <string name="setup_referendum_vote_conviction_info"><font>기권</font> 시 확신도가 0.1x로 설정됩니다</string>
+    <string name="setup_referendum_vote_conviction_info">기권 시 확신도가 0.1x로 설정됩니다</string>
     <string name="setup_staking_conflict_message">직접 Staking과 Nomination Pools를 동시에 사용할 수 없습니다</string>
     <string name="setup_staking_conflict_title">이미 Staking 중</string>
     <string name="setup_staking_type_advanced_options_condition">고급 Staking 관리</string>
@@ -1497,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">네트워크 수수료를 지불할 토큰</string>
     <string name="swap_custom_fee_selector_footer">입력한 금액 외에 네트워크 수수료가 추가됩니다</string>
     <string name="swap_error_pair_not_supported">이 페어는 지원되지 않습니다</string>
+    <string name="swap_execution_failure" formatted="false">작업 #%s (%s) 실패</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s에서 %s로의 스왑 %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%s에서 %s로의 전송</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s 작업</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s of %s 작업</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%s에서 %s로 %s에서 스왑 중</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%s에서 %s로 전송 중</string>
+    <string name="swap_execution_time">실행 시간</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">충분하지 않은 토큰을 보유하고 있으므로 %s의 네트워크 수수료를 지불한 후 최소 %s을(를) 유지해야 합니다</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s 토큰을 받기 위해 최소 %s을(를) 유지해야 합니다</string>
     <string name="swap_failure_insufficient_balance_message">네트워크 수수료로 %2$s를 지불해야 하므로 최대 %1$s까지 교환할 수 있습니다.</string>
@@ -1516,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">다른 네트워크에서 %s 전송</string>
     <string name="swap_get_token_receive_description">QR 또는 주소로 %s 받기</string>
     <string name="swap_get_token_using">%s 받기</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">스왑 실행 중 중간 수령 금액이 %s로 최소 잔액 %s보다 적습니다. 더 큰 스왑 금액을 지정해보세요.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">슬리피지는 %s에서 %s 사이로 지정해야 합니다</string>
     <string name="swap_invalid_slippage_failure_title">잘못된 슬리피지</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">지불할 토큰 선택</string>
@@ -1524,6 +1556,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">다른 금액 입력</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">%s로 네트워크 수수료를 지불하기 위해, Nova는 계정의 최소 %s 잔액을 유지하기 위해 자동으로 %s를 %s로 교환합니다.</string>
     <string name="swap_network_fee_description">블록체인이 모든 거래를 처리하고 검증하기 위해 부과하는 네트워크 수수료입니다. 네트워크 상태나 거래 속도에 따라 다를 수 있습니다.</string>
+    <string name="swap_network_flow_title">%s 교환을 위한 네트워크 선택</string>
     <string name="swap_not_enought_liquidity_failure">풀에 교환할 수 있는 유동성이 충분하지 않습니다</string>
     <string name="swap_price_difference_description">가격 차이는 두 자산 간의 가격 차이를 나타냅니다. 암호화폐 교환 시, 가격 차이는 일반적으로 교환하는 자산의 가격과 교환받는 자산의 가격 간의 차이를 의미합니다.</string>
     <string name="swap_price_difference_title">가격 차이</string>
@@ -1533,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">이전 환율: %1$s ≈ %2$s.\n새 환율: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">교환 비율이 업데이트되었습니다</string>
     <string name="swap_repeat_operation">작업 반복</string>
+    <string name="swap_route">경로</string>
+    <string name="swap_route_description">당신의 토큰이 원하는 토큰을 얻기 위해 다른 네트워크를 통해 이동하는 방식입니다.</string>
+    <string name="swap_route_segment_swap_title">스왑</string>
+    <string name="swap_route_segment_transfer_title">전송</string>
     <string name="swap_settings_title">교환 설정</string>
     <string name="swap_slippage">슬리페이지</string>
     <string name="swap_slippage_description">슬리페이지는 분산형 거래에서 흔히 발생하는 현상으로, 교환 거래의 최종 가격이 시장 상황 변화로 인해 예상 가격과 다를 수 있습니다.</string>
@@ -1616,6 +1653,7 @@
     <string name="wallet_asset_buy_with">구매 방법</string>
     <string name="wallet_asset_receive">받기</string>
     <string name="wallet_asset_receive_token">%s 수령</string>
+    <string name="wallet_asset_receive_token_subtitle">이 주소로 %1$s 토큰과 %2$s 네트워크에서의 토큰만 보내세요, 그렇지 않으면 자금을 잃을 수 있습니다.</string>
     <string name="wallet_asset_send">보내기</string>
     <string name="wallet_asset_swap">스왑</string>
     <string name="wallet_assets">자산</string>

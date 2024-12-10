@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_account_api.data.fee
 
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 sealed interface FeePaymentCurrency {
@@ -8,7 +10,12 @@ sealed interface FeePaymentCurrency {
     /**
      * Use native currency of the chain to pay the fee
      */
-    object Native : FeePaymentCurrency
+    object Native : FeePaymentCurrency {
+
+        override fun toString(): String {
+            return "Native"
+        }
+    }
 
     /**
      * Request to use a specific [asset] for payment fees
@@ -17,7 +24,21 @@ sealed interface FeePaymentCurrency {
      *
      * The actual asset used to pay fees will be available in [Fee.asset]
      */
-    data class Asset(val asset: Chain.Asset) : FeePaymentCurrency
+    class Asset(val asset: Chain.Asset) : FeePaymentCurrency {
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is Asset) return false
+            return asset.fullId == other.asset.fullId
+        }
+
+        override fun hashCode(): Int {
+            return asset.hashCode()
+        }
+
+        override fun toString(): String {
+            return "Asset(${asset.symbol})"
+        }
+    }
 
     companion object
 }
@@ -26,5 +47,12 @@ fun Chain.Asset.toFeePaymentCurrency(): FeePaymentCurrency {
     return when {
         isCommissionAsset -> FeePaymentCurrency.Native
         else -> FeePaymentCurrency.Asset(this)
+    }
+}
+
+fun FeePaymentCurrency.toChainAsset(chain: Chain): Chain.Asset {
+    return when (this) {
+        is FeePaymentCurrency.Asset -> asset
+        FeePaymentCurrency.Native -> chain.utilityAsset
     }
 }

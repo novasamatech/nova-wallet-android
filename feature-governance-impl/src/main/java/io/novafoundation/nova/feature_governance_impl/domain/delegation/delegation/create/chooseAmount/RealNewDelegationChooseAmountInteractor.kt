@@ -80,7 +80,7 @@ class RealNewDelegationChooseAmountInteractor(
                 amount = amount,
                 conviction = conviction,
                 delegate = delegate,
-                user = origin.requestedOrigin,
+                user = origin.executingAccount,
                 chain = chain,
                 tracks = tracks,
                 shouldRemoveOtherTracks = shouldRemoveOtherTracks

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 interface FieldValidator {
+
     fun observe(inputStream: Flow<String>): Flow<FieldValidationResult>
 
     companion object
@@ -37,9 +38,20 @@ class CompoundFieldValidator(
 }
 
 sealed class FieldValidationResult {
+
     object Ok : FieldValidationResult()
 
-    class Error(val reason: String) : FieldValidationResult()
+    class Error(
+        /**
+         * User-friendly error message to be displayed in UI
+         */
+        val reason: String,
+
+        /**
+         * The optional tag that other components may use to determine which validator originated this error
+         */
+        val tag: String? = null
+    ) : FieldValidationResult()
 }
 
 fun FieldValidationResult.getReasonOrNull(): String? {
@@ -47,6 +59,10 @@ fun FieldValidationResult.getReasonOrNull(): String? {
         is FieldValidationResult.Error -> reason
         else -> null
     }
+}
+
+fun FieldValidationResult.isErrorWithTag(tag: String): Boolean {
+    return this is FieldValidationResult.Error && this.tag == tag
 }
 
 fun ValidatableInputField.observeErrors(

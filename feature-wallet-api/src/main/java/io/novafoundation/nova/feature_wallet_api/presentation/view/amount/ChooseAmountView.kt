@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewChooseAmountBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
@@ -34,8 +36,8 @@ class ChooseAmountView @JvmOverloads constructor(
         binder.chooseAmountBalanceLabel.setTextOrHide(label)
     }
 
-    fun loadAssetImage(imageUrl: String) {
-        binder.chooseAmountInput.loadAssetImage(imageUrl)
+    fun loadAssetImage(icon: Icon) {
+        binder.chooseAmountInput.loadAssetImage(icon)
     }
 
     fun setTitle(title: String?) {
@@ -50,7 +52,7 @@ class ChooseAmountView @JvmOverloads constructor(
         binder.chooseAmountInput.setFiatAmount(fiat)
     }
 
-    override fun setError(errorState: AmountChooserMixinBase.AmountErrorState) {
+    override fun setError(errorState: FieldValidationResult) {
         // TODO not implemented
     }
 

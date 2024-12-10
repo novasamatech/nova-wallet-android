@@ -7,16 +7,22 @@ import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
+import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetGroupingDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
+import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
 class BalanceListFragment :
@@ -55,10 +61,13 @@ class BalanceListFragment :
         binder.balanceListAssets.setHasFixedSize(true)
         binder.balanceListAssets.adapter = adapter
 
-        AssetGroupingDecoration.applyDefaultTo(binder.balanceListAssets, assetsAdapter)
+        val animationSettings = ExpandableAnimationSettings.createForAssets()
+        val animator = ExpandableAnimator(binder.balanceListAssets, animationSettings, assetsAdapter)
 
-        // modification animations only harm here
-        binder.balanceListAssets.itemAnimator = null
+        binder.balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        binder.balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
+
+        AssetBaseDecoration.applyDefaultTo(binder.balanceListAssets, assetsAdapter)
 
         binder.walletContainer.setOnRefreshListener {
             viewModel.fullSync()
@@ -76,7 +85,7 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.assetModelsFlow.observe {
+        viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
                 binder.balanceListAssets?.invalidateItemDecorations()
             }
@@ -119,10 +128,23 @@ class BalanceListFragment :
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
 
         viewModel.shouldShowCrowdloanBanner.observe(headerAdapter::setCrowdloanBannerVisible)
+
+        viewModel.assetViewModeModelFlow.observe { headerAdapter.setAssetViewModeModel(it) }
     }
 
-    override fun assetClicked(asset: AssetModel) {
+    override fun assetClicked(asset: Chain.Asset) {
         viewModel.assetClicked(asset)
+    }
+
+    override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
+        if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
+            viewModel.assetClicked(tokenGroup.groupType.asset)
+        } else {
+            val itemAnimator = binder.balanceListAssets.itemAnimator as AssetTokensItemAnimator
+            itemAnimator.prepareForAnimation()
+
+            viewModel.assetListMixin.expandToken(tokenGroup)
+        }
     }
 
     override fun totalBalanceClicked() {
@@ -135,10 +157,6 @@ class BalanceListFragment :
 
     override fun searchClicked() {
         viewModel.searchClicked()
-    }
-
-    override fun filtersClicked() {
-        viewModel.filtersClicked()
     }
 
     override fun avatarClicked() {
@@ -171,6 +189,10 @@ class BalanceListFragment :
 
     override fun crowdloanBannerCloseClicked() {
         viewModel.crowdloanBannerCloseClicked()
+    }
+
+    override fun assetViewModeClicked() {
+        viewModel.switchViewMode()
     }
 
     override fun swapClicked() {

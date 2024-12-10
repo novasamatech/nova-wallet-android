@@ -17,6 +17,20 @@ import io.novafoundation.nova.feature_assets.databinding.FragmentConfirmSendBind
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendAmount
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendConfirm
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendContainer
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendCrossChainFee
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendFromNetwork
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendHints
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendOriginFee
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendRecipient
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendSender
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendToNetwork
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendToolbar
+import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendWallet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
@@ -63,8 +77,9 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel, FragmentConfirmSe
     override fun subscribe(viewModel: ConfirmSendViewModel) {
         setupExternalActions(viewModel)
         observeValidations(viewModel)
-        setupFeeLoading(viewModel.originFeeMixin, binder.confirmSendOriginFee)
-        setupFeeLoading(viewModel.crossChainFeeMixin, binder.confirmSendCrossChainFee)
+
+        viewModel.feeMixin.setupFeeLoading(binder.confirmSendOriginFee, binder.confirmSendCrossChainFee)
+
         observeHints(viewModel.hintsMixin, binder.confirmSendHints)
 
         viewModel.recipientModel.observe(binder.confirmSendRecipient::showAddress)

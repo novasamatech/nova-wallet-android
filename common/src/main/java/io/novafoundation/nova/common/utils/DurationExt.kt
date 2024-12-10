@@ -10,3 +10,6 @@ val Duration.lastHours: Int
 
 val Duration.lastMinutes: Int
     get() = this.toComponents { _, _, minutes, _, _ -> minutes }
+
+val Duration.lastSeconds: Int
+    get() = this.toComponents { _, _, _, seconds, _ -> seconds }

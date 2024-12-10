@@ -1,52 +1,54 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
-import io.novafoundation.nova.common.utils.MultiMap
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapability
-import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
-import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
-import io.novafoundation.nova.feature_swap_core.domain.model.SwapQuoteException
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuote
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.AssetExchangeQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
-interface AssetExchange : CustomFeeCapability {
+interface AssetExchange {
 
-    interface Factory {
+    interface SingleChainFactory {
 
-        suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange?
+        suspend fun create(chain: Chain, swapHost: SwapHost): AssetExchange
+    }
+
+    interface MultiChainFactory {
+
+        suspend fun create(swapHost: SwapHost): AssetExchange
+    }
+
+    interface SwapHost {
+
+        val scope: CoroutineScope
+
+        suspend fun quote(quoteArgs: ParentQuoterArgs): Balance
+
+        suspend fun extrinsicService(): ExtrinsicService
     }
 
     suspend fun sync()
 
-    /**
-     * Implementations should expect `asset` to be non-utility asset,
-     * e.g. they don't need to additionally check whether asset is utility or not
-     * They can also expect this method is called only when asset is present in [AssetExchange.availableSwapDirections]
-     */
+    suspend fun availableDirectSwapConnections(): List<SwapGraphEdge>
 
-    suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId>
+    fun feePaymentOverrides(): List<FeePaymentProviderOverride>
 
-    @Throws(SwapQuoteException::class)
-    suspend fun quote(args: AssetExchangeQuoteArgs): AssetExchangeQuote
-
-    suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee
-
-    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
-
-    suspend fun slippageConfig(): SlippageConfig
-
-    fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
+    fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }
 
-class AssetExchangeFee(
-    val networkFee: Fee,
-    val minimumBalanceBuyIn: MinimumBalanceBuyIn
+data class FeePaymentProviderOverride(
+    val provider: FeePaymentProvider,
+    val chain: Chain
+)
+
+data class ParentQuoterArgs(
+    val chainAssetIn: Chain.Asset,
+    val chainAssetOut: Chain.Asset,
+    val amount: Balance,
+    val swapDirection: SwapDirection,
 )

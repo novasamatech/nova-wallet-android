@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_swap_api.R
 import io.novafoundation.nova.feature_swap_api.databinding.ViewSwapAssetBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -45,8 +46,7 @@ class SwapAssetView @JvmOverloads constructor(
     }
 
     private fun setAssetImageUrl(icon: Icon) {
-        binder.swapAssetImage.setImageTint(context.getColor(R.color.icon_primary))
-        binder.swapAssetImage.setIcon(icon, imageLoader)
+        binder.swapAssetImage.setTokenIcon(icon, imageLoader)
         binder.swapAssetImage.setBackgroundResource(R.drawable.bg_token_container)
     }
 

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.intFromHex
@@ -27,6 +26,7 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSig
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.anyAddressToAccountId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
@@ -38,10 +38,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.EraType
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.CheckMetadataHash
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
@@ -50,7 +50,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrin
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromHex
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
-import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -104,12 +103,13 @@ class PolkadotExternalSignInteractor(
     override val validationSystem: ConfirmDAppOperationValidationSystem = EmptyValidationSystem()
 
     override suspend fun createAccountAddressModel(): AddressModel {
-        return addressIconGenerator.createAddressModel(
-            accountAddress = signPayload.address,
+        val icon = addressIconGenerator.createAddressIcon(
+            accountId = signPayload.accountId(),
             sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            accountName = null,
-            background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+            backgroundColorRes = AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
+
+        return AddressModel(signPayload.address, icon, name = null)
     }
 
     override suspend fun chainUi(): Result<ChainUi?> {
@@ -175,14 +175,13 @@ class PolkadotExternalSignInteractor(
     }
 
     private suspend fun signBytes(signBytesPayload: PolkadotSignPayload.Raw): SignedResult {
-        // assumption - only substrate dApps
-        val substrateAccountId = signBytesPayload.address.toAccountId()
+        val accountId = signBytesPayload.address.anyAddressToAccountId()
 
         val signer = resolveWalletSigner()
         val payload = runCatching {
-            SignerPayloadRaw.fromHex(signBytesPayload.data, substrateAccountId)
+            SignerPayloadRaw.fromHex(signBytesPayload.data, accountId)
         }.getOrElse {
-            SignerPayloadRaw.fromUtf8(signBytesPayload.data, substrateAccountId)
+            SignerPayloadRaw.fromUtf8(signBytesPayload.data, accountId)
         }
 
         val signature = signer.signRaw(payload).asHexString()
@@ -232,10 +231,7 @@ class PolkadotExternalSignInteractor(
             )
         }
 
-        val extrinsic = when (val callRepresentation = callRepresentation(runtime)) {
-            is CallRepresentation.Instance -> builder.call(callRepresentation.call).buildExtrinsic()
-            is CallRepresentation.Bytes -> builder.buildExtrinsic(rawCallBytes = callRepresentation.bytes)
-        }
+        val extrinsic = builder.call(parsedExtrinsic.call).buildExtrinsic()
 
         val actualParsedExtrinsic = parsedExtrinsic.copy(
             metadataHash = actualMetadataHash.checkMetadataHash.metadataHash
@@ -264,9 +260,9 @@ class PolkadotExternalSignInteractor(
         return ActualMetadataHash(modifiedOriginal = true, checkMetadataHash = metadataProof.checkMetadataHash)
     }
 
-    private fun PolkadotSignPayload.Json.callRepresentation(runtime: RuntimeSnapshot): CallRepresentation = runCatching {
-        CallRepresentation.Instance(GenericCall.fromHex(runtime, method))
-    }.getOrDefault(CallRepresentation.Bytes(method.fromHex()))
+    private fun PolkadotSignPayload.Json.decodedCall(runtime: RuntimeSnapshot): GenericCall.Instance {
+        return GenericCall.fromHex(runtime, method)
+    }
 
     private suspend fun PolkadotSignPayload.Json.chain(): Chain {
         return chainRegistry.getChainOrNull(genesisHash) ?: throw ExternalSignInteractor.Error.UnsupportedChain(genesisHash)
@@ -287,9 +283,21 @@ class PolkadotExternalSignInteractor(
                 blockHash = blockHash.fromHex(),
                 era = EraType.fromHex(runtime, era),
                 tip = tip.bigIntegerFromHex(),
-                call = callRepresentation(runtime),
+                call = decodedCall(runtime),
                 metadataHash = metadataHash?.fromHex()
             )
+        }
+    }
+
+    private suspend fun PolkadotSignPayload.accountId(): AccountId {
+        return when (this) {
+            is PolkadotSignPayload.Json -> {
+                val chain = chainOrNull()
+
+                chain?.accountIdOf(address) ?: address.anyAddressToAccountId()
+            }
+
+            is PolkadotSignPayload.Raw -> address.anyAddressToAccountId()
         }
     }
 

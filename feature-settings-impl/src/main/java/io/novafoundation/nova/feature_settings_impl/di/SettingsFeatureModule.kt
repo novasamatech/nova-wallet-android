@@ -8,17 +8,21 @@ import io.novafoundation.nova.feature_settings_impl.domain.CloudBackupSettingsIn
 import io.novafoundation.nova.feature_settings_impl.domain.RealCloudBackupSettingsInteractor
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.AppearanceInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.CustomNodeInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.NetworkManagementInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.PreConfiguredNetworksInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealAddNetworkInteractor
+import io.novafoundation.nova.feature_settings_impl.domain.RealAppearanceInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealCustomNodeInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementChainInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.RealNetworkManagementInteractor
@@ -70,9 +74,10 @@ class SettingsFeatureModule {
     fun provideNetworkManagementChainInteractor(
         chainRegistry: ChainRegistry,
         nodeHealthStateTesterFactory: NodeHealthStateTesterFactory,
-        chainRepository: ChainRepository
+        chainRepository: ChainRepository,
+        accountInteractor: AccountInteractor
     ): NetworkManagementChainInteractor {
-        return RealNetworkManagementChainInteractor(chainRegistry, nodeHealthStateTesterFactory, chainRepository)
+        return RealNetworkManagementChainInteractor(chainRegistry, nodeHealthStateTesterFactory, chainRepository, accountInteractor)
     }
 
     @Provides
@@ -166,5 +171,11 @@ class SettingsFeatureModule {
             nodeConnectionFactory,
             customChainFactory
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAppearanceInteractor(assetsIconModeRepository: AssetsIconModeRepository): AppearanceInteractor {
+        return RealAppearanceInteractor(assetsIconModeRepository)
     }
 }

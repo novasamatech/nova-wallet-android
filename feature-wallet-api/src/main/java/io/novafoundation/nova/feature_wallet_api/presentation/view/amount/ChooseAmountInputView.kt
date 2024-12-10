@@ -6,10 +6,11 @@ import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewChooseAmountInputBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
 
@@ -34,8 +35,8 @@ class ChooseAmountInputView @JvmOverloads constructor(
         background = context.getInputBackground()
     }
 
-    fun loadAssetImage(imageUrl: String?) {
-        binder.chooseAmountInputImage.loadTokenIcon(imageUrl, imageLoader)
+    fun loadAssetImage(icon: Icon) {
+        binder.chooseAmountInputImage.setTokenIcon(icon, imageLoader)
     }
 
     fun setAssetName(name: String) {

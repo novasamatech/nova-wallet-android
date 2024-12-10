@@ -13,6 +13,8 @@ interface TokenRepository {
      */
     suspend fun observeTokens(chainAssets: List<Chain.Asset>): Flow<Map<FullChainAssetId, Token>>
 
+    suspend fun getTokens(chainAsset: List<Chain.Asset>): Map<FullChainAssetId, Token>
+
     suspend fun getToken(chainAsset: Chain.Asset): Token
 
     suspend fun getTokenOrNull(chainAsset: Chain.Asset): Token?

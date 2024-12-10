@@ -62,8 +62,9 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
             val idRaw = typeExtras?.get(STATEMINE_EXTRAS_ID)!!
             val id = mapStatemineAssetIdFromRaw(idRaw)
             val palletName = typeExtras[STATEMINE_EXTRAS_PALLET_NAME] as String?
+            val isSufficient = typeExtras[STATEMINE_IS_SUFFICIENT] as Boolean? ?: STATEMINE_IS_SUFFICIENT_DEFAULT
 
-            Chain.Asset.Type.Statemine(id, palletName)
+            Chain.Asset.Type.Statemine(id, palletName, isSufficient)
         }
 
         ASSET_ORML -> {
@@ -279,7 +280,7 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
     val buyProviders = local.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
 
     return Chain.Asset(
-        iconUrl = local.icon,
+        icon = local.icon,
         id = local.id,
         symbol = local.symbol.asTokenSymbol(),
         precision = local.precision.asPrecision(),

@@ -50,7 +50,7 @@ class GovernanceLocksView @JvmOverloads constructor(
 }
 
 class GovernanceLocksModel(
-    val amount: String?,
+    val amount: CharSequence?,
     val title: String,
     val hasUnlockableLocks: Boolean
 )

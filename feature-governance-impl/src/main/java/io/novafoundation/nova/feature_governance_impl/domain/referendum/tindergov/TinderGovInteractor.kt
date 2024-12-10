@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.tinderg
 
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.VotingPower
@@ -17,6 +18,8 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.tindergov.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.ReferendaSharedComputation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.StartStakingLandingValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.startSwipeGovValidation
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -54,6 +57,8 @@ interface TinderGovInteractor {
     suspend fun getVotingPowerState(): VotingPowerState
 
     suspend fun awaitAllItemsVoted(coroutineScope: CoroutineScope, basket: List<TinderGovBasketItem>)
+
+    fun startSwipeGovValidationSystem(): StartStakingLandingValidationSystem
 }
 
 class RealTinderGovInteractor(
@@ -128,6 +133,10 @@ class RealTinderGovInteractor(
 
                 allBasketItemsVoted
             }.first()
+    }
+
+    override fun startSwipeGovValidationSystem(): StartStakingLandingValidationSystem {
+        return ValidationSystem.startSwipeGovValidation()
     }
 
     private fun TinderGovBasketItem.isItemNotAvailableToVote(

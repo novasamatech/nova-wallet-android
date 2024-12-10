@@ -84,7 +84,7 @@
 
         <io.novafoundation.nova.common.view.PrimaryButtonV2
             android:id="@+id/tinderGovCardReadMore"
-            style="@style/Widget.Nova.MaterialButton.Secondary.Transparent"
+            style="@style/Widget.Nova.MaterialButton.Secondary.HalfTransparent"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:text="@string/common_read_more"

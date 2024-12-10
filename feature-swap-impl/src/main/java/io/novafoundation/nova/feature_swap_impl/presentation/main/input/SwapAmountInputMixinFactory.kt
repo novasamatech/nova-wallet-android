@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main.input
 
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.FieldValidator
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
@@ -19,7 +21,8 @@ import kotlinx.coroutines.flow.map
 
 class SwapAmountInputMixinFactory(
     private val chainRegistry: ChainRegistry,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val assetIconProvider: AssetIconProvider
 ) {
 
     fun create(
@@ -38,7 +41,8 @@ class SwapAmountInputMixinFactory(
             resourceManager = resourceManager,
             maxActionProvider = maxActionProvider,
             fiatFormatter = fiatFormatter,
-            fieldValidator = fieldValidator
+            fieldValidator = fieldValidator,
+            assetIconProvider = assetIconProvider
         )
     }
 }
@@ -51,12 +55,14 @@ private class RealSwapAmountInputMixin(
     private val resourceManager: ResourceManager,
     maxActionProvider: MaxActionProvider?,
     fiatFormatter: AmountChooserMixinBase.FiatFormatter,
-    fieldValidator: FieldValidator
+    fieldValidator: FieldValidator,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseAmountChooserProvider(
     coroutineScope = coroutineScope,
     tokenFlow = tokenFlow,
     maxActionProvider = maxActionProvider,
     fiatFormatter = fiatFormatter,
+    allowMaxAction = true,
     fieldValidator = fieldValidator
 ),
     SwapAmountInputMixin.Presentation {
@@ -75,7 +81,7 @@ private class RealSwapAmountInputMixin(
         val chain = chainRegistry.getChain(chainAsset.chainId)
 
         return SwapInputAssetModel(
-            assetIcon = SwapInputAssetModel.SwapAssetIcon.Chosen(chainAsset.iconUrl),
+            assetIcon = SwapInputAssetModel.SwapAssetIcon.Chosen(assetIconProvider.getAssetIconOrFallback(chainAsset)),
             title = chainAsset.symbol.value,
             subtitleIcon = chain.iconOrFallback(),
             subtitle = chain.name,

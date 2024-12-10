@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -23,20 +25,31 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
+import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
+import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
+import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -52,13 +65,28 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSearchInteractor(
+    fun provideAssetSearchUseCase(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        assetSourceRegistry: AssetSourceRegistry,
         swapService: SwapService
-    ) = AssetSearchInteractor(walletRepository, accountRepository, chainRegistry, assetSourceRegistry, swapService)
+    ) = AssetSearchUseCase(walletRepository, accountRepository, chainRegistry, swapService)
+
+    @Provides
+    @FeatureScope
+    fun provideSearchInteractorFactory(
+        assetViewModeRepository: AssetsViewModeRepository,
+        assetSearchUseCase: AssetSearchUseCase,
+        chainRegistry: ChainRegistry
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideAssetNetworksInteractor(
+        chainRegistry: ChainRegistry,
+        swapService: SwapService,
+        assetSearchUseCase: AssetSearchUseCase
+    ) = AssetNetworksInteractor(chainRegistry, swapService, assetSearchUseCase)
 
     @Provides
     @FeatureScope
@@ -141,4 +169,44 @@ class AssetsFeatureModule {
         coinPriceRepository = coinPriceRepository,
         poolAccountDerivation = poolAccountDerivation
     )
+
+    @Provides
+    @FeatureScope
+    fun provideInitialSwapFlowExecutor(
+        assetsRouter: AssetsRouter
+    ): InitialSwapFlowExecutor {
+        return InitialSwapFlowExecutor(assetsRouter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSwapExecutor(
+        initialSwapFlowExecutor: InitialSwapFlowExecutor,
+        assetsRouter: AssetsRouter,
+        swapSettingsStateProvider: SwapSettingsStateProvider
+    ): SwapFlowExecutorFactory {
+        return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAmountFormatter(resourceManager: ResourceManager): AmountFormatter {
+        return RealAmountFormatter(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideExpandableAssetsMixinFactory(
+        assetIconProvider: AssetIconProvider,
+        currencyInteractor: CurrencyInteractor,
+        assetsViewModeRepository: AssetsViewModeRepository,
+        amountFormatter: AmountFormatter
+    ): ExpandableAssetsMixinFactory {
+        return ExpandableAssetsMixinFactory(
+            assetIconProvider,
+            currencyInteractor,
+            assetsViewModeRepository,
+            amountFormatter
+        )
+    }
 }

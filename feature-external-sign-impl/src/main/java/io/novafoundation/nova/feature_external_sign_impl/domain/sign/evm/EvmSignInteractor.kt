@@ -42,7 +42,7 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDApp
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForSimpleFeeChanges
+import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -116,9 +116,9 @@ class EvmSignInteractor(
 
     override val validationSystem: ConfirmDAppOperationValidationSystem = ValidationSystem {
         if (payload is ConfirmTx) {
-            checkForSimpleFeeChanges(
+            checkForFeeChanges(
                 calculateFee = { calculateFee()!! },
-                currentFee = { it.decimalFee },
+                currentFee = { it.fee },
                 chainAsset = { it.token!!.configuration },
                 error = ConfirmDAppOperationValidationFailure::FeeSpikeDetected
             )
@@ -311,7 +311,7 @@ class EvmSignInteractor(
         val chainCurrency = evmChain.nativeCurrency
 
         return Chain.Asset(
-            iconUrl = evmChain.iconUrl,
+            icon = null,
             id = 0,
             priceId = null,
             chainId = evmChain.chainId,

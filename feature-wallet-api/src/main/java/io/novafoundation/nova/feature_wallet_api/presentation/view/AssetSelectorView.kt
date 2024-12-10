@@ -6,10 +6,10 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -69,7 +69,7 @@ class AssetSelectorView @JvmOverloads constructor(
         with(assetSelectorModel) {
             binder.assetSelectorBalance.text = assetModel.assetBalance
             binder.assetSelectorTokenName.text = title
-            binder.assetSelectorIcon.load(assetModel.imageUrl, imageLoader)
+            binder.assetSelectorIcon.setIcon(assetModel.icon, imageLoader)
         }
     }
 }

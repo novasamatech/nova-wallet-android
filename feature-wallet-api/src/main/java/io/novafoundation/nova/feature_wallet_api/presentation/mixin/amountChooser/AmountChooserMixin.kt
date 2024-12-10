@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
@@ -34,7 +35,7 @@ interface AmountChooserMixinBase : CoroutineScope {
     )
     val amountInput: StateFlow<String>
 
-    val fieldError: Flow<AmountErrorState>
+    val fieldError: Flow<FieldValidationResult>
 
     val maxAction: MaxAction
 
@@ -52,12 +53,6 @@ interface AmountChooserMixinBase : CoroutineScope {
     interface FiatFormatter {
 
         fun formatFlow(tokenFlow: Flow<Token>, amountFlow: Flow<BigDecimal>): Flow<CharSequence>
-    }
-
-    sealed class AmountErrorState {
-        object Valid : AmountErrorState()
-
-        class Invalid(val message: String) : AmountErrorState()
     }
 
     class InputState<T>(val value: T, val initiatedByUser: Boolean, val inputKind: InputKind) {
@@ -98,14 +93,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
             balanceField: (Asset) -> BigDecimal,
             @StringRes balanceLabel: Int?
         ): Presentation
-    }
-}
-
-fun AmountChooserMixinBase.AmountErrorState.getMessageOrNull(): String? {
-    return if (this is AmountChooserMixinBase.AmountErrorState.Invalid) {
-        message
-    } else {
-        null
     }
 }
 

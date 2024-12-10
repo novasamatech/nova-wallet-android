@@ -1,7 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
 
-    <!--<string name="settings_email">Email</string>-->
+    <string name="common_not_enough_to_pay_fee_message">You don\'t hae enough balance to pay network fee of %s. Current balance is %s</string>
+
+    <string name="common_sec">sec</string>
+
+    <string name="common_do_not_close_app">Do not close the app!</string>
+
+    <string name="common_failed">Failed</string>
+
+    <string name="swap_execution_operations_progress">%s of %s operations</string>
+
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operation</item>
+        <item quantity="other">%s operations</item>
+    </plurals>
+
+    <string name="swap_execution_progress_swap_label">Swapping %s to %s on %s</string>
+    <string name="swap_execution_progress_transfer_label">Transferring %s to %s</string>
+
+    <string name="swap_execution_failure">Failed on operation #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label">%s to %s swap on %s</string>
+    <string name="swap_execution_failure_transfer_label">%s transfer from %s to %s</string>
+
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <string name="swap_execution_time">Execution time</string>
+
+    <string name="common_total_fee">Total fee</string>
+
+    <string name="common_fee_with_label">Fee: %s</string>
+
+    <string name="swap_route_segment_transfer_title">Transfer</string>
+    <string name="swap_route_segment_swap_title">Swap</string>
+    <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
+    <string name="swap_route">Route</string>
+
+    <string name="select_network_title">Select network</string>
+
+    <string name="assets_search_token_hint">Search by token</string>
+
+    <string name="receive_screen_copy_address">Copy Address</string>
+    <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
+
+    <string name="appearance_token_assets_title">token icons</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_white_icon_title">White</string>
+    <string name="appearance_colored_icon_title">Colored</string>
+
+    <string name="buy_network_flow_title">Select network for buying %s</string>
+    <string name="receive_network_flow_title">Select network for receiving %s</string>
+    <string name="send_network_flow_title">Select network for sending %s</string>
+    <string name="swap_network_flow_title">Select network for swaping %s</string>
+
+    <string name="asset_view_tokens">Tokens</string>
+    <string name="asset_view_networks">Networks</string>
+
+    <string name="settings_wiki">Wiki &amp; Help Center</string>
+
     <string name="settings_email">Get support via Email</string>
 
     <string name="swipe_gov_card_placeholder_basket_full_text">You have already voted for all available referenda</string>
@@ -626,8 +686,6 @@
     <string name="deep_linking_invalid_derivation_path">Invalid derivation path</string>
 
     <string name="referendim_details_not_found_title">Referendum not found</string>
-
-    <string name="settings_wiki">Wiki</string>
 
     <string name="operations_swap_title">Swap</string>
 

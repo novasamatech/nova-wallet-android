@@ -49,7 +49,7 @@ interface StorageDataSource {
 
     suspend fun <R> subscribe(
         chainId: String,
-        subscriptionBuilder: SubstrateSubscriptionBuilder,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?,
         at: BlockHash? = null,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>

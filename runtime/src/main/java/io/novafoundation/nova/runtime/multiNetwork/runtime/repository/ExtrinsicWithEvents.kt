@@ -17,7 +17,7 @@ enum class ExtrinsicStatus {
 }
 
 class ExtrinsicWithEvents(
-    val extrinsic: Extrinsic.DecodedInstance,
+    val extrinsic: Extrinsic.Instance,
     val extrinsicHash: String,
     val events: List<GenericEvent.Instance>
 )
@@ -40,7 +40,7 @@ fun ExtrinsicWithEvents.isSuccess(): Boolean {
     return status == ExtrinsicStatus.SUCCESS
 }
 
-fun Extrinsic.DecodedInstance.signer(): AccountId {
+fun Extrinsic.Instance.signer(): AccountId {
     val accountIdentifier = requireNotNull(signature?.accountIdentifier) {
         "Extrinsic is unsigned"
     }
@@ -55,14 +55,32 @@ fun List<GenericEvent.Instance>.nativeFee(): BigInteger? {
     return bindNumber(actualFee) + bindNumber(tip)
 }
 
+fun List<GenericEvent.Instance>.assetTxFeePaidEvent(): GenericEvent.Instance? {
+    return findEvent(Modules.ASSET_TX_PAYMENT, "AssetTxFeePaid")
+}
+
 fun List<GenericEvent.Instance>.requireNativeFee(): BigInteger {
     return requireNotNull(nativeFee()) {
         "No native fee event found"
     }
 }
 
+fun List<GenericEvent.Instance>.findExtrinsicFailure(): GenericEvent.Instance? {
+    return findEvent(Modules.SYSTEM, FAILURE_EVENT)
+}
+
+fun List<GenericEvent.Instance>.findExtrinsicFailureOrThrow(): GenericEvent.Instance {
+    return requireNotNull(findExtrinsicFailure()) {
+        "No Extrinsic Failure event found"
+    }
+}
+
 fun List<GenericEvent.Instance>.findEvent(module: String, event: String): GenericEvent.Instance? {
     return find { it.instanceOf(module, event) }
+}
+
+fun List<GenericEvent.Instance>.findEventOrThrow(module: String, event: String): GenericEvent.Instance {
+    return first { it.instanceOf(module, event) }
 }
 
 fun List<GenericEvent.Instance>.findLastEvent(module: String, event: String): GenericEvent.Instance? {

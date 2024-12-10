@@ -5,6 +5,7 @@ import android.widget.EditText
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
@@ -17,7 +18,7 @@ interface AmountInputView {
 
     fun setFiatAmount(fiat: CharSequence?)
 
-    fun setError(errorState: AmountChooserMixinBase.AmountErrorState)
+    fun setError(errorState: FieldValidationResult)
 }
 
 interface MaxAvailableView {

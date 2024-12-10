@@ -8,11 +8,14 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
-import io.novafoundation.nova.feature_swap_core.di.SwapCoreApi
+import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.di.SwapConfirmationComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.execution.di.SwapExecutionComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.fee.di.SwapFeeComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.di.SwapMainSettingsComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.options.di.SwapOptionsComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.route.di.SwapRouteComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -32,6 +35,12 @@ interface SwapFeatureComponent : SwapFeatureApi {
     fun swapConfirmation(): SwapConfirmationComponent.Factory
 
     fun swapOptions(): SwapOptionsComponent.Factory
+
+    fun swapRoute(): SwapRouteComponent.Factory
+
+    fun swapFee(): SwapFeeComponent.Factory
+
+    fun swapExecution(): SwapExecutionComponent.Factory
 
     @Component.Factory
     interface Factory {

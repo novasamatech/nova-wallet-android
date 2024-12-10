@@ -55,7 +55,6 @@ class OperationListItem @kotlin.jvm.JvmOverloads constructor(
     fun setIconStyle(iconStyle: IconStyle) {
         when (iconStyle) {
             IconStyle.BORDERED_CIRCLE -> {
-                icon.setPadding(6.dp)
                 icon.setBackgroundResource(R.drawable.bg_icon_container_on_color)
                 icon.setImageTintRes(R.color.icon_secondary)
             }

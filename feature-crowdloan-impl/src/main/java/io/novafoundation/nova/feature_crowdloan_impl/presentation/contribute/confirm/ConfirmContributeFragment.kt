@@ -74,7 +74,7 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, Fragm
         viewModel.assetModelFlow.observe {
             binder.confirmContributeAmount.setAssetBalance(it.assetBalance)
             binder.confirmContributeAmount.setAssetName(it.tokenSymbol)
-            binder.confirmContributeAmount.loadAssetImage(it.imageUrl)
+            binder.confirmContributeAmount.loadAssetImage(it.icon)
         }
 
         binder.confirmContributeAmount.amountInput.setText(viewModel.selectedAmount)

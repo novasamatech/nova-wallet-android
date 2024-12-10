@@ -2,8 +2,9 @@ package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.utils.chainId
-import io.novafoundation.nova.common.utils.toCallInstance
 import io.novafoundation.nova.common.validation.ValidationStatus
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
+import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -11,8 +12,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -111,13 +110,11 @@ class ProxiedSigner(
         val proxyAccountId = signerAccountId(chain)
         val proxyAccount = accountRepository.findMetaAccount(proxyAccountId, chain.id) ?: throw IllegalStateException("Proxy account is not found")
 
-        val callInstance = extrinsicPayload.call.toCallInstance() ?: signingNotSupported()
-
         val validationPayload = ProxiedExtrinsicValidationPayload(
             proxyAccount,
             proxyAccountId,
             ChainWithAsset(chain, chain.commissionAsset),
-            callInstance.call
+            extrinsicPayload.call
         )
 
         val requestBusPayload = ProxyExtrinsicValidationRequestBus.Request(validationPayload)
@@ -142,9 +139,7 @@ class ProxiedSigner(
             proxyAccountId = proxyAccountId
         )
 
-        val callInstance = payload.call.toCallInstance() ?: signingNotSupported()
-
-        val proxyType = proxyCallFilterFactory.getFirstMatchedTypeOrNull(callInstance.call, availableProxyTypes)
+        val proxyType = proxyCallFilterFactory.getFirstMatchedTypeOrNull(payload.call, availableProxyTypes)
             ?: notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
         val proxyAddress = proxyMetaAccount.requireAddressIn(chain)
@@ -153,7 +148,7 @@ class ProxiedSigner(
         return payload.wrapIntoProxyPayload(
             proxyAccountId = proxyAccountId,
             proxyType = proxyType,
-            callInstance = callInstance,
+            call = payload.call,
             currentProxyNonce = nonce
         )
     }

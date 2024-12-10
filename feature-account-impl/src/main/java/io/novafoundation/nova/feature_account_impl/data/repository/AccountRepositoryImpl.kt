@@ -299,6 +299,10 @@ class AccountRepositoryImpl(
         return accountDataSource.hasSecretsAccounts()
     }
 
+    override suspend fun deleteProxiedMetaAccountsByChain(chainId: String) {
+        accountDataSource.deleteProxiedMetaAccountsByChain(chainId)
+    }
+
     override fun nodesFlow(): Flow<List<Node>> {
         return nodeDao.nodesFlow()
             .mapList { mapNodeLocalToNode(it) }

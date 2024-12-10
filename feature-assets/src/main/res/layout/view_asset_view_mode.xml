@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageSwitcher
+        android:id="@+id/assetViewModeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inAnimation="@anim/asset_mode_fade_in"
+        android:outAnimation="@anim/asset_mode_fade_out" />
+
+    <TextSwitcher
+        android:id="@+id/assetViewModeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</merge>

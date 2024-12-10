@@ -1,68 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    tools:background="@color/secondary_screen_background"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/receiveToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
 
-        <io.novafoundation.nova.common.view.Toolbar
-            android:id="@+id/receiveToolbar"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/receiveBackButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:dividerVisible="false"
-            app:homeButtonIcon="@drawable/ic_close"
-            tools:titleText="Receive KSM" />
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/icon_primary" />
 
-        <io.novafoundation.nova.common.view.LabeledTextView
-            style="@style/Widget.Nova.WalletWithAddress"
-            android:id="@+id/receiveFrom"
-            android:layout_width="match_parent"
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/receiveChain"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:actionIcon="@drawable/ic_more_horizontal"
-            tools:label="Kusama" />
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/receiveTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/text_primary"
+        tools:text="Receive DOT" />
+
+    <TextView
+        android:id="@+id/receiveSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/text_secondary"
+        tools:text="Send only DOT token and tokens in Polkadot network
+to this address, or you might lose your funds" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/receiveQrCodeContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="48dp"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical"
+        android:paddingBottom="12dp">
+
+        <io.novafoundation.nova.common.view.QrCodeView
+            android:id="@+id/receiveQrCode"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+            android:id="@+id/receiveAccount"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="48dp"
-            android:gravity="center_horizontal"
             android:layout_marginHorizontal="16dp"
-            android:text="@string/wallet_receive_description_v2_2_0"
-            android:textColor="@color/text_primary" />
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/text_primary_on_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/receiveQrCode"
+            tools:text="🌌 NOVA" />
 
-        <ImageView
-            android:id="@+id/receiveQrCode"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/receiveAddress"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="24dp"
-            android:padding="8dp"
-            android:layout_marginEnd="48dp"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
-            tools:layout_height="315dp"
-            tools:layout_width="315dp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/text_secondary_on_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/receiveAccount"
+            tools:text="Day71BAT8tLr1u43yUV2pKDZE6BvFWrXqFNzMdSHz6iRMAZxKuSr" />
 
-        <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/receiveShare"
-            style="@style/Widget.Nova.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="48dp"
-            android:text="@string/wallet_receive_share_qr" />
-    </LinearLayout>
-</ScrollView>
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
+            android:id="@+id/receiveCopyButton"
+            style="@style/Widget.Nova.MaterialButton.Secondary.Transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/receive_screen_copy_address"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:textColor="@color/button_text_accent"
+            app:icon="@drawable/ic_copy_outline"
+            app:iconSize="16dp"
+            app:iconTint="@color/icon_accent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/receiveAddress" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.legacy.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/receiveShare"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/wallet_receive_share_qr"
+        app:iconSrc="@drawable/ic_share_outline" />
+</LinearLayout>

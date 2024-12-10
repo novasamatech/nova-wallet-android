@@ -42,7 +42,8 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
 
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
         STATEMINE_EXTRAS_ID to mapStatemineAssetIdToRaw(type.id),
-        STATEMINE_EXTRAS_PALLET_NAME to type.palletName
+        STATEMINE_EXTRAS_PALLET_NAME to type.palletName,
+        STATEMINE_IS_SUFFICIENT to type.isSufficient
     )
 
     is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
@@ -97,7 +98,7 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
         source = mapAssetSourceToLocal(asset.source),
         buyProviders = gson.toJson(asset.buyProviders),
         typeExtras = gson.toJson(typeExtras),
-        icon = asset.iconUrl,
+        icon = asset.icon,
         enabled = asset.enabled
     )
 }

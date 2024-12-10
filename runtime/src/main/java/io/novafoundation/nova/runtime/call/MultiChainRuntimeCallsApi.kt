@@ -18,6 +18,6 @@ internal class RealMultiChainRuntimeCallsApi(
         val runtime = chainRegistry.getRuntime(chainId)
         val socket = chainRegistry.getSocket(chainId)
 
-        return RealRuntimeCallsApi(runtime, socket)
+        return RealRuntimeCallsApi(runtime, chainId, socket)
     }
 }

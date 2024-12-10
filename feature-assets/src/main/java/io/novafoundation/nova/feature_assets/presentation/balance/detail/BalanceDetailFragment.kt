@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceDetailBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -103,7 +103,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         }
 
         viewModel.assetDetailsModel.observe { asset ->
-            binder.balanceDetailTokenIcon.loadTokenIcon(asset.token.configuration.iconUrl, imageLoader)
+            binder.balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)
             binder.balanceDetailTokenName.text = asset.token.configuration.symbol.value
 
             binder.balanceDetailRate.text = asset.token.rate

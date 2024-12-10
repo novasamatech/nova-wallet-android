@@ -5,7 +5,7 @@ import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.FragmentManageChainTokensBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -46,7 +46,7 @@ class ManageChainTokensFragment :
 
     override fun subscribe(viewModel: ManageChainTokensViewModel) {
         viewModel.headerModel.observe { headerModel ->
-            binder.manageChainTokenIcon.loadTokenIcon(headerModel.icon, imageLoader)
+            binder.manageChainTokenIcon.setTokenIcon(headerModel.icon, imageLoader)
             binder.manageChainTokenSymbol.text = headerModel.symbol
             binder.manageChainTokenSubtitle.text = headerModel.networks
         }

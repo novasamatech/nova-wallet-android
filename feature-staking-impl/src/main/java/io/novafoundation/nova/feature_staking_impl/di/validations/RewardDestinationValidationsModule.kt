@@ -10,13 +10,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDest
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDestination.RewardDestinationFeeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDestination.RewardDestinationValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDestination.RewardDestinationValidationSystem
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 
 @Module
 class RewardDestinationValidationsModule {
 
     @FeatureScope
     @Provides
-    fun provideFeeValidation() = RewardDestinationFeeValidation(
+    fun provideFeeValidation(): RewardDestinationFeeValidation = EnoughAmountToTransferValidationGeneric(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.availableControllerBalance },
         errorProducer = { RewardDestinationValidationFailure.CannotPayFees }

@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import java.math.BigInteger
 
 data class StartMultiStakingValidationPayload(
     val recommendableSelection: RecommendableMultiStakingSelection,
     val asset: Asset,
-    val fee: DecimalFee,
+    val fee: Fee,
 ) {
     val selection = recommendableSelection.selection
 }

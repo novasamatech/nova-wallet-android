@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.sw
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -13,14 +14,14 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.icon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_swap_api.domain.model.rateAgainst
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
-import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionModel
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionParcel
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -49,6 +50,7 @@ class SwapDetailViewModel(
     private val walletUiUseCase: WalletUiUseCase,
     private val swapRateFormatter: SwapRateFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+    private val assetIconProvider: AssetIconProvider,
     val operation: OperationParcelizeModel.Swap,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
@@ -122,11 +124,10 @@ class SwapDetailViewModel(
 
     fun repeatOperationClicked() {
         val amount = if (operation.amountIsAssetIn) operation.amountIn.amount else operation.amountOut.amount
-        val direction = if (operation.amountIsAssetIn) SwapDirectionModel.SPECIFIED_IN else SwapDirectionModel.SPECIFIED_OUT
+        val direction = if (operation.amountIsAssetIn) SwapDirectionParcel.SPECIFIED_IN else SwapDirectionParcel.SPECIFIED_OUT
         val payload = SwapSettingsPayload.RepeatOperation(
             assetIn = operation.amountIn.assetId,
             assetOut = operation.amountOut.assetId,
-            feeAsset = operation.amountFee.assetId,
             amount = amount,
             direction = direction
         )
@@ -152,7 +153,7 @@ class SwapDetailViewModel(
         income: Boolean
     ): SwapAssetView.Model {
         return SwapAssetView.Model(
-            assetIcon = token.configuration.icon(),
+            assetIcon = assetIconProvider.getAssetIconOrFallback(token.configuration),
             amount = mapAmountToAmountModel(amount, token, estimatedFiat = true),
             chainUi = mapChainToUi(chainRegistry.getChain(token.configuration.chainId)),
             amountTextColorRes = if (income) R.color.text_positive else R.color.text_primary

@@ -31,7 +31,7 @@ class LockedTokensBottomSheet(
 
     private fun createViewItem(lock: BalanceLocksModel.Lock): TableCellView {
         return TableCellView.createTableCellView(context).apply {
-            setDividerVisible(false)
+            setOwnDividerVisible(false)
             setTitle(lock.name)
             showAmount(lock.amount)
             updateLayoutParams<ViewGroup.MarginLayoutParams> {

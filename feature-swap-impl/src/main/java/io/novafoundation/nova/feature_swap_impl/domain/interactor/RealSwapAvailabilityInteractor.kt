@@ -19,12 +19,15 @@ class RealSwapAvailabilityInteractor(
         swapService.sync(coroutineScope)
     }
 
+    override suspend fun warmUpCommonlyUsedChains(computationScope: CoroutineScope) {
+        swapService.warmUpCommonChains(computationScope)
+    }
+
     override fun anySwapAvailableFlow(): Flow<Boolean> {
         return chainRegistry.enabledChainsFlow().map { it.any(Chain::isSwapSupported) }
     }
 
     override suspend fun swapAvailableFlow(asset: Chain.Asset, coroutineScope: CoroutineScope): Flow<Boolean> {
-        return swapService.availableSwapDirectionsFor(asset, coroutineScope)
-            .map { it.isNotEmpty() }
+        return swapService.hasAvailableSwapDirections(asset, coroutineScope)
     }
 }

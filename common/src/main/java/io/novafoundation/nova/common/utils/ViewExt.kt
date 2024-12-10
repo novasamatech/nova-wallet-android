@@ -268,6 +268,10 @@ fun RecyclerView.findFirstVisiblePosition(): Int {
     return (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 }
 
+fun RecyclerView.findLastVisiblePosition(): Int {
+    return (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+}
+
 fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
     val listener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
@@ -341,6 +345,10 @@ fun View.applyImeInsetts() = applyInsetter {
 }
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
+
+fun View.setBackgroundTintRes(@ColorRes colorRes: Int) {
+    backgroundTintList = ColorStateList.valueOf(context.getColor(colorRes))
+}
 
 fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     setVisible(input is Input.Enabled)

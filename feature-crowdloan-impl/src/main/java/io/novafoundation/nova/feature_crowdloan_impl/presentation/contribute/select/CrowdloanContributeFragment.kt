@@ -78,7 +78,7 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel, F
         viewModel.assetModelFlow.observe {
             binder.crowdloanContributeAmount.setAssetBalance(it.assetBalance)
             binder.crowdloanContributeAmount.setAssetName(it.tokenSymbol)
-            binder.crowdloanContributeAmount.loadAssetImage(it.imageUrl)
+            binder.crowdloanContributeAmount.loadAssetImage(it.icon)
         }
 
         binder.crowdloanContributeAmount.amountInput.bindTo(viewModel.enteredAmountFlow, lifecycleScope)
