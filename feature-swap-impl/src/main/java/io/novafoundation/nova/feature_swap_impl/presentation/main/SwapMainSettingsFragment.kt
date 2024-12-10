@@ -25,20 +25,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.fee.select.FeeAs
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentMainSwapSettingsBinding
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsRate
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsExecutionTime
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsGetAssetIn
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsRoute
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupSelectableFeeToken
 
 import javax.inject.Inject
 

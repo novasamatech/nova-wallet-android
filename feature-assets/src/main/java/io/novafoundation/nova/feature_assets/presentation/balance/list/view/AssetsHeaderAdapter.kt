@@ -12,16 +12,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Nft
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetTitle
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListCrowdloansPromoBanner
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListSearch
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -243,7 +233,7 @@ class HeaderHolder(
         balanceListCrowdloansPromoBanner.setVisible(bannerVisible)
     }
 
-    fun bindAssetViewMode(assetViewModeModel: AssetViewModeModel?) = with(containerView) {
+    fun bindAssetViewMode(assetViewModeModel: AssetViewModeModel?) = with(binder) {
         assetViewModeModel?.let { balanceListAssetTitle.switchTextTo(assetViewModeModel) }
     }
 }

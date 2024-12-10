@@ -9,12 +9,12 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.databinding.ViewTokenAmountBinding
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.android.synthetic.main.view_token_amount.view.viewTokenAmountAmount
-import kotlinx.android.synthetic.main.view_token_amount.view.viewTokenAmountIcon
 
 class TokenAmountModel(
     val amount: String,
@@ -38,6 +38,8 @@ class TokenAmountView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewTokenAmountBinding.inflate(inflater(), this)
+
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
@@ -45,12 +47,10 @@ class TokenAmountView @JvmOverloads constructor(
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
-
-        View.inflate(context, R.layout.view_token_amount, this)
     }
 
     fun setModel(model: TokenAmountModel) {
-        viewTokenAmountAmount.text = model.amount
-        viewTokenAmountIcon.setIcon(model.tokenIcon, imageLoader)
+        binder.viewTokenAmountAmount.text = model.amount
+        binder.viewTokenAmountIcon.setIcon(model.tokenIcon, imageLoader)
     }
 }

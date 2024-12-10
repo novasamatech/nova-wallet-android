@@ -14,24 +14,18 @@ import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapConfirmationBinding
+import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapFeeBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel.FeeOperationModel
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel.SwapComponentFeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-import kotlinx.android.synthetic.main.fragment_swap_fee.swapFeeContent
-import kotlinx.android.synthetic.main.fragment_swap_fee.swapFeeTotal
 
-class SwapFeeFragment : BaseBottomSheetFragment<SwapFeeViewModel>() {
+class SwapFeeFragment : BaseBottomSheetFragment<SwapFeeViewModel, FragmentSwapFeeBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_swap_fee, container, false)
-    }
+    override fun createBinding() = FragmentSwapFeeBinding.inflate(layoutInflater)
 
     override fun initViews() {}
 
@@ -50,11 +44,11 @@ class SwapFeeFragment : BaseBottomSheetFragment<SwapFeeViewModel>() {
             feeState.onLoaded(::showFeeSegments)
         }
 
-        viewModel.totalFee.observe(swapFeeTotal::setText)
+        viewModel.totalFee.observe(binder.swapFeeTotal::setText)
     }
 
     private fun showFeeSegments(feeSegments: List<SwapSegmentFeeModel>) {
-        swapFeeContent.removeAllViews()
+        binder.swapFeeContent.removeAllViews()
 
         return feeSegments.forEachIndexed { index, swapSegmentFeeModel ->
             showFeeSegment(
@@ -88,7 +82,7 @@ class SwapFeeFragment : BaseBottomSheetFragment<SwapFeeViewModel>() {
             }
         }
 
-        swapFeeContent.addView(segmentTable)
+        binder.swapFeeContent.addView(segmentTable)
     }
 
     private fun createFeeComponentViews(model: SwapComponentFeeModel): List<View> {

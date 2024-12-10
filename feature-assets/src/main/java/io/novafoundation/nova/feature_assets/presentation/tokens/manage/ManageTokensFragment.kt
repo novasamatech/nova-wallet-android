@@ -17,13 +17,7 @@ import io.novafoundation.nova.feature_assets.databinding.FragmentManageTokensBin
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.domain.assets.filters.NonZeroBalanceFilter
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensContainer
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensList
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensPlaceholder
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensSearch
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensToolbar
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_manage_tokens.manageTokensSwitchZeroBalances
 
 class ManageTokensFragment :
     BaseFragment<ManageTokensViewModel, FragmentManageTokensBinding>(),

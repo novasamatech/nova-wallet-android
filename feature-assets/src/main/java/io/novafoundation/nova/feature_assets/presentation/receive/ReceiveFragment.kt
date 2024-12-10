@@ -17,18 +17,7 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
-import kotlinx.android.synthetic.main.fragment_receive.receiveQrCode
-import kotlinx.android.synthetic.main.fragment_receive.receiveShare
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_receive.receiveAccount
-import kotlinx.android.synthetic.main.fragment_receive.receiveAddress
-import kotlinx.android.synthetic.main.fragment_receive.receiveBackButton
-import kotlinx.android.synthetic.main.fragment_receive.receiveChain
-import kotlinx.android.synthetic.main.fragment_receive.receiveCopyButton
-import kotlinx.android.synthetic.main.fragment_receive.receiveQrCodeContainer
-import kotlinx.android.synthetic.main.fragment_receive.receiveSubtitle
-import kotlinx.android.synthetic.main.fragment_receive.receiveTitle
-import kotlinx.android.synthetic.main.fragment_receive.receiveToolbar
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
@@ -54,7 +43,7 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>()
         binder.receiveBackButton.setOnClickListener { viewModel.backClicked() }
 
         binder.receiveShare.setOnClickListener {
-            val qrBitmap = receiveQrCode.drawToBitmap()
+            val qrBitmap = binder.receiveQrCode.drawToBitmap()
             viewModel.shareButtonClicked(qrBitmap)
         }
 

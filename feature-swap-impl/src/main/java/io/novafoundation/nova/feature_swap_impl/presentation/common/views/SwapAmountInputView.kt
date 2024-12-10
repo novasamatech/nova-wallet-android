@@ -21,14 +21,6 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.ViewSwapAmountInputBinding
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputContainer
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputError
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputFiat
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputField
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputImage
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitle
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputSubtitleImage
-import kotlinx.android.synthetic.main.view_swap_amount_input.view.swapAmountInputToken
 
 class SwapAmountInputView @JvmOverloads constructor(
     context: Context,

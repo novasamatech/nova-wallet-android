@@ -21,19 +21,6 @@ import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.send.common.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import kotlinx.android.synthetic.main.fragment_select_send.chooseAmountContainer
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendAmount
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendCrossChainFee
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendDestinationChain
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendFromTitle
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendNext
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginChain
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginFee
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendRecipient
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendToTitle
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendToolbar
-import kotlinx.android.synthetic.main.fragment_select_send.selectWallet
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
 private const val KEY_ASSET_PAYLOAD = "KEY_ASSET_PAYLOAD"

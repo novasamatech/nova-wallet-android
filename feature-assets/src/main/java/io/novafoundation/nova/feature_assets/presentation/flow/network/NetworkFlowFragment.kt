@@ -12,17 +12,18 @@ import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentNetworkFlowBinding
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_network_flow.networkFlowList
-import kotlinx.android.synthetic.main.fragment_network_flow.networkFlowToolbar
 
 abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
-    BaseFragment<T>(),
+    BaseFragment<T, FragmentNetworkFlowBinding>(),
     NetworkFlowAdapter.ItemNetworkHandler {
 
     companion object : PayloadCreator<NetworkFlowPayload> by FragmentPayloadCreator()
+
+    override fun createBinding() = FragmentNetworkFlowBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -39,21 +40,14 @@ abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
         ConcatAdapter(titleAdapter, networkAdapter)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_network_flow, container, false)
-    }
 
     override fun initViews() {
-        networkFlowToolbar.applyStatusBarInsets()
-        networkFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.networkFlowToolbar.applyStatusBarInsets()
+        binder.networkFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        networkFlowList.setHasFixedSize(true)
-        networkFlowList.adapter = adapter
-        networkFlowList.itemAnimator = null
+        binder.networkFlowList.setHasFixedSize(true)
+        binder.networkFlowList.adapter = adapter
+        binder.networkFlowList.itemAnimator = null
     }
 
     override fun subscribe(viewModel: T) {

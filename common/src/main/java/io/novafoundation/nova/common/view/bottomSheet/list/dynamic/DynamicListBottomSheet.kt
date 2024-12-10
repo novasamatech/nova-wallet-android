@@ -16,12 +16,6 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetContent
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetHeader
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetItemContainer
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetRightAction
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetSubtitle
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetTitle
 
 typealias ClickHandler<T> = (BaseDynamicListBottomSheet, T) -> Unit
 
@@ -57,7 +51,7 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
     }
 
     fun setSubtitle(subtitle: CharSequence?) {
-        dynamicListSheetSubtitle.setTextOrHide(subtitle)
+        binder.dynamicListSheetSubtitle.setTextOrHide(subtitle)
     }
 
     final override fun setTitle(titleId: Int) {

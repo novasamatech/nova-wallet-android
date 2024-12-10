@@ -7,36 +7,25 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.feature_assets.databinding.FragmentManageTokensBinding
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentAppearanceBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceColoredButton
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceColoredIcon
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceColoredText
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceToolbar
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceWhiteButton
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceWhiteIcon
-import kotlinx.android.synthetic.main.fragment_appearance.appearanceWhiteText
 
-class AppearanceFragment : BaseFragment<AppearanceViewModel>() {
+class AppearanceFragment : BaseFragment<AppearanceViewModel, FragmentAppearanceBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_appearance, container, false)
-    }
+    override fun createBinding() = FragmentAppearanceBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        appearanceToolbar.applyStatusBarInsets()
-        appearanceToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.appearanceToolbar.applyStatusBarInsets()
+        binder.appearanceToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        appearanceWhiteButton.setOnClickListener { viewModel.selectWhiteIcon() }
-        appearanceColoredButton.setOnClickListener { viewModel.selectColoredIcon() }
+        binder.appearanceWhiteButton.setOnClickListener { viewModel.selectWhiteIcon() }
+        binder.appearanceColoredButton.setOnClickListener { viewModel.selectColoredIcon() }
 
-        appearanceWhiteButton.background = getRippleDrawable(cornerSizeInDp = 10)
-        appearanceColoredButton.background = getRippleDrawable(cornerSizeInDp = 10)
+        binder.appearanceWhiteButton.background = getRippleDrawable(cornerSizeInDp = 10)
+        binder.appearanceColoredButton.background = getRippleDrawable(cornerSizeInDp = 10)
     }
 
     override fun inject() {
@@ -51,11 +40,11 @@ class AppearanceFragment : BaseFragment<AppearanceViewModel>() {
 
     override fun subscribe(viewModel: AppearanceViewModel) {
         viewModel.assetIconsStateFlow.observe {
-            appearanceWhiteIcon.isSelected = it.whiteActive
-            appearanceWhiteText.isSelected = it.whiteActive
+            binder.appearanceWhiteIcon.isSelected = it.whiteActive
+            binder.appearanceWhiteText.isSelected = it.whiteActive
 
-            appearanceColoredIcon.isSelected = it.coloredActive
-            appearanceColoredText.isSelected = it.coloredActive
+            binder.appearanceColoredIcon.isSelected = it.coloredActive
+            binder.appearanceColoredText.isSelected = it.coloredActive
         }
     }
 }

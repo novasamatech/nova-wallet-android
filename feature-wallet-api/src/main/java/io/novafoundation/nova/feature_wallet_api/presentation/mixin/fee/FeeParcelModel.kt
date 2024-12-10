@@ -7,9 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.runtime.util.ChainAssetParcel
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import kotlinx.android.parcel.Parcelize
 import kotlinx.parcelize.Parcelize
-import java.math.BigDecimal
 import java.math.BigInteger
 
 sealed interface FeeParcelModel : Parcelable {
