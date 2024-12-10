@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.governance.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -9,13 +8,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIconToTarget
-import io.novafoundation.nova.feature_push_notifications.R
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemNewReferenda
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemReferendumUpdate
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemState
-import kotlinx.android.synthetic.main.item_push_governance_settings.view.pushGovernanceItemTracks
+import io.novafoundation.nova.feature_push_notifications.databinding.ItemPushGovernanceSettingsBinding
 
 class PushGovernanceSettingsAdapter(
     private val imageLoader: ImageLoader,
@@ -33,7 +28,7 @@ class PushGovernanceSettingsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PushGovernanceItemViewHolder {
-        return PushGovernanceItemViewHolder(parent.inflateChild(R.layout.item_push_governance_settings), imageLoader, itemHandler)
+        return PushGovernanceItemViewHolder(ItemPushGovernanceSettingsBinding.inflate(parent.inflater(), parent, false), imageLoader, itemHandler)
     }
 
     override fun onBindViewHolder(holder: PushGovernanceItemViewHolder, position: Int) {
@@ -70,22 +65,22 @@ class PushGovernanceItemCallback() : DiffUtil.ItemCallback<PushGovernanceRVItem>
 }
 
 class PushGovernanceItemViewHolder(
-    itemView: View,
+    private val binder: ItemPushGovernanceSettingsBinding,
     private val imageLoader: ImageLoader,
     private val itemHandler: PushGovernanceSettingsAdapter.ItemHandler
-) : ViewHolder(itemView) {
+) : ViewHolder(binder.root) {
 
     init {
-        itemView.pushGovernanceItemState.setIconTintColor(null)
+        binder.pushGovernanceItemState.setIconTintColor(null)
     }
 
     fun bind(item: PushGovernanceRVItem) {
         with(itemView) {
             updateListenners(item)
 
-            pushGovernanceItemState.setTitle(item.chainName)
+            binder.pushGovernanceItemState.setTitle(item.chainName)
             imageLoader.loadChainIconToTarget(item.chainIconUrl, context) {
-                pushGovernanceItemState.setIcon(it)
+                binder.pushGovernanceItemState.setIcon(it)
             }
 
             setEnabled(item)
@@ -96,11 +91,11 @@ class PushGovernanceItemViewHolder(
     }
 
     fun setTracks(item: PushGovernanceRVItem) {
-        itemView.pushGovernanceItemTracks.setValue(item.tracksText)
+        binder.pushGovernanceItemTracks.setValue(item.tracksText)
     }
 
     fun setEnabled(item: PushGovernanceRVItem) {
-        with(itemView) {
+        with(binder) {
             pushGovernanceItemState.setChecked(item.isEnabled)
             pushGovernanceItemNewReferenda.isVisible = item.isEnabled
             pushGovernanceItemReferendumUpdate.isVisible = item.isEnabled
@@ -110,18 +105,18 @@ class PushGovernanceItemViewHolder(
     }
 
     fun setNewReferendaEnabled(item: PushGovernanceRVItem) {
-        itemView.pushGovernanceItemNewReferenda.setChecked(item.isNewReferendaEnabled)
+        binder.pushGovernanceItemNewReferenda.setChecked(item.isNewReferendaEnabled)
     }
 
     fun setReferendaUpdatesEnabled(item: PushGovernanceRVItem) {
-        itemView.pushGovernanceItemReferendumUpdate.setChecked(item.isReferendaUpdatesEnabled)
+        binder.pushGovernanceItemReferendumUpdate.setChecked(item.isReferendaUpdatesEnabled)
     }
 
     fun updateListenners(item: PushGovernanceRVItem) {
-        itemView.pushGovernanceItemState.setOnClickListener { itemHandler.enableSwitcherClick(item) }
-        itemView.pushGovernanceItemNewReferenda.setOnClickListener { itemHandler.newReferendaClick(item) }
-        itemView.pushGovernanceItemReferendumUpdate.setOnClickListener { itemHandler.referendaUpdatesClick(item) }
-        itemView.pushGovernanceItemTracks.setOnClickListener { itemHandler.tracksClicked(item) }
+        binder.pushGovernanceItemState.setOnClickListener { itemHandler.enableSwitcherClick(item) }
+        binder.pushGovernanceItemNewReferenda.setOnClickListener { itemHandler.newReferendaClick(item) }
+        binder.pushGovernanceItemReferendumUpdate.setOnClickListener { itemHandler.referendaUpdatesClick(item) }
+        binder.pushGovernanceItemTracks.setOnClickListener { itemHandler.tracksClicked(item) }
     }
 }
 

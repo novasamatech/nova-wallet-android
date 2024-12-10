@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 @Parcelize

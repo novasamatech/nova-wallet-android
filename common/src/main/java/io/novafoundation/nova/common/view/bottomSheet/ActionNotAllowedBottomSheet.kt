@@ -2,47 +2,43 @@ package io.novafoundation.nova.common.view.bottomSheet
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.setPadding
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.BottomSheetActionNotAllowedBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.view.PrimaryButton
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedImage
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedOk
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedSubtitle
-import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedTitle
 
 open class ActionNotAllowedBottomSheet(
     context: Context,
     private val onSuccess: () -> Unit,
-) : BaseBottomSheet(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
+) : BaseBottomSheet<BottomSheetActionNotAllowedBinding>(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
+
+    override val binder = BottomSheetActionNotAllowedBinding.inflate(LayoutInflater.from(context))
 
     val iconView: ImageView
-        get() = actionNotAllowedImage
+        get() = binder.actionNotAllowedImage
 
     val titleView: TextView
-        get() = actionNotAllowedTitle
+        get() = binder.actionNotAllowedTitle
 
     val subtitleView: TextView
-        get() = actionNotAllowedSubtitle
+        get() = binder.actionNotAllowedSubtitle
 
     val buttonView: PrimaryButton
-        get() = actionNotAllowedOk
-
-    init {
-        setContentView(R.layout.bottom_sheet_action_not_allowed)
-    }
+        get() = binder.actionNotAllowedOk
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setOnDismissListener { onSuccess() }
 
-        actionNotAllowedOk.setOnClickListener {
+        binder.actionNotAllowedOk.setOnClickListener {
             dismiss()
         }
     }

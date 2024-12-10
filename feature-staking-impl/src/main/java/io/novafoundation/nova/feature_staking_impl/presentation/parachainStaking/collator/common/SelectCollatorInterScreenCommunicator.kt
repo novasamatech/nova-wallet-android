@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.CollatorParcelModel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface SelectCollatorInterScreenRequester : InterScreenRequester<Request, Response>
 interface SelectCollatorInterScreenResponder : InterScreenResponder<Request, Response>

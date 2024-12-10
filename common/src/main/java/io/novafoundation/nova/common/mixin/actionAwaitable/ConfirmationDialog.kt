@@ -36,7 +36,7 @@ fun BaseFragmentMixin<*>.setupConfirmationDialog(
     }
 }
 
-fun BaseFragment<*>.setupConfirmationOrDenyDialog(@StyleRes style: Int, awaitableMixin: ConfirmOrDenyAwaitable<ConfirmationDialogInfo>) {
+fun BaseFragment<*, *>.setupConfirmationOrDenyDialog(@StyleRes style: Int, awaitableMixin: ConfirmOrDenyAwaitable<ConfirmationDialogInfo>) {
     awaitableMixin.awaitableActionLiveData.observeEvent { action ->
         dialog(requireContext(), style) {
             setTitle(action.payload.title)

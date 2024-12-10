@@ -1,23 +1,23 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff
 
 import android.content.Context
+import android.view.LayoutInflater
 import io.novafoundation.nova.common.utils.addColor
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.diff.CloudBackupDiff
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentBackupDiffBinding
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter.CloudBackupDiffAdapter
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffApply
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffCancel
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffList
-import kotlinx.android.synthetic.main.fragment_backup_diff.backupDiffSubtitle
 
 class CloudBackupDiffBottomSheet(
     context: Context,
     private val payload: Payload,
     onApply: (CloudBackupDiff, CloudBackup) -> Unit,
-) : BaseBottomSheet(context) {
+) : BaseBottomSheet<FragmentBackupDiffBinding>(context) {
+
+    override val binder: FragmentBackupDiffBinding = FragmentBackupDiffBinding.inflate(LayoutInflater.from(context))
 
     class Payload(val diffList: List<Any>, val cloudBackupDiff: CloudBackupDiff, val cloudBackup: CloudBackup)
 
@@ -26,12 +26,11 @@ class CloudBackupDiffBottomSheet(
     }
 
     init {
-        setContentView(R.layout.fragment_backup_diff)
-        backupDiffSubtitle.text = buildSubtitleText()
-        backupDiffList.adapter = adapter
+        binder.backupDiffSubtitle.text = buildSubtitleText()
+        binder.backupDiffList.adapter = adapter
 
-        backupDiffCancel.setOnClickListener { dismiss() }
-        backupDiffApply.setOnClickListener {
+        binder.backupDiffCancel.setOnClickListener { dismiss() }
+        binder.backupDiffApply.setOnClickListener {
             onApply(payload.cloudBackupDiff, payload.cloudBackup)
             dismiss()
         }

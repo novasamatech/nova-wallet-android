@@ -1,13 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupSeedBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupItemHandler
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
-import kotlinx.android.synthetic.main.item_manual_backup_seed.view.manualBackupSecretsSeedContainer
-import kotlinx.android.synthetic.main.item_manual_backup_seed.view.manualBackupSecretsSeedLabel
-import kotlinx.android.synthetic.main.item_manual_backup_seed.view.manualBackupSecretsSeedText
 
 data class ManualBackupSeedRvItem(
     val label: String,
@@ -20,14 +17,15 @@ data class ManualBackupSeedRvItem(
     }
 }
 
-class ManualBackupSeedViewHolder(itemView: View, private val itemHandler: ManualBackupItemHandler) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupSeedViewHolder(private val binder: ItemManualBackupSeedBinding, private val itemHandler: ManualBackupItemHandler) :
+    ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupSeedRvItem)
-        itemView.manualBackupSecretsSeedLabel.text = item.label
-        itemView.manualBackupSecretsSeedContainer.showContent(item.isShown)
-        itemView.manualBackupSecretsSeedText.text = item.seed
+        binder.manualBackupSecretsSeedLabel.text = item.label
+        binder.manualBackupSecretsSeedContainer.showContent(item.isShown)
+        binder.manualBackupSecretsSeedText.text = item.seed
 
-        itemView.manualBackupSecretsSeedContainer.onContentShownListener { itemHandler.onTapToRevealClicked(item) }
+        binder.manualBackupSecretsSeedContainer.onContentShownListener { itemHandler.onTapToRevealClicked(item) }
     }
 }

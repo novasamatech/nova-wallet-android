@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.se
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ContributePayload(

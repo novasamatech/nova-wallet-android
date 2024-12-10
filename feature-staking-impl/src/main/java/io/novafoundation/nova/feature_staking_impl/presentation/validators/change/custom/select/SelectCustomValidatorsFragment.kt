@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,21 +11,15 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSelectCustomValidatorsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsClearFilters
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsContainer
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsCount
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsDeselectAll
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsFillWithRecommended
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsList
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsNext
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsSorting
-import kotlinx.android.synthetic.main.fragment_select_custom_validators.selectCustomValidatorsToolbar
 
-class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
+class SelectCustomValidatorsFragment :
+    BaseFragment<SelectCustomValidatorsViewModel, FragmentSelectCustomValidatorsBinding>(),
+    StakeTargetAdapter.ItemHandler<Validator> {
 
     companion object {
 
@@ -40,48 +32,42 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
         }
     }
 
+    override fun createBinding() = FragmentSelectCustomValidatorsBinding.inflate(layoutInflater)
+
     val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)
     }
 
     var filterAction: ImageView? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_select_custom_validators, container, false)
-    }
-
     override fun initViews() {
-        selectCustomValidatorsContainer.applyInsetter {
+        binder.selectCustomValidatorsContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
         }
 
-        selectCustomValidatorsList.adapter = adapter
-        selectCustomValidatorsList.setHasFixedSize(true)
+        binder.selectCustomValidatorsList.adapter = adapter
+        binder.selectCustomValidatorsList.setHasFixedSize(true)
 
-        selectCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        filterAction = selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
+        filterAction = binder.selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_filter) {
             viewModel.settingsClicked()
         }
 
-        selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_search) {
+        binder.selectCustomValidatorsToolbar.addCustomAction(R.drawable.ic_search) {
             viewModel.searchClicked()
         }
 
-        selectCustomValidatorsList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
+        binder.selectCustomValidatorsList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
 
-        selectCustomValidatorsFillWithRecommended.setOnClickListener { viewModel.fillRestWithRecommended() }
-        selectCustomValidatorsClearFilters.setOnClickListener { viewModel.clearFilters() }
-        selectCustomValidatorsDeselectAll.setOnClickListener { viewModel.deselectAll() }
+        binder.selectCustomValidatorsFillWithRecommended.setOnClickListener { viewModel.fillRestWithRecommended() }
+        binder.selectCustomValidatorsClearFilters.setOnClickListener { viewModel.clearFilters() }
+        binder.selectCustomValidatorsDeselectAll.setOnClickListener { viewModel.deselectAll() }
 
-        selectCustomValidatorsNext.setOnClickListener { viewModel.nextClicked() }
+        binder.selectCustomValidatorsNext.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun onDestroyView() {
@@ -103,21 +89,21 @@ class SelectCustomValidatorsFragment : BaseFragment<SelectCustomValidatorsViewMo
     override fun subscribe(viewModel: SelectCustomValidatorsViewModel) {
         viewModel.validatorModelsFlow.observe(adapter::submitList)
 
-        viewModel.selectedTitle.observe(selectCustomValidatorsCount::setText)
+        viewModel.selectedTitle.observe(binder.selectCustomValidatorsCount::setText)
 
         viewModel.buttonState.observe {
-            selectCustomValidatorsNext.text = it.text
+            binder.selectCustomValidatorsNext.text = it.text
 
             val state = if (it.enabled) ButtonState.NORMAL else ButtonState.DISABLED
 
-            selectCustomValidatorsNext.setState(state)
+            binder.selectCustomValidatorsNext.setState(state)
         }
 
-        viewModel.scoringHeader.observe(selectCustomValidatorsSorting::setText)
+        viewModel.scoringHeader.observe(binder.selectCustomValidatorsSorting::setText)
 
-        viewModel.fillWithRecommendedEnabled.observe(selectCustomValidatorsFillWithRecommended::setEnabled)
-        viewModel.clearFiltersEnabled.observe(selectCustomValidatorsClearFilters::setEnabled)
-        viewModel.deselectAllEnabled.observe(selectCustomValidatorsDeselectAll::setEnabled)
+        viewModel.fillWithRecommendedEnabled.observe(binder.selectCustomValidatorsFillWithRecommended::setEnabled)
+        viewModel.clearFiltersEnabled.observe(binder.selectCustomValidatorsClearFilters::setEnabled)
+        viewModel.deselectAllEnabled.observe(binder.selectCustomValidatorsDeselectAll::setEnabled)
 
         viewModel.recommendationSettingsIcon.observe { icon ->
             filterAction?.setImageResource(icon)

@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
 
 class AssetSendFlowFragment : AssetFlowFragment<AssetSendFlowViewModel>() {
 
@@ -13,7 +12,7 @@ class AssetSendFlowFragment : AssetFlowFragment<AssetSendFlowViewModel>() {
         super.initViews()
         setTitle(R.string.wallet_asset_send)
 
-        assetFlowPlaceholder.setButtonClickListener {
+        binder.assetFlowPlaceholder.setButtonClickListener {
             viewModel.openBuyFlow()
         }
     }

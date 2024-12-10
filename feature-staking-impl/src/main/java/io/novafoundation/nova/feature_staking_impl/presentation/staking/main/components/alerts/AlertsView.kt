@@ -2,15 +2,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_alerts.view.alertShimmer
-import kotlinx.android.synthetic.main.view_alerts.view.alertsRecycler
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewAlertsBinding
 
 class AlertsView @JvmOverloads constructor(
     context: Context,
@@ -20,16 +18,16 @@ class AlertsView @JvmOverloads constructor(
 
     private val alertsAdapter = AlertsAdapter()
 
-    init {
-        View.inflate(context, R.layout.view_alerts, this)
+    private val binder = ViewAlertsBinding.inflate(inflater(), this)
 
+    init {
         orientation = VERTICAL
 
         with(context) {
             background = getBlockDrawable()
         }
 
-        alertsRecycler.adapter = alertsAdapter
+        binder.alertsRecycler.adapter = alertsAdapter
     }
 
     fun setStatus(alerts: List<AlertModel>) {
@@ -38,16 +36,16 @@ class AlertsView @JvmOverloads constructor(
         } else {
             makeVisible()
 
-            alertShimmer.makeGone()
-            alertsRecycler.makeVisible()
+            binder.alertShimmer.makeGone()
+            binder.alertsRecycler.makeVisible()
 
             alertsAdapter.submitList(alerts)
         }
     }
 
     fun showLoading() {
-        alertShimmer.makeVisible()
-        alertsRecycler.makeGone()
+        binder.alertShimmer.makeVisible()
+        binder.alertsRecycler.makeGone()
     }
 }
 

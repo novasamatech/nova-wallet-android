@@ -19,10 +19,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.injectionLayoutParams
-import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeDescription
-import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeScrollableContent
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeAmount
-import kotlinx.android.synthetic.main.fragment_contribute_confirm.view.confirmContributeInjectionParent
+
 import kotlinx.coroutines.CoroutineScope
 
 abstract class MainFlowMoonbeamCustomization(
@@ -72,8 +69,8 @@ class SelectContributeMoonbeamCustomization(
         injectViews(
             state = state,
             scope = scope,
-            injectionContainer = into.crowdloanContributeScrollableContent,
-            anchor = into.crowdloanContributeDescription,
+            injectionContainer = into.findViewById(R.id.crowdloanContributeScrollableContent),
+            anchor = into.findViewById(R.id.crowdloanContributeDescription),
             titleView = TextView(into.context, null, 0, R.style.TextAppearance_NovaFoundation_Header4).apply {
                 layoutParams = injectionLayoutParams(context, topMarginDp = 22)
             }
@@ -100,8 +97,8 @@ class ConfirmContributeMoonbeamCustomization(
         injectViews(
             state = state,
             scope = scope,
-            injectionContainer = into.confirmContributeInjectionParent,
-            anchor = into.confirmContributeAmount,
+            injectionContainer = into.findViewById(R.id.confirmContributeInjectionParent),
+            anchor = into.findViewById(R.id.confirmContributeAmount),
             titleView = TextView(into.context, null, 0, R.style.TextAppearance_NovaFoundation_Body1).apply {
                 layoutParams = injectionLayoutParams(context, topMarginDp = 12)
 

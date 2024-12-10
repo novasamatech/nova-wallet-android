@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.start
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -11,37 +7,28 @@ import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartChangeValidatorsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsContainer
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsCustom
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsRecommended
-import kotlinx.android.synthetic.main.fragment_start_change_validators.startChangeValidatorsToolbar
 
-class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewModel>() {
+class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewModel, FragmentStartChangeValidatorsBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_start_change_validators, container, false)
-    }
+    override fun createBinding() = FragmentStartChangeValidatorsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        startChangeValidatorsContainer.applyInsetter {
+        binder.startChangeValidatorsContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
         }
 
-        startChangeValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.startChangeValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        startChangeValidatorsRecommended.setupAction(viewLifecycleOwner) { viewModel.goToRecommendedClicked() }
-        startChangeValidatorsRecommended.setOnLearnMoreClickedListener { viewModel.recommendedLearnMoreClicked() }
+        binder.startChangeValidatorsRecommended.setupAction(viewLifecycleOwner) { viewModel.goToRecommendedClicked() }
+        binder.startChangeValidatorsRecommended.setOnLearnMoreClickedListener { viewModel.recommendedLearnMoreClicked() }
 
-        startChangeValidatorsCustom.background = getRoundedCornerDrawable(R.color.block_background).withRippleMask()
-        startChangeValidatorsCustom.setOnClickListener { viewModel.goToCustomClicked() }
+        binder.startChangeValidatorsCustom.background = getRoundedCornerDrawable(R.color.block_background).withRippleMask()
+        binder.startChangeValidatorsCustom.setOnClickListener { viewModel.goToCustomClicked() }
     }
 
     override fun inject() {
@@ -58,14 +45,14 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
         observeBrowserEvents(viewModel)
 
         viewModel.validatorsLoading.observe { loading ->
-            startChangeValidatorsRecommended.action.setProgressState(loading)
-            startChangeValidatorsCustom.setInProgress(loading)
+            binder.startChangeValidatorsRecommended.action.setProgressState(loading)
+            binder.startChangeValidatorsCustom.setInProgress(loading)
         }
 
         viewModel.customValidatorsTexts.observe {
-            startChangeValidatorsToolbar.setTitle(it.toolbarTitle)
-            startChangeValidatorsCustom.title.text = it.selectManuallyTitle
-            startChangeValidatorsCustom.setBadgeText(it.selectManuallyBadge)
+            binder.startChangeValidatorsToolbar.setTitle(it.toolbarTitle)
+            binder.startChangeValidatorsCustom.title.text = it.selectManuallyTitle
+            binder.startChangeValidatorsCustom.setBadgeText(it.selectManuallyBadge)
         }
     }
 }

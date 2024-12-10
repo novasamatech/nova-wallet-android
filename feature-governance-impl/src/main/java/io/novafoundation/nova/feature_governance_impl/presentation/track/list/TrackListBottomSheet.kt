@@ -2,17 +2,16 @@ package io.novafoundation.nova.feature_governance_impl.presentation.track.list
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter.Handler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemTrackBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.track.setTrackModel
-import kotlinx.android.synthetic.main.item_track.view.itemTrack
 
 class TrackListBottomSheet(
     context: Context,
@@ -26,16 +25,16 @@ class TrackListBottomSheet(
     }
 
     override fun holderCreator(): HolderCreator<TrackModel> = {
-        TrackHolder(it.inflateChild(R.layout.item_track))
+        TrackHolder(ItemTrackBinding.inflate(it.inflater(), it, false))
     }
 }
 
 class TrackHolder(
-    itemView: View
-) : DynamicListSheetAdapter.Holder<TrackModel>(itemView) {
+    private val binder: ItemTrackBinding
+) : DynamicListSheetAdapter.Holder<TrackModel>(binder.root) {
 
     override fun bind(item: TrackModel, isSelected: Boolean, handler: Handler<TrackModel>) {
-        itemView.itemTrack.setTrackModel(item)
+        binder.itemTrack.setTrackModel(item)
     }
 }
 

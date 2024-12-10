@@ -1,26 +1,21 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.staking
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_push_notifications.R
+import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushStakingSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter.PushStakingRVItem
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.adapter.PushStakingSettingsAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingList
-import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingProgress
-import kotlinx.android.synthetic.main.fragment_push_staking_settings.pushStakingToolbar
 
-class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel>(), PushStakingSettingsAdapter.ItemHandler {
+class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel, FragmentPushStakingSettingsBinding>(), PushStakingSettingsAdapter.ItemHandler {
 
     companion object {
         private const val KEY_REQUEST = "KEY_REQUEST"
@@ -32,6 +27,8 @@ class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel>()
         }
     }
 
+    override fun createBinding() = FragmentPushStakingSettingsBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
@@ -39,17 +36,13 @@ class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel>()
         PushStakingSettingsAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_push_staking_settings, container, false)
-    }
-
     override fun initViews() {
-        pushStakingToolbar.applyStatusBarInsets()
-        pushStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
-        pushStakingToolbar.setRightActionClickListener { viewModel.clearClicked() }
+        binder.pushStakingToolbar.applyStatusBarInsets()
+        binder.pushStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.pushStakingToolbar.setRightActionClickListener { viewModel.clearClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        pushStakingList.adapter = adapter
+        binder.pushStakingList.adapter = adapter
     }
 
     override fun inject() {
@@ -61,12 +54,12 @@ class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel>()
 
     override fun subscribe(viewModel: PushStakingSettingsViewModel) {
         viewModel.clearButtonEnabledFlow.observe {
-            pushStakingToolbar.setRightActionEnabled(it)
+            binder.pushStakingToolbar.setRightActionEnabled(it)
         }
 
         viewModel.stakingSettingsList.observe {
-            pushStakingList.isVisible = it is ExtendedLoadingState.Loaded
-            pushStakingProgress.isVisible = it is ExtendedLoadingState.Loading
+            binder.pushStakingList.isVisible = it is ExtendedLoadingState.Loaded
+            binder.pushStakingProgress.isVisible = it is ExtendedLoadingState.Loading
 
             if (it is ExtendedLoadingState.Loaded) {
                 adapter.submitList(it.data)

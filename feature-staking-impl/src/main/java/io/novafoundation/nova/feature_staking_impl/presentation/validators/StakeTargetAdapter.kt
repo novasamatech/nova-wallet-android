@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -8,22 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.presentation.setColoredText
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetCheck
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetActionIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetIcon
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetName
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringPrimary
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetScoringSecondary
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleLabel
-import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetSubtitleValue
 
 class StakeTargetAdapter<V>(
     private val itemHandler: ItemHandler<V>,
@@ -56,9 +46,7 @@ class StakeTargetAdapter<V>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StakingTargetViewHolder<V> {
-        val view = parent.inflateChild(R.layout.item_validator)
-
-        return StakingTargetViewHolder(view)
+        return StakingTargetViewHolder(ItemValidatorBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: StakingTargetViewHolder<V>, position: Int) {
@@ -86,13 +74,13 @@ class StakeTargetAdapter<V>(
     }
 }
 
-class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+class StakingTargetViewHolder<V>(private val binder: ItemValidatorBinding) : RecyclerView.ViewHolder(binder.root) {
 
     fun bind(
         stakeTargetModel: StakeTargetModel<V>,
         itemHandler: StakeTargetAdapter.ItemHandler<V>,
         mode: StakeTargetAdapter.Mode
-    ) = with(containerView) {
+    ) = with(binder) {
         itemStakingTargetName.text = stakeTargetModel.addressModel.nameOrAddress
         itemStakingTargetIcon.setImageDrawable(stakeTargetModel.addressModel.image)
 
@@ -100,7 +88,7 @@ class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerVie
             itemHandler.stakeTargetInfoClicked(stakeTargetModel)
         }
 
-        setOnClickListener {
+        root.setOnClickListener {
             itemHandler.stakeTargetClicked(stakeTargetModel)
         }
 
@@ -114,7 +102,7 @@ class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerVie
         mode: StakeTargetAdapter.Mode,
         StakeTargetModel: StakeTargetModel<V>,
         handler: StakeTargetAdapter.ItemHandler<V>
-    ) = with(containerView) {
+    ) = with(binder) {
         when {
             mode == StakeTargetAdapter.Mode.EDIT -> {
                 itemStakingTargetActionIcon.makeVisible()
@@ -137,7 +125,7 @@ class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerVie
         }
     }
 
-    fun bindScoring(StakeTargetModel: StakeTargetModel<*>) = with(containerView) {
+    fun bindScoring(StakeTargetModel: StakeTargetModel<*>) = with(binder) {
         when (val scoring = StakeTargetModel.scoring) {
             null -> {
                 itemStakingTargetScoringPrimary.makeGone()
@@ -161,7 +149,7 @@ class StakingTargetViewHolder<V>(override val containerView: View) : RecyclerVie
         }
     }
 
-    fun bindSubtitle(item: StakeTargetModel<*>) = with(containerView) {
+    fun bindSubtitle(item: StakeTargetModel<*>) = with(binder) {
         if (item.subtitle != null) {
             itemStakingTargetSubtitleLabel.makeVisible()
             itemStakingTargetSubtitleValue.makeVisible()

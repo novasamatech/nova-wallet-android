@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
 @Parcelize

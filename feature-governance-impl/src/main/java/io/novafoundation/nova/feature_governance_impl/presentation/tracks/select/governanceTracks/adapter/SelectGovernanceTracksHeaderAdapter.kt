@@ -1,23 +1,19 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.delegationTracks.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
-import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_governance_tracks_header.view.selectGovernanceTracksChain
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemGovernanceTracksHeaderBinding
 
 class SelectGovernanceTracksHeaderAdapter : RecyclerView.Adapter<SelectGovernanceTracksHeaderViewHolder>() {
 
     var chainUi: ChainUi? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectGovernanceTracksHeaderViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_governance_tracks_header)
-
-        return SelectGovernanceTracksHeaderViewHolder(containerView)
+        return SelectGovernanceTracksHeaderViewHolder(ItemGovernanceTracksHeaderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun getItemCount(): Int {
@@ -33,9 +29,9 @@ class SelectGovernanceTracksHeaderAdapter : RecyclerView.Adapter<SelectGovernanc
     }
 }
 
-class SelectGovernanceTracksHeaderViewHolder(containerView: View) : ViewHolder(containerView) {
+class SelectGovernanceTracksHeaderViewHolder(private val binder: ItemGovernanceTracksHeaderBinding) : ViewHolder(binder.root) {
 
-    fun bind(chainUi: ChainUi?) = with(itemView) {
+    fun bind(chainUi: ChainUi?) = with(binder) {
         selectGovernanceTracksChain.setVisible(chainUi != null)
         chainUi?.let { selectGovernanceTracksChain.setChain(chainUi) }
     }

@@ -4,22 +4,18 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.InputType
 import android.util.AttributeSet
-import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewChooseAmountOldBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
-import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAmountInput
-import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetBalance
-import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetPriceAmount
-import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetImage
-import kotlinx.android.synthetic.main.view_choose_amount_old.view.stakingAssetToken
 
 class AmountView @JvmOverloads constructor(
     context: Context,
@@ -27,16 +23,16 @@ class AmountView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
+    private val binder = ViewChooseAmountOldBinding.inflate(inflater(), this)
+
     val amountInput: EditText
-        get() = stakingAmountInput
+        get() = binder.stakingAmountInput
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
 
     init {
-        View.inflate(context, R.layout.view_choose_amount_old, this)
-
         setBackground()
 
         applyAttributes(attrs)
@@ -85,22 +81,22 @@ class AmountView @JvmOverloads constructor(
     }
 
     fun setAssetImage(image: Drawable) {
-        stakingAssetImage.setImageDrawable(image)
+        binder.stakingAssetImage.setImageDrawable(image)
     }
 
     fun loadAssetImage(icon: Icon) {
-        stakingAssetImage.setIcon(icon, imageLoader)
+        binder.stakingAssetImage.setIcon(icon, imageLoader)
     }
 
     fun setAssetName(name: String) {
-        stakingAssetToken.text = name
+        binder.stakingAssetToken.text = name
     }
 
     fun setAssetBalance(balance: String) {
-        stakingAssetBalance.text = balance
+        binder.stakingAssetBalance.text = balance
     }
 
     fun setFiatAmount(priceAmount: String?) {
-        stakingAssetPriceAmount.setTextOrHide(priceAmount)
+        binder.stakingAssetPriceAmount.setTextOrHide(priceAmount)
     }
 }

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
 import java.math.BigInteger
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface TinderGovVoteRequester : InterScreenRequester<TinderGovVoteRequester.Request, TinderGovVoteResponder.Response> {
 

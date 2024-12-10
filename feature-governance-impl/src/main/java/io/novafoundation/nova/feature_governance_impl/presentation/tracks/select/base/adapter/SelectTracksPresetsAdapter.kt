@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegationTracksPresetBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTracksPresetModel
-import kotlinx.android.synthetic.main.item_delegation_tracks_preset.view.itemDelegationTracksPreset
 
 class SelectTracksPresetsAdapter(
     private val handler: Handler
@@ -19,9 +17,7 @@ class SelectTracksPresetsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationTrackPresetViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegation_tracks_preset)
-
-        return DelegationTrackPresetViewHolder(containerView, handler)
+        return DelegationTrackPresetViewHolder(ItemDelegationTracksPresetBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: DelegationTrackPresetViewHolder, position: Int) {
@@ -40,16 +36,16 @@ private object TracksPresetDiffCallback : DiffUtil.ItemCallback<DelegationTracks
 }
 
 class DelegationTrackPresetViewHolder(
-    containerView: View,
+    private val binder: ItemDelegationTracksPresetBinding,
     handler: SelectTracksPresetsAdapter.Handler
-) : ViewHolder(containerView) {
+) : ViewHolder(binder.root) {
 
     init {
-        containerView.setOnClickListener { handler.presetClicked(bindingAdapterPosition) }
+        binder.root.setOnClickListener { handler.presetClicked(bindingAdapterPosition) }
     }
 
     fun bind(item: DelegationTracksPresetModel) {
-        with(itemView) {
+        with(binder) {
             itemDelegationTracksPreset.text = item.label
         }
     }

@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -18,25 +18,19 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentExtrinsicDetailsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.model.ExtrinsicContentModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.model.ExtrinsicContentModel.BlockEntry
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicContentContainer
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmount
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailIcon
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailNetwork
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailSender
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailStatus
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailToolbar
+
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_extrinsic_details.extrinsicDetailAmountFiat
 
 private const val KEY_EXTRINSIC = "KEY_EXTRINSIC"
 
-class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
+class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel, FragmentExtrinsicDetailsBinding>() {
 
     companion object {
         fun getBundle(operation: OperationParcelizeModel.Extrinsic) = Bundle().apply {
@@ -44,19 +38,15 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         }
     }
 
+    override fun createBinding() = FragmentExtrinsicDetailsBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_extrinsic_details, container, false)
-
     override fun initViews() {
-        extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.extrinsicDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        extrinsicDetailSender.setOnClickListener {
+        binder.extrinsicDetailSender.setOnClickListener {
             viewModel.fromAddressClicked()
         }
     }
@@ -77,23 +67,23 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            extrinsicDetailStatus.showOperationStatus(statusAppearance)
-            extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
+            binder.extrinsicDetailStatus.showOperationStatus(statusAppearance)
+            binder.extrinsicDetailAmount.setTextColorRes(statusAppearance.amountTint)
 
-            extrinsicDetailToolbar.setTitle(time.formatDateTime())
+            binder.extrinsicDetailToolbar.setTitle(time.formatDateTime())
 
-            extrinsicDetailAmount.text = fee
-            extrinsicDetailAmountFiat.setTextOrHide(this.fiatFee)
+            binder.extrinsicDetailAmount.text = fee
+            binder.extrinsicDetailAmountFiat.setTextOrHide(this.fiatFee)
         }
 
         viewModel.content.observe(::showExtrinsicContent)
 
-        viewModel.senderAddressModelFlow.observe(extrinsicDetailSender::showAddress)
+        viewModel.senderAddressModelFlow.observe(binder.extrinsicDetailSender::showAddress)
 
-        viewModel.chainUi.observe(extrinsicDetailNetwork::showChain)
+        viewModel.chainUi.observe(binder.extrinsicDetailNetwork::showChain)
 
         viewModel.operationIcon.observe {
-            extrinsicDetailIcon.setIcon(it, imageLoader)
+            binder.extrinsicDetailIcon.setIcon(it, imageLoader)
         }
     }
 
@@ -116,7 +106,7 @@ class ExtrinsicDetailFragment : BaseFragment<ExtrinsicDetailViewModel>() {
 
         block.apply(builder)
 
-        extrinsicContentContainer.addView(block)
+        binder.extrinsicContentContainer.addView(block)
     }
 
     private fun TableView.blockEntry(entry: BlockEntry) {

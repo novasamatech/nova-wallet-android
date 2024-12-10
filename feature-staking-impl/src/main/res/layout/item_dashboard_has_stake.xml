@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeChainContainer" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/itemDashboardHasStakeRewardsLabelСontainer"
+        android:id="@+id/itemDashboardHasStakeRewardsLabelContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -66,7 +66,7 @@
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/itemDashboardHasStakeRewardsAmountСontainer"
+        android:id="@+id/itemDashboardHasStakeRewardsAmountContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -102,8 +102,8 @@
         android:layout_marginTop="4dp"
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsAmountСontainer"
-        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsAmountСontainer">
+        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRewardsAmountContainer"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeRewardsAmountContainer">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeRewardsFiat"

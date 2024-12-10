@@ -2,12 +2,12 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewNovaConnectBinding
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_nova_connect.view.viewNovaConnectTargetIcon
 
 class NovaConnectView @JvmOverloads constructor(
     context: Context,
@@ -15,20 +15,20 @@ class NovaConnectView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
+    private val binder = ViewNovaConnectBinding.inflate(inflater(), this)
+
     init {
         orientation = HORIZONTAL
-
-        View.inflate(context, R.layout.view_nova_connect, this)
 
         attrs?.let(::applyAttributes)
     }
 
     fun setTargetImage(@DrawableRes targetImageRes: Int) {
-        viewNovaConnectTargetIcon.setImageResource(targetImageRes)
+        binder.viewNovaConnectTargetIcon.setImageResource(targetImageRes)
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.NovaConnectView) {
         val targetImage = it.getDrawable(R.styleable.NovaConnectView_targetImage)
-        viewNovaConnectTargetIcon.setImageDrawable(targetImage)
+        binder.viewNovaConnectTargetIcon.setImageDrawable(targetImage)
     }
 }

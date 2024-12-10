@@ -2,12 +2,11 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewSearchToolbarBinding
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_search_toolbar.view.searchToolbarCancel
-import kotlinx.android.synthetic.main.view_search_toolbar.view.searchToolbarSearch
 
 class SearchToolbar @JvmOverloads constructor(
     context: Context,
@@ -15,15 +14,15 @@ class SearchToolbar @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewSearchToolbarBinding.inflate(inflater(), this)
+
     val searchInput
-        get() = searchToolbarSearch
+        get() = binder.searchToolbarSearch
 
     val cancel
-        get() = searchToolbarCancel
+        get() = binder.searchToolbarCancel
 
     init {
-        View.inflate(context, R.layout.view_search_toolbar, this)
-
         orientation = HORIZONTAL
         setBackgroundResource(R.color.blur_navigation_background)
 

@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.AccountNameChooserMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.api.WithAccountNameChooserMixin
 
-fun <V> BaseFragment<V>.setupAccountNameChooserUi(
+fun <V> BaseFragment<V, *>.setupAccountNameChooserUi(
     viewModel: V,
     ui: InputField,
     additionalViewsToControlVisibility: List<View> = emptyList(),

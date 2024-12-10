@@ -26,7 +26,7 @@ interface SelectAddressMixin {
     suspend fun openSelectAddress(selectedAddress: String?)
 }
 
-fun BaseFragment<*>.setupYourWalletsBtn(view: YourWalletsView, selectAddressMixin: SelectAddressMixin) {
+fun BaseFragment<*, *>.setupYourWalletsBtn(view: YourWalletsView, selectAddressMixin: SelectAddressMixin) {
     selectAddressMixin.isSelectAddressAvailableFlow.observe {
         view.isInvisible = !it
     }

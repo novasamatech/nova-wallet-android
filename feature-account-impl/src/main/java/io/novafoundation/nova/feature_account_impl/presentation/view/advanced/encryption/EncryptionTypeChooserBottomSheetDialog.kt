@@ -2,9 +2,8 @@ package io.novafoundation.nova.feature_account_impl.presentation.view.advanced.e
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
@@ -12,9 +11,8 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.ItemEncryptionTypeBinding
 import io.novafoundation.nova.feature_account_impl.presentation.view.advanced.encryption.model.CryptoTypeModel
-import kotlinx.android.synthetic.main.item_encryption_type.view.encryptionTv
-import kotlinx.android.synthetic.main.item_encryption_type.view.rightIcon
 
 class EncryptionTypeChooserBottomSheetDialog(
     context: Context,
@@ -29,18 +27,18 @@ class EncryptionTypeChooserBottomSheetDialog(
     }
 
     override fun holderCreator(): HolderCreator<CryptoTypeModel> = {
-        EncryptionTypeViewHolder(it.inflateChild(R.layout.item_encryption_type))
+        EncryptionTypeViewHolder(ItemEncryptionTypeBinding.inflate(it.inflater(), it, false))
     }
 }
 
 class EncryptionTypeViewHolder(
-    itemView: View
-) : DynamicListSheetAdapter.Holder<CryptoTypeModel>(itemView) {
+    private val binder: ItemEncryptionTypeBinding
+) : DynamicListSheetAdapter.Holder<CryptoTypeModel>(binder.root) {
 
     override fun bind(item: CryptoTypeModel, isSelected: Boolean, handler: DynamicListSheetAdapter.Handler<CryptoTypeModel>) {
         super.bind(item, isSelected, handler)
 
-        with(itemView) {
+        with(binder) {
             if (isSelected) {
                 rightIcon.makeVisible()
             } else {

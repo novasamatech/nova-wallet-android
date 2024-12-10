@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView
@@ -11,13 +9,12 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentSignParitySignerScanBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.setupQrCodeExpiration
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
-import kotlinx.android.synthetic.main.fragment_sign_parity_signer_scan.signParitySignerScanScanner
-import kotlinx.android.synthetic.main.fragment_sign_parity_signer_scan.signParitySignerScanToolbar
 
-class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewModel>() {
+class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewModel, FragmentSignParitySignerScanBinding>() {
 
     companion object {
 
@@ -30,18 +27,16 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
         }
     }
 
-    override val scanView: ScanView
-        get() = signParitySignerScanScanner
+    override fun createBinding() = FragmentSignParitySignerScanBinding.inflate(layoutInflater)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_sign_parity_signer_scan, container, false)
-    }
+    override val scanView: ScanView
+        get() = binder.signParitySignerScanScanner
 
     override fun initViews() {
         super.initViews()
 
-        signParitySignerScanToolbar.applyStatusBarInsets()
-        signParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.signParitySignerScanToolbar.applyStatusBarInsets()
+        binder.signParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {
@@ -54,7 +49,7 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
     override fun subscribe(viewModel: ScanSignParitySignerViewModel) {
         super.subscribe(viewModel)
 
-        signParitySignerScanToolbar.setTitle(viewModel.title)
+        binder.signParitySignerScanToolbar.setTitle(viewModel.title)
         scanView.setTitle(viewModel.scanLabel)
 
         setupQrCodeExpiration(

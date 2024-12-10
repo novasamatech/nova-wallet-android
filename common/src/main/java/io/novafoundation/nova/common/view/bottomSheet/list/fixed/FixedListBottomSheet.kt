@@ -1,93 +1,78 @@
 package io.novafoundation.nova.common.view.bottomSheet.list.fixed
 
 import android.content.Context
-import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
-import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
+import io.novafoundation.nova.common.databinding.ItemSheetDescriptiveActionBinding
+import io.novafoundation.nova.common.databinding.ItemSheetIconicLabelBinding
+import io.novafoundation.nova.common.databinding.ItemSheetSwitcherBinding
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetItemContainer
-import kotlinx.android.synthetic.main.bottom_sheeet_fixed_list.fixedListSheetTitle
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionArrow
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionIcon
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionSubtitle
-import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionTitle
-import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
-import kotlinx.android.synthetic.main.item_sheet_switcher.view.itemSheetSwitcher
 
-typealias ViewGetter<V> = FixedListBottomSheet.() -> V
+typealias ViewGetter<B, V> = FixedListBottomSheet.ViewConfiguration<B>.() -> V
 
-abstract class FixedListBottomSheet(
+abstract class FixedListBottomSheet<B : ViewBinding>(
     context: Context,
-    onCancel: (() -> Unit)? = null,
-    private val viewConfiguration: ViewConfiguration = ViewConfiguration.default()
-) : BaseBottomSheet(context, onCancel = onCancel) {
+    private val viewConfiguration: ViewConfiguration<B>,
+    onCancel: (() -> Unit)? = null
+) : BaseBottomSheet<B>(context, onCancel = onCancel) {
 
-    class ViewConfiguration(
-        @LayoutRes val layout: Int,
-        val container: ViewGetter<ViewGroup>,
-        val title: ViewGetter<TextView>,
+    class ViewConfiguration<B : ViewBinding>(
+        val configurationBinder: B,
+        val container: ViewGetter<B, ViewGroup>,
+        val title: ViewGetter<B, TextView>,
     ) {
         companion object {
-            fun default() = ViewConfiguration(
-                layout = R.layout.bottom_sheeet_fixed_list,
-                container = { fixedListSheetItemContainer },
-                title = { fixedListSheetTitle },
+            fun default(context: Context) = ViewConfiguration(
+                configurationBinder = BottomSheeetFixedListBinding.inflate(LayoutInflater.from(context)),
+                container = { configurationBinder.fixedListSheetItemContainer },
+                title = { configurationBinder.fixedListSheetTitle },
             )
         }
     }
 
-    init {
-        setContentView(viewConfiguration.layout)
-    }
-
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    override val binder: B = viewConfiguration.configurationBinder
 
     final override fun setContentView(layoutResId: Int) {
         super.setContentView(layoutResId)
     }
 
     override fun setTitle(@StringRes titleRes: Int) {
-        viewConfiguration.title(this).setText(titleRes)
+        viewConfiguration.title(viewConfiguration).setText(titleRes)
     }
 
     override fun setTitle(title: CharSequence?) {
-        viewConfiguration.title(this).setTextOrHide(title?.toString())
+        viewConfiguration.title(viewConfiguration).setTextOrHide(title?.toString())
     }
 
-    fun item(@LayoutRes layoutRes: Int, builder: (View) -> Unit) {
-        val container = viewConfiguration.container(this)
+    fun <IB : ViewBinding> item(binder: IB, builder: (IB) -> Unit) {
+        val container = viewConfiguration.container(viewConfiguration)
 
-        val view = container.inflateChild(layoutRes)
+        builder.invoke(binder)
 
-        builder.invoke(view)
-
-        container.addView(view)
+        container.addView(binder.root)
     }
 
     fun addItem(view: View) {
-        val container = viewConfiguration.container(this)
+        val container = viewConfiguration.container(viewConfiguration)
         container.addView(view)
     }
 
     fun <T : View> item(view: T, builder: (T) -> Unit) {
         builder.invoke(view)
 
-        viewConfiguration.container(this).addView(view)
+        viewConfiguration.container(viewConfiguration).addView(view)
     }
 
     fun getCommonPadding(): Int {
@@ -95,19 +80,19 @@ abstract class FixedListBottomSheet(
     }
 }
 
-fun FixedListBottomSheet.textItem(
+fun FixedListBottomSheet<*>.textItem(
     @DrawableRes iconRes: Int,
     title: String,
     showArrow: Boolean = false,
     applyIconTint: Boolean = true,
     onClick: (View) -> Unit,
 ) {
-    item(R.layout.item_sheet_iconic_label) { view ->
-        view.itemExternalActionContent.text = title
+    item(ItemSheetIconicLabelBinding.inflate(LayoutInflater.from(context))) { itemBinder ->
+        itemBinder.itemExternalActionContent.text = title
 
         val paddingInDp = 12
 
-        view.itemExternalActionContent.setDrawableStart(
+        itemBinder.itemExternalActionContent.setDrawableStart(
             drawableRes = iconRes,
             widthInDp = 24,
             tint = R.color.icon_primary.takeIf { applyIconTint },
@@ -115,7 +100,7 @@ fun FixedListBottomSheet.textItem(
         )
 
         if (showArrow) {
-            view.itemExternalActionContent.setDrawableEnd(
+            itemBinder.itemExternalActionContent.setDrawableEnd(
                 drawableRes = R.drawable.ic_chevron_right,
                 widthInDp = 24,
                 tint = R.color.icon_secondary,
@@ -123,11 +108,11 @@ fun FixedListBottomSheet.textItem(
             )
         }
 
-        view.setDismissingClickListener(onClick)
+        itemBinder.root.setDismissingClickListener(onClick)
     }
 }
 
-fun FixedListBottomSheet.textWithDescriptionItem(
+fun FixedListBottomSheet<*>.textWithDescriptionItem(
     title: String,
     description: String,
     @DrawableRes iconRes: Int,
@@ -135,23 +120,23 @@ fun FixedListBottomSheet.textWithDescriptionItem(
     showArrowWhenEnabled: Boolean = false,
     onClick: (View) -> Unit,
 ) {
-    item(R.layout.item_sheet_descriptive_action) { view ->
-        view.itemSheetDescriptiveActionTitle.text = title
-        view.itemSheetDescriptiveActionSubtitle.text = description
+    item(ItemSheetDescriptiveActionBinding.inflate(LayoutInflater.from(context))) { itemBinder ->
+        itemBinder.itemSheetDescriptiveActionTitle.text = title
+        itemBinder.itemSheetDescriptiveActionSubtitle.text = description
 
-        view.isEnabled = enabled
+        itemBinder.root.isEnabled = enabled
 
-        view.itemSheetDescriptiveActionIcon.setImageResource(iconRes)
+        itemBinder.itemSheetDescriptiveActionIcon.setImageResource(iconRes)
 
-        view.itemSheetDescriptiveActionArrow.setVisible(enabled && showArrowWhenEnabled)
+        itemBinder.itemSheetDescriptiveActionArrow.setVisible(enabled && showArrowWhenEnabled)
 
         if (enabled) {
-            view.setDismissingClickListener(onClick)
+            itemBinder.root.setDismissingClickListener(onClick)
         }
     }
 }
 
-fun FixedListBottomSheet.textWithDescriptionItem(
+fun FixedListBottomSheet<*>.textWithDescriptionItem(
     @StringRes titleRes: Int,
     @StringRes descriptionRes: Int,
     @DrawableRes iconRes: Int,
@@ -169,7 +154,7 @@ fun FixedListBottomSheet.textWithDescriptionItem(
     )
 }
 
-fun FixedListBottomSheet.textItem(
+fun FixedListBottomSheet<*>.textItem(
     @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     showArrow: Boolean = false,
@@ -185,23 +170,23 @@ fun FixedListBottomSheet.textItem(
     )
 }
 
-fun FixedListBottomSheet.switcherItem(
+fun FixedListBottomSheet<*>.switcherItem(
     @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     initialState: Boolean,
     onClick: (View) -> Unit
 ) {
-    item(R.layout.item_sheet_switcher) { view ->
-        view.itemSheetSwitcher.setText(titleRes)
-        view.itemSheetSwitcher.isChecked = initialState
+    item(ItemSheetSwitcherBinding.inflate(LayoutInflater.from(context))) { itemBinder ->
+        itemBinder.itemSheetSwitcher.setText(titleRes)
+        itemBinder.itemSheetSwitcher.isChecked = initialState
 
-        view.itemSheetSwitcher.setDrawableStart(
+        itemBinder.itemSheetSwitcher.setDrawableStart(
             drawableRes = iconRes,
             widthInDp = 24,
             tint = R.color.icon_primary,
             paddingInDp = 12
         )
 
-        view.setDismissingClickListener(onClick)
+        itemBinder.root.setDismissingClickListener(onClick)
     }
 }

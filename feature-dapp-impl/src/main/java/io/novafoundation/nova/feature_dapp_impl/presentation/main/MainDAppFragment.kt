@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
 import android.graphics.Rect
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -17,21 +14,23 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappMainBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappListAdapter
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_dapp_main.dappRecyclerView
 
 class MainDAppFragment :
-    BaseFragment<MainDAppViewModel>(),
+    BaseFragment<MainDAppViewModel, FragmentDappMainBinding>(),
     DappListAdapter.Handler,
     DAppHeaderAdapter.Handler,
     DappCategoriesAdapter.Handler {
 
+    override fun createBinding() = FragmentDappMainBinding.inflate(layoutInflater)
+
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this) }
 
@@ -47,18 +46,10 @@ class MainDAppFragment :
 
     private val dappListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappListAdapter(this) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_dapp_main, container, false)
-    }
-
     override fun initViews() {
-        dappRecyclerView.applyStatusBarInsets()
-        dappRecyclerView.adapter = ConcatAdapter(headerAdapter, categoriesAdapter, dappsShimmering, dappListAdapter)
-        dappRecyclerView.addItemDecoration(DAppItemDecoration(requireContext()))
+        binder.dappRecyclerView.applyStatusBarInsets()
+        binder.dappRecyclerView.adapter = ConcatAdapter(headerAdapter, categoriesAdapter, dappsShimmering, dappListAdapter)
+        binder.dappRecyclerView.addItemDecoration(DAppItemDecoration(requireContext()))
     }
 
     override fun inject() {
@@ -80,10 +71,12 @@ class MainDAppFragment :
                     dappsShimmering.show(false)
                     dappListAdapter.submitList(state.data)
                 }
+
                 is LoadingState.Loading -> {
                     dappsShimmering.show(true)
                     dappListAdapter.submitList(listOf())
                 }
+
                 else -> {}
             }
         }

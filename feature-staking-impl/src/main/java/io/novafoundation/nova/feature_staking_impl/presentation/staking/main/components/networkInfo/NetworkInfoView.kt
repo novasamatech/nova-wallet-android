@@ -2,15 +2,14 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkCollapsibleView
-import kotlinx.android.synthetic.main.view_network_info.view.stakingNetworkInfoTitle
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewNetworkInfoBinding
 
 private const val ANIMATION_DURATION = 220L
 
@@ -31,29 +30,29 @@ class NetworkInfoView @JvmOverloads constructor(
         NetworkInfoAdapter()
     }
 
-    init {
-        View.inflate(context, R.layout.view_network_info, this)
+    private val binder = ViewNetworkInfoBinding.inflate(inflater(), this)
 
+    init {
         with(context) {
             background = getBlockDrawable()
         }
 
         orientation = VERTICAL
 
-        stakingNetworkCollapsibleView.adapter = adapter
-        stakingNetworkCollapsibleView.itemAnimator = null
+        binder.stakingNetworkCollapsibleView.adapter = adapter
+        binder.stakingNetworkCollapsibleView.itemAnimator = null
     }
 
     fun setState(state: NetworkInfoState?) = letOrHide(state) { networkInfoState ->
         setExpanded(networkInfoState.expanded)
 
-        stakingNetworkInfoTitle.text = networkInfoState.title
+        binder.stakingNetworkInfoTitle.text = networkInfoState.title
 
         adapter.submitList(networkInfoState.actions)
     }
 
     fun onExpandClicked(listener: OnClickListener) {
-        stakingNetworkInfoTitle.setOnClickListener(listener)
+        binder.stakingNetworkInfoTitle.setOnClickListener(listener)
     }
 
     private fun setExpanded(expanded: Boolean) {
@@ -67,21 +66,21 @@ class NetworkInfoView @JvmOverloads constructor(
     private fun collapse() {
         if (currentState == State.COLLAPSED) return
 
-        stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_down, 0)
+        binder.stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_down, 0)
         currentState = State.COLLAPSED
-        stakingNetworkCollapsibleView.animate()
+        binder.stakingNetworkCollapsibleView.animate()
             .setDuration(ANIMATION_DURATION)
             .alpha(0f)
-            .withEndAction { stakingNetworkCollapsibleView.makeGone() }
+            .withEndAction { binder.stakingNetworkCollapsibleView.makeGone() }
     }
 
     private fun expand() {
         if (currentState == State.EXPANDED) return
 
-        stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_up, 0)
-        stakingNetworkCollapsibleView.makeVisible()
+        binder.stakingNetworkInfoTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_chevron_up, 0)
+        binder.stakingNetworkCollapsibleView.makeVisible()
         currentState = State.EXPANDED
-        stakingNetworkCollapsibleView.animate()
+        binder.stakingNetworkCollapsibleView.animate()
             .setDuration(ANIMATION_DURATION)
             .alpha(1f)
     }

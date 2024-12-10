@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -15,19 +12,12 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingUnbondConfirmBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm.model.ParachainStakingUnbondConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmAmount
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmCollator
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmConfirm
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmContainer
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmHints
-import kotlinx.android.synthetic.main.fragment_parachain_staking_unbond_confirm.parachainStakingUnbondConfirmToolbar
 
-class ParachainStakingUnbondConfirmFragment : BaseFragment<ParachainStakingUnbondConfirmViewModel>() {
+class ParachainStakingUnbondConfirmFragment : BaseFragment<ParachainStakingUnbondConfirmViewModel, FragmentParachainStakingUnbondConfirmBinding>() {
 
     companion object {
 
@@ -36,25 +26,19 @@ class ParachainStakingUnbondConfirmFragment : BaseFragment<ParachainStakingUnbon
         fun getBundle(payload: ParachainStakingUnbondConfirmPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_unbond_confirm, container, false)
-    }
+    override fun createBinding() = FragmentParachainStakingUnbondConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        parachainStakingUnbondConfirmContainer.applyStatusBarInsets()
+        binder.parachainStakingUnbondConfirmContainer.applyStatusBarInsets()
 
-        parachainStakingUnbondConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.parachainStakingUnbondConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        parachainStakingUnbondConfirmExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.parachainStakingUnbondConfirmExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        parachainStakingUnbondConfirmConfirm.prepareForProgress(viewLifecycleOwner)
-        parachainStakingUnbondConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.parachainStakingUnbondConfirmConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.parachainStakingUnbondConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        parachainStakingUnbondConfirmCollator.setOnClickListener { viewModel.collatorClicked() }
+        binder.parachainStakingUnbondConfirmCollator.setOnClickListener { viewModel.collatorClicked() }
     }
 
     override fun inject() {
@@ -71,15 +55,15 @@ class ParachainStakingUnbondConfirmFragment : BaseFragment<ParachainStakingUnbon
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, parachainStakingUnbondConfirmExtrinsicInfo.fee)
-        observeHints(viewModel.hintsMixin, parachainStakingUnbondConfirmHints)
+        setupFeeLoading(viewModel, binder.parachainStakingUnbondConfirmExtrinsicInfo.fee)
+        observeHints(viewModel.hintsMixin, binder.parachainStakingUnbondConfirmHints)
 
-        viewModel.showNextProgress.observe(parachainStakingUnbondConfirmConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.parachainStakingUnbondConfirmConfirm::setProgressState)
 
-        viewModel.currentAccountModelFlow.observe(parachainStakingUnbondConfirmExtrinsicInfo::setAccount)
-        viewModel.walletFlow.observe(parachainStakingUnbondConfirmExtrinsicInfo::setWallet)
+        viewModel.currentAccountModelFlow.observe(binder.parachainStakingUnbondConfirmExtrinsicInfo::setAccount)
+        viewModel.walletFlow.observe(binder.parachainStakingUnbondConfirmExtrinsicInfo::setWallet)
 
-        viewModel.collatorAddressModel.observe(parachainStakingUnbondConfirmCollator::showAddress)
-        viewModel.amountModel.observe(parachainStakingUnbondConfirmAmount::setAmount)
+        viewModel.collatorAddressModel.observe(binder.parachainStakingUnbondConfirmCollator::showAddress)
+        viewModel.amountModel.observe(binder.parachainStakingUnbondConfirmAmount::setAmount)
     }
 }

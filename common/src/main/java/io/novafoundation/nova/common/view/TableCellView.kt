@@ -17,6 +17,7 @@ import coil.ImageLoader
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewTableCellBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dp
@@ -27,6 +28,7 @@ import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.images.ExtraImageRequestBuilding
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.postToSelf
@@ -36,14 +38,6 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_table_cell.view.barrier
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellContent
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellImage
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellTitle
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueDivider
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
-import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
 private const val DRAW_DIVIDER_DEFAULT = true
 
@@ -70,23 +64,25 @@ open class TableCellView @JvmOverloads constructor(
         }
     }
 
+    private val binder = ViewTableCellBinding.inflate(inflater(), this)
+
     val title: TextView
-        get() = tableCellTitle
+        get() = binder.tableCellTitle
 
     val valuePrimary: TextView
-        get() = tableCellValuePrimary
+        get() = binder.tableCellValuePrimary
 
     val valueSecondary: TextView
-        get() = tableCellValueSecondary
+        get() = binder.tableCellValueSecondary
 
     val image: ImageView
-        get() = tableCellImage
+        get() = binder.tableCellImage
 
     private val valueProgress: ProgressBar
-        get() = tableCellValueProgress
+        get() = binder.tableCellValueProgress
 
     private val contentGroup: Group
-        get() = tableCellContent
+        get() = binder.tableCellContent
 
     private var shouldDrawDivider: Boolean = DRAW_DIVIDER_DEFAULT
 
@@ -95,8 +91,6 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.view_table_cell, this)
-
         setBackgroundResource(R.drawable.bg_primary_list_item)
         minHeight = 44.dp(context)
 
@@ -112,11 +106,11 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     fun setTitle(titleRes: Int) {
-        tableCellTitle.setText(titleRes)
+        binder.tableCellTitle.setText(titleRes)
     }
 
     fun setTitle(title: String?) {
-        tableCellTitle.text = title
+        binder.tableCellTitle.text = title
     }
 
     fun setImage(src: Drawable) {
@@ -177,15 +171,15 @@ open class TableCellView @JvmOverloads constructor(
         """
     )
     fun setOwnDividerVisible(visible: Boolean) {
-        tableCellValueDivider.setVisible(visible && shouldDrawDivider)
+        binder.tableCellValueDivider.setVisible(visible && shouldDrawDivider)
     }
 
     fun setPrimaryValueEndIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
-        tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
+        binder.tableCellValuePrimary.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
     fun setPrimaryValueStartIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
-        tableCellValuePrimary.setDrawableStart(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
+        binder.tableCellValuePrimary.setDrawableStart(icon, widthInDp = 16, paddingInDp = 8, tint = tint)
     }
 
     fun setPrimaryValueStyle(style: FieldStyle) {
@@ -209,11 +203,11 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     fun setTitleIconEnd(@DrawableRes icon: Int?, tintRes: Int?) {
-        tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
+        binder.tableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
     fun setTitleIconStart(@DrawableRes icon: Int?, tintRes: Int?) {
-        tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
+        binder.tableCellTitle.setDrawableStart(icon, widthInDp = 16, paddingInDp = 4, tint = tintRes)
     }
 
     fun showValue(primary: CharSequence, secondary: CharSequence? = null) {
@@ -232,14 +226,14 @@ open class TableCellView @JvmOverloads constructor(
         constraintSet.clone(this)
 
         if (ellipsisable) {
-            constraintSet.connect(tableCellTitle.id, ConstraintSet.END, barrier.id, ConstraintSet.START, 16.dp(context))
-            constraintSet.clear(tableCellValuePrimary.id, ConstraintSet.START)
-            constraintSet.constrainedWidth(tableCellTitle.id, true)
-            constraintSet.setHorizontalBias(tableCellTitle.id, 0f)
+            constraintSet.connect(binder.tableCellTitle.id, ConstraintSet.END, binder.barrier.id, ConstraintSet.START, 16.dp(context))
+            constraintSet.clear(binder.tableCellValuePrimary.id, ConstraintSet.START)
+            constraintSet.constrainedWidth(binder.tableCellTitle.id, true)
+            constraintSet.setHorizontalBias(binder.tableCellTitle.id, 0f)
         } else {
-            constraintSet.clear(tableCellTitle.id, ConstraintSet.END)
-            constraintSet.connect(tableCellValuePrimary.id, ConstraintSet.START, tableCellTitle.id, ConstraintSet.END, 16.dp(context))
-            constraintSet.constrainedWidth(tableCellTitle.id, false)
+            constraintSet.clear(binder.tableCellTitle.id, ConstraintSet.END)
+            constraintSet.connect(binder.tableCellValuePrimary.id, ConstraintSet.START, binder.tableCellTitle.id, ConstraintSet.END, 16.dp(context))
+            constraintSet.constrainedWidth(binder.tableCellTitle.id, false)
         }
         constraintSet.applyTo(this)
     }

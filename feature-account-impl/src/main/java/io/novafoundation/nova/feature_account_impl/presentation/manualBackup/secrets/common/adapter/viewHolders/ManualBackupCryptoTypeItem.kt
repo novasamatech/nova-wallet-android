@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
 import androidx.core.view.isGone
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupCryptoTypeBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
-import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsCryptoType
-import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsDerivationPath
-import kotlinx.android.synthetic.main.item_manual_backup_crypto_type.view.manualBackupSecretsDerivationPathLabel
 
 data class ManualBackupCryptoTypeRvItem(
     val network: String,
@@ -21,14 +18,14 @@ data class ManualBackupCryptoTypeRvItem(
     }
 }
 
-class ManualBackupCryptoTypeViewHolder(itemView: View) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupCryptoTypeViewHolder(private val binder: ItemManualBackupCryptoTypeBinding) : ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupCryptoTypeRvItem)
-        itemView.manualBackupSecretsCryptoType.setLabel(item.cryptoTypeTitle)
-        itemView.manualBackupSecretsCryptoType.setMessage(item.cryptoTypeSubtitle)
-        itemView.manualBackupSecretsDerivationPath.setMessage(item.derivationPath)
-        itemView.manualBackupSecretsDerivationPathLabel.isGone = item.hideDerivationPath
-        itemView.manualBackupSecretsDerivationPath.isGone = item.hideDerivationPath
+        binder.manualBackupSecretsCryptoType.setLabel(item.cryptoTypeTitle)
+        binder.manualBackupSecretsCryptoType.setMessage(item.cryptoTypeSubtitle)
+        binder.manualBackupSecretsDerivationPath.setMessage(item.derivationPath)
+        binder.manualBackupSecretsDerivationPathLabel.isGone = item.hideDerivationPath
+        binder.manualBackupSecretsDerivationPath.isGone = item.hideDerivationPath
     }
 }

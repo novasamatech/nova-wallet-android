@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import android.os.Parcelable
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendationConfig
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CollatorRecommendationConfigParcelModel(val sorting: CollatorSorting) : Parcelable

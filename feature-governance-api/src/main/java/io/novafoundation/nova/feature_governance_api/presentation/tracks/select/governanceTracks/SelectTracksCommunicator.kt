@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface SelectTracksRequester : InterScreenRequester<SelectTracksRequester.Request, SelectTracksResponder.Response> {
 

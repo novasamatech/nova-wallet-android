@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'io.novafoundation.nova.feature_cloud_backup_api'
@@ -30,8 +30,6 @@ dependencies {
 
     implementation daggerDep
     kapt daggerKapt
-
-    implementation androidDep
 
     api project(':core-api')
     api project(':core-db')

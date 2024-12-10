@@ -38,6 +38,10 @@ import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
 
+fun View.inflater(): LayoutInflater {
+    return LayoutInflater.from(context)
+}
+
 fun View.updatePadding(
     top: Int = paddingTop,
     bottom: Int = paddingBottom,

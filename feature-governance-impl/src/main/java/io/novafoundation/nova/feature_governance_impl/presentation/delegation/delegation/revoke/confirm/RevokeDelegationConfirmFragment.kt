@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.revoke.confirm
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -14,22 +12,14 @@ import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentRevokeDelegationConfirmBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.setVoteModelOrHide
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.model.setDelegateLabelState
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackDelegationListBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmConfirm
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmDelegate
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmDelegation
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmHints
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmInformation
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmToolbar
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmTracks
-import kotlinx.android.synthetic.main.fragment_revoke_delegation_confirm.revokeDelegationConfirmUndelegatingPeriod
 
-class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmViewModel>() {
+class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmViewModel, FragmentRevokeDelegationConfirmBinding>() {
 
     companion object {
 
@@ -38,25 +28,19 @@ class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmView
         fun getBundle(payload: RevokeDelegationConfirmPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_revoke_delegation_confirm, container, false)
-    }
+    override fun createBinding() = FragmentRevokeDelegationConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        revokeDelegationConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.revokeDelegationConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        revokeDelegationConfirmConfirm.prepareForProgress(viewLifecycleOwner)
-        revokeDelegationConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.revokeDelegationConfirmConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.revokeDelegationConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        revokeDelegationConfirmDelegate.setOnClickListener { viewModel.delegateClicked() }
+        binder.revokeDelegationConfirmDelegate.setOnClickListener { viewModel.delegateClicked() }
 
-        revokeDelegationConfirmInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.revokeDelegationConfirmInformation.setOnAccountClickedListener { viewModel.accountClicked() }
 
-        revokeDelegationConfirmTracks.setOnClickListener { viewModel.tracksClicked() }
+        binder.revokeDelegationConfirmTracks.setOnClickListener { viewModel.tracksClicked() }
     }
 
     override fun inject() {
@@ -73,19 +57,19 @@ class RevokeDelegationConfirmFragment : BaseFragment<RevokeDelegationConfirmView
         observeRetries(viewModel.partialRetriableMixin)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        observeHints(viewModel.hintsMixin, revokeDelegationConfirmHints)
+        observeHints(viewModel.hintsMixin, binder.revokeDelegationConfirmHints)
 
-        setupFeeLoading(viewModel, revokeDelegationConfirmInformation.fee)
-        viewModel.currentAddressModelFlow.observe(revokeDelegationConfirmInformation::setAccount)
-        viewModel.walletModel.observe(revokeDelegationConfirmInformation::setWallet)
+        setupFeeLoading(viewModel, binder.revokeDelegationConfirmInformation.fee)
+        viewModel.currentAddressModelFlow.observe(binder.revokeDelegationConfirmInformation::setAccount)
+        viewModel.walletModel.observe(binder.revokeDelegationConfirmInformation::setWallet)
 
-        viewModel.delegateLabelModel.observe(revokeDelegationConfirmDelegate::setDelegateLabelState)
-        viewModel.tracksSummary.observe(revokeDelegationConfirmTracks::showValue)
-        viewModel.userDelegation.observe(revokeDelegationConfirmDelegation::setVoteModelOrHide)
+        viewModel.delegateLabelModel.observe(binder.revokeDelegationConfirmDelegate::setDelegateLabelState)
+        viewModel.tracksSummary.observe(binder.revokeDelegationConfirmTracks::showValue)
+        viewModel.userDelegation.observe(binder.revokeDelegationConfirmDelegation::setVoteModelOrHide)
 
-        viewModel.undelegatingPeriod.observe(revokeDelegationConfirmUndelegatingPeriod::showLoadingValue)
+        viewModel.undelegatingPeriod.observe(binder.revokeDelegationConfirmUndelegatingPeriod::showLoadingValue)
 
-        viewModel.showNextProgress.observe(revokeDelegationConfirmConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.revokeDelegationConfirmConfirm::setProgressState)
 
         viewModel.showTracksEvent.observeEvent { tracks ->
             TrackDelegationListBottomSheet(requireContext(), tracks).show()
