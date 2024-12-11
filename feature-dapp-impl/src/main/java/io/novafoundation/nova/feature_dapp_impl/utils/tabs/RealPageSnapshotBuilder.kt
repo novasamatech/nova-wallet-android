@@ -30,8 +30,8 @@ class RealPageSnapshotBuilder(
         val icon = webView.favicon
         val pageBitmap = webView.drawToBitmap()
 
-        val pageIconPath = saveBitmap(browserTabSession, icon, "icon")
-        val pagePicturePath = saveBitmap(browserTabSession, pageBitmap, "page")
+        val pageIconPath = saveBitmap(browserTabSession, icon, "icon", 100)
+        val pagePicturePath = saveBitmap(browserTabSession, pageBitmap, "page", 40)
 
         return PageSnapshot(
             pageName = pageName,
@@ -40,7 +40,7 @@ class RealPageSnapshotBuilder(
         )
     }
 
-    private fun saveBitmap(browserTabSession: BrowserTabSession, bitmap: Bitmap?, filePrefix: String): String? {
+    private fun saveBitmap(browserTabSession: BrowserTabSession, bitmap: Bitmap?, filePrefix: String, quality: Int): String? {
         if (bitmap == null) return null
 
         // Use this pattern to don't create a new image everytime when we rewrite the page snapshot
@@ -50,7 +50,7 @@ class RealPageSnapshotBuilder(
         try {
             rootScope.launch(Dispatchers.IO) {
                 val outputStream = FileOutputStream(file)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
                 outputStream.close()
             }
 
