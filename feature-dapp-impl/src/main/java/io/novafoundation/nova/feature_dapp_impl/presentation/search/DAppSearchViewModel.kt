@@ -128,7 +128,7 @@ class DAppSearchViewModel(
                 is DappSearchResult.Url -> searchResult.url
             }
 
-            if (searchResult !is DappSearchResult.Dapp) {
+            if (!searchResult.trusting) {
                 dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
             }
 

@@ -35,6 +35,10 @@ class DAppFavoritesViewModel(
         }
     }
 
+    fun backClicked() {
+        router.back()
+    }
+
     fun openDApp(dapp: DappModel) {
         router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url))
     }
