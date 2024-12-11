@@ -12,7 +12,7 @@ interface BrowserTabService {
 
     fun detachCurrentSession()
 
-    suspend fun makeCurrentTabSnapshot()
+    fun makeCurrentTabSnapshot()
 
     suspend fun createNewTab(url: String): BrowserTab
 

@@ -44,8 +44,8 @@ class BrowserTabsModule {
 
     @FeatureScope
     @Provides
-    fun providePageSnapshotBuilder(fileProvider: FileProvider): PageSnapshotBuilder {
-        return RealPageSnapshotBuilder(fileProvider)
+    fun providePageSnapshotBuilder(fileProvider: FileProvider, rootScope: RootScope): PageSnapshotBuilder {
+        return RealPageSnapshotBuilder(fileProvider, rootScope)
     }
 
     @FeatureScope

@@ -3,24 +3,26 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import android.graphics.Bitmap
 import androidx.core.view.drawToBitmap
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.fromName
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 interface PageSnapshotBuilder {
 
-    suspend fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot
+    fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot
 }
 
 class RealPageSnapshotBuilder(
-    private val fileProvider: FileProvider
+    private val fileProvider: FileProvider,
+    private val rootScope: RootScope
 ) : PageSnapshotBuilder {
 
-    override suspend fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot {
+    override fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot {
         val webView = browserTabSession.webView
         if (!webView.isLaidOut) return PageSnapshot.fromName(browserTabSession.startUrl)
 
@@ -38,7 +40,7 @@ class RealPageSnapshotBuilder(
         )
     }
 
-    private suspend fun saveBitmap(browserTabSession: BrowserTabSession, bitmap: Bitmap?, filePrefix: String): String? {
+    private fun saveBitmap(browserTabSession: BrowserTabSession, bitmap: Bitmap?, filePrefix: String): String? {
         if (bitmap == null) return null
 
         // Use this pattern to don't create a new image everytime when we rewrite the page snapshot
@@ -46,7 +48,7 @@ class RealPageSnapshotBuilder(
         val file = fileProvider.getFileInExternalCacheStorage(fileName)
 
         try {
-            withContext(Dispatchers.IO) {
+            rootScope.launch(Dispatchers.IO) {
                 val outputStream = FileOutputStream(file)
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                 outputStream.close()

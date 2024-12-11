@@ -237,7 +237,7 @@ class DAppBrowserViewModel(
         router.openTabs()
     }
 
-    fun makePageSnapshot() = launch {
+    fun makePageSnapshot() {
         browserTabService.makeCurrentTabSnapshot()
     }
 

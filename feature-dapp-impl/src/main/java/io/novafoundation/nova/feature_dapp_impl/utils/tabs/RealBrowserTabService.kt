@@ -98,14 +98,10 @@ class RealBrowserTabService(
         activeSessions.removeAll()
     }
 
-    override suspend fun makeCurrentTabSnapshot() {
-        val currentTab = selectedTabIdFlow.first()
-        val pageSession = activeSessions.get(currentTab)
+    override fun makeCurrentTabSnapshot() {
+        val currentTab = selectedTabIdFlow.value
 
-        if (pageSession != null) {
-            val snapshot = pageSnapshotBuilder.getPageSnapshot(pageSession)
-            browserTabInternalRepository.savePageSnapshot(pageSession.tabId, snapshot)
-        }
+        currentTab?.let { makeTabSnapshot(currentTab) }
     }
 
     private suspend fun addNewSession(tab: BrowserTab): BrowserTabSession {
@@ -140,16 +136,18 @@ class RealBrowserTabService(
     override fun onPageChanged(tabId: String, url: String, title: String?) {
         launch(Dispatchers.Main) {
             withContext(Dispatchers.Default) { browserTabInternalRepository.changeCurrentUrl(tabId, url) }
-            makeTabSnapshot(tabId)
         }
     }
 
-    private suspend fun makeTabSnapshot(tabId: String) {
+    private fun makeTabSnapshot(tabId: String) {
         val pageSession = activeSessions.get(tabId)
 
         if (pageSession != null) {
             val snapshot = pageSnapshotBuilder.getPageSnapshot(pageSession)
-            withContext(Dispatchers.Default) { browserTabInternalRepository.savePageSnapshot(pageSession.tabId, snapshot) }
+
+            rootScope.launch(Dispatchers.Default) {
+                browserTabInternalRepository.savePageSnapshot(pageSession.tabId, snapshot)
+            }
         }
     }
 }
