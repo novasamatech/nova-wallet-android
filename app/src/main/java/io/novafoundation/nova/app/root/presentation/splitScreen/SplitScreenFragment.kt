@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.splitScreen
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -58,6 +59,9 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     }
 
     override fun initViews() {
+        val outlineMargin = Rect(0, (-12).dp, 0, 0) // To avoid round corners at top
+        mainNavHost.outlineProvider = RoundCornersOutlineProvider(12.dpF, margin = outlineMargin)
+
         dappEntryPoint.setOnClickListener { viewModel.onTabsClicked() }
         dappEntryPointClose.setOnClickListener { viewModel.onTabsCloseClicked() }
     }
@@ -66,12 +70,7 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
         setupCloseAllDappTabsDialogue(viewModel.closeAllTabsConfirmation)
 
         viewModel.dappTabsVisible.observe { shouldBeVisible ->
-            val isVisibilityChanged = dappEntryPoint.isVisible != shouldBeVisible
-
-            if (isVisibilityChanged) {
-                mainNavHost.outlineProvider = RoundCornersOutlineProvider(getOutlineCornerRadius(shouldBeVisible))
-            }
-
+            mainNavHost.clipToOutline = shouldBeVisible
             dappEntryPoint.isVisible = shouldBeVisible
         }
 
