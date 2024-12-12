@@ -53,6 +53,5 @@ fun ImageMonitor.setPathOrStopWatching(filePath: String?) {
         stopMonitoring()
     } else {
         startMonitoring(filePath)
-
     }
 }

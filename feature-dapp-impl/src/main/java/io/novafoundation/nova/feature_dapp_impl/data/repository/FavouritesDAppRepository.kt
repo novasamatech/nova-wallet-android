@@ -6,7 +6,6 @@ import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapFavouriteDAppLocalToFavouriteDApp
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapFavouriteDAppToFavouriteDAppLocal
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Null
 import kotlinx.coroutines.flow.Flow
 
 interface FavouritesDAppRepository {

@@ -40,7 +40,6 @@ class SplitScreenViewModel(
         }
     }.distinctUntilChanged()
 
-
     val dappTabsVisible = tabsFlow.map { it.isNotEmpty() }
         .distinctUntilChanged()
 

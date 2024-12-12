@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
