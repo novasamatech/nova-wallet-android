@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking
 
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
@@ -19,38 +20,45 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 
 class StartMultiStakingNavigator(
-    navigationHolder: SplitScreenNavigationHolder,
+    splitScreenNavigationHolder: SplitScreenNavigationHolder,
+    rootNavigationHolder: RootNavigationHolder,
     private val stakingDashboardRouter: StakingDashboardRouter,
     private val commonNavigationHolder: Navigator,
-) : BaseNavigator(navigationHolder), StartMultiStakingRouter {
+) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), StartMultiStakingRouter {
 
-    override fun openStartStakingLanding(payload: StartStakingLandingPayload) = performNavigation(
-        actionId = R.id.action_mainFragment_to_startStackingLanding,
-        args = StartStakingLandingFragment.getBundle(payload)
-    )
+    override fun openStartStakingLanding(payload: StartStakingLandingPayload) {
+        navigationBuilder(R.id.action_mainFragment_to_startStackingLanding)
+            .setArgs(StartStakingLandingFragment.getBundle(payload))
+            .perform()
+    }
 
-    override fun openStartParachainStaking() = performNavigation(
-        actionId = R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph,
-        args = StartParachainStakingFragment.getBundle(StartParachainStakingPayload(StartParachainStakingMode.START))
-    )
+    override fun openStartParachainStaking() {
+        navigationBuilder(R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph)
+            .setArgs(StartParachainStakingFragment.getBundle(StartParachainStakingPayload(StartParachainStakingMode.START)))
+            .perform()
+    }
 
-    override fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload) = performNavigation(
-        actionId = R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph,
-        args = SetupAmountMultiStakingFragment.getBundle(payload)
-    )
+    override fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload) {
+        navigationBuilder(R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph)
+            .setArgs(SetupAmountMultiStakingFragment.getBundle(payload))
+            .perform()
+    }
 
-    override fun openSetupStakingType(payload: SetupStakingTypePayload) = performNavigation(
-        R.id.action_setupAmountMultiStakingFragment_to_setupStakingType,
-        args = SetupStakingTypeFragment.getArguments(payload)
-    )
+    override fun openSetupStakingType(payload: SetupStakingTypePayload) {
+        navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
+            .setArgs(SetupStakingTypeFragment.getArguments(payload))
+            .perform()
+    }
 
-    override fun openConfirm(payload: ConfirmMultiStakingPayload) = performNavigation(
-        actionId = R.id.action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment,
-        args = ConfirmMultiStakingFragment.getBundle(payload)
-    )
+    override fun openConfirm(payload: ConfirmMultiStakingPayload) {
+        navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment)
+            .setArgs(ConfirmMultiStakingFragment.getBundle(payload))
+            .perform()
+    }
 
     override fun openSelectedValidators() {
-        performNavigation(R.id.action_confirmMultiStakingFragment_to_confirmNominationsFragment)
+        navigationBuilder(R.id.action_confirmMultiStakingFragment_to_confirmNominationsFragment)
+            .perform()
     }
 
     override fun returnToStakingDashboard() {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.common.utils.Event
@@ -10,8 +11,9 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 class StakingDashboardNavigator(
-    navigationHolder: SplitScreenNavigationHolder,
-) : BaseNavigator(navigationHolder), StakingDashboardRouter {
+    splitScreenNavigationHolder: SplitScreenNavigationHolder,
+    rootNavigationHolder: RootNavigationHolder
+) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null
     private var pendingAction: Int? = null

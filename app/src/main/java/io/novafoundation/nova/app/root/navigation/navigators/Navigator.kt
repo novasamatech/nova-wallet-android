@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.navigation.navigators
 import android.os.Bundle
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavOptions
-import androidx.navigation.fragment.FragmentNavigator
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation

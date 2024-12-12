@@ -14,27 +14,24 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFr
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 
 class DAppNavigator(
-    private val rootNavigationHolder: RootNavigationHolder,
-    private val splitScreenNavigationHolder: SplitScreenNavigationHolder
-) : BaseNavigator(rootNavigationHolder), DAppRouter {
+    splitScreenNavigationHolder: SplitScreenNavigationHolder,
+    rootNavigationHolder: RootNavigationHolder,
+) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), DAppRouter {
 
     override fun openChangeAccount() {
-        splitScreenNavigationHolder.navController?.performNavigation(R.id.action_open_switch_wallet)
+        navigationBuilder(R.id.action_open_switch_wallet)
+            .perform()
     }
 
     override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
-        // Close deapp browser if it is already opened
-        // TODO it's better to provide new url to existing browser
-        val currentDestination = rootNavigationHolder.navController?.currentDestination
-
-        val destinationId = when (currentDestination?.id) {
-            R.id.dappBrowserFragment -> R.id.action_DAppBrowserFragment_to_DAppBrowserFragment
-            R.id.dappSearchFragment -> R.id.action_dappSearchFragment_to_dapp_browser_graph
-            R.id.dappTabsFragment -> R.id.action_dappTabsFragment_to_dapp_browser_graph
-            else -> R.id.action_open_dappBrowser
-        }
-
-        performNavigation(destinationId, DAppBrowserFragment.getBundle(payload), extras)
+        navigationBuilder()
+            .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_DAppBrowserFragment)
+            .addCase(R.id.dappSearchFragment, R.id.action_dappSearchFragment_to_dapp_browser_graph)
+            .addCase(R.id.dappTabsFragment, R.id.action_dappTabsFragment_to_dapp_browser_graph)
+            .setFallbackCase(R.id.action_open_dappBrowser)
+            .setExtras(extras)
+            .setArgs(DAppBrowserFragment.getBundle(payload))
+            .perform()
     }
 
     override fun openDappSearch() {
@@ -42,43 +39,41 @@ class DAppNavigator(
     }
 
     override fun openDappSearchWithCategory(categoryId: String?) {
-        performNavigation(
-            actionId = R.id.action_open_dappSearch,
-            args = DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL, preselectedCategoryId = categoryId))
-        )
+        navigationBuilder(R.id.action_open_dappSearch)
+            .setArgs(DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL, preselectedCategoryId = categoryId)))
+            .perform()
     }
 
     override fun finishDappSearch() {
-        performNavigation(R.id.action_finish_dapp_search)
+        navigationBuilder(R.id.action_finish_dapp_search)
+            .perform()
     }
 
-    override fun openAddToFavourites(payload: AddToFavouritesPayload) = performNavigation(
-        actionId = R.id.action_DAppBrowserFragment_to_addToFavouritesFragment,
-        args = AddToFavouritesFragment.getBundle(payload)
-    )
+    override fun openAddToFavourites(payload: AddToFavouritesPayload) {
+        navigationBuilder(R.id.action_DAppBrowserFragment_to_addToFavouritesFragment)
+            .setArgs(AddToFavouritesFragment.getBundle(payload))
+            .perform()
+    }
 
     override fun openAuthorizedDApps() {
-        splitScreenNavigationHolder.navController?.performNavigation(
-            actionId = R.id.action_mainFragment_to_authorizedDAppsFragment
-        )
+        navigationBuilder(R.id.action_mainFragment_to_authorizedDAppsFragment)
+            .perform()
     }
 
     override fun openTabs() {
-        val currentDestination = rootNavigationHolder.navController?.currentDestination
-
-        val destinationId = when (currentDestination?.id) {
-            R.id.dappBrowserFragment -> R.id.action_DAppBrowserFragment_to_browserTabsFragment
-            else -> R.id.action_open_dappTabs
-        }
-
-        performNavigation(destinationId)
+        navigationBuilder()
+            .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_browserTabsFragment)
+            .setFallbackCase(R.id.action_open_dappTabs)
+            .perform()
     }
 
-    override fun closeTabsScreen() = performNavigation(
-        actionId = R.id.action_finish_tabs_fragment
-    )
+    override fun closeTabsScreen() {
+        navigationBuilder(R.id.action_finish_tabs_fragment)
+            .perform()
+    }
 
     override fun openDAppFavorites() {
-        splitScreenNavigationHolder.navController?.performNavigation(R.id.action_open_dapp_favorites)
+        navigationBuilder(R.id.action_open_dapp_favorites)
+            .perform()
     }
 }

@@ -67,7 +67,7 @@ class NavigationBuilder(private val navigationHolder: NavigationHolder, private 
         return this
     }
 
-    fun setExtras(extras: FragmentNavigator.Extras): NavigationBuilder {
+    fun setExtras(extras: FragmentNavigator.Extras?): NavigationBuilder {
         this.extras = extras
         return this
     }
