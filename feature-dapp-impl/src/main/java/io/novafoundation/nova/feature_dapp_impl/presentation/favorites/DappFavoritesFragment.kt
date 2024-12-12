@@ -40,6 +40,7 @@ class DappFavoritesFragment : BaseBottomSheetFragment<DAppFavoritesViewModel>(),
 
     override fun initViews() {
         favoritesDappToolbar.applyStatusBarInsets()
+        favoritesDappToolbar.setHomeButtonListener { viewModel.backClicked() }
         favoritesDappList.adapter = adapter
         itemDragHelper.attachToRecyclerView(favoritesDappList)
     }

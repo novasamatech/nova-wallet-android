@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
@@ -42,6 +43,7 @@ class DAppSearchModule {
         router: DAppRouter,
         resourceManager: ResourceManager,
         interactor: SearchDappInteractor,
+        dappInteractor: DappInteractor,
         searchResponder: DAppSearchCommunicator,
         payload: SearchPayload,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -54,7 +56,8 @@ class DAppSearchModule {
             dAppSearchResponder = searchResponder,
             payload = payload,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            appLinksProvider = appLinksProvider
+            appLinksProvider = appLinksProvider,
+            dappInteractor = dappInteractor
         )
     }
 }

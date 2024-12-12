@@ -33,7 +33,13 @@ class SearchDappInteractor(
 
         val searchGroupContent = when {
             query.isEmpty() -> null
-            Urls.isValidWebUrl(query) -> DappSearchResult.Url(Urls.ensureHttpsProtocol(query))
+            Urls.isValidWebUrl(query) -> {
+                val searchUrl = Urls.ensureHttpsProtocol(query)
+                val searchUrlDomain = Urls.domainOf(searchUrl)
+                val trusting = dapps.any { Urls.domainOf(it.url) == searchUrlDomain }
+                DappSearchResult.Url(searchUrl, trusting)
+            }
+
             else -> DappSearchResult.Search(query, searchUrlFor(query))
         }
 

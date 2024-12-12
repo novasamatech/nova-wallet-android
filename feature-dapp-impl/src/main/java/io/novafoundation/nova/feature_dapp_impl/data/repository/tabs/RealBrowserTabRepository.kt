@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_dapp_impl.data.repository.tabs
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.model.BrowserTabLocal
+import io.novafoundation.nova.feature_dapp_api.data.model.SimpleTabModel
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class RealBrowserTabRepository(
     private val browserTabsDao: BrowserTabsDao
@@ -21,9 +21,11 @@ class RealBrowserTabRepository(
         browserTabsDao.removeTab(tabId)
     }
 
-    override fun observeTabsWithNames(): Flow<Map<String, String?>> {
+    override fun observeTabsWithNames(): Flow<List<SimpleTabModel>> {
         return browserTabsDao.observeAllTabs()
-            .map { tabs -> tabs.associate { it.id to it.pageName } }
+            .mapList {
+                SimpleTabModel(it.id, it.pageName, it.pageIconPath)
+            }
     }
 
     override suspend fun removeAllTabs() {
@@ -43,6 +45,10 @@ class RealBrowserTabRepository(
         return browserTabsDao.observeAllTabs().mapList { tab ->
             tab.fromLocal()
         }
+    }
+
+    override suspend fun changeCurrentUrl(tabId: String, url: String) {
+        browserTabsDao.updateCurrentUrl(tabId, url)
     }
 }
 

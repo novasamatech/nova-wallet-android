@@ -62,6 +62,7 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
 
         viewModel.tabsFlow.observe {
             adapter.submitList(it)
+            browserTabsList.scrollToPosition(it.size - 1)
         }
     }
 

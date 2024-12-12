@@ -124,5 +124,6 @@ class HeaderHolder(
         favoritesAdapter.submitList(favoritesDApps)
         dAppMainFavoriteDAppList.isGone = favoritesDApps.isEmpty()
         dAppMainFavoriteDAppTitle.isGone = favoritesDApps.isEmpty()
+        dAppMainFavoriteDAppsShow.isGone = favoritesDApps.isEmpty()
     }
 }

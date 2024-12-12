@@ -12,13 +12,15 @@ interface BrowserTabService {
 
     fun detachCurrentSession()
 
-    suspend fun makeCurrentTabSnapshot()
+    fun makeCurrentTabSnapshot()
 
     suspend fun createNewTab(url: String): BrowserTab
 
     suspend fun removeTab(tabId: String)
 
     suspend fun removeAllTabs()
+
+    fun destroyActiveSessions()
 }
 
 suspend fun BrowserTabService.createAndSelectTab(url: String) {
