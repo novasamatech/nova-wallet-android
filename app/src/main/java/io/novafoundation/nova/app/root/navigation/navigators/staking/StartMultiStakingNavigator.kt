@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 
 class StartMultiStakingNavigator(
-    navigationHolder: MainNavigationHolder,
+    navigationHolder: SplitScreenNavigationHolder,
     private val stakingDashboardRouter: StakingDashboardRouter,
     private val commonNavigationHolder: Navigator,
 ) : BaseNavigator(navigationHolder), StartMultiStakingRouter {

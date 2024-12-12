@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking.parachain
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment
@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class ParachainStakingNavigator(
-    navigationHolder: MainNavigationHolder,
+    navigationHolder: SplitScreenNavigationHolder,
     private val commonNavigator: Navigator,
 ) : BaseNavigator(navigationHolder), ParachainStakingRouter {
 

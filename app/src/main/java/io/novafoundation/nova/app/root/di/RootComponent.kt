@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.di
 import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
@@ -52,7 +52,7 @@ interface RootComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance mainNavigationHolder: MainNavigationHolder,
+            @BindsInstance splitScreenNavigationHolder: SplitScreenNavigationHolder,
             @BindsInstance rootNavigationHolder: RootNavigationHolder,
             @BindsInstance rootRouter: RootRouter,
             @BindsInstance governanceRouter: GovernanceRouter,

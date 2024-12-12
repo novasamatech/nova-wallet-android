@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.settings
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
 class SettingsNavigator(
-    navigationHolder: MainNavigationHolder,
+    navigationHolder: SplitScreenNavigationHolder,
     private val rootRouter: RootRouter,
     private val walletConnectDelegate: WalletConnectRouter,
     private val delegate: Navigator

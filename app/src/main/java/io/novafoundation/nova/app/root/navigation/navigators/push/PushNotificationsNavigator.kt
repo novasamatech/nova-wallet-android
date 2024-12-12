@@ -3,11 +3,11 @@ package io.novafoundation.nova.app.root.navigation.navigators.push
 import android.os.Bundle
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 
 class PushNotificationsNavigator(
-    navigationHolder: MainNavigationHolder,
+    navigationHolder: SplitScreenNavigationHolder,
 ) : BaseNavigator(navigationHolder), PushNotificationsRouter {
 
     override fun openPushSettings() {

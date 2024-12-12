@@ -17,7 +17,7 @@ import coil.load
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.RoundCornersOutlineProvider
@@ -34,7 +34,7 @@ import kotlinx.android.synthetic.main.fragment_split_screen.mainNavHost
 class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
 
     @Inject
-    lateinit var mainNavigationHolder: MainNavigationHolder
+    lateinit var splitScreenNavigationHolder: SplitScreenNavigationHolder
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -46,13 +46,13 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainNavigationHolder.attach(mainNavController)
+        splitScreenNavigationHolder.attach(mainNavController)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
-        mainNavigationHolder.detach()
+        splitScreenNavigationHolder.detach()
     }
 
     override fun inject() {

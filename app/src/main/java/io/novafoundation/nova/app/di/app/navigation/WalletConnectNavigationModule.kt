@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.walletConnect.ApproveSessionCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.walletConnect.WalletConnectNavigator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -16,11 +16,11 @@ class WalletConnectNavigationModule {
     @Provides
     @ApplicationScope
     fun provideApproveSessionCommunicator(
-        navigationHolder: MainNavigationHolder,
+        navigationHolder: SplitScreenNavigationHolder,
         automaticInteractionGate: AutomaticInteractionGate,
     ): ApproveSessionCommunicator = ApproveSessionCommunicatorImpl(navigationHolder, automaticInteractionGate)
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: MainNavigationHolder): WalletConnectRouter = WalletConnectNavigator(navigationHolder)
+    fun provideRouter(navigationHolder: SplitScreenNavigationHolder): WalletConnectRouter = WalletConnectNavigator(navigationHolder)
 }

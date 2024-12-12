@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.account.PolkadotVaultVariantSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.account.SelectAddressCommunicatorImpl
@@ -30,33 +30,33 @@ class AccountNavigationModule {
     @Provides
     @ApplicationScope
     fun providePinCodeTwoFactorVerificationCommunicator(
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideSelectWalletCommunicator(
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): SelectWalletCommunicator = SelectWalletCommunicatorImpl(navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideParitySignerCommunicator(
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): PolkadotVaultVariantSignCommunicator = PolkadotVaultVariantSignCommunicatorImpl(navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideSelectAddressCommunicator(
         router: AssetsRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideSelectMultipleWalletsCommunicator(
         router: AssetsRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): SelectMultipleWalletsCommunicator = SelectMultipleWalletsCommunicatorImpl(router, navigationHolder)
 
     @ApplicationScope
@@ -67,20 +67,20 @@ class AccountNavigationModule {
     @ApplicationScope
     fun providePushGovernanceSettingsCommunicator(
         router: AccountRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): SyncWalletsBackupPasswordCommunicator = SyncWalletsBackupPasswordCommunicatorImpl(router, navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideChangeBackupPasswordCommunicator(
         router: AccountRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): ChangeBackupPasswordCommunicator = ChangeBackupPasswordCommunicatorImpl(router, navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideRestoreBackupPasswordCommunicator(
         router: AccountRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): RestoreBackupPasswordCommunicator = RestoreBackupPasswordCommunicatorImpl(router, navigationHolder)
 }

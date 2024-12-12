@@ -5,8 +5,6 @@
     android:id="@+id/root_nav_graph"
     app:startDestination="@id/splashFragment">
 
-    <include app:graph="@navigation/main_nav_graph" />
-
     <include app:graph="@navigation/onboarding_nav_graph" />
 
     <include app:graph="@navigation/import_nav_graph" />
@@ -20,7 +18,7 @@
     <include app:graph="@navigation/import_wallet_options_nav_graph" />
 
     <action
-        android:id="@+id/action_open_main"
+        android:id="@+id/action_open_split_screen"
         app:destination="@id/splitScreenFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"

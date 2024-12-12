@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.governance.GovernanceNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.governance.SelectTracksCommunicatorImpl
@@ -18,7 +18,7 @@ class GovernanceNavigationModule {
     @ApplicationScope
     @Provides
     fun provideRouter(
-        navigationHolder: MainNavigationHolder,
+        navigationHolder: SplitScreenNavigationHolder,
         commonNavigator: Navigator,
     ): GovernanceRouter = GovernanceNavigator(navigationHolder, commonNavigator)
 
@@ -26,13 +26,13 @@ class GovernanceNavigationModule {
     @ApplicationScope
     fun provideSelectTracksCommunicator(
         router: GovernanceRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): SelectTracksCommunicator = SelectTracksCommunicatorImpl(router, navigationHolder)
 
     @Provides
     @ApplicationScope
     fun provideTinderGovVoteCommunicator(
         router: GovernanceRouter,
-        navigationHolder: MainNavigationHolder
+        navigationHolder: SplitScreenNavigationHolder
     ): TinderGovVoteCommunicator = TinderGovVoteCommunicatorImpl(router, navigationHolder)
 }

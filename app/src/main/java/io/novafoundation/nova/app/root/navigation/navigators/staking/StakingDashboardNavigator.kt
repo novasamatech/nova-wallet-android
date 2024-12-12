@@ -4,13 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 class StakingDashboardNavigator(
-    navigationHolder: MainNavigationHolder,
+    navigationHolder: SplitScreenNavigationHolder,
 ) : BaseNavigator(navigationHolder), StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null

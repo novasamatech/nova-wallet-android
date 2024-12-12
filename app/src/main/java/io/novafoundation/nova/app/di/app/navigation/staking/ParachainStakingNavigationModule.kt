@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation.staking
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.parachain.ParachainStakingNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.parachain.SelectCollatorInterScreenCommunicatorImpl
@@ -17,19 +17,19 @@ class ParachainStakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideParachainStakingRouter(navigationHolder: MainNavigationHolder, navigator: Navigator): ParachainStakingRouter {
+    fun provideParachainStakingRouter(navigationHolder: SplitScreenNavigationHolder, navigator: Navigator): ParachainStakingRouter {
         return ParachainStakingNavigator(navigationHolder, navigator)
     }
 
     @Provides
     @ApplicationScope
-    fun provideSelectCollatorCommunicator(navigationHolder: MainNavigationHolder): SelectCollatorInterScreenCommunicator {
+    fun provideSelectCollatorCommunicator(navigationHolder: SplitScreenNavigationHolder): SelectCollatorInterScreenCommunicator {
         return SelectCollatorInterScreenCommunicatorImpl(navigationHolder)
     }
 
     @Provides
     @ApplicationScope
-    fun provideSelectCollatorSettingsCommunicator(navigationHolder: MainNavigationHolder): SelectCollatorSettingsInterScreenCommunicator {
+    fun provideSelectCollatorSettingsCommunicator(navigationHolder: SplitScreenNavigationHolder): SelectCollatorSettingsInterScreenCommunicator {
         return SelectCollatorSettingsInterScreenCommunicatorImpl(navigationHolder)
     }
 }

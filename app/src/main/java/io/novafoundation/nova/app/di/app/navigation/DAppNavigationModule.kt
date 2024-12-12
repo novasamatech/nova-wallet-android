@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.dApp.DAppNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.dApp.DAppSearchCommunicatorImpl
@@ -15,8 +15,8 @@ class DAppNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(rootNavigationHolder: RootNavigationHolder, mainNavigationHolder: MainNavigationHolder): DAppRouter =
-        DAppNavigator(rootNavigationHolder, mainNavigationHolder)
+    fun provideRouter(rootNavigationHolder: RootNavigationHolder, splitScreenNavigationHolder: SplitScreenNavigationHolder): DAppRouter =
+        DAppNavigator(rootNavigationHolder, splitScreenNavigationHolder)
 
     @ApplicationScope
     @Provides

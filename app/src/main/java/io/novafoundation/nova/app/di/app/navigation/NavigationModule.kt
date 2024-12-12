@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.di.app.navigation.staking.StakingNavigationModule
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -43,7 +43,7 @@ class NavigationModule {
     @Provides
     fun provideMainNavigatorHolder(
         contextManager: ContextManager
-    ): MainNavigationHolder = MainNavigationHolder(contextManager)
+    ): SplitScreenNavigationHolder = SplitScreenNavigationHolder(contextManager)
 
     @ApplicationScope
     @Provides
@@ -55,7 +55,7 @@ class NavigationModule {
     @Provides
     fun provideNavigator(
         rootNavigatorHolder: RootNavigationHolder,
-        mainNavigatorHolder: MainNavigationHolder,
+        mainNavigatorHolder: SplitScreenNavigationHolder,
         walletConnectRouter: WalletConnectRouter,
         stakingDashboardRouter: StakingDashboardRouter,
     ): Navigator = Navigator(rootNavigatorHolder, mainNavigatorHolder, walletConnectRouter, stakingDashboardRouter)

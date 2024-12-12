@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.dApp
 
 import androidx.navigation.fragment.FragmentNavigator
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
@@ -15,11 +15,11 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayloa
 
 class DAppNavigator(
     private val rootNavigationHolder: RootNavigationHolder,
-    private val mainNavigationHolder: MainNavigationHolder
+    private val splitScreenNavigationHolder: SplitScreenNavigationHolder
 ) : BaseNavigator(rootNavigationHolder), DAppRouter {
 
     override fun openChangeAccount() {
-        mainNavigationHolder.navController?.performNavigation(R.id.action_open_switch_wallet)
+        splitScreenNavigationHolder.navController?.performNavigation(R.id.action_open_switch_wallet)
     }
 
     override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
@@ -58,7 +58,7 @@ class DAppNavigator(
     )
 
     override fun openAuthorizedDApps() {
-        mainNavigationHolder.navController?.performNavigation(
+        splitScreenNavigationHolder.navController?.performNavigation(
             actionId = R.id.action_mainFragment_to_authorizedDAppsFragment
         )
     }
@@ -79,6 +79,6 @@ class DAppNavigator(
     )
 
     override fun openDAppFavorites() {
-        mainNavigationHolder.navController?.performNavigation(R.id.action_open_dapp_favorites)
+        splitScreenNavigationHolder.navController?.performNavigation(R.id.action_open_dapp_favorites)
     }
 }

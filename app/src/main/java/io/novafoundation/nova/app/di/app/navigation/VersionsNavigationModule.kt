@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.versions.VersionsNavigator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -14,7 +14,7 @@ class VersionsNavigationModule {
     @Provides
     @ApplicationScope
     fun provideRouter(
-        navigationHolder: MainNavigationHolder,
+        navigationHolder: SplitScreenNavigationHolder,
         appLinksProvider: AppLinksProvider
     ): VersionsRouter = VersionsNavigator(navigationHolder, appLinksProvider.storeUrl)
 }

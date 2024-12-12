@@ -2,12 +2,11 @@ package io.novafoundation.nova.app.root.navigation.navigators
 
 import android.os.Bundle
 import androidx.lifecycle.asFlow
-import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
@@ -99,11 +98,11 @@ import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.flow.Flow
 
 class Navigator(
-    private val rootNavigationHolder: RootNavigationHolder,
-    private val mainNavigationHolder: MainNavigationHolder,
+    rootNavigationHolder: RootNavigationHolder,
+    splitScreenNavigationHolder: SplitScreenNavigationHolder,
     private val walletConnectDelegate: WalletConnectRouter,
     private val stakingDashboardDelegate: StakingDashboardRouter
-) : BaseNavigator(mainNavigationHolder),
+) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder),
     SplashRouter,
     OnboardingRouter,
     AccountRouter,
@@ -111,23 +110,32 @@ class Navigator(
     RootRouter,
     CrowdloanRouter {
 
-    private val rootNavController: NavController?
-        get() = rootNavigationHolder.navController
-
-    private val mainNavController: NavController?
-        get() = mainNavigationHolder.navController
-
     override fun openWelcomeScreen() {
+        /*
+        Was:
         when (rootNavController?.currentDestination?.id) {
             R.id.accountsFragment -> rootNavController?.navigate(R.id.action_walletManagment_to_welcome, WelcomeFragment.bundle(false))
             R.id.splashFragment -> rootNavController?.navigate(R.id.action_splash_to_onboarding, WelcomeFragment.bundle(false))
         }
+        */
+        // Now:
+        navigationBuilder()
+            .addCase(R.id.accountsFragment, R.id.action_walletManagment_to_welcome)
+            .addCase(R.id.splashFragment, R.id.action_splash_to_onboarding)
+            .setArgs(WelcomeFragment.bundle(false))
+            .perform()
     }
 
     override fun openInitialCheckPincode() {
-        val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_main), ToolbarConfiguration())
-        val bundle = PincodeFragment.getPinCodeBundle(action)
-        rootNavController?.navigate(R.id.action_splash_to_pin, bundle)
+        val action = PinCodeAction.Check(NavComponentDelayedNavigation(R.id.action_open_split_screen), ToolbarConfiguration())
+
+        /* Was:
+        rootNavController?.navigate(R.id.action_splash_to_pin, PincodeFragment.getPinCodeBundle(action))
+        */
+        // Now:
+        navigationBuilder(R.id.action_splash_to_pin)
+            .setArgs(PincodeFragment.getPinCodeBundle(action))
+            .perform()
     }
 
     override fun openCreateFirstWallet() {
@@ -138,7 +146,7 @@ class Navigator(
     }
 
     override fun openMain() {
-        rootNavController?.navigate(R.id.action_open_main)
+        rootNavController?.navigate(R.id.action_open_split_screen)
     }
 
     override fun openAfterPinCode(delayedNavigation: DelayedNavigation) {
@@ -397,7 +405,7 @@ class Navigator(
     }
 
     override fun openStaking() {
-        if (mainNavController?.currentDestination?.id != R.id.mainFragment) mainNavController?.navigate(R.id.action_open_main)
+        if (mainNavController?.currentDestination?.id != R.id.mainFragment) mainNavController?.navigate(R.id.action_open_split_screen)
 
         stakingDashboardDelegate.openStakingDashboard()
     }
@@ -697,7 +705,7 @@ class Navigator(
     }
 
     private fun buildCreatePinBundle(): Bundle {
-        val delayedNavigation = NavComponentDelayedNavigation(R.id.action_open_main)
+        val delayedNavigation = NavComponentDelayedNavigation(R.id.action_open_split_screen)
         val action = PinCodeAction.Create(delayedNavigation)
         return PincodeFragment.getPinCodeBundle(action)
     }
