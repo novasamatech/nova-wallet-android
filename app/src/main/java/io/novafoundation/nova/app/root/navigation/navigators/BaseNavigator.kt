@@ -23,6 +23,10 @@ abstract class BaseNavigator(
         navigationHolder.executeBack()
     }
 
+    fun finishApp() {
+        navigationHolder.finishApp()
+    }
+
     fun navigationBuilder(destination: Int? = null): NavigationBuilder {
         return NavigationBuilder(navigationHolder, destination)
     }
@@ -53,7 +57,7 @@ class NavigationBuilder(private val navigationHolder: NavigationHolder, private 
         return this
     }
 
-    fun setArgs(args: Bundle): NavigationBuilder {
+    fun setArgs(args: Bundle?): NavigationBuilder {
         this.args = args
         return this
     }
