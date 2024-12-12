@@ -7,11 +7,18 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_dapp_api.data.model.SimpleTabModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+data class TabsTitleModel(
+    val title: String,
+    val iconPath: String?
+)
 
 class SplitScreenViewModel(
     private val interactor: SplitScreenInteractor,
@@ -27,19 +34,21 @@ class SplitScreenViewModel(
 
     val tabsTitle = tabsFlow.map { tabs ->
         if (tabs.size == 1) {
-            tabs.values.single() ?: tabSizeTitle(tabs.size)
+            singleTabTitle(tabs.single())
         } else {
             tabSizeTitle(tabs.size)
         }
-    }
+    }.distinctUntilChanged()
+
 
     val dappTabsVisible = tabsFlow.map { it.isNotEmpty() }
+        .distinctUntilChanged()
 
     fun onTabsClicked() = launch {
-        val tabIds = tabsFlow.first().keys
+        val tabs = tabsFlow.first()
 
-        if (tabIds.size == 1) {
-            val payload = DAppBrowserPayload.Tab(tabIds.single())
+        if (tabs.size == 1) {
+            val payload = DAppBrowserPayload.Tab(tabs.single().tabId)
             router.openDAppBrowser(payload)
         } else {
             router.openTabs()
@@ -52,5 +61,16 @@ class SplitScreenViewModel(
         interactor.removeAllTabs()
     }
 
-    private fun tabSizeTitle(size: Int) = resourceManager.getString(R.string.dapp_entry_point_title, size)
+    private fun singleTabTitle(tab: SimpleTabModel): TabsTitleModel {
+        return tab.title?.let {
+            TabsTitleModel(it, tab.iconPath)
+        } ?: tabSizeTitle(1)
+    }
+
+    private fun tabSizeTitle(size: Int): TabsTitleModel {
+        return TabsTitleModel(
+            resourceManager.getString(R.string.dapp_entry_point_title, size),
+            null
+        )
+    }
 }
