@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.marginTop
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import coil.ImageLoader
@@ -80,6 +84,7 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
             }
             dappEntryPointText.text = model.title
         }
+        manageImeInsets()
     }
 
     private val mainNavController: NavController by lazy {
@@ -88,11 +93,40 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
         navHostFragment.navController
     }
 
-    private fun getOutlineCornerRadius(isRounded: Boolean): Float {
-        return if (isRounded) {
-            12f
-        } else {
-            0f
+    /**
+     * Since we have a dAppEntryPoint we must change ime insets for main container and its children
+     * to avoid extra bottom space when keyboard is shown
+     */
+    private fun manageImeInsets() {
+        // We change this value when dappEntryPoint is shown/hidden
+        var dappEntryPointHeight = 0
+
+        // Inset listener that provides a custom insets to its children
+        ViewCompat.setOnApplyWindowInsetsListener(mainNavHost) { _, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            val changedImeInsets = Insets.of(
+                imeInsets.left,
+                imeInsets.top,
+                imeInsets.right,
+                (imeInsets.bottom - dappEntryPointHeight).coerceAtLeast(0)
+            )
+
+            WindowInsetsCompat.Builder(insets)
+                .setInsets(WindowInsetsCompat.Type.ime(), changedImeInsets)
+                .build()
+        }
+
+        // Subscribe to get dAppEntryPoint height
+        viewModel.dappTabsVisible.observe {
+            dappEntryPoint.post {
+                dappEntryPointHeight = if (dappEntryPoint.isVisible) {
+                    dappEntryPoint.height + dappEntryPoint.marginTop
+                } else {
+                    0
+                }
+                ViewCompat.requestApplyInsets(mainNavHost) // Request new insets to trigger inset listener
+            }
         }
     }
 }

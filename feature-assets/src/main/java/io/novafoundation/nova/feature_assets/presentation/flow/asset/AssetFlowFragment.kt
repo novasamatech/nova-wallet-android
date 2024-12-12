@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.core.graphics.Insets
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
@@ -12,13 +14,13 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.CompoundAssetDecorationPreferences
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.NetworkAssetDecorationPreferences
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.TokenAssetGroupDecorationPreferences
