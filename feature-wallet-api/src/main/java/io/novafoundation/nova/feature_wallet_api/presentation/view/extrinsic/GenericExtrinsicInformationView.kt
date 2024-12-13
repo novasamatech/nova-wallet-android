@@ -9,7 +9,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 import kotlinx.android.synthetic.main.view_generic_extrinsic_information.view.viewGenericExtrinsicInformationAccount
 import kotlinx.android.synthetic.main.view_generic_extrinsic_information.view.viewGenericExtrinsicInformationFee
@@ -40,7 +41,7 @@ class GenericExtrinsicInformationView @JvmOverloads constructor(
         viewGenericExtrinsicInformationAccount.showAddress(addressModel)
     }
 
-    fun setFeeStatus(feeStatus: FeeStatus<*>) {
+    fun setFeeStatus(feeStatus: FeeStatus<*, FeeDisplay>) {
         viewGenericExtrinsicInformationFee.setFeeStatus(feeStatus)
     }
 }

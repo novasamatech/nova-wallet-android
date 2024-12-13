@@ -52,6 +52,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.startCreateWalle
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
@@ -60,8 +62,10 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
@@ -325,10 +329,6 @@ class Navigator(
         navController?.navigate(R.id.action_open_receive, ReceiveFragment.getBundle(assetPayload))
     }
 
-    override fun openAssetFilters() {
-        navController?.navigate(R.id.action_mainFragment_to_assetFiltersFragment)
-    }
-
     override fun openAssetSearch() {
         navController?.navigate(R.id.action_mainFragment_to_assetSearchFragment)
     }
@@ -401,6 +401,26 @@ class Navigator(
         performNavigation(R.id.action_open_awaiting_card_creation)
     }
 
+    override fun openSendNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_sendFlow_to_sendFlowNetwork, NetworkFlowFragment.createPayload(payload))
+    }
+
+    override fun openReceiveNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_receiveFlow_to_receiveFlowNetwork, NetworkFlowFragment.createPayload(payload))
+    }
+
+    override fun openSwapNetworks(payload: NetworkSwapFlowPayload) {
+        navController?.navigate(R.id.action_selectAssetSwapFlowFragment_to_swapFlowNetworkFragment, NetworkSwapFlowFragment.createPayload(payload))
+    }
+
+    override fun returnToMainSwapScreen() {
+        navController?.navigate(R.id.action_return_to_swap_settings)
+    }
+
+    override fun openBuyNetworks(payload: NetworkFlowPayload) {
+        navController?.navigate(R.id.action_buyFlow_to_buyFlowNetwork, NetworkFlowFragment.createPayload(payload))
+    }
+
     override fun openSwapFlow() {
         val payload = SwapFlowPayload.InitialSelecting
         navController?.navigate(R.id.action_mainFragment_to_swapFlow, AssetSwapFlowFragment.getBundle(payload))
@@ -412,6 +432,10 @@ class Navigator(
 
     override fun openTopUpCard(payload: TopUpCardPayload) {
         navController?.navigate(R.id.action_open_topUpCard, TopUpCardFragment.getBundle(payload))
+    }
+
+    override fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
+        navController?.navigate(R.id.action_finish_and_open_swap_settings, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
     }
 
     override fun openNfts() {

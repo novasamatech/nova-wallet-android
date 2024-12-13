@@ -12,9 +12,9 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.Tot
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetTitle
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListCrowdloansPromoBanner
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListFilters
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNovaCard
@@ -30,7 +30,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun totalBalanceClicked()
 
         fun searchClicked()
-        fun filtersClicked()
+
         fun manageClicked()
 
         fun avatarClicked()
@@ -52,6 +52,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun crowdloanBannerCloseClicked()
 
         fun novaCardClick()
+
+        fun assetViewModeClicked()
     }
 
     private var filterIconRes: Int? = null
@@ -63,11 +65,10 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     private var nftPreviews: List<NftPreviewUi>? = null
     private var crowdloanBannerVisible: Boolean = false
     private var novaCardText: CharSequence? = null
+    private var assetViewModeModel: AssetViewModeModel? = null
 
     fun setFilterIconRes(filterIconRes: Int) {
         this.filterIconRes = filterIconRes
-
-        notifyItemChanged(0, Payload.FILTER_ICON)
     }
 
     fun setCrowdloanBannerVisible(crowdloanBannerVisible: Boolean) {
@@ -118,6 +119,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         notifyItemChanged(0, Payload.NOVA_CARD_TEXT)
     }
 
+    fun setAssetViewModeModel(assetViewModeModel: AssetViewModeModel) {
+        this.assetViewModeModel = assetViewModeModel
+
+        notifyItemChanged(0, Payload.ASSET_VIEW_MODE)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(parent.inflateChild(R.layout.item_asset_header), handler)
     }
@@ -134,9 +141,9 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.PLACEHOLDER -> holder.bindPlaceholder(shouldShowPlaceholder)
                     Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
-                    Payload.FILTER_ICON -> holder.bindFilterIcon(filterIconRes)
                     Payload.CROWDLOAN_BANNER_VISIBLE -> holder.bindCrowdloanBanner(crowdloanBannerVisible)
                     Payload.NOVA_CARD_TEXT -> holder.bindNovaCardText(novaCardText)
+                    Payload.ASSET_VIEW_MODE -> holder.bindAssetViewMode(assetViewModeModel)
                 }
             }
         }
@@ -151,8 +158,9 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
             shouldShowPlaceholder,
             walletConnectModel,
             filterIconRes,
+            novaCardText,
             crowdloanBannerVisible,
-            novaCardText
+            assetViewModeModel
         )
     }
 
@@ -162,8 +170,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, PLACEHOLDER, WALLET_CONNECT, FILTER_ICON,
-    CROWDLOAN_BANNER_VISIBLE, NOVA_CARD_TEXT,
+    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, PLACEHOLDER, WALLET_CONNECT,
+    CROWDLOAN_BANNER_VISIBLE, NOVA_CARD_TEXT, ASSET_VIEW_MODE
 }
 
 class HeaderHolder(
@@ -179,7 +187,6 @@ class HeaderHolder(
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
             balanceListSearch.setOnClickListener { handler.searchClicked() }
-            balanceListFilters.setOnClickListener { handler.filtersClicked() }
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buyClicked() }
@@ -187,6 +194,7 @@ class HeaderHolder(
             balanceListAssetPlaceholder.setButtonClickListener { handler.buyClicked() }
             balanceListCrowdloansPromoBanner.setOnClickListener { handler.crowdloanBannerClicked() }
             balanceListCrowdloansPromoBanner.setOnCloseClickListener { handler.crowdloanBannerCloseClicked() }
+            balanceListAssetTitle.setOnClickListener { handler.assetViewModeClicked() }
 
             balanceListAssetPlaceholder.setButtonText(R.string.assets_buy_tokens_placeholder_button)
             balanceListTotalBalance.onSwapClick { handler.swapClicked() }
@@ -201,8 +209,9 @@ class HeaderHolder(
         shouldShowPlaceholder: Boolean,
         walletConnect: WalletConnectSessionsModel?,
         filterIconRes: Int?,
+        novaCardText: CharSequence?,
         bannerVisible: Boolean,
-        novaCardText: CharSequence?
+        assetViewModeModel: AssetViewModeModel?
     ) {
         bindTotalBalance(totalBalance)
         bindAddress(addressModel)
@@ -210,9 +219,9 @@ class HeaderHolder(
         bindNftCount(nftCount)
         bindPlaceholder(shouldShowPlaceholder)
         bindWalletConnect(walletConnect)
-        bindFilterIcon(filterIconRes)
         bindCrowdloanBanner(bannerVisible)
         bindNovaCardText(novaCardText)
+        bindAssetViewMode(assetViewModeModel)
     }
 
     fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(containerView) {
@@ -243,15 +252,15 @@ class HeaderHolder(
         containerView.balanceListWalletConnect.setConnectionCount(it.connections)
     }
 
-    fun bindFilterIcon(filterIconRes: Int?) {
-        filterIconRes?.let { containerView.balanceListFilters.setImageResource(it) }
-    }
-
     fun bindCrowdloanBanner(bannerVisible: Boolean) = with(containerView) {
         balanceListCrowdloansPromoBanner.setVisible(bannerVisible)
     }
 
     fun bindNovaCardText(text: CharSequence?) = with(containerView) {
         assetNovaCardText.setText(text)
+    }
+
+    fun bindAssetViewMode(assetViewModeModel: AssetViewModeModel?) = with(containerView) {
+        assetViewModeModel?.let { balanceListAssetTitle.switchTextTo(assetViewModeModel) }
     }
 }

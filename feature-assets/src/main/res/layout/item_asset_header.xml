@@ -86,18 +86,16 @@
         app:promoBanner_image="@drawable/crowdloan_banner_image"
         app:promoBanner_title="@string/assets_crowdloan_unlock_banner_title" />
 
-    <TextView
+    <io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeView
         android:id="@+id/balanceListAssetTitle"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/wallet_tokens"
-        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toTopOf="@+id/balanceListAssetPlaceholder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balanceListCrowdloansPromoBanner"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="16dp"
+        android:minHeight="24sp"
         app:layout_goneMarginBottom="20dp" />
 
     <io.novafoundation.nova.common.view.IconButton
@@ -106,20 +104,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_search"
-        app:layout_constraintBottom_toBottomOf="@+id/balanceListFilters"
-        app:layout_constraintEnd_toStartOf="@+id/balanceListFilters"
-        app:layout_constraintTop_toTopOf="@+id/balanceListFilters"
-        app:tint="@color/chip_icon" />
-
-    <io.novafoundation.nova.common.view.IconButton
-        android:id="@+id/balanceListFilters"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_chip_filter"
         app:layout_constraintBottom_toBottomOf="@+id/balanceListManage"
         app:layout_constraintEnd_toStartOf="@+id/balanceListManage"
-        app:layout_constraintTop_toTopOf="@+id/balanceListManage" />
+        app:layout_constraintTop_toTopOf="@+id/balanceListManage"
+        app:tint="@color/chip_icon" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/balanceListManage"

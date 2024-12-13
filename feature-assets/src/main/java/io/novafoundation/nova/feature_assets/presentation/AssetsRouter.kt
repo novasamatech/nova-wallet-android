@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_assets.presentation
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
+import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
@@ -41,8 +43,6 @@ interface AssetsRouter {
 
     fun openReceive(assetPayload: AssetPayload)
 
-    fun openAssetFilters()
-
     fun openAssetSearch()
 
     fun openManageTokens()
@@ -75,6 +75,8 @@ interface AssetsRouter {
 
     fun openTopUpCard(payload: TopUpCardPayload)
 
+    fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
+
     fun openStaking()
 
     fun closeSendFlow()
@@ -84,4 +86,14 @@ interface AssetsRouter {
     fun finishTopUpFlowAndAwaitCardCreation()
 
     fun openAwaitingCardCreation()
+
+    fun openSendNetworks(payload: NetworkFlowPayload)
+
+    fun openReceiveNetworks(payload: NetworkFlowPayload)
+
+    fun openSwapNetworks(payload: NetworkSwapFlowPayload)
+
+    fun returnToMainSwapScreen()
+
+    fun openBuyNetworks(payload: NetworkFlowPayload)
 }

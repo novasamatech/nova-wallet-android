@@ -137,7 +137,7 @@ class DAppBrowserViewModel(
 
         return when (response) {
             is ExternalSignCommunicator.Response.Rejected -> ConfirmTxResponse.Rejected(response.requestId)
-            is ExternalSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature)
+            is ExternalSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature, response.modifiedTransaction)
             is ExternalSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId, response.shouldPresent)
             is ExternalSignCommunicator.Response.Sent -> ConfirmTxResponse.Sent(response.requestId, response.txHash)
         }

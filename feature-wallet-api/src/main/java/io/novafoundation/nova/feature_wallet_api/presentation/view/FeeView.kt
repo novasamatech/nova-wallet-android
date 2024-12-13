@@ -5,7 +5,8 @@ import android.util.AttributeSet
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableCellView
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 
 class FeeView @JvmOverloads constructor(
     context: Context,
@@ -14,17 +15,23 @@ class FeeView @JvmOverloads constructor(
 ) : TableCellView(context, attrs, defStyle) {
 
     init {
-        setTitle(R.string.network_fee)
-
-        setFeeStatus(FeeStatus.Loading)
+        // Super constructor might have set the title based on attrs
+        // We want to obey to attrs so only set the default fee label if attr value was not supplied
+        if (title.text.isNullOrBlank()) {
+            setTitle(R.string.network_fee)
+        }
     }
 
-    fun setFeeStatus(feeStatus: FeeStatus<*>) {
+    fun setFeeStatus(feeStatus: FeeStatus<*, FeeDisplay>) {
         setVisible(feeStatus !is FeeStatus.NoFee)
 
         when (feeStatus) {
             is FeeStatus.Loading -> {
-                showProgress()
+                if (feeStatus.visibleDuringProgress) {
+                    showProgress()
+                } else {
+                    setVisible(false)
+                }
             }
 
             is FeeStatus.Error -> {
@@ -32,11 +39,20 @@ class FeeView @JvmOverloads constructor(
             }
 
             is FeeStatus.Loaded -> {
-                showAmount(feeStatus.feeModel.display)
+                showFeeDisplay(feeStatus.feeModel.display)
             }
 
             FeeStatus.NoFee -> { }
         }
+    }
+
+    fun setFeeDisplay(feeDisplay: FeeDisplay) {
+        setVisible(true)
+        showFeeDisplay(feeDisplay)
+    }
+
+    private fun showFeeDisplay(feeDisplay: FeeDisplay) {
+        showValue(feeDisplay.title, feeDisplay.subtitle)
     }
 
     fun setFeeEditable(editable: Boolean, onEditTokenClick: OnClickListener) {

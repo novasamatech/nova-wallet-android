@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%sで追加できるプロキシの上限に達しました。新しいものを追加するためには既存のプロキシを削除してください。</string>
     <string name="add_proxy_maximum_reached_error_title">プロキシの最大数に達しました</string>
     <string name="added_networks_empty_placeholder">追加されたカスタムネットワーク\nここに表示されます</string>
+    <string name="appearance_colored_icon_title">カラー</string>
+    <string name="appearance_title">外観</string>
+    <string name="appearance_token_assets_title">トークンアイコン</string>
+    <string name="appearance_white_icon_title">ホワイト</string>
     <string name="asset_add_evm_token_already_exist_message">入力されたコントラクトアドレスは%sトークンとしてNovaに存在します。</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">入力されたコントラクトアドレスは%sトークンとしてNovaに存在します。本当にそれを変更しますか?</string>
     <string name="asset_add_evm_token_already_exist_title">このトークンはすでに存在します</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">コントラクトアドレスを入力</string>
     <string name="asset_add_token_enter_decimals">小数を入力</string>
     <string name="asset_add_token_enter_symbol">シンボルを入力</string>
+    <string name="asset_view_networks">ネットワーク</string>
+    <string name="asset_view_tokens">トークン</string>
     <string name="assets_add_token">トークンを追加</string>
     <string name="assets_add_token_enter_info_address_label">コントラクトアドレス</string>
     <string name="assets_add_token_enter_info_decimals_label">小数</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledgerはこのトークンをサポートしていません</string>
     <string name="assets_search_hint">ネットワークまたはトークンで検索</string>
     <string name="assets_search_placeholder">入力した名前のネットワークやトークンが見つかりませんでした</string>
+    <string name="assets_search_token_hint">トークンで検索</string>
     <string name="assets_select_send_your_wallets">あなたのウォレット</string>
     <string name="assets_send_flow_placeholder">送信するトークンがありません。\nトークンを購入または受け取ってください\nアカウントに。</string>
     <string name="assets_swap_flow_pay_title">支払い用トークン</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">バックアップ</string>
     <string name="biometric_auth_title">生体認証</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
+    <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
     <string name="buy_provider_open_confirmation_title">ブラウザで続行しますか？</string>
     <string name="chain_network_management_auto_balance">自動バランスノード</string>
@@ -348,6 +356,7 @@
     <string name="common_details">詳細</string>
     <string name="common_disabled">無効</string>
     <string name="common_disconnect">切断する</string>
+    <string name="common_do_not_close_app">アプリを閉じないでください！</string>
     <string name="common_done">完了</string>
     <string name="common_dont_show_again">これを再表示しない</string>
     <string name="common_edit">編集</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">操作によりアカウントが削除されます</string>
     <string name="common_expired">期限切れ</string>
     <string name="common_explore">探索する</string>
+    <string name="common_failed">失敗しました</string>
     <string name="common_fee_changed_message" formatted="false">推定ネットワーク手数料%sがデフォルトのネットワーク手数料(%s)よりも大幅に高くなっています。これは一時的なネットワーク渋滞が原因かもしれません。ネットワーク手数料をリフレッシュして、より低い手数料を待つことができます。</string>
     <string name="common_fee_changed_title">ネットワーク手数料が高すぎます</string>
+    <string name="common_fee_with_label">手数料: %s</string>
     <string name="common_filter_sort_header">ソート順:</string>
     <string name="common_filters">フィルター</string>
     <string name="common_find_out_more">詳しく知る</string>
@@ -419,6 +430,7 @@
     <string name="common_not_available">利用できません</string>
     <string name="common_not_enough_funds_message">申し訳ありませんが、ネットワーク手数料を支払うための十分な資金がありません。</string>
     <string name="common_not_enough_funds_title">残高不足</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">ネットワーク手数料%sを支払うには残高が不足しています。現在の残高は%sです</string>
     <string name="common_not_now">今はしません</string>
     <string name="common_off">オフ</string>
     <string name="common_ok">OK</string>
@@ -458,6 +470,10 @@
     <string name="common_search">検索</string>
     <string name="common_search_placeholder_default">検索結果がここに表示されます</string>
     <string name="common_search_results_number">検索結果：%d</string>
+    <string name="common_sec">秒</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d秒</item>
+    </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
@@ -481,6 +497,7 @@
     <string name="common_to_settings">設定を開く</string>
     <string name="common_too_small_balance_title">残高が少なすぎます</string>
     <string name="common_total">合計</string>
+    <string name="common_total_fee">合計手数料</string>
     <string name="common_transaction_id">取引ID</string>
     <string name="common_transaction_submitted">取引が送信されました</string>
     <string name="common_try_again">もう一度試してください</string>
@@ -493,6 +510,7 @@
     <string name="common_unlimited">無制限</string>
     <string name="common_update">更新</string>
     <string name="common_use">使用</string>
+    <string name="common_use_max">最大を使用</string>
     <string name="common_validation_invalid_address_message">受信者は有効な %s アドレスである必要があります</string>
     <string name="common_validation_invalid_address_title">無効な受信者</string>
     <string name="common_waiting">待機中</string>
@@ -960,6 +978,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">プッシュ通知を有効にすることで、%sと%sに同意したことになります</string>
     <string name="push_welcome_timeout_error_message">設定タブから通知設定にアクセスして、後でもう一度お試しください</string>
     <string name="push_welcome_title">お見逃しなく！</string>
+    <string name="receive_network_flow_title">受信するネットワークを選択 %s</string>
+    <string name="receive_screen_copy_address">住所をコピー</string>
     <string name="recover_json_hint">jsonを貼り付けるかファイルをアップロード...</string>
     <string name="recover_json_upload">ファイルをアップロード</string>
     <string name="recovery_json">JSONを復元</string>
@@ -974,6 +994,8 @@
     <string name="referenda_list_placeholder">レファレンダム情報は開始されるとここに表示されます</string>
     <string name="referenda_search_placeholder">入力されたタイトルまたはIDのレファレンダムが見つかりませんでした</string>
     <string name="referenda_search_toolbar_hint">レファレンダムのタイトルまたはIDで検索</string>
+    <string name="referenda_swipe_gov_banner_chip">%d レファレンダ</string>
+    <string name="referenda_swipe_gov_banner_subtitle">スワイプしてAIサマリーでレファレンダに投票。迅速かつ簡単！</string>
     <string name="referenda_title">レファレンダム</string>
     <string name="referendim_details_not_found_title">レファレンダムが見つかりません</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">棄権票は0.1xの信念でのみ行うことができます。0.1xの信念で投票しますか？</string>
@@ -1111,16 +1133,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
+    <string name="select_network_title">ネットワークを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">アドレスまたはw3n</string>
+    <string name="send_network_flow_title">送信するネットワークを選択 %s</string>
     <string name="send_recipient_system_account_message">受信者はシステムアカウントです。どの会社や個人にも管理されていません。\nそれでもこの転送を実行してもよろしいですか？</string>
     <string name="send_recipient_system_account_title">トークンが失われます</string>
     <string name="set_staking_proxy_address_description">権限を与える</string>
     <string name="settings_biometric_not_ready_message">設定で生体認証が有効になっていることを確認してください</string>
     <string name="settings_biometric_not_ready_title">設定で生体認証が無効になっています</string>
     <string name="settings_community">コミュニティ</string>
-    <string name="settings_email">Eメール</string>
+    <string name="settings_email">メールでサポートを受ける</string>
     <string name="settings_general">一般</string>
     <string name="settings_pin_code_verification_confirmation_message">ウォレットでの署名操作（Nova Walletで作成またはインポートされたもの）は、署名の作成前にPIN確認が必要です</string>
     <string name="settings_pin_code_verification_confirmation_title">操作の署名に認証を要求</string>
@@ -1132,7 +1156,7 @@
     <string name="settings_security">セキュリティ</string>
     <string name="settings_support">サポート＆フィードバック</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">ウィキ</string>
+    <string name="settings_wiki">ウィキとヘルプセンター</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">棄権時には信念が0.1xに設定されます</string>
     <string name="setup_staking_conflict_message">Direct StakingとNomination Poolsを同時にステークすることはできません</string>
@@ -1494,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">ネットワーク手数料を支払うトークン</string>
     <string name="swap_custom_fee_selector_footer">入力された金額の上にネットワーク手数料が追加されます</string>
     <string name="swap_error_pair_not_supported">このペアはサポートされていません</string>
+    <string name="swap_execution_failure" formatted="false">操作 #%s (%s) が失敗しました</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%sから%sへの%s転送</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s操作</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s/%sの操作</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%sを%sに転送</string>
+    <string name="swap_execution_time">実行時間</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">十分なトークンを保持していないため、%sのネットワーク手数料を支払った後に少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%sトークンを受け取るために少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_insufficient_balance_message">ネットワーク手数料として%2$sを支払うため、最大%1$sをスワップできます。</string>
@@ -1513,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">他のネットワークから %s を転送</string>
     <string name="swap_get_token_receive_description">QRコードまたはあなたのアドレスで %s を受け取る</string>
     <string name="swap_get_token_using">%s を使って取得</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">スワップ実行中に中間受取額が%sで、これは最小残高%sを下回っています。より大きなスワップ額を指定してみてください。</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">スリッページは %s から %s の間で指定する必要があります</string>
     <string name="swap_invalid_slippage_failure_title">無効なスリッページ</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">支払うトークンを選択</string>
@@ -1521,6 +1556,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">別の金額を入力</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">ネットワーク手数料を %s で支払うため、Novaは %s を %s に自動的にスワップして、アカウントの最低 %s 残高を維持します。</string>
     <string name="swap_network_fee_description">ブロックチェーンによって取引や検証を処理するためのネットワーク手数料。ネットワークの状況や取引速度によって異なる場合があります。</string>
+    <string name="swap_network_flow_title">スワップするネットワークを選択 %s</string>
     <string name="swap_not_enought_liquidity_failure">プールにスワップするための十分な流動性がありません</string>
     <string name="swap_price_difference_description">価格差とは、二つの異なる資産間の価格差を指します。暗号通貨のスワップを行う際、価格差は通常、交換する資産の価格と交換される資産の価格の違いを意味します。</string>
     <string name="swap_price_difference_title">価格差</string>
@@ -1530,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">旧レート: %1$s ≈ %2$s。\n新レート: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">交換レートが更新されました</string>
     <string name="swap_repeat_operation">操作を繰り返す</string>
+    <string name="swap_route">ルート</string>
+    <string name="swap_route_description">異なるネットワークを通じて希望するトークンを得るためにトークンが通る経路です。</string>
+    <string name="swap_route_segment_swap_title">スワップ</string>
+    <string name="swap_route_segment_transfer_title">転送</string>
     <string name="swap_settings_title">スワップ設定</string>
     <string name="swap_slippage">スリッページ</string>
     <string name="swap_slippage_description">スワップのスリッページは、分散型取引でよく見られる現象で、取引の最終価格が市場状況の変化により予想価格から少し異なる場合があります。</string>
@@ -1540,6 +1580,31 @@
     <string name="swap_slippage_warning_too_small">低スリッページ許容のため、トランザクションがリバートされる可能性があります。</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%sの金額は%sの最低残高を下回っています</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">交換する金額が小さすぎます</string>
+    <string name="swipe_gov_abstain_format">棄権: %s</string>
+    <string name="swipe_gov_aye_format">賛成: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">後でこのレファレンダムに投票することができます</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">投票リストからレファレンダ %s を削除しますか？</string>
+    <string name="swipe_gov_basket_removed_items_message">一部のレファレンダはもはや投票に利用できないか、投票に必要なトークンが不足している可能性があります。利用可能な投票：%s。</string>
+    <string name="swipe_gov_basket_removed_items_title">投票リストから除外されたレファレンダの一部</string>
+    <string name="swipe_gov_card_data_loading_error_message">レファレンダのデータを読み込むことができませんでした</string>
+    <string name="swipe_gov_card_data_loading_error_title">データが取得できません</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">利用可能なレファレンダに既に投票したか、現在投票できるレファレンダがありません。後で戻ってきてください。</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">利用可能なレファレンダに既に投票しています</string>
+    <string name="swipe_gov_card_requested_title">リクエスト済み：</string>
+    <string name="swipe_gov_cards_basket_title">投票リスト</string>
+    <string name="swipe_gov_cards_counter">残り %d</string>
+    <string name="swipe_gov_cards_full_list">投票を確認</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">投票するレファレンダはありません</string>
+    <string name="swipe_gov_cards_placeholder_button">投票を確認する</string>
+    <string name="swipe_gov_cards_voting_list_empty">投票がありません</string>
+    <string name="swipe_gov_convirm_votes_success_message">%d レファレンダへの投票に成功しました</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">現在の投票力 %s (%sx) で投票するには残高が不足しています。投票力を変更するか、ウォレットに資金を追加してください。</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">投票に必要な残高が不足しています</string>
+    <string name="swipe_gov_nay_format">反対: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">%d レファレンダに投票</string>
+    <string name="swipe_gov_vote_subtitle">SwipeGovで将来の投票を設定します</string>
+    <string name="swipe_gov_vote_title">投票力</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">ウォレット</string>
     <string name="today">今日</string>
@@ -1588,6 +1653,7 @@
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>
     <string name="wallet_asset_receive_token">受け取る %s</string>
+    <string name="wallet_asset_receive_token_subtitle">送信するのは%1$sトークンと%2$sネットワークのトークンのみ可能です、それ以外の場合、資金を失う可能性があります</string>
     <string name="wallet_asset_send">送信</string>
     <string name="wallet_asset_swap">スワップ</string>
     <string name="wallet_assets">資産</string>

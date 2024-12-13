@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -129,7 +129,7 @@ class ParachainStakingRebondViewModel(
         _showNextProgress.value = true
 
         val payload = ParachainStakingRebondValidationPayload(
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             asset = assetFlow.first()
         )
 

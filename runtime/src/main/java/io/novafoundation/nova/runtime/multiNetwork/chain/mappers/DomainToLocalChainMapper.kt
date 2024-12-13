@@ -13,7 +13,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLoca
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.runtime.ext.autoBalanceEnabled
-import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
+import io.novafoundation.nova.runtime.ext.selectedUnformattedWssNodeUrlOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
@@ -42,7 +42,8 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
 
     is Chain.Asset.Type.Statemine -> ASSET_STATEMINE to mapOf(
         STATEMINE_EXTRAS_ID to mapStatemineAssetIdToRaw(type.id),
-        STATEMINE_EXTRAS_PALLET_NAME to type.palletName
+        STATEMINE_EXTRAS_PALLET_NAME to type.palletName,
+        STATEMINE_IS_SUFFICIENT to type.isSufficient
     )
 
     is Chain.Asset.Type.Orml -> ASSET_ORML to mapOf(
@@ -97,7 +98,7 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
         source = mapAssetSourceToLocal(asset.source),
         buyProviders = gson.toJson(asset.buyProviders),
         typeExtras = gson.toJson(typeExtras),
-        icon = asset.iconUrl,
+        icon = asset.icon,
         enabled = asset.enabled
     )
 }
@@ -157,19 +158,14 @@ fun mapNodeSelectionPreferencesToLocal(chain: Chain): NodeSelectionPreferencesLo
     return NodeSelectionPreferencesLocal(
         chainId = chain.id,
         autoBalanceEnabled = chain.autoBalanceEnabled,
-        selectedNodeUrl = chain.selectedNodeUrlOrNull
+        selectedNodeUrl = chain.selectedUnformattedWssNodeUrlOrNull
     )
 }
 
-fun mapNodeSelectionStrategyToLocal(domain: Chain): ChainLocal.NodeSelectionStrategyLocal {
-    val autobalanceStrategy = when (val strategy = domain.nodes.nodeSelectionStrategy) {
-        is Chain.Nodes.NodeSelectionStrategy.SelectedNode -> strategy.autoBalanceStrategy
-        is Chain.Nodes.NodeSelectionStrategy.AutoBalance -> strategy
-    }
-
-    return when (autobalanceStrategy) {
-        Chain.Nodes.NodeSelectionStrategy.AutoBalance.ROUND_ROBIN -> ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN
-        Chain.Nodes.NodeSelectionStrategy.AutoBalance.UNIFORM -> ChainLocal.NodeSelectionStrategyLocal.UNIFORM
+fun mapNodeSelectionStrategyToLocal(domain: Chain): ChainLocal.AutoBalanceStrategyLocal {
+    return when (domain.nodes.autoBalanceStrategy) {
+        Chain.Nodes.AutoBalanceStrategy.ROUND_ROBIN -> ChainLocal.AutoBalanceStrategyLocal.ROUND_ROBIN
+        Chain.Nodes.AutoBalanceStrategy.UNIFORM -> ChainLocal.AutoBalanceStrategyLocal.UNIFORM
     }
 }
 
@@ -195,6 +191,7 @@ fun mapChainExternalApiToLocal(gson: Gson, chainId: String, api: ExternalApi): C
         is ExternalApi.GovernanceDelegations -> mapExternalApiGovernanceDelegations(chainId, api)
         is ExternalApi.GovernanceReferenda -> mapExternalApiGovernanceReferenda(gson, chainId, api)
         is ExternalApi.Staking -> mapExternalApiStaking(chainId, api)
+        is ExternalApi.ReferendumSummary -> mapExternalApiReferendumSummary(chainId, api)
     }
 }
 
@@ -260,6 +257,16 @@ fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): ChainExter
         chainId = chainId,
         sourceType = SourceType.SUBQUERY,
         apiType = ChainExternalApiLocal.ApiType.STAKING,
+        parameters = null,
+        url = api.url
+    )
+}
+
+fun mapExternalApiReferendumSummary(chainId: String, api: ExternalApi.ReferendumSummary): ChainExternalApiLocal {
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.UNKNOWN,
+        apiType = ChainExternalApiLocal.ApiType.REFERENDUM_SUMMARY,
         parameters = null,
         url = api.url
     )

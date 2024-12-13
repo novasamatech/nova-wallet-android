@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Você alcançou o limite de %s proxies adicionados em %s. Remova proxies para adicionar novos.</string>
     <string name="add_proxy_maximum_reached_error_title">Número máximo de proxies foi alcançado</string>
     <string name="added_networks_empty_placeholder">Redes personalizadas adicionadas\naparecerão aqui</string>
+    <string name="appearance_colored_icon_title">Colorido</string>
+    <string name="appearance_title">Aparência</string>
+    <string name="appearance_token_assets_title">ícones de token</string>
+    <string name="appearance_white_icon_title">Branco</string>
     <string name="asset_add_evm_token_already_exist_message">O endereço do contrato inserido já está presente na Nova como um token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">O endereço do contrato inserido já está presente na Nova como um token %s. Tem certeza de que deseja modificá-lo?</string>
     <string name="asset_add_evm_token_already_exist_title">Este token já existe</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Insira o endereço do contrato</string>
     <string name="asset_add_token_enter_decimals">Insira os decimais</string>
     <string name="asset_add_token_enter_symbol">Insira o símbolo</string>
+    <string name="asset_view_networks">Redes</string>
+    <string name="asset_view_tokens">Tokens</string>
     <string name="assets_add_token">Adicionar token</string>
     <string name="assets_add_token_enter_info_address_label">Endereço do contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimais</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger não suporta este token</string>
     <string name="assets_search_hint">Buscar por rede ou token</string>
     <string name="assets_search_placeholder">Nenhuma rede ou token com o nome inserido foi encontrado</string>
+    <string name="assets_search_token_hint">Pesquisar por token</string>
     <string name="assets_select_send_your_wallets">Suas carteiras</string>
     <string name="assets_send_flow_placeholder">Você não tem tokens para enviar. Compre ou Receba tokens na sua conta.</string>
     <string name="assets_swap_flow_pay_title">Token para pagamento</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Backup</string>
     <string name="biometric_auth_title">Autenticação biométrica</string>
     <string name="buy_completed">Compra iniciada! Por favor, aguarde até 60 minutos. Você pode rastrear o status pelo email.</string>
+    <string name="buy_network_flow_title">Selecione a rede para comprar %s</string>
     <string name="buy_provider_open_confirmation_message">Para continuar a compra você será redirecionado do aplicativo Nova Wallet para %s</string>
     <string name="buy_provider_open_confirmation_title">Continuar no navegador?</string>
     <string name="chain_network_management_auto_balance">Equilibrar nós automaticamente</string>
@@ -348,6 +356,7 @@
     <string name="common_details">Detalhes</string>
     <string name="common_disabled">Desativado</string>
     <string name="common_disconnect">Desconectar</string>
+    <string name="common_do_not_close_app">Não feche o aplicativo!</string>
     <string name="common_done">Feito</string>
     <string name="common_dont_show_again">Não mostrar isso novamente</string>
     <string name="common_edit">Editar</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">A operação removerá a conta</string>
     <string name="common_expired">Expirado</string>
     <string name="common_explore">Explorar</string>
+    <string name="common_failed">Falhou</string>
     <string name="common_fee_changed_message" formatted="false">A taxa de rede estimada %s é muito maior que a taxa de rede padrão (%s). Isso pode ser devido à congestão temporária da rede. Você pode atualizar para esperar por uma taxa de rede menor.</string>
     <string name="common_fee_changed_title">Taxa de rede está muito alta</string>
+    <string name="common_fee_with_label">Taxa: %s</string>
     <string name="common_filter_sort_header">Ordenar por:</string>
     <string name="common_filters">Filtros</string>
     <string name="common_find_out_more">Descubra mais</string>
@@ -423,6 +434,7 @@
     <string name="common_not_available">Não disponível</string>
     <string name="common_not_enough_funds_message">Desculpe, você não tem fundos suficientes para pagar a taxa de rede.</string>
     <string name="common_not_enough_funds_title">Saldo insuficiente</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Você não tem saldo suficiente para pagar a taxa de rede de %s. Saldo atual é %s</string>
     <string name="common_not_now">Agora não</string>
     <string name="common_off">Desligado</string>
     <string name="common_ok">OK</string>
@@ -462,6 +474,11 @@
     <string name="common_search">Pesquisar</string>
     <string name="common_search_placeholder_default">Os resultados da pesquisa serão exibidos aqui</string>
     <string name="common_search_results_number">Resultados da pesquisa: %d</string>
+    <string name="common_sec">seg</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
     <string name="common_secret_derivation_path">Sequência de derivação secreta</string>
     <string name="common_settings">Configurações</string>
     <string name="common_share">Compartilhar</string>
@@ -485,6 +502,7 @@
     <string name="common_to_settings">Abrir Configurações</string>
     <string name="common_too_small_balance_title">Seu saldo é muito pequeno</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Taxa total</string>
     <string name="common_transaction_id">ID da transação</string>
     <string name="common_transaction_submitted">Transação enviada</string>
     <string name="common_try_again">Tente novamente</string>
@@ -498,6 +516,7 @@
     <string name="common_unlimited">Ilimitado</string>
     <string name="common_update">Atualizar</string>
     <string name="common_use">Usar</string>
+    <string name="common_use_max">Usar máximo</string>
     <string name="common_validation_invalid_address_message">O destinatário deve ser um endereço %s válido</string>
     <string name="common_validation_invalid_address_title">Destinatário inválido</string>
     <string name="common_waiting">Aguardando</string>
@@ -967,6 +986,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Ao ativar as notificações push, você concorda com nossos %s e %s</string>
     <string name="push_welcome_timeout_error_message">Por favor, tente novamente mais tarde acessando as configurações de notificação na aba Configurações</string>
     <string name="push_welcome_title">Não perca nada!</string>
+    <string name="receive_network_flow_title">Selecione a rede para receber %s</string>
+    <string name="receive_screen_copy_address">Copiar Endereço</string>
     <string name="recover_json_hint">Cole o json ou faça upload do arquivo…</string>
     <string name="recover_json_upload">Fazer upload de arquivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -981,6 +1002,8 @@
     <string name="referenda_list_placeholder">As informações dos referendos aparecerão aqui quando começarem</string>
     <string name="referenda_search_placeholder">Nenhum referendo com o título ou ID inserido foi encontrado</string>
     <string name="referenda_search_toolbar_hint">Buscar por título de referendo ou ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referendos</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Deslize para votar nos referendos com resumos de IA. Rápido e fácil!</string>
     <string name="referenda_title">Referendos</string>
     <string name="referendim_details_not_found_title">Referendo não encontrado</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Os votos de abstenção só podem ser feitos com convicção de 0.1x. Votar com convicção de 0.1x?</string>
@@ -1119,16 +1142,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Faixas indisponíveis</string>
     <string name="select_ledger_location_enable_request_message">Nova precisa que a localização seja ativada para poder realizar a varredura Bluetooth para encontrar seu dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Por favor, ative a localização geográfica nas configurações do dispositivo</string>
+    <string name="select_network_title">Selecionar rede</string>
     <string name="select_tracks_for">Selecione faixas para</string>
     <string name="selected_tracks_quantity" formatted="false">%d de %d</string>
     <string name="send_address_hint">Endereço ou w3n</string>
+    <string name="send_network_flow_title">Selecione a rede para enviar %s</string>
     <string name="send_recipient_system_account_message">O destinatário é uma conta do sistema. Não é controlado por nenhuma empresa ou indivíduo.\nVocê ainda deseja realizar esta transferência?</string>
     <string name="send_recipient_system_account_title">Os tokens serão perdidos</string>
     <string name="set_staking_proxy_address_description">Dar autoridade para</string>
     <string name="settings_biometric_not_ready_message">Por favor, certifique-se de que a biometria está ativada nas Configurações</string>
     <string name="settings_biometric_not_ready_title">Biometria desativada nas Configurações</string>
     <string name="settings_community">Comunidade</string>
-    <string name="settings_email">Escrever para os desenvolvedores</string>
+    <string name="settings_email">Obtenha suporte via Email</string>
     <string name="settings_general">Geral</string>
     <string name="settings_pin_code_verification_confirmation_message">Cada operação de assinatura em carteiras com par de chaves (criada na nova wallet ou importada) deve exigir a verificação do PIN antes da construção da assinatura</string>
     <string name="settings_pin_code_verification_confirmation_title">Solicitar autenticação para assinatura de operações</string>
@@ -1140,7 +1165,7 @@
     <string name="settings_security">Segurança</string>
     <string name="settings_support">Suporte &amp; Feedback</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki e Central de Ajuda</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">A convicção será definida como 0.1x quando Abstain</string>
     <string name="setup_staking_conflict_message">Você não pode fazer staking com Staking Direto e Pools de Nomeação ao mesmo tempo</string>
@@ -1504,6 +1529,17 @@
     <string name="swap_custom_fee_selector_description">Token para pagar a taxa de rede</string>
     <string name="swap_custom_fee_selector_footer">A taxa de rede é adicionada em cima do valor inserido</string>
     <string name="swap_error_pair_not_supported">Este par não é suportado</string>
+    <string name="swap_execution_failure" formatted="false">Falha na operação #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Troca de %s para %s em %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transferência de %s de %s para %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operação</item>
+        <item quantity="other">%s operações</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s de %s operações</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Trocando %s para %s em %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Transferindo %s para %s</string>
+    <string name="swap_execution_time">Tempo de execução</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Você deve manter pelo menos %s após pagar a taxa de rede %s, pois você está com tokens insuficientes</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Você deve manter pelo menos %s para receber o token %s</string>
     <string name="swap_failure_insufficient_balance_message">Você pode trocar até %1$s, pois você precisa pagar %2$s de taxa de rede.</string>
@@ -1523,6 +1559,7 @@
     <string name="swap_get_token_cross_chain_description">Transfira %s de outra rede</string>
     <string name="swap_get_token_receive_description">Receba %s com QR ou seu endereço</string>
     <string name="swap_get_token_using">Obtenha %s usando</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Durante a execução da troca, o valor intermediário recebido é %s, que é menor que o saldo mínimo de %s. Tente especificar um valor de troca maior.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">O deslizamento deve ser especificado entre %s e %s</string>
     <string name="swap_invalid_slippage_failure_title">Deslizamento inválido</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Selecione um token para pagar</string>
@@ -1531,6 +1568,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Digite outra quantidade</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Para pagar a taxa de rede com %s, a Nova fará automaticamente a troca de %s por %s para manter o saldo mínimo de %s na sua conta.</string>
     <string name="swap_network_fee_description">Uma taxa de rede cobrada pela blockchain para processar e validar quaisquer transações. Pode variar dependendo das condições da rede ou velocidade da transação.</string>
+    <string name="swap_network_flow_title">Selecione a rede para trocar %s</string>
     <string name="swap_not_enought_liquidity_failure">O pool não tem liquidez suficiente para a troca</string>
     <string name="swap_price_difference_description">Diferença de preço refere-se à diferença de preço entre dois ativos diferentes. Ao fazer uma troca em cripto, a diferença de preço geralmente é entre o preço do ativo que você está trocando e o preço do ativo com o qual você está trocando.</string>
     <string name="swap_price_difference_title">Diferença de preço</string>
@@ -1540,6 +1578,10 @@
     <string name="swap_rate_was_updated_failure_message">Taxa antiga: %1$s ≈ %2$s.\nNova taxa: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">A taxa de troca foi atualizada</string>
     <string name="swap_repeat_operation">Repetir a operação</string>
+    <string name="swap_route">Rota</string>
+    <string name="swap_route_description">O caminho que seu token percorrerá através de diferentes redes para obter o token desejado.</string>
+    <string name="swap_route_segment_swap_title">Troca</string>
+    <string name="swap_route_segment_transfer_title">Transferência</string>
     <string name="swap_settings_title">Configurações de Troca</string>
     <string name="swap_slippage">Deslizamento</string>
     <string name="swap_slippage_description">Deslizamento em trocas é um acontecimento comum em negociações descentralizadas onde o preço final de uma transação de troca pode diferir ligeiramente do preço esperado, devido às condições de mercado em mudança.</string>
@@ -1550,6 +1592,31 @@
     <string name="swap_slippage_warning_too_small">A transação pode ser revertida por causa da baixa tolerância ao deslizamento.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">A quantia de %s é menor que o saldo mínimo de %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Você está tentando trocar uma quantia muito pequena</string>
+    <string name="swipe_gov_abstain_format">Abstenção: %s</string>
+    <string name="swipe_gov_aye_format">A favor: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Você sempre pode votar neste referendo mais tarde</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Remover referendo %s da lista de votos?</string>
+    <string name="swipe_gov_basket_removed_items_message">Alguns dos referendos não estão mais disponíveis para votação ou você pode não ter tokens suficientes disponíveis para votar. Disponível para votar: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Alguns dos referendos foram excluídos da lista de votos</string>
+    <string name="swipe_gov_card_data_loading_error_message">Os dados do referendo não puderam ser carregados</string>
+    <string name="swipe_gov_card_data_loading_error_title">Nenhum dado recuperado</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Você já votou em todos os referendos disponíveis ou não há referendos para votar agora. Volte mais tarde.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Você já votou em todos os referendos disponíveis</string>
+    <string name="swipe_gov_card_requested_title">Solicitado:</string>
+    <string name="swipe_gov_cards_basket_title">Lista de votos</string>
+    <string name="swipe_gov_cards_counter">Faltam %d</string>
+    <string name="swipe_gov_cards_full_list">Confirmar votos</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Nenhum referendo para votar</string>
+    <string name="swipe_gov_cards_placeholder_button">Confirme seus votos</string>
+    <string name="swipe_gov_cards_voting_list_empty">Sem votos</string>
+    <string name="swipe_gov_convirm_votes_success_message">Você votou com sucesso em %d referendos</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Você não tem saldo suficiente para votar com o poder de voto atual %s (%sx). Por favor, altere o poder de voto ou adicione mais fundos à sua carteira.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Saldo insuficiente para votar</string>
+    <string name="swipe_gov_nay_format">Contra: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Vote em %d referendos</string>
+    <string name="swipe_gov_vote_subtitle">A votação será definida para votos futuros no SwipeGov</string>
+    <string name="swipe_gov_vote_title">Poder de voto</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Carteira</string>
     <string name="today">Hoje</string>
@@ -1598,6 +1665,7 @@
     <string name="wallet_asset_buy_with">Comprar com</string>
     <string name="wallet_asset_receive">Receber</string>
     <string name="wallet_asset_receive_token">Receber %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Envie somente o token %1$s e tokens na rede %2$s para este endereço, ou você pode perder seus fundos</string>
     <string name="wallet_asset_send">Enviar</string>
     <string name="wallet_asset_swap">Trocar</string>
     <string name="wallet_assets">Ativos</string>

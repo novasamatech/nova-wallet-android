@@ -5,14 +5,13 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
-import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDepositInUsedAsset
@@ -51,22 +50,20 @@ abstract class BaseAssetTransfers(
     protected abstract suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>>
 
     override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
-        val feePaymentCurrency = transfer.commissionAsset.toFeePaymentCurrency()
-        val submissionOptions = ExtrinsicService.SubmissionOptions(feePaymentCurrency)
+        val submissionOptions = ExtrinsicService.SubmissionOptions(transfer.feePaymentCurrency)
 
         return extrinsicServiceFactory
-            .create(coroutineScope)
+            .createDefault(coroutineScope)
             .submitExtrinsic(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
                 transfer(transfer)
             }
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
-        val feePaymentCurrency = transfer.commissionAsset.toFeePaymentCurrency()
-        val submissionOptions = ExtrinsicService.SubmissionOptions(feePaymentCurrency)
+        val submissionOptions = ExtrinsicService.SubmissionOptions(transfer.feePaymentCurrency)
 
         return extrinsicServiceFactory
-            .create(coroutineScope)
+            .createDefault(coroutineScope)
             .estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet, submissionOptions = submissionOptions) {
                 transfer(transfer)
             }

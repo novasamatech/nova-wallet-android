@@ -20,7 +20,7 @@ class PriceSectionView @JvmOverloads constructor(
         attrs?.let(::applyAttrs)
     }
 
-    fun setPrice(token: String, fiat: String?) {
+    fun setPrice(token: CharSequence, fiat: CharSequence?) {
         sectionPriceToken.text = token
         sectionPriceFiat.setTextOrHide(fiat)
     }

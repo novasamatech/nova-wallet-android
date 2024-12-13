@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.rebondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -120,7 +120,7 @@ class ConfirmRebondViewModel(
         _showNextProgress.value = true
 
         val payload = RebondValidationPayload(
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             rebondAmount = payload.amount,
             controllerAsset = assetFlow.first()
         )

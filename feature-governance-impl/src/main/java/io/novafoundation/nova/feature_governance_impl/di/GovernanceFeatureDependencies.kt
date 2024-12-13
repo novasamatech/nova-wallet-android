@@ -11,12 +11,14 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
+import io.novafoundation.nova.core_db.dao.TinderGovDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -37,6 +39,8 @@ import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
@@ -44,6 +48,24 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
+
+    val onChainIdentityRepository: OnChainIdentityRepository
+
+    val listChooserMixinFactory: ListChooserMixin.Factory
+
+    val identityMixinFactory: IdentityMixin.Factory
+
+    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+
+    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val bannerVisibilityRepository: BannerVisibilityRepository
+
+    val chainMultiLocationConverterFactory: ChainMultiLocationConverterFactory
+
+    val assetMultiLocationConverterFactory: MultiLocationConverterFactory
+
+    val assetIconProvider: AssetIconProvider
 
     val feeLoaderMixinFactory: FeeLoaderMixin.Factory
 
@@ -97,6 +119,8 @@ interface GovernanceFeatureDependencies {
 
     val governanceDAppsDao: GovernanceDAppsDao
 
+    val tinderGovDao: TinderGovDao
+
     val networkApiCreator: NetworkApiCreator
 
     @Caching
@@ -113,16 +137,4 @@ interface GovernanceFeatureDependencies {
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageDataSource(): StorageDataSource
-
-    val onChainIdentityRepository: OnChainIdentityRepository
-
-    val listChooserMixinFactory: ListChooserMixin.Factory
-
-    val identityMixinFactory: IdentityMixin.Factory
-
-    val partialRetriableMixinFactory: PartialRetriableMixin.Factory
-
-    val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val bannerVisibilityRepository: BannerVisibilityRepository
 }

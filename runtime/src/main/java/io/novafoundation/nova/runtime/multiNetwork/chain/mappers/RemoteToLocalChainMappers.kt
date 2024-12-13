@@ -12,7 +12,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceTy
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
-import io.novafoundation.nova.core_db.model.chain.ChainLocal.NodeSelectionStrategyLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.AutoBalanceStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -99,11 +99,11 @@ fun mapRemoteChainToLocal(
     return chainLocal
 }
 
-private fun mapNodeSelectionStrategyToLocal(remote: String?): NodeSelectionStrategyLocal {
+private fun mapNodeSelectionStrategyToLocal(remote: String?): AutoBalanceStrategyLocal {
     return when (remote) {
-        null, "roundRobin" -> NodeSelectionStrategyLocal.ROUND_ROBIN
-        "uniform" -> NodeSelectionStrategyLocal.UNIFORM
-        else -> NodeSelectionStrategyLocal.UNKNOWN
+        null, "roundRobin" -> AutoBalanceStrategyLocal.ROUND_ROBIN
+        "uniform" -> AutoBalanceStrategyLocal.UNIFORM
+        else -> AutoBalanceStrategyLocal.UNKNOWN
     }
 }
 
@@ -210,6 +210,7 @@ private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "crowdloans" -> ApiType.CROWDLOANS
     "governance" -> ApiType.GOVERNANCE_REFERENDA
     "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS
+    "referendum-summary" -> ApiType.REFERENDUM_SUMMARY
     else -> ApiType.UNKNOWN
 }
 

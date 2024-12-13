@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_settings_impl.R
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import kotlinx.android.synthetic.main.fragment_settings.accountView
 import kotlinx.android.synthetic.main.fragment_settings.settingsAppVersion
+import kotlinx.android.synthetic.main.fragment_settings.settingsAppearance
 import kotlinx.android.synthetic.main.fragment_settings.settingsAvatar
 import kotlinx.android.synthetic.main.fragment_settings.settingsBiometricAuth
 import kotlinx.android.synthetic.main.fragment_settings.settingsCloudBackup
@@ -63,6 +64,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel>() {
         settingsPushNotifications.setOnClickListener { viewModel.pushNotificationsClicked() }
         settingsCurrency.setOnClickListener { viewModel.currenciesClicked() }
         settingsLanguage.setOnClickListener { viewModel.languagesClicked() }
+        settingsAppearance.setOnClickListener { viewModel.appearanceClicked() }
 
         settingsTelegram.setOnClickListener { viewModel.telegramClicked() }
         settingsTwitter.setOnClickListener { viewModel.twitterClicked() }

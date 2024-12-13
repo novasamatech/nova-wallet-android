@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -23,12 +24,16 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
@@ -65,6 +70,14 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
     }
 }
 
+@OptIn(ExperimentalTime::class)
+inline fun <R> measureExecution(label: String, function: () -> R): R {
+    val (value, time) = measureTimedValue(function)
+    Log.d("Performance", "$label took $time")
+
+    return value
+}
+
 inline fun <T, reified E : Throwable> Result<T>.mapErrorNotInstance(transform: (throwable: Throwable) -> Throwable): Result<T> {
     return mapError { throwable ->
         if (throwable !is E) {
@@ -99,10 +112,20 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     return destination
 }
 
+fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
+    return subList(fromIndex.coerceIn(0, size), toIndex.coerceIn(0, size))
+}
+
 suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     return coroutineScope {
         map { async { operation(it) } }
     }.awaitAll()
+}
+
+suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> Collection<R>): List<R> {
+    return coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll().flatten()
 }
 
 suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
@@ -251,6 +274,10 @@ fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all {
 fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
+
+fun <T> Result<T?>.requireInnerNotNull(): Result<T> {
+    return mapCatching { requireNotNull(it) }
+}
 
 /**
  * Given a list finds a partition point in O(log2(N)) given that there is only a single partition point present.
@@ -593,3 +620,9 @@ fun Calendar.resetDay() {
     set(Calendar.SECOND, 0)
     set(Calendar.MILLISECOND, 0)
 }
+
+inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
+    launch { block() }
+}
+
+fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }

@@ -8,7 +8,7 @@ data class NetworkInfoItem(val title: String, val content: ExtendedLoadingState<
 
     companion object;
 
-    data class Content(val primary: String, val secondary: String?)
+    data class Content(val primary: CharSequence, val secondary: CharSequence?)
 }
 
 fun NetworkInfoItem.Companion.totalStaked(resourceManager: ResourceManager, content: ExtendedLoadingState<NetworkInfoItem.Content>): NetworkInfoItem {

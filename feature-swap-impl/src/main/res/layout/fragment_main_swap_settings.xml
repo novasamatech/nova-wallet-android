@@ -50,7 +50,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+            <io.novafoundation.nova.feature_swap_impl.presentation.common.views.SwapAmountInputView
                 android:id="@+id/swapMainSettingsPayInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsGetAssetIn" />
 
-            <io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+            <io.novafoundation.nova.feature_swap_impl.presentation.common.views.SwapAmountInputView
                 android:id="@+id/swapMainSettingsReceiveInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -165,11 +165,25 @@
                             app:title="@string/swap_rate_title"
                             app:titleIcon="@drawable/ic_info" />
 
+                        <io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
+                            android:id="@+id/swapMainSettingsRoute"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:titleIcon="@drawable/ic_info" />
+
+                        <io.novafoundation.nova.common.view.TableCellView
+                            android:id="@+id/swapMainSettingsExecutionTime"
+                            app:title="@string/swap_execution_time"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
                         <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                             android:id="@+id/swapMainSettingsDetailsNetworkFee"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:title="@string/network_fee"
+                            app:title="@string/common_total_fee"
                             app:titleIcon="@drawable/ic_info" />
 
                     </io.novafoundation.nova.common.view.TableView>
@@ -177,17 +191,6 @@
                 </FrameLayout>
 
             </io.novafoundation.nova.common.view.ExpandableView>
-
-            <io.novafoundation.nova.common.view.AlertView
-                android:id="@+id/swapMainSettingsMinBalanceAlert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                app:alertMode="info"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/swapMainSettingsDetails" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

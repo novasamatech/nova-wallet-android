@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.api.of
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -38,8 +39,7 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetMod
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,6 +71,7 @@ sealed class ExtraBonusState {
 }
 
 class CrowdloanContributeViewModel(
+    private val assetIconProvider: AssetIconProvider,
     private val router: CrowdloanRouter,
     private val contributionInteractor: CrowdloanContributeInteractor,
     private val resourceManager: ResourceManager,
@@ -97,7 +98,7 @@ class CrowdloanContributeViewModel(
         .share()
 
     val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(it, resourceManager) }
+        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager) }
         .inBackground()
         .share()
 
@@ -270,14 +271,12 @@ class CrowdloanContributeViewModel(
             feeConstructor = {
                 val crowdloan = crowdloanFlow.first()
 
-                val fee = contributionInteractor.estimateFee(
+                contributionInteractor.estimateFee(
                     crowdloan,
                     amount,
                     bonusActiveState?.payload,
                     customizationPayload,
                 )
-
-                SimpleFee(fee)
             },
             onRetryCancelled = ::backClicked
         )
@@ -297,7 +296,7 @@ class CrowdloanContributeViewModel(
         val validationPayload = ContributeValidationPayload(
             crowdloan = crowdloanFlow.first(),
             customizationPayload = customizationPayload,
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             asset = assetFlow.first(),
             bonusPayload = router.latestCustomBonus,
             contributionAmount = contributionAmount

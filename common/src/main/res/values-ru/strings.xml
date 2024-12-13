@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Вы достигли лимита добавленных прокси (%s) в %s . Удалите прокси, чтобы добавить новые.</string>
     <string name="add_proxy_maximum_reached_error_title">Достигнуто максимальное количество прокси</string>
     <string name="added_networks_empty_placeholder">Добавленные пользовательские сети\nпоявятся здесь</string>
+    <string name="appearance_colored_icon_title">Цветной</string>
+    <string name="appearance_title">Внешний вид</string>
+    <string name="appearance_token_assets_title">иконки токенов</string>
+    <string name="appearance_white_icon_title">Белый</string>
     <string name="asset_add_evm_token_already_exist_message">Введенный адрес контракта уже добавлен в Nova как токен %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Введенный адрес контракта присутствует в Nova как токен %s. Вы уверены, что хотите изменить его?</string>
     <string name="asset_add_evm_token_already_exist_title">Этот токен уже добавлен</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Введите адрес контракта</string>
     <string name="asset_add_token_enter_decimals">Введите число десятичных знаков</string>
     <string name="asset_add_token_enter_symbol">Введите символ</string>
+    <string name="asset_view_networks">Сети</string>
+    <string name="asset_view_tokens">Токены</string>
     <string name="assets_add_token">Добавить токен</string>
     <string name="assets_add_token_enter_info_address_label">Адрес контракта</string>
     <string name="assets_add_token_enter_info_decimals_label">Число десятичных знаков</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger не поддерживает этот токен</string>
     <string name="assets_search_hint">Поиск по названию сети или токена</string>
     <string name="assets_search_placeholder">Токены и сети с указанным именем\nне найдены</string>
+    <string name="assets_search_token_hint">Поиск по токену</string>
     <string name="assets_select_send_your_wallets">Ваши кошельки</string>
     <string name="assets_send_flow_placeholder">У вас нет токенов для отправки.\nКупите или получите токены\nна свой аккаунт.</string>
     <string name="assets_swap_flow_pay_title">Токен для оплаты</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Бэкап</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
+    <string name="buy_network_flow_title">Выберите сеть для покупки %s</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
     <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
     <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
@@ -348,6 +356,7 @@
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
+    <string name="common_do_not_close_app">Не закрывайте приложение!</string>
     <string name="common_done">Готово</string>
     <string name="common_dont_show_again">Больше не показывать это</string>
     <string name="common_edit">Редактировать</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">Операция удалит аккаунт</string>
     <string name="common_expired">Истекла</string>
     <string name="common_explore">Исследуй</string>
+    <string name="common_failed">Не удалось</string>
     <string name="common_fee_changed_message" formatted="false">Предполагаемая комиссия %s намного выше, чем комиссия по умолчанию (%s). Это может быть связано с временной перегрузкой сети. Вы можете обновить комиссию, чтобы дождаться более низкой суммы.</string>
     <string name="common_fee_changed_title">Комиссия сети слишком высокая</string>
+    <string name="common_fee_with_label">Комиссия: %s</string>
     <string name="common_filter_sort_header">Сортировать по:</string>
     <string name="common_filters">Фильтры</string>
     <string name="common_find_out_more">Узнать больше</string>
@@ -431,6 +442,7 @@
     <string name="common_not_available">Не доступно</string>
     <string name="common_not_enough_funds_message">К сожалению, у вас недостаточно средств для оплаты сетевого сбора.</string>
     <string name="common_not_enough_funds_title">Недостаточный баланс</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">У вас недостаточно средств для оплаты сетевой комиссии в размере %s. Текущий баланс: %s</string>
     <string name="common_not_now">Не сейчас</string>
     <string name="common_off">Выкл</string>
     <string name="common_ok">OK</string>
@@ -470,6 +482,13 @@
     <string name="common_search">Поиск</string>
     <string name="common_search_placeholder_default">Результаты поиска будут отображаться здесь</string>
     <string name="common_search_results_number">Результаты поиска: %d</string>
+    <string name="common_sec">сек</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d секунда</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">%d секунд</item>
+    </plurals>
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
     <string name="common_settings">Настройки</string>
     <string name="common_share">Поделиться</string>
@@ -493,6 +512,7 @@
     <string name="common_to_settings">Открыть Настройки</string>
     <string name="common_too_small_balance_title">Ваш баланс слишком мал</string>
     <string name="common_total">Всего</string>
+    <string name="common_total_fee">Общая комиссия</string>
     <string name="common_transaction_id">ID транзакции</string>
     <string name="common_transaction_submitted">Транзакция отправлена</string>
     <string name="common_try_again">Попробовать снова</string>
@@ -508,6 +528,7 @@
     <string name="common_unlimited">Неограниченно</string>
     <string name="common_update">Обновить</string>
     <string name="common_use">Использовать</string>
+    <string name="common_use_max">Использовать максимум</string>
     <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
     <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
     <string name="common_waiting">Ожидание</string>
@@ -981,6 +1002,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
     <string name="push_welcome_timeout_error_message">Повторите попытку позже, открыв настройки уведомлений на вкладке «Настройки»</string>
     <string name="push_welcome_title">Не пропустите ничего!</string>
+    <string name="receive_network_flow_title">Выберите сеть для получения %s</string>
+    <string name="receive_screen_copy_address">Скопировать адрес</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
     <string name="recovery_json">JSON для восстановления</string>
@@ -995,6 +1018,8 @@
     <string name="referenda_list_placeholder">Информация о референдумах появится здесь, когда они начнутся</string>
     <string name="referenda_search_placeholder">Не найдены референдумы\nс таким названием или ID</string>
     <string name="referenda_search_toolbar_hint">Поиск по заголовку или ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d референдума</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Свайпайте, чтобы проголосовать за референдумы с резюме от AI. Быстро и легко!</string>
     <string name="referenda_title">Референдумы</string>
     <string name="referendim_details_not_found_title">Референдум не найден</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Голосование с воздержанием возможно только с убежденностью 0.1x. Проголосовать с убежденностью 0.1x?</string>
@@ -1135,16 +1160,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
+    <string name="select_network_title">Выберите сеть</string>
     <string name="select_tracks_for">Выберите треки для</string>
     <string name="selected_tracks_quantity" formatted="false">%d из %d</string>
     <string name="send_address_hint">Адрес или w3n</string>
+    <string name="send_network_flow_title">Выберите сеть для отправки %s</string>
     <string name="send_recipient_system_account_message">Получатель является системным аккаунтом. Этот аккаунт не контролируется какой-либо компанией или частным лицом. \nВы уверены, что все еще хотите выполнить данный перевод?</string>
     <string name="send_recipient_system_account_title">Токены будут потеряны</string>
     <string name="set_staking_proxy_address_description">Выдать полномочия аккаунту</string>
     <string name="settings_biometric_not_ready_message">Пожалуйста, убедитесь, что биометрия включена в настройках</string>
     <string name="settings_biometric_not_ready_title">Биометрия отключена в настройках</string>
     <string name="settings_community">Сообщество</string>
-    <string name="settings_email">Написать разработчикам</string>
+    <string name="settings_email">Получите поддержку по Email</string>
     <string name="settings_general">Основные</string>
     <string name="settings_pin_code_verification_confirmation_message">Каждая операция подписи на кошельках с парой ключей (созданной в кошельке nova или импортированной) должна требовать проверки PIN-кода перед созданием подписи</string>
     <string name="settings_pin_code_verification_confirmation_title">Запрашивать аутентификацию для подписи операций</string>
@@ -1156,7 +1183,7 @@
     <string name="settings_security">Безопасность</string>
     <string name="settings_support">Поддержка и обратная связь</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Руководство пользователя</string>
+    <string name="settings_wiki">Вики и справочный центр</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">Убежденность будет установлена на 0.1x при Воздержании</string>
     <string name="setup_staking_conflict_message">Невозможно стейкать напрямую и в пуле одновременно</string>
@@ -1524,6 +1551,19 @@
     <string name="swap_custom_fee_selector_description">Токен для оплаты комиссии сети</string>
     <string name="swap_custom_fee_selector_footer">Комиссия сети добавится к введенной сумме</string>
     <string name="swap_error_pair_not_supported">Эта пара не поддерживается</string>
+    <string name="swap_execution_failure" formatted="false">Не удалось выполнить операцию #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Обмен %s на %s в %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Перевод %s из %s в %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s операция</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">%s операций</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s из %s операций</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Обмен %s на %s в %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Перевод %s в %s</string>
+    <string name="swap_execution_time">Время выполнения</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Вы должны сохранить как минимум %s после оплаты сетевой комиссии %s, поскольку вы храните не самодостаточные токены</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Вы должны сохранить как минимум %s, чтобы получить %s токены</string>
     <string name="swap_failure_insufficient_balance_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s.</string>
@@ -1543,6 +1583,7 @@
     <string name="swap_get_token_cross_chain_description">Перевести %s из другой сети</string>
     <string name="swap_get_token_receive_description">Получить %s по QR или вашему адресу</string>
     <string name="swap_get_token_using">Получить %s с помощью</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Во время выполнения обмена промежуточная полученная сумма равна %s, что меньше минимального баланса %s. Попробуйте указать большую сумму обмена.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Проскальзывание должно быть указано в диапазоне от %s до %s</string>
     <string name="swap_invalid_slippage_failure_title">Недопустимое проскальзывание</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Выберите токен для оплаты</string>
@@ -1551,6 +1592,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Введите другую сумму</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Чтобы оплатить комиссию сети с помощью %s, Nova автоматически обменяет %s на %s, чтобы поддерживать минимальный %s баланс вашей учетной записи.</string>
     <string name="swap_network_fee_description">Комиссия сети, взимается блокчейном за обработку и проверку транзакций. Может варьироваться в зависимости от условий сети или скорости транзакции.</string>
+    <string name="swap_network_flow_title">Выберите сеть для обмена %s</string>
     <string name="swap_not_enought_liquidity_failure">В пуле недостаточно ликвидности для обмена</string>
     <string name="swap_price_difference_description">Разница в цене представляет собой разницу между двумя различными активами. При обмене криптовалюты под разницей в цене обычно имеется ввиду разница между ценой актива, которую вы получаете и ценой актива, которую вы платите.</string>
     <string name="swap_price_difference_title">Разница в цене</string>
@@ -1560,6 +1602,10 @@
     <string name="swap_rate_was_updated_failure_message">Старый курс: %1$s ≈ %2$s.\nНовый курс: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Обменный курс изменился</string>
     <string name="swap_repeat_operation">Повторить операцию</string>
+    <string name="swap_route">Маршрут</string>
+    <string name="swap_route_description">Путь, по которому ваш токен пройдет через разные сети, чтобы получить желаемый токен.</string>
+    <string name="swap_route_segment_swap_title">Обмен</string>
+    <string name="swap_route_segment_transfer_title">Перевод</string>
     <string name="swap_settings_title">Настройки обмена</string>
     <string name="swap_slippage">Проскальзывание</string>
     <string name="swap_slippage_description">Проскальзывание - распространенное явление в децентрализованной торговле, когда конечная цена сделки по обмену может незначительно отличаться от ожидаемой в связи с изменением рыночных условий.</string>
@@ -1570,6 +1616,31 @@
     <string name="swap_slippage_warning_too_small">Транзакция может быть отменена из-за низкой устойчивости к проскальзыванию.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Сумма %s меньше минимального баланса %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Вы пытаетесь обменять слишком маленькую сумму</string>
+    <string name="swipe_gov_abstain_format">Воздержаться: %s</string>
+    <string name="swipe_gov_aye_format">За: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Вы всегда можете проголосовать за этот референдум позже </string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Удалить референдум %s из списка голосований?</string>
+    <string name="swipe_gov_basket_removed_items_message">Некоторые референдумы больше недоступны для голосования или у вас может быть недостаточно токенов для голосования. Доступно для голосования: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Некоторые референдумы исключены из списка голосований</string>
+    <string name="swipe_gov_card_data_loading_error_message">Данные референдума не удалось загрузить</string>
+    <string name="swipe_gov_card_data_loading_error_title">Данные не получены</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Вы уже проголосовали во всех доступных референдумах или на данный момент нет референдумов для голосования. Вернитесь позже.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Вы уже проголосовали во всех доступных референдумах</string>
+    <string name="swipe_gov_card_requested_title">Запрошено:</string>
+    <string name="swipe_gov_cards_basket_title">Список голосований</string>
+    <string name="swipe_gov_cards_counter">Осталось %d</string>
+    <string name="swipe_gov_cards_full_list">Подтвердить голоса</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Нет референдумов для голосования</string>
+    <string name="swipe_gov_cards_placeholder_button">Подтвердите ваши голоса</string>
+    <string name="swipe_gov_cards_voting_list_empty">Нет голосов</string>
+    <string name="swipe_gov_convirm_votes_success_message">Вы успешно проголосовали за %d референдума</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">У вас недостаточно баланса, чтобы проголосовать с текущей мощностью голоса %s (%sx). Пожалуйста, измените мощность голоса или добавьте больше средств в ваш кошелек.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Недостаточно баланса для голосования</string>
+    <string name="swipe_gov_nay_format">Против: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Проголосовать за %d референдума</string>
+    <string name="swipe_gov_vote_subtitle">Голосование будет настроено для будущих голосов в SwipeGov</string>
+    <string name="swipe_gov_vote_title">Мощность голоса</string>
     <string name="tabbar_staking_title">Стейкинг</string>
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>
@@ -1618,6 +1689,7 @@
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>
     <string name="wallet_asset_receive_token">Получить %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Отправляйте только токен %1$s и токены в сети %2$s на этот адрес, иначе вы можете потерять свои средства</string>
     <string name="wallet_asset_send">Перевести</string>
     <string name="wallet_asset_swap">Обменять</string>
     <string name="wallet_assets">Активы</string>

@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Bạn đã đạt đến giới hạn %s proxy được thêm vào %s. Xóa proxy để thêm proxy mới.</string>
     <string name="add_proxy_maximum_reached_error_title">Đã đạt đến số lượng proxy tối đa</string>
     <string name="added_networks_empty_placeholder">Các mạng tùy chỉnh đã thêm\nsẽ xuất hiện ở đây</string>
+    <string name="appearance_colored_icon_title">Đã tô màu</string>
+    <string name="appearance_title">Giao diện</string>
+    <string name="appearance_token_assets_title">biểu tượng token</string>
+    <string name="appearance_white_icon_title">Trắng</string>
     <string name="asset_add_evm_token_already_exist_message">Địa chỉ hợp đồng đã nhập có sẵn trong Nova là token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Địa chỉ hợp đồng đã nhập có sẵn trong Nova là token %s. Bạn có chắc chắn muốn thay đổi không?</string>
     <string name="asset_add_evm_token_already_exist_title">Token này đã tồn tại</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Nhập địa chỉ hợp đồng</string>
     <string name="asset_add_token_enter_decimals">Nhập số thập phân</string>
     <string name="asset_add_token_enter_symbol">Nhập ký hiệu</string>
+    <string name="asset_view_networks">Mạng</string>
+    <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Thêm token</string>
     <string name="assets_add_token_enter_info_address_label">Địa chỉ hợp đồng</string>
     <string name="assets_add_token_enter_info_decimals_label">Số thập phân</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger không hỗ trợ token này</string>
     <string name="assets_search_hint">Tìm kiếm theo mạng hoặc token</string>
     <string name="assets_search_placeholder">Không tìm thấy mạng hoặc token nào với\ntên đã nhập</string>
+    <string name="assets_search_token_hint">Tìm kiếm theo token</string>
     <string name="assets_select_send_your_wallets">Ví của bạn</string>
     <string name="assets_send_flow_placeholder">Bạn không có token để gửi.\nMua hoặc Nhận token vào\ntài khoản của bạn.</string>
     <string name="assets_swap_flow_pay_title">Token để thanh toán</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Sao lưu</string>
     <string name="biometric_auth_title">Xác thực sinh trắc học</string>
     <string name="buy_completed">Mua hàng đã được khởi tạo! Vui lòng đợi tối đa 60 phút. Bạn có thể theo dõi trạng thái trong email.</string>
+    <string name="buy_network_flow_title">Chọn mạng để mua %s</string>
     <string name="buy_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
     <string name="buy_provider_open_confirmation_title">Tiếp tục trong trình duyệt?</string>
     <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
@@ -348,6 +356,7 @@
     <string name="common_details">Chi tiết</string>
     <string name="common_disabled">Đã tắt</string>
     <string name="common_disconnect">Ngắt kết nối</string>
+    <string name="common_do_not_close_app">Không đóng ứng dụng!</string>
     <string name="common_done">Hoàn thành</string>
     <string name="common_dont_show_again">Không hiển thị lại điều này</string>
     <string name="common_edit">Chỉnh sửa</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">Thao tác sẽ xóa tài khoản</string>
     <string name="common_expired">Hết hạn</string>
     <string name="common_explore">Khám phá</string>
+    <string name="common_failed">Thất bại</string>
     <string name="common_fee_changed_message" formatted="false">Phí mạng ước tính %s cao hơn nhiều so với phí mạng mặc định (%s). Điều này có thể do tắc nghẽn mạng tạm thời. Bạn có thể làm mới để đợi phí mạng thấp hơn.</string>
     <string name="common_fee_changed_title">Phí mạng quá cao</string>
+    <string name="common_fee_with_label">Phí: %s</string>
     <string name="common_filter_sort_header">Sắp xếp theo:</string>
     <string name="common_filters">Bộ lọc</string>
     <string name="common_find_out_more">Tìm hiểu thêm</string>
@@ -419,6 +430,7 @@
     <string name="common_not_available">Không khả dụng</string>
     <string name="common_not_enough_funds_message">Xin lỗi, bạn không có đủ tiền để trả phí mạng.</string>
     <string name="common_not_enough_funds_title">Số dư không đủ</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Bạn không có đủ số dư để trả phí mạng %s. Số dư hiện tại là %s</string>
     <string name="common_not_now">Không phải bây giờ</string>
     <string name="common_off">Tắt</string>
     <string name="common_ok">OK</string>
@@ -458,6 +470,10 @@
     <string name="common_search">Tìm kiếm</string>
     <string name="common_search_placeholder_default">Kết quả tìm kiếm sẽ hiển thị ở đây</string>
     <string name="common_search_results_number">Kết quả tìm kiếm: %d</string>
+    <string name="common_sec">giây</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d giây</item>
+    </plurals>
     <string name="common_secret_derivation_path">Đường dẫn dẫn xuất bí mật</string>
     <string name="common_settings">Cài đặt</string>
     <string name="common_share">Chia sẻ</string>
@@ -481,6 +497,7 @@
     <string name="common_to_settings">Mở Cài đặt</string>
     <string name="common_too_small_balance_title">Số dư của bạn quá nhỏ</string>
     <string name="common_total">Tổng cộng</string>
+    <string name="common_total_fee">Tổng phí</string>
     <string name="common_transaction_id">ID Giao dịch</string>
     <string name="common_transaction_submitted">Giao dịch đã được gửi</string>
     <string name="common_try_again">Thử lại</string>
@@ -493,6 +510,7 @@
     <string name="common_unlimited">Không giới hạn</string>
     <string name="common_update">Cập nhật</string>
     <string name="common_use">Sử dụng</string>
+    <string name="common_use_max">Sử dụng tối đa</string>
     <string name="common_validation_invalid_address_message">Người nhận phải là địa chỉ %s hợp lệ</string>
     <string name="common_validation_invalid_address_title">Người nhận không hợp lệ</string>
     <string name="common_waiting">Đang chờ</string>
@@ -960,6 +978,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Bằng việc bật thông báo đẩy, bạn đồng ý với %s và %s của chúng tôi</string>
     <string name="push_welcome_timeout_error_message">Vui lòng thử lại sau bằng cách truy cập cài đặt thông báo từ tab Cài đặt</string>
     <string name="push_welcome_title">Đừng bỏ lỡ điều gì!</string>
+    <string name="receive_network_flow_title">Chọn mạng để nhận %s</string>
+    <string name="receive_screen_copy_address">Sao chép Địa chỉ</string>
     <string name="recover_json_hint">Dán mã JSON hoặc tải lên tệp...</string>
     <string name="recover_json_upload">Tải lên tệp</string>
     <string name="recovery_json">Khôi phục JSON</string>
@@ -974,6 +994,8 @@
     <string name="referenda_list_placeholder">Thông tin về các cuộc trưng cầu dân ý sẽ xuất hiện ở đây khi chúng bắt đầu</string>
     <string name="referenda_search_placeholder">Không tìm thấy cuộc trưng cầu dân ý với tiêu đề hoặc ID đã nhập\n</string>
     <string name="referenda_search_toolbar_hint">Tìm kiếm theo tiêu đề hoặc ID cuộc trưng cầu dân ý</string>
+    <string name="referenda_swipe_gov_banner_chip">%d cuộc trưng cầu</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Vuốt để bình chọn cho cuộc trưng cầu với tóm tắt AI. Nhanh và dễ dàng!</string>
     <string name="referenda_title">Cuộc trưng cầu dân ý</string>
     <string name="referendim_details_not_found_title">Không tìm thấy cuộc trưng cầu dân ý</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Bỏ phiếu Abstain chỉ có thể thực hiện với độ xác tín 0.1x. Bỏ phiếu với độ xác tín 0.1x?</string>
@@ -1111,16 +1133,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Track không có sẵn</string>
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
+    <string name="select_network_title">Chọn mạng</string>
     <string name="select_tracks_for">Chọn track cho</string>
     <string name="selected_tracks_quantity" formatted="false">%d trong %d</string>
     <string name="send_address_hint">Địa chỉ hoặc w3n</string>
+    <string name="send_network_flow_title">Chọn mạng để gửi %s</string>
     <string name="send_recipient_system_account_message">Người nhận là một tài khoản hệ thống. Nó không được kiểm soát bởi bất kỳ công ty hoặc cá nhân nào.\nBạn có chắc chắn vẫn muốn thực hiện chuyển khoản này không?</string>
     <string name="send_recipient_system_account_title">Token sẽ bị mất</string>
     <string name="set_staking_proxy_address_description">Cấp quyền cho</string>
     <string name="settings_biometric_not_ready_message">Vui lòng, đảm bảo sinh trắc học đã được bật trong Cài đặt</string>
     <string name="settings_biometric_not_ready_title">Sinh trắc học đã bị vô hiệu hóa trong Cài đặt</string>
     <string name="settings_community">Cộng đồng</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Nhận hỗ trợ qua Email</string>
     <string name="settings_general">Chung</string>
     <string name="settings_pin_code_verification_confirmation_message">Mỗi hoạt động ký trên ví với cặp khóa (tạo trong ví nova hoặc nhập) cần yêu cầu xác minh PIN trước khi tạo chữ ký</string>
     <string name="settings_pin_code_verification_confirmation_title">Yêu cầu xác thực cho các hoạt động ký</string>
@@ -1132,9 +1156,9 @@
     <string name="settings_security">Bảo mật</string>
     <string name="settings_support">Hỗ trợ &amp;  Phản hồi</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Trung tâm trợ giúp</string>
     <string name="settings_youtube">Youtube</string>
-    <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi <font>bỏ phiếu Abstain</font></string>
+    <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi bỏ phiếu Abstain</string>
     <string name="setup_staking_conflict_message">Bạn không thể Stake với Direct Staking và Nomination Pools cùng một lúc</string>
     <string name="setup_staking_conflict_title">Đã staking</string>
     <string name="setup_staking_type_advanced_options_condition">Quản lý Stake nâng cao</string>
@@ -1494,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">Token để trả phí mạng</string>
     <string name="swap_custom_fee_selector_footer">Phí mạng được thêm vào trên số tiền đã nhập</string>
     <string name="swap_error_pair_not_supported">Cặp này không được hỗ trợ</string>
+    <string name="swap_execution_failure" formatted="false">Thất bại trên hoạt động #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s sang %s hoán đổi trên %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Chuyển %s từ %s sang %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s hoạt động</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s của %s hoạt động</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Đang hoán đổi %s sang %s trên %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Đang chuyển %s sang %s</string>
+    <string name="swap_execution_time">Thời gian thực hiện</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Bạn cần giữ ít nhất %s sau khi trả phí mạng %s vì bạn giữ các token không đủ</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Bạn cần giữ ít nhất %s để nhận được token %s</string>
     <string name="swap_failure_insufficient_balance_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả %2$s cho phí mạng.</string>
@@ -1513,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">Chuyển %s từ mạng khác</string>
     <string name="swap_get_token_receive_description">Nhận %s bằng QR hoặc địa chỉ của bạn</string>
     <string name="swap_get_token_using">Nhận %s bằng cách sử dụng</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Trong khi hoán đổi thực hiện, số tiền nhận trung gian là %s, thấp hơn số dư tối thiểu %s. Hãy thử chỉ định số tiền hoán đổi lớn hơn.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Độ trượt giá phải được chỉ định trong khoảng %s đến %s</string>
     <string name="swap_invalid_slippage_failure_title">Độ trượt giá không hợp lệ</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Chọn một token để thanh toán</string>
@@ -1521,6 +1556,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Nhập số tiền khác</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Để thanh toán phí mạng bằng %s, Nova sẽ tự động hoán đổi %s thành %s để duy trì số dư tối thiểu %s trong tài khoản của bạn.</string>
     <string name="swap_network_fee_description">Một khoản phí mạng được tính bởi blockchain để xử lý và xác nhận bất kỳ giao dịch nào. Có thể thay đổi tùy thuộc vào điều kiện mạng hoặc tốc độ giao dịch.</string>
+    <string name="swap_network_flow_title">Chọn mạng để hoán đổi %s</string>
     <string name="swap_not_enought_liquidity_failure">Pool không có đủ thanh khoản để thực hiện hoán đổi</string>
     <string name="swap_price_difference_description">Sự khác biệt về giá đề cập đến sự chênh lệch giá giữa hai tài sản khác nhau. Khi thực hiện hoán đổi trong tiền điện tử, sự khác biệt về giá thường là sự chênh lệch giữa giá của tài sản mà bạn đang hoán đổi và giá của tài sản mà bạn đang hoán đổi.</string>
     <string name="swap_price_difference_title">Sự khác biệt về giá</string>
@@ -1530,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">Tỷ giá cũ: %1$s 	 %2$s.\nTỷ giá mới: %1$s 	 %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Tỷ giá hoán đổi đã được cập nhật</string>
     <string name="swap_repeat_operation">Lặp lại thao tác</string>
+    <string name="swap_route">Lộ trình</string>
+    <string name="swap_route_description">Cách mà token của bạn sẽ đi qua các mạng lưới khác nhau để có được token mong muốn.</string>
+    <string name="swap_route_segment_swap_title">Hoán đổi</string>
+    <string name="swap_route_segment_transfer_title">Chuyển</string>
     <string name="swap_settings_title">Cài đặt hoán đổi</string>
     <string name="swap_slippage">Trượt giá</string>
     <string name="swap_slippage_description">Trượt giá hoán đổi là một hiện tượng phổ biến trong giao dịch phi tập trung nơi giá cuối cùng của một giao dịch hoán đổi có thể hơi khác so với giá dự kiến do điều kiện thị trường thay đổi.</string>
@@ -1540,6 +1580,31 @@
     <string name="swap_slippage_warning_too_small">Giao dịch có thể bị hoàn lại do mức chấp nhận độ trượt giá thấp.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Số lượng %s ít hơn số dư tối thiểu %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Bạn đang cố gắng hoán đổi số tiền quá nhỏ</string>
+    <string name="swipe_gov_abstain_format">Kiềm chế: %s</string>
+    <string name="swipe_gov_aye_format">Đồng ý: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Bạn luôn có thể bỏ phiếu cho cuộc trưng cầu này sau</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Xóa cuộc trưng cầu %s khỏi danh sách bỏ phiếu?</string>
+    <string name="swipe_gov_basket_removed_items_message">Một số cuộc trưng cầu không còn khả dụng để bỏ phiếu hoặc bạn có thể không có đủ token để bỏ phiếu. Khả dụng để bỏ phiếu: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Một số cuộc trưng cầu bị loại khỏi danh sách bỏ phiếu</string>
+    <string name="swipe_gov_card_data_loading_error_message">Không thể tải dữ liệu cuộc trưng cầu</string>
+    <string name="swipe_gov_card_data_loading_error_title">Không có dữ liệu</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Bạn đã bỏ phiếu cho tất cả các cuộc trưng cầu khả dụng hoặc hiện không có cuộc trưng cầu nào để bỏ phiếu. Quay lại sau.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Bạn đã bỏ phiếu cho tất cả các cuộc trưng cầu khả dụng</string>
+    <string name="swipe_gov_card_requested_title">Yêu cầu:</string>
+    <string name="swipe_gov_cards_basket_title">Danh sách bỏ phiếu</string>
+    <string name="swipe_gov_cards_counter">%d còn lại</string>
+    <string name="swipe_gov_cards_full_list">Xác nhận phiếu</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Không có cuộc trưng cầu để bỏ phiếu</string>
+    <string name="swipe_gov_cards_placeholder_button">Xác nhận phiếu của bạn</string>
+    <string name="swipe_gov_cards_voting_list_empty">Không có phiếu</string>
+    <string name="swipe_gov_convirm_votes_success_message">Bạn đã thành công bỏ phiếu cho %d cuộc trưng cầu</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Bạn không có đủ số dư để bỏ phiếu với sức mạnh hiện tại %s (%sx). Vui lòng thay đổi sức mạnh bỏ phiếu hoặc thêm thêm tiền vào ví của bạn.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Số dư không đủ để bỏ phiếu</string>
+    <string name="swipe_gov_nay_format">Không đồng ý: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Bỏ phiếu cho %d cuộc trưng cầu</string>
+    <string name="swipe_gov_vote_subtitle">Việc bỏ phiếu sẽ được đặt cho các cuộc bỏ phiếu trong tương lai trong SwipeGov</string>
+    <string name="swipe_gov_vote_title">Sức mạnh bỏ phiếu</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Ví</string>
     <string name="today">Hôm nay</string>
@@ -1588,6 +1653,7 @@
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>
     <string name="wallet_asset_receive_token">Nhận %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Chỉ gửi token %1$s và các token trong mạng %2$s tới địa chỉ này, nếu không bạn có thể mất tiền</string>
     <string name="wallet_asset_send">Gửi</string>
     <string name="wallet_asset_swap">Hoán đổi</string>
     <string name="wallet_assets">Tài sản</string>

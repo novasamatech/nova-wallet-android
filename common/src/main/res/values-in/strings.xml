@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Anda telah mencapai batas %s proxy yang ditambahkan dalam %s. Hapus proxy untuk menambahkan yang baru.</string>
     <string name="add_proxy_maximum_reached_error_title">Jumlah maksimum proxy telah tercapai</string>
     <string name="added_networks_empty_placeholder">Jaringan kustom yang ditambahkan\nakan muncul di sini</string>
+    <string name="appearance_colored_icon_title">Berwarna</string>
+    <string name="appearance_title">Penampilan</string>
+    <string name="appearance_token_assets_title">ikon token</string>
+    <string name="appearance_white_icon_title">Putih</string>
     <string name="asset_add_evm_token_already_exist_message">Alamat kontrak yang dimasukkan ada dalam Nova sebagai token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Alamat kontrak yang dimasukkan ada dalam Nova sebagai token %s. Apakah Anda yakin ingin memodifikasinya?</string>
     <string name="asset_add_evm_token_already_exist_title">Token ini sudah ada</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Masukkan alamat kontrak</string>
     <string name="asset_add_token_enter_decimals">Masukkan desimal</string>
     <string name="asset_add_token_enter_symbol">Masukkan simbol</string>
+    <string name="asset_view_networks">Jaringan</string>
+    <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Tambahkan token</string>
     <string name="assets_add_token_enter_info_address_label">Alamat kontrak</string>
     <string name="assets_add_token_enter_info_decimals_label">Desimal</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger tidak mendukung token ini</string>
     <string name="assets_search_hint">Cari berdasarkan jaringan atau token</string>
     <string name="assets_search_placeholder">Tidak ada jaringan atau token dengan nama yang dimasukkan ditemukan</string>
+    <string name="assets_search_token_hint">Cari berdasarkan token</string>
     <string name="assets_select_send_your_wallets">Dompet Anda</string>
     <string name="assets_send_flow_placeholder">Anda tidak memiliki token untuk dikirim. Beli atau Terima token ke akun Anda.</string>
     <string name="assets_swap_flow_pay_title">Token untuk membayar</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Cadangan</string>
     <string name="biometric_auth_title">Otentikasi Biometrik</string>
     <string name="buy_completed">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya melalui email.</string>
+    <string name="buy_network_flow_title">Pilih jaringan untuk membeli %s</string>
     <string name="buy_provider_open_confirmation_message">Untuk melanjutkan pembelian, Anda akan diarahkan dari aplikasi Nova Wallet ke %s</string>
     <string name="buy_provider_open_confirmation_title">Lanjut di browser?</string>
     <string name="chain_network_management_auto_balance">Node saldo otomatis</string>
@@ -348,6 +356,7 @@
     <string name="common_details">Detail</string>
     <string name="common_disabled">Nonaktif</string>
     <string name="common_disconnect">Putus</string>
+    <string name="common_do_not_close_app">Jangan tutup aplikasinya!</string>
     <string name="common_done">Selesai</string>
     <string name="common_dont_show_again">Jangan tampilkan ini lagi</string>
     <string name="common_edit">Edit</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">Operasi akan menghapus akun</string>
     <string name="common_expired">Kedaluwarsa</string>
     <string name="common_explore">Jelajahi</string>
+    <string name="common_failed">Gagal</string>
     <string name="common_fee_changed_message" formatted="false">Biaya jaringan yang diperkirakan %s jauh lebih tinggi dari biaya jaringan default (%s). Hal ini mungkin disebabkan oleh kemacetan jaringan sementara. Anda dapat menyegarkan untuk menunggu biaya jaringan yang lebih rendah.</string>
     <string name="common_fee_changed_title">Biaya jaringan terlalu tinggi</string>
+    <string name="common_fee_with_label">Biaya: %s</string>
     <string name="common_filter_sort_header">Urutkan berdasarkan:</string>
     <string name="common_filters">Penyaring</string>
     <string name="common_find_out_more">Temukan lebih lanjut</string>
@@ -419,6 +430,7 @@
     <string name="common_not_available">Tidak tersedia</string>
     <string name="common_not_enough_funds_message">Maaf, Anda tidak memiliki cukup dana untuk membayar biaya jaringan.</string>
     <string name="common_not_enough_funds_title">Saldo tidak mencukupi</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Saldo Anda tidak cukup untuk membayar biaya jaringan sebesar %s. Saldo saat ini adalah %s</string>
     <string name="common_not_now">Tidak sekarang</string>
     <string name="common_off">Mati</string>
     <string name="common_ok">OK</string>
@@ -458,6 +470,10 @@
     <string name="common_search">Cari</string>
     <string name="common_search_placeholder_default">Hasil pencarian akan ditampilkan di sini</string>
     <string name="common_search_results_number">Hasil pencarian: %d</string>
+    <string name="common_sec">detik</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d detik</item>
+    </plurals>
     <string name="common_secret_derivation_path">Jalur derivasi rahasia</string>
     <string name="common_settings">Pengaturan</string>
     <string name="common_share">Bagikan</string>
@@ -481,6 +497,7 @@
     <string name="common_to_settings">Buka Pengaturan</string>
     <string name="common_too_small_balance_title">Saldo Anda terlalu kecil</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Biaya total</string>
     <string name="common_transaction_id">ID Transaksi</string>
     <string name="common_transaction_submitted">Transaksi dikirim</string>
     <string name="common_try_again">Coba lagi</string>
@@ -493,6 +510,7 @@
     <string name="common_unlimited">Tidak terbatas</string>
     <string name="common_update">Perbarui</string>
     <string name="common_use">Gunakan</string>
+    <string name="common_use_max">Gunakan maksimum</string>
     <string name="common_validation_invalid_address_message">Penerima harus merupakan alamat %s yang valid</string>
     <string name="common_validation_invalid_address_title">Penerima tidak valid</string>
     <string name="common_waiting">Menunggu</string>
@@ -960,6 +978,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Dengan mengaktifkan pemberitahuan push, Anda menyetujui %s dan %s kami</string>
     <string name="push_welcome_timeout_error_message">Harap coba lagi nanti dengan mengakses pengaturan pemberitahuan dari tab Pengaturan</string>
     <string name="push_welcome_title">Jangan lewatkan hal apa pun!</string>
+    <string name="receive_network_flow_title">Pilih jaringan untuk menerima %s</string>
+    <string name="receive_screen_copy_address">Salin Alamat</string>
     <string name="recover_json_hint">Tempelkan json atau unggah file...</string>
     <string name="recover_json_upload">Unggah file</string>
     <string name="recovery_json">Pulihkan JSON</string>
@@ -974,6 +994,8 @@
     <string name="referenda_list_placeholder">Informasi Referenda akan muncul di sini ketika mereka dimulai</string>
     <string name="referenda_search_placeholder">Tidak ada referenda dengan judul atau ID yang dimasukkan ditemukan</string>
     <string name="referenda_search_toolbar_hint">Cari berdasarkan judul referendum atau ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referendum</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Gesek untuk memberikan suara pada referendum dengan ringkasan AI. Cepat &amp;  mudah!</string>
     <string name="referenda_title">Referenda</string>
     <string name="referendim_details_not_found_title">Referendum tidak ditemukan</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Suara Abstain hanya dapat dilakukan dengan keyakinan 0,1x. Pilih dengan keyakinan 0,1x?</string>
@@ -1111,16 +1133,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
+    <string name="select_network_title">Pilih jaringan</string>
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
     <string name="send_address_hint">Address or w3n</string>
+    <string name="send_network_flow_title">Pilih jaringan untuk mengirim %s</string>
     <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual.\nAre you sure you still want to perform this transfer?</string>
     <string name="send_recipient_system_account_title">Tokens will be lost</string>
     <string name="set_staking_proxy_address_description">Give authority to</string>
     <string name="settings_biometric_not_ready_message">Pastikan biometrik diaktifkan dalam Pengaturan</string>
     <string name="settings_biometric_not_ready_title">Biometrik dinonaktifkan dalam Pengaturan</string>
     <string name="settings_community">Komunitas</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Dapatkan dukungan melalui Email</string>
     <string name="settings_general">Umum</string>
     <string name="settings_pin_code_verification_confirmation_message">Setiap operasi tanda tangan pada dompet dengan pasangan kunci (dibuat di dompet nova atau diimpor) harus memerlukan verifikasi PIN sebelum membuat tanda tangan</string>
     <string name="settings_pin_code_verification_confirmation_title">Minta autentikasi untuk penandatanganan operasi</string>
@@ -1132,7 +1156,7 @@
     <string name="settings_security">Keamanan</string>
     <string name="settings_support">Dukungan &amp; Masukan</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Pusat Bantuan</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">Keyakinan akan diatur ke 0,1x ketika Abstain</string>
     <string name="setup_staking_conflict_message">Anda tidak dapat melakukan staking dengan Staking Langsung dan Pool Nominasi pada saat yang sama</string>
@@ -1494,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">Token untuk membayar biaya jaringan</string>
     <string name="swap_custom_fee_selector_footer">Biaya jaringan ditambahkan di atas jumlah yang dimasukkan</string>
     <string name="swap_error_pair_not_supported">Pasangan ini tidak didukung</string>
+    <string name="swap_execution_failure" formatted="false">Gagal dalam operasi #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s ke %s swap pada %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transfer %s dari %s ke %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s operasi</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s dari %s operasi</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Menukarkan %s ke %s pada %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Mentransfer %s ke %s</string>
+    <string name="swap_execution_time">Waktu eksekusi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Anda harus menyisihkan setidaknya %s setelah membayar biaya jaringan %s karena Anda memegang token yang tidak mencukupi</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Anda harus menyisihkan setidaknya %s untuk menerima token %s</string>
     <string name="swap_failure_insufficient_balance_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan.</string>
@@ -1513,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">Transfer %s dari jaringan lain</string>
     <string name="swap_get_token_receive_description">Terima %s dengan QR atau alamat Anda</string>
     <string name="swap_get_token_using">Dapatkan %s menggunakan</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Selama eksekusi swap, jumlah terima sementara adalah %s yang lebih rendah dari saldo minimum %s. Coba tentukan jumlah swap yang lebih besar.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Prosentase pergeseran harus ditentukan antara %s dan %s</string>
     <string name="swap_invalid_slippage_failure_title">Pergeseran tidak valid</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Pilih token untuk membayar</string>
@@ -1521,6 +1556,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Masukkan jumlah lain</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Untuk membayar biaya jaringan dengan %s, Nova secara otomatis akan menukar %s dengan %s untuk mempertahankan saldo minimum %s akun Anda.</string>
     <string name="swap_network_fee_description">Biaya jaringan yang dibebankan oleh blockchain untuk memproses dan memvalidasi transaksi. Bisa bervariasi tergantung pada kondisi jaringan atau kecepatan transaksi.</string>
+    <string name="swap_network_flow_title">Pilih jaringan untuk menukar %s</string>
     <string name="swap_not_enought_liquidity_failure">Pool tidak memiliki likuiditas yang cukup untuk swap</string>
     <string name="swap_price_difference_description">Perbedaan harga merujuk pada perbedaan harga antara dua aset yang berbeda. Ketika melakukan swap dalam kripto, perbedaan harga biasanya adalah perbedaan antara harga aset yang Anda tukarkan dengan harga aset yang Anda tukar.</string>
     <string name="swap_price_difference_title">Perbedaan harga</string>
@@ -1530,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">Kurs lama: %1$s ≈ %2$s.\nKurs baru: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Kurs pertukaran telah diperbarui</string>
     <string name="swap_repeat_operation">Ulangi operasi</string>
+    <string name="swap_route">Rute</string>
+    <string name="swap_route_description">Jalur yang akan diambil token Anda melalui berbagai jaringan untuk mendapatkan token yang diinginkan.</string>
+    <string name="swap_route_segment_swap_title">Tukar</string>
+    <string name="swap_route_segment_transfer_title">Transfer</string>
     <string name="swap_settings_title">Pengaturan swap</string>
     <string name="swap_slippage">Slippage</string>
     <string name="swap_slippage_description">Slippage adalah kejadian umum dalam perdagangan terdesentralisasi di mana harga akhir dari transaksi swap mungkin sedikit berbeda dari harga yang diharapkan, karena kondisi pasar yang berubah.</string>
@@ -1540,6 +1580,31 @@
     <string name="swap_slippage_warning_too_small">Transaksi mungkin dibalikkan karena toleransi slippage yang rendah.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Jumlah %s kurang dari saldo minimum %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Anda mencoba untuk menukar jumlah yang terlalu kecil</string>
+    <string name="swipe_gov_abstain_format">Abstain: %s</string>
+    <string name="swipe_gov_aye_format">Aye: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Anda selalu bisa memberikan suara untuk referendum ini nanti</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Hapus referendum %s dari daftar suara?</string>
+    <string name="swipe_gov_basket_removed_items_message">Beberapa referendum tidak lagi tersedia untuk pemungutan suara atau Anda mungkin tidak memiliki cukup token yang tersedia untuk memberikan suara. Tersedia untuk memberikan suara: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Beberapa referendum dikeluarkan dari daftar suara</string>
+    <string name="swipe_gov_card_data_loading_error_message">Data referendum tidak dapat dimuat</string>
+    <string name="swipe_gov_card_data_loading_error_title">Tidak ada data yang ditemukan</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Anda telah memberikan suara untuk semua referendum yang tersedia atau tidak ada referendum untuk memberikan suara saat ini. Kembali lagi nanti.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Anda telah memberikan suara untuk semua referendum yang tersedia</string>
+    <string name="swipe_gov_card_requested_title">Diminta:</string>
+    <string name="swipe_gov_cards_basket_title">Daftar suara</string>
+    <string name="swipe_gov_cards_counter">%d tersisa</string>
+    <string name="swipe_gov_cards_full_list">Konfirmasi suara</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Tidak ada referendum untuk memberikan suara</string>
+    <string name="swipe_gov_cards_placeholder_button">Konfirmasi suara Anda</string>
+    <string name="swipe_gov_cards_voting_list_empty">Tidak ada suara</string>
+    <string name="swipe_gov_convirm_votes_success_message">Anda berhasil memberikan suara untuk %d referendum</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Anda tidak memiliki saldo yang cukup untuk memberikan suara dengan kekuatan suara saat ini %s (%sx). Silakan ubah kekuatan suara atau tambahkan lebih banyak dana ke dompet Anda.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Saldo tidak mencukupi untuk memberikan suara</string>
+    <string name="swipe_gov_nay_format">Nay: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Berikan suara untuk %d referendum</string>
+    <string name="swipe_gov_vote_subtitle">Pemungutan suara akan diatur untuk suara di masa depan di SwipeGov</string>
+    <string name="swipe_gov_vote_title">Kekuatan Suara</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Dompet</string>
     <string name="today">Hari ini</string>
@@ -1588,6 +1653,7 @@
     <string name="wallet_asset_buy_with">Beli dengan</string>
     <string name="wallet_asset_receive">Terima</string>
     <string name="wallet_asset_receive_token">Terima %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Hanya kirim token %1$s dan token di jaringan %2$s ke alamat ini, atau Anda bisa kehilangan dana Anda</string>
     <string name="wallet_asset_send">Kirim</string>
     <string name="wallet_asset_swap">Tukar</string>
     <string name="wallet_assets">Aset</string>

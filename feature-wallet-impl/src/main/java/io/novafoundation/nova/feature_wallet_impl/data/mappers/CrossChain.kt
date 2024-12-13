@@ -115,6 +115,7 @@ private fun mapXcmTransferTypeFromRemote(remote: String): XcmTransferType {
         "xtokens" -> XcmTransferType.X_TOKENS
         "xcmpallet" -> XcmTransferType.XCM_PALLET_RESERVE
         "xcmpallet-teleport" -> XcmTransferType.XCM_PALLET_TELEPORT
+        "xcmpallet-transferAssets" -> XcmTransferType.XCM_PALLET_TRANSFER_ASSETS
         else -> XcmTransferType.UNKNOWN
     }
 }

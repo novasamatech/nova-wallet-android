@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -15,8 +16,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetChange
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.subscribeOnAssetClick
-import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_referenda_list.referendaList
 
 class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(), ReferendaListHeaderAdapter.Handler {
 
@@ -50,6 +51,8 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
 
     override fun subscribe(viewModel: ReferendaListViewModel) {
         subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
+        observeValidations(viewModel)
+
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {
             referendaHeaderAdapter.setAsset(it)
         }
@@ -60,6 +63,10 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
 
         viewModel.governanceDelegated.observeWhenVisible {
             referendaHeaderAdapter.setDelegations(it.dataOrNull)
+        }
+
+        viewModel.tinderGovBanner.observeWhenVisible {
+            referendaHeaderAdapter.setTinderGovBanner(it)
         }
 
         viewModel.referendaFilterIcon.observeWhenVisible {
@@ -91,5 +98,9 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel>(
 
     override fun onClickReferendaFilters() {
         viewModel.filtersClicked()
+    }
+
+    override fun onTinderGovBannerClicked() {
+        viewModel.openTinderGovCards()
     }
 }

@@ -33,6 +33,7 @@
         <attr name="chipIcon" format="reference" />
         <attr name="chipIconSize" format="dimension" />
         <attr name="android:text" />
+        <attr name="android:textAllCaps" />
         <attr name="chipSize" format="enum">
             <enum name="normal" value="0" />
             <enum name="small" value="1" />

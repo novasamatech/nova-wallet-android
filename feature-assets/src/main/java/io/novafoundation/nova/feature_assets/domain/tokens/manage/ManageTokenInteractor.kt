@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_assets.domain.tokens.AssetsDataCleaner
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.unifiedSymbol
+import io.novafoundation.nova.runtime.ext.normalizeSymbol
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -92,7 +92,7 @@ class RealManageTokenInteractor(
         val enabledAssets = assetsWithChains.filter { it.asset.enabled }
             .map { it.asset.fullId }
 
-        return assetsWithChains.groupBy { (_, asset) -> asset.unifiedSymbol() }
+        return assetsWithChains.groupBy { (_, asset) -> asset.normalizeSymbol() }
             .map { (symbol, chainsWithAssets) ->
                 val (_, firstAsset) = chainsWithAssets.first()
                 val tokenAssets = chainsWithAssets.filter { it.asset.enabled }
@@ -103,7 +103,7 @@ class RealManageTokenInteractor(
                 MultiChainToken(
                     id = symbol,
                     symbol = symbol,
-                    icon = firstAsset.iconUrl,
+                    icon = firstAsset.icon,
                     isSwitchable = !isLastTokenEnabled,
                     instances = chainsWithAssets.map { (chain, asset) ->
                         MultiChainToken.ChainTokenInstance(

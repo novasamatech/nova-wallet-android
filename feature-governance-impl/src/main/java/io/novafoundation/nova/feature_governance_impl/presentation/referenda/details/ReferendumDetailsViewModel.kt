@@ -71,13 +71,14 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.ful
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumProposerPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.timeline.TimelineLayout
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.SetupVoteReferendumPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVotePayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.state.selectedChainFlow
@@ -277,8 +278,8 @@ class ReferendumDetailsViewModel(
             payload = validationPayload,
             validationFailureTransformerCustom = { status, _ -> mapValidationFailureToUi(status.reason) },
         ) {
-            val votePayload = SetupVoteReferendumPayload(payload.referendumId)
-            router.openSetupVoteReferendum(votePayload)
+            val votePayload = SetupVotePayload(payload.referendumId)
+            router.openSetupReferendumVote(votePayload)
         }
     }
 
@@ -446,17 +447,15 @@ class ReferendumDetailsViewModel(
     }
 
     private fun mapReferendumTitleToUi(referendumDetails: ReferendumDetails): String {
-        return referendumDetails.offChainMetadata?.title
-            ?: referendumDetails.onChainMetadata?.preImage?.let { referendumFormatter.formatOnChainName(it.call) }
-            ?: referendumFormatter.formatUnknownReferendumTitle(referendumDetails.id)
+        return referendumFormatter.formatReferendumName(referendumDetails)
     }
 
     private suspend fun mapReferendumCallToUi(referendumCall: ReferendumCall): ReferendumCallModel {
         return when (referendumCall) {
             is ReferendumCall.TreasuryRequest -> {
-                val token = tokenFlow.first()
+                val token = tokenUseCase.getToken(referendumCall.chainAsset.fullId)
 
-                ReferendumCallModel.GovernanceRequest.AmountOnly(
+                ReferendumCallModel.GovernanceRequest(
                     amount = mapAmountToAmountModel(referendumCall.amount, token)
                 )
             }

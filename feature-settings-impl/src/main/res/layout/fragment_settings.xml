@@ -110,6 +110,13 @@
                 app:title="@string/language_title"
                 tools:settingValue="English" />
 
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsAppearance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_settings_appearance"
+                app:title="@string/appearance_title"/>
+
         </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
         <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
@@ -161,6 +168,38 @@
         <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/settings_support" />
+
+        <io.novafoundation.nova.common.view.settings.SettingsGroupView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_mail_outline"
+                app:title="@string/settings_email" />
+
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsWiki"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_nova_wiki"
+                app:title="@string/settings_wiki" />
+
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsRateUs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_rate_us"
+                app:title="@string/about_rate_app" />
+
+        </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+        <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/settings_community" />
 
         <io.novafoundation.nova.common.view.settings.SettingsGroupView
@@ -188,38 +227,6 @@
                 app:icon="@drawable/ic_youtube"
                 app:title="@string/settings_youtube" />
         </io.novafoundation.nova.common.view.settings.SettingsGroupView>
-
-        <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_support" />
-
-        <io.novafoundation.nova.common.view.settings.SettingsGroupView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <io.novafoundation.nova.common.view.settings.SettingsItemView
-                android:id="@+id/settingsRateUs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_rate_us"
-                app:title="@string/about_rate_app" />
-
-            <io.novafoundation.nova.common.view.settings.SettingsItemView
-                android:id="@+id/settingsWiki"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_nova_wiki"
-                app:title="@string/settings_wiki" />
-
-            <io.novafoundation.nova.common.view.settings.SettingsItemView
-                android:id="@+id/settingsEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_mail_outline"
-                app:title="@string/settings_email" />
-        </io.novafoundation.nova.common.view.settings.SettingsGroupView>
-
 
         <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
             android:layout_width="match_parent"

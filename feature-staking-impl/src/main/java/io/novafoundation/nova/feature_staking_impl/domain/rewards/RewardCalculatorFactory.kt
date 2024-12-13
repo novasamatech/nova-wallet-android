@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.data.unwrapNominationPools
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
+import io.novafoundation.nova.feature_staking_impl.domain.common.eraTimeCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.error.accountIdNotFound
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -42,7 +43,8 @@ class RewardCalculatorFactory(
     suspend fun create(
         stakingOption: StakingOption,
         exposures: AccountIdMap<Exposure>,
-        validatorsPrefs: AccountIdMap<ValidatorPrefs?>
+        validatorsPrefs: AccountIdMap<ValidatorPrefs?>,
+        scope: CoroutineScope
     ): RewardCalculator = withContext(Dispatchers.Default) {
         val totalIssuance = totalIssuanceRepository.getTotalIssuance(stakingOption.assetWithChain.chain.id)
 
@@ -57,7 +59,7 @@ class RewardCalculatorFactory(
             )
         }
 
-        stakingOption.createRewardCalculator(validators, totalIssuance)
+        stakingOption.createRewardCalculator(validators, totalIssuance, scope)
     }
 
     suspend fun create(stakingOption: StakingOption, scope: CoroutineScope): RewardCalculator = withContext(Dispatchers.Default) {
@@ -66,13 +68,17 @@ class RewardCalculatorFactory(
         val exposures = shareStakingSharedComputation.get().electedExposuresInActiveEra(chainId, scope)
         val validatorsPrefs = stakingRepository.getValidatorPrefs(chainId, exposures.keys)
 
-        create(stakingOption, exposures, validatorsPrefs)
+        create(stakingOption, exposures, validatorsPrefs, scope)
     }
 
-    private suspend fun StakingOption.createRewardCalculator(validators: List<RewardCalculationTarget>, totalIssuance: BigInteger): RewardCalculator {
+    private suspend fun StakingOption.createRewardCalculator(
+        validators: List<RewardCalculationTarget>,
+        totalIssuance: BigInteger,
+        scope: CoroutineScope
+    ): RewardCalculator {
         return when (unwrapNominationPools().stakingType) {
             RELAYCHAIN, RELAYCHAIN_AURA -> {
-                val custom = customRelayChainCalculator(validators, totalIssuance)
+                val custom = customRelayChainCalculator(validators, totalIssuance, scope)
                 if (custom != null) return custom
 
                 val activePublicParachains = parasRepository.activePublicParachains(assetWithChain.chain.id)
@@ -88,10 +94,12 @@ class RewardCalculatorFactory(
 
     private suspend fun StakingOption.customRelayChainCalculator(
         validators: List<RewardCalculationTarget>,
-        totalIssuance: BigInteger
+        totalIssuance: BigInteger,
+        scope: CoroutineScope
     ): RewardCalculator? {
         return when (chain.id) {
             Chain.Geneses.VARA -> Vara(chain.id, validators, totalIssuance)
+            Chain.Geneses.POLKADOT -> PolkadotInflationPrediction(validators, totalIssuance, scope)
             else -> null
         }
     }
@@ -116,6 +124,30 @@ class RewardCalculatorFactory(
         }
             .onFailure {
                 Log.e(LOG_TAG, "Failed to create Vara reward calculator, fallbacking to default", it)
+            }
+            .getOrNull()
+    }
+
+    private suspend fun StakingOption.PolkadotInflationPrediction(
+        validators: List<RewardCalculationTarget>,
+        totalIssuance: BigInteger,
+        scope: CoroutineScope
+    ): RewardCalculator? {
+        return runCatching {
+            val eraRewardCalculator = shareStakingSharedComputation.get().eraTimeCalculator(this, scope)
+            val eraDuration = eraRewardCalculator.eraDuration()
+
+            val inflationPredictionInfo = stakingRepository.getInflationPredictionInfo(chain.id)
+
+            InflationPredictionInfoCalculator(
+                inflationPredictionInfo = inflationPredictionInfo,
+                eraDuration = eraDuration,
+                totalIssuance = totalIssuance,
+                validators = validators
+            )
+        }
+            .onFailure {
+                Log.e("RewardCalculatorFactory", "Failed to create Polkadot Inflation Prediction reward calculator, fallbacking to default", it)
             }
             .getOrNull()
     }

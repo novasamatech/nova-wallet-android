@@ -13,8 +13,8 @@ import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourc
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.RealVoteReferendumInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.VoteReferendumValidationSystem
-import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.voteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendumValidationSystem
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.voteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.RealLocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory

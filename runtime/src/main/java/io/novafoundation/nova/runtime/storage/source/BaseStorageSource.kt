@@ -110,7 +110,7 @@ abstract class BaseStorageSource(
 
     override suspend fun <R> subscribe(
         chainId: String,
-        subscriptionBuilder: SubstrateSubscriptionBuilder,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?,
         at: BlockHash?,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R> {

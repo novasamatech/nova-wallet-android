@@ -1,13 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.ForegroundColorSpan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -23,7 +20,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
@@ -32,21 +28,25 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownItem
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBalanceBreakdownModel
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -72,10 +72,11 @@ class BalanceListViewModel(
     private val router: AssetsRouter,
     private val currencyInteractor: CurrencyInteractor,
     private val balanceBreakdownInteractor: BalanceBreakdownInteractor,
-    private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val resourceManager: ResourceManager,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
-    private val swapAvailabilityInteractor: SwapAvailabilityInteractor
+    private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
+    private val assetListMixinFactory: AssetListMixinFactory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -93,9 +94,9 @@ class BalanceListViewModel(
         walletInteractor::syncAllNfts
     )
 
-    private val assetsFlow = walletInteractor.assetsFlow()
+    val assetListMixin = assetListMixinFactory.create(viewModelScope)
 
-    private val filteredAssetsFlow = walletInteractor.filterAssets(assetsFlow)
+    private val externalBalancesFlow = assetListMixin.externalBalancesFlow
 
     private val isFiltersEnabledFlow = walletInteractor.isFiltersEnabledFlow()
 
@@ -109,10 +110,7 @@ class BalanceListViewModel(
     val selectedWalletModelFlow = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
-        .shareInBackground()
-
-    private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetsFlow, externalBalancesFlow)
+    private val balanceBreakdown = balanceBreakdownInteractor.balanceBreakdownFlow(assetListMixin.assetsFlow, externalBalancesFlow)
         .shareInBackground()
 
     private val nftsPreviews = assetsListInteractor.observeNftPreviews()
@@ -129,12 +127,6 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val assetModelsFlow = combine(filteredAssetsFlow, selectedCurrency, externalBalancesFlow) { assets, currency, externalBalances ->
-        walletInteractor.groupAssets(assets, externalBalances).mapGroupedAssetsToUi(currency)
-    }
-        .distinctUntilChanged()
-        .shareInBackground()
-
     val totalBalanceFlow = combine(
         balanceBreakdown,
         swapAvailabilityInteractor.anySwapAvailableFlow()
@@ -142,7 +134,7 @@ class BalanceListViewModel(
         val currency = selectedCurrency.first()
         TotalBalanceModel(
             isBreakdownAbailable = breakdown.breakdown.isNotEmpty(),
-            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatAsTotalBalance(),
+            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatBalanceWithFraction(amountFormatter, R.dimen.total_balance_fraction_size),
             lockedBalanceFiat = breakdown.locksTotal.amount.formatAsCurrency(currency),
             enableSwap = swapSupported
         )
@@ -150,7 +142,7 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val shouldShowPlaceholderFlow = filteredAssetsFlow.map { it.isEmpty() }
+    val shouldShowPlaceholderFlow = assetListMixin.assetModelsFlow.map { it.isEmpty() }
 
     val balanceBreakdownFlow = balanceBreakdown.map {
         val currency = selectedCurrency.first()
@@ -176,6 +168,13 @@ class BalanceListViewModel(
         .shareInBackground()
 
     val novaCardText = flowOf { getNovaCardText() }
+
+    val assetViewModeModelFlow = assetListMixin.assetsViewModeFlow.map {
+        when (it) {
+            AssetViewMode.NETWORKS -> AssetViewModeModel(R.drawable.ic_asset_view_networks, R.string.asset_view_networks)
+            AssetViewMode.TOKENS -> AssetViewModeModel(R.drawable.ic_asset_view_tokens, R.string.asset_view_tokens)
+        }
+    }.distinctUntilChanged()
 
     init {
         selectedCurrency
@@ -209,10 +208,10 @@ class BalanceListViewModel(
         }
     }
 
-    fun assetClicked(asset: AssetModel) {
+    fun assetClicked(asset: Chain.Asset) {
         val payload = AssetPayload(
-            chainId = asset.token.configuration.chainId,
-            chainAssetId = asset.token.configuration.id
+            chainId = asset.chainId,
+            chainAssetId = asset.id
         )
 
         router.openAssetDetails(payload)
@@ -220,10 +219,6 @@ class BalanceListViewModel(
 
     fun avatarClicked() {
         router.openSwitchWallet()
-    }
-
-    fun filtersClicked() {
-        router.openAssetFilters()
     }
 
     fun manageClicked() {
@@ -305,27 +300,6 @@ class BalanceListViewModel(
         }
     }
 
-    private fun String.formatAsTotalBalance(): CharSequence {
-        val amountWithFraction = toAmountWithFraction()
-
-        val textColor = resourceManager.getColor(R.color.text_secondary)
-        val colorSpan = ForegroundColorSpan(textColor)
-        val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(R.dimen.total_balance_fraction_size))
-
-        return with(amountWithFraction) {
-            val spannableBuilder = SpannableStringBuilder()
-                .append(amount)
-            if (fraction != null) {
-                spannableBuilder.append(separator + fraction)
-                val startIndex = amount.length
-                val endIndex = amount.length + separator.length + fraction!!.length
-                spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            spannableBuilder
-        }
-    }
-
     fun sendClicked() {
         router.openSendFlow()
     }
@@ -358,6 +332,10 @@ class BalanceListViewModel(
 
     fun novaCardClicked() {
         router.openNovaCard()
+    }
+
+    fun switchViewMode() {
+        launch { assetListMixin.switchViewMode() }
     }
 
     private fun getNovaCardText(): CharSequence {

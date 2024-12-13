@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s\'da eklenen maksimum proxy (%s) limitine ulaştınız. Yeni eklemeler yapabilmek için proxy\'leri kaldırın.</string>
     <string name="add_proxy_maximum_reached_error_title">Maksimum proxy sayısına ulaşıldı</string>
     <string name="added_networks_empty_placeholder">Eklenen özel ağlar\nburada görünecek</string>
+    <string name="appearance_colored_icon_title">Renkli</string>
+    <string name="appearance_title">Görünüm</string>
+    <string name="appearance_token_assets_title">token simgeleri</string>
+    <string name="appearance_white_icon_title">Beyaz</string>
     <string name="asset_add_evm_token_already_exist_message">Girilen sözleşme adresi Nova\'da zaten %s tokeni olarak bulunmaktadır.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Girilen sözleşme adresi Nova\'da zaten %s tokeni olarak bulunmaktadır. Değiştirmek istediğinize emin misiniz?</string>
     <string name="asset_add_evm_token_already_exist_title">Bu token zaten var</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">Sözleşme adresi girin</string>
     <string name="asset_add_token_enter_decimals">Ondalık sayısını girin</string>
     <string name="asset_add_token_enter_symbol">Sembol girin</string>
+    <string name="asset_view_networks">Ağlar</string>
+    <string name="asset_view_tokens">Tokenler</string>
     <string name="assets_add_token">Token ekle</string>
     <string name="assets_add_token_enter_info_address_label">Sözleşme adresi</string>
     <string name="assets_add_token_enter_info_decimals_label">Ondalıklar</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger bu token\'i desteklemiyor</string>
     <string name="assets_search_hint">Ağ veya token adına göre ara</string>
     <string name="assets_search_placeholder">Girilen adla herhangi bir ağ veya token bulunamadı</string>
+    <string name="assets_search_token_hint">Tokene göre ara</string>
     <string name="assets_select_send_your_wallets">Cüzdanlarınız</string>
     <string name="assets_send_flow_placeholder">Göndermek için token\'ınız yok.\nHesabınıza token alın veya alın.</string>
     <string name="assets_swap_flow_pay_title">Ödeme yapılacak Token</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">Yedekleme</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
+    <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
     <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
@@ -348,6 +356,7 @@
     <string name="common_details">Detaylar</string>
     <string name="common_disabled">Devre dışı</string>
     <string name="common_disconnect">Bağlantıyı kes</string>
+    <string name="common_do_not_close_app">Uygulamayı kapatmayın!</string>
     <string name="common_done">Tamam</string>
     <string name="common_dont_show_again">Bunu bir daha gösterme</string>
     <string name="common_edit">Düzenle</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">Hesap kaldırılacak</string>
     <string name="common_expired">Süresi doldu</string>
     <string name="common_explore">Keşfet</string>
+    <string name="common_failed">Başarısız</string>
     <string name="common_fee_changed_message" formatted="false">Tahmini ağ ücreti %s, varsayılan ağ ücretinden (%s) çok daha yüksek. Bu, geçici bir ağ yoğunluğundan kaynaklanıyor olabilir. Daha düşük bir ağ ücreti için yenileyebilirsiniz.</string>
     <string name="common_fee_changed_title">Ağ ücreti çok yüksek</string>
+    <string name="common_fee_with_label">Ücret: %s</string>
     <string name="common_filter_sort_header">Şuna göre sırala:</string>
     <string name="common_filters">Filtreler</string>
     <string name="common_find_out_more">Daha fazla bilgi edinin</string>
@@ -423,6 +434,7 @@
     <string name="common_not_available">Mevcut değil</string>
     <string name="common_not_enough_funds_message">Üzgünüm, ağ ücretini ödeyecek yeterli bakiyeniz yok.</string>
     <string name="common_not_enough_funds_title">Yetersiz bakiye</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Ağ ücreti olan %s ödemesi için yeterli bakiyeniz yok. Mevcut bakiye %s</string>
     <string name="common_not_now">Şimdi değil</string>
     <string name="common_off">Kapalı</string>
     <string name="common_ok">Tamam</string>
@@ -462,6 +474,11 @@
     <string name="common_search">Arama</string>
     <string name="common_search_placeholder_default">Arama sonuçları burada gösterilecek</string>
     <string name="common_search_results_number">Arama sonuçları: %d</string>
+    <string name="common_sec">sn</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d saniye</item>
+        <item quantity="other">%d saniye</item>
+    </plurals>
     <string name="common_secret_derivation_path">Gizli türetme yolu</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
@@ -485,6 +502,7 @@
     <string name="common_to_settings">Ayarları Aç</string>
     <string name="common_too_small_balance_title">Bakiyeniz çok küçük</string>
     <string name="common_total">Toplam</string>
+    <string name="common_total_fee">Toplam Ücret</string>
     <string name="common_transaction_id">İşlem Kimliği</string>
     <string name="common_transaction_submitted">İşlem Gönderildi</string>
     <string name="common_try_again">Tekrar Deneyin</string>
@@ -498,6 +516,7 @@
     <string name="common_unlimited">Sınırsız</string>
     <string name="common_update">Güncelle</string>
     <string name="common_use">Kullan</string>
+    <string name="common_use_max">Maksimumu Kullan</string>
     <string name="common_validation_invalid_address_message">Alıcı geçerli bir %s adresi olmalıdır</string>
     <string name="common_validation_invalid_address_title">Geçersiz alıcı</string>
     <string name="common_waiting">Bekleniyor</string>
@@ -967,6 +986,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Bildirimleri etkinleştirmekle, %s ve %s kabul etmiş olursunuz</string>
     <string name="push_welcome_timeout_error_message">Lütfen, Ayarlar sekmesinden bildirim ayarlarına erişerek daha sonra tekrar deneyin</string>
     <string name="push_welcome_title">Hiçbir şeyi kaçırmayın!</string>
+    <string name="receive_network_flow_title">Alma için ağ seçin %s</string>
+    <string name="receive_screen_copy_address">Adresi Kopyala</string>
     <string name="recover_json_hint">Json yapıştırın ya da dosya yükleyin...</string>
     <string name="recover_json_upload">Dosya yükle</string>
     <string name="recovery_json">JSON Kurtar</string>
@@ -981,6 +1002,8 @@
     <string name="referenda_list_placeholder">Referandumlar başladığında bilgiler burada görünecek</string>
     <string name="referenda_search_placeholder">Girilen başlık veya ID ile hiç referandum bulunamadı</string>
     <string name="referenda_search_toolbar_hint">Referandum başlığı veya ID ile ara</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referandum</string>
+    <string name="referenda_swipe_gov_banner_subtitle">AI özetleriyle referandumlara oy vermek için kaydırın. Hızlı ve kolay!</string>
     <string name="referenda_title">Referandumlar</string>
     <string name="referendim_details_not_found_title">Referandum bulunamadı</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">Çekimser oylar yalnızca 0.1x inançla yapılabilir. 0.1x inançla oy kullanmak ister misiniz?</string>
@@ -1119,16 +1142,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Ulaşılamayan yollar</string>
     <string name="select_ledger_location_enable_request_message">Nova\'nın Bluetooth taraması yaparak Ledger cihazınızı bulabilmesi için konumun etkinleştirilmesi gerekiyor</string>
     <string name="select_ledger_location_enable_request_title">Lütfen cihaz ayarlarında coğrafi konumu etkinleştirin</string>
+    <string name="select_network_title">Ağ seç</string>
     <string name="select_tracks_for">İçin şarkıları seçin</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">Adres veya w3n</string>
+    <string name="send_network_flow_title">Gönderme için ağ seçin %s</string>
     <string name="send_recipient_system_account_message">Alıcı, bir sistem hesabıdır. Bir şirket veya birey tarafından kontrol edilmez.\nBu transferi gerçekleştirmek istediğinize emin misiniz?</string>
     <string name="send_recipient_system_account_title">Token\'lar kaybolacak</string>
     <string name="set_staking_proxy_address_description">Yetki ver</string>
     <string name="settings_biometric_not_ready_message">Lütfen, biyometrinin Ayarlar\'da etkinleştirildiğinden emin olun</string>
     <string name="settings_biometric_not_ready_title">Ayarlar\'da biyometrik kapalı</string>
     <string name="settings_community">Topluluk</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Email yoluyla destek alın</string>
     <string name="settings_general">Genel</string>
     <string name="settings_pin_code_verification_confirmation_message">Anahtar çiftiyle (nova cüzdanında oluşturulan veya içe aktarılan) cüzdanlarda sign işlemi yapılırken, imza oluşturmadan önce PIN doğrulaması gerektirir</string>
     <string name="settings_pin_code_verification_confirmation_title">Operasyon imzalanırken kimlik doğrulama isteyin</string>
@@ -1140,7 +1165,7 @@
     <string name="settings_security">Güvenlik</string>
     <string name="settings_support">Destek &amp; Geribildirim</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Yardım Merkezi</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">Çekinmelerde 0.1x olarak Ayarlanacak</string>
     <string name="setup_staking_conflict_message">Aynı anda hem Doğrudan Stake hem de Nomination Havuzlarını kullanarak stake yapamazsınız</string>
@@ -1504,6 +1529,17 @@
     <string name="swap_custom_fee_selector_description">Ağ ücreti ödemek için token</string>
     <string name="swap_custom_fee_selector_footer">Ağ ücreti girilen miktarın üstüne eklenir</string>
     <string name="swap_error_pair_not_supported">Bu çift desteklenmiyor</string>
+    <string name="swap_execution_failure" formatted="false">#%s (%s) işlemi başarısız oldu</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s\'den %s\'e %s üzerinde swap</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%s\'den %s\'e %s transferi</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s işlem</item>
+        <item quantity="other">%s işlem</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s/%s işlem</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%s\'den %s\'e %s üzerinde takas</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%s\'den %s\'e transfer</string>
+    <string name="swap_execution_time">Gerçekleşme süresi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Ödeme yaptıktan sonra ağ ücreti olarak %s tutarında en azından %s tutmanız gerekmektedir çünkü yeterli olmayan tokenlara sahipsiniz</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s token almak için en az %s tutmalısınız</string>
     <string name="swap_failure_insufficient_balance_message">Ağ ücreti için %2$s ödemeniz gerektiği için en fazla %1$s tutarında takas yapabilirsiniz.</string>
@@ -1523,6 +1559,7 @@
     <string name="swap_get_token_cross_chain_description">Başka bir ağdan %s transfer et</string>
     <string name="swap_get_token_receive_description">QR veya adresinizle %s alın</string>
     <string name="swap_get_token_using">%s kullanarak alın</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Takas gerçekleştirilirken ara alınan miktar %s olarak minimum bakiye olan %s\'in altında. Daha büyük bir takas miktarı belirtmeye çalışın.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Kayma %s ile %s arasında belirtilmeli</string>
     <string name="swap_invalid_slippage_failure_title">Geçersiz kayma</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Ödeme yapmak için bir token seçin</string>
@@ -1531,6 +1568,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Başka bir miktar girin</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">%s ile ağ ücreti ödemek için, Nova otomatik olarak hesabınızın minimum %s bakiyesini korumak için %s\'i %s\'ye dönüştürecektir.</string>
     <string name="swap_network_fee_description">Herhangi bir işlemi işlemek ve doğrulamak için blockchain tarafından alınan ağ ücretleri. Ağ koşullarına veya işlem hızına bağlı olarak değişebilir.</string>
+    <string name="swap_network_flow_title">Takas için ağ seçin %s</string>
     <string name="swap_not_enought_liquidity_failure">Havuzda takas için yeterli likidite yok</string>
     <string name="swap_price_difference_description">Fiyat farkı, iki farklı varlık arasındaki fiyat farkını ifade eder. Kripto takas yaparken, fiyat farkı genellikle takas ettiğiniz varlığın fiyatı ile takas ettiğiniz varlığın fiyatı arasındaki farktır.</string>
     <string name="swap_price_difference_title">Fiyat farkı</string>
@@ -1540,6 +1578,10 @@
     <string name="swap_rate_was_updated_failure_message">Eski oran: %1$s ≈ %2$s.\nYeni oran: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Takas oranı güncellendi</string>
     <string name="swap_repeat_operation">İşlemi tekrarla</string>
+    <string name="swap_route">Rota</string>
+    <string name="swap_route_description">Token\'ınızın farklı ağlardan geçerek istenen token\'a ulaşmak için alacağı yol.</string>
+    <string name="swap_route_segment_swap_title">Takas</string>
+    <string name="swap_route_segment_transfer_title">Transfer</string>
     <string name="swap_settings_title">Takas ayarları</string>
     <string name="swap_slippage">Kayma</string>
     <string name="swap_slippage_description">Takas kayması, değişken piyasa koşulları nedeniyle, bir takas işleminin nihai fiyatının beklenen fiyattan küçük bir miktar farklılık gösterebileceği merkeziyetsiz ticarette yaygın bir durumdur.</string>
@@ -1550,6 +1592,31 @@
     <string name="swap_slippage_warning_too_small">Düşük kayma toleransı nedeniyle işlem geri alınabilir.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%s miktarı, %s\'nin minimum bakiyesinden az</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Çok küçük bir miktar takası yapmaya çalışıyorsunuz</string>
+    <string name="swipe_gov_abstain_format">Çekimser: %s</string>
+    <string name="swipe_gov_aye_format">Evet: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Bu referanduma her zaman daha sonra oy verebilirsiniz</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Referandum %s oy listesinden kaldırılsın mı?</string>
+    <string name="swipe_gov_basket_removed_items_message">Bazı referandumlara artık oy verilemiyor veya oy vermek için yeterli token bulunmayabilir. Oy verilebilir: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Bazı referandumlar oy listesinden çıkarıldı</string>
+    <string name="swipe_gov_card_data_loading_error_message">Referandum verileri yüklenemedi</string>
+    <string name="swipe_gov_card_data_loading_error_title">Veri alınamadı</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Mevcut tüm referandumlara zaten oy verdiniz veya şu anda oylayacak referandum yok. Daha sonra tekrar gelin.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Mevcut tüm referandumlara zaten oy verdiniz</string>
+    <string name="swipe_gov_card_requested_title">Talep Edilen:</string>
+    <string name="swipe_gov_cards_basket_title">Oy listesi</string>
+    <string name="swipe_gov_cards_counter">%d kaldı</string>
+    <string name="swipe_gov_cards_full_list">Oyları onayla</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Oylanacak referandum yok</string>
+    <string name="swipe_gov_cards_placeholder_button">Oylarınızı onaylayın</string>
+    <string name="swipe_gov_cards_voting_list_empty">Oy yok</string>
+    <string name="swipe_gov_convirm_votes_success_message">%d referandum için başarıyla oy verdiniz</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Mevcut oy gücü %s (%sx) ile oy vermek için yeterli bakiyeniz yok. Lütfen oy gücünü değiştirin veya cüzdanınıza daha fazla para ekleyin.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Oy vermek için yetersiz bakiye</string>
+    <string name="swipe_gov_nay_format">Hayır: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">%d referandum için oy verin</string>
+    <string name="swipe_gov_vote_subtitle">SwipeGov\'daki gelecekteki oylar için oy verilecektir</string>
+    <string name="swipe_gov_vote_title">Oy gücü</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Cüzdan</string>
     <string name="today">Bugün</string>
@@ -1598,6 +1665,7 @@
     <string name="wallet_asset_buy_with">ile Satın al</string>
     <string name="wallet_asset_receive">Al</string>
     <string name="wallet_asset_receive_token">%s al</string>
+    <string name="wallet_asset_receive_token_subtitle">Bu adrese yalnızca %1$s token ve %2$s ağındaki tokenleri gönderin, aksi takdirde paranızı kaybedebilirsiniz</string>
     <string name="wallet_asset_send">Gönder</string>
     <string name="wallet_asset_swap">Takas et</string>
     <string name="wallet_assets">Varlıklar</string>

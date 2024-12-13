@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:strokeColor="@color/container_border"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/tinderGovCardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/itemTinderGovCardSummary"
+            style="@style/TextAppearance.NovaFoundation.Regular.Title3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:autoSizeMaxTextSize="26sp"
+            android:autoSizeMinTextSize="16sp"
+            android:autoSizeTextType="uniform"
+            android:ellipsize="end"
+            android:textColor="@color/tinder_gov_banner_secondary_text"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Sovereign Nature proposes DOTphin Event Multipass with WalletConnect integration and dynamic NFTs by Unique Network for Polkadot events, aiming for unified proof of attendance and immersive engagement."
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <LinearLayout
+            android:id="@+id/itemTinderGovCardAmountContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/tinderGovCardReadMore"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"/>
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/swipe_gov_card_requested_title"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/itemTinderGovCardRequestedAmount"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/text_primary"
+                tools:text="1M DOT " />
+
+            <TextView
+                android:id="@+id/itemTinderGovCardRequestedFiat"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/text_secondary"
+                tools:text="$7,42M" />
+
+        </LinearLayout>
+
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
+            android:id="@+id/tinderGovCardReadMore"
+            style="@style/Widget.Nova.MaterialButton.Secondary.HalfTransparent"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="@string/common_read_more"
+            android:textColor="@color/text_primary"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/right_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="24dp"
+        android:background="@drawable/bg_common_circle"
+        android:backgroundTint="@color/button_background_approve"
+        android:padding="20dp"
+        android:src="@drawable/ic_thumbs_up_filled"
+        app:tint="@color/icon_primary" />
+
+    <ImageView
+        android:id="@+id/left_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="24dp"
+        android:background="@drawable/bg_common_circle"
+        android:backgroundTint="@color/button_background_reject"
+        android:padding="20dp"
+        android:src="@drawable/ic_thumbs_down_filled"
+        app:tint="@color/icon_primary" />
+
+    <ImageView
+        android:id="@+id/top_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_common_circle"
+        android:backgroundTint="@color/button_background_secondary"
+        android:padding="16dp"
+        android:src="@drawable/ic_abstain_vote"
+        app:tint="@color/icon_primary" />
+
+</com.google.android.material.card.MaterialCardView>

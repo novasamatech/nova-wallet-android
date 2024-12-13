@@ -16,8 +16,7 @@ sealed interface SwapSettingsPayload : Parcelable {
     class RepeatOperation(
         override val assetIn: AssetPayload,
         val assetOut: AssetPayload,
-        val feeAsset: AssetPayload,
         val amount: Balance,
-        val direction: SwapDirectionModel
+        val direction: SwapDirectionParcel
     ) : SwapSettingsPayload
 }

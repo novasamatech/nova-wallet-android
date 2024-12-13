@@ -173,6 +173,10 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">您已达到在%s中添加的代理的上限%s。移除代理以添加新代理。</string>
     <string name="add_proxy_maximum_reached_error_title">已达到代理最大数量</string>
     <string name="added_networks_empty_placeholder">添加的自定义网络会显示在这里</string>
+    <string name="appearance_colored_icon_title">彩色图标</string>
+    <string name="appearance_title">外观</string>
+    <string name="appearance_token_assets_title">代币图标</string>
+    <string name="appearance_white_icon_title">白色图标</string>
     <string name="asset_add_evm_token_already_exist_message">输入的合约地址已作为%s代币存在于Nova中。</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">输入的合约地址已作为%s代币存在于Nova中。您确定要修改它吗？</string>
     <string name="asset_add_evm_token_already_exist_title">该代币已存在</string>
@@ -185,6 +189,8 @@
     <string name="asset_add_token_enter_contract_address">输入合约地址</string>
     <string name="asset_add_token_enter_decimals">输入小数</string>
     <string name="asset_add_token_enter_symbol">输入符号</string>
+    <string name="asset_view_networks">网络</string>
+    <string name="asset_view_tokens">代币</string>
     <string name="assets_add_token">添加代币</string>
     <string name="assets_add_token_enter_info_address_label">合约地址</string>
     <string name="assets_add_token_enter_info_decimals_label">小数点</string>
@@ -207,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger 不支持此代币</string>
     <string name="assets_search_hint">按网络或代币搜索</string>
     <string name="assets_search_placeholder">没有找到输入名称的网络或代币</string>
+    <string name="assets_search_token_hint">按代币搜索</string>
     <string name="assets_select_send_your_wallets">你的钱包</string>
     <string name="assets_send_flow_placeholder">你没有要发送的代币。购买或接收代币到你的账户。</string>
     <string name="assets_swap_flow_pay_title">要支付的代币</string>
@@ -235,6 +242,7 @@
     <string name="backup_title">备份</string>
     <string name="biometric_auth_title">生物认证</string>
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
+    <string name="buy_network_flow_title">选择购买%s的网络</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
     <string name="buy_provider_open_confirmation_title">在浏览器中继续？</string>
     <string name="chain_network_management_auto_balance">自动平衡节点</string>
@@ -348,6 +356,7 @@
     <string name="common_details">详细信息</string>
     <string name="common_disabled">已禁用</string>
     <string name="common_disconnect">断开</string>
+    <string name="common_do_not_close_app">不要关闭应用程序!</string>
     <string name="common_done">完成</string>
     <string name="common_dont_show_again">不再显示</string>
     <string name="common_edit">编辑</string>
@@ -367,8 +376,10 @@
     <string name="common_existential_warning_title">操作将移除账户</string>
     <string name="common_expired">已过期</string>
     <string name="common_explore">探索</string>
+    <string name="common_failed">失败</string>
     <string name="common_fee_changed_message" formatted="false">预估的网络费用%s远高于默认的网络费用(%s)。这可能是由于临时网络拥堵。您可以刷新以等待更低的网络费用。</string>
     <string name="common_fee_changed_title">网络费用过高</string>
+    <string name="common_fee_with_label">费用: %s</string>
     <string name="common_filter_sort_header">排序依据：</string>
     <string name="common_filters">过滤器</string>
     <string name="common_find_out_more">了解更多</string>
@@ -419,6 +430,7 @@
     <string name="common_not_available">不可用</string>
     <string name="common_not_enough_funds_message">抱歉，您没有足够的资金支付网络费用。</string>
     <string name="common_not_enough_funds_title">余额不足</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">你的余额不足以支付 %s 的网络费用。当前余额为 %s</string>
     <string name="common_not_now">暂不</string>
     <string name="common_off">关闭</string>
     <string name="common_ok">确定</string>
@@ -458,6 +470,10 @@
     <string name="common_search">搜索</string>
     <string name="common_search_placeholder_default">搜索结果将在这里显示</string>
     <string name="common_search_results_number">搜索结果：%d</string>
+    <string name="common_sec">秒</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d 秒</item>
+    </plurals>
     <string name="common_secret_derivation_path">密钥派生路径</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
@@ -481,6 +497,7 @@
     <string name="common_to_settings">打开设置</string>
     <string name="common_too_small_balance_title">您的余额太小</string>
     <string name="common_total">总计</string>
+    <string name="common_total_fee">总费用</string>
     <string name="common_transaction_id">交易ID</string>
     <string name="common_transaction_submitted">交易已提交</string>
     <string name="common_try_again">再试一次</string>
@@ -493,6 +510,7 @@
     <string name="common_unlimited">无限</string>
     <string name="common_update">更新</string>
     <string name="common_use">使用</string>
+    <string name="common_use_max">使用最大值</string>
     <string name="common_validation_invalid_address_message">接收者应该是一个有效的%s地址</string>
     <string name="common_validation_invalid_address_title">无效的接收者</string>
     <string name="common_waiting">等待中</string>
@@ -960,6 +978,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">启用推送通知，即表示您同意我们的 %s 和 %s</string>
     <string name="push_welcome_timeout_error_message">请稍后再试，通过设置选项卡中的通知设置访问</string>
     <string name="push_welcome_title">不要错过任何事情！</string>
+    <string name="receive_network_flow_title">选择接收%s的网络</string>
+    <string name="receive_screen_copy_address">复制地址</string>
     <string name="recover_json_hint">粘贴 json 字符串或上传文件…</string>
     <string name="recover_json_upload">上传文件</string>
     <string name="recovery_json">恢复 JSON</string>
@@ -974,6 +994,8 @@
     <string name="referenda_list_placeholder">公投信息将在这里显示，当它们开始时</string>
     <string name="referenda_search_placeholder">未找到输入的标题或 ID 的公投</string>
     <string name="referenda_search_toolbar_hint">按公投标题或 ID 搜索</string>
+    <string name="referenda_swipe_gov_banner_chip"> %d 个公投</string>
+    <string name="referenda_swipe_gov_banner_subtitle">滑动以通过 AI 概要投票。快速简单！</string>
     <string name="referenda_title">公投</string>
     <string name="referendim_details_not_found_title">未找到公投</string>
     <string name="referendum_abstain_vote_invalid_conviction_subtitle">弃权票只能通过 0.1x 决心投票。是否以 0.1x 决心投票？</string>
@@ -1111,16 +1133,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">不可用的轨道</string>
     <string name="select_ledger_location_enable_request_message">Nova需要启用地理位置，以便能够进行蓝牙扫描查找您的Ledger设备</string>
     <string name="select_ledger_location_enable_request_title">请在设备设置中启用地理位置</string>
+    <string name="select_network_title">选择网络</string>
     <string name="select_tracks_for">选择曲目</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">地址或w3n</string>
+    <string name="send_network_flow_title">选择发送%s的网络</string>
     <string name="send_recipient_system_account_message">收件人是一个系统账户。它不受任何公司或个人控制。您确定仍然要执行此转账吗？</string>
     <string name="send_recipient_system_account_title">代币将会丢失</string>
     <string name="set_staking_proxy_address_description">授权给</string>
     <string name="settings_biometric_not_ready_message">请确保在设置中启用了生物识别</string>
     <string name="settings_biometric_not_ready_title">设置中禁用了生物识别</string>
     <string name="settings_community">社区</string>
-    <string name="settings_email">电子邮件</string>
+    <string name="settings_email">通过电子邮件获得支持</string>
     <string name="settings_general">通用</string>
     <string name="settings_pin_code_verification_confirmation_message">带有密钥对的钱包（在nova钱包中创建或导入的）上的每次签名操作都应在构造签名前要求进行PIN验证</string>
     <string name="settings_pin_code_verification_confirmation_title">请求操作签名的认证</string>
@@ -1132,7 +1156,7 @@
     <string name="settings_security">安全性</string>
     <string name="settings_support">支持和反馈</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">维基</string>
+    <string name="settings_wiki">维基百科和帮助中心</string>
     <string name="settings_youtube">Youtube</string>
     <string name="setup_referendum_vote_conviction_info">弃权时将把决心设置为 0.1x</string>
     <string name="setup_staking_conflict_message">不能同时使用直接质押和提名池进行质押</string>
@@ -1494,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">用于支付网络费用的代币</string>
     <string name="swap_custom_fee_selector_footer">网络费用将添加到输入的金额之上</string>
     <string name="swap_error_pair_not_supported">不支持此对</string>
+    <string name="swap_execution_failure" formatted="false">操作 #%s (%s) 失败</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s 到 %s 的交换在 %s 上</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%s 从 %s 转到 %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s 操作</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s 共 %s 操作</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">正在进行 %s 到 %s 的交换在 %s 上</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">正在传输 %s 到 %s</string>
+    <string name="swap_execution_time">执行时间</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">您在支付%s网络费后至少应保留%s，因为您持有的代币不足</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">您必须至少保留%s，以接收%s代币</string>
     <string name="swap_failure_insufficient_balance_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费</string>
@@ -1513,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">从另一个网络转移%s</string>
     <string name="swap_get_token_receive_description">通过QR或您的地址接收%s</string>
     <string name="swap_get_token_using">使用%s获取</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">在交换执行期间，中间接收金额为 %s，少于最低余额 %s。请尝试指定更大的交换金额。</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">滑点必须指定在%s到%s之间</string>
     <string name="swap_invalid_slippage_failure_title">无效滑点</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">选择一个代币来支付</string>
@@ -1521,6 +1556,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">输入其他金额</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">为了支付网络费用，Nova将自动将%s兑换为%s，以保持您账户的最低%s余额。</string>
     <string name="swap_network_fee_description">区块链收取的网络费用，用于处理和验证任何交易。可能会根据网络状况或交易速度而变化。</string>
+    <string name="swap_network_flow_title">选择交换%s的网络</string>
     <string name="swap_not_enought_liquidity_failure">池子没有足够的流动性进行交换</string>
     <string name="swap_price_difference_description">价格差异指的是两种不同资产之间的价格差。在加密货币交换中，价格差异通常是您要交换的资产的价格与您交换的资产的价格之间的差异。</string>
     <string name="swap_price_difference_title">价格差异</string>
@@ -1530,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">旧汇率：%1$s ≈ %2$s。\n新汇率：%1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">兑换率已更新</string>
     <string name="swap_repeat_operation">重复操作</string>
+    <string name="swap_route">路线</string>
+    <string name="swap_route_description">你的代币通过不同网络到达所需代币的路径。</string>
+    <string name="swap_route_segment_swap_title">交换</string>
+    <string name="swap_route_segment_transfer_title">转移</string>
     <string name="swap_settings_title">交换设置</string>
     <string name="swap_slippage">滑点</string>
     <string name="swap_slippage_description">在去中心化交易中，交换滑点是一种常见现象，由于市场条件的变化，交易的最终价格可能会与预期价格略有不同。</string>
@@ -1540,6 +1580,31 @@
     <string name="swap_slippage_warning_too_small">因低滑点容忍度可能会被回退。</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%s的金额小于%s的最低余额</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">您尝试交换的金额太小</string>
+    <string name="swipe_gov_abstain_format">弃权： %s</string>
+    <string name="swipe_gov_aye_format">赞成： %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">你永远可以稍后为这个公投投票</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">从投票列表中移除公投 %s ？</string>
+    <string name="swipe_gov_basket_removed_items_message">某些公投不再可供投票或您的代币不足。可投票的：%s。</string>
+    <string name="swipe_gov_basket_removed_items_title">某些公投已从投票列表中排除</string>
+    <string name="swipe_gov_card_data_loading_error_message">无法加载公投数据</string>
+    <string name="swipe_gov_card_data_loading_error_title">没有数据</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">您已为所有可用的公投投票，或目前没有公投可供投票。请稍后再回来。</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">您已为所有可用的公投投票</string>
+    <string name="swipe_gov_card_requested_title">请求：</string>
+    <string name="swipe_gov_cards_basket_title">投票列表</string>
+    <string name="swipe_gov_cards_counter">剩余 %d </string>
+    <string name="swipe_gov_cards_full_list">确认投票</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">没有公投可投票</string>
+    <string name="swipe_gov_cards_placeholder_button">确认您的投票</string>
+    <string name="swipe_gov_cards_voting_list_empty">没有投票</string>
+    <string name="swipe_gov_convirm_votes_success_message">你已经成功为 %d 个公投投票</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">您的余额不足以使用当前的投票权 %s (%sx) 进行投票。请更改投票权或向您的钱包添加更多资金。</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">投票余额不足</string>
+    <string name="swipe_gov_nay_format">反对： %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">为 %d 个公投投票</string>
+    <string name="swipe_gov_vote_subtitle">投票将在 SwipeGov 的未来投票中设置</string>
+    <string name="swipe_gov_vote_title">投票权</string>
     <string name="tabbar_staking_title">质押</string>
     <string name="tabbar_wallet_title">钱包</string>
     <string name="today">今天</string>
@@ -1588,6 +1653,7 @@
     <string name="wallet_asset_buy_with">用...购买</string>
     <string name="wallet_asset_receive">接收</string>
     <string name="wallet_asset_receive_token">接收 %s</string>
+    <string name="wallet_asset_receive_token_subtitle">仅将%1$s代币和%2$s网络中的代币发送到此地址，否则您可能会失去资金</string>
     <string name="wallet_asset_send">发送</string>
     <string name="wallet_asset_swap">兑换</string>
     <string name="wallet_assets">资产</string>

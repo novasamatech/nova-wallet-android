@@ -27,9 +27,7 @@ class DelegatedVoteRemote(
 
     class Parent(
         val referendumId: BigInteger,
-        val delegate: Delegate,
+        val delegateId: String,
         val standardVote: StandardVoteRemote?
     )
-
-    class Delegate(@SerializedName("accountId") val address: String)
 }

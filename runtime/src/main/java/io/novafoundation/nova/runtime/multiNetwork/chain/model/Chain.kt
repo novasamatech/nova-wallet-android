@@ -15,7 +15,10 @@ typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 typealias BuyProviderId = String
 typealias BuyProviderArguments = Map<String, Any?>
 
-data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
+data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId) {
+
+    companion object
+}
 
 data class Chain(
     val id: ChainId,
@@ -65,7 +68,7 @@ data class Chain(
     )
 
     data class Asset(
-        val iconUrl: String?,
+        val icon: String?,
         val id: ChainAssetId,
         val priceId: String?,
         val chainId: ChainId,
@@ -88,7 +91,8 @@ data class Chain(
 
             data class Statemine(
                 val id: StatemineAssetId,
-                val palletName: String?
+                val palletName: String?,
+                val isSufficient: Boolean,
             ) : Type()
 
             data class Orml(
@@ -122,17 +126,20 @@ data class Chain(
     }
 
     data class Nodes(
-        val nodeSelectionStrategy: NodeSelectionStrategy,
+        val autoBalanceStrategy: AutoBalanceStrategy,
+        val wssNodeSelectionStrategy: NodeSelectionStrategy,
         val nodes: List<Node>,
     ) {
 
-        sealed interface NodeSelectionStrategy {
+        enum class AutoBalanceStrategy {
+            ROUND_ROBIN, UNIFORM
+        }
 
-            enum class AutoBalance : NodeSelectionStrategy {
-                ROUND_ROBIN, UNIFORM
-            }
+        sealed class NodeSelectionStrategy {
 
-            class SelectedNode(val nodeUrl: String?, val autoBalanceStrategy: AutoBalance) : NodeSelectionStrategy
+            object AutoBalance : NodeSelectionStrategy()
+
+            class SelectedNode(val unformattedNodeUrl: String) : NodeSelectionStrategy()
         }
     }
 
@@ -194,6 +201,8 @@ data class Chain(
         }
 
         data class GovernanceDelegations(override val url: String) : ExternalApi()
+
+        data class ReferendumSummary(override val url: String) : ExternalApi()
     }
 
     enum class Governance {

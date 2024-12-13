@@ -1,35 +1,23 @@
 package io.novafoundation.nova.feature_wallet_api.data.mappers
 
-import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericFeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.toFeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 
-fun <F : GenericFee> mapFeeToFeeModel(
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("This is a internal logic related to fee mixin. To access or set the fee use corresponding methods from FeeLoaderMixinV2.Presentation")
+fun <F : FeeBase> mapFeeToFeeModel(
     fee: F,
     token: Token,
     includeZeroFiat: Boolean = true
-) = GenericFeeModel(
-    decimalFee = GenericDecimalFee(
-        genericFee = fee,
-        networkFeeDecimalAmount = token.amountFromPlanks(fee.networkFee.amount),
-    ),
-    chainAsset = token.configuration,
+): FeeModel<F, FeeDisplay> = FeeModel(
     display = mapAmountToAmountModel(
-        amountInPlanks = fee.networkFee.amount,
+        amountInPlanks = fee.amount,
         token = token,
         includeZeroFiat = includeZeroFiat
-    )
+    ).toFeeDisplay(),
+    fee = fee
 )
-
-@Suppress("DeprecatedCallableAddReplaceWith")
-@Deprecated("Backward-compatible adapter")
-fun mapFeeToFeeModel(
-    fee: Fee,
-    token: Token,
-    includeZeroFiat: Boolean = true
-) = mapFeeToFeeModel(SimpleFee(fee), token, includeZeroFiat)

@@ -8,25 +8,50 @@
     android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
-    <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/manageTokensToolbar"
+    <LinearLayout
+        android:id="@+id/manageTokensToolbarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:dividerVisible="false"
-        app:homeButtonIcon="@drawable/ic_close"
-        app:layout_constraintTop_toTopOf="parent"
-        app:textRight="@string/manage_assets_add_token"
-        app:titleText="@string/assets_manage_tokens_title" />
+        android:background="@color/solid_navigation_background"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <io.novafoundation.nova.common.view.SearchView
-        android:id="@+id/manageTokensSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:hint="@string/assets_search_hint"
-        app:layout_constraintTop_toBottomOf="@id/manageTokensToolbar" />
+        <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/manageTokensToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentBackground="@color/solid_navigation_background"
+            app:dividerVisible="false"
+            app:homeButtonIcon="@drawable/ic_close"
+            app:layout_constraintTop_toTopOf="parent"
+            app:textRight="@string/manage_assets_add_token"
+            app:titleText="@string/assets_manage_tokens_title" />
+
+        <io.novafoundation.nova.common.view.SearchView
+            android:id="@+id/manageTokensSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:hint="@string/assets_search_hint"
+            app:layout_constraintTop_toBottomOf="@id/manageTokensToolbar" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/manageTokensSwitchZeroBalances"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:paddingHorizontal="16dp"
+            android:text="@string/wallet_filter_hide_zero_balance"
+            android:textColor="@color/text_secondary" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/navigation_divider" />
+    </LinearLayout>
 
     <io.novafoundation.nova.common.view.PlaceholderView
         android:id="@+id/manageTokensPlaceholder"
@@ -37,7 +62,7 @@
         android:text="@string/assets_search_placeholder"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manageTokensSearch"
+        app:layout_constraintTop_toBottomOf="@id/manageTokensToolbarContainer"
         app:layout_constraintVertical_bias="0.353"
         app:placeholderBackgroundStyle="no_background"
         tools:layout_editor_absoluteX="16dp" />
@@ -46,14 +71,13 @@
         android:id="@+id/manageTokensList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manageTokensSearch"
+        app:layout_constraintTop_toBottomOf="@id/manageTokensToolbarContainer"
         tools:listitem="@layout/item_manage_token_multichain" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.view.setAmountChangeModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.view.setAmountChangeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmGovernanceUnlockConfirm
 import kotlinx.android.synthetic.main.fragment_governance_confirm_unlock.confirmGovernanceUnlockInformation

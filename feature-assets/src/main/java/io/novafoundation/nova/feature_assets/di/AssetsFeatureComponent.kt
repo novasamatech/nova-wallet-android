@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.BalanceDetailComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.AssetFiltersComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
@@ -17,12 +16,17 @@ import io.novafoundation.nova.feature_assets.presentation.buy.flow.di.AssetBuyFl
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.di.NovaCardComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.di.TopUpCardComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.di.WaitingNovaCardTopUpComponent
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.di.AssetBuyFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.network.di.NetworkBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
-import io.novafoundation.nova.feature_assets.presentation.receive.flow.di.AssetReceiveFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.di.AssetReceiveFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.receive.flow.network.di.NetworkReceiveFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
-import io.novafoundation.nova.feature_assets.presentation.send.flow.di.AssetSendFlowComponent
-import io.novafoundation.nova.feature_assets.presentation.swap.di.AssetSwapFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.send.flow.asset.di.AssetSendFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.send.flow.network.di.NetworkSendFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.di.AssetSwapFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.network.di.NetworkSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
@@ -77,8 +81,6 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun receiveComponentFactory(): ReceiveComponent.Factory
 
-    fun assetFiltersComponentFactory(): AssetFiltersComponent.Factory
-
     fun assetSearchComponentFactory(): AssetSearchComponent.Factory
 
     fun manageTokensComponentFactory(): ManageTokensComponent.Factory
@@ -96,6 +98,14 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun receiveFlowComponent(): AssetReceiveFlowComponent.Factory
 
     fun buyFlowComponent(): AssetBuyFlowComponent.Factory
+
+    fun networkBuyFlowComponent(): NetworkBuyFlowComponent.Factory
+
+    fun networkReceiveFlowComponent(): NetworkReceiveFlowComponent.Factory
+
+    fun networkSendFlowComponent(): NetworkSendFlowComponent.Factory
+
+    fun networkSwapFlowComponent(): NetworkSwapFlowComponent.Factory
 
     fun topUpCardComponentFactory(): TopUpCardComponent.Factory
 

@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
@@ -27,6 +28,7 @@ class CrowdloanContributeModule {
     @IntoMap
     @ViewModelKey(CrowdloanContributeViewModel::class)
     fun provideViewModel(
+        assetIconProvider: AssetIconProvider,
         interactor: CrowdloanContributeInteractor,
         router: CrowdloanRouter,
         resourceManager: ResourceManager,
@@ -38,6 +40,7 @@ class CrowdloanContributeModule {
         customContributeManager: CustomContributeManager,
     ): ViewModel {
         return CrowdloanContributeViewModel(
+            assetIconProvider,
             router,
             interactor,
             resourceManager,

@@ -11,7 +11,7 @@ sealed class ConfirmTxResponse : Parcelable {
     class Rejected(override val requestId: String) : ConfirmTxResponse()
 
     @Parcelize
-    class Signed(override val requestId: String, val signature: String) : ConfirmTxResponse()
+    class Signed(override val requestId: String, val signature: String, val modifiedTransaction: String?) : ConfirmTxResponse()
 
     @Parcelize
     class Sent(override val requestId: String, val txHash: String) : ConfirmTxResponse()

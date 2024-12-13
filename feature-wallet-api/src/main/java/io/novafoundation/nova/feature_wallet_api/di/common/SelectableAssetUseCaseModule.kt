@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -32,10 +33,12 @@ class SelectableAssetUseCaseModule {
     @Provides
     @FeatureScope
     fun provideAssetSelectorMixinFactory(
+        assetIconProvider: AssetIconProvider,
         assetUseCase: SelectableAssetUseCase<*>,
         singleAssetSharedState: SelectableSingleAssetSharedState<*>,
         resourceManager: ResourceManager
     ) = AssetSelectorFactory(
+        assetIconProvider,
         assetUseCase,
         singleAssetSharedState,
         resourceManager

@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts
 
 class AlertModel(
-    val title: String,
-    val extraMessage: String,
+    val title: CharSequence,
+    val extraMessage: CharSequence,
     val type: Type
 ) {
     sealed class Type {

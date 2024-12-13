@@ -17,7 +17,7 @@ class RetriableMultiResult<T>(val succeeded: List<T>, val failed: RetriableFailu
 
 fun <T> RetriableMultiResult.Companion.allFailed(failed: RetriableFailure<T>) = RetriableMultiResult(emptyList(), failed)
 
-inline fun <T> RetriableMultiResult<T>.onFullSuccess(action: (successResults: List<T>) -> Unit): RetriableMultiResult<T> {
+suspend inline fun <T> RetriableMultiResult<T>.onFullSuccess(action: suspend (successResults: List<T>) -> Unit): RetriableMultiResult<T> {
     if (failed == null) {
         action(succeeded)
     }

@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector
 
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
+import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
@@ -20,6 +22,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class AssetSelectorFactory(
+    private val assetIconProvider: AssetIconProvider,
     private val assetUseCase: SelectableAssetUseCase<*>,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val resourceManager: ResourceManager
@@ -29,11 +32,12 @@ class AssetSelectorFactory(
         scope: CoroutineScope,
         amountProvider: (Asset) -> BigDecimal
     ): AssetSelectorMixin.Presentation {
-        return AssetSelectorProvider(assetUseCase, resourceManager, singleAssetSharedState, scope, amountProvider)
+        return AssetSelectorProvider(assetIconProvider, assetUseCase, resourceManager, singleAssetSharedState, scope, amountProvider)
     }
 }
 
 private class AssetSelectorProvider(
+    private val assetIconProvider: AssetIconProvider,
     private val assetUseCase: SelectableAssetUseCase<*>,
     private val resourceManager: ResourceManager,
     private val singleAssetSharedState: SingleAssetSharedState,
@@ -79,7 +83,14 @@ private class AssetSelectorProvider(
     }
 
     private fun mapAssetAndOptionToSelectorModel(assetAndOption: SelectableAssetAndOption): AssetSelectorModel {
-        val assetModel = mapAssetToAssetModel(assetAndOption.asset, resourceManager, patternId = null, retrieveAmount = amountProvider)
+        val assetModel = mapAssetToAssetModel(
+            assetIconProvider,
+            assetAndOption.asset,
+            resourceManager,
+            icon = assetAndOption.option.assetWithChain.chain.iconOrFallback(),
+            patternId = null,
+            retrieveAmount = amountProvider
+        )
         val title = assetAndOption.formatTitle()
 
         return AssetSelectorModel(assetModel, title, assetAndOption.option.additional.identifier)

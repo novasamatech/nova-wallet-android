@@ -1,9 +1,13 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.list
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combineToPair
@@ -11,9 +15,11 @@ import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.withItemScope
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.DelegatedState
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.GovernanceLocksOverview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
@@ -25,18 +31,25 @@ import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFi
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListState
+import io.novafoundation.nova.feature_governance_impl.domain.summary.ReferendaSummaryInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
+import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.validation.StartSwipeGovValidationPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendaGroupModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.TinderGovBannerModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.toReferendumDetailsPrefilledData
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.validation.handleStartSwipeGovValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.supportTinderGov
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -55,8 +68,14 @@ class ReferendaListViewModel(
     private val updateSystem: UpdateSystem,
     private val governanceRouter: GovernanceRouter,
     private val referendumFormatter: ReferendumFormatter,
-    private val governanceDAppsInteractor: GovernanceDAppsInteractor
-) : BaseViewModel(), WithAssetSelector {
+    private val governanceDAppsInteractor: GovernanceDAppsInteractor,
+    private val referendaSummaryInteractor: ReferendaSummaryInteractor,
+    private val tinderGovInteractor: TinderGovInteractor,
+    private val selectedMetaAccountUseCase: SelectedAccountUseCase,
+    private val validationExecutor: ValidationExecutor,
+) : BaseViewModel(),
+    WithAssetSelector,
+    Validatable by validationExecutor {
 
     override val assetSelectorMixin = assetSelectorFactory.create(
         scope = this,
@@ -99,6 +118,18 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
+    private val referendaSummariesFlow = referendaListStateFlow.mapLoading { referenda ->
+        val referendaIds = referenda.availableToVoteReferenda.map { it.id }
+        referendaSummaryInteractor.getReferendaSummaries(referendaIds, viewModelScope)
+    }.shareInBackground()
+
+    val tinderGovBanner = referendaSummariesFlow.map { summaries ->
+        val chain = selectedAssetSharedState.chain()
+        mapTinderGovToUi(chain, summaries)
+    }
+        .inBackground()
+        .shareWhileSubscribed()
+
     val referendaFilterIcon = referendaFilters
         .map { mapFilterTypeToIconRes(it) }
         .inBackground()
@@ -127,6 +158,27 @@ class ReferendaListViewModel(
         governanceRouter.openReferendum(payload)
     }
 
+    fun openTinderGovCards() = launch {
+        val payload = StartSwipeGovValidationPayload(
+            chain = selectedAssetSharedState.chain(),
+            metaAccount = selectedMetaAccountUseCase.getSelectedMetaAccount()
+        )
+
+        validationExecutor.requireValid(
+            validationSystem = tinderGovInteractor.startSwipeGovValidationSystem(),
+            payload = payload,
+            validationFailureTransformerCustom = { validationFailure, _ ->
+                handleStartSwipeGovValidationFailure(
+                    resourceManager,
+                    validationFailure,
+                    governanceRouter
+                )
+            }
+        ) {
+            governanceRouter.openTinderGovCards()
+        }
+    }
+
     private fun mapLocksOverviewToUi(locksOverview: GovernanceLocksOverview?, asset: Asset): GovernanceLocksModel? {
         if (locksOverview == null) return null
 
@@ -153,6 +205,20 @@ class ReferendaListViewModel(
 
             DelegatedState.DelegationNotSupported -> null
         }
+    }
+
+    private fun mapTinderGovToUi(chain: Chain, referendaSummariesLoadingState: ExtendedLoadingState<Map<ReferendumId, String>>): TinderGovBannerModel? {
+        if (!chain.supportTinderGov()) return null
+
+        val referendumSummaries = referendaSummariesLoadingState.dataOrNull ?: return null
+
+        return TinderGovBannerModel(
+            if (referendumSummaries.isEmpty()) {
+                null
+            } else {
+                resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, referendumSummaries.size)
+            }
+        )
     }
 
     private fun mapReferendumGroupToUi(referendumGroup: ReferendumGroup, groupSize: Int): ReferendaGroupModel {

@@ -64,7 +64,11 @@ sealed class AssetLocationPath {
 }
 
 enum class XcmTransferType {
-    X_TOKENS, XCM_PALLET_RESERVE, XCM_PALLET_TELEPORT, UNKNOWN
+    X_TOKENS,
+    XCM_PALLET_RESERVE,
+    XCM_PALLET_TELEPORT,
+    XCM_PALLET_TRANSFER_ASSETS,
+    UNKNOWN
 }
 
 enum class XCMInstructionType {

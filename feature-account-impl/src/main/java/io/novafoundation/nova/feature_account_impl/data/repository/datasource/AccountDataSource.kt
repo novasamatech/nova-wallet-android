@@ -105,6 +105,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun hasSecretsAccounts(): Boolean
 
     suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+
+    suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

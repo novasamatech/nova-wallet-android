@@ -76,9 +76,9 @@ class NovaChipView @JvmOverloads constructor(
             drawablePadding = 0f,
             iconVerticalMargin = 0f,
             iconHorizontalMargin = 0f,
-            textTopMargin = 2f,
-            textBottomMargin = 2f,
-            textHorizontalMargin = 6.0f,
+            textTopMargin = 3f,
+            textBottomMargin = 3f,
+            textHorizontalMargin = 8.0f,
             textAppearanceRes = R.style.TextAppearance_NovaFoundation_SemiBold_Footnote,
             cornerRadiusDp = 8
         )
@@ -94,6 +94,8 @@ class NovaChipView @JvmOverloads constructor(
         }
     }
 
+    private val customTextAppearance: Int?
+
     init {
         View.inflate(context, R.layout.view_chip, this)
         orientation = HORIZONTAL
@@ -101,7 +103,9 @@ class NovaChipView @JvmOverloads constructor(
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.NovaChipView)
 
         val size = typedArray.getEnum(R.styleable.NovaChipView_chipSize, SIZE_DEFAULT)
-        setSize(size)
+
+        customTextAppearance = typedArray.getResourceIdOrNull(R.styleable.NovaChipView_chipTextAppearance)
+        setSize(size, customTextAppearance)
 
         if (typedArray.hasValue(R.styleable.NovaChipView_chipIcon)) {
             val iconDrawable = typedArray.getDrawable(R.styleable.NovaChipView_chipIcon)
@@ -118,11 +122,11 @@ class NovaChipView @JvmOverloads constructor(
         val backgroundTintColor = typedArray.getResourceId(R.styleable.NovaChipView_backgroundColor, R.color.chips_background)
         setChipBackground(backgroundTintColor)
 
-        val textAppearanceId = typedArray.getResourceIdOrNull(R.styleable.NovaChipView_chipTextAppearance)
-        textAppearanceId?.let(chipText::setTextAppearance)
-
         val text = typedArray.getString(R.styleable.NovaChipView_android_text)
         setText(text)
+
+        val textAllCaps = typedArray.getBoolean(R.styleable.NovaChipView_android_textAllCaps, true)
+        setTextAllCaps(textAllCaps)
 
         @ColorRes
         val textColorRes = typedArray.getResourceId(
@@ -143,7 +147,7 @@ class NovaChipView @JvmOverloads constructor(
         return TruncateAt.values()[index - 1]
     }
 
-    fun setSize(size: Size) {
+    fun setSize(size: Size, customTextAppearance: Int? = null) {
         this.size = size
 
         val startPadding = if (chipIcon.isVisible) {
@@ -172,7 +176,7 @@ class NovaChipView @JvmOverloads constructor(
             setMargins(0, top, 0, bottom)
         }
 
-        chipText.setTextAppearance(size.textAppearanceRes)
+        chipText.setTextAppearance(customTextAppearance ?: size.textAppearanceRes)
 
         chipDrawablePadding.layoutParams = LayoutParams(size.drawablePadding.dp, LayoutParams.MATCH_PARENT)
     }
@@ -217,9 +221,13 @@ class NovaChipView @JvmOverloads constructor(
         setIconTint(textColorRes)
     }
 
-    fun setText(text: String?) {
+    fun setText(text: CharSequence?) {
         chipText.setTextOrHide(text)
         invalidateDrawablePadding()
+    }
+
+    fun setTextAllCaps(value: Boolean) {
+        chipText.isAllCaps = value
     }
 
     private fun useIcon(useIcon: Boolean) {
@@ -242,8 +250,8 @@ class NovaChipView @JvmOverloads constructor(
     }
 
     private fun refreshSize() {
-        setSize(size)
+        setSize(size, customTextAppearance)
     }
 }
 
-fun NovaChipView.setTextOrHide(text: String?) = letOrHide(text, ::setText)
+fun NovaChipView.setTextOrHide(text: CharSequence?) = letOrHide(text, ::setText)

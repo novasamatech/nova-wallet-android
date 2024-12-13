@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.common.bin
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -114,6 +115,10 @@ class GovV1ConvictionVotingRepository(
     }
 
     override fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
+        democracyVote(referendumId, vote)
+    }
+
+    override fun CallBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
         democracyVote(referendumId, vote)
     }
 

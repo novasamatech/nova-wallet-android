@@ -29,7 +29,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Defa
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
@@ -40,6 +39,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
+import io.novasama.substrate_sdk_android.runtime.metadata.method
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
@@ -48,6 +48,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunctio
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
@@ -185,7 +186,7 @@ fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
+fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
@@ -354,6 +355,13 @@ fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boo
 
 fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == this.event.index
 
+fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
+    val runtimeApi = runtimeApiOrNull("AssetConversionApi") ?: return null
+
+    return runtimeApi.method("quote_price_tokens_for_exact_tokens")
+        .inputs.first().type
+}
+
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
 fun SignedRaw.toEcdsaSignatureData(): Sign.SignatureData {
@@ -379,10 +387,6 @@ fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()
 
-fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
-    return (this as? CallRepresentation.Instance)
-}
-
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
     ?: fallbacks.firstOrNull { modules[it] != null }
         ?.let { modules[it] } ?: throw NoSuchElementException()
@@ -393,6 +397,20 @@ fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEnt
 
 suspend fun SocketService.awaitConnected() {
     networkStateFlow().first { it is SocketStateMachine.State.Connected }
+}
+
+fun String.hexBytesSize(): Int {
+    val contentLength = if (startsWith("0x")) {
+        length - 2
+    } else {
+        length
+    }
+
+    return contentLength / 2
+}
+
+fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
+    return apis != null
 }
 
 object Modules {

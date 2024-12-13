@@ -42,8 +42,9 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.HydraDxAssetConversionFactory
-import io.novafoundation.nova.feature_swap_core.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -54,8 +55,10 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
@@ -144,12 +147,14 @@ interface AccountFeatureDependencies {
 
     fun multiChainRuntimeCallsApi(): MultiChainRuntimeCallsApi
 
-    fun hydraDxAssetConversionFactory(): HydraDxAssetConversionFactory
+    val hydraDxAssetConversionFactory: HydraDxQuoting.Factory
+
+    val pathQuoterFactory: PathQuoter.Factory
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
 
-    fun hydraDxAssetIdConverter(): HydraDxAssetIdConverter
+    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
 
     val systemCallExecutor: SystemCallExecutor
 
@@ -186,4 +191,8 @@ interface AccountFeatureDependencies {
     val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
     val storageCache: StorageCache
+
+    val eventsRepository: EventsRepository
+
+    val xcmVersionDetector: XcmVersionDetector
 }

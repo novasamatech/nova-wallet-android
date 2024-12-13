@@ -217,7 +217,7 @@
 
     <action
         android:id="@+id/action_open_swapSetupAmount"
-        app:destination="@id/start_swap_graph"
+        app:destination="@id/start_swap_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -287,6 +287,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_openTinderGovCards"
+        app:destination="@id/tinder_gov_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -312,6 +320,14 @@
         <action
             android:id="@+id/action_mainFragment_to_languagesFragment"
             app:destination="@id/languagesFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_appearanceFragment"
+            app:destination="@id/appearanceFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -360,14 +376,6 @@
         <action
             android:id="@+id/action_mainFragment_to_dappSearchGraph"
             app:destination="@id/dapp_search_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_mainFragment_to_assetFiltersFragment"
-            app:destination="@id/assetFiltersFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -479,7 +487,7 @@
 
         <action
             android:id="@+id/action_mainFragment_to_swapFlow"
-            app:destination="@id/swapFlowFragment"
+            app:destination="@id/select_swap_token_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -595,6 +603,12 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.language.LanguagesFragment"
         android:label="LanguagesFragment"
         tools:layout="@layout/fragment_languages" />
+
+    <fragment
+        android:id="@+id/appearanceFragment"
+        android:name="io.novafoundation.nova.feature_settings_impl.presentation.assetIcons.AppearanceFragment"
+        android:label="AppearanceFragment"
+        tools:layout="@layout/fragment_appearance" />
 
     <fragment
         android:id="@+id/walletDetailsFragment"
@@ -847,11 +861,6 @@
 
     <include app:graph="@navigation/nfts_nav_graph" />
 
-    <dialog
-        android:id="@+id/assetFiltersFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.balance.filters.AssetFiltersBottomSheetFragment"
-        android:label="AssetFiltersFragment" />
-
     <fragment
         android:id="@+id/authorizedDAppsFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps.AuthorizedDAppsFragment"
@@ -885,7 +894,7 @@
 
     <fragment
         android:id="@+id/sendFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.AssetSendFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.asset.AssetSendFlowFragment"
         android:label="AssetSendFlowFragment">
 
         <action
@@ -897,22 +906,60 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/mainFragment" />
 
+        <action
+            android:id="@+id/action_sendFlow_to_sendFlowNetwork"
+            app:destination="@id/sendFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
         android:id="@+id/receiveFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.AssetReceiveFlowFragment"
-        android:label="AssetReceiveFlowFragment" />
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.AssetReceiveFlowFragment"
+        android:label="AssetReceiveFlowFragment">
+
+        <action
+            android:id="@+id/action_receiveFlow_to_receiveFlowNetwork"
+            app:destination="@id/receiveFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/buyFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.AssetBuyFlowFragment"
-        android:label="AssetBuyFlowFragment" />
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowFragment"
+        android:label="AssetBuyFlowFragment">
+
+        <action
+            android:id="@+id/action_buyFlow_to_buyFlowNetwork"
+            app:destination="@id/buyFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
 
     <fragment
-        android:id="@+id/swapFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.swap.AssetSwapFlowFragment"
-        android:label="AssetSwapFlowFragment" />
+        android:id="@+id/sendFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment"
+        android:label="NetworkSendFlowFragment" />
+
+    <fragment
+        android:id="@+id/receiveFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.network.NetworkReceiveFlowFragment"
+        android:label="NetworkReceiveFlowFragment" />
+
+    <fragment
+        android:id="@+id/buyFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowFragment"
+        android:label="NetworkBuyFlowFragment" />
 
     <fragment
         android:id="@+id/walletConnectScanFragment"
@@ -966,6 +1013,8 @@
 
     <include app:graph="@navigation/start_swap_nav_graph" />
 
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
+
     <include app:graph="@navigation/manage_tokens_graph" />
 
     <include app:graph="@navigation/sign_parity_signer_graph" />
@@ -1003,4 +1052,9 @@
     <include app:graph="@navigation/network_management_graph" />
 
     <include app:graph="@navigation/nova_card_graph" />
+
+    <include app:graph="@navigation/tinder_gov_graph" />
+
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
+
 </navigation>

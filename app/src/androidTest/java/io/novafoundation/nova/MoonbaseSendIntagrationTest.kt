@@ -89,7 +89,7 @@ class MoonbaseSendIntagrationTest {
 
         val extrinsic = extrinsicBuilderFactory.create(chain, signer, accountId)
             .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
-            .build()
+            .buildExtrinsic()
 
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
 

@@ -12,7 +12,7 @@ import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.common.utils.markdown.StylePlugin
+import io.novafoundation.nova.common.utils.markdown.LinkStylePlugin
 
 @Module
 class MarkdownFullModule {
@@ -22,7 +22,7 @@ class MarkdownFullModule {
     fun provideMarkwon(context: Context, imageLoader: ImageLoader): Markwon {
         return Markwon.builder(context)
             .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS))
-            .usePlugin(StylePlugin(context))
+            .usePlugin(LinkStylePlugin(context))
             .usePlugin(CoilImagesPlugin.create(context, imageLoader))
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(TablePlugin.create(context))

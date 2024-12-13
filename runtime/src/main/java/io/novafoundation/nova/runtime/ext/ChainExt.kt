@@ -3,7 +3,9 @@ package io.novafoundation.nova.runtime.ext
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
@@ -49,14 +51,11 @@ const val EVM_DEFAULT_TOKEN_DECIMALS = 18
 private const val EIP_155_PREFIX = "eip155"
 
 val Chain.autoBalanceEnabled: Boolean
-    get() = nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
+    get() = nodes.wssNodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
 
-val Chain.autoBalanceDisabled: Boolean
-    get() = !autoBalanceEnabled
-
-val Chain.selectedNodeUrlOrNull: String?
-    get() = if (nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
-        nodes.nodeSelectionStrategy.nodeUrl
+val Chain.selectedUnformattedWssNodeUrlOrNull: String?
+    get() = if (nodes.wssNodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
+        nodes.wssNodeSelectionStrategy.unformattedNodeUrl
     } else {
         null
     }
@@ -199,10 +198,26 @@ val Chain.Asset.isUtilityAsset: Boolean
 inline val Chain.Asset.isCommissionAsset: Boolean
     get() = isUtilityAsset
 
+inline val FullChainAssetId.isUtility: Boolean
+    get() = assetId == UTILITY_ASSET_ID
+
+private const val XC_PREFIX = "xc"
+
+fun Chain.Asset.normalizeSymbol(): String {
+    return normalizeTokenSymbol(this.symbol.value)
+}
+
 private const val MOONBEAM_XC_PREFIX = "xc"
 
-fun Chain.Asset.unifiedSymbol(): String {
-    return symbol.value.removePrefix(MOONBEAM_XC_PREFIX)
+fun TokenSymbol.normalize(): TokenSymbol {
+    return normalizeTokenSymbol(value).asTokenSymbol()
+}
+
+fun normalizeTokenSymbol(symbol: String): String {
+    if (symbol.startsWith(XC_PREFIX)) {
+        return symbol.removePrefix(XC_PREFIX)
+    }
+    return symbol
 }
 
 val Chain.Node.isWss: Boolean
@@ -215,8 +230,12 @@ fun Chain.Nodes.wssNodes(): List<Chain.Node> {
     return nodes.filter { it.isWss }
 }
 
-fun Chain.Nodes.httpNodes(): Chain.Nodes {
-    return copy(nodes = nodes.filter { it.isHttps })
+fun Chain.Nodes.httpNodes(): List<Chain.Node> {
+    return nodes.filter { it.isHttps }
+}
+
+fun Chain.Nodes.hasHttpNodes(): Boolean {
+    return nodes.any { it.isHttps }
 }
 
 val Chain.Asset.disabled: Boolean
@@ -247,6 +266,16 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
+}
+
+fun String.anyAddressToAccountId(): ByteArray {
+    return runCatching {
+        // Substrate
+        toAccountId()
+    }.recoverCatching {
+        // Evm
+        asEthereumAddress().toAccountId().value
+    }.getOrThrow()
 }
 
 fun Chain.accountIdOrNull(address: String): ByteArray? {
@@ -505,3 +534,17 @@ fun Chain.Explorer.normalizedUrl(): String? {
     val url = listOfNotNull(extrinsic, account, event).firstOrNull()
     return url?.let { Urls.normalizeUrl(it) }
 }
+
+fun Chain.supportTinderGov(): Boolean {
+    return hasReferendaSummaryApi()
+}
+
+fun Chain.hasReferendaSummaryApi(): Boolean {
+    return externalApi<Chain.ExternalApi.ReferendumSummary>() != null
+}
+
+fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
+    return externalApi<Chain.ExternalApi.ReferendumSummary>()
+}
+
+fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

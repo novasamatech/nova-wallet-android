@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/cell_background_pressed">
+    <item
+        android:id="@android:id/mask"
+        android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="#fff" />
+        </shape>
+    </item>
+
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="@color/button_background_secondary" />
+            <stroke android:color="@color/checkbox_border" android:width="1dp" />
+        </shape>
+    </item>
+</ripple>

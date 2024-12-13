@@ -3,9 +3,9 @@ package io.novafoundation.nova.runtime.extrinsic
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
-import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataProof
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
+import io.novafoundation.nova.runtime.extrinsic.signer.generateMetadataProofWithSignerRestrictions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -85,17 +85,6 @@ class ExtrinsicBuilderFactory(
             nonceOffset++
 
             newElement
-        }
-    }
-
-    private suspend fun MetadataShortenerService.generateMetadataProofWithSignerRestrictions(
-        chain: Chain,
-        signer: NovaSigner,
-    ): MetadataProof {
-        return if (signer.supportsCheckMetadataHash(chain)) {
-            generateMetadataProof(chain.id)
-        } else {
-            generateDisabledMetadataProof(chain.id)
         }
     }
 }
