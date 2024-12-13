@@ -6,8 +6,6 @@ import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
-import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.utils.getParcelableCompat
@@ -98,11 +96,10 @@ import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.flow.Flow
 
 class Navigator(
-    rootNavigationHolder: RootNavigationHolder,
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val walletConnectDelegate: WalletConnectRouter,
     private val stakingDashboardDelegate: StakingDashboardRouter
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder),
+) : BaseNavigator(navigationHoldersRegistry),
     SplashRouter,
     OnboardingRouter,
     AccountRouter,
@@ -123,7 +120,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_splash_to_pin)
             .setArgs(PincodeFragment.getPinCodeBundle(action))
-            .perform()
+            .performInRoot()
     }
 
     override fun openCreateFirstWallet() {
@@ -134,7 +131,7 @@ class Navigator(
 
     override fun openMain() {
         navigationBuilder(R.id.action_open_split_screen)
-            .perform()
+            .performInRoot()
     }
 
     override fun openAfterPinCode(delayedNavigation: DelayedNavigation) {
@@ -216,13 +213,15 @@ class Navigator(
             .perform()
     }
 
+    @Deprecated("TODO: Use communicator api instead")
     override val customBonusFlow: Flow<BonusPayload?>
-        get() = mainNavController!!.currentBackStackEntry!!.savedStateHandle
+        get() = currentBackStackEntry!!.savedStateHandle
             .getLiveData<BonusPayload?>(CrowdloanContributeFragment.KEY_BONUS_LIVE_DATA)
             .asFlow()
 
+    @Deprecated("TODO: Use communicator api instead")
     override val latestCustomBonus: BonusPayload?
-        get() = mainNavController!!.currentBackStackEntry!!.savedStateHandle
+        get() = currentBackStackEntry!!.savedStateHandle
             .get(CrowdloanContributeFragment.KEY_BONUS_LIVE_DATA)
 
     override fun openCustomContribute(payload: CustomContributePayload) {
@@ -231,8 +230,9 @@ class Navigator(
             .perform()
     }
 
+    @Deprecated("TODO: Use communicator api instead")
     override fun setCustomBonus(payload: BonusPayload) {
-        mainNavController!!.previousBackStackEntry!!.savedStateHandle.set(CrowdloanContributeFragment.KEY_BONUS_LIVE_DATA, payload)
+        previousBackStackEntry!!.savedStateHandle.set(CrowdloanContributeFragment.KEY_BONUS_LIVE_DATA, payload)
     }
 
     override fun openConfirmContribute(payload: ConfirmContributePayload) {
@@ -419,7 +419,10 @@ class Navigator(
     }
 
     override fun openStaking() {
-        if (mainNavController?.currentDestination?.id != R.id.mainFragment) mainNavController?.navigate(R.id.action_open_split_screen)
+        if (currentDestination?.id != R.id.mainFragment) {
+            navigationBuilder(R.id.action_open_split_screen)
+                .perform()
+        }
 
         stakingDashboardDelegate.openStakingDashboard()
     }
@@ -477,8 +480,6 @@ class Navigator(
     }
 
     override fun nonCancellableVerify() {
-        val currentDestination = mainNavController?.currentDestination
-
         if (currentDestination?.id == R.id.splashFragment) {
             return
         }
@@ -487,13 +488,16 @@ class Navigator(
         val bundle = PincodeFragment.getPinCodeBundle(action)
 
         if (currentDestination?.id == R.id.pincodeFragment) {
-            val currentBackStackEntry = mainNavController!!.currentBackStackEntry
             val arguments = currentBackStackEntry!!.arguments!!.getParcelableCompat<PinCodeAction>(PincodeFragment.KEY_PINCODE_ACTION)
             if (arguments is PinCodeAction.Change) {
-                mainNavController?.navigate(R.id.action_pin_code_access_recovery, bundle)
+                navigationBuilder(R.id.action_pin_code_access_recovery)
+                    .setArgs(bundle)
+                    .perform()
             }
         } else {
-            mainNavController?.navigate(R.id.action_pin_code_access_recovery, bundle)
+            navigationBuilder(R.id.action_pin_code_access_recovery)
+                .setArgs(bundle)
+                .perform()
         }
     }
 

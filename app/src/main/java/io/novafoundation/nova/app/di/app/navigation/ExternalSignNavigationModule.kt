@@ -2,7 +2,9 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.externalSign.ExternalSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.externalSign.ExternalSignNavigator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -15,7 +17,8 @@ class ExternalSignNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: SplitScreenNavigationHolder): ExternalSignRouter = ExternalSignNavigator(navigationHolder)
+    fun provideRouter(navigationHoldersRegistry: NavigationHoldersRegistry): ExternalSignRouter =
+        ExternalSignNavigator(navigationHoldersRegistry)
 
     @ApplicationScope
     @Provides

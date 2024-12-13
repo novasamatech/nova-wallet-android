@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
@@ -45,11 +46,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class RelayStakingNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
     private val stakingDashboardRouter: StakingDashboardRouter,
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), StakingRouter {
+) : BaseNavigator(navigationHoldersRegistry), StakingRouter {
 
     override fun returnToStakingMain() {
         navigationBuilder(R.id.back_to_staking_main)
@@ -103,19 +103,17 @@ class RelayStakingNavigator(
     }
 
     override fun openSelectCustomValidators() {
-        val flowType = when (navigationHolder.navController?.currentDestination?.id) {
+        val flowType = when (currentDestination?.id) {
             R.id.setupStakingType -> FlowType.SETUP_STAKING_VALIDATORS
             else -> FlowType.CHANGE_STAKING_VALIDATORS
         }
         val payload = CustomValidatorsPayload(flowType)
 
-        performNavigation(
-            cases = arrayOf(
-                R.id.setupStakingType to R.id.action_setupStakingType_to_selectCustomValidatorsFragment,
-                R.id.startChangeValidatorsFragment to R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment,
-            ),
-            args = SelectCustomValidatorsFragment.getBundle(payload)
-        )
+        navigationBuilder()
+            .addCase(R.id.setupStakingType, R.id.action_setupStakingType_to_selectCustomValidatorsFragment)
+            .addCase(R.id.startChangeValidatorsFragment, R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment)
+            .setArgs(SelectCustomValidatorsFragment.getBundle(payload))
+            .perform()
     }
 
     override fun openCustomValidatorsSettings() {

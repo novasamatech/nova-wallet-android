@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.ParachainStakingRebondFragment
@@ -20,10 +21,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class ParachainStakingNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), ParachainStakingRouter {
+) : BaseNavigator(navigationHoldersRegistry), ParachainStakingRouter {
 
     override fun openStartStaking(payload: StartParachainStakingPayload) {
         navigationBuilder(R.id.action_open_startParachainStakingGraph)

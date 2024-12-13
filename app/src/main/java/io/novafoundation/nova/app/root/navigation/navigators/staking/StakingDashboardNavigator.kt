@@ -6,14 +6,14 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 class StakingDashboardNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), StakingDashboardRouter {
+    navigationHoldersRegistry: NavigationHoldersRegistry
+) : BaseNavigator(navigationHoldersRegistry), StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null
     private var pendingAction: Int? = null
@@ -24,7 +24,7 @@ class StakingDashboardNavigator(
         stakingTabNavController = navController
 
         if (pendingAction != null) {
-            navController.performNavigation(pendingAction!!)
+            navController.navigate(pendingAction!!)
             pendingAction = null
         }
     }
@@ -34,7 +34,7 @@ class StakingDashboardNavigator(
     }
 
     override fun openMoreStakingOptions() {
-        stakingTabNavController?.performNavigation(R.id.action_stakingDashboardFragment_to_moreStakingOptionsFragment)
+        stakingTabNavController?.navigate(R.id.action_stakingDashboardFragment_to_moreStakingOptionsFragment)
     }
 
     override fun backInStakingTab() {
@@ -42,11 +42,12 @@ class StakingDashboardNavigator(
     }
 
     override fun returnToStakingDashboard() {
-        performNavigation(R.id.back_to_main)
+        navigationBuilder(R.id.back_to_main)
+            .perform()
+
         returnToStakingTabRoot()
         scrollToDashboardTopEvent.value = Unit.event()
     }
-
     override fun openStakingDashboard() {
         stakingTabNavController.performNavigationOrDelay(R.id.action_open_staking)
     }
@@ -59,7 +60,7 @@ class StakingDashboardNavigator(
         val controller = this
 
         if (controller != null) {
-            controller.performNavigation(actionId)
+            controller.navigate(actionId)
         } else {
             pendingAction = actionId
         }

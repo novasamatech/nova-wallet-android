@@ -4,40 +4,47 @@ import android.os.Bundle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
-import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 
 abstract class BaseNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder
+    private val navigationHoldersRegistry: NavigationHoldersRegistry
 ) : ReturnableRouter {
 
-    private val holders = listOf(splitScreenNavigationHolder, rootNavigationHolder)
+    val currentBackStackEntry
+        get() = navigationHoldersRegistry.firstAttachedNavController
+            ?.currentBackStackEntry
 
-    private val navigationHolder: NavigationHolder
-        get() = holders.first { it.isAttached() }
+    val previousBackStackEntry
+        get() = navigationHoldersRegistry.firstAttachedNavController
+            ?.previousBackStackEntry
+
+    val currentDestination
+        get() = navigationHoldersRegistry.firstAttachedNavController
+            ?.currentDestination
 
     override fun back() {
-        navigationHolder.executeBack()
+        navigationHoldersRegistry.firstAttachedHolder.executeBack()
     }
 
     fun finishApp() {
-        navigationHolder.finishApp()
+        navigationHoldersRegistry.firstAttachedHolder.finishApp()
     }
 
     fun navigationBuilder(destination: Int? = null): NavigationBuilder {
-        return NavigationBuilder(navigationHolder, destination)
+        return NavigationBuilder(navigationHoldersRegistry, destination)
     }
 }
 
 /**
  * Builder for navigation
- * @param navigationHolder
+ * @param navigationHoldersRegistry
  * @param actionId - action to perform or fallback when cases not found
  */
-class NavigationBuilder(private val navigationHolder: NavigationHolder, private val actionId: Int?) {
+class NavigationBuilder(
+    private val navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val actionId: Int?
+) {
 
     class Case(val destination: Int, val actionId: Int)
 
@@ -73,14 +80,22 @@ class NavigationBuilder(private val navigationHolder: NavigationHolder, private 
     }
 
     fun perform() {
+        performInternal(navigationHoldersRegistry.firstAttachedHolder)
+    }
+
+    fun performInRoot() {
+        performInternal(navigationHoldersRegistry.rootNavigationHolder)
+    }
+
+    private fun performInternal(navigationHolder: NavigationHolder) {
         if (actionId == null) {
-            performCases()
+            performCases(navigationHolder)
         } else {
-            performAction(actionId)
+            performAction(navigationHolder, actionId)
         }
     }
 
-    private fun performCases() {
+    private fun performCases(navigationHolder: NavigationHolder) {
         val navController = navigationHolder.navController ?: return
         val currentDestination = navController.currentDestination ?: return
 
@@ -89,10 +104,10 @@ class NavigationBuilder(private val navigationHolder: NavigationHolder, private 
             ?: fallbackCaseActionId
             ?: throw IllegalArgumentException("Unknown case for ${currentDestination.label}")
 
-        performAction(caseActionId)
+        performAction(navigationHolder, caseActionId)
     }
 
-    private fun performAction(actionId: Int) {
+    private fun performAction(navigationHolder: NavigationHolder, actionId: Int) {
         val navController = navigationHolder.navController ?: return
         val currentDestination = navController.currentDestination ?: return
 

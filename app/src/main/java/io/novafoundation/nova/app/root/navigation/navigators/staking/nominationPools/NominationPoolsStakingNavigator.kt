@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMoreFragment
@@ -12,10 +13,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
 
 class NominationPoolsStakingNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), NominationPoolsRouter {
+) : BaseNavigator(navigationHoldersRegistry), NominationPoolsRouter {
 
     override fun openSetupBondMore() {
         navigationBuilder(R.id.action_stakingFragment_to_PoolsBondMoreGraph).perform()

@@ -5,6 +5,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.showBrowser
@@ -46,11 +47,10 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.ReferendumVotersPayload
 
 class GovernanceNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
     private val contextManager: ContextManager
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), GovernanceRouter {
+) : BaseNavigator(navigationHoldersRegistry), GovernanceRouter {
 
     override fun openReferendum(payload: ReferendumDetailsPayload) {
         navigationBuilder()

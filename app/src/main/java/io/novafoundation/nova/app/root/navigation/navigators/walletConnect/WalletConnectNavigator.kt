@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsFragment
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.details.WalletConnectSessionDetailsPayload
@@ -11,9 +12,8 @@ import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
 
 class WalletConnectNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), WalletConnectRouter {
+    navigationHoldersRegistry: NavigationHoldersRegistry
+) : BaseNavigator(navigationHoldersRegistry), WalletConnectRouter {
 
     override fun openSessionDetails(payload: WalletConnectSessionDetailsPayload) {
         navigationBuilder(R.id.action_walletConnectSessionsFragment_to_walletConnectSessionDetailsFragment)

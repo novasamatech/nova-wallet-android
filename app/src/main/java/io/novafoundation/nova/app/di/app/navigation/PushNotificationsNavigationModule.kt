@@ -2,7 +2,9 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.push.PushGovernanceSettingsCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.push.PushNotificationsNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.push.PushStakingSettingsCommunicatorImpl
@@ -16,7 +18,8 @@ class PushNotificationsNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: SplitScreenNavigationHolder): PushNotificationsRouter = PushNotificationsNavigator(navigationHolder)
+    fun provideRouter(navigationHoldersRegistry: NavigationHoldersRegistry): PushNotificationsRouter =
+        PushNotificationsNavigator(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope

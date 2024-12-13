@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressFragment
@@ -19,9 +20,8 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.l
 
 class LedgerNavigator(
     private val accountRouter: AccountRouter,
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), LedgerRouter {
+    navigationHoldersRegistry: NavigationHoldersRegistry
+) : BaseNavigator(navigationHoldersRegistry), LedgerRouter {
 
     override fun openImportFillWallet() {
         navigationBuilder(R.id.action_startImportLedgerFragment_to_fillWalletImportLedgerFragment)

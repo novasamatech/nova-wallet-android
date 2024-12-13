@@ -2,7 +2,9 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.settings.SettingsNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
@@ -17,8 +19,8 @@ class SettingsNavigationModule {
     @Provides
     fun provideRouter(
         rootRouter: RootRouter,
-        navigationHolder: SplitScreenNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         walletConnectRouter: WalletConnectRouter,
         navigator: Navigator,
-    ): SettingsRouter = SettingsNavigator(navigationHolder, rootRouter, walletConnectRouter, navigator)
+    ): SettingsRouter = SettingsNavigator(navigationHoldersRegistry, rootRouter, walletConnectRouter, navigator)
 }

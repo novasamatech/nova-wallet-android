@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -20,11 +21,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 
 class StartMultiStakingNavigator(
-    splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    rootNavigationHolder: RootNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val stakingDashboardRouter: StakingDashboardRouter,
     private val commonNavigationHolder: Navigator,
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), StartMultiStakingRouter {
+) : BaseNavigator(navigationHoldersRegistry), StartMultiStakingRouter {
 
     override fun openStartStakingLanding(payload: StartStakingLandingPayload) {
         navigationBuilder(R.id.action_mainFragment_to_startStackingLanding)

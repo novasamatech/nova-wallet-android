@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
@@ -15,10 +16,9 @@ import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.payloa
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 class SwapNavigator(
-    private val splitScreenNavigationHolder: SplitScreenNavigationHolder,
-    private val rootNavigationHolder: RootNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonDelegate: Navigator
-) : BaseNavigator(splitScreenNavigationHolder, rootNavigationHolder), SwapRouter {
+) : BaseNavigator(navigationHoldersRegistry), SwapRouter {
 
     override fun openSwapConfirmation(payload: SwapConfirmationPayload) {
         val bundle = SwapConfirmationFragment.getBundle(payload)

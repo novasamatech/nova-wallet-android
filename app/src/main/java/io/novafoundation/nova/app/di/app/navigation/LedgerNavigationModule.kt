@@ -2,7 +2,9 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.ledger.LedgerNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.ledger.LedgerSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.ledger.SelectLedgerAddressCommunicatorImpl
@@ -17,17 +19,18 @@ class LedgerNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideSelectLedgerAddressCommunicator(navigationHolder: SplitScreenNavigationHolder): SelectLedgerAddressInterScreenCommunicator {
-        return SelectLedgerAddressCommunicatorImpl(navigationHolder)
+    fun provideSelectLedgerAddressCommunicator(splitScreenNavigationHolder: SplitScreenNavigationHolder): SelectLedgerAddressInterScreenCommunicator {
+        return SelectLedgerAddressCommunicatorImpl(splitScreenNavigationHolder)
     }
 
     @Provides
     @ApplicationScope
     fun provideLedgerSignerCommunicator(
-        navigationHolder: SplitScreenNavigationHolder
-    ): LedgerSignCommunicator = LedgerSignCommunicatorImpl(navigationHolder)
+        splitScreenNavigationHolder: SplitScreenNavigationHolder
+    ): LedgerSignCommunicator = LedgerSignCommunicatorImpl(splitScreenNavigationHolder)
 
     @ApplicationScope
     @Provides
-    fun provideRouter(router: AccountRouter, navigationHolder: SplitScreenNavigationHolder): LedgerRouter = LedgerNavigator(router, navigationHolder)
+    fun provideRouter(router: AccountRouter, navigationHoldersRegistry: NavigationHoldersRegistry): LedgerRouter =
+        LedgerNavigator(router, navigationHoldersRegistry)
 }

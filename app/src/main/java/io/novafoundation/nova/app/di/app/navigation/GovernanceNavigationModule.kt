@@ -2,12 +2,15 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.governance.GovernanceNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.governance.SelectTracksCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.governance.TinderGovVoteCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
@@ -18,9 +21,10 @@ class GovernanceNavigationModule {
     @ApplicationScope
     @Provides
     fun provideRouter(
-        navigationHolder: SplitScreenNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         commonNavigator: Navigator,
-    ): GovernanceRouter = GovernanceNavigator(navigationHolder, commonNavigator)
+        contextManager: ContextManager
+    ): GovernanceRouter = GovernanceNavigator(navigationHoldersRegistry, commonNavigator, contextManager)
 
     @Provides
     @ApplicationScope
