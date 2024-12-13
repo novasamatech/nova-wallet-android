@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.Bala
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
-import io.novafoundation.nova.feature_assets.presentation.buy.flow.di.AssetBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.di.NovaCardComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.di.TopUpCardComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.di.WaitingNovaCardTopUpComponent

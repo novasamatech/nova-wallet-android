@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setAddress
@@ -19,20 +21,20 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.TransferFeeDisplayFormatter
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.createForTransfer
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.OriginGenericFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.commissionAsset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectGenericWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.createGenericChangeableFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +52,7 @@ class TopUpCardViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val novaCardInteractor: NovaCardInteractor,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     addressInputMixinFactory: AddressInputMixinFactory,
@@ -86,7 +88,7 @@ class TopUpCardViewModel(
         balanceField = Asset::transferable,
     )
 
-    val feeMixin = feeLoaderMixinFactory.createGenericChangeableFee<OriginGenericFee>(assetFlow, coroutineScope)
+    val feeMixin = feeLoaderMixinFactory.createDefault<SubmissionFee>(this, chainAssetFlow)
 
     val titleFlow = chainAssetFlow.map {
         resourceManager.getString(R.string.fragment_top_up_card_title, it.symbol)
@@ -109,18 +111,19 @@ class TopUpCardViewModel(
     fun nextClicked() = launch {
         sendInProgressFlow.value = true
 
-        val fee = feeMixin.awaitDecimalFee()
+        val fee = feeMixin.awaitFee()
+        val originFee = OriginFee(fee, null)
 
-        val transfer = buildTransfer(feeMixin.commissionAsset())
+        val transfer = buildTransfer(feeMixin.feePaymentCurrency())
 
         val payload = AssetTransferPayload(
             transfer = WeightedAssetTransfer(
                 assetTransfer = transfer,
-                fee = fee,
+                fee = originFee,
             ),
             crossChainFee = null,
-            originFee = fee,
-            originCommissionAsset = feeMixin.commissionAsset(),
+            originFee = originFee,
+            originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = assetFlow.first()
         )
 
@@ -134,7 +137,7 @@ class TopUpCardViewModel(
                     resourceManager = resourceManager,
                     status = status,
                     actions = actions,
-                    feeLoaderMixin = feeMixin
+                    setFee = feeMixin
                 )
             },
         ) {
@@ -161,27 +164,25 @@ class TopUpCardViewModel(
     }
 
     private fun setupFees() {
-        feeMixin.connectGenericWith(
-            feeMixin.commissionAssetFlow(),
-            scope = viewModelScope,
-            feeConstructor = { commissionAsset ->
-                val assetTransfer = buildTransfer(commissionAsset)
+        feeMixin.connectWith(
+            feeMixin.feeChainAssetFlow
+        ) { feePaymentCurrency, commissionAsset ->
+            val assetTransfer = buildTransfer(feePaymentCurrency)
 
-                val originFee = sendInteractor.getOriginFee(assetTransfer, viewModelScope)
-                SimpleGenericFee(originFee)
-            }
-        )
+            val originFee = sendInteractor.getOriginFee(assetTransfer, viewModelScope)
+            originFee.submissionFee
+        }
     }
 
     private suspend fun buildTransfer(
-        commissionAsset: Asset
+        feePaymentCurrency: FeePaymentCurrency
     ): AssetTransfer {
         val chainWithAsset = chainWithAssetFlow.first()
         val amount = amountChooserMixin.amount.first()
         val address = addressInputMixin.getAddress()
         return buildAssetTransfer(
             metaAccount = selectedAccount.first(),
-            commissionAsset = commissionAsset,
+            feePaymentCurrency = feePaymentCurrency,
             origin = chainWithAsset,
             destination = chainWithAsset,
             amount = amount,

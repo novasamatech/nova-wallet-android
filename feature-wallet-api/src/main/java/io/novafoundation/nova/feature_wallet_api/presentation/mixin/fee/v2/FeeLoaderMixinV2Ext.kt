@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 
 suspend fun <F> FeeLoaderMixinV2<F, *>.awaitFee(): F = fee
@@ -24,6 +25,20 @@ suspend fun <F> FeeLoaderMixinV2<F, *>.awaitOptionalFee(): F? = fee
             else -> {} // skip
         }
     }.first()
+
+context(BaseViewModel)
+fun <F, I1> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
+    input: Flow<I1>,
+    feeConstructor: suspend (FeePaymentCurrency, input: I1) -> F,
+) {
+    input.map { input ->
+        loadFee(
+            feeConstructor = { paymentCurrency -> feeConstructor(paymentCurrency, input) },
+        )
+    }
+        .inBackground()
+        .launchIn(this@BaseViewModel)
+}
 
 context(BaseViewModel)
 fun <F, I1, I2, I3, I4> FeeLoaderMixinV2.Presentation<F, *>.connectWith(

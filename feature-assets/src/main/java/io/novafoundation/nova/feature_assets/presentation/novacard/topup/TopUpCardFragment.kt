@@ -12,8 +12,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
+import kotlinx.android.synthetic.main.fragment_select_send.selectSendCrossChainFee
+import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginFee
 import kotlinx.android.synthetic.main.fragment_top_up_card.topUpCardAmount
 import kotlinx.android.synthetic.main.fragment_top_up_card.topUpCardContainer
 import kotlinx.android.synthetic.main.fragment_top_up_card.topUpCardContinue
@@ -58,7 +62,9 @@ class TopUpCardFragment : BaseFragment<TopUpCardViewModel>() {
 
     override fun subscribe(viewModel: TopUpCardViewModel) {
         observeValidations(viewModel)
-        setupFeeLoading(viewModel.feeMixin, topUpCardFee)
+
+        viewModel.feeMixin.setupFeeLoading(topUpCardFee)
+
         setupAmountChooser(viewModel.amountChooserMixin, topUpCardAmount)
         setupAddressInput(viewModel.addressInputMixin, topUpCardRecipient)
 
