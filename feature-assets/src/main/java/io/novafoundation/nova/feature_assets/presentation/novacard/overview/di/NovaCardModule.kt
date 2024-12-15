@@ -51,6 +51,7 @@ class NovaCardModule {
             appLinksProvider,
             gson,
             BuildConfig.NOVA_CARD_WIDGET_ID,
+            BuildConfig.NOVA_CARD_WIDGET_SECRET,
             webViewCardCreationInterceptorFactory
         )
     }
