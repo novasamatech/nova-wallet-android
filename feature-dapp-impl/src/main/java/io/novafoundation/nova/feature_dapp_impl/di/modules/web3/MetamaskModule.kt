@@ -11,35 +11,29 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.di.Metamask
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskInjector
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskProviderInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskResponder
+import io.novafoundation.nova.feature_dapp_core.web3.injector.MetamaskScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.MetamaskWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class MetamaskModule {
 
     @Provides
-    @Metamask
     @FeatureScope
-    fun provideWeb3JavaScriptInterface() = WebViewWeb3JavaScriptInterface()
-
-    @Provides
-    @FeatureScope
-    fun provideInjector(
+    fun provideProviderInjector(
         gson: Gson,
         webViewScriptInjector: WebViewScriptInjector,
-        @Metamask web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
-    ) = MetamaskInjector(
+    ) = MetamaskProviderInjector(
         isDebug = BuildConfig.DEBUG,
         gson = gson,
-        jsInterface = web3JavaScriptInterface,
         webViewScriptInjector = webViewScriptInjector
     )
 
@@ -53,7 +47,7 @@ class MetamaskModule {
     @FeatureScope
     fun provideTransportFactory(
         responder: MetamaskResponder,
-        @Metamask web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+        web3JavaScriptInterface: MetamaskWeb3JavaScriptInterface,
         gson: Gson
     ): MetamaskTransportFactory {
         return MetamaskTransportFactory(

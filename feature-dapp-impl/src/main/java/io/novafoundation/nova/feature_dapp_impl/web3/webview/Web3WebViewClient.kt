@@ -10,17 +10,18 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_dapp_core.web3.injector.Web3ScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
 
-interface Web3Injector {
+interface Web3ProviderInjector {
 
-    fun initialInject(into: WebView, extensionStore: ExtensionsStore)
-
-    fun injectForPage(into: WebView, url: String, extensionStore: ExtensionsStore)
+    fun injectProvider(into: WebView, extensionStore: ExtensionsStore)
 }
 
+
 class Web3WebViewClientFactory(
-    private val injectors: List<Web3Injector>,
+    private val providerInjectors: List<Web3ProviderInjector>,
+    private val scriptInjectors: List<Web3ScriptInjector>,
 ) {
 
     fun create(
@@ -29,7 +30,7 @@ class Web3WebViewClientFactory(
         onPageChangedListener: OnPageChangedListener,
         pageCallback: PageCallback
     ): Web3WebViewClient {
-        return Web3WebViewClient(injectors, extensionStore, webView, onPageChangedListener, pageCallback)
+        return Web3WebViewClient(providerInjectors, scriptInjectors, extensionStore, webView, onPageChangedListener, pageCallback)
     }
 }
 
@@ -40,7 +41,8 @@ interface PageCallback {
 }
 
 class Web3WebViewClient(
-    private val injectors: List<Web3Injector>,
+    private val providerInjectors: List<Web3ProviderInjector>,
+    private val scriptInjectors: List<Web3ScriptInjector>,
     private val extensionStore: ExtensionsStore,
     private val webView: WebView,
     private val onPageChangedListener: OnPageChangedListener,
@@ -58,7 +60,7 @@ class Web3WebViewClient(
     private var desktopModeChanged = false
 
     fun initialInject() {
-        injectors.forEach { it.initialInject(webView, extensionStore) }
+        scriptInjectors.forEach { it.initialInject(webView) }
     }
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
@@ -88,7 +90,10 @@ class Web3WebViewClient(
         onPageChangedListener(url, view.title)
     }
 
-    private fun tryInject(view: WebView, url: String) = injectors.forEach { it.injectForPage(view, url, extensionStore) }
+    private fun tryInject(view: WebView, url: String) {
+        scriptInjectors.forEach { it.injectForPage(webView) }
+        providerInjectors.forEach { it.injectProvider(webView, extensionStore) }
+    }
 
     private fun setDesktopViewport(webView: WebView) {
         val density = webView.context.resources.displayMetrics.density

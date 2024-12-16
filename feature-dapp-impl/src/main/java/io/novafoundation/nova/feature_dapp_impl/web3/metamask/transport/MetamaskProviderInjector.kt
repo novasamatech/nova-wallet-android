@@ -2,13 +2,9 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport
 
 import android.webkit.WebView
 import com.google.gson.Gson
-import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionsStore
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3Injector
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
-
-private const val JS_INTERFACE_NAME = "Metamask"
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ProviderInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewScriptInjector
 
 private class ProviderConfig(
     val chainId: String,
@@ -17,23 +13,14 @@ private class ProviderConfig(
     val address: String?
 )
 
-class MetamaskInjector(
+class MetamaskProviderInjector(
     private val isDebug: Boolean,
     private val gson: Gson,
-    private val jsInterface: WebViewWeb3JavaScriptInterface,
     private val webViewScriptInjector: WebViewScriptInjector
-) : Web3Injector {
+) : Web3ProviderInjector {
 
-    override fun initialInject(into: WebView, extensionStore: ExtensionsStore) {
-        webViewScriptInjector.injectJsInterface(into, jsInterface, JS_INTERFACE_NAME)
-    }
 
-    override fun injectForPage(into: WebView, url: String, extensionStore: ExtensionsStore) {
-        webViewScriptInjector.injectScript(R.raw.metamask_min, into, scriptId = "novawallet-metamask-bundle")
-        injectProvider(extensionStore, into)
-    }
-
-    private fun injectProvider(extensionStore: ExtensionsStore, into: WebView) {
+    override fun injectProvider(into: WebView, extensionStore: ExtensionsStore) {
         val state = extensionStore.metamask.state.value
         val chain = state.chain
 

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_dapp_impl.web3.webview
+package io.novafoundation.nova.feature_dapp_core.web3.webView
 
 import android.webkit.WebView
 import androidx.annotation.RawRes

@@ -8,9 +8,10 @@ import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.feature_dapp_impl.di.modules.web3.MetamaskModule
 import io.novafoundation.nova.feature_dapp_impl.di.modules.web3.PolkadotJsModule
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.states.MetamaskStateFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskInjector
+import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskProviderInjector
+import io.novafoundation.nova.feature_dapp_core.web3.injector.MetamaskScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.transport.MetamaskTransportFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsInjector
+import io.novafoundation.nova.feature_dapp_core.web3.injector.PolkadotScriptInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.states.PolkadotJsStateFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.session.DbWeb3Session
@@ -18,7 +19,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewScriptInjector
 
 @Module(includes = [PolkadotJsModule::class, MetamaskModule::class])
 class Web3Module {
@@ -29,19 +30,17 @@ class Web3Module {
 
     @Provides
     @FeatureScope
-    fun provideScriptInjector(
-        resourceManager: ResourceManager,
-    ) = WebViewScriptInjector(resourceManager)
-
-    @Provides
-    @FeatureScope
     fun provideWeb3ClientFactory(
-        polkadotJsInjector: PolkadotJsInjector,
-        metamaskInjector: MetamaskInjector,
+        polkadotScriptInjector: PolkadotScriptInjector,
+        metamaskScriptInjector: MetamaskScriptInjector,
+        metamaskProviderInjector: MetamaskProviderInjector,
     ) = Web3WebViewClientFactory(
-        injectors = listOf(
-            polkadotJsInjector,
-            metamaskInjector
+        scriptInjectors = listOf(
+            polkadotScriptInjector,
+            metamaskScriptInjector
+        ),
+        providerInjectors = listOf(
+            metamaskProviderInjector
         )
     )
 

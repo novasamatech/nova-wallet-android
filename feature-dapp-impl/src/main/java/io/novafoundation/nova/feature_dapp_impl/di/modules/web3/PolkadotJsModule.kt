@@ -8,34 +8,20 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_dapp_core.web3.webView.PolkadotJsWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsInjector
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsResponder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.di.PolkadotJs
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.states.PolkadotJsStateFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInjector
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 @Module
 class PolkadotJsModule {
-
-    @Provides
-    @PolkadotJs
-    @FeatureScope
-    fun provideWeb3JavaScriptInterface() = WebViewWeb3JavaScriptInterface()
-
-    @Provides
-    @FeatureScope
-    fun providePolkadotJsInjector(
-        webViewScriptInjector: WebViewScriptInjector,
-        @PolkadotJs web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
-    ) = PolkadotJsInjector(web3JavaScriptInterface, webViewScriptInjector)
 
     @Provides
     @FeatureScope
@@ -47,7 +33,7 @@ class PolkadotJsModule {
     @FeatureScope
     fun providePolkadotJsTransportFactory(
         web3Responder: PolkadotJsResponder,
-        @PolkadotJs web3JavaScriptInterface: WebViewWeb3JavaScriptInterface,
+        web3JavaScriptInterface: PolkadotJsWeb3JavaScriptInterface,
         gson: Gson
     ): PolkadotJsTransportFactory {
         return PolkadotJsTransportFactory(

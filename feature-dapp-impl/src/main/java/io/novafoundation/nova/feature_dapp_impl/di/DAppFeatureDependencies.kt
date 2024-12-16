@@ -17,6 +17,12 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_dapp_core.web3.injector.MetamaskScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.injector.PolkadotScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.MetamaskWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_core.web3.webView.PolkadotJsWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -25,6 +31,27 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 interface DAppFeatureDependencies {
+
+
+    val phishingSitesDao: PhishingSitesDao
+
+    val favouriteDAppsDao: FavouriteDAppsDao
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val walletUiUseCase: WalletUiUseCase
+
+    val walletRepository: WalletRepository
+
+    val webViewScriptInjector: WebViewScriptInjector
+
+    val metamaskScriptInjector: MetamaskScriptInjector
+
+    val polkadotJsScriptInjector: PolkadotScriptInjector
+
+    val polkadotWeb3JavaScriptInterface: PolkadotJsWeb3JavaScriptInterface
+
+    val metamaskWeb3JavaScriptInterface: MetamaskWeb3JavaScriptInterface
 
     fun currencyRepository(): CurrencyRepository
 
@@ -62,14 +89,4 @@ interface DAppFeatureDependencies {
     fun dappAuthorizationDao(): DappAuthorizationDao
 
     fun browserHostSettingsDao(): BrowserHostSettingsDao
-
-    val phishingSitesDao: PhishingSitesDao
-
-    val favouriteDAppsDao: FavouriteDAppsDao
-
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-
-    val walletUiUseCase: WalletUiUseCase
-
-    val walletRepository: WalletRepository
 }

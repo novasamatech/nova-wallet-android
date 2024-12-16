@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.parseArbitraryObject
 import io.novafoundation.nova.feature_dapp_impl.web3.Web3Responder
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadJSON
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapRawPayloadToSignerPayloadRaw
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Transport
 import kotlinx.coroutines.CoroutineScope
 

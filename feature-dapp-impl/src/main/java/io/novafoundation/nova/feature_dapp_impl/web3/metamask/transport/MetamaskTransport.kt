@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskPers
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTransaction
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskTypedMessage
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.SwitchChainRequest
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
+import io.novafoundation.nova.feature_dapp_core.web3.webView.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3Transport
 import kotlinx.coroutines.CoroutineScope
 

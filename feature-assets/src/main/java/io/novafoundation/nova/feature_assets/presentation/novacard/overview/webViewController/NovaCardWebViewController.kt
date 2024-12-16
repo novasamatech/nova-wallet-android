@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController
 
 import android.Manifest
+import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
@@ -17,6 +18,8 @@ import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.systemCall.FilePickerSystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
+import io.novafoundation.nova.feature_dapp_core.web3.injector.MetamaskScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.MetamaskWeb3JavaScriptInterface
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,7 +32,9 @@ class NovaCardWebViewControllerFactory(
     private val gson: Gson,
     private val widgetId: String,
     private val widgetSecret: String,
-    private val webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
+    private val webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory,
+    private val metamaskScriptInjector: MetamaskScriptInjector,
+    private val metamaskWeb3JavaScriptInterface: MetamaskWeb3JavaScriptInterface
 ) {
 
     fun create(
@@ -55,7 +60,9 @@ class NovaCardWebViewControllerFactory(
             pageProvider = pageProvider,
             novaCardJsCallback = jsCallback,
             coroutineScope = scope,
-            cardCreationInterceptor = webViewCardCreationInterceptorFactory.create(cardCreatedListener)
+            cardCreationInterceptor = webViewCardCreationInterceptorFactory.create(cardCreatedListener),
+            metamaskScriptInjector = metamaskScriptInjector,
+            metamaskWeb3JavaScriptInterface = metamaskWeb3JavaScriptInterface
         )
     }
 }
@@ -71,6 +78,8 @@ class NovaCardWebViewController(
     private val novaCardJsCallback: NovaCardJsCallback,
     private val coroutineScope: CoroutineScope,
     private val cardCreationInterceptor: WebViewCardCreationInterceptor,
+    private val metamaskScriptInjector: MetamaskScriptInjector,
+    private val metamaskWeb3JavaScriptInterface: MetamaskWeb3JavaScriptInterface,
     private val setupConfig: CardSetupConfig,
     private val widgetId: String,
     private val widgetSecret: String
@@ -86,9 +95,11 @@ class NovaCardWebViewController(
             cardCreationInterceptor.runPolling(coroutineScope)
         }
 
-        override fun onPageFinished(view: WebView, url: String) {
-            super.onPageFinished(view, url)
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            metamaskScriptInjector.injectForPage(webView)
+        }
 
+        override fun onPageFinished(view: WebView, url: String) {
             if (!jsScriptWasCalled) {
                 jsScriptWasCalled = true
                 //webView.evaluateJavascript(pageProvider.getJsScript(), null)
@@ -136,6 +147,8 @@ class NovaCardWebViewController(
         webSettings.useWideViewPort = true
         webSettings.displayZoomControls = false
         //webView.addJavascriptInterface(novaCardJsCallback, pageProvider.getCallbackName())
+
+        metamaskScriptInjector.initialInject(webView)
 
         webView.webViewClient = webViewClient
 

@@ -27,6 +27,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureHolder
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_core.di.DAppCoreFeatureApi
+import io.novafoundation.nova.feature_dapp_core.di.DAppCoreHolder
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
@@ -99,6 +101,12 @@ interface ComponentHolderModule {
     @ClassKey(DAppFeatureApi::class)
     @IntoMap
     fun provideDAppFeature(dAppFeatureHolder: DAppFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(DAppCoreFeatureApi::class)
+    @IntoMap
+    fun provideDAppCoreFeature(dAppFeatureHolder: DAppCoreHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.WebViewCardCreationInterceptorFactory
+import io.novafoundation.nova.feature_dapp_core.web3.injector.MetamaskScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.MetamaskWeb3JavaScriptInterface
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -42,7 +44,9 @@ class NovaCardModule {
         appLinksProvider: AppLinksProvider,
         fileProvider: FileProvider,
         gson: Gson,
-        webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
+        webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory,
+        metamaskScriptInjector: MetamaskScriptInjector,
+        metamaskWeb3JavaScriptInterface: MetamaskWeb3JavaScriptInterface
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
             systemCallExecutor,
@@ -52,7 +56,9 @@ class NovaCardModule {
             gson,
             BuildConfig.NOVA_CARD_WIDGET_ID,
             BuildConfig.NOVA_CARD_WIDGET_SECRET,
-            webViewCardCreationInterceptorFactory
+            webViewCardCreationInterceptorFactory,
+            metamaskScriptInjector,
+            metamaskWeb3JavaScriptInterface
         )
     }
 

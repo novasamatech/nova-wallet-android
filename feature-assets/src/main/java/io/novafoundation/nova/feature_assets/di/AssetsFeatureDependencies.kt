@@ -48,6 +48,8 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_dapp_core.web3.injector.MetamaskScriptInjector
+import io.novafoundation.nova.feature_dapp_core.web3.webView.MetamaskWeb3JavaScriptInterface
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
@@ -183,6 +185,10 @@ interface AssetsFeatureDependencies {
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
     val okHttpClient: OkHttpClient
+
+    val metamaskScriptInjector: MetamaskScriptInjector
+
+    val metamaskWeb3JavaScriptInterface: MetamaskWeb3JavaScriptInterface
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

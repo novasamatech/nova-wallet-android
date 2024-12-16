@@ -50,6 +50,7 @@ dependencies {
     implementation project(':web3names')
     implementation project(':runtime')
     implementation project(':feature-buy-api')
+    implementation project(':feature-dapp-core')
 
     implementation kotlinDep
 
