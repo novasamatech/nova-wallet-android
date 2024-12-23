@@ -19,7 +19,8 @@ import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.WebViewCardCreationInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptorFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -27,10 +28,19 @@ import okhttp3.OkHttpClient
 class NovaCardModule {
 
     @Provides
-    fun provideWebViewCardCreationInterceptorFactory(
+    fun provideCardCreationInterceptorFactory(
         gson: Gson,
         okHttpClient: OkHttpClient
-    ): WebViewCardCreationInterceptorFactory = WebViewCardCreationInterceptorFactory(
+    ): CardCreationInterceptorFactory = CardCreationInterceptorFactory(
+        gson = gson,
+        okHttpClient = okHttpClient
+    )
+
+    @Provides
+    fun provideTopUpRequestInterceptorFactory(
+        gson: Gson,
+        okHttpClient: OkHttpClient
+    ): TopUpRequestInterceptorFactory = TopUpRequestInterceptorFactory(
         gson = gson,
         okHttpClient = okHttpClient
     )
@@ -38,20 +48,16 @@ class NovaCardModule {
     @Provides
     fun provideNovaCardWebViewControllerFactory(
         systemCallExecutor: SystemCallExecutor,
-        permissionsAskerFactory: PermissionsAskerFactory,
-        appLinksProvider: AppLinksProvider,
         fileProvider: FileProvider,
-        gson: Gson,
-        webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
+        permissionsAskerFactory: PermissionsAskerFactory,
+        appLinksProvider: AppLinksProvider
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
             systemCallExecutor,
             fileProvider,
             permissionsAskerFactory,
             appLinksProvider,
-            gson,
-            BuildConfig.NOVA_CARD_WIDGET_ID,
-            webViewCardCreationInterceptorFactory
+            BuildConfig.NOVA_CARD_WIDGET_ID
         )
     }
 

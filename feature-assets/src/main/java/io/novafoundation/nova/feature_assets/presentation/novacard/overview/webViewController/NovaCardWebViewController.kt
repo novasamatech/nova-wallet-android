@@ -9,13 +9,15 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
-import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.systemCall.FilePickerSystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.NovaCardInterceptor
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -24,21 +26,16 @@ class NovaCardWebViewControllerFactory(
     private val fileProvider: FileProvider,
     private val permissionsAskerFactory: PermissionsAskerFactory,
     private val appLinksProvider: AppLinksProvider,
-    private val gson: Gson,
-    private val widgetId: String,
-    private val webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
+    private val widgetId: String
 ) {
 
     fun create(
         fragment: Fragment,
         webView: WebView,
-        eventHandler: NovaCardEventHandler,
-        cardCreatedListener: OnCardCreatedListener,
+        interceptors: List<NovaCardInterceptor>,
         setupConfig: CardSetupConfig,
         scope: CoroutineScope,
     ): NovaCardWebViewController {
-        val jsCallback = NovaCardJsCallback(gson, eventHandler)
-        val pageProvider = NovaCardWebPageProvider(widgetId = widgetId, setupConfig)
         return NovaCardWebViewController(
             fragment = fragment,
             webView = webView,
@@ -46,10 +43,10 @@ class NovaCardWebViewControllerFactory(
             appLinksProvider = appLinksProvider,
             permissionsAskerFactory = permissionsAskerFactory,
             systemCallExecutor = systemCallExecutor,
-            pageProvider = pageProvider,
-            novaCardJsCallback = jsCallback,
-            coroutineScope = scope,
-            cardCreationInterceptor = webViewCardCreationInterceptorFactory.create(cardCreatedListener)
+            setupConfig = setupConfig,
+            widgetId = widgetId,
+            interceptors = interceptors,
+            coroutineScope = scope
         )
     }
 }
@@ -61,33 +58,18 @@ class NovaCardWebViewController(
     private val appLinksProvider: AppLinksProvider,
     private val permissionsAskerFactory: PermissionsAskerFactory,
     private val systemCallExecutor: SystemCallExecutor,
-    private val pageProvider: NovaCardWebPageProvider,
-    private val novaCardJsCallback: NovaCardJsCallback,
-    private val coroutineScope: CoroutineScope,
-    private val cardCreationInterceptor: WebViewCardCreationInterceptor
+    private val setupConfig: CardSetupConfig,
+    private val widgetId: String,
+    private val interceptors: List<NovaCardInterceptor>,
+    private val coroutineScope: CoroutineScope
 ) {
 
     private val permissionsAsker = permissionsAskerFactory.create(fragment)
 
     private val webViewClient = object : WebViewClient() {
 
-        private var jsScriptWasCalled = false
-
-        init {
-            cardCreationInterceptor.runPolling(coroutineScope)
-        }
-
-        override fun onPageFinished(view: WebView, url: String) {
-            super.onPageFinished(view, url)
-
-            if (!jsScriptWasCalled) {
-                jsScriptWasCalled = true
-                webView.evaluateJavascript(pageProvider.getJsScript(), null)
-            }
-        }
-
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            cardCreationInterceptor.intercept(request)
+            interceptors.firstOrNull { it.intercept(request) }
 
             return super.shouldInterceptRequest(view, request)
         }
@@ -126,18 +108,24 @@ class NovaCardWebViewController(
         webSettings.allowContentAccess = true
         webSettings.useWideViewPort = true
         webSettings.displayZoomControls = false
-        webView.addJavascriptInterface(novaCardJsCallback, pageProvider.getCallbackName())
 
         webView.webViewClient = webViewClient
 
         webView.webChromeClient = webChromeClient
 
-        webView.loadDataWithBaseURL(
-            appLinksProvider.novaCardWidgetUrl,
-            pageProvider.getPage(),
-            "text/html",
-            "UTF-8",
-            null
-        )
+        val uri = Uri.parse(appLinksProvider.novaCardWidgetUrl).buildUpon()
+            .appendQueryParameter("widget_id", widgetId)
+            .appendQueryParameter("type", "sell")
+            .appendQueryParameter("currency", setupConfig.spendToken.symbol.value)
+            .appendQueryParameter("payment_method", "fiat_card_open")
+            .appendQueryParameter("fiat_currency", "EUR")
+            .appendQueryParameter("theme", "nova")
+            .appendQueryParameter("hide_refund_address", "true")
+            .appendQueryParameter("refund_address", setupConfig.refundAddress)
+            .appendQueryParameter("fix_payment_method", "true")
+            .appendQueryParameter("show_spend_card_details", "true")
+            .build()
+
+        webView.loadUrl(uri.toString())
     }
 }

@@ -9,9 +9,11 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardEventHandler
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.OnCardCreatedListener
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptor
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptor
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptorFactory
 import kotlinx.android.synthetic.main.fragment_nova_card.novaCardContainer
 import kotlinx.android.synthetic.main.fragment_nova_card.novaCardWebView
 import kotlinx.coroutines.flow.first
@@ -19,10 +21,16 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
 
-class NovaCardFragment : BaseFragment<NovaCardViewModel>(), NovaCardEventHandler, OnCardCreatedListener {
+class NovaCardFragment : BaseFragment<NovaCardViewModel>(), CardCreationInterceptor.Callback, TopUpRequestInterceptor.Callback {
 
     @Inject
     lateinit var novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory
+
+    @Inject
+    lateinit var cardCreationInterceptorFactory: CardCreationInterceptorFactory
+
+    @Inject
+    lateinit var topUpRequestInterceptorFactory: TopUpRequestInterceptorFactory
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,11 +54,15 @@ class NovaCardFragment : BaseFragment<NovaCardViewModel>(), NovaCardEventHandler
 
     override fun subscribe(viewModel: NovaCardViewModel) {
         viewModel.launch {
+            val interceptors = listOf(
+                cardCreationInterceptorFactory.create(this@NovaCardFragment),
+                topUpRequestInterceptorFactory.create(this@NovaCardFragment)
+            )
+
             val novaCardWebViewController = novaCardWebViewControllerFactory.create(
                 fragment = this@NovaCardFragment,
                 webView = novaCardWebView,
-                eventHandler = this@NovaCardFragment,
-                cardCreatedListener = this@NovaCardFragment,
+                interceptors = interceptors,
                 setupConfig = viewModel.setupCardConfig.first(),
                 scope = viewModel
             )
@@ -59,15 +71,15 @@ class NovaCardFragment : BaseFragment<NovaCardViewModel>(), NovaCardEventHandler
         }
     }
 
-    override fun transactionStatusChanged(event: NovaCardEventHandler.TransactionStatus) {
-        viewModel.onTransactionStatusChanged(event)
-    }
-
-    override fun openTopUp(amount: BigDecimal, address: String) {
-        viewModel.openTopUp(amount, address)
-    }
-
     override fun onCardCreated() {
         viewModel.onCardCreated()
+    }
+
+    override fun onCardTopUpCompleted(orderId: String) {
+        viewModel.onTopUpFinished(orderId)
+    }
+
+    override fun onTopUpStart(orderId: String, amount: BigDecimal, address: String) {
+        viewModel.openTopUp(orderId, amount, address)
     }
 }
