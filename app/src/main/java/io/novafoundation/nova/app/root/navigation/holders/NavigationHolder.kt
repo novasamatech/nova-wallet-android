@@ -8,6 +8,10 @@ abstract class NavigationHolder(val contextManager: ContextManager) {
     var navController: NavController? = null
         private set
 
+    fun isControllerAttached(): Boolean {
+        return navController != null
+    }
+
     fun attach(navController: NavController) {
         this.navController = navController
     }

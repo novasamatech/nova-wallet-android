@@ -92,6 +92,7 @@
         android:id="@+id/dappSearchFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment"
         android:label="DappSearchFragment"
+        app:useAdd="true"
         tools:layout="@layout/fragment_search_dapp">
 
         <action

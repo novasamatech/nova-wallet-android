@@ -24,4 +24,7 @@ abstract class BrowserTabsDao {
 
     @Query("UPDATE browser_tabs SET pageName = :pageName, pageIconPath = :pageIconPath, pagePicturePath = :pagePicturePath WHERE id = :tabId")
     abstract suspend fun updatePageSnapshot(tabId: String, pageName: String?, pageIconPath: String?, pagePicturePath: String?)
+
+    @Query("UPDATE browser_tabs SET currentUrl = :url WHERE id = :tabId")
+    abstract fun updateCurrentUrl(tabId: String, url: String)
 }

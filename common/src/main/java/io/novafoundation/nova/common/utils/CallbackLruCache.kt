@@ -6,8 +6,12 @@ class CallbackLruCache<K, V>(maxSize: Int) : LruCache<K, V>(maxSize) {
 
     private var entryRemovedCallback: ((V) -> Unit)? = null
 
-    fun setCallback(callback: (V) -> Unit) {
+    fun setOnEntryRemovedCallback(callback: (V) -> Unit) {
         this.entryRemovedCallback = callback
+    }
+
+    fun removeAll() {
+        trimToSize(0)
     }
 
     override fun entryRemoved(evicted: Boolean, key: K, oldValue: V, newValue: V) {

@@ -8,8 +8,10 @@ import coil.ImageLoader
 import coil.clear
 import coil.load
 import io.novafoundation.nova.common.list.BaseViewHolder
+import io.novafoundation.nova.common.utils.ImageMonitor
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.loadOrHide
+import io.novafoundation.nova.common.utils.setPathOrStopWatching
 import io.novafoundation.nova.feature_dapp_impl.R
 import java.io.File
 import kotlinx.android.synthetic.main.item_browser_tab.view.browserTabCard
@@ -56,15 +58,31 @@ class BrowserTabViewHolder(
     private val itemHandler: BrowserTabsAdapter.Handler,
 ) : BaseViewHolder(view) {
 
+    private val screenshotImageMonitor = ImageMonitor(
+        imageView = itemView.browserTabScreenshot,
+        imageLoader = imageLoader
+    )
+
+    private val tabIconImageMonitor = ImageMonitor(
+        imageView = itemView.browserTabFavicon,
+        imageLoader = imageLoader
+    )
+
     fun bind(item: BrowserTabRvItem) = with(itemView) {
         browserTabCard.setOnClickListener { itemHandler.tabClicked(item, browserTabScreenshot) }
         browserTabClose.setOnClickListener { itemHandler.tabCloseClicked(item) }
         browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
         browserTabFavicon.loadOrHide(item.tabFaviconPath?.asFile(), imageLoader)
         browserTabSiteName.text = item.tabName
+
+        screenshotImageMonitor.setPathOrStopWatching(item.tabScreenshotPath)
+        tabIconImageMonitor.setPathOrStopWatching(item.tabFaviconPath)
     }
 
     override fun unbind() {
+        screenshotImageMonitor.stopMonitoring()
+        tabIconImageMonitor.stopMonitoring()
+
         with(itemView) {
             browserTabScreenshot.clear()
             browserTabFavicon.clear()

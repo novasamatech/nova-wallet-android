@@ -6,13 +6,17 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
+import io.novafoundation.nova.feature_dapp_api.domain.BrowserSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabInternalRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealPageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.RealBrowserTabRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.RealBrowserSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.PageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealTabMemoryRestrictionService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.TabMemoryRestrictionService
@@ -40,8 +44,8 @@ class BrowserTabsModule {
 
     @FeatureScope
     @Provides
-    fun providePageSnapshotBuilder(fileProvider: FileProvider): PageSnapshotBuilder {
-        return RealPageSnapshotBuilder(fileProvider)
+    fun providePageSnapshotBuilder(fileProvider: FileProvider, rootScope: RootScope): PageSnapshotBuilder {
+        return RealPageSnapshotBuilder(fileProvider, rootScope)
     }
 
     @FeatureScope
@@ -65,13 +69,24 @@ class BrowserTabsModule {
         browserTabInternalRepository: BrowserTabInternalRepository,
         pageSnapshotBuilder: PageSnapshotBuilder,
         tabMemoryRestrictionService: TabMemoryRestrictionService,
-        browserTabSessionFactory: BrowserTabSessionFactory
+        browserTabSessionFactory: BrowserTabSessionFactory,
+        rootScope: RootScope
     ): BrowserTabService {
         return RealBrowserTabService(
             browserTabInternalRepository = browserTabInternalRepository,
             pageSnapshotBuilder = pageSnapshotBuilder,
             tabMemoryRestrictionService = tabMemoryRestrictionService,
-            browserTabSessionFactory = browserTabSessionFactory
+            browserTabSessionFactory = browserTabSessionFactory,
+            rootScope = rootScope
         )
+    }
+
+    @FeatureScope
+    @Provides
+    fun provideBrowserSessionsInteractor(
+        browserTabService: BrowserTabService,
+        accountRepository: AccountRepository
+    ): BrowserSessionInteractor {
+        return RealBrowserSessionInteractor(browserTabService, accountRepository)
     }
 }

@@ -247,8 +247,16 @@ class Navigator(
         mainNavController?.navigate(R.id.action_crowdloanContributeFragment_to_confirmContributeFragment, ConfirmContributeFragment.getBundle(payload))
     }
 
+    /*
+    When we open some screen in root host then main navigation controller is detaching from its holder
+    So in this case we must execute back for root controller
+    */
     override fun back() {
-        mainNavigationHolder.executeBack()
+        if (mainNavigationHolder.isControllerAttached()) {
+            mainNavigationHolder.executeBack()
+        } else {
+            rootNavigationHolder.executeBack()
+        }
     }
 
     override fun returnToMain() {

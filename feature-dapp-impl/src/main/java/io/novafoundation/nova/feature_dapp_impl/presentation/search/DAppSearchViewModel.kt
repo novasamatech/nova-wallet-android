@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
@@ -32,6 +33,7 @@ class DAppSearchViewModel(
     private val router: DAppRouter,
     private val resourceManager: ResourceManager,
     private val interactor: SearchDappInteractor,
+    private val dappInteractor: DappInteractor,
     private val payload: SearchPayload,
     private val dAppSearchResponder: DAppSearchResponder,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
@@ -70,6 +72,10 @@ class DAppSearchViewModel(
     init {
         if (!payload.initialUrl.isNullOrEmpty()) {
             _selectQueryTextEvent.sendEvent()
+        }
+
+        launch {
+            dappInteractor.dAppsSync()
         }
     }
 
@@ -122,7 +128,7 @@ class DAppSearchViewModel(
                 is DappSearchResult.Url -> searchResult.url
             }
 
-            if (searchResult !is DappSearchResult.Dapp) {
+            if (!searchResult.isTrustedByNova) {
                 dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
             }
 

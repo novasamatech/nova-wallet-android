@@ -179,8 +179,8 @@ class DAppBrowserViewModel(
         browserTabService.detachCurrentSession()
     }
 
-    fun onPageChanged(url: String, title: String?) {
-        updateCurrentPage(url, title, synchronizedWithBrowser = true)
+    fun onPageChanged(url: String?, title: String?) {
+        updateCurrentPage(url ?: "", title, synchronizedWithBrowser = true)
     }
 
     fun closeClicked() = launch {
@@ -237,7 +237,7 @@ class DAppBrowserViewModel(
         router.openTabs()
     }
 
-    fun makePageSnapshot() = launch {
+    fun makePageSnapshot() {
         browserTabService.makeCurrentTabSnapshot()
     }
 

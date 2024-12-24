@@ -61,6 +61,10 @@ class DbFavouritesDAppRepository(
     }
 
     override suspend fun getNextOrderingIndex(): Int {
-        return favouriteDAppsDao.getMaxOrderingIndex() + 1
+        return try {
+            favouriteDAppsDao.getMaxOrderingIndex() + 1
+        } catch (e: NullPointerException) { // For case we don't have added favorite dapps
+            0
+        }
     }
 }
