@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 @JvmInline
-value class InformationSize(val sizeInBytes: Long) : Comparable<InformationSize> {
+value class InformationSize(private val sizeInBytes: Long) : Comparable<InformationSize> {
 
     companion object {
 
@@ -17,6 +17,9 @@ value class InformationSize(val sizeInBytes: Long) : Comparable<InformationSize>
 
         val Long.megabytes: InformationSize get() = toInformationSize(InformationSizeUnit.MEGABYTES)
     }
+
+    val inWholeBytes
+        get() = sizeInBytes
 
     override fun compareTo(other: InformationSize): Int {
         return sizeInBytes.compareTo(other.sizeInBytes)

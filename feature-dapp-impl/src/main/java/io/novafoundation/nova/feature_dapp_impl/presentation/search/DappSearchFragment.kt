@@ -11,9 +11,9 @@ import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -99,10 +99,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         viewModel.categoriesFlow.observe {
             searchDappCategoriesShimmering.isVisible = it.isLoading()
             searchDappCategories.isVisible = it.isLoaded()
-
-            if (it is ExtendedLoadingState.Loaded) {
-                categoriesAdapter.submitList(it.data)
-            }
+            it.onLoaded { categoriesAdapter.submitList(it) }
         }
     }
 

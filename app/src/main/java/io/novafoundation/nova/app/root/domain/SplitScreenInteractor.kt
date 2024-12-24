@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 class SplitScreenInteractor(val repository: BrowserTabExternalRepository) {
 
-    fun observeTabsWithNames(): Flow<List<SimpleTabModel>> {
+    fun observeTabNamesById(): Flow<List<SimpleTabModel>> {
         return repository.observeTabsWithNames()
     }
 
