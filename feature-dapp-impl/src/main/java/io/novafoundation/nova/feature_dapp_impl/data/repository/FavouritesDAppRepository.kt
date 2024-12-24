@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.data.repository
 
+import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
 import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapFavouriteDAppLocalToFavouriteDApp
@@ -18,6 +19,10 @@ interface FavouritesDAppRepository {
     fun observeIsFavourite(url: String): Flow<Boolean>
 
     suspend fun removeFavourite(dAppUrl: String)
+
+    suspend fun updateFavoriteDapps(favoriteDapps: List<FavouriteDApp>)
+
+    suspend fun getNextOrderingIndex(): Int
 }
 
 class DbFavouritesDAppRepository(
@@ -46,5 +51,16 @@ class DbFavouritesDAppRepository(
 
     override suspend fun removeFavourite(dAppUrl: String) {
         favouriteDAppsDao.deleteFavouriteDApp(dAppUrl)
+    }
+
+    override suspend fun updateFavoriteDapps(favoriteDapps: List<FavouriteDApp>) {
+        val newDapps = favoriteDapps.map { mapFavouriteDAppToFavouriteDAppLocal(it) }
+        val currentDapps = favouriteDAppsDao.getFavouriteDApps()
+        val diff = CollectionDiffer.findDiff(newDapps, currentDapps, false)
+        favouriteDAppsDao.updateFavourites(diff.updated)
+    }
+
+    override suspend fun getNextOrderingIndex(): Int {
+        return favouriteDAppsDao.getMaxOrderingIndex() + 1
     }
 }

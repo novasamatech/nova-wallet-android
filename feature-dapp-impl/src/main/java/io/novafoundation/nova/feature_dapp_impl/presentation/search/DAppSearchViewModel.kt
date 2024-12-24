@@ -12,17 +12,19 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,8 +35,7 @@ class DAppSearchViewModel(
     private val payload: SearchPayload,
     private val dAppSearchResponder: DAppSearchResponder,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val appLinksProvider: AppLinksProvider,
-    private val browserTabService: BrowserTabService
+    private val appLinksProvider: AppLinksProvider
 ) : BaseViewModel() {
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
@@ -44,13 +45,25 @@ class DAppSearchViewModel(
     private val _selectQueryTextEvent = MutableLiveData<Event<Unit>>()
     val selectQueryTextEvent: LiveData<Event<Unit>> = _selectQueryTextEvent
 
-    val searchResults = query
-        .mapLatest {
-            interactor.searchDapps(it)
-                .mapKeys { (searchGroup, _) -> mapSearchGroupToTextHeader(searchGroup) }
-                .mapValues { (_, groupItems) -> groupItems.map(::mapSearchResultToSearchModel) }
-                .toListWithHeaders()
-        }
+    private val selectedCategoryId = MutableStateFlow(payload.preselectedCategoryId)
+
+    val categoriesFlow = combine(
+        interactor.categories(),
+        selectedCategoryId
+    ) { categories, categoryId ->
+        categories.map { dappCategoryToUi(it, isSelected = it.id == categoryId) }
+    }
+        .distinctUntilChanged()
+        .withSafeLoading()
+        .inBackground()
+        .share()
+
+    val searchResults = combine(query, selectedCategoryId) { query, categoryId ->
+        interactor.searchDapps(query, categoryId)
+            .mapKeys { (searchGroup, _) -> mapSearchGroupToTextHeader(searchGroup) }
+            .mapValues { (_, groupItems) -> groupItems.map(::mapSearchResultToSearchModel) }
+            .toListWithHeaders()
+    }
         .inBackground()
         .share()
 
@@ -128,5 +141,13 @@ class DAppSearchViewModel(
         SearchPayload.Request.GO_TO_URL -> true
 
         SearchPayload.Request.OPEN_NEW_URL -> false
+    }
+
+    fun onCategoryClicked(id: String) {
+        if (selectedCategoryId.value == id) {
+            selectedCategoryId.value = null
+        } else {
+            selectedCategoryId.value = id
+        }
     }
 }

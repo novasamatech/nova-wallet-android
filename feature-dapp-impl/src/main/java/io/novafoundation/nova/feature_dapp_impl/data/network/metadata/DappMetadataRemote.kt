@@ -14,6 +14,7 @@ class DappMetadataRemote(
 )
 
 class DappCategoryRemote(
+    val icon: String?,
     val name: String,
     val id: String
 )

@@ -12,11 +12,9 @@
         android:name="io.novafoundation.nova.app.root.navigation.navigationFragment.MainNavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="6dp"
         android:layout_weight="1"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@id/dappEntryPoint"
-        app:layout_goneMarginBottom="0dp"
         app:navGraph="@navigation/main_nav_graph" />
 
     <FrameLayout
@@ -25,6 +23,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_dapp_entry_point"
         android:paddingBottom="24dp"
+        android:layout_marginTop="6dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView

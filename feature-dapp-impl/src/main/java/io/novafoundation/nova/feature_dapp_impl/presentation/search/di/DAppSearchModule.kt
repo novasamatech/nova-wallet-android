@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteract
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
-import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 
 @Module(includes = [ViewModelModule::class])
 class DAppSearchModule {
@@ -46,8 +45,7 @@ class DAppSearchModule {
         searchResponder: DAppSearchCommunicator,
         payload: SearchPayload,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        appLinksProvider: AppLinksProvider,
-        browserTabService: BrowserTabService
+        appLinksProvider: AppLinksProvider
     ): ViewModel {
         return DAppSearchViewModel(
             router = router,
@@ -56,8 +54,7 @@ class DAppSearchModule {
             dAppSearchResponder = searchResponder,
             payload = payload,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            appLinksProvider = appLinksProvider,
-            browserTabService = browserTabService
+            appLinksProvider = appLinksProvider
         )
     }
 }
