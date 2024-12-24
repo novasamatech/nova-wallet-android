@@ -23,7 +23,7 @@ class DAppFavoritesViewModel(
 
     val removeFavouriteConfirmationAwaitable = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
-    private val favoriteDAppsFlow = MutableStateFlow<List<FavouriteDApp>>(listOf())
+    private val favoriteDAppsFlow = MutableStateFlow<List<FavouriteDApp>>(emptyList())
 
     val favoriteDAppsUIFlow = favoriteDAppsFlow
         .map { dapps -> dapps.map { mapFavoriteDappToDappModel(it) } }
