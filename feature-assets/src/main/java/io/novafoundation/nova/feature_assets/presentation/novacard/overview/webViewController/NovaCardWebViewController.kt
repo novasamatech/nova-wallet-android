@@ -12,12 +12,10 @@ import androidx.fragment.app.Fragment
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.systemCall.FilePickerSystemCall
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.NovaCardInterceptor
-import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

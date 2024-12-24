@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors
 
 import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import okhttp3.OkHttpClient

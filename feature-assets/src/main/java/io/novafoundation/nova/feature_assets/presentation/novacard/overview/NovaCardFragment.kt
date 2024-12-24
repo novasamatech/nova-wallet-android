@@ -75,8 +75,8 @@ class NovaCardFragment : BaseFragment<NovaCardViewModel>(), CardCreationIntercep
         viewModel.onCardCreated()
     }
 
-    override fun onCardTopUpCompleted(orderId: String) {
-        viewModel.onTopUpFinished(orderId)
+    override fun onTopUpCompleted(orderId: String) {
+        viewModel.onTopUpCompleted(orderId)
     }
 
     override fun onTopUpStart(orderId: String, amount: BigDecimal, address: String) {

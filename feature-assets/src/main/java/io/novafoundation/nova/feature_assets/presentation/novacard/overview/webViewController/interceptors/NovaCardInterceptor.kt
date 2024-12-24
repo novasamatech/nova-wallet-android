@@ -13,7 +13,6 @@ interface NovaCardInterceptor {
      * @return Make a request and return WebResourceResponse if the request was intercepted otherwise null
      */
     fun intercept(request: WebResourceRequest): Boolean
-
 }
 
 fun makeRequest(okHttpClient: OkHttpClient, requestBuilder: Request.Builder): Response {

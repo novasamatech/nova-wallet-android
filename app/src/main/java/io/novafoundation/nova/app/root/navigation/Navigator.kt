@@ -434,6 +434,10 @@ class Navigator(
         navController?.navigate(R.id.action_open_topUpCard, TopUpCardFragment.getBundle(payload))
     }
 
+    override fun closeTopUp() {
+        navController?.navigate(R.id.action_close_top_up_with_browser)
+    }
+
     override fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navController?.navigate(R.id.action_finish_and_open_swap_settings, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
     }

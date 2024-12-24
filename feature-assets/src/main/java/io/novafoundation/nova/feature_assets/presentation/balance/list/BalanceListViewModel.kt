@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
-import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase

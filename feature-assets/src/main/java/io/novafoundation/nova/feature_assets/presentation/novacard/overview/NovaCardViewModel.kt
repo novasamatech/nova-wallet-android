@@ -65,7 +65,7 @@ class NovaCardViewModel(
         }
     }
 
-    fun onTopUpFinished(orderId: String) {
+    fun onTopUpCompleted(orderId: String) {
         openedOrderIds.remove(orderId)
         makeCardCreated()
     }

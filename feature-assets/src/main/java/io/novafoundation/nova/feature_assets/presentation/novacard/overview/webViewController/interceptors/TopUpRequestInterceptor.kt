@@ -22,7 +22,7 @@ class TopUpRequestInterceptor(
 
     interface Callback {
 
-        fun onCardTopUpCompleted(orderId: String)
+        fun onTopUpCompleted(orderId: String)
 
         fun onTopUpStart(orderId: String, amount: BigDecimal, address: String)
     }
@@ -52,7 +52,7 @@ class TopUpRequestInterceptor(
             when {
                 topUpResponse.isNew() -> onCardCreatedListener.onTopUpStart(orderId, topUpResponse.getAmount(), topUpResponse.getAddress())
 
-                topUpResponse.isCompleted() -> onCardCreatedListener.onCardTopUpCompleted(orderId)
+                topUpResponse.isCompleted() -> onCardCreatedListener.onTopUpCompleted(orderId)
             }
 
             true
