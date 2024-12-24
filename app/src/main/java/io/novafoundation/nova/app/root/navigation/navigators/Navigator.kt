@@ -252,7 +252,7 @@ class Navigator(
     So in this case we must execute back for root controller
     */
     override fun back() {
-        if (mainNavigationHolder.isAttached()) {
+        if (mainNavigationHolder.isControllerAttached()) {
             mainNavigationHolder.executeBack()
         } else {
             rootNavigationHolder.executeBack()

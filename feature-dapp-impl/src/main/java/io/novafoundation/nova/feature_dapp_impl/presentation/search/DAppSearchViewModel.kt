@@ -128,7 +128,7 @@ class DAppSearchViewModel(
                 is DappSearchResult.Url -> searchResult.url
             }
 
-            if (!searchResult.trusting) {
+            if (!searchResult.isTrustedByNova) {
                 dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
             }
 

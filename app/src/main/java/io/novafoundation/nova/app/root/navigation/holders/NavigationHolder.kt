@@ -8,7 +8,7 @@ abstract class NavigationHolder(val contextManager: ContextManager) {
     var navController: NavController? = null
         private set
 
-    fun isAttached(): Boolean {
+    fun isControllerAttached(): Boolean {
         return navController != null
     }
 
