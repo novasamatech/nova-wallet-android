@@ -81,7 +81,7 @@ class DappCategoryViewHolder(
     fun bindSelected(isSelected: Boolean) {
         itemView.isSelected = isSelected
 
-        // We must set tint to image view programmatically since we can't specify the state for default color
+        // We must set tint to image view programmatically since we can't specify the state for default color in state list
         if (isSelected) {
             itemView.itemDappCategoryIcon.setColorFilter(ContextCompat.getColor(itemView.context, R.color.icon_primary_on_content))
         } else {

@@ -65,28 +65,43 @@ class DAppHeaderAdapter(
         )
     }
 
+    override fun onBindViewHolder(holder: HeaderHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            payloads.filterIsInstance<Payload>().forEach {
+                when (it) {
+                    Payload.WALLET -> holder.bindWallet(walletModel)
+                    Payload.FAVORITES -> holder.bindFavoritres(favoritesDApps)
+                    Payload.CATEGORIES -> holder.bindCategories(categories)
+                    Payload.CATEGORIES_SHIMMERING -> holder.bindCategoriesShimmering(showCategoriesShimmering)
+                }
+            }
+        }
+    }
+
     override fun getItemCount(): Int {
         return 1
     }
 
     fun setWallet(walletModel: SelectedWalletModel) {
         this.walletModel = walletModel
-        notifyItemChanged(0, true)
+        notifyItemChanged(0, Payload.WALLET)
     }
 
     fun setFavorites(favoritesDApps: List<DappModel>) {
         this.favoritesDApps = favoritesDApps
-        notifyItemChanged(0, true)
+        notifyItemChanged(0, Payload.FAVORITES)
     }
 
     fun setCategories(categories: List<DAppCategoryModel>) {
         this.categories = categories
-        notifyItemChanged(0, true)
+        notifyItemChanged(0, Payload.CATEGORIES)
     }
 
     fun showCategoriesShimmering(show: Boolean) {
         showCategoriesShimmering = show
-        notifyItemChanged(0, true)
+        notifyItemChanged(0, Payload.CATEGORIES_SHIMMERING)
     }
 }
 
@@ -115,15 +130,34 @@ class HeaderHolder(
         categoriesState: List<DAppCategoryModel>,
         favoritesDApps: List<DappModel>,
         showCategoriesShimmering: Boolean
-    ) = with(itemView) {
-        walletModel?.let { dappMainSelectedWallet.setModel(walletModel) }
-        categoriesAdapter.submitList(categoriesState)
-        categorizedDappsCategoriesShimmering.setVisible(showCategoriesShimmering, falseState = View.INVISIBLE)
-        mainDappCategories.isInvisible = showCategoriesShimmering
+    ) {
+        bindWallet(walletModel)
+        bindCategories(categoriesState)
+        bindFavoritres(favoritesDApps)
+        bindCategoriesShimmering(showCategoriesShimmering)
+    }
 
+    fun bindWallet(walletModel: SelectedWalletModel?) = with(itemView) {
+        walletModel?.let { dappMainSelectedWallet.setModel(walletModel) }
+    }
+
+    fun bindCategories(categoriesState: List<DAppCategoryModel>) = with(itemView) {
+        categoriesAdapter.submitList(categoriesState)
+    }
+
+    fun bindFavoritres(favoritesDApps: List<DappModel>) = with(itemView) {
         favoritesAdapter.submitList(favoritesDApps)
         dAppMainFavoriteDAppList.isGone = favoritesDApps.isEmpty()
         dAppMainFavoriteDAppTitle.isGone = favoritesDApps.isEmpty()
         dAppMainFavoriteDAppsShow.isGone = favoritesDApps.isEmpty()
     }
+
+    fun bindCategoriesShimmering(showCategoriesShimmering: Boolean) = with(itemView) {
+        categorizedDappsCategoriesShimmering.setVisible(showCategoriesShimmering, falseState = View.INVISIBLE)
+        mainDappCategories.isInvisible = showCategoriesShimmering
+    }
+}
+
+private enum class Payload {
+    WALLET, FAVORITES, CATEGORIES, CATEGORIES_SHIMMERING
 }

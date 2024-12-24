@@ -50,7 +50,7 @@ class RealBrowserTabService(
     }
 
     init {
-        activeSessions.setCallback {
+        activeSessions.setOnEntryRemovedCallback {
             launch(Dispatchers.Main) {
                 it.detachFromHost()
                 it.destroy()

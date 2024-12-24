@@ -4,15 +4,15 @@ import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 
 sealed interface DappSearchResult {
 
-    val trusting: Boolean
+    val isTrustedByNova: Boolean
 
-    class Url(val url: String, override val trusting: Boolean) : DappSearchResult
+    class Url(val url: String, override val isTrustedByNova: Boolean) : DappSearchResult
 
     class Search(val query: String, val searchUrl: String) : DappSearchResult {
-        override val trusting: Boolean = false
+        override val isTrustedByNova: Boolean = false
     }
 
     class Dapp(val dapp: DApp) : DappSearchResult {
-        override val trusting: Boolean = true
+        override val isTrustedByNova: Boolean = true
     }
 }
