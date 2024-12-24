@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="10dp"
         android:includeFontPadding="false"
         android:textColor="@color/text_primary"
         tools:text="@string/fragment_top_up_card_title" />
