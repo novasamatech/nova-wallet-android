@@ -4,5 +4,5 @@ interface VersionsRouter {
 
     fun openAppUpdater()
 
-    fun back()
+    fun closeUpdateNotifications()
 }

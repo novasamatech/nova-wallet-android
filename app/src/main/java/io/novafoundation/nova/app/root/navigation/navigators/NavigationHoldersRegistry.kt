@@ -13,7 +13,7 @@ class NavigationHoldersRegistry(
     private val holders = listOf(splitScreenNavigationHolder, rootNavigationHolder)
 
     val firstAttachedHolder: NavigationHolder
-        get() = holders.first { it.isAttached() }
+        get() = holders.first { it.isControllerAttached() }
 
     val firstAttachedNavController: NavController?
         get() = firstAttachedHolder.navController

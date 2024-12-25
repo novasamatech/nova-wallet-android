@@ -13,9 +13,14 @@ class VersionsNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
     private val contextManager: ContextManager,
     private val updateSourceLink: String
-) : BaseNavigator(navigationHoldersRegistry),VersionsRouter {
+) : BaseNavigator(navigationHoldersRegistry), VersionsRouter {
 
     override fun openAppUpdater() {
         contextManager.getActivity()?.showBrowser(updateSourceLink, R.string.common_cannot_find_app)
+    }
+
+    override fun closeUpdateNotifications() {
+        navigationBuilder(R.id.action_close_update_notifications)
+            .performInRoot()
     }
 }

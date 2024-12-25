@@ -39,6 +39,12 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     @Inject
     lateinit var imageLoader: ImageLoader
 
+    private val mainNavController: NavController by lazy {
+        val navHostFragment = childFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
+
+        navHostFragment.navController
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_split_screen, container, false)
     }
@@ -50,9 +56,9 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        splitScreenNavigationHolder.detachNavController(mainNavController)
 
-        splitScreenNavigationHolder.detach()
+        super.onDestroyView()
     }
 
     override fun inject() {
@@ -85,12 +91,6 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
             dappEntryPointText.text = model.title
         }
         manageImeInsets()
-    }
-
-    private val mainNavController: NavController by lazy {
-        val navHostFragment = childFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
-
-        navHostFragment.navController
     }
 
     /**

@@ -169,7 +169,7 @@ class Navigator(
             .addCase(R.id.restoreCloudBackupFragment, R.id.action_restoreCloudBackupFragment_to_pincodeFragment)
             .addCase(R.id.finishImportGenericLedgerFragment, R.id.action_finishImportGenericLedgerFragment_to_pincodeFragment)
             .setArgs(args)
-            .perform()
+            .performInRoot()
     }
 
     override fun openAdvancedSettings(payload: AdvancedEncryptionModePayload) {
@@ -492,18 +492,18 @@ class Navigator(
             if (arguments is PinCodeAction.Change) {
                 navigationBuilder(R.id.action_pin_code_access_recovery)
                     .setArgs(bundle)
-                    .perform()
+                    .performInRoot()
             }
         } else {
             navigationBuilder(R.id.action_pin_code_access_recovery)
                 .setArgs(bundle)
-                .perform()
+                .performInRoot()
         }
     }
 
     override fun openUpdateNotifications() {
         navigationBuilder(R.id.action_open_update_notifications)
-            .perform()
+            .performInRoot()
     }
 
     override fun openPushWelcome() {

@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.pincode
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationRequester.Request
@@ -11,7 +12,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeF
 import kotlinx.coroutines.flow.Flow
 
 class PinCodeTwoFactorVerificationCommunicatorImpl(
-    navigationHolder: SplitScreenNavigationHolder
+    navigationHolder: RootNavigationHolder
 ) : NavStackInterScreenCommunicator<Request, Response>(navigationHolder), PinCodeTwoFactorVerificationCommunicator {
 
     override val responseFlow: Flow<Response>
