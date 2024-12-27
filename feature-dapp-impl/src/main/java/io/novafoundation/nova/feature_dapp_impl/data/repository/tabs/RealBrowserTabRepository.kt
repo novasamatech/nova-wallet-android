@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import java.util.Date
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class RealBrowserTabRepository(
     private val browserTabsDao: BrowserTabsDao
@@ -25,6 +26,14 @@ class RealBrowserTabRepository(
         return browserTabsDao.observeAllTabs()
             .mapList {
                 SimpleTabModel(it.id, it.pageName, it.pageIconPath)
+            }.map {
+                it + listOf(
+                    SimpleTabModel(
+                        "someId",
+                        "Hmm",
+                        null
+                    )
+                )
             }
     }
 

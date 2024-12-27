@@ -11,9 +11,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
-class StakingDashboardNavigator(
-    navigationHoldersRegistry: NavigationHoldersRegistry
-) : BaseNavigator(navigationHoldersRegistry), StakingDashboardRouter {
+class StakingDashboardNavigator : StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null
     private var pendingAction: Int? = null
@@ -42,8 +40,7 @@ class StakingDashboardNavigator(
     }
 
     override fun returnToStakingDashboard() {
-        navigationBuilder(R.id.back_to_main)
-            .perform()
+        stakingTabNavController?.navigate(R.id.back_to_main)
 
         returnToStakingTabRoot()
         scrollToDashboardTopEvent.value = Unit.event()

@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.account.PolkadotVaultVariantSignCommunicatorImpl
@@ -30,7 +31,7 @@ class AccountNavigationModule {
     @Provides
     @ApplicationScope
     fun providePinCodeTwoFactorVerificationCommunicator(
-        navigationHolder: SplitScreenNavigationHolder
+        navigationHolder: RootNavigationHolder
     ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHolder)
 
     @Provides

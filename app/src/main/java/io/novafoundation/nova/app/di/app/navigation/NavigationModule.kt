@@ -9,7 +9,9 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
@@ -88,4 +90,9 @@ class NavigationModule {
     @ApplicationScope
     @Provides
     fun provideCrowdloanRouter(navigator: Navigator): CrowdloanRouter = navigator
+
+    @ApplicationScope
+    @Provides
+    fun provideDelayedNavigationRouter(navigator: Navigator): DelayedNavigationRouter = navigator
+
 }

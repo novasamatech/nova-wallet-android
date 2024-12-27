@@ -20,8 +20,11 @@ import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.FragmentPayloadCreator
+import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.RoundCornersOutlineProvider
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.payloadOrElse
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.setupCloseAllDappTabsDialogue
 import java.io.File
 import javax.inject.Inject
@@ -32,6 +35,8 @@ import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPointText
 import kotlinx.android.synthetic.main.fragment_split_screen.mainNavHost
 
 class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
+
+    companion object : PayloadCreator<SplitScreenPayload> by FragmentPayloadCreator()
 
     @Inject
     lateinit var splitScreenNavigationHolder: SplitScreenNavigationHolder
@@ -53,6 +58,8 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
         super.onViewCreated(view, savedInstanceState)
 
         splitScreenNavigationHolder.attach(mainNavController)
+
+        viewModel.onNavigationAttached()
     }
 
     override fun onDestroyView() {
@@ -64,7 +71,7 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
             .splitScreenFragmentComponentFactory()
-            .create(this)
+            .create(this, payloadOrElse { SplitScreenPayload.NoNavigation })
             .inject(this)
     }
 

@@ -60,22 +60,6 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_import_nav_graph"
-        app:destination="@id/import_nav_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_root_to_balanceDetailFragment"
-        app:destination="@id/balanceDetailFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
         android:id="@+id/action_open_dappBrowser"
         app:destination="@id/dapp_browser_graph"
         app:enterAnim="@anim/fragment_slide_in"

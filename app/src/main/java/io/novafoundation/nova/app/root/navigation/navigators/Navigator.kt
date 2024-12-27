@@ -8,6 +8,7 @@ import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedN
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.utils.getParcelableCompat
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
@@ -105,7 +106,8 @@ class Navigator(
     AccountRouter,
     AssetsRouter,
     RootRouter,
-    CrowdloanRouter {
+    CrowdloanRouter,
+    DelayedNavigationRouter {
 
     override fun openWelcomeScreen() {
         navigationBuilder()
@@ -545,7 +547,6 @@ class Navigator(
             .addCase(R.id.mainFragment, R.id.action_mainFragment_to_balanceDetailFragment)
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
-            .setFallbackCase(R.id.action_root_to_balanceDetailFragment)
             .setArgs(bundle)
             .perform()
     }
@@ -782,5 +783,16 @@ class Navigator(
         val delayedNavigation = NavComponentDelayedNavigation(R.id.action_open_split_screen)
         val action = PinCodeAction.Create(delayedNavigation)
         return PincodeFragment.getPinCodeBundle(action)
+    }
+
+    override fun runDelayedNavigation(delayedNavigation: DelayedNavigation) {
+        when (delayedNavigation) {
+            BackDelayedNavigation -> back()
+            is NavComponentDelayedNavigation -> {
+                navigationBuilder(delayedNavigation.globalActionId)
+                    .setArgs(delayedNavigation.extras)
+                    .perform()
+            }
+        }
     }
 }
