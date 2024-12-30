@@ -25,7 +25,7 @@ fun <T> BaseFragment<*>.payload(): T {
 }
 
 fun <T> BaseFragment<*>.payloadOrNull(): T? {
-    return requireArguments().getParcelable(KEY_PAYLOAD)
+    return arguments?.getParcelable(KEY_PAYLOAD) as? T
 }
 
 fun <T> BaseFragment<*>.payloadOrElse(fallback: () -> T): T {

@@ -38,9 +38,9 @@ class SplitScreenFragmentModule {
         delayedNavigationRouter: DelayedNavigationRouter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
-        payloadOrElse: SplitScreenPayload
+        payload: SplitScreenPayload
     ): ViewModel {
-        return SplitScreenViewModel(interactor, dAppRouter, delayedNavigationRouter, actionAwaitableMixinFactory, resourceManager, payloadOrElse)
+        return SplitScreenViewModel(interactor, dAppRouter, delayedNavigationRouter, actionAwaitableMixinFactory, resourceManager, payload)
     }
 
     @Provides

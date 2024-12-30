@@ -28,10 +28,10 @@ class SplitScreenViewModel(
     private val delayedNavigationRouter: DelayedNavigationRouter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val splitScreenPayload: SplitScreenPayload
+    private val payload: SplitScreenPayload
 ) : BaseViewModel() {
 
-    private val consumablePayload = Consumer(splitScreenPayload)
+    private val consumablePayload = Consumer(payload)
 
     val closeAllTabsConfirmation = actionAwaitableMixinFactory.confirmingAction<Unit>()
 
@@ -80,14 +80,16 @@ class SplitScreenViewModel(
     }
 
     fun onNavigationAttached() {
-        when (val payload = consumablePayload.get()) {
-            is SplitScreenPayload.InstantNavigationOnAttach -> {
-                delayedNavigationRouter.runDelayedNavigation(payload.delayedNavigation)
-            }
+        consumablePayload.use {
+            when (it) {
+                is SplitScreenPayload.InstantNavigationOnAttach -> {
+                    delayedNavigationRouter.runDelayedNavigation(it.delayedNavigation)
+                }
 
-            SplitScreenPayload.NoNavigation,
-            null -> {
-            } // Do nothing
+                SplitScreenPayload.NoNavigation,
+                null -> {
+                } // Do nothing
+            }
         }
     }
 }

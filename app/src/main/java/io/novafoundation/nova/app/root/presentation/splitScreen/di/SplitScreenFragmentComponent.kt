@@ -20,7 +20,7 @@ interface SplitScreenFragmentComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payloadOrElse: SplitScreenPayload
+            @BindsInstance payload: SplitScreenPayload
         ): SplitScreenFragmentComponent
     }
 

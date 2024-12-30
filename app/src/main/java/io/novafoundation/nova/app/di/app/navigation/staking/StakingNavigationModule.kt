@@ -21,10 +21,8 @@ class StakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideStakingDashboardNavigator(
-        navigationHoldersRegistry: NavigationHoldersRegistry
-    ): StakingDashboardNavigator {
-        return StakingDashboardNavigator(navigationHoldersRegistry)
+    fun provideStakingDashboardNavigator(): StakingDashboardNavigator {
+        return StakingDashboardNavigator()
     }
 
     @Provides

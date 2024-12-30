@@ -7,6 +7,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDash
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -38,6 +39,7 @@ class RootFeatureHolder @Inject constructor(
     private val accountRouter: AccountRouter,
     private val assetsRouter: AssetsRouter,
     private val stakingDashboardNavigator: StakingDashboardNavigator,
+    private val delayedNavRouter: DelayedNavigationRouter,
     featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
 
@@ -71,6 +73,7 @@ class RootFeatureHolder @Inject constructor(
                 assetsRouter,
                 accountRouter,
                 stakingDashboardNavigator,
+                delayedNavRouter,
                 rootFeatureDependencies
             )
     }

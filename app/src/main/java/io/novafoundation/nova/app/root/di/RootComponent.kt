@@ -11,6 +11,7 @@ import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponen
 import io.novafoundation.nova.app.root.presentation.splitScreen.di.SplitScreenFragmentComponent
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -60,6 +61,7 @@ interface RootComponent {
             @BindsInstance assetsRouter: AssetsRouter,
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance stakingDashboardNavigator: StakingDashboardNavigator,
+            @BindsInstance delayedNavigationRouter: DelayedNavigationRouter,
             deps: RootDependencies
         ): RootComponent
     }

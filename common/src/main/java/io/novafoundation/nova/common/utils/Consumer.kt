@@ -7,4 +7,11 @@ class Consumer<T>(private var target: T?) {
         target = null
         return returnable
     }
+
+    fun use(block: (T) -> Unit) {
+        val target = get()
+        if (target != null) {
+            block(target)
+        }
+    }
 }
