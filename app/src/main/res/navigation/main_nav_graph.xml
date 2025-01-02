@@ -49,6 +49,8 @@
 
     <include app:graph="@navigation/import_wallet_options_nav_graph" />
 
+    <include app:graph="@navigation/onboarding_nav_graph" />
+
     <action
         android:id="@+id/action_importWalletOptionsFragment"
         app:destination="@id/import_wallet_options_nav_graph"
@@ -347,6 +349,12 @@
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_onboarding"
+        app:destination="@id/onboarding_nav_graph"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"/>
 
     <fragment
         android:id="@+id/mainFragment"
