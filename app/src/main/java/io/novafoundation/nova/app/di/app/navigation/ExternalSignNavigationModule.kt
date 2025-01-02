@@ -23,7 +23,7 @@ class ExternalSignNavigationModule {
     @ApplicationScope
     @Provides
     fun provideSignExtrinsicCommunicator(
-        navigationHolder: SplitScreenNavigationHolder,
+        navigationHolder: RootNavigationHolder,
         automaticInteractionGate: AutomaticInteractionGate,
     ): ExternalSignCommunicator {
         return ExternalSignCommunicatorImpl(navigationHolder, automaticInteractionGate)

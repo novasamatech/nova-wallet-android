@@ -29,8 +29,6 @@
 
     <include app:graph="@navigation/wallet_connect_nav_graph" />
 
-    <include app:graph="@navigation/external_sign_graph" />
-
     <include app:graph="@navigation/staking_main_graph" />
 
     <include app:graph="@navigation/push_settings_graph" />
@@ -233,13 +231,6 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
-    <action
-        android:id="@+id/action_open_externalSignGraph"
-        app:destination="@id/external_sign_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_scanWalletConnect"
