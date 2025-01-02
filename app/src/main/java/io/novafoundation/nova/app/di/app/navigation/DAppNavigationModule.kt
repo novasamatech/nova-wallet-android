@@ -23,7 +23,7 @@ class DAppNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideSearchDappCommunicator(navigationHolder: RootNavigationHolder): DAppSearchCommunicator {
-        return DAppSearchCommunicatorImpl(navigationHolder)
+    fun provideSearchDappCommunicator(navigationHoldersRegistry: NavigationHoldersRegistry): DAppSearchCommunicator {
+        return DAppSearchCommunicatorImpl(navigationHoldersRegistry)
     }
 }

@@ -19,15 +19,15 @@ class LedgerNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideSelectLedgerAddressCommunicator(splitScreenNavigationHolder: SplitScreenNavigationHolder): SelectLedgerAddressInterScreenCommunicator {
-        return SelectLedgerAddressCommunicatorImpl(splitScreenNavigationHolder)
+    fun provideSelectLedgerAddressCommunicator(navigationHoldersRegistry: NavigationHoldersRegistry): SelectLedgerAddressInterScreenCommunicator {
+        return SelectLedgerAddressCommunicatorImpl(navigationHoldersRegistry)
     }
 
     @Provides
     @ApplicationScope
     fun provideLedgerSignerCommunicator(
-        splitScreenNavigationHolder: SplitScreenNavigationHolder
-    ): LedgerSignCommunicator = LedgerSignCommunicatorImpl(splitScreenNavigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): LedgerSignCommunicator = LedgerSignCommunicatorImpl(navigationHoldersRegistry)
 
     @ApplicationScope
     @Provides

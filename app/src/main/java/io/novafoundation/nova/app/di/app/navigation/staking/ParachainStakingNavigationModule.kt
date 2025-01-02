@@ -27,13 +27,13 @@ class ParachainStakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideSelectCollatorCommunicator(navigationHolder: SplitScreenNavigationHolder): SelectCollatorInterScreenCommunicator {
-        return SelectCollatorInterScreenCommunicatorImpl(navigationHolder)
+    fun provideSelectCollatorCommunicator(navigationHoldersRegistry: NavigationHoldersRegistry): SelectCollatorInterScreenCommunicator {
+        return SelectCollatorInterScreenCommunicatorImpl(navigationHoldersRegistry)
     }
 
     @Provides
     @ApplicationScope
-    fun provideSelectCollatorSettingsCommunicator(navigationHolder: SplitScreenNavigationHolder): SelectCollatorSettingsInterScreenCommunicator {
-        return SelectCollatorSettingsInterScreenCommunicatorImpl(navigationHolder)
+    fun provideSelectCollatorSettingsCommunicator(navigationHoldersRegistry: NavigationHoldersRegistry): SelectCollatorSettingsInterScreenCommunicator {
+        return SelectCollatorSettingsInterScreenCommunicatorImpl(navigationHoldersRegistry)
     }
 }

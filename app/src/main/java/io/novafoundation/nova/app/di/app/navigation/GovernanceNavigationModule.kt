@@ -30,13 +30,13 @@ class GovernanceNavigationModule {
     @ApplicationScope
     fun provideSelectTracksCommunicator(
         router: GovernanceRouter,
-        navigationHolder: SplitScreenNavigationHolder
-    ): SelectTracksCommunicator = SelectTracksCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectTracksCommunicator = SelectTracksCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideTinderGovVoteCommunicator(
         router: GovernanceRouter,
-        navigationHolder: SplitScreenNavigationHolder
-    ): TinderGovVoteCommunicator = TinderGovVoteCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): TinderGovVoteCommunicator = TinderGovVoteCommunicatorImpl(router, navigationHoldersRegistry)
 }

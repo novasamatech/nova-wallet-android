@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.getBackStackEntryBefore
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Request
@@ -11,8 +12,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
 
-class LedgerSignCommunicatorImpl(navigationHolder: SplitScreenNavigationHolder) :
-    NavStackInterScreenCommunicator<Request, Response>(navigationHolder), LedgerSignCommunicator {
+class LedgerSignCommunicatorImpl(navigationHoldersRegistry: NavigationHoldersRegistry) :
+    NavStackInterScreenCommunicator<Request, Response>(navigationHoldersRegistry), LedgerSignCommunicator {
 
     private var usedVariant: LedgerVariant? = null
 

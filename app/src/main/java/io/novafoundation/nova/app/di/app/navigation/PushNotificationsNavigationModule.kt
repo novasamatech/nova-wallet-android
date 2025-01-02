@@ -25,13 +25,13 @@ class PushNotificationsNavigationModule {
     @ApplicationScope
     fun providePushGovernanceSettingsCommunicator(
         router: PushNotificationsRouter,
-        navigationHolder: SplitScreenNavigationHolder
-    ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun providePushStakingSettingsCommunicator(
         router: PushNotificationsRouter,
-        navigationHolder: SplitScreenNavigationHolder
-    ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 }
