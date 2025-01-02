@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.navigators.account
 
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
-import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsRequester

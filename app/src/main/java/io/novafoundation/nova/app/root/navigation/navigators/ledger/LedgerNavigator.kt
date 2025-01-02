@@ -1,9 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.navigators.ledger
 
 import io.novafoundation.nova.app.R
-import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter

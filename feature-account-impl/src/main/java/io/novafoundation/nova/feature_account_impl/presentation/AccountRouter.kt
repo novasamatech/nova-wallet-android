@@ -97,6 +97,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openManualBackupSecrets(payload: ManualBackupCommonPayload)
 
     fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload)
-    
+
     fun finishApp()
 }

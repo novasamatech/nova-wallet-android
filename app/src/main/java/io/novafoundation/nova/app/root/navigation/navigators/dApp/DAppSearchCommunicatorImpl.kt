@@ -2,7 +2,6 @@ package io.novafoundation.nova.app.root.navigation.navigators.dApp
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
-import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator.Response
