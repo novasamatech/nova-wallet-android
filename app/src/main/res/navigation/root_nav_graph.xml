@@ -162,7 +162,6 @@
         android:id="@+id/pincodeFragmentOverlay"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
         android:label="fragment_pincode"
-        app:useAdd="true"
         tools:layout="@layout/fragment_pincode" />
 
     <fragment
