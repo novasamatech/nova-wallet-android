@@ -15,7 +15,7 @@ class TitledSearchToolbar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private val binder = ViewTitledSearchToolbarBinding.inflate(inflater())
+    private val binder = ViewTitledSearchToolbarBinding.inflate(inflater(), this, true)
 
     val toolbar: Toolbar
         get() = binder.titledSearchToolbar

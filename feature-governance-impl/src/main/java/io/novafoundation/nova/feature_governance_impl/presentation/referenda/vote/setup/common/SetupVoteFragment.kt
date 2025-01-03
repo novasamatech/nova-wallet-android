@@ -34,7 +34,7 @@ abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T, Fragm
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val view = onCreateView(inflater, container, savedInstanceState)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
         binder.setupVoteControlFrame.addView(getControlView(inflater, view))
         return view
     }

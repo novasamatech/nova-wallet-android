@@ -53,7 +53,6 @@ class ExecutionTimerView @JvmOverloads constructor(
     private var currentTimer: CountDownTimer? = null
 
     init {
-        inflate(context, R.layout.view_execution_timer, this)
         setupTimerSwitcher()
     }
 

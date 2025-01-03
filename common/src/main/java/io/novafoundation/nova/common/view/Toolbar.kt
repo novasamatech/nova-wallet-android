@@ -31,7 +31,7 @@ class Toolbar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binder = ViewToolbarBinding.inflate(inflater())
+    private val binder = ViewToolbarBinding.inflate(inflater(), this, true)
 
     val rightActionText: TextView
         get() = binder.rightText

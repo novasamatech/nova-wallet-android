@@ -24,8 +24,6 @@ class WarningCheckBox @JvmOverloads constructor(
     private val binder = ViewWarningCheckboxBinding.inflate(inflater(), this)
 
     init {
-        inflate(context, R.layout.view_warning_checkbox, this)
-
         orientation = VERTICAL
         setBackgroundResource(R.drawable.secondary_container_ripple_background)
         addStatesFromChildren()
