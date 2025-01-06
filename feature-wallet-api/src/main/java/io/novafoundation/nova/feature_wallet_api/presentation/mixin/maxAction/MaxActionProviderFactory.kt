@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction
+package io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction
 
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider

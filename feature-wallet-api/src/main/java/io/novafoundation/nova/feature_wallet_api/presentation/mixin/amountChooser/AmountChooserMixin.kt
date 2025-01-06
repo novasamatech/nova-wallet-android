@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -85,13 +86,15 @@ interface AmountChooserMixin : AmountChooserMixinBase {
             assetFlow: Flow<Asset>,
             availableBalanceFlow: Flow<BigInteger>,
             @StringRes balanceLabel: Int?,
+            maxActionProvider: MaxActionProvider?,
         ): Presentation
 
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
             balanceField: (Asset) -> BigDecimal,
-            @StringRes balanceLabel: Int?
+            @StringRes balanceLabel: Int?,
+            maxActionProvider: MaxActionProvider?,
         ): Presentation
     }
 }

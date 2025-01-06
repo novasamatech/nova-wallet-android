@@ -23,7 +23,8 @@ class AmountChooserProviderFactory(
         scope: CoroutineScope,
         assetFlow: Flow<Asset>,
         availableBalanceFlow: Flow<BigInteger>,
-        balanceLabel: Int?
+        balanceLabel: Int?,
+        maxActionProvider: MaxActionProvider?
     ): AmountChooserProvider {
         return AmountChooserProvider(
             coroutineScope = scope,
@@ -31,12 +32,7 @@ class AmountChooserProviderFactory(
             balanceLabel = balanceLabel,
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
-            // TODO allow that once tested
-            allowMaxAction = false,
-            maxActionProvider = MaxActionProvider.create(scope) {
-                val chainAssetFlow = assetFlow.map { it.token.configuration }
-                chainAssetFlow.providingBalance(availableBalanceFlow)
-            }
+            maxActionProvider = maxActionProvider
         )
     }
 
@@ -44,13 +40,15 @@ class AmountChooserProviderFactory(
         scope: CoroutineScope,
         assetFlow: Flow<Asset>,
         balanceField: (Asset) -> BigDecimal,
-        @StringRes balanceLabel: Int?
+        @StringRes balanceLabel: Int?,
+        maxActionProvider: MaxActionProvider?
     ): AmountChooserMixin.Presentation {
         return create(
             scope = scope,
             assetFlow = assetFlow,
             availableBalanceFlow = assetFlow.map { it.token.planksFromAmount(balanceField(it)) },
             balanceLabel = balanceLabel,
+            maxActionProvider = maxActionProvider
         )
     }
 }
@@ -61,13 +59,11 @@ class AmountChooserProvider(
     private val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     @StringRes private val balanceLabel: Int?,
-    private val allowMaxAction: Boolean,
-    maxActionProvider: MaxActionProvider
+    maxActionProvider: MaxActionProvider?
 ) : BaseAmountChooserProvider(
     coroutineScope = coroutineScope,
     tokenFlow = usedAssetFlow.map { it.token },
     maxActionProvider = maxActionProvider,
-    allowMaxAction = allowMaxAction
 ),
     AmountChooserMixin.Presentation {
 

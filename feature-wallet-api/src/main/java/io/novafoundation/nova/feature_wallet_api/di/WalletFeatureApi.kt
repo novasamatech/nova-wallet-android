@@ -26,34 +26,19 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.context.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 
 interface WalletFeatureApi {
 
-    fun provideWalletRepository(): WalletRepository
-
-    fun provideTokenRepository(): TokenRepository
-
-    fun provideAssetCache(): AssetCache
-
-    fun provideWallConstants(): WalletConstants
-
-    fun provideFeeLoaderMixinFactory(): FeeLoaderMixin.Factory
-
     val assetSourceRegistry: AssetSourceRegistry
-
-    fun provideAmountChooserFactory(): AmountChooserMixin.Factory
-
-    fun coingeckoApi(): CoingeckoApi
-
-    fun enoughTotalToStayAboveEDValidationFactory(): EnoughTotalToStayAboveEDValidationFactory
-
-    fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
 
     val phishingValidationFactory: PhishingValidationFactory
 
     val crossChainTransfersRepository: CrossChainTransfersRepository
+
     val crossChainWeigher: CrossChainWeigher
+
     val crossChainTransactor: CrossChainTransactor
 
     val balanceLocksRepository: BalanceLocksRepository
@@ -81,4 +66,24 @@ interface WalletFeatureApi {
     val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 
     val assetsValidationContextFactory: AssetsValidationContext.Factory
+
+    fun provideWalletRepository(): WalletRepository
+
+    fun provideTokenRepository(): TokenRepository
+
+    fun provideAssetCache(): AssetCache
+
+    fun provideWallConstants(): WalletConstants
+
+    fun provideFeeLoaderMixinFactory(): FeeLoaderMixin.Factory
+
+    fun provideAmountChooserFactory(): AmountChooserMixin.Factory
+
+    fun coingeckoApi(): CoingeckoApi
+
+    fun enoughTotalToStayAboveEDValidationFactory(): EnoughTotalToStayAboveEDValidationFactory
+
+    fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
+
+    fun maxActionProviderFactory(): MaxActionProviderFactory
 }

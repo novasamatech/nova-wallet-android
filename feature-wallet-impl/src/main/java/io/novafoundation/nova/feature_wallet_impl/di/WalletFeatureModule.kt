@@ -63,6 +63,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
@@ -429,5 +430,11 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
     ): AssetsValidationContext.Factory {
         return AssetValidationContextFactory(arbitraryAssetUseCase, chainRegistry, assetSourceRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMaxActionProviderFactory(): MaxActionProviderFactory {
+        return MaxActionProviderFactory()
     }
 }
