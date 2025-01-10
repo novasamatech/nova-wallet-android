@@ -51,7 +51,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromHex
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
