@@ -7,10 +7,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.domain.SplitScreenInteractor
+import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenPayload
 import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
@@ -33,10 +35,12 @@ class SplitScreenFragmentModule {
     fun provideViewModel(
         interactor: SplitScreenInteractor,
         dAppRouter: DAppRouter,
+        delayedNavigationRouter: DelayedNavigationRouter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        payload: SplitScreenPayload
     ): ViewModel {
-        return SplitScreenViewModel(interactor, dAppRouter, actionAwaitableMixinFactory, resourceManager)
+        return SplitScreenViewModel(interactor, dAppRouter, delayedNavigationRouter, actionAwaitableMixinFactory, resourceManager, payload)
     }
 
     @Provides

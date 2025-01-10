@@ -4,10 +4,12 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.di.app.navigation.staking.StakingNavigationModule
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
@@ -43,7 +45,7 @@ class NavigationModule {
     @Provides
     fun provideMainNavigatorHolder(
         contextManager: ContextManager
-    ): MainNavigationHolder = MainNavigationHolder(contextManager)
+    ): SplitScreenNavigationHolder = SplitScreenNavigationHolder(contextManager)
 
     @ApplicationScope
     @Provides
@@ -53,12 +55,20 @@ class NavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideNavigator(
+    fun provideNavigationHoldersRegistry(
         rootNavigatorHolder: RootNavigationHolder,
-        mainNavigatorHolder: MainNavigationHolder,
+        splitScreenNavigationHolder: SplitScreenNavigationHolder,
+    ): NavigationHoldersRegistry {
+        return NavigationHoldersRegistry(splitScreenNavigationHolder, rootNavigatorHolder)
+    }
+
+    @ApplicationScope
+    @Provides
+    fun provideNavigator(
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         walletConnectRouter: WalletConnectRouter,
         stakingDashboardRouter: StakingDashboardRouter,
-    ): Navigator = Navigator(rootNavigatorHolder, mainNavigatorHolder, walletConnectRouter, stakingDashboardRouter)
+    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter, stakingDashboardRouter)
 
     @Provides
     @ApplicationScope
@@ -79,4 +89,8 @@ class NavigationModule {
     @ApplicationScope
     @Provides
     fun provideCrowdloanRouter(navigator: Navigator): CrowdloanRouter = navigator
+
+    @ApplicationScope
+    @Provides
+    fun provideDelayedNavigationRouter(navigator: Navigator): DelayedNavigationRouter = navigator
 }

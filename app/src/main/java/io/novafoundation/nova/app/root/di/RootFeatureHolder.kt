@@ -1,12 +1,13 @@
 package io.novafoundation.nova.app.root.di
 
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -30,7 +31,7 @@ import javax.inject.Inject
 
 @ApplicationScope
 class RootFeatureHolder @Inject constructor(
-    private val mainNavigationHolder: MainNavigationHolder,
+    private val splitScreenNavigationHolder: SplitScreenNavigationHolder,
     private val rootNavigationHolder: RootNavigationHolder,
     private val navigator: Navigator,
     private val governanceRouter: GovernanceRouter,
@@ -38,6 +39,7 @@ class RootFeatureHolder @Inject constructor(
     private val accountRouter: AccountRouter,
     private val assetsRouter: AssetsRouter,
     private val stakingDashboardNavigator: StakingDashboardNavigator,
+    private val delayedNavRouter: DelayedNavigationRouter,
     featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
 
@@ -63,7 +65,7 @@ class RootFeatureHolder @Inject constructor(
 
         return DaggerRootComponent.factory()
             .create(
-                mainNavigationHolder,
+                splitScreenNavigationHolder,
                 rootNavigationHolder,
                 navigator,
                 governanceRouter,
@@ -71,6 +73,7 @@ class RootFeatureHolder @Inject constructor(
                 assetsRouter,
                 accountRouter,
                 stakingDashboardNavigator,
+                delayedNavRouter,
                 rootFeatureDependencies
             )
     }

@@ -2,8 +2,8 @@ package io.novafoundation.nova.app.root.navigation.navigators.account
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.NavStackInterScreenCommunicator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
 import io.novafoundation.nova.app.root.navigation.getBackStackEntryBefore
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Response
@@ -12,8 +12,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.ShowSignParitySignerPayload
 
 class PolkadotVaultVariantSignCommunicatorImpl(
-    navigationHolder: MainNavigationHolder,
-) : NavStackInterScreenCommunicator<Request, Response>(navigationHolder), PolkadotVaultVariantSignCommunicator {
+    navigationHoldersRegistry: NavigationHoldersRegistry
+) : NavStackInterScreenCommunicator<Request, Response>(navigationHoldersRegistry), PolkadotVaultVariantSignCommunicator {
 
     private var usedPolkadotVaultVariant: PolkadotVaultVariant? = null
 

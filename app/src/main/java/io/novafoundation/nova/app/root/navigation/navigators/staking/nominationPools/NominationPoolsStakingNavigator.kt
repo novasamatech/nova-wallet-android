@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking.nomination
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.NominationPoolsConfirmBondMoreFragment
@@ -11,29 +11,41 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
 
 class NominationPoolsStakingNavigator(
-    navigationHolder: MainNavigationHolder,
+    navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
-) : BaseNavigator(navigationHolder), NominationPoolsRouter {
+) : BaseNavigator(navigationHoldersRegistry), NominationPoolsRouter {
 
-    override fun openSetupBondMore() = performNavigation(R.id.action_stakingFragment_to_PoolsBondMoreGraph)
+    override fun openSetupBondMore() {
+        navigationBuilder(R.id.action_stakingFragment_to_PoolsBondMoreGraph).navigateInFirstAttachedContext()
+    }
 
-    override fun openConfirmBondMore(payload: NominationPoolsConfirmBondMorePayload) = performNavigation(
-        actionId = R.id.action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment,
-        args = NominationPoolsConfirmBondMoreFragment.getBundle(payload)
-    )
+    override fun openConfirmBondMore(payload: NominationPoolsConfirmBondMorePayload) {
+        navigationBuilder(R.id.action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment)
+            .setArgs(NominationPoolsConfirmBondMoreFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
 
-    override fun openConfirmUnbond(payload: NominationPoolsConfirmUnbondPayload) = performNavigation(
-        actionId = R.id.action_nominationPoolsSetupUnbondFragment_to_nominationPoolsConfirmUnbondFragment,
-        args = NominationPoolsConfirmUnbondFragment.getBundle(payload)
-    )
+    override fun openConfirmUnbond(payload: NominationPoolsConfirmUnbondPayload) {
+        navigationBuilder(R.id.action_nominationPoolsSetupUnbondFragment_to_nominationPoolsConfirmUnbondFragment)
+            .setArgs(NominationPoolsConfirmUnbondFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
 
-    override fun openRedeem() = performNavigation(R.id.action_stakingFragment_to_PoolsRedeemFragment)
+    override fun openRedeem() {
+        navigationBuilder(R.id.action_stakingFragment_to_PoolsRedeemFragment).navigateInFirstAttachedContext()
+    }
 
-    override fun openClaimRewards() = performNavigation(R.id.action_stakingFragment_to_PoolsClaimRewardsFragment)
+    override fun openClaimRewards() {
+        navigationBuilder(R.id.action_stakingFragment_to_PoolsClaimRewardsFragment).navigateInFirstAttachedContext()
+    }
 
-    override fun openSetupUnbond() = performNavigation(R.id.action_stakingFragment_to_PoolsUnbondGraph)
+    override fun openSetupUnbond() {
+        navigationBuilder(R.id.action_stakingFragment_to_PoolsUnbondGraph).navigateInFirstAttachedContext()
+    }
 
-    override fun returnToStakingMain() = performNavigation(R.id.back_to_staking_main)
+    override fun returnToStakingMain() {
+        navigationBuilder(R.id.back_to_staking_main).navigateInFirstAttachedContext()
+    }
 
     override fun returnToMain() {
         commonNavigator.returnToMain()

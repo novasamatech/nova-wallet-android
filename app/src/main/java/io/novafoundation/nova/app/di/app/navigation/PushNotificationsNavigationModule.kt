@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.push.PushGovernanceSettingsCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.push.PushNotificationsNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.push.PushStakingSettingsCommunicatorImpl
@@ -16,19 +16,20 @@ class PushNotificationsNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: MainNavigationHolder): PushNotificationsRouter = PushNotificationsNavigator(navigationHolder)
+    fun provideRouter(navigationHoldersRegistry: NavigationHoldersRegistry): PushNotificationsRouter =
+        PushNotificationsNavigator(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun providePushGovernanceSettingsCommunicator(
         router: PushNotificationsRouter,
-        navigationHolder: MainNavigationHolder
-    ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun providePushStakingSettingsCommunicator(
         router: PushNotificationsRouter,
-        navigationHolder: MainNavigationHolder
-    ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 }

@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation.staking
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StartMultiStakingNavigator
@@ -21,8 +21,8 @@ class StakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideStakingDashboardNavigator(navigationHolder: MainNavigationHolder): StakingDashboardNavigator {
-        return StakingDashboardNavigator(navigationHolder)
+    fun provideStakingDashboardNavigator(): StakingDashboardNavigator {
+        return StakingDashboardNavigator()
     }
 
     @Provides
@@ -32,10 +32,10 @@ class StakingNavigationModule {
     @Provides
     @ApplicationScope
     fun provideStartMultiStakingRouter(
-        navigationHolder: MainNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         dashboardRouter: StakingDashboardRouter,
         commonNavigator: Navigator
     ): StartMultiStakingRouter {
-        return StartMultiStakingNavigator(navigationHolder, dashboardRouter, commonNavigator)
+        return StartMultiStakingNavigator(navigationHoldersRegistry, dashboardRouter, commonNavigator)
     }
 }

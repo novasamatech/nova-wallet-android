@@ -3,7 +3,7 @@ package io.novafoundation.nova.app.root.di
 import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
@@ -11,6 +11,7 @@ import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponen
 import io.novafoundation.nova.app.root.presentation.splitScreen.di.SplitScreenFragmentComponent
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -52,7 +53,7 @@ interface RootComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance mainNavigationHolder: MainNavigationHolder,
+            @BindsInstance splitScreenNavigationHolder: SplitScreenNavigationHolder,
             @BindsInstance rootNavigationHolder: RootNavigationHolder,
             @BindsInstance rootRouter: RootRouter,
             @BindsInstance governanceRouter: GovernanceRouter,
@@ -60,6 +61,7 @@ interface RootComponent {
             @BindsInstance assetsRouter: AssetsRouter,
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance stakingDashboardNavigator: StakingDashboardNavigator,
+            @BindsInstance delayedNavigationRouter: DelayedNavigationRouter,
             deps: RootDependencies
         ): RootComponent
     }

@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenFragment
+import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenPayload
 import io.novafoundation.nova.common.di.scope.ScreenScope
 
 @Subcomponent(
@@ -18,7 +19,8 @@ interface SplitScreenFragmentComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance fragment: Fragment
+            @BindsInstance fragment: Fragment,
+            @BindsInstance payload: SplitScreenPayload
         ): SplitScreenFragmentComponent
     }
 

@@ -16,6 +16,18 @@ abstract class NavigationHolder(val contextManager: ContextManager) {
         this.navController = navController
     }
 
+    /**
+     * Detaches the current navController only if it matches the one provided.
+     * This check ensures that if a new screen with a navController is attached,
+     * it doesn't lose its navController when the previous screen calls detach.
+     * By verifying equality, we prevent unintended detachment.
+     */
+    fun detachNavController(navController: NavController) {
+        if (this.navController == navController) {
+            this.navController = null
+        }
+    }
+
     fun detach() {
         navController = null
     }

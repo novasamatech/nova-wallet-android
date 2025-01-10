@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Consumer
 import io.novafoundation.nova.feature_dapp_api.data.model.SimpleTabModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
@@ -23,9 +25,13 @@ data class TabsTitleModel(
 class SplitScreenViewModel(
     private val interactor: SplitScreenInteractor,
     private val router: DAppRouter,
+    private val delayedNavigationRouter: DelayedNavigationRouter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val payload: SplitScreenPayload
 ) : BaseViewModel() {
+
+    private val consumablePayload = Consumer(payload)
 
     val closeAllTabsConfirmation = actionAwaitableMixinFactory.confirmingAction<Unit>()
 
@@ -71,5 +77,19 @@ class SplitScreenViewModel(
             resourceManager.getString(R.string.dapp_entry_point_title, size),
             null
         )
+    }
+
+    fun onNavigationAttached() {
+        consumablePayload.useOnce {
+            when (it) {
+                is SplitScreenPayload.InstantNavigationOnAttach -> {
+                    delayedNavigationRouter.runDelayedNavigation(it.delayedNavigation)
+                }
+
+                SplitScreenPayload.NoNavigation,
+                null -> {
+                } // Do nothing
+            }
+        }
     }
 }

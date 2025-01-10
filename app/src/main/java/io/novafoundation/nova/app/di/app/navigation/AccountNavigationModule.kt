@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.MainNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.account.PolkadotVaultVariantSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.account.SelectAddressCommunicatorImpl
@@ -30,34 +30,34 @@ class AccountNavigationModule {
     @Provides
     @ApplicationScope
     fun providePinCodeTwoFactorVerificationCommunicator(
-        navigationHolder: MainNavigationHolder
-    ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideSelectWalletCommunicator(
-        navigationHolder: MainNavigationHolder
-    ): SelectWalletCommunicator = SelectWalletCommunicatorImpl(navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectWalletCommunicator = SelectWalletCommunicatorImpl(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideParitySignerCommunicator(
-        navigationHolder: MainNavigationHolder
-    ): PolkadotVaultVariantSignCommunicator = PolkadotVaultVariantSignCommunicatorImpl(navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PolkadotVaultVariantSignCommunicator = PolkadotVaultVariantSignCommunicatorImpl(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideSelectAddressCommunicator(
         router: AssetsRouter,
-        navigationHolder: MainNavigationHolder
-    ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideSelectMultipleWalletsCommunicator(
         router: AssetsRouter,
-        navigationHolder: MainNavigationHolder
-    ): SelectMultipleWalletsCommunicator = SelectMultipleWalletsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectMultipleWalletsCommunicator = SelectMultipleWalletsCommunicatorImpl(router, navigationHoldersRegistry)
 
     @ApplicationScope
     @Provides
@@ -67,20 +67,20 @@ class AccountNavigationModule {
     @ApplicationScope
     fun providePushGovernanceSettingsCommunicator(
         router: AccountRouter,
-        navigationHolder: MainNavigationHolder
-    ): SyncWalletsBackupPasswordCommunicator = SyncWalletsBackupPasswordCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SyncWalletsBackupPasswordCommunicator = SyncWalletsBackupPasswordCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideChangeBackupPasswordCommunicator(
         router: AccountRouter,
-        navigationHolder: MainNavigationHolder
-    ): ChangeBackupPasswordCommunicator = ChangeBackupPasswordCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): ChangeBackupPasswordCommunicator = ChangeBackupPasswordCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideRestoreBackupPasswordCommunicator(
         router: AccountRouter,
-        navigationHolder: MainNavigationHolder
-    ): RestoreBackupPasswordCommunicator = RestoreBackupPasswordCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): RestoreBackupPasswordCommunicator = RestoreBackupPasswordCommunicatorImpl(router, navigationHoldersRegistry)
 }

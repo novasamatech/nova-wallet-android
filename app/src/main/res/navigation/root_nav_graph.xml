@@ -5,8 +5,6 @@
     android:id="@+id/root_nav_graph"
     app:startDestination="@id/splashFragment">
 
-    <include app:graph="@navigation/main_nav_graph" />
-
     <include app:graph="@navigation/onboarding_nav_graph" />
 
     <include app:graph="@navigation/import_nav_graph" />
@@ -19,8 +17,20 @@
 
     <include app:graph="@navigation/import_wallet_options_nav_graph" />
 
+    <include app:graph="@navigation/external_sign_graph" />
+
+    <include app:graph="@navigation/sign_ledger_nav_graph" />
+
     <action
-        android:id="@+id/action_open_main"
+        android:id="@+id/action_open_externalSignGraph"
+        app:destination="@id/external_sign_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_split_screen"
         app:destination="@id/splitScreenFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
@@ -62,28 +72,20 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_import_nav_graph"
-        app:destination="@id/import_nav_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_root_to_balanceDetailFragment"
-        app:destination="@id/balanceDetailFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
         android:id="@+id/action_open_dappBrowser"
         app:destination="@id/dapp_browser_graph"
         app:enterAnim="@anim/fragment_slide_in"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_slide_out" />
+
+    <action
+        android:id="@+id/action_import_nav_graph"
+        app:destination="@id/import_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_dappSearch"
@@ -104,6 +106,14 @@
     <action
         android:id="@+id/action_importWalletOptionsFragment"
         app:destination="@id/import_wallet_options_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_sign_parity_signer"
+        app:destination="@id/sign_parity_signer_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -152,7 +162,6 @@
         android:id="@+id/pincodeFragmentOverlay"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
         android:label="fragment_pincode"
-        app:useAdd="true"
         tools:layout="@layout/fragment_pincode" />
 
     <fragment
@@ -160,7 +169,18 @@
         android:name="io.novafoundation.nova.feature_versions_impl.presentation.update.UpdateNotificationFragment"
         android:label="updateNotificationsFragment"
         app:useAdd="true"
-        tools:layout="@layout/fragment_update_notifications" />
+        tools:layout="@layout/fragment_update_notifications">
+
+        <action
+            android:id="@+id/action_close_update_notifications"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/updateNotificationsFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/balanceDetailFragment"

@@ -2,8 +2,70 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_nav_graph"
+    android:id="@+id/split_screen_nav_graph"
     app:startDestination="@id/mainFragment">
+
+    <include app:graph="@navigation/import_wallet_options_nav_graph" />
+
+    <include app:graph="@navigation/start_swap_nav_graph" />
+
+    <include app:graph="@navigation/manage_tokens_graph" />
+
+    <include app:graph="@navigation/sign_parity_signer_graph" />
+
+    <include app:graph="@navigation/sign_ledger_nav_graph" />
+
+    <include app:graph="@navigation/add_ledger_chain_account_graph" />
+
+    <include app:graph="@navigation/referendum_details_graph" />
+
+    <include app:graph="@navigation/referendum_unlock_graph" />
+
+    <include app:graph="@navigation/delegation_nav_graph" />
+
+    <include app:graph="@navigation/your_delegations_nav_graph" />
+
+    <include app:graph="@navigation/referenda_search_graph" />
+
+    <include app:graph="@navigation/wallet_connect_nav_graph" />
+
+    <include app:graph="@navigation/staking_main_graph" />
+
+    <include app:graph="@navigation/push_settings_graph" />
+
+    <include app:graph="@navigation/cloud_backup_settings_graph" />
+
+    <include app:graph="@navigation/manual_backup_graph" />
+
+    <include app:graph="@navigation/create_wallet_nav_graph" />
+
+    <include app:graph="@navigation/network_management_graph" />
+
+    <include app:graph="@navigation/tinder_gov_graph" />
+
+    <include app:graph="@navigation/select_swap_token_nav_graph" />
+
+    <include app:graph="@navigation/import_nav_graph" />
+
+    <include app:graph="@navigation/import_wallet_options_nav_graph" />
+
+    <include app:graph="@navigation/onboarding_nav_graph" />
+
+    <action
+        android:id="@+id/action_importWalletOptionsFragment"
+        app:destination="@id/import_wallet_options_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/open_pincode_check"
+        app:destination="@+id/pincodeFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_send"
@@ -85,7 +147,7 @@
         app:launchSingleTop="true"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_open_exit"
-        app:popUpTo="@id/main_nav_graph" />
+        app:popUpTo="@id/split_screen_nav_graph" />
 
     <action
         android:id="@+id/action_export_seed"
@@ -140,6 +202,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_import_nav_graph"
+        app:destination="@id/import_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_sign_parity_signer"
         app:destination="@id/sign_parity_signer_graph"
         app:enterAnim="@anim/fragment_open_enter"
@@ -163,13 +233,6 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
-    <action
-        android:id="@+id/action_open_externalSignGraph"
-        app:destination="@id/external_sign_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_scanWalletConnect"
@@ -286,6 +349,12 @@
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_onboarding"
+        app:destination="@id/onboarding_nav_graph"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"/>
 
     <fragment
         android:id="@+id/mainFragment"
@@ -997,45 +1066,5 @@
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DappFavoritesFragment"
         android:label="fragment_favorites"
         tools:layout="@layout/fragment_favorites_dapp"/>
-
-    <include app:graph="@navigation/start_swap_nav_graph" />
-
-    <include app:graph="@navigation/manage_tokens_graph" />
-
-    <include app:graph="@navigation/sign_parity_signer_graph" />
-
-    <include app:graph="@navigation/sign_ledger_nav_graph" />
-
-    <include app:graph="@navigation/add_ledger_chain_account_graph" />
-
-    <include app:graph="@navigation/referendum_details_graph" />
-
-    <include app:graph="@navigation/referendum_unlock_graph" />
-
-    <include app:graph="@navigation/delegation_nav_graph" />
-
-    <include app:graph="@navigation/your_delegations_nav_graph" />
-
-    <include app:graph="@navigation/referenda_search_graph" />
-
-    <include app:graph="@navigation/wallet_connect_nav_graph" />
-
-    <include app:graph="@navigation/external_sign_graph" />
-
-    <include app:graph="@navigation/staking_main_graph" />
-
-    <include app:graph="@navigation/push_settings_graph" />
-
-    <include app:graph="@navigation/cloud_backup_settings_graph" />
-
-    <include app:graph="@navigation/manual_backup_graph" />
-
-    <include app:graph="@navigation/create_wallet_nav_graph" />
-
-    <include app:graph="@navigation/network_management_graph" />
-
-    <include app:graph="@navigation/tinder_gov_graph" />
-
-    <include app:graph="@navigation/select_swap_token_nav_graph" />
 
 </navigation>
