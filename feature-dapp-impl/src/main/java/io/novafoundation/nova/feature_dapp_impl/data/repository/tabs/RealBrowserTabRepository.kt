@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.data.repository.tabs
 
-import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.model.BrowserTabLocal
