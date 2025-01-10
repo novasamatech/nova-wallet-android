@@ -26,7 +26,7 @@ abstract class BaseNavigator(
         navigationHoldersRegistry.firstAttachedHolder.finishApp()
     }
 
-    protected fun navigationBuilder(destination: Int? = null): NavigationBuilder {
+    fun navigationBuilder(destination: Int? = null): NavigationBuilder {
         return NavigationBuilder(navigationHoldersRegistry, destination)
     }
 }
