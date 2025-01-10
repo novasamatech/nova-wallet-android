@@ -17,6 +17,6 @@ class DAppSearchCommunicatorImpl(navigationHoldersRegistry: NavigationHoldersReg
 
         navigationBuilder(R.id.action_open_dappSearch_from_browser)
             .setArgs(DappSearchFragment.getBundle(request))
-            .performInRoot()
+            .navigateInRoot()
     }
 }

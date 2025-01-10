@@ -23,12 +23,12 @@ class SwapNavigator(
 
         navigationBuilder(R.id.action_swapMainSettingsFragment_to_swapConfirmationFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwapOptions() {
         navigationBuilder(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBalanceDetails(assetPayload: AssetPayload) {
@@ -36,7 +36,7 @@ class SwapNavigator(
 
         navigationBuilder(R.id.action_swapConfirmationFragment_to_assetDetails)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun selectAssetIn(selectedAsset: AssetPayload?) {
@@ -45,7 +45,7 @@ class SwapNavigator(
 
         navigationBuilder(R.id.action_swapSettingsFragment_to_select_swap_token_graph)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun selectAssetOut(selectedAsset: AssetPayload?) {
@@ -54,7 +54,7 @@ class SwapNavigator(
 
         navigationBuilder(R.id.action_swapSettingsFragment_to_select_swap_token_graph)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSendCrossChain(destination: AssetPayload, recipientAddress: String?) {

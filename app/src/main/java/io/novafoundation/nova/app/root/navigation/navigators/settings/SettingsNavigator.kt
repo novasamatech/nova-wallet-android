@@ -36,73 +36,73 @@ class SettingsNavigator(
 
     override fun openNetworks() {
         navigationBuilder(R.id.action_open_networkManagement)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openNetworkDetails(payload: ChainNetworkManagementPayload) {
         navigationBuilder(R.id.action_open_networkManagementDetails)
             .setArgs(ChainNetworkManagementFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCustomNode(payload: CustomNodePayload) {
         navigationBuilder(R.id.action_open_customNode)
             .setArgs(CustomNodeFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun addNetwork() {
         navigationBuilder(R.id.action_open_preConfiguredNetworks)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCreateNetworkFlow() {
         navigationBuilder(R.id.action_open_addNetworkFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCreateNetworkFlow(payload: AddNetworkPayload.Mode.Add) {
         navigationBuilder(R.id.action_open_addNetworkFragment)
             .setArgs(AddNetworkMainFragment.getBundle(AddNetworkPayload(payload)))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishCreateNetworkFlow() {
         navigationBuilder(R.id.action_finishCreateNetworkFlow)
             .setArgs(NetworkManagementListFragment.getBundle(openAddedTab = true))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openEditNetwork(payload: AddNetworkPayload.Mode.Edit) {
         navigationBuilder(R.id.action_open_editNetwork)
             .setArgs(AddNetworkMainFragment.getBundle(AddNetworkPayload(payload)))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPushNotificationSettings() {
         navigationBuilder(R.id.action_open_pushNotificationsSettings)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCurrencies() {
         navigationBuilder(R.id.action_mainFragment_to_currenciesFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openLanguages() {
         navigationBuilder(R.id.action_mainFragment_to_languagesFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAppearance() {
         navigationBuilder(R.id.action_mainFragment_to_appearanceFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openChangePinCode() {
         navigationBuilder(R.id.action_change_pin_code)
             .setArgs(PincodeFragment.getPinCodeBundle(PinCodeAction.Change))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openWalletDetails(metaId: Long) {
@@ -123,11 +123,11 @@ class SettingsNavigator(
 
     override fun openCloudBackupSettings() {
         navigationBuilder(R.id.action_open_cloudBackupSettings)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManualBackup() {
         navigationBuilder(R.id.action_open_manualBackupSelectWallet)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 }

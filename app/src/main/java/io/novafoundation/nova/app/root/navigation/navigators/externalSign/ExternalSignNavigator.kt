@@ -13,6 +13,6 @@ class ExternalSignNavigator(
     override fun openExtrinsicDetails(extrinsicContent: String) {
         navigationBuilder(R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment)
             .setArgs(ExternalExtrinsicDetailsFragment.getBundle(extrinsicContent))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 }

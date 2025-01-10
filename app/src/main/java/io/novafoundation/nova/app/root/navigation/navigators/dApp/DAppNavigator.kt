@@ -18,10 +18,12 @@ class DAppNavigator(
 
     override fun openChangeAccount() {
         navigationBuilder(R.id.action_open_switch_wallet)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
+        // Close dapp browser if it is already opened
+        // TODO it's better to provide new url to existing browser
         navigationBuilder()
             .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_DAppBrowserFragment)
             .addCase(R.id.dappSearchFragment, R.id.action_dappSearchFragment_to_dapp_browser_graph)
@@ -29,7 +31,7 @@ class DAppNavigator(
             .setFallbackCase(R.id.action_open_dappBrowser)
             .setExtras(extras)
             .setArgs(DAppBrowserFragment.getBundle(payload))
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openDappSearch() {
@@ -39,39 +41,39 @@ class DAppNavigator(
     override fun openDappSearchWithCategory(categoryId: String?) {
         navigationBuilder(R.id.action_open_dappSearch)
             .setArgs(DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL, preselectedCategoryId = categoryId)))
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun finishDappSearch() {
         navigationBuilder(R.id.action_finish_dapp_search)
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openAddToFavourites(payload: AddToFavouritesPayload) {
         navigationBuilder(R.id.action_DAppBrowserFragment_to_addToFavouritesFragment)
             .setArgs(AddToFavouritesFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAuthorizedDApps() {
         navigationBuilder(R.id.action_mainFragment_to_authorizedDAppsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openTabs() {
         navigationBuilder()
             .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_browserTabsFragment)
             .setFallbackCase(R.id.action_open_dappTabs)
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun closeTabsScreen() {
         navigationBuilder(R.id.action_finish_tabs_fragment)
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openDAppFavorites() {
         navigationBuilder(R.id.action_open_dapp_favorites)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 }

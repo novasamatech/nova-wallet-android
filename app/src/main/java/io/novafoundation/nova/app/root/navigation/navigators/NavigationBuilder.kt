@@ -25,11 +25,15 @@ class NavigationBuilder(
     private var extras: FragmentNavigator.Extras? = null
 
     fun addCase(currentDestination: Int, actionId: Int): NavigationBuilder {
+        require(this.actionId == null)
+
         cases.add(Case(currentDestination, actionId))
         return this
     }
 
     fun setFallbackCase(actionId: Int): NavigationBuilder {
+        require(this.actionId == null)
+
         fallbackCaseActionId = actionId
         return this
     }
@@ -49,11 +53,11 @@ class NavigationBuilder(
         return this
     }
 
-    fun perform() {
+    fun navigateInFirstAttachedContext() {
         performInternal(navigationHoldersRegistry.firstAttachedHolder)
     }
 
-    fun performInRoot() {
+    fun navigateInRoot() {
         performInternal(navigationHoldersRegistry.rootNavigationHolder)
     }
 

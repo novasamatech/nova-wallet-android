@@ -24,6 +24,6 @@ class PinCodeTwoFactorVerificationCommunicatorImpl(
 
         navigationBuilder(R.id.action_pin_code_two_factor_verification)
             .setArgs(bundle)
-            .performInRoot()
+            .navigateInRoot()
     }
 }

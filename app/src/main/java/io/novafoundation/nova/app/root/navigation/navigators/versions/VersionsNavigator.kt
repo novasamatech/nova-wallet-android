@@ -19,6 +19,6 @@ class VersionsNavigator(
 
     override fun closeUpdateNotifications() {
         navigationBuilder(R.id.action_close_update_notifications)
-            .performInRoot()
+            .navigateInRoot()
     }
 }

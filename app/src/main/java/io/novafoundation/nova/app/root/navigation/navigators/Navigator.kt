@@ -114,7 +114,7 @@ class Navigator(
             .addCase(R.id.accountsFragment, R.id.action_walletManagment_to_welcome)
             .addCase(R.id.splashFragment, R.id.action_splash_to_onboarding)
             .setArgs(WelcomeFragment.bundle(false))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openInitialCheckPincode() {
@@ -122,18 +122,18 @@ class Navigator(
 
         navigationBuilder(R.id.action_splash_to_pin)
             .setArgs(PincodeFragment.getPinCodeBundle(action))
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openCreateFirstWallet() {
         navigationBuilder(R.id.action_welcomeFragment_to_startCreateWallet)
             .setArgs(StartCreateWalletFragment.bundle(StartCreateWalletPayload(FlowType.FIRST_WALLET)))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openMain() {
         navigationBuilder(R.id.action_open_split_screen)
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openAfterPinCode(delayedNavigation: DelayedNavigation) {
@@ -150,7 +150,7 @@ class Navigator(
                 navigationBuilder(delayedNavigation.globalActionId)
                     .setArgs(delayedNavigation.extras)
                     .setNavOptions(navOptions)
-                    .perform()
+                    .navigateInFirstAttachedContext()
             }
 
             is BackDelayedNavigation -> back()
@@ -171,19 +171,19 @@ class Navigator(
             .addCase(R.id.restoreCloudBackupFragment, R.id.action_restoreCloudBackupFragment_to_pincodeFragment)
             .addCase(R.id.finishImportGenericLedgerFragment, R.id.action_finishImportGenericLedgerFragment_to_pincodeFragment)
             .setArgs(args)
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openAdvancedSettings(payload: AdvancedEncryptionModePayload) {
         navigationBuilder(R.id.action_open_advancedEncryptionFragment)
             .setArgs(AdvancedEncryptionFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmMnemonicOnCreate(confirmMnemonicPayload: ConfirmMnemonicPayload) {
         navigationBuilder(R.id.action_backupMnemonicFragment_to_confirmMnemonicFragment)
             .setArgs(ConfirmMnemonicFragment.getBundle(confirmMnemonicPayload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openImportAccountScreen(payload: ImportAccountPayload) {
@@ -191,7 +191,7 @@ class Navigator(
             .addCase(R.id.splashFragment, R.id.action_splashFragment_to_import_nav_graph)
             .setFallbackCase(R.id.action_import_nav_graph)
             .setArgs(ImportAccountFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openMnemonicScreen(accountName: String?, addAccountPayload: AddAccountPayload) {
@@ -202,7 +202,7 @@ class Navigator(
             .addCase(R.id.startCreateWalletFragment, R.id.action_startCreateWalletFragment_to_mnemonic_nav_graph)
             .addCase(R.id.walletDetailsFragment, R.id.action_accountDetailsFragment_to_mnemonic_nav_graph)
             .setArgs(BackupMnemonicFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openContribute(payload: ContributePayload) {
@@ -212,7 +212,7 @@ class Navigator(
             .addCase(R.id.mainFragment, R.id.action_mainFragment_to_crowdloanContributeFragment)
             .addCase(R.id.moonbeamCrowdloanTermsFragment, R.id.action_moonbeamCrowdloanTermsFragment_to_crowdloanContributeFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     @Deprecated("TODO: Use communicator api instead")
@@ -229,7 +229,7 @@ class Navigator(
     override fun openCustomContribute(payload: CustomContributePayload) {
         navigationBuilder(R.id.action_crowdloanContributeFragment_to_customContributeFragment)
             .setArgs(CustomContributeFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     @Deprecated("TODO: Use communicator api instead")
@@ -240,30 +240,30 @@ class Navigator(
     override fun openConfirmContribute(payload: ConfirmContributePayload) {
         navigationBuilder(R.id.action_crowdloanContributeFragment_to_confirmContributeFragment)
             .setArgs(ConfirmContributeFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToMain() {
         navigationBuilder(R.id.back_to_main)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openMoonbeamFlow(payload: ContributePayload) {
         navigationBuilder(R.id.action_mainFragment_to_moonbeamCrowdloanTermsFragment)
             .setArgs(MoonbeamCrowdloanTermsFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAddAccount(payload: AddAccountPayload) {
         navigationBuilder(R.id.action_open_onboarding)
             .setArgs(WelcomeFragment.bundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openFilter(payload: TransactionHistoryFilterPayload) {
         navigationBuilder(R.id.action_mainFragment_to_filterFragment)
             .setArgs(TransactionHistoryFilterFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSend(payload: SendPayload, initialRecipientAddress: String?) {
@@ -271,7 +271,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_open_send)
             .setArgs(extras)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmTransfer(transferDraft: TransferDraft) {
@@ -279,7 +279,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_chooseAmountFragment_to_confirmTransferFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openTransferDetail(transaction: OperationParcelizeModel.Transfer) {
@@ -287,7 +287,7 @@ class Navigator(
 
         navigationBuilder(R.id.open_transfer_detail)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openRewardDetail(reward: OperationParcelizeModel.Reward) {
@@ -295,7 +295,7 @@ class Navigator(
 
         navigationBuilder(R.id.open_reward_detail)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPoolRewardDetail(reward: OperationParcelizeModel.PoolReward) {
@@ -303,7 +303,7 @@ class Navigator(
 
         navigationBuilder(R.id.open_pool_reward_detail)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwapDetail(swap: OperationParcelizeModel.Swap) {
@@ -311,105 +311,105 @@ class Navigator(
 
         navigationBuilder(R.id.open_swap_detail)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openExtrinsicDetail(extrinsic: OperationParcelizeModel.Extrinsic) {
         navigationBuilder(R.id.open_extrinsic_detail)
             .setArgs(ExtrinsicDetailFragment.getBundle(extrinsic))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openWallets() {
         navigationBuilder(R.id.action_open_accounts)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwitchWallet() {
         navigationBuilder(R.id.action_open_switch_wallet)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openDelegatedAccountsUpdates() {
         navigationBuilder(R.id.action_switchWalletFragment_to_delegatedAccountUpdates)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSelectAddress(arguments: Bundle) {
         navigationBuilder(R.id.action_open_select_address)
             .setArgs(arguments)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSelectMultipleWallets(arguments: Bundle) {
         navigationBuilder(R.id.action_open_select_multiple_wallets)
             .setArgs(arguments)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openNodes() {
         navigationBuilder(R.id.action_mainFragment_to_nodesFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
         navigationBuilder(R.id.action_open_receive)
             .setArgs(ReceiveFragment.getBundle(assetPayload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAssetSearch() {
         navigationBuilder(R.id.action_mainFragment_to_assetSearchFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManageTokens() {
         navigationBuilder(R.id.action_mainFragment_to_manageTokensGraph)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManageChainTokens(payload: ManageChainTokensPayload) {
         val args = ManageChainTokensFragment.getBundle(payload)
         navigationBuilder(R.id.action_manageTokensFragment_to_manageChainTokensFragment)
             .setArgs(args)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAddTokenSelectChain() {
         navigationBuilder(R.id.action_manageTokensFragment_to_addTokenSelectChainFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSendFlow() {
         navigationBuilder(R.id.action_mainFragment_to_sendFlow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openReceiveFlow() {
         navigationBuilder(R.id.action_mainFragment_to_receiveFlow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBuyFlow() {
         navigationBuilder(R.id.action_mainFragment_to_buyFlow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBuyFlowFromSendFlow() {
         navigationBuilder(R.id.action_sendFlow_to_buyFlow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload) {
         val args = AddTokenEnterInfoFragment.getBundle(payload)
         navigationBuilder(R.id.action_addTokenSelectChainFragment_to_addTokenEnterInfoFragment)
             .setArgs(args)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishAddTokenFlow() {
         navigationBuilder(R.id.finish_add_token_flow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openWalletConnectSessions(metaId: Long) {
@@ -423,7 +423,7 @@ class Navigator(
     override fun openStaking() {
         if (currentDestination?.id != R.id.mainFragment) {
             navigationBuilder(R.id.action_open_split_screen)
-                .perform()
+                .navigateInFirstAttachedContext()
         }
 
         stakingDashboardDelegate.openStakingDashboard()
@@ -431,54 +431,54 @@ class Navigator(
 
     override fun closeSendFlow() {
         navigationBuilder(R.id.action_close_send_flow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSendNetworks(payload: NetworkFlowPayload) {
         navigationBuilder(R.id.action_sendFlow_to_sendFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openReceiveNetworks(payload: NetworkFlowPayload) {
         navigationBuilder(R.id.action_receiveFlow_to_receiveFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwapNetworks(payload: NetworkSwapFlowPayload) {
         navigationBuilder(R.id.action_selectAssetSwapFlowFragment_to_swapFlowNetworkFragment)
             .setArgs(NetworkSwapFlowFragment.createPayload(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBuyNetworks(payload: NetworkFlowPayload) {
         navigationBuilder(R.id.action_buyFlow_to_buyFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToMainSwapScreen() {
         navigationBuilder(R.id.action_return_to_swap_settings)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwapFlow() {
         val payload = SwapFlowPayload.InitialSelecting
         navigationBuilder(R.id.action_mainFragment_to_swapFlow)
             .setArgs(AssetSwapFlowFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navigationBuilder(R.id.action_open_swapSetupAmount)
             .setArgs(SwapMainSettingsFragment.getBundle(swapSettingsPayload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openNfts() {
         navigationBuilder(R.id.action_mainFragment_to_nfts_nav_graph)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun nonCancellableVerify() {
@@ -494,35 +494,35 @@ class Navigator(
             if (arguments is PinCodeAction.Change) {
                 navigationBuilder(R.id.action_pin_code_access_recovery)
                     .setArgs(bundle)
-                    .performInRoot()
+                    .navigateInRoot()
             }
         } else {
             navigationBuilder(R.id.action_pin_code_access_recovery)
                 .setArgs(bundle)
-                .performInRoot()
+                .navigateInRoot()
         }
     }
 
     override fun openUpdateNotifications() {
         navigationBuilder(R.id.action_open_update_notifications)
-            .performInRoot()
+            .navigateInRoot()
     }
 
     override fun openPushWelcome() {
         navigationBuilder(R.id.action_open_pushNotificationsWelcome)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCloudBackupSettings() {
         navigationBuilder(R.id.action_open_cloudBackupSettings)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
             navigationBuilder(R.id.action_return_to_wallet)
-                .perform()
+                .navigateInFirstAttachedContext()
         }
     }
 
@@ -530,14 +530,14 @@ class Navigator(
         val extras = WalletDetailsFragment.getBundle(metaId)
         navigationBuilder(R.id.action_open_account_details)
             .setArgs(extras)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openNodeDetails(nodeId: Int) {
         val extras = NodeDetailsFragment.getBundle(nodeId)
         navigationBuilder(R.id.action_nodesFragment_to_nodeDetailsFragment)
             .setArgs(extras)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAssetDetails(assetPayload: AssetPayload) {
@@ -548,12 +548,12 @@ class Navigator(
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAddNode() {
         navigationBuilder(R.id.action_nodesFragment_to_addNodeFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openChangeWatchAccount(payload: AddAccountPayload.ChainAccount) {
@@ -561,18 +561,18 @@ class Navigator(
 
         navigationBuilder(R.id.action_accountDetailsFragment_to_changeWatchAccountFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCreateWallet(payload: StartCreateWalletPayload) {
         navigationBuilder(R.id.action_open_create_new_wallet)
             .setArgs(StartCreateWalletFragment.bundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openUserContributions() {
         navigationBuilder(R.id.action_mainFragment_to_userContributionsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun getExportMnemonicDelayedNavigation(exportPayload: ExportPayload.ChainAccount): DelayedNavigation {
@@ -599,12 +599,12 @@ class Navigator(
 
         navigationBuilder(R.id.action_export_json)
             .setArgs(extras)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishExportFlow() {
         navigationBuilder(R.id.finish_export_flow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openScanImportParitySigner(payload: ParitySignerStartPayload) {
@@ -612,7 +612,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_startImportParitySignerFragment_to_scanImportParitySignerFragment)
             .setArgs(args)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPreviewImportParitySigner(payload: ParitySignerAccountPayload) {
@@ -620,7 +620,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_scanImportParitySignerFragment_to_previewImportParitySignerFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openFinishImportParitySigner(payload: ParitySignerAccountPayload) {
@@ -628,7 +628,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_previewImportParitySignerFragment_to_finishImportParitySignerFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openScanParitySignerSignature(payload: ScanSignParitySignerPayload) {
@@ -636,12 +636,12 @@ class Navigator(
 
         navigationBuilder(R.id.action_showSignParitySignerFragment_to_scanSignParitySignerFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishParitySignerFlow() {
         navigationBuilder(R.id.action_finish_parity_signer_flow)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount) {
@@ -649,7 +649,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_accountDetailsFragment_to_addLedgerAccountGraph)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCreateCloudBackupPassword(walletName: String) {
@@ -657,34 +657,34 @@ class Navigator(
 
         navigationBuilder(R.id.action_startCreateWalletFragment_to_createCloudBackupPasswordFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun restoreCloudBackup() {
         navigationBuilder()
             .addCase(R.id.importWalletOptionsFragment, R.id.action_importWalletOptionsFragment_to_restoreCloudBackup)
             .addCase(R.id.startCreateWalletFragment, R.id.action_startCreateWalletFragment_to_resotreCloudBackupFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSyncWalletsBackupPassword() {
         navigationBuilder(R.id.action_cloudBackupSettings_to_syncWalletsBackupPasswordFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openChangeBackupPasswordFlow() {
         navigationBuilder(R.id.action_cloudBackupSettings_to_checkCloudBackupPasswordFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openRestoreBackupPassword() {
         navigationBuilder(R.id.action_cloudBackupSettings_to_restoreCloudBackupPasswordFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openChangeBackupPassword() {
         navigationBuilder(R.id.action_checkCloudBackupPasswordFragment_to_changeBackupPasswordFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManualBackupSelectAccount(metaId: Long) {
@@ -692,7 +692,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_manualBackupSelectWalletFragment_to_manualBackupSelectAccountFragment)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManualBackupConditions(payload: ManualBackupCommonPayload) {
@@ -708,26 +708,26 @@ class Navigator(
             .addCase(R.id.manualBackupSelectWallet, R.id.action_manualBackupSelectWallet_to_pincode_check)
             .addCase(R.id.manualBackupSelectAccount, R.id.action_manualBackupSelectAccount_to_pincode_check)
             .setArgs(pinCodeBundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManualBackupSecrets(payload: ManualBackupCommonPayload) {
         val bundle = ManualBackupSecretsFragment.bundle(payload)
         navigationBuilder(R.id.action_manualBackupWarning_to_manualBackupSecrets)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload) {
         val bundle = ManualBackupAdvancedSecretsFragment.bundle(payload)
         navigationBuilder(R.id.action_manualBackupSecrets_to_manualBackupAdvancedSecrets)
             .setArgs(bundle)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCreateWatchWallet() {
         navigationBuilder(R.id.action_importWalletOptionsFragment_to_createWatchWalletFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStartImportParitySigner() {
@@ -742,17 +742,17 @@ class Navigator(
         navigationBuilder()
             .addCase(R.id.welcomeFragment, R.id.action_welcomeFragment_to_importWalletOptionsFragment)
             .setFallbackCase(R.id.action_importWalletOptionsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStartImportLegacyLedger() {
         navigationBuilder(R.id.action_importWalletOptionsFragment_to_import_legacy_ledger_graph)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStartImportGenericLedger() {
         navigationBuilder(R.id.action_importWalletOptionsFragment_to_import_generic_ledger_graph)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun withPinCodeCheckRequired(
@@ -768,7 +768,7 @@ class Navigator(
 
         navigationBuilder(R.id.open_pincode_check)
             .setArgs(PincodeFragment.getPinCodeBundle(action))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     private fun openStartImportPolkadotVault(variant: PolkadotVaultVariant) {
@@ -776,7 +776,7 @@ class Navigator(
 
         navigationBuilder(R.id.action_importWalletOptionsFragment_to_import_parity_signer_graph)
             .setArgs(args)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     private fun buildCreatePinBundle(): Bundle {
@@ -791,7 +791,7 @@ class Navigator(
             is NavComponentDelayedNavigation -> {
                 navigationBuilder(delayedNavigation.globalActionId)
                     .setArgs(delayedNavigation.extras)
-                    .perform()
+                    .navigateInFirstAttachedContext()
             }
         }
     }

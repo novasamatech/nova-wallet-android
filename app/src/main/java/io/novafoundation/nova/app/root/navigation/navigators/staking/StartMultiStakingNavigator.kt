@@ -27,36 +27,36 @@ class StartMultiStakingNavigator(
     override fun openStartStakingLanding(payload: StartStakingLandingPayload) {
         navigationBuilder(R.id.action_mainFragment_to_startStackingLanding)
             .setArgs(StartStakingLandingFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStartParachainStaking() {
         navigationBuilder(R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph)
             .setArgs(StartParachainStakingFragment.getBundle(StartParachainStakingPayload(StartParachainStakingMode.START)))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload) {
         navigationBuilder(R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph)
             .setArgs(SetupAmountMultiStakingFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSetupStakingType(payload: SetupStakingTypePayload) {
         navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
             .setArgs(SetupStakingTypeFragment.getArguments(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirm(payload: ConfirmMultiStakingPayload) {
         navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment)
             .setArgs(ConfirmMultiStakingFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSelectedValidators() {
         navigationBuilder(R.id.action_confirmMultiStakingFragment_to_confirmNominationsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToStakingDashboard() {

@@ -71,7 +71,7 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
             .asFlow()
     }
 
-    fun navigationBuilder(destination: Int? = null): NavigationBuilder {
+    protected fun navigationBuilder(destination: Int? = null): NavigationBuilder {
         return NavigationBuilder(navigationHoldersRegistry, destination)
     }
 }

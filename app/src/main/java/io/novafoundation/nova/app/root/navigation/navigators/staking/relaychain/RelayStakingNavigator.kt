@@ -51,7 +51,7 @@ class RelayStakingNavigator(
 
     override fun returnToStakingMain() {
         navigationBuilder(R.id.back_to_staking_main)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSwitchWallet() = commonNavigator.openSwitchWallet()
@@ -60,44 +60,44 @@ class RelayStakingNavigator(
 
     override fun openCustomRebond() {
         navigationBuilder(R.id.action_stakingFragment_to_customRebondFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCurrentValidators() {
         navigationBuilder(R.id.action_stakingFragment_to_currentValidatorsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToCurrentValidators() {
         navigationBuilder(R.id.action_confirmStakingFragment_back_to_currentValidatorsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openChangeRewardDestination() {
         navigationBuilder(R.id.action_stakingFragment_to_selectRewardDestinationFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmRewardDestination(payload: ConfirmRewardDestinationPayload) {
         navigationBuilder(R.id.action_selectRewardDestinationFragment_to_confirmRewardDestinationFragment)
             .setArgs(ConfirmRewardDestinationFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openControllerAccount() {
         navigationBuilder(R.id.action_stakingBalanceFragment_to_setControllerAccountFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmSetController(payload: ConfirmSetControllerPayload) {
         navigationBuilder(R.id.action_stakingSetControllerAccountFragment_to_confirmSetControllerAccountFragment)
             .setArgs(ConfirmSetControllerFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openRecommendedValidators() {
         navigationBuilder(R.id.action_startChangeValidatorsFragment_to_recommendedValidatorsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSelectCustomValidators() {
@@ -111,148 +111,148 @@ class RelayStakingNavigator(
             .addCase(R.id.setupStakingType, R.id.action_setupStakingType_to_selectCustomValidatorsFragment)
             .addCase(R.id.startChangeValidatorsFragment, R.id.action_startChangeValidatorsFragment_to_selectCustomValidatorsFragment)
             .setArgs(SelectCustomValidatorsFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openCustomValidatorsSettings() {
         navigationBuilder(R.id.action_selectCustomValidatorsFragment_to_settingsCustomValidatorsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSearchCustomValidators() {
         navigationBuilder(R.id.action_selectCustomValidatorsFragment_to_searchCustomValidatorsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openReviewCustomValidators(payload: CustomValidatorsPayload) {
         navigationBuilder(R.id.action_selectCustomValidatorsFragment_to_reviewCustomValidatorsFragment)
             .setArgs(ReviewCustomValidatorsFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmStaking() {
         navigationBuilder(R.id.openConfirmStakingFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmNominations() {
         navigationBuilder(R.id.action_confirmStakingFragment_to_confirmNominationsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openChainStakingMain() {
         navigationBuilder(R.id.action_mainFragment_to_stakingGraph)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStartChangeValidators() {
         navigationBuilder(R.id.openStartChangeValidatorsFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStory(story: StakingStoryModel) {
         navigationBuilder(R.id.open_staking_story)
             .setArgs(StoryFragment.getBundle(story))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPayouts() {
         navigationBuilder(R.id.action_stakingFragment_to_payoutsListFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPayoutDetails(payout: PendingPayoutParcelable) {
         navigationBuilder(R.id.action_payoutsListFragment_to_payoutDetailsFragment)
             .setArgs(PayoutDetailsFragment.getBundle(payout))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmPayout(payload: ConfirmPayoutPayload) {
         navigationBuilder(R.id.action_open_confirm_payout)
             .setArgs(ConfirmPayoutFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBondMore() {
         navigationBuilder(R.id.action_open_selectBondMoreFragment)
             .setArgs(SelectBondMoreFragment.getBundle(SelectBondMorePayload()))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmBondMore(payload: ConfirmBondMorePayload) {
         navigationBuilder(R.id.action_selectBondMoreFragment_to_confirmBondMoreFragment)
             .setArgs(ConfirmBondMoreFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSelectUnbond() {
         navigationBuilder(R.id.action_stakingFragment_to_selectUnbondFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmUnbond(payload: ConfirmUnbondPayload) {
         navigationBuilder(R.id.action_selectUnbondFragment_to_confirmUnbondFragment)
             .setArgs(ConfirmUnbondFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openRedeem() {
         navigationBuilder(R.id.action_open_redeemFragment)
             .setArgs(RedeemFragment.getBundle(RedeemPayload()))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmRebond(payload: ConfirmRebondPayload) {
         navigationBuilder(R.id.action_open_confirm_rebond)
             .setArgs(ConfirmRebondFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openValidatorDetails(payload: StakeTargetDetailsPayload) {
         navigationBuilder(R.id.open_validator_details)
             .setArgs(ValidatorDetailsFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openRebag() {
         navigationBuilder(R.id.action_stakingFragment_to_rebag)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStakingPeriods() {
         navigationBuilder(R.id.action_stakingFragment_to_staking_periods)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSetupStakingType() {
         navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSelectPool(payload: SelectingPoolPayload) {
         val arguments = SelectPoolFragment.getBundle(payload)
         navigationBuilder(R.id.action_setupStakingType_to_selectCustomPoolFragment)
             .setArgs(arguments)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSearchPool(payload: SelectingPoolPayload) {
         val arguments = SearchPoolFragment.getBundle(payload)
         navigationBuilder(R.id.action_selectPool_to_searchPoolFragment)
             .setArgs(arguments)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishSetupValidatorsFlow() {
         navigationBuilder(R.id.action_back_to_setupAmountMultiStakingFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishSetupPoolFlow() {
         navigationBuilder()
             .addCase(R.id.searchPoolFragment, R.id.action_searchPool_to_setupAmountMultiStakingFragment)
             .addCase(R.id.selectPoolFragment, R.id.action_selectPool_to_setupAmountMultiStakingFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishRedeemFlow(redeemConsequences: RedeemConsequences) {
@@ -265,29 +265,29 @@ class RelayStakingNavigator(
 
     override fun openAddStakingProxy() {
         navigationBuilder(R.id.action_open_addStakingProxyFragment)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmAddStakingProxy(payload: ConfirmAddStakingProxyPayload) {
         navigationBuilder(R.id.action_addStakingProxyFragment_to_confirmAddStakingProxyFragment)
             .setArgs(ConfirmAddStakingProxyFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openStakingProxyList() {
         navigationBuilder(R.id.action_open_stakingProxyList)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmRemoveStakingProxy(payload: ConfirmRemoveStakingProxyPayload) {
         navigationBuilder(R.id.action_open_confirmRemoveStakingProxyFragment)
             .setArgs(ConfirmRemoveStakingProxyFragment.getBundle(payload))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openDAppBrowser(url: String) {
         navigationBuilder(R.id.action_open_dappBrowser)
             .setArgs(DAppBrowserFragment.getBundle(DAppBrowserPayload.Address(url)))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 }

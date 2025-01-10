@@ -80,7 +80,7 @@ class SplitScreenViewModel(
     }
 
     fun onNavigationAttached() {
-        consumablePayload.use {
+        consumablePayload.useOnce {
             when (it) {
                 is SplitScreenPayload.InstantNavigationOnAttach -> {
                     delayedNavigationRouter.runDelayedNavigation(it.delayedNavigation)

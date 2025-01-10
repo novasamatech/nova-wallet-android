@@ -12,18 +12,18 @@ class PushNotificationsNavigator(
 
     override fun openPushSettings() {
         navigationBuilder(R.id.action_pushWelcome_to_pushSettings)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPushGovernanceSettings(args: Bundle) {
         navigationBuilder(R.id.action_pushSettings_to_governanceSettings)
             .setArgs(args)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 
     override fun openPushStakingSettings(args: Bundle) {
         navigationBuilder(R.id.action_pushSettings_to_stakingSettings)
             .setArgs(args)
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 }

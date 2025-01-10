@@ -13,6 +13,6 @@ class NftNavigator(
     override fun openNftDetails(nftId: String) {
         navigationBuilder(R.id.action_nftListFragment_to_nftDetailsFragment)
             .setArgs(NftDetailsFragment.getBundle(nftId))
-            .perform()
+            .navigateInFirstAttachedContext()
     }
 }
