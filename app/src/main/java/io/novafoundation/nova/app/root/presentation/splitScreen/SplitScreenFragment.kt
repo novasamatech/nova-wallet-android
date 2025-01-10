@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.RoundCornersOutlineProvider
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.payloadOrElse
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.setupCloseAllDappTabsDialogue
@@ -92,8 +93,8 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
         }
 
         viewModel.tabsTitle.observe { model ->
-            dappEntryPointIcon.letOrHide(model.iconPath) {
-                dappEntryPointIcon.load(File(it), imageLoader)
+            dappEntryPointIcon.letOrHide(model.icon) {
+                dappEntryPointIcon.setIcon(it, imageLoader)
             }
             dappEntryPointText.text = model.title
         }

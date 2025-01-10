@@ -10,13 +10,12 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
-import io.novafoundation.nova.feature_dapp_api.domain.BrowserSessionInteractor
+import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabInternalRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealPageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.RealBrowserTabRepository
-import io.novafoundation.nova.feature_dapp_impl.domain.RealBrowserSessionInteractor
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.PageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealTabMemoryRestrictionService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.TabMemoryRestrictionService
@@ -66,6 +65,8 @@ class BrowserTabsModule {
     @FeatureScope
     @Provides
     fun provideBrowserTabPoolService(
+        accountRepository: AccountRepository,
+        dAppMetadataRepository: DAppMetadataRepository,
         browserTabInternalRepository: BrowserTabInternalRepository,
         pageSnapshotBuilder: PageSnapshotBuilder,
         tabMemoryRestrictionService: TabMemoryRestrictionService,
@@ -77,16 +78,9 @@ class BrowserTabsModule {
             pageSnapshotBuilder = pageSnapshotBuilder,
             tabMemoryRestrictionService = tabMemoryRestrictionService,
             browserTabSessionFactory = browserTabSessionFactory,
+            accountRepository = accountRepository,
+            dAppMetadataRepository = dAppMetadataRepository,
             rootScope = rootScope
         )
-    }
-
-    @FeatureScope
-    @Provides
-    fun provideBrowserSessionsInteractor(
-        browserTabService: BrowserTabService,
-        accountRepository: AccountRepository
-    ): BrowserSessionInteractor {
-        return RealBrowserSessionInteractor(browserTabService, accountRepository)
     }
 }

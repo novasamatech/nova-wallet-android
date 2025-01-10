@@ -47,6 +47,8 @@ class BrowserTabSession(
         pageCallback = this
     )
 
+    var currentUrl: String = startUrl
+
     private var nestedPageCallback: PageCallback? = null
 
     init {
@@ -63,7 +65,7 @@ class BrowserTabSession(
         this.nestedPageCallback = pageCallback
 
         // To provide initial state
-        pageCallback.onPageChanged(webView, webView.url ?: startUrl, webView.title)
+        pageCallback.onPageChanged(webView, webView.url, webView.title)
     }
 
     fun detachFromHost() {
@@ -79,7 +81,7 @@ class BrowserTabSession(
         nestedPageCallback?.handleBrowserIntent(intent)
     }
 
-    override fun onPageChanged(view: WebView, url: String, title: String?) {
+    override fun onPageChanged(view: WebView, url: String?, title: String?) {
         nestedPageCallback?.onPageChanged(view, url, title)
         onPageChangedCallback.onPageChanged(tabId, url, title)
     }

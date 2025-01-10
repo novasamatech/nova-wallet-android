@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
@@ -25,7 +26,7 @@ class BrowserTabsViewModel(
         .mapList {
             BrowserTabRvItem(
                 tabId = it.id,
-                tabName = it.pageSnapshot.pageName,
+                tabName = it.pageSnapshot.pageName ?: Urls.domainOf(it.currentUrl),
                 tabFaviconPath = it.pageSnapshot.pageIconPath,
                 tabScreenshotPath = it.pageSnapshot.pagePicturePath
             )

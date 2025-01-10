@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class BrowserTabsDao {
 
-    @Query("SELECT * FROM browser_tabs")
-    abstract fun observeAllTabs(): Flow<List<BrowserTabLocal>>
+    @Query("SELECT * FROM browser_tabs WHERE metaId = :metaId ORDER BY creationTime DESC")
+    abstract fun observeTabsByMetaId(metaId: Long): Flow<List<BrowserTabLocal>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertTab(tab: BrowserTabLocal)
@@ -27,4 +27,7 @@ abstract class BrowserTabsDao {
 
     @Query("UPDATE browser_tabs SET currentUrl = :url WHERE id = :tabId")
     abstract fun updateCurrentUrl(tabId: String, url: String)
+
+    @Query("UPDATE browser_tabs SET dappMetadata_iconLink = :dappIconUrl WHERE id = :tabId")
+    abstract fun updateKnownDAppMetadata(tabId: String, dappIconUrl: String?)
 }

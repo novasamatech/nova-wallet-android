@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BrowserTabExternalRepository {
 
-    fun observeTabsWithNames(): Flow<List<SimpleTabModel>>
+    fun observeTabsWithNames(metaId: Long): Flow<List<SimpleTabModel>>
 
     suspend fun removeAllTabs()
 }
