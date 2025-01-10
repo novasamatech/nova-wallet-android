@@ -19,7 +19,6 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLa
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_dapp_api.domain.BrowserSessionInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
@@ -50,8 +49,7 @@ class RootViewModel(
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val browserSessionInteractor: BrowserSessionInteractor
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -91,9 +89,6 @@ class RootViewModel(
         syncPushSettingsIfNeeded()
 
         externalServiceInitializer.initialize()
-
-        browserSessionInteractor.destroyActiveSessionsOnAccountChange()
-            .launchIn(this)
     }
 
     private fun observeBusEvents() {

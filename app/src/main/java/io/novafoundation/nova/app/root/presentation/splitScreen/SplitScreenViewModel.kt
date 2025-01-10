@@ -9,6 +9,9 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Consumer
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.asFileIcon
+import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.feature_dapp_api.data.model.SimpleTabModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
@@ -19,7 +22,7 @@ import kotlinx.coroutines.launch
 
 data class TabsTitleModel(
     val title: String,
-    val iconPath: String?
+    val icon: Icon?
 )
 
 class SplitScreenViewModel(
@@ -68,7 +71,7 @@ class SplitScreenViewModel(
 
     private fun singleTabTitle(tab: SimpleTabModel): TabsTitleModel {
         return tab.title?.let {
-            TabsTitleModel(it, tab.iconPath)
+            TabsTitleModel(it, tab.knownDAppIconUrl?.asUrlIcon() ?: tab.faviconPath?.asFileIcon())
         } ?: tabSizeTitle(1)
     }
 

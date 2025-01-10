@@ -13,7 +13,7 @@ interface PageCallback {
 
     fun handleBrowserIntent(intent: Intent)
 
-    fun onPageChanged(webView: WebView, url: String, title: String?)
+    fun onPageChanged(webView: WebView, url: String?, title: String?)
 }
 
 class Web3WebViewClient(

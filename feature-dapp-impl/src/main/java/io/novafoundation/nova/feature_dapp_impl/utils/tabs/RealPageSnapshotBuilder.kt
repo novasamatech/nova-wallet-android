@@ -3,7 +3,9 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import android.graphics.Bitmap
 import androidx.core.view.drawToBitmap
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.nullIfBlank
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.fromName
@@ -24,9 +26,11 @@ class RealPageSnapshotBuilder(
 
     override fun getPageSnapshot(browserTabSession: BrowserTabSession): PageSnapshot {
         val webView = browserTabSession.webView
-        if (!webView.isLaidOut) return PageSnapshot.fromName(browserTabSession.startUrl)
+        if (!webView.isLaidOut) {
+            return PageSnapshot.fromName(Urls.domainOf(browserTabSession.currentUrl))
+        }
 
-        val pageName = webView.title
+        val pageName = webView.title.nullIfBlank() ?: Urls.domainOf(browserTabSession.currentUrl)
         val icon = webView.favicon
         val pageBitmap = webView.drawToBitmap()
 
@@ -50,7 +54,7 @@ class RealPageSnapshotBuilder(
         try {
             rootScope.launch(Dispatchers.IO) {
                 val outputStream = FileOutputStream(file)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+                bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
                 outputStream.close()
             }
 

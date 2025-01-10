@@ -13,7 +13,6 @@ import androidx.core.view.marginTop
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import coil.ImageLoader
-import coil.load
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
@@ -23,10 +22,10 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.RoundCornersOutlineProvider
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.payloadOrElse
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.setupCloseAllDappTabsDialogue
-import java.io.File
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPoint
 import kotlinx.android.synthetic.main.fragment_split_screen.dappEntryPointClose
@@ -92,8 +91,8 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel>() {
         }
 
         viewModel.tabsTitle.observe { model ->
-            dappEntryPointIcon.letOrHide(model.iconPath) {
-                dappEntryPointIcon.load(File(it), imageLoader)
+            dappEntryPointIcon.letOrHide(model.icon) {
+                dappEntryPointIcon.setIcon(it, imageLoader)
             }
             dappEntryPointText.text = model.title
         }

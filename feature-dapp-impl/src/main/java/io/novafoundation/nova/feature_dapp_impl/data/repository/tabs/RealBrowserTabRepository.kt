@@ -21,10 +21,10 @@ class RealBrowserTabRepository(
         browserTabsDao.removeTab(tabId)
     }
 
-    override fun observeTabsWithNames(): Flow<List<SimpleTabModel>> {
-        return browserTabsDao.observeAllTabs()
+    override fun observeTabsWithNames(metaId: Long): Flow<List<SimpleTabModel>> {
+        return browserTabsDao.observeTabsByMetaId(metaId)
             .mapList {
-                SimpleTabModel(it.id, it.pageName, it.pageIconPath)
+                SimpleTabModel(it.id, it.pageName, it.knownDAppMetadata?.iconLink, it.pageIconPath)
             }
     }
 
@@ -41,8 +41,8 @@ class RealBrowserTabRepository(
         )
     }
 
-    override fun observeTabs(): Flow<List<BrowserTab>> {
-        return browserTabsDao.observeAllTabs().mapList { tab ->
+    override fun observeTabs(metaId: Long): Flow<List<BrowserTab>> {
+        return browserTabsDao.observeTabsByMetaId(metaId).mapList { tab ->
             tab.fromLocal()
         }
     }
@@ -50,17 +50,23 @@ class RealBrowserTabRepository(
     override suspend fun changeCurrentUrl(tabId: String, url: String) {
         browserTabsDao.updateCurrentUrl(tabId, url)
     }
+
+    override suspend fun changeKnownDAppMetadata(tabId: String, dappIconUrl: String?) {
+        browserTabsDao.updateKnownDAppMetadata(tabId, dappIconUrl)
+    }
 }
 
 private fun BrowserTabLocal.fromLocal(): BrowserTab {
     return BrowserTab(
         id = id,
+        metaId = metaId,
         currentUrl = currentUrl,
         pageSnapshot = PageSnapshot(
             pageName = pageName,
             pageIconPath = pageIconPath,
             pagePicturePath = pagePicturePath
         ),
+        knownDAppMetadata = knownDAppMetadata?.let { BrowserTab.KnownDAppMetadata(it.iconLink) },
         creationTime = Date(creationTime),
     )
 }
@@ -68,10 +74,12 @@ private fun BrowserTabLocal.fromLocal(): BrowserTab {
 private fun BrowserTab.toLocal(): BrowserTabLocal {
     return BrowserTabLocal(
         id = id,
+        metaId = metaId,
         currentUrl = currentUrl,
         creationTime = creationTime.time,
         pageName = pageSnapshot.pageName,
         pageIconPath = pageSnapshot.pageIconPath,
+        knownDAppMetadata = knownDAppMetadata?.let { BrowserTabLocal.KnownDAppMetadata(it.iconLink) },
         pagePicturePath = pageSnapshot.pagePicturePath
     )
 }

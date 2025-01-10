@@ -10,11 +10,14 @@ val AddBrowserTabs_64_65 = object : Migration(64, 65) {
             """
             CREATE TABLE IF NOT EXISTS `browser_tabs` (
                 `id` TEXT NOT NULL, 
+                `metaId` INTEGER NOT NULL, 
                 `currentUrl` TEXT NOT NULL, 
                 `creationTime` INTEGER NOT NULL, 
                 `pageName` TEXT, `pageIconPath` TEXT, 
                 `pagePicturePath` TEXT, 
-                PRIMARY KEY(`id`)
+                `dappMetadata_iconLink` TEXT,
+                PRIMARY KEY(`id`), 
+                FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
             )
         """
         )

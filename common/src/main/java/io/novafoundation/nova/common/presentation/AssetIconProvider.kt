@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asIcon
+import io.novafoundation.nova.common.utils.images.asUrlIcon
 
 interface AssetIconProvider {
 
@@ -31,7 +32,7 @@ class RealAssetIconProvider(
             AssetIconMode.WHITE -> "$whiteBaseUrl/$iconName"
         }
 
-        return iconUrl.asIcon()
+        return iconUrl.asUrlIcon()
     }
 }
 

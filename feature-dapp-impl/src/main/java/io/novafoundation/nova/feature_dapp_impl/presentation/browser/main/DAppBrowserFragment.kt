@@ -334,7 +334,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         }
     }
 
-    override fun onPageChanged(webView: WebView, url: String, title: String?) {
+    override fun onPageChanged(webView: WebView, url: String?, title: String?) {
         viewModel.onPageChanged(url, title)
     }
 

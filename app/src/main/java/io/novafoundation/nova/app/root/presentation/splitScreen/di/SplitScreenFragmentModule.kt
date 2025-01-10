@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 
@@ -25,8 +26,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 class SplitScreenFragmentModule {
 
     @Provides
-    fun provideInteractor(repository: BrowserTabExternalRepository): SplitScreenInteractor {
-        return SplitScreenInteractor(repository)
+    fun provideInteractor(repository: BrowserTabExternalRepository, accountRepository: AccountRepository): SplitScreenInteractor {
+        return SplitScreenInteractor(repository, accountRepository)
     }
 
     @Provides
