@@ -15,7 +15,7 @@
         android:layout_weight="1"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@id/dappEntryPoint"
-        app:navGraph="@navigation/main_nav_graph" />
+        app:navGraph="@navigation/split_screen_nav_graph" />
 
     <FrameLayout
         android:id="@+id/dappEntryPoint"

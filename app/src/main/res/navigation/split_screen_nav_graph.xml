@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_nav_graph"
+    android:id="@+id/split_screen_nav_graph"
     app:startDestination="@id/mainFragment">
 
     <include app:graph="@navigation/import_wallet_options_nav_graph" />
@@ -147,7 +147,7 @@
         app:launchSingleTop="true"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_open_exit"
-        app:popUpTo="@id/main_nav_graph" />
+        app:popUpTo="@id/split_screen_nav_graph" />
 
     <action
         android:id="@+id/action_export_seed"
