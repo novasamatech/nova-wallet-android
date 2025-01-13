@@ -1,9 +1,11 @@
 package io.novafoundation.nova.app.root.navigation.navigators.dApp
 
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.builder.NavigationBuilder
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesFragment
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
@@ -24,11 +26,8 @@ class DAppNavigator(
     override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
         // Close dapp browser if it is already opened
         // TODO it's better to provide new url to existing browser
-        navigationBuilder().cases()
-            .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_DAppBrowserFragment)
-            .addCase(R.id.dappSearchFragment, R.id.action_dappSearchFragment_to_dapp_browser_graph)
-            .addCase(R.id.dappTabsFragment, R.id.action_dappTabsFragment_to_dapp_browser_graph)
-            .setFallbackCase(R.id.action_open_dappBrowser)
+        navigationBuilder().graph(R.id.dapp_browser_graph)
+            .setDappAnimations()
             .setExtras(extras)
             .setArgs(DAppBrowserFragment.getBundle(payload))
             .navigateInRoot()
@@ -39,9 +38,8 @@ class DAppNavigator(
     }
 
     override fun openDappSearchWithCategory(categoryId: String?) {
-        navigationBuilder().cases()
-            .addCase(R.id.dappTabsFragment, R.id.action_dappTabsFragment_to_dappSearch)
-            .setFallbackCase(R.id.action_open_dappSearch)
+        navigationBuilder().graph(R.id.dapp_search_graph)
+            .setDappAnimations()
             .setArgs(DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL, preselectedCategoryId = categoryId)))
             .navigateInRoot()
     }
@@ -64,8 +62,7 @@ class DAppNavigator(
 
     override fun openTabs() {
         navigationBuilder().graph(R.id.dapp_tabs_graph)
-            //.addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_browserTabsFragment)
-            //.setFallbackCase(R.id.action_open_dappTabs)
+            .setDappAnimations()
             .navigateInRoot()
     }
 
@@ -77,5 +74,36 @@ class DAppNavigator(
     override fun openDAppFavorites() {
         navigationBuilder().action(R.id.action_open_dapp_favorites)
             .navigateInFirstAttachedContext()
+    }
+
+    private fun NavigationBuilder.setDappAnimations(): NavigationBuilder {
+        val currentDestinationId = currentDestination?.id
+
+        // For this currentDestinations we will use default animation. And for other - slide_in, slide_out
+        val dappDestinations = listOf(
+            R.id.dappSearchFragment,
+            R.id.dappBrowserFragment,
+            R.id.dappTabsFragment
+        )
+
+        val navOptionsBuilder = if (currentDestinationId in dappDestinations) {
+            // Only slide out animation
+            NavOptions.Builder()
+                .setEnterAnim(R.anim.fragment_open_enter)
+                .setExitAnim(R.anim.fragment_open_exit)
+                .setPopEnterAnim(R.anim.fragment_close_enter)
+                .setPopExitAnim(R.anim.fragment_slide_out)
+                .setPopUpTo(R.id.splitScreenFragment, false)
+        } else {
+            // Slide in/out animations
+            NavOptions.Builder()
+                .setEnterAnim(R.anim.fragment_slide_in)
+                .setExitAnim(R.anim.fragment_open_exit)
+                .setPopEnterAnim(R.anim.fragment_close_enter)
+                .setPopExitAnim(R.anim.fragment_slide_out)
+                .setPopUpTo(R.id.splitScreenFragment, false)
+        }
+
+        return setNavOptions(navOptionsBuilder.build())
     }
 }

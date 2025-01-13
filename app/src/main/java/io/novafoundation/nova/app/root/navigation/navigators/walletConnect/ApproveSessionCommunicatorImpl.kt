@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.navigation.navigators.walletConnect
 import com.walletconnect.web3.wallet.client.Wallet
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.FlowInterScreenCommunicator
-import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.navigationBuilder
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
