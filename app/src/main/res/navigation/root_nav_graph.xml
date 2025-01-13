@@ -30,6 +30,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_approve_wallet_connect_session"
+        app:destination="@id/walletConnectApproveSessionFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_split_screen"
         app:destination="@id/splitScreenFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -193,5 +201,10 @@
         android:name="io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenFragment"
         android:label="SplitScreenFragment"
         tools:layout="@layout/fragment_split_screen" />
+
+    <fragment
+        android:id="@+id/walletConnectApproveSessionFragment"
+        android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
+        android:label="WalletConnectApproveSessionFragment" />
 
 </navigation>

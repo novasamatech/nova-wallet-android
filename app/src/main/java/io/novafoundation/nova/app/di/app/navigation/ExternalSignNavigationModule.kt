@@ -22,9 +22,9 @@ class ExternalSignNavigationModule {
     @ApplicationScope
     @Provides
     fun provideSignExtrinsicCommunicator(
-        navigationHolder: RootNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         automaticInteractionGate: AutomaticInteractionGate,
     ): ExternalSignCommunicator {
-        return ExternalSignCommunicatorImpl(navigationHolder, automaticInteractionGate)
+        return ExternalSignCommunicatorImpl(navigationHoldersRegistry, automaticInteractionGate)
     }
 }

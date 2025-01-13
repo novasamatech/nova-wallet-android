@@ -1024,8 +1024,7 @@
     <fragment
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
-        android:label="WalletConnectApproveSessionFragment"
-        app:useAdd="true" />
+        android:label="WalletConnectApproveSessionFragment" />
 
     <fragment
         android:id="@+id/validatorDetailsFragment"

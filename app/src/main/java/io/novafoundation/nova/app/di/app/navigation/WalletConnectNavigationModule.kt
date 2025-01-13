@@ -17,9 +17,9 @@ class WalletConnectNavigationModule {
     @Provides
     @ApplicationScope
     fun provideApproveSessionCommunicator(
-        navigationHolder: SplitScreenNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         automaticInteractionGate: AutomaticInteractionGate,
-    ): ApproveSessionCommunicator = ApproveSessionCommunicatorImpl(navigationHolder, automaticInteractionGate)
+    ): ApproveSessionCommunicator = ApproveSessionCommunicatorImpl(navigationHoldersRegistry, automaticInteractionGate)
 
     @ApplicationScope
     @Provides

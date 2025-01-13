@@ -3,6 +3,8 @@ package io.novafoundation.nova.app.root.navigation.navigators.externalSign
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.FlowInterScreenCommunicator
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.navigationBuilder
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
@@ -13,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ExternalSignCommunicatorImpl(
-    private val navigationHolder: NavigationHolder,
+    private val navigationHoldersRegistry: NavigationHoldersRegistry,
     private val automaticInteractionGate: AutomaticInteractionGate,
 ) : CoroutineScope by CoroutineScope(Dispatchers.Main),
     FlowInterScreenCommunicator<ExternalSignPayload, ExternalSignCommunicator.Response>(),
@@ -23,7 +25,9 @@ class ExternalSignCommunicatorImpl(
         launch {
             automaticInteractionGate.awaitInteractionAllowed()
 
-            navigationHolder.navController!!.navigate(R.id.action_open_externalSignGraph, ExternalSignFragment.getBundle(request))
+            navigationHoldersRegistry.navigationBuilder(R.id.action_open_externalSignGraph)
+                .setArgs(ExternalSignFragment.getBundle(request))
+                .navigateInRoot()
         }
     }
 }

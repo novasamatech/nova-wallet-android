@@ -43,4 +43,6 @@
 
     <include app:graph="@navigation/dapp_browser_graph" />
 
+    <include app:graph="@navigation/dapp_search_graph" />
+
 </navigation>
