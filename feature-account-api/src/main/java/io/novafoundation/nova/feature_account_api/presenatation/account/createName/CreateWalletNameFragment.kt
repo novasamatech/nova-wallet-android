@@ -1,37 +1,29 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.createName
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameContinue
-import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameInput
-import kotlinx.android.synthetic.main.fragment_create_wallet_name.createWalletNameToolbar
+import io.novafoundation.nova.feature_account_api.databinding.FragmentCreateWalletNameBinding
 
-abstract class CreateWalletNameFragment<V : CreateWalletNameViewModel> : BaseFragment<V>() {
+abstract class CreateWalletNameFragment<V : CreateWalletNameViewModel> : BaseFragment<V, FragmentCreateWalletNameBinding>() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_create_wallet_name, container, false)
-    }
+    override fun createBinding() = FragmentCreateWalletNameBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        createWalletNameToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.createWalletNameToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
-        createWalletNameContinue.setOnClickListener {
-            createWalletNameInput.hideSoftKeyboard()
+        binder.createWalletNameContinue.setOnClickListener {
+            binder.createWalletNameInput.hideSoftKeyboard()
             viewModel.nextClicked()
         }
     }
 
     override fun subscribe(viewModel: V) {
-        viewModel.continueState.observe(createWalletNameContinue::setState)
+        viewModel.continueState.observe(binder.createWalletNameContinue::setState)
 
-        createWalletNameInput.bindTo(viewModel.name, viewLifecycleOwner.lifecycleScope)
+        binder.createWalletNameInput.bindTo(viewModel.name, viewLifecycleOwner.lifecycleScope)
     }
 }

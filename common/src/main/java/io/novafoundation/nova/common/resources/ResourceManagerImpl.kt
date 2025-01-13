@@ -14,10 +14,8 @@ import io.novafoundation.nova.common.utils.formatting.formatDateTime
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.readText
 import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalTime::class)
 @ApplicationScope
 class ResourceManagerImpl(
     private val contextManager: ContextManager
@@ -80,14 +78,13 @@ class ResourceManagerImpl(
         return DateUtils.formatDateTime(contextManager.getApplicationContext(), timestamp, DateUtils.FORMAT_SHOW_TIME)
     }
 
-    @OptIn(ExperimentalTime::class)
     override fun formatDuration(elapsedTime: Long): String {
         val inDays = elapsedTime.daysFromMillis().toInt()
 
         return when {
             inDays > 0 -> getQuantityString(R.plurals.staking_main_lockup_period_value, inDays, inDays)
             else -> {
-                val inSeconds = elapsedTime.milliseconds.inSeconds.toLong()
+                val inSeconds = elapsedTime.milliseconds.inWholeSeconds
 
                 DateUtils.formatElapsedTime(inSeconds)
             }

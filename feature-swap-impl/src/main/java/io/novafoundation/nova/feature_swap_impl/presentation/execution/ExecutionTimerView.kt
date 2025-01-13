@@ -15,14 +15,12 @@ import android.widget.TextSwitcher
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_swap_impl.R
-import kotlinx.android.synthetic.main.view_execution_timer.view.executionProgress
-import kotlinx.android.synthetic.main.view_execution_timer.view.executionResult
-import kotlinx.android.synthetic.main.view_execution_timer.view.executionTimeSeconds
-import kotlinx.android.synthetic.main.view_execution_timer.view.executionTimeSwitcher
+import io.novafoundation.nova.feature_swap_impl.databinding.ViewExecutionTimerBinding
 import kotlin.math.cos
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -45,6 +43,8 @@ class ExecutionTimerView @JvmOverloads constructor(
         class CountdownTimer(val duration: Duration) : State
     }
 
+    private val binder = ViewExecutionTimerBinding.inflate(inflater(), this)
+
     private var currentState: State? = null
 
     private val slideTopInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_slide_bottom_in)
@@ -53,7 +53,6 @@ class ExecutionTimerView @JvmOverloads constructor(
     private var currentTimer: CountDownTimer? = null
 
     init {
-        inflate(context, R.layout.view_execution_timer, this)
         setupTimerSwitcher()
     }
 
@@ -65,43 +64,43 @@ class ExecutionTimerView @JvmOverloads constructor(
         when (state) {
             State.Success -> {
                 hideTimerWithAnimation()
-                executionResult.setImageResource(R.drawable.ic_execution_result_success)
-                executionResult.fadeInWithScale()
+                binder.executionResult.setImageResource(R.drawable.ic_execution_result_success)
+                binder.executionResult.fadeInWithScale()
             }
 
             State.Error -> {
                 hideTimerWithAnimation()
-                executionResult.setImageResource(R.drawable.ic_execution_result_error)
-                executionResult.fadeInWithScale()
+                binder.executionResult.setImageResource(R.drawable.ic_execution_result_error)
+                binder.executionResult.fadeInWithScale()
             }
 
             is State.CountdownTimer -> {
-                executionResult.fadeOutWithScale()
+                binder.executionResult.fadeOutWithScale()
                 showTimerWithAnimation()
 
-                executionProgress.runInfinityRotationAnimation()
+                binder.executionProgress.runInfinityRotationAnimation()
 
                 // We add delay to match progress animation perfectly
                 // Text should be switched in the middle of a progress animation with small offset
                 val middleOfAnimation = SECOND_MILLIS / 2
                 val switchAnimationOffset = slideTopOutAnimation.duration / 2
                 val delay = middleOfAnimation - switchAnimationOffset
-                currentTimer = CountdownSwitcherTimer(executionTimeSwitcher, state.duration)
+                currentTimer = CountdownSwitcherTimer(binder.executionTimeSwitcher, state.duration)
                 runTimerWithDelay(delay, currentTimer!!)
             }
         }
     }
 
     private fun hideTimerWithAnimation() {
-        executionProgress.fadeOut()
-        executionTimeSwitcher.fadeOutWithScale()
-        executionTimeSeconds.fadeOutWithScale()
+        binder.executionProgress.fadeOut()
+        binder.executionTimeSwitcher.fadeOutWithScale()
+        binder.executionTimeSeconds.fadeOutWithScale()
     }
 
     private fun showTimerWithAnimation() {
-        executionProgress.fadeIn()
-        executionTimeSwitcher.fadeInWithScale()
-        executionTimeSeconds.fadeInWithScale()
+        binder.executionProgress.fadeIn()
+        binder.executionTimeSwitcher.fadeInWithScale()
+        binder.executionTimeSeconds.fadeInWithScale()
     }
 
     private fun runTimerWithDelay(delay: Long, timer: CountDownTimer) {
@@ -109,7 +108,7 @@ class ExecutionTimerView @JvmOverloads constructor(
     }
 
     private fun setupTimerSwitcher() {
-        executionTimeSwitcher.setFactory {
+        binder.executionTimeSwitcher.setFactory {
             val textView = TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_Bold_Title3)
             textView.setGravity(Gravity.CENTER)
             textView.setTextColorRes(R.color.text_primary)
@@ -117,8 +116,8 @@ class ExecutionTimerView @JvmOverloads constructor(
             textView
         }
 
-        executionTimeSwitcher.inAnimation = slideTopInAnimation
-        executionTimeSwitcher.outAnimation = slideTopOutAnimation
+        binder.executionTimeSwitcher.inAnimation = slideTopInAnimation
+        binder.executionTimeSwitcher.outAnimation = slideTopOutAnimation
     }
 
     private fun View.runInfinityRotationAnimation() {

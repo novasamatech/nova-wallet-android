@@ -1,18 +1,14 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.ChipLabelView
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountChipHolder
-import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_cloud_backup_account_diff.view.itemCloudBackupAccountDiffIcon
-import kotlinx.android.synthetic.main.item_cloud_backup_account_diff.view.itemCloudBackupAccountDiffName
-import kotlinx.android.synthetic.main.item_cloud_backup_account_diff.view.itemCloudBackupAccountDiffState
+import io.novafoundation.nova.feature_settings_impl.databinding.ItemCloudBackupAccountDiffBinding
 
 class CloudBackupDiffAdapter : GroupedListAdapter<CloudBackupDiffGroupRVItem, AccountDiffRVItem>(BackupAccountDiffCallback()) {
 
@@ -21,7 +17,7 @@ class CloudBackupDiffAdapter : GroupedListAdapter<CloudBackupDiffGroupRVItem, Ac
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return AccountDiffHolder(parent.inflateChild(R.layout.item_cloud_backup_account_diff))
+        return AccountDiffHolder(ItemCloudBackupAccountDiffBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: CloudBackupDiffGroupRVItem) {
@@ -33,13 +29,13 @@ class CloudBackupDiffAdapter : GroupedListAdapter<CloudBackupDiffGroupRVItem, Ac
     }
 }
 
-class AccountDiffHolder(view: View) : GroupedListHolder(view) {
+class AccountDiffHolder(private val binder: ItemCloudBackupAccountDiffBinding) : GroupedListHolder(binder.root) {
 
-    fun bind(accountModel: AccountDiffRVItem) = with(containerView) {
+    fun bind(accountModel: AccountDiffRVItem) = with(binder) {
         itemCloudBackupAccountDiffIcon.setImageDrawable(accountModel.icon)
         itemCloudBackupAccountDiffName.text = accountModel.title
         itemCloudBackupAccountDiffState.text = accountModel.state
-        itemCloudBackupAccountDiffState.setTextColor(context.getColor(accountModel.stateColorRes))
+        itemCloudBackupAccountDiffState.setTextColor(root.context.getColor(accountModel.stateColorRes))
         itemCloudBackupAccountDiffState.setDrawableStart(accountModel.stateIconRes, paddingInDp = 4)
     }
 }

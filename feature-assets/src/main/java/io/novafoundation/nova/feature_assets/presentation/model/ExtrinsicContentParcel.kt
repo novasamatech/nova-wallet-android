@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.model
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ExtrinsicContentParcel(val blocks: List<Block>) : Parcelable {

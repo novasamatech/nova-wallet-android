@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 
 import android.content.Context
 import android.os.Bundle
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_account_impl.R
@@ -10,7 +11,7 @@ class JsonPasteOptionsSheet(
     context: Context,
     val onPaste: () -> Unit,
     val onOpenFile: () -> Unit
-) : FixedListBottomSheet(context) {
+) : FixedListBottomSheet<BottomSheeetFixedListBinding>(context, viewConfiguration = ViewConfiguration.default(context)) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

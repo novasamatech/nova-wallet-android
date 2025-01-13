@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class PolkadotSignPayload : Parcelable {
 

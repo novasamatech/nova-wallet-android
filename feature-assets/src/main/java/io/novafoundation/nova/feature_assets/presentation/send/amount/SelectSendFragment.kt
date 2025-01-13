@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.send.amount
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -17,28 +15,17 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupExternalAccounts
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.setupYourWalletsBtn
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentSelectSendBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.send.common.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import kotlinx.android.synthetic.main.fragment_select_send.chooseAmountContainer
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendAmount
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendCrossChainFee
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendDestinationChain
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendFromTitle
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendNext
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginChain
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendOriginFee
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendRecipient
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendToTitle
-import kotlinx.android.synthetic.main.fragment_select_send.selectSendToolbar
-import kotlinx.android.synthetic.main.fragment_select_send.selectWallet
 
 private const val KEY_ADDRESS = "KEY_ADDRESS"
 private const val KEY_ASSET_PAYLOAD = "KEY_ASSET_PAYLOAD"
 
-class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
+class SelectSendFragment : BaseFragment<SelectSendViewModel, FragmentSelectSendBinding>() {
 
     companion object {
 
@@ -48,26 +35,22 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
         )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_select_send, container, false)
+    override fun createBinding() = FragmentSelectSendBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        chooseAmountContainer.applyStatusBarInsets(false)
-        selectSendNext.prepareForProgress(viewLifecycleOwner)
-        selectSendNext.setOnClickListener { viewModel.nextClicked() }
+        binder.chooseAmountContainer.applyStatusBarInsets(false)
+        binder.selectSendNext.prepareForProgress(viewLifecycleOwner)
+        binder.selectSendNext.setOnClickListener { viewModel.nextClicked() }
 
-        selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectSendToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        selectSendOriginChain.setOnClickListener { viewModel.originChainClicked() }
-        selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
+        binder.selectSendOriginChain.setOnClickListener { viewModel.originChainClicked() }
+        binder.selectSendDestinationChain.setOnClickListener { viewModel.destinationChainClicked() }
 
-        selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
+        binder.selectWallet.setOnClickListener { viewModel.selectRecipientWallet() }
 
-        selectSendCrossChainFee.makeGone() // gone inititally
-        selectSendCrossChainFee.setTitle(R.string.wallet_send_cross_chain_fee)
+        binder.selectSendCrossChainFee.makeGone() // gone inititally
+        binder.selectSendCrossChainFee.setTitle(R.string.wallet_send_cross_chain_fee)
     }
 
     override fun inject() {
@@ -85,39 +68,39 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
 
         observeValidations(viewModel)
 
-        viewModel.feeMixin.setupFeeLoading(selectSendOriginFee, selectSendCrossChainFee)
+        viewModel.feeMixin.setupFeeLoading(binder.selectSendOriginFee, binder.selectSendCrossChainFee)
 
-        setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
-        setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)
-        setupExternalAccounts(viewModel.addressInputMixin, selectSendRecipient)
-        setupYourWalletsBtn(selectWallet, viewModel.selectAddressMixin)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.selectSendAmount)
+        setupAddressInput(viewModel.addressInputMixin, binder.selectSendRecipient)
+        setupExternalAccounts(viewModel.addressInputMixin, binder.selectSendRecipient)
+        setupYourWalletsBtn(binder.selectWallet, viewModel.selectAddressMixin)
 
         viewModel.chooseDestinationChain.awaitableActionLiveData.observeEvent {
-            removeInputKeyboardCallback(selectSendRecipient)
+            removeInputKeyboardCallback(binder.selectSendRecipient)
             val crossChainDestinationBottomSheet = SelectCrossChainDestinationBottomSheet(
                 context = requireContext(),
                 payload = it.payload,
                 onSelected = { _, item -> it.onSuccess(item) },
                 onCancelled = it.onCancel
             )
-            crossChainDestinationBottomSheet.setOnDismissListener { addInputKeyboardCallback(viewModel.addressInputMixin, selectSendRecipient) }
+            crossChainDestinationBottomSheet.setOnDismissListener { addInputKeyboardCallback(viewModel.addressInputMixin, binder.selectSendRecipient) }
             crossChainDestinationBottomSheet.show()
         }
 
         viewModel.transferDirectionModel.observe {
-            selectSendOriginChain.setModel(it.originChip)
-            selectSendFromTitle.text = it.originChainLabel
+            binder.selectSendOriginChain.setModel(it.originChip)
+            binder.selectSendFromTitle.text = it.originChainLabel
 
             if (it.destinationChip != null) {
-                selectSendDestinationChain.setModel(it.destinationChip)
-                selectSendDestinationChain.makeVisible()
-                selectSendToTitle.makeVisible()
+                binder.selectSendDestinationChain.setModel(it.destinationChip)
+                binder.selectSendDestinationChain.makeVisible()
+                binder.selectSendToTitle.makeVisible()
             } else {
-                selectSendToTitle.makeGone()
-                selectSendDestinationChain.makeGone()
+                binder.selectSendToTitle.makeGone()
+                binder.selectSendDestinationChain.makeGone()
             }
         }
 
-        viewModel.continueButtonStateLiveData.observe(selectSendNext::setState)
+        viewModel.continueButtonStateLiveData.observe(binder.selectSendNext::setState)
     }
 }

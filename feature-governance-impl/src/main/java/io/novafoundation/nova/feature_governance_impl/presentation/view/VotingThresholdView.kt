@@ -2,18 +2,13 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.letOrHide
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewVotingThresholdBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
-import kotlinx.android.synthetic.main.view_voting_threshold.view.negativePercentage
-import kotlinx.android.synthetic.main.view_voting_threshold.view.positivePercentage
-import kotlinx.android.synthetic.main.view_voting_threshold.view.thresholdInfo
-import kotlinx.android.synthetic.main.view_voting_threshold.view.thresholdPercentage
-import kotlinx.android.synthetic.main.view_voting_threshold.view.votesView
 
 class VotingThresholdView @JvmOverloads constructor(
     context: Context,
@@ -21,23 +16,24 @@ class VotingThresholdView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
+    private val binder = ViewVotingThresholdBinding.inflate(inflater(), this)
+
     init {
-        View.inflate(context, R.layout.view_voting_threshold, this)
         orientation = VERTICAL
     }
 
     fun setThresholdModel(maybeModel: ReferendumVotingModel?) = letOrHide(maybeModel) { model ->
-        thresholdInfo.isVisible = model.thresholdInfoVisible
-        thresholdInfo.text = model.thresholdInfo
-        thresholdInfo.setDrawableStart(model.votingResultIcon, widthInDp = 16, tint = model.votingResultIconColor, paddingInDp = 4)
-        votesView.setThreshold(model.thresholdFraction)
-        votesView.setPositiveVotesFraction(model.positiveFraction)
-        positivePercentage.text = model.positivePercentage
-        negativePercentage.text = model.negativePercentage
-        thresholdPercentage.text = model.thresholdPercentage
+        binder.thresholdInfo.isVisible = model.thresholdInfoVisible
+        binder.thresholdInfo.text = model.thresholdInfo
+        binder.thresholdInfo.setDrawableStart(model.votingResultIcon, widthInDp = 16, tint = model.votingResultIconColor, paddingInDp = 4)
+        binder.votesView.setThreshold(model.thresholdFraction)
+        binder.votesView.setPositiveVotesFraction(model.positiveFraction)
+        binder.positivePercentage.text = model.positivePercentage
+        binder.negativePercentage.text = model.negativePercentage
+        binder.thresholdPercentage.text = model.thresholdPercentage
     }
 
-    fun setThresholdInfoVisible(visible: Boolean?) = thresholdInfo.letOrHide(visible) { value ->
-        thresholdInfo.isVisible = value
+    fun setThresholdInfoVisible(visible: Boolean?) = binder.thresholdInfo.letOrHide(visible) { value ->
+        binder.thresholdInfo.isVisible = value
     }
 }

@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.base
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
@@ -15,63 +12,48 @@ import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createBackupPasswordSubtitle
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createBackupPasswordTitle
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordConfirmInput
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordContinue
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordInput
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordLetters
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordMinChars
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordNumbers
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordPasswordsMatch
-import kotlinx.android.synthetic.main.fragment_create_cloud_backup_password.createCloudBackupPasswordToolbar
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentCreateCloudBackupPasswordBinding
 
-abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> : BaseFragment<T>() {
+abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> : BaseFragment<T, FragmentCreateCloudBackupPasswordBinding>() {
+
+    override fun createBinding() = FragmentCreateCloudBackupPasswordBinding.inflate(layoutInflater)
 
     abstract val titleRes: Int
     abstract val subtitleRes: Int
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_create_cloud_backup_password, container, false)
-    }
-
     override fun initViews() {
-        createCloudBackupPasswordToolbar.applyStatusBarInsets()
-        createCloudBackupPasswordToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.createCloudBackupPasswordToolbar.applyStatusBarInsets()
+        binder.createCloudBackupPasswordToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        createBackupPasswordTitle.setText(titleRes)
-        createBackupPasswordSubtitle.setText(subtitleRes)
+        binder.createBackupPasswordTitle.setText(titleRes)
+        binder.createBackupPasswordSubtitle.setText(subtitleRes)
 
-        createCloudBackupPasswordContinue.setOnClickListener { viewModel.continueClicked() }
-        createCloudBackupPasswordInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
-        createCloudBackupPasswordConfirmInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
-        createCloudBackupPasswordContinue.prepareForProgress(viewLifecycleOwner)
+        binder.createCloudBackupPasswordContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.createCloudBackupPasswordInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
+        binder.createCloudBackupPasswordConfirmInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
+        binder.createCloudBackupPasswordContinue.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun subscribe(viewModel: T) {
         observeActionBottomSheet(viewModel)
 
-        createCloudBackupPasswordInput.content.bindTo(viewModel.passwordFlow, lifecycleScope)
-        createCloudBackupPasswordConfirmInput.content.bindTo(viewModel.passwordConfirmFlow, lifecycleScope)
+        binder.createCloudBackupPasswordInput.content.bindTo(viewModel.passwordFlow, lifecycleScope)
+        binder.createCloudBackupPasswordConfirmInput.content.bindTo(viewModel.passwordConfirmFlow, lifecycleScope)
 
         viewModel.passwordStateFlow.observe { state ->
-            createCloudBackupPasswordMinChars.requirementState(state.containsMinSymbols)
-            createCloudBackupPasswordNumbers.requirementState(state.hasNumbers)
-            createCloudBackupPasswordLetters.requirementState(state.hasLetters)
-            createCloudBackupPasswordPasswordsMatch.requirementState(state.passwordsMatch)
+            binder.createCloudBackupPasswordMinChars.requirementState(state.containsMinSymbols)
+            binder.createCloudBackupPasswordNumbers.requirementState(state.hasNumbers)
+            binder.createCloudBackupPasswordLetters.requirementState(state.hasLetters)
+            binder.createCloudBackupPasswordPasswordsMatch.requirementState(state.passwordsMatch)
         }
 
         viewModel.continueButtonState.observe { state ->
-            createCloudBackupPasswordContinue.setState(state)
+            binder.createCloudBackupPasswordContinue.setState(state)
         }
 
         viewModel.showPasswords.observe {
-            createCloudBackupPasswordInput.content.switchPasswordInputType(it)
-            createCloudBackupPasswordConfirmInput.content.switchPasswordInputType(it)
+            binder.createCloudBackupPasswordInput.content.switchPasswordInputType(it)
+            binder.createCloudBackupPasswordConfirmInput.content.switchPasswordInputType(it)
         }
     }
 

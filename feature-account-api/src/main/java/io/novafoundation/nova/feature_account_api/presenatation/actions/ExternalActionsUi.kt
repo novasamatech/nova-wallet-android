@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 
-fun <T> BaseFragment<T>.setupExternalActions(viewModel: T) where T : BaseViewModel, T : ExternalActions {
+fun <T> BaseFragment<T, *>.setupExternalActions(viewModel: T) where T : BaseViewModel, T : ExternalActions {
     setupExternalActions(viewModel) { context, payload ->
         ExternalActionsSheet(
             context,
@@ -17,7 +17,7 @@ fun <T> BaseFragment<T>.setupExternalActions(viewModel: T) where T : BaseViewMod
     }
 }
 
-inline fun <T> BaseFragment<T>.setupExternalActions(
+inline fun <T> BaseFragment<T, *>.setupExternalActions(
     viewModel: T,
     crossinline customSheetCreator: suspend (Context, ExternalActions.Payload) -> ExternalActionsSheet,
 ) where T : BaseViewModel, T : ExternalActions {

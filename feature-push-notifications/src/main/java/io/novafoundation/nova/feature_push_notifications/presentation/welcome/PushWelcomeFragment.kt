@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.welcome
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -12,32 +8,27 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.feature_push_notifications.R
+import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushWelcomeBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeCancelButton
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeEnableButton
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeTermsAndConditions
-import kotlinx.android.synthetic.main.fragment_push_welcome.pushWelcomeToolbar
 
-class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel>() {
+class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel, FragmentPushWelcomeBinding>() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_push_welcome, container, false)
-    }
+    override fun createBinding() = FragmentPushWelcomeBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        pushWelcomeToolbar.applyStatusBarInsets()
-        pushWelcomeEnableButton.prepareForProgress(this)
-        pushWelcomeCancelButton.prepareForProgress(this)
-        pushWelcomeToolbar.setHomeButtonListener { viewModel.backClicked() }
-        pushWelcomeEnableButton.setOnClickListener { viewModel.askPermissionAndEnablePushNotifications() }
-        pushWelcomeCancelButton.setOnClickListener { viewModel.backClicked() }
+        binder.pushWelcomeToolbar.applyStatusBarInsets()
+        binder.pushWelcomeEnableButton.prepareForProgress(this)
+        binder.pushWelcomeCancelButton.prepareForProgress(this)
+        binder.pushWelcomeToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.pushWelcomeEnableButton.setOnClickListener { viewModel.askPermissionAndEnablePushNotifications() }
+        binder.pushWelcomeCancelButton.setOnClickListener { viewModel.backClicked() }
 
         configureTermsAndPrivacy()
     }
 
     private fun configureTermsAndPrivacy() {
-        pushWelcomeTermsAndConditions.applyTermsAndPrivacyPolicy(
+        binder.pushWelcomeTermsAndConditions.applyTermsAndPrivacyPolicy(
             R.string.push_welcome_terms_and_conditions,
             R.string.common_terms_and_conditions_formatting,
             R.string.common_privacy_policy_formatting,
@@ -59,8 +50,8 @@ class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel>() {
         setupPermissionAsker(viewModel)
 
         viewModel.buttonState.observe { state ->
-            pushWelcomeEnableButton.setState(state)
-            pushWelcomeCancelButton.setState(state)
+            binder.pushWelcomeEnableButton.setState(state)
+            binder.pushWelcomeCancelButton.setState(state)
         }
     }
 }

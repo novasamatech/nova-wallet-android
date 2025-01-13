@@ -2,26 +2,23 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentImportAccountBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.FileRequester
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.ImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.RequestCode
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountContinue
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountSourceContainer
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountTitle
-import kotlinx.android.synthetic.main.fragment_import_account.importAccountToolbar
+
 import javax.inject.Inject
 
-class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
+class ImportAccountFragment : BaseFragment<ImportAccountViewModel, FragmentImportAccountBinding>() {
+
+    override fun createBinding() = FragmentImportAccountBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -37,22 +34,14 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_import_account, container, false)
-    }
-
     override fun initViews() {
-        importAccountToolbar.setRightActionClickListener {
+        binder.importAccountToolbar.setRightActionClickListener {
             viewModel.optionsClicked()
         }
-        importAccountToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.importAccountToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
-        importAccountContinue.setOnClickListener { viewModel.nextClicked() }
-        importAccountContinue.prepareForProgress(viewLifecycleOwner)
+        binder.importAccountContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.importAccountContinue.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -66,16 +55,16 @@ class ImportAccountFragment : BaseFragment<ImportAccountViewModel>() {
     }
 
     override fun subscribe(viewModel: ImportAccountViewModel) {
-        importAccountTitle.setText(viewModel.importSource.nameRes)
+        binder.importAccountTitle.setText(viewModel.importSource.nameRes)
 
         val sourceView = viewModel.importSource.initializeView(viewModel, fragment = this)
-        importAccountSourceContainer.addView(sourceView)
+        binder.importAccountSourceContainer.addView(sourceView)
 
         observeFeatures(viewModel.importSource)
 
-        importAccountToolbar.setRightIconVisible(viewModel.importSource.encryptionOptionsAvailable)
+        binder.importAccountToolbar.setRightIconVisible(viewModel.importSource.encryptionOptionsAvailable)
 
-        viewModel.nextButtonState.observe(importAccountContinue::setState)
+        viewModel.nextButtonState.observe(binder.importAccountContinue::setState)
     }
 
     private fun observeFeatures(source: ImportSource) {

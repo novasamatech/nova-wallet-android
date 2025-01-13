@@ -1,11 +1,14 @@
 package io.novafoundation.nova.common.utils
 
+import android.os.Parcelable
 import io.novafoundation.nova.common.utils.formatting.format
 import java.math.BigDecimal
 import java.math.RoundingMode
+import kotlinx.parcelize.Parcelize
 
 @JvmInline
-value class TokenSymbol(val value: String) {
+@Parcelize
+value class TokenSymbol(val value: String) : Parcelable {
 
     companion object; // extensions
 

@@ -17,7 +17,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewTipsInputBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.onTextChanged
@@ -25,17 +27,14 @@ import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getInputBackgroundError
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputClear
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputContainer
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputError
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputField
-import kotlinx.android.synthetic.main.view_tips_input.view.tipsInputFieldContainer
 
 class TipsInputField @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context), ValidatableInputField {
+
+    private val binder = ViewTipsInputBinding.inflate(inflater(), this)
 
     private var postfix: String? = null
     private var postfixPadding = 4.dp
@@ -44,17 +43,16 @@ class TipsInputField @JvmOverloads constructor(
     private val textPaint: Paint
 
     val content: EditText
-        get() = tipsInputField
+        get() = binder.tipsInputField
 
     init {
         orientation = VERTICAL
-        View.inflate(context, R.layout.view_tips_input, this)
-        tipsInputFieldContainer.setAddStatesFromChildren(true)
-        tipsInputFieldContainer.background = context.getInputBackground()
+        binder.tipsInputFieldContainer.setAddStatesFromChildren(true)
+        binder.tipsInputFieldContainer.background = context.getInputBackground()
 
         content.onTextChanged {
-            tipsInputClear.isVisible = it.isNotEmpty()
-            tipsInputContainer.isVisible = it.isEmpty()
+            binder.tipsInputClear.isVisible = it.isNotEmpty()
+            binder.tipsInputContainer.isVisible = it.isEmpty()
             measurePostfix(it)
             invalidate()
         }
@@ -63,7 +61,7 @@ class TipsInputField @JvmOverloads constructor(
             color = content.currentTextColor
         }
 
-        tipsInputClear.setOnClickListener { content.text = null }
+        binder.tipsInputClear.setOnClickListener { content.text = null }
 
         attrs?.let(::applyAttributes)
         setWillNotDraw(false)
@@ -95,7 +93,7 @@ class TipsInputField @JvmOverloads constructor(
     }
 
     fun clearTips() {
-        tipsInputContainer.removeAllViews()
+        binder.tipsInputContainer.removeAllViews()
     }
 
     fun addIconTip(@DrawableRes iconRes: Int, @ColorRes tintRes: Int? = null, onClick: OnClickListener): View {
@@ -105,7 +103,7 @@ class TipsInputField @JvmOverloads constructor(
         view.setPadding(8.dp, 0.dp, 8.dp, 0.dp)
         view.setImageTintRes(tintRes)
         view.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        tipsInputContainer.addView(view)
+        binder.tipsInputContainer.addView(view)
         return view
     }
 
@@ -117,7 +115,7 @@ class TipsInputField @JvmOverloads constructor(
         view.setPadding(12.dp, 0.dp, 12.dp, 0.dp)
         tintRes?.let { view.setTextColor(context.getColor(it)) }
         view.gravity = Gravity.CENTER
-        tipsInputContainer.addView(view)
+        binder.tipsInputContainer.addView(view)
         return view
     }
 
@@ -131,21 +129,21 @@ class TipsInputField @JvmOverloads constructor(
     }
 
     override fun showError(error: String) {
-        tipsInputError.makeVisible()
-        tipsInputError.text = error
+        binder.tipsInputError.makeVisible()
+        binder.tipsInputError.text = error
         val color = context.getColor(R.color.text_negative)
         content.setTextColor(color)
         textPaint.color = color
-        tipsInputFieldContainer.background = context.getInputBackgroundError()
+        binder.tipsInputFieldContainer.background = context.getInputBackgroundError()
         invalidate()
     }
 
     override fun hideError() {
-        tipsInputError.makeGone()
+        binder.tipsInputError.makeGone()
         val color = context.getColor(R.color.text_primary)
         content.setTextColor(color)
         textPaint.color = color
-        tipsInputFieldContainer.background = context.getInputBackground()
+        binder.tipsInputFieldContainer.background = context.getInputBackground()
         invalidate()
     }
 

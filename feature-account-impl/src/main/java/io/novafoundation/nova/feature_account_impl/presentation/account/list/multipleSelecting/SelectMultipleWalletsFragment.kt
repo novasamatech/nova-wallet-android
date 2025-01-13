@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -18,13 +16,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsRequester
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentSelectMultipleWalletsBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_select_multiple_wallets.selectMultipleWalletsConfirm
-import kotlinx.android.synthetic.main.fragment_select_multiple_wallets.selectMultipleWalletsList
-import kotlinx.android.synthetic.main.fragment_select_multiple_wallets.selectMultipleWalletsToolbar
 
-class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewModel>(), AccountHolder.AccountItemHandler {
+class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewModel, FragmentSelectMultipleWalletsBinding>(), AccountHolder.AccountItemHandler {
 
     companion object {
         private const val KEY_REQUEST = "KEY_REQUEST"
@@ -35,6 +31,8 @@ class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewMode
             }
         }
     }
+
+    override fun createBinding() = FragmentSelectMultipleWalletsBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -52,17 +50,13 @@ class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewMode
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(titleAdapter, walletsAdapter) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_select_multiple_wallets, container, false)
-    }
-
     override fun initViews() {
-        selectMultipleWalletsToolbar.applyStatusBarInsets()
-        selectMultipleWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectMultipleWalletsToolbar.applyStatusBarInsets()
+        binder.selectMultipleWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        selectMultipleWalletsList.adapter = adapter
-        selectMultipleWalletsConfirm.setOnClickListener { viewModel.confirm() }
+        binder.selectMultipleWalletsList.adapter = adapter
+        binder.selectMultipleWalletsConfirm.setOnClickListener { viewModel.confirm() }
     }
 
     override fun inject() {
@@ -77,7 +71,7 @@ class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewMode
 
         viewModel.titleFlow.observe(titleAdapter::setText)
         viewModel.walletsListingMixin.metaAccountsFlow.observe(walletsAdapter::submitList)
-        viewModel.confirmButtonState.observe(selectMultipleWalletsConfirm::setState)
+        viewModel.confirmButtonState.observe(binder.selectMultipleWalletsConfirm::setState)
     }
 
     override fun itemClicked(accountModel: AccountUi) {

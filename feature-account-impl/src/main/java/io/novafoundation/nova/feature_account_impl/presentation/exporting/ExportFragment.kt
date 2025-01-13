@@ -3,10 +3,11 @@ package io.novafoundation.nova.feature_account_impl.presentation.exporting
 import android.app.PendingIntent
 import android.content.Intent
 import androidx.annotation.CallSuper
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ShareCompletedReceiver
 
-abstract class ExportFragment<V : ExportViewModel> : BaseFragment<V>() {
+abstract class ExportFragment<V : ExportViewModel, B : ViewBinding> : BaseFragment<V, B>() {
 
     @CallSuper
     override fun subscribe(viewModel: V) {

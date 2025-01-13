@@ -1,24 +1,19 @@
 package io.novafoundation.nova.feature_account_impl.presentation.exporting.seed
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentExportSeedBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedContentContainer
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedTitle
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedToolbar
-import kotlinx.android.synthetic.main.fragment_export_seed.exportSeedValue
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
-class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
+class ExportSeedFragment : ExportFragment<ExportSeedViewModel, FragmentExportSeedBinding>() {
 
     companion object {
         fun getBundle(exportPayload: ExportPayload.ChainAccount): Bundle {
@@ -28,16 +23,14 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_export_seed, container, false)
-    }
+    override fun createBinding() = FragmentExportSeedBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        exportSeedToolbar.setHomeButtonListener { viewModel.back() }
+        binder.exportSeedToolbar.setHomeButtonListener { viewModel.back() }
 
-        exportSeedToolbar.setRightActionClickListener { viewModel.optionsClicked() }
+        binder.exportSeedToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
-        exportSeedContentContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.input_background)
+        binder.exportSeedContentContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.input_background)
     }
 
     override fun inject() {
@@ -50,8 +43,8 @@ class ExportSeedFragment : ExportFragment<ExportSeedViewModel>() {
     override fun subscribe(viewModel: ExportSeedViewModel) {
         super.subscribe(viewModel)
 
-        viewModel.secretFlow.observe(exportSeedValue::setText)
+        viewModel.secretFlow.observe(binder.exportSeedValue::setText)
 
-        viewModel.secretTypeNameFlow.observe(exportSeedTitle::setText)
+        viewModel.secretTypeNameFlow.observe(binder.exportSeedTitle::setText)
     }
 }

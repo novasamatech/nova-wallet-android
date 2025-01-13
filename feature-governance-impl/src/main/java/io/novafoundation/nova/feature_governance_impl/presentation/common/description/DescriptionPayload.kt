@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.common.description
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class DescriptionPayload(

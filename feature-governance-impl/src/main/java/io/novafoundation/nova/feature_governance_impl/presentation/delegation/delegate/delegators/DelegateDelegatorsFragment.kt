@@ -1,9 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -12,16 +11,12 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentDelegateDelegatorsBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VoterModel
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.delegators.list.DelegatorsAdapter
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsCount
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsList
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsProgress
-import kotlinx.android.synthetic.main.fragment_delegate_delegators.delegateDelegatorsToolbar
 
-class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), DelegatorsAdapter.Handler {
+class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel, FragmentDelegateDelegatorsBinding>(), DelegatorsAdapter.Handler {
 
     companion object {
         private const val KEY_PAYLOAD = "payload"
@@ -33,15 +28,9 @@ class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), 
         }
     }
 
-    private val delegatorsAdapter = DelegatorsAdapter(this)
+    override fun createBinding() = FragmentDelegateDelegatorsBinding.inflate(layoutInflater)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_delegate_delegators, container, false)
-    }
+    private val delegatorsAdapter = DelegatorsAdapter(this)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,12 +38,12 @@ class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), 
     }
 
     override fun initViews() {
-        delegateDelegatorsToolbar.applyStatusBarInsets()
+        binder.delegateDelegatorsToolbar.applyStatusBarInsets()
 
-        delegateDelegatorsList.setHasFixedSize(true)
-        delegateDelegatorsList.adapter = delegatorsAdapter
+        binder.delegateDelegatorsList.setHasFixedSize(true)
+        binder.delegateDelegatorsList.adapter = delegatorsAdapter
 
-        delegateDelegatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.delegateDelegatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {
@@ -75,22 +64,22 @@ class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel>(), 
                 is ExtendedLoadingState.Error -> {}
                 is ExtendedLoadingState.Loaded -> {
                     delegatorsAdapter.submitList(state.data)
-                    delegateDelegatorsList.makeVisible()
-                    delegateDelegatorsProgress.makeGone()
+                    binder.delegateDelegatorsList.makeVisible()
+                    binder.delegateDelegatorsProgress.makeGone()
                 }
                 ExtendedLoadingState.Loading -> {
-                    delegateDelegatorsList.makeGone()
-                    delegateDelegatorsProgress.makeVisible()
+                    binder.delegateDelegatorsList.makeGone()
+                    binder.delegateDelegatorsProgress.makeVisible()
                 }
             }
         }
 
         viewModel.delegatorsCount.observe { state ->
             if (state is ExtendedLoadingState.Loaded) {
-                delegateDelegatorsCount.text = state.data
-                delegateDelegatorsCount.makeVisible()
+                binder.delegateDelegatorsCount.text = state.data
+                binder.delegateDelegatorsCount.makeVisible()
             } else {
-                delegateDelegatorsCount.makeGone()
+                binder.delegateDelegatorsCount.makeGone()
             }
         }
     }

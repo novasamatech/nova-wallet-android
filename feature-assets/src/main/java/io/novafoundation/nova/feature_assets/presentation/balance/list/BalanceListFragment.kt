@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -12,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
@@ -26,17 +23,17 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
-import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
 class BalanceListFragment :
-    BaseFragment<BalanceListViewModel>(),
+    BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler {
 
+    override fun createBinding() = FragmentBalanceListBinding.inflate(layoutInflater)
+
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private var balanceBreakdownBottomSheet: BalanceBreakdownBottomSheet? = null
 
@@ -52,16 +49,8 @@ class BalanceListFragment :
         ConcatAdapter(headerAdapter, assetsAdapter)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_balance_list, container, false)
-    }
-
     override fun initViews() {
-        balanceListAssets.applyInsetter {
+        binder.balanceListAssets.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -69,18 +58,18 @@ class BalanceListFragment :
 
         hideKeyboard()
 
-        balanceListAssets.setHasFixedSize(true)
-        balanceListAssets.adapter = adapter
+        binder.balanceListAssets.setHasFixedSize(true)
+        binder.balanceListAssets.adapter = adapter
 
         val animationSettings = ExpandableAnimationSettings.createForAssets()
-        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
+        val animator = ExpandableAnimator(binder.balanceListAssets, animationSettings, assetsAdapter)
 
-        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
-        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
+        binder.balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        binder.balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
 
-        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        AssetBaseDecoration.applyDefaultTo(binder.balanceListAssets, assetsAdapter)
 
-        walletContainer.setOnRefreshListener {
+        binder.walletContainer.setOnRefreshListener {
             viewModel.fullSync()
         }
     }
@@ -98,7 +87,7 @@ class BalanceListFragment :
     override fun subscribe(viewModel: BalanceListViewModel) {
         viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                balanceListAssets?.invalidateItemDecorations()
+                binder.balanceListAssets?.invalidateItemDecorations()
             }
         }
 
@@ -109,7 +98,7 @@ class BalanceListFragment :
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
 
         viewModel.hideRefreshEvent.observeEvent {
-            walletContainer.isRefreshing = false
+            binder.walletContainer.isRefreshing = false
         }
 
         viewModel.balanceBreakdownFlow.observe {
@@ -151,7 +140,7 @@ class BalanceListFragment :
         if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
             viewModel.assetClicked(tokenGroup.groupType.asset)
         } else {
-            val itemAnimator = balanceListAssets.itemAnimator as AssetTokensItemAnimator
+            val itemAnimator = binder.balanceListAssets.itemAnimator as AssetTokensItemAnimator
             itemAnimator.prepareForAnimation()
 
             viewModel.assetListMixin.expandToken(tokenGroup)

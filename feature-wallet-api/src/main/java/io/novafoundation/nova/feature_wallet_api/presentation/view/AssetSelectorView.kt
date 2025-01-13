@@ -8,17 +8,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getIdleDrawable
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.databinding.ViewAssetSelectorBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorAction
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorBalance
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorIcon
-import kotlinx.android.synthetic.main.view_asset_selector.view.assetSelectorTokenName
 
 class AssetSelectorView @JvmOverloads constructor(
     context: Context,
@@ -30,9 +28,9 @@ class AssetSelectorView @JvmOverloads constructor(
         BLURRED, BORDERED
     }
 
-    init {
-        View.inflate(context, R.layout.view_asset_selector, this)
+    private val binder = ViewAssetSelectorBinding.inflate(inflater(), this)
 
+    init {
         attrs?.let {
             applyAttributes(it)
         }
@@ -48,7 +46,7 @@ class AssetSelectorView @JvmOverloads constructor(
     }
 
     fun setActionIcon(drawable: Drawable) {
-        assetSelectorAction.setImageDrawable(drawable)
+        binder.assetSelectorAction.setImageDrawable(drawable)
     }
 
     fun setBackgroundStyle(style: BackgroundStyle) = with(context) {
@@ -69,9 +67,9 @@ class AssetSelectorView @JvmOverloads constructor(
         assetSelectorModel: AssetSelectorModel
     ) {
         with(assetSelectorModel) {
-            assetSelectorBalance.text = assetModel.assetBalance
-            assetSelectorTokenName.text = title
-            assetSelectorIcon.setIcon(assetModel.icon, imageLoader)
+            binder.assetSelectorBalance.text = assetModel.assetBalance
+            binder.assetSelectorTokenName.text = title
+            binder.assetSelectorIcon.setIcon(assetModel.icon, imageLoader)
         }
     }
 }

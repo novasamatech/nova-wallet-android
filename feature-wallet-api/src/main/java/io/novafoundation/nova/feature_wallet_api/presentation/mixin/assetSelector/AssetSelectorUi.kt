@@ -11,7 +11,7 @@ interface WithAssetSelector {
     val assetSelectorMixin: AssetSelectorMixin
 }
 
-fun <V> BaseFragment<V>.setupAssetSelector(
+fun <V> BaseFragment<V, *>.setupAssetSelector(
     view: AssetSelectorView,
     selectorMixin: AssetSelectorMixin,
     imageLoader: ImageLoader
@@ -26,7 +26,7 @@ fun <V> BaseFragment<V>.setupAssetSelector(
     subscribeOnAssetClick(selectorMixin, imageLoader)
 }
 
-fun <V> BaseFragment<V>.subscribeOnAssetChange(
+fun <V> BaseFragment<V, *>.subscribeOnAssetChange(
     selectorMixin: AssetSelectorMixin,
     onAssetChanged: (AssetSelectorModel) -> Unit
 ) where V : BaseViewModel {
@@ -35,7 +35,7 @@ fun <V> BaseFragment<V>.subscribeOnAssetChange(
     }
 }
 
-fun <V> BaseFragment<V>.subscribeOnAssetClick(
+fun <V> BaseFragment<V, *>.subscribeOnAssetClick(
     selectorMixin: AssetSelectorMixin,
     imageLoader: ImageLoader
 ) where V : BaseViewModel {

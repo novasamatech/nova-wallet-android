@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.LedgerChainAccount
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class FinishImportLedgerPayload(

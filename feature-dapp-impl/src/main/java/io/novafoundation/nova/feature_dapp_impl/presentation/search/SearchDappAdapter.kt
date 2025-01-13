@@ -7,12 +7,11 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_api.presentation.view.DAppView
+import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappSearchCategoryBinding
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
-import kotlinx.android.synthetic.main.item_dapp_search_category.view.searchCategory
 
 class SearchDappAdapter(
     private val handler: Handler
@@ -24,7 +23,7 @@ class SearchDappAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return CategoryHolder(parent)
+        return CategoryHolder(ItemDappSearchCategoryBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
@@ -84,10 +83,10 @@ private object DiffCallback : BaseGroupedDiffCallback<TextHeader, DappSearchMode
 
 private object SearchDappPayloadGenerator : PayloadGenerator<DappSearchModel>(DappSearchModel::title)
 
-private class CategoryHolder(parentView: ViewGroup) : GroupedListHolder(parentView.inflateChild(R.layout.item_dapp_search_category)) {
+private class CategoryHolder(private val binder: ItemDappSearchCategoryBinding) : GroupedListHolder(binder.root) {
 
     fun bind(item: TextHeader) {
-        containerView.searchCategory.text = item.content
+        binder.searchCategory.text = item.content
     }
 }
 

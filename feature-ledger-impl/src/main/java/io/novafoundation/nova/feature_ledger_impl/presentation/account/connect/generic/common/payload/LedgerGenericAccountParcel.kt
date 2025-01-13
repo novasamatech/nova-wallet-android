@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 import android.os.Parcelable
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novasama.substrate_sdk_android.encrypt.EncryptionType
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class LedgerGenericAccountParcel(

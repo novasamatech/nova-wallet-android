@@ -20,6 +20,6 @@ class FragmentPayloadCreator<T : Parcelable> : PayloadCreator<T> {
     }
 }
 
-fun <T> BaseFragment<*>.payload(): T {
+fun <T> BaseFragment<*, *>.payload(): T {
     return requireArguments().getParcelable(KEY_PAYLOAD)!!
 }

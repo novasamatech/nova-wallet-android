@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.DefaultItemAnimator
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -13,36 +10,28 @@ import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentTinderGovBasketBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter.TinderGovBasketAdapter
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.basket.adpter.TinderGovBasketRvItem
-import kotlinx.android.synthetic.main.fragment_tinder_gov_basket.tinderGovBasketButton
-import kotlinx.android.synthetic.main.fragment_tinder_gov_basket.tinderGovBasketList
-import kotlinx.android.synthetic.main.fragment_tinder_gov_basket.tinderGovBasketToolbar
 
-class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), TinderGovBasketAdapter.Handler {
+class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel, FragmentTinderGovBasketBinding>(), TinderGovBasketAdapter.Handler {
+
+    override fun createBinding() = FragmentTinderGovBasketBinding.inflate(layoutInflater)
 
     private val adapter = TinderGovBasketAdapter(this)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_tinder_gov_basket, container, false)
-    }
-
     override fun initViews() {
-        tinderGovBasketToolbar.applyStatusBarInsets()
-        tinderGovBasketToolbar.setHomeButtonListener { viewModel.backClicked() }
-        tinderGovBasketToolbar.setRightActionClickListener { viewModel.toggleEditMode() }
+        binder.tinderGovBasketToolbar.applyStatusBarInsets()
+        binder.tinderGovBasketToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.tinderGovBasketToolbar.setRightActionClickListener { viewModel.toggleEditMode() }
 
-        tinderGovBasketList.itemAnimator = DefaultItemAnimator()
+        binder.tinderGovBasketList.itemAnimator = DefaultItemAnimator()
             .apply {
                 supportsChangeAnimations = false
             }
-        tinderGovBasketList.adapter = adapter
-        tinderGovBasketButton.setOnClickListener { viewModel.voteClicked() }
+        binder.tinderGovBasketList.adapter = adapter
+        binder.tinderGovBasketButton.setOnClickListener { viewModel.voteClicked() }
     }
 
     override fun inject() {
@@ -57,14 +46,14 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel>(), Tinder
 
     override fun subscribe(viewModel: TinderGovBasketViewModel) {
         viewModel.inEditModeFlow.observe { adapter.setEditMode(it) }
-        viewModel.editModeButtonText.observe { tinderGovBasketToolbar.setTextRight(it) }
+        viewModel.editModeButtonText.observe { binder.tinderGovBasketToolbar.setTextRight(it) }
 
         viewModel.basketFlow.observe {
             adapter.submitList(it)
         }
 
         viewModel.voteButtonStateFlow.observe {
-            tinderGovBasketButton.setState(it)
+            binder.tinderGovBasketButton.setState(it)
         }
 
         viewModel.removeReferendumAction.awaitableActionLiveData.observeEvent { event ->

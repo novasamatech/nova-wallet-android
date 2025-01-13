@@ -2,19 +2,16 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteType
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVoteTypeColor
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVotesCount
-import kotlinx.android.synthetic.main.view_voters.view.votersViewVotesCountShimmer
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewVotersBinding
 
 class VotersView @JvmOverloads constructor(
     context: Context,
@@ -22,24 +19,24 @@ class VotersView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.view_voters, this)
+    private val binder = ViewVotersBinding.inflate(inflater(), this)
 
+    init {
         setBackgroundResource(R.drawable.bg_primary_list_item)
     }
 
     fun setVoteType(@StringRes voteTypeRes: Int, @ColorRes voteColorRes: Int) {
-        votersViewVoteType.setText(voteTypeRes)
-        votersViewVoteTypeColor.background = getRoundedCornerDrawable(voteColorRes, cornerSizeDp = 3)
+        binder.votersViewVoteType.setText(voteTypeRes)
+        binder.votersViewVoteTypeColor.background = getRoundedCornerDrawable(voteColorRes, cornerSizeDp = 3)
     }
 
     fun showLoading(loading: Boolean) {
-        votersViewVotesCountShimmer.isVisible = loading
-        votersViewVotesCount.isVisible = !loading
+        binder.votersViewVotesCountShimmer.isVisible = loading
+        binder.votersViewVotesCount.isVisible = !loading
     }
 
     fun setVotesValue(value: String?) {
-        votersViewVotesCount.setTextOrHide(value)
+        binder.votersViewVotesCount.setTextOrHide(value)
     }
 }
 

@@ -12,8 +12,6 @@ import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CrowdloanMainFlowFeatures
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.SelectContributeCustomization
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.acala.main.base.AcalaMainFlowCustomization
-import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeScrollableContent
-import kotlinx.android.synthetic.main.fragment_contribute.view.crowdloanContributeTitle
 
 private const val LEARN_TYPES_LINK = "https://wiki.acala.network/acala/acala-crowdloan/crowdloan-event#3.2-ways-to-participate"
 
@@ -28,16 +26,17 @@ class AcalaSelectContributeCustomization :
     ) {
         require(state is AcalaSelectContributeViewState)
 
-        val container = into.crowdloanContributeScrollableContent
+        val crowdloanContributeScrollableContent = into.findViewById<ViewGroup>(R.id.crowdloanContributeScrollableContent)
+        val crowdloanContributeTitle = into.findViewById<TextView>(R.id.crowdloanContributeTitle)
 
-        val typeSelector = container.inflateChild(R.layout.view_acala_contribution_type) as RadioGroup
+        val typeSelector = crowdloanContributeScrollableContent.inflateChild(R.layout.view_acala_contribution_type) as RadioGroup
         typeSelector.bindTo(state.selectedContributionTypeIdFlow, scope)
 
-        val learnMoreText = container.inflateChild(R.layout.view_acala_learn_contributions) as TextView
+        val learnMoreText = crowdloanContributeScrollableContent.inflateChild(R.layout.view_acala_learn_contributions) as TextView
         learnMoreText.setOnClickListener { state.learnContributionTypesClicked() }
 
-        container.addAfter(
-            anchor = container.crowdloanContributeTitle,
+        crowdloanContributeScrollableContent.addAfter(
+            anchor = crowdloanContributeTitle,
             newViews = listOf(typeSelector, learnMoreText)
         )
     }

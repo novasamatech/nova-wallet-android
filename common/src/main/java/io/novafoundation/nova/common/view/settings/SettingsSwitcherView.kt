@@ -3,14 +3,14 @@ package io.novafoundation.nova.common.view.settings
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewSettingsSwitcherBinding
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_settings_switcher.view.settingsSwitcher
 
 class SettingsSwitcherView @JvmOverloads constructor(
     context: Context,
@@ -18,34 +18,34 @@ class SettingsSwitcherView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    init {
-        View.inflate(context, R.layout.view_settings_switcher, this)
+    private val binder = ViewSettingsSwitcherBinding.inflate(inflater(), this)
 
+    init {
         attrs?.let(::applyAttributes)
     }
 
     fun setTitle(title: String?) {
-        settingsSwitcher.text = title
+        binder.settingsSwitcher.text = title
     }
 
     fun setIconTintColor(@ColorRes tintRes: Int?) {
-        settingsSwitcher.setCompoundDrawableTintRes(tintRes)
+        binder.settingsSwitcher.setCompoundDrawableTintRes(tintRes)
     }
 
     fun setIcon(icon: Drawable?) {
         // Set icon size 24 dp
         val iconSize = 24.dp
         icon?.setBounds(0, 0, iconSize, iconSize)
-        settingsSwitcher.setCompoundDrawables(icon, null, null, null)
+        binder.settingsSwitcher.setCompoundDrawables(icon, null, null, null)
     }
 
     fun setChecked(checked: Boolean) {
-        settingsSwitcher.isChecked = checked
+        binder.settingsSwitcher.isChecked = checked
     }
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
-        settingsSwitcher.isEnabled = enabled
+        binder.settingsSwitcher.isEnabled = enabled
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.SettingsSwitcherView) {
@@ -56,6 +56,6 @@ class SettingsSwitcherView @JvmOverloads constructor(
         setIcon(icon)
 
         val textColorStateList = it.getColorStateList(R.styleable.SettingsSwitcherView_switcherTextColor)
-        textColorStateList?.let { settingsSwitcher.setTextColor(it) }
+        textColorStateList?.let { binder.settingsSwitcher.setTextColor(it) }
     }
 }

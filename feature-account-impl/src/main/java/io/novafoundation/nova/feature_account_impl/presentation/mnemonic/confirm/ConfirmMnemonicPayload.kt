@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confir
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ConfirmMnemonicPayload(

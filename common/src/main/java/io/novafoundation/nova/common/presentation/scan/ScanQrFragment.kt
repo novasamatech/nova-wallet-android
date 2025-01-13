@@ -2,10 +2,11 @@ package io.novafoundation.nova.common.presentation.scan
 
 import android.view.WindowManager
 import androidx.annotation.CallSuper
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 
-abstract class ScanQrFragment<V : ScanQrViewModel> : BaseFragment<V>() {
+abstract class ScanQrFragment<V : ScanQrViewModel, B : ViewBinding> : BaseFragment<V, B>() {
 
     abstract val scanView: ScanView
 

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.advance
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class AdvancedEncryptionModePayload : Parcelable {
 

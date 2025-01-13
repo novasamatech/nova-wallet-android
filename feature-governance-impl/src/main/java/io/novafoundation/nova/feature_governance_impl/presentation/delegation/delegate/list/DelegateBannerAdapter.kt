@@ -1,13 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_delegations_header.view.delegateBannerMoreContent
-import kotlinx.android.synthetic.main.item_delegations_header.view.itemDelegationBanner
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegationsHeaderBinding
 
 class DelegateBannerAdapter(
     private val handler: Handler
@@ -22,9 +19,7 @@ class DelegateBannerAdapter(
     private var showBanner: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationsHeaderViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegations_header)
-
-        return DelegationsHeaderViewHolder(containerView, handler)
+        return DelegationsHeaderViewHolder(ItemDelegationsHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun getItemCount(): Int {
@@ -46,12 +41,12 @@ class DelegateBannerAdapter(
 }
 
 class DelegationsHeaderViewHolder(
-    containerView: View,
+    binder: ItemDelegationsHeaderBinding,
     handler: DelegateBannerAdapter.Handler
-) : ViewHolder(containerView) {
+) : ViewHolder(binder.root) {
 
     init {
-        with(containerView) {
+        with(binder) {
             itemDelegationBanner.setOnCloseClickListener {
                 handler.closeBanner()
             }

@@ -1,23 +1,20 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentAddTokenSelectChainBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_add_token_select_chain.addTokenSelectChainChains
-import kotlinx.android.synthetic.main.fragment_add_token_select_chain.addTokenSelectChainToolbar
+
 import javax.inject.Inject
 
 class AddTokenSelectChainFragment :
-    BaseFragment<AddTokenSelectChainViewModel>(),
+    BaseFragment<AddTokenSelectChainViewModel, FragmentAddTokenSelectChainBinding>(),
     SelectChainAdapter.ItemHandler {
+
+    override fun createBinding() = FragmentAddTokenSelectChainBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -26,21 +23,13 @@ class AddTokenSelectChainFragment :
         SelectChainAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_add_token_select_chain, container, false)
-    }
-
     override fun initViews() {
-        addTokenSelectChainToolbar.applyStatusBarInsets()
+        binder.addTokenSelectChainToolbar.applyStatusBarInsets()
 
-        addTokenSelectChainChains.setHasFixedSize(true)
-        addTokenSelectChainChains.adapter = chainsAdapter
+        binder.addTokenSelectChainChains.setHasFixedSize(true)
+        binder.addTokenSelectChainChains.adapter = chainsAdapter
 
-        addTokenSelectChainToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.addTokenSelectChainToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {

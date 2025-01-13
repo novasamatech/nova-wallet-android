@@ -2,9 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 
 import android.os.Bundle
 import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.condition.setupConditions
@@ -15,15 +13,10 @@ import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentBackupMnemonicBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicContinue
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicPassphrase
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicCondition1
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicCondition2
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicCondition3
-import kotlinx.android.synthetic.main.fragment_backup_mnemonic.backupMnemonicToolbar
 
-class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
+class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel, FragmentBackupMnemonicBinding>() {
 
     companion object {
 
@@ -36,32 +29,32 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_backup_mnemonic, container, false)
-    }
+    override fun createBinding() = FragmentBackupMnemonicBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        backupMnemonicToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
-        backupMnemonicToolbar.setRightActionClickListener { viewModel.optionsClicked() }
+        binder.backupMnemonicToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.backupMnemonicToolbar.setRightActionClickListener { viewModel.optionsClicked() }
 
         buildConditions()
 
-        backupMnemonicContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.backupMnemonicContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     private fun buildConditions() {
-        backupMnemonicCondition1.setText(buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight))
-        backupMnemonicCondition2.setText(buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight))
-        backupMnemonicCondition3.setText(buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight))
+        binder.backupMnemonicCondition1.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight)
+        )
+        binder.backupMnemonicCondition2.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight)
+        )
+        binder.backupMnemonicCondition3.setText(
+            buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight)
+        )
 
         viewModel.conditionMixin.setupConditions(
-            backupMnemonicCondition1,
-            backupMnemonicCondition2,
-            backupMnemonicCondition3
+            binder.backupMnemonicCondition1,
+            binder.backupMnemonicCondition2,
+            binder.backupMnemonicCondition3
         )
     }
 
@@ -84,14 +77,14 @@ class BackupMnemonicFragment : BaseFragment<BackupMnemonicViewModel>() {
     }
 
     override fun subscribe(viewModel: BackupMnemonicViewModel) {
-        viewModel.buttonState.observe(backupMnemonicContinue::setState)
+        viewModel.buttonState.observe(binder.backupMnemonicContinue::setState)
 
         viewModel.showMnemonicWarningDialog.observeEvent {
             showMnemonicWarning()
         }
 
         viewModel.mnemonicDisplay.observe {
-            backupMnemonicPassphrase.setWords(it)
+            binder.backupMnemonicPassphrase.setWords(it)
         }
     }
 

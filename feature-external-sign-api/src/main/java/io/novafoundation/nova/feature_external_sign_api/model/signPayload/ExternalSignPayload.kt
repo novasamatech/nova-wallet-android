@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_external_sign_api.model.signPayload
 import android.os.Parcelable
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ExternalSignPayload(

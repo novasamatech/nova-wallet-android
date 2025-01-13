@@ -7,7 +7,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
@@ -16,7 +15,6 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
 enum class ExpandableViewState {
     COLLAPSED,
@@ -56,10 +54,6 @@ class ExpandableView @JvmOverloads constructor(
                 it.rotation = 180 * animatedValue
             }
         }
-    }
-
-    fun setImage(@DrawableRes imageRes: Int) {
-        bannerImage.setImageResource(imageRes)
     }
 
     fun setState(state: ExpandableViewState) {

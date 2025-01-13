@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingView
 
-fun BaseFragment<*>.setupStakeActionsComponent(component: StakeActionsComponent, view: ManageStakingView) {
+fun BaseFragment<*, *>.setupStakeActionsComponent(component: StakeActionsComponent, view: ManageStakingView) {
     // state
     component.state.observe { stakeActionsState ->
         if (stakeActionsState == null) {

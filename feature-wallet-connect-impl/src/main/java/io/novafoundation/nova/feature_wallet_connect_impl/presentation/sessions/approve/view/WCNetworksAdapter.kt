@@ -7,20 +7,20 @@ import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_account_api.databinding.ItemBottomSheetChainListBinding
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.view.ChainChipView
-import io.novafoundation.nova.feature_wallet_connect_impl.R
-import kotlinx.android.synthetic.main.item_bottom_sheet_wc_networks_label.view.itemWcNetworksLabel
+import io.novafoundation.nova.feature_wallet_connect_impl.databinding.ItemBottomSheetWcNetworksLabelBinding
 
 class WCNetworksAdapter : GroupedListAdapter<WCNetworkListModel.Label, WCNetworkListModel.Chain>(WCNetworksDiffCallback()) {
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        return WcNetworksLabelHolder(parent)
+        return WcNetworksLabelHolder(ItemBottomSheetWcNetworksLabelBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        return WcNetworksChainHolder(parent)
+        return WcNetworksChainHolder(ItemBottomSheetChainListBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindChild(holder: GroupedListHolder, child: WCNetworkListModel.Chain) {
@@ -32,7 +32,7 @@ class WCNetworksAdapter : GroupedListAdapter<WCNetworkListModel.Label, WCNetwork
     }
 }
 
-private class WcNetworksChainHolder(rootView: ViewGroup) : GroupedListHolder(rootView.inflateChild(R.layout.item_bottom_sheet_chain_list)) {
+private class WcNetworksChainHolder(private val binder: ItemBottomSheetChainListBinding) : GroupedListHolder(binder.root) {
 
     private val chainChipView = containerView as ChainChipView
 
@@ -41,9 +41,9 @@ private class WcNetworksChainHolder(rootView: ViewGroup) : GroupedListHolder(roo
     }
 }
 
-private class WcNetworksLabelHolder(rootView: ViewGroup) : GroupedListHolder(rootView.inflateChild(R.layout.item_bottom_sheet_wc_networks_label)) {
+private class WcNetworksLabelHolder(private val binder: ItemBottomSheetWcNetworksLabelBinding) : GroupedListHolder(binder.root) {
 
-    fun bind(item: WCNetworkListModel.Label) = with(containerView.itemWcNetworksLabel) {
+    fun bind(item: WCNetworkListModel.Label) = with(binder.root) {
         updateLayoutParams<MarginLayoutParams> {
             if (item.needsAdditionalSeparator) {
                 setMargins(16.dp(context), 12.dp(context), 16.dp(context), 4.dp(context))

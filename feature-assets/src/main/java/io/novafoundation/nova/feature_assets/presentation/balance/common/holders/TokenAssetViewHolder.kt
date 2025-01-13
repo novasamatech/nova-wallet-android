@@ -1,26 +1,20 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.common.holders
 
-import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableChildViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
+import io.novafoundation.nova.feature_assets.databinding.ItemTokenAssetBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetImage
-import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetToken
-import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetBalance
-import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetChainIcon
-import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetChainName
-import kotlinx.android.synthetic.main.item_token_asset.view.itemTokenAssetPriceAmount
 
 class TokenAssetViewHolder(
-    containerView: View,
+    private val binder: ItemTokenAssetBinding,
     private val imageLoader: ImageLoader,
-) : GroupedListHolder(containerView), ExpandableChildViewHolder {
+) : GroupedListHolder(binder.root), ExpandableChildViewHolder {
 
     override var expandableItem: ExpandableChildItem? = null
 
@@ -28,19 +22,19 @@ class TokenAssetViewHolder(
         expandableItem = tokenAsset
 
         val asset = tokenAsset.asset
-        itemTokenAssetImage.setTokenIcon(tokenAsset.assetIcon, imageLoader)
-        itemTokenAssetChainIcon.loadChainIcon(tokenAsset.chain.icon, imageLoader)
-        itemTokenAssetChainName.text = tokenAsset.chain.name
+        binder.itemTokenAssetImage.setTokenIcon(tokenAsset.assetIcon, imageLoader)
+        binder.itemTokenAssetChainIcon.loadChainIcon(tokenAsset.chain.icon, imageLoader)
+        binder.itemTokenAssetChainName.text = tokenAsset.chain.name
 
         bindTotal(asset)
 
-        itemTokenAssetToken.text = asset.token.configuration.symbol.value
+        binder.itemTokenAssetToken.text = asset.token.configuration.symbol.value
 
         setOnClickListener { itemHandler.assetClicked(asset.token.configuration) }
     }
 
     fun bindTotal(asset: AssetModel) {
-        containerView.itemTokenAssetBalance.text = asset.amount.token
-        containerView.itemTokenAssetPriceAmount.text = asset.amount.fiat
+        binder.itemTokenAssetBalance.text = asset.amount.token
+        binder.itemTokenAssetPriceAmount.text = asset.amount.fiat
     }
 }

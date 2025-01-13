@@ -20,7 +20,7 @@ sealed class ImportSource(@StringRes titleRes: Int) : AccountSource(titleRes) {
 
     abstract val fieldsValidFlow: Flow<Boolean>
 
-    abstract fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*>): ImportSourceView<*>
+    abstract fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*, *>): ImportSourceView<*>
 
     abstract suspend fun performImport(addAccountType: AddAccountType): Result<Unit>
 

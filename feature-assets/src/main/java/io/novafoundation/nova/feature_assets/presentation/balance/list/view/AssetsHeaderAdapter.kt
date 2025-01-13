@@ -3,24 +3,15 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ItemAssetHeaderBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetPlaceholder
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAssetTitle
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListCrowdloansPromoBanner
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListManage
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListSearch
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -115,7 +106,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(parent.inflateChild(R.layout.item_asset_header), handler)
+        return HeaderHolder(ItemAssetHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int, payloads: MutableList<Any>) {
@@ -162,12 +153,14 @@ private enum class Payload {
 }
 
 class HeaderHolder(
-    override val containerView: View,
+    private val binder: ItemAssetHeaderBinding,
     handler: AssetsHeaderAdapter.Handler,
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : RecyclerView.ViewHolder(binder.root), LayoutContainer {
+
+    override val containerView: View = binder.root
 
     init {
-        with(containerView) {
+        with(binder) {
             balanceListWalletConnect.setOnClickListener { handler.walletConnectClicked() }
             balanceListTotalBalance.setOnClickListener { handler.totalBalanceClicked() }
             balanceListManage.setOnClickListener { handler.manageClicked() }
@@ -208,39 +201,39 @@ class HeaderHolder(
         bindAssetViewMode(assetViewModeModel)
     }
 
-    fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(containerView) {
+    fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(binder) {
         balanceListNfts.setPreviews(nftPreviews)
     }
 
-    fun bindNftCount(nftCount: String?) = with(containerView) {
+    fun bindNftCount(nftCount: String?) = with(binder) {
         balanceListNfts.setNftCount(nftCount)
     }
 
     fun bindTotalBalance(totalBalance: TotalBalanceModel?) = totalBalance?.let {
-        with(containerView) {
+        with(binder) {
             balanceListTotalBalance.showTotalBalance(totalBalance)
         }
     }
 
     fun bindAddress(walletModel: SelectedWalletModel?) = walletModel?.let {
-        containerView.balanceListTotalTitle.text = it.name
+        binder.balanceListTotalTitle.text = it.name
 
-        containerView.balanceListAvatar.setModel(it)
+        binder.balanceListAvatar.setModel(it)
     }
 
-    fun bindPlaceholder(shouldShowPlaceholder: Boolean) = with(containerView) {
+    fun bindPlaceholder(shouldShowPlaceholder: Boolean) = with(binder) {
         balanceListAssetPlaceholder.setVisible(shouldShowPlaceholder)
     }
 
     fun bindWalletConnect(walletConnectModel: WalletConnectSessionsModel?) = walletConnectModel?.let {
-        containerView.balanceListWalletConnect.setConnectionCount(it.connections)
+        binder.balanceListWalletConnect.setConnectionCount(it.connections)
     }
 
-    fun bindCrowdloanBanner(bannerVisible: Boolean) = with(containerView) {
+    fun bindCrowdloanBanner(bannerVisible: Boolean) = with(binder) {
         balanceListCrowdloansPromoBanner.setVisible(bannerVisible)
     }
 
-    fun bindAssetViewMode(assetViewModeModel: AssetViewModeModel?) = with(containerView) {
+    fun bindAssetViewMode(assetViewModeModel: AssetViewModeModel?) = with(binder) {
         assetViewModeModel?.let { balanceListAssetTitle.switchTextTo(assetViewModeModel) }
     }
 }

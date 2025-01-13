@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -12,18 +10,17 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentReviewCustomValidatorsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.EDIT
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter.Mode.VIEW
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsAccounts
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsList
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsNext
-import kotlinx.android.synthetic.main.fragment_review_custom_validators.reviewCustomValidatorsToolbar
 
-class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
+class ReviewCustomValidatorsFragment :
+    BaseFragment<ReviewCustomValidatorsViewModel, FragmentReviewCustomValidatorsBinding>(),
+    StakeTargetAdapter.ItemHandler<Validator> {
 
     companion object {
 
@@ -36,31 +33,25 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         }
     }
 
+    override fun createBinding() = FragmentReviewCustomValidatorsBinding.inflate(layoutInflater)
+
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_review_custom_validators, container, false)
-    }
-
     override fun initViews() {
-        reviewCustomValidatorsList.adapter = adapter
+        binder.reviewCustomValidatorsList.adapter = adapter
 
-        reviewCustomValidatorsList.setHasFixedSize(true)
+        binder.reviewCustomValidatorsList.setHasFixedSize(true)
 
-        reviewCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.reviewCustomValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        reviewCustomValidatorsNext.setOnClickListener {
+        binder.reviewCustomValidatorsNext.setOnClickListener {
             viewModel.nextClicked()
         }
 
-        reviewCustomValidatorsToolbar.setRightActionClickListener {
+        binder.reviewCustomValidatorsToolbar.setRightActionClickListener {
             viewModel.isInEditMode.toggle()
         }
     }
@@ -79,11 +70,11 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
         viewModel.selectedValidatorModels.observe(adapter::submitList)
 
         viewModel.selectionStateFlow.observe {
-            reviewCustomValidatorsAccounts.setTextColorRes(if (it.isOverflow) R.color.text_negative else R.color.text_primary)
-            reviewCustomValidatorsAccounts.text = it.selectedHeaderText
+            binder.reviewCustomValidatorsAccounts.setTextColorRes(if (it.isOverflow) R.color.text_negative else R.color.text_primary)
+            binder.reviewCustomValidatorsAccounts.text = it.selectedHeaderText
 
-            reviewCustomValidatorsNext.setState(if (it.isOverflow) ButtonState.DISABLED else ButtonState.NORMAL)
-            reviewCustomValidatorsNext.text = it.nextButtonText
+            binder.reviewCustomValidatorsNext.setState(if (it.isOverflow) ButtonState.DISABLED else ButtonState.NORMAL)
+            binder.reviewCustomValidatorsNext.text = it.nextButtonText
         }
 
         viewModel.isInEditMode.observe {
@@ -91,7 +82,7 @@ class ReviewCustomValidatorsFragment : BaseFragment<ReviewCustomValidatorsViewMo
 
             val rightActionRes = if (it) R.string.common_done else R.string.common_edit
 
-            reviewCustomValidatorsToolbar.setTextRight(getString(rightActionRes))
+            binder.reviewCustomValidatorsToolbar.setTextRight(getString(rightActionRes))
         }
     }
 
