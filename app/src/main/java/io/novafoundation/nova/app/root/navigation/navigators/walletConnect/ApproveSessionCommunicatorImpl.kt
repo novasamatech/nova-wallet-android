@@ -21,7 +21,7 @@ class ApproveSessionCommunicatorImpl(
         launch {
             automaticInteractionGate.awaitInteractionAllowed()
 
-            navigationHoldersRegistry.navigationBuilder(R.id.action_open_approve_wallet_connect_session)
+            navigationHoldersRegistry.navigationBuilder().action(R.id.action_open_approve_wallet_connect_session)
                 .navigateInFirstAttachedContext()
         }
     }

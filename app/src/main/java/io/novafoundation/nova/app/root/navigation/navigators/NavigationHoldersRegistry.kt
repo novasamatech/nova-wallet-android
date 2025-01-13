@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import io.novafoundation.nova.app.root.navigation.holders.NavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
+import io.novafoundation.nova.app.root.navigation.navigators.builder.NavigationBuilderRegistry
 
 class NavigationHoldersRegistry(
     val splitScreenNavigationHolder: SplitScreenNavigationHolder,
@@ -19,6 +20,6 @@ class NavigationHoldersRegistry(
         get() = firstAttachedHolder.navController
 }
 
-fun NavigationHoldersRegistry.navigationBuilder(action: Int? = null): NavigationBuilder {
-    return NavigationBuilder(this, action)
+fun NavigationHoldersRegistry.navigationBuilder(): NavigationBuilderRegistry {
+    return NavigationBuilderRegistry(this)
 }

@@ -33,7 +33,7 @@ fun BaseNavigator.openSplitScreenWithInstantAction(actionId: Int, nestedActionEx
     val delayedNavigation = NavComponentDelayedNavigation(actionId, nestedActionExtras)
 
     val splitScreenPayload = SplitScreenPayload.InstantNavigationOnAttach(delayedNavigation)
-    navigationBuilder(R.id.action_open_split_screen)
+    navigationBuilder().action(R.id.action_open_split_screen)
         .setArgs(SplitScreenFragment.createPayload(splitScreenPayload))
         .navigateInRoot()
 }

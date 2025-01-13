@@ -20,7 +20,7 @@ class PinCodeTwoFactorVerificationCommunicatorImpl(
         val action = PinCodeAction.TwoFactorVerification(request.useBiometryIfEnabled)
         val bundle = PincodeFragment.getPinCodeBundle(action)
 
-        navigationHoldersRegistry.navigationBuilder(R.id.action_pin_code_two_factor_verification)
+        navigationHoldersRegistry.navigationBuilder().action(R.id.action_pin_code_two_factor_verification)
             .setArgs(bundle)
             .navigateInRoot()
     }

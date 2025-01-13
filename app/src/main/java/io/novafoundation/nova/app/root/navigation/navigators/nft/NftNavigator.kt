@@ -11,7 +11,7 @@ class NftNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), NftRouter {
 
     override fun openNftDetails(nftId: String) {
-        navigationBuilder(R.id.action_nftListFragment_to_nftDetailsFragment)
+        navigationBuilder().action(R.id.action_nftListFragment_to_nftDetailsFragment)
             .setArgs(NftDetailsFragment.getBundle(nftId))
             .navigateInFirstAttachedContext()
     }

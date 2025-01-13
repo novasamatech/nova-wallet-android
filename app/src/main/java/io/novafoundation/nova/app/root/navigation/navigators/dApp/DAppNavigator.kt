@@ -17,14 +17,14 @@ class DAppNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), DAppRouter {
 
     override fun openChangeAccount() {
-        navigationBuilder(R.id.action_open_switch_wallet)
+        navigationBuilder().action(R.id.action_open_switch_wallet)
             .navigateInFirstAttachedContext()
     }
 
     override fun openDAppBrowser(payload: DAppBrowserPayload, extras: FragmentNavigator.Extras?) {
         // Close dapp browser if it is already opened
         // TODO it's better to provide new url to existing browser
-        navigationBuilder()
+        navigationBuilder().cases()
             .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_DAppBrowserFragment)
             .addCase(R.id.dappSearchFragment, R.id.action_dappSearchFragment_to_dapp_browser_graph)
             .addCase(R.id.dappTabsFragment, R.id.action_dappTabsFragment_to_dapp_browser_graph)
@@ -39,41 +39,43 @@ class DAppNavigator(
     }
 
     override fun openDappSearchWithCategory(categoryId: String?) {
-        navigationBuilder(R.id.action_open_dappSearch)
+        navigationBuilder().cases()
+            .addCase(R.id.dappTabsFragment, R.id.action_dappTabsFragment_to_dappSearch)
+            .setFallbackCase(R.id.action_open_dappSearch)
             .setArgs(DappSearchFragment.getBundle(SearchPayload(initialUrl = null, SearchPayload.Request.OPEN_NEW_URL, preselectedCategoryId = categoryId)))
             .navigateInRoot()
     }
 
     override fun finishDappSearch() {
-        navigationBuilder(R.id.action_finish_dapp_search)
+        navigationBuilder().action(R.id.action_finish_dapp_search)
             .navigateInRoot()
     }
 
     override fun openAddToFavourites(payload: AddToFavouritesPayload) {
-        navigationBuilder(R.id.action_DAppBrowserFragment_to_addToFavouritesFragment)
+        navigationBuilder().action(R.id.action_DAppBrowserFragment_to_addToFavouritesFragment)
             .setArgs(AddToFavouritesFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openAuthorizedDApps() {
-        navigationBuilder(R.id.action_mainFragment_to_authorizedDAppsFragment)
+        navigationBuilder().action(R.id.action_mainFragment_to_authorizedDAppsFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun openTabs() {
-        navigationBuilder()
-            .addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_browserTabsFragment)
-            .setFallbackCase(R.id.action_open_dappTabs)
+        navigationBuilder().graph(R.id.dapp_tabs_graph)
+            //.addCase(R.id.dappBrowserFragment, R.id.action_DAppBrowserFragment_to_browserTabsFragment)
+            //.setFallbackCase(R.id.action_open_dappTabs)
             .navigateInRoot()
     }
 
     override fun closeTabsScreen() {
-        navigationBuilder(R.id.action_finish_tabs_fragment)
+        navigationBuilder().action(R.id.action_finish_tabs_fragment)
             .navigateInRoot()
     }
 
     override fun openDAppFavorites() {
-        navigationBuilder(R.id.action_open_dapp_favorites)
+        navigationBuilder().action(R.id.action_open_dapp_favorites)
             .navigateInFirstAttachedContext()
     }
 }

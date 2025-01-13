@@ -16,35 +16,35 @@ class NominationPoolsStakingNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), NominationPoolsRouter {
 
     override fun openSetupBondMore() {
-        navigationBuilder(R.id.action_stakingFragment_to_PoolsBondMoreGraph).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_PoolsBondMoreGraph).navigateInFirstAttachedContext()
     }
 
     override fun openConfirmBondMore(payload: NominationPoolsConfirmBondMorePayload) {
-        navigationBuilder(R.id.action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment)
+        navigationBuilder().action(R.id.action_nominationPoolsSetupBondMoreFragment_to_nominationPoolsConfirmBondMoreFragment)
             .setArgs(NominationPoolsConfirmBondMoreFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmUnbond(payload: NominationPoolsConfirmUnbondPayload) {
-        navigationBuilder(R.id.action_nominationPoolsSetupUnbondFragment_to_nominationPoolsConfirmUnbondFragment)
+        navigationBuilder().action(R.id.action_nominationPoolsSetupUnbondFragment_to_nominationPoolsConfirmUnbondFragment)
             .setArgs(NominationPoolsConfirmUnbondFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openRedeem() {
-        navigationBuilder(R.id.action_stakingFragment_to_PoolsRedeemFragment).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_PoolsRedeemFragment).navigateInFirstAttachedContext()
     }
 
     override fun openClaimRewards() {
-        navigationBuilder(R.id.action_stakingFragment_to_PoolsClaimRewardsFragment).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_PoolsClaimRewardsFragment).navigateInFirstAttachedContext()
     }
 
     override fun openSetupUnbond() {
-        navigationBuilder(R.id.action_stakingFragment_to_PoolsUnbondGraph).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_PoolsUnbondGraph).navigateInFirstAttachedContext()
     }
 
     override fun returnToStakingMain() {
-        navigationBuilder(R.id.back_to_staking_main).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.back_to_staking_main).navigateInFirstAttachedContext()
     }
 
     override fun returnToMain() {

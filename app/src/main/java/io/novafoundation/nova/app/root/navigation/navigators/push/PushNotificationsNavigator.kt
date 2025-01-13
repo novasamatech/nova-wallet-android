@@ -11,18 +11,18 @@ class PushNotificationsNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), PushNotificationsRouter {
 
     override fun openPushSettings() {
-        navigationBuilder(R.id.action_pushWelcome_to_pushSettings)
+        navigationBuilder().action(R.id.action_pushWelcome_to_pushSettings)
             .navigateInFirstAttachedContext()
     }
 
     override fun openPushGovernanceSettings(args: Bundle) {
-        navigationBuilder(R.id.action_pushSettings_to_governanceSettings)
+        navigationBuilder().action(R.id.action_pushSettings_to_governanceSettings)
             .setArgs(args)
             .navigateInFirstAttachedContext()
     }
 
     override fun openPushStakingSettings(args: Bundle) {
-        navigationBuilder(R.id.action_pushSettings_to_stakingSettings)
+        navigationBuilder().action(R.id.action_pushSettings_to_stakingSettings)
             .setArgs(args)
             .navigateInFirstAttachedContext()
     }

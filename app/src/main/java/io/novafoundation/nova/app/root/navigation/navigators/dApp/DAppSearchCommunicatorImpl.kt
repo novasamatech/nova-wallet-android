@@ -15,7 +15,7 @@ class DAppSearchCommunicatorImpl(navigationHoldersRegistry: NavigationHoldersReg
     override fun openRequest(request: SearchPayload) {
         super.openRequest(request)
 
-        navigationBuilder(R.id.action_open_dappSearch_from_browser)
+        navigationBuilder().action(R.id.action_open_dappSearch_from_browser)
             .setArgs(DappSearchFragment.getBundle(request))
             .navigateInRoot()
     }

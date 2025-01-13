@@ -21,20 +21,20 @@ class SwapNavigator(
     override fun openSwapConfirmation(payload: SwapConfirmationPayload) {
         val bundle = SwapConfirmationFragment.getBundle(payload)
 
-        navigationBuilder(R.id.action_swapMainSettingsFragment_to_swapConfirmationFragment)
+        navigationBuilder().action(R.id.action_swapMainSettingsFragment_to_swapConfirmationFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
 
     override fun openSwapOptions() {
-        navigationBuilder(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
+        navigationBuilder().action(R.id.action_swapMainSettingsFragment_to_swapOptionsFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun openBalanceDetails(assetPayload: AssetPayload) {
         val bundle = BalanceDetailFragment.getBundle(assetPayload)
 
-        navigationBuilder(R.id.action_swapConfirmationFragment_to_assetDetails)
+        navigationBuilder().action(R.id.action_swapConfirmationFragment_to_assetDetails)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
@@ -43,7 +43,7 @@ class SwapNavigator(
         val payload = SwapFlowPayload.ReselectAssetIn(selectedAsset)
         val bundle = AssetSwapFlowFragment.getBundle(payload)
 
-        navigationBuilder(R.id.action_swapSettingsFragment_to_select_swap_token_graph)
+        navigationBuilder().action(R.id.action_swapSettingsFragment_to_select_swap_token_graph)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
@@ -52,7 +52,7 @@ class SwapNavigator(
         val payload = SwapFlowPayload.ReselectAssetOut(selectedAsset)
         val bundle = AssetSwapFlowFragment.getBundle(payload)
 
-        navigationBuilder(R.id.action_swapSettingsFragment_to_select_swap_token_graph)
+        navigationBuilder().action(R.id.action_swapSettingsFragment_to_select_swap_token_graph)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }

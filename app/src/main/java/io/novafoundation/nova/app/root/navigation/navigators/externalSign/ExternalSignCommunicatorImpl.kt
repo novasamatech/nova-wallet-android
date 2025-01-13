@@ -25,7 +25,7 @@ class ExternalSignCommunicatorImpl(
         launch {
             automaticInteractionGate.awaitInteractionAllowed()
 
-            navigationHoldersRegistry.navigationBuilder(R.id.action_open_externalSignGraph)
+            navigationHoldersRegistry.navigationBuilder().action(R.id.action_open_externalSignGraph)
                 .setArgs(ExternalSignFragment.getBundle(request))
                 .navigateInRoot()
         }

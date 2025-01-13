@@ -24,24 +24,24 @@ class ParachainStakingNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), ParachainStakingRouter {
 
     override fun openStartStaking(payload: StartParachainStakingPayload) {
-        navigationBuilder(R.id.action_open_startParachainStakingGraph)
+        navigationBuilder().action(R.id.action_open_startParachainStakingGraph)
             .setArgs(StartParachainStakingFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload) {
-        navigationBuilder(R.id.action_startParachainStakingFragment_to_confirmStartParachainStakingFragment)
+        navigationBuilder().action(R.id.action_startParachainStakingFragment_to_confirmStartParachainStakingFragment)
             .setArgs(ConfirmStartParachainStakingFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSearchCollator() {
-        navigationBuilder(R.id.action_selectCollatorFragment_to_searchCollatorFragment)
+        navigationBuilder().action(R.id.action_selectCollatorFragment_to_searchCollatorFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun openCollatorDetails(payload: StakeTargetDetailsPayload) {
-        navigationBuilder(R.id.open_validator_details)
+        navigationBuilder().action(R.id.open_validator_details)
             .setArgs(ValidatorDetailsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
@@ -51,48 +51,48 @@ class ParachainStakingNavigator(
     }
 
     override fun returnToStakingMain() {
-        navigationBuilder(R.id.back_to_staking_main).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.back_to_staking_main).navigateInFirstAttachedContext()
     }
 
     override fun returnToStartStaking() {
-        navigationBuilder(R.id.action_return_to_start_staking).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_return_to_start_staking).navigateInFirstAttachedContext()
     }
 
     override fun openCurrentCollators() {
-        navigationBuilder(R.id.action_stakingFragment_to_currentCollatorsFragment).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_currentCollatorsFragment).navigateInFirstAttachedContext()
     }
 
     override fun openUnbond() {
-        navigationBuilder(R.id.action_open_parachainUnbondGraph).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_open_parachainUnbondGraph).navigateInFirstAttachedContext()
     }
 
     override fun openConfirmUnbond(payload: ParachainStakingUnbondConfirmPayload) {
-        navigationBuilder(R.id.action_parachainStakingUnbondFragment_to_parachainStakingUnbondConfirmFragment)
+        navigationBuilder().action(R.id.action_parachainStakingUnbondFragment_to_parachainStakingUnbondConfirmFragment)
             .setArgs(ParachainStakingUnbondConfirmFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openRedeem() {
-        navigationBuilder(R.id.action_stakingFragment_to_parachainStakingRedeemFragment).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_parachainStakingRedeemFragment).navigateInFirstAttachedContext()
     }
 
     override fun openRebond(payload: ParachainStakingRebondPayload) {
-        navigationBuilder(R.id.action_stakingFragment_to_parachainStakingRebondFragment)
+        navigationBuilder().action(R.id.action_stakingFragment_to_parachainStakingRebondFragment)
             .setArgs(ParachainStakingRebondFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSetupYieldBoost() {
-        navigationBuilder(R.id.action_stakingFragment_to_yieldBoostGraph).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_stakingFragment_to_yieldBoostGraph).navigateInFirstAttachedContext()
     }
 
     override fun openConfirmYieldBoost(payload: YieldBoostConfirmPayload) {
-        navigationBuilder(R.id.action_setupYieldBoostFragment_to_yieldBoostConfirmFragment)
+        navigationBuilder().action(R.id.action_setupYieldBoostFragment_to_yieldBoostConfirmFragment)
             .setArgs(YieldBoostConfirmFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openAddStakingProxy() {
-        navigationBuilder(R.id.action_open_addStakingProxyFragment).navigateInFirstAttachedContext()
+        navigationBuilder().action(R.id.action_open_addStakingProxyFragment).navigateInFirstAttachedContext()
     }
 }
