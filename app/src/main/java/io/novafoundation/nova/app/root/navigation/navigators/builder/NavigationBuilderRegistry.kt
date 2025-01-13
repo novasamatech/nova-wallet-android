@@ -8,5 +8,5 @@ class NavigationBuilderRegistry(private val registry: NavigationHoldersRegistry)
 
     fun cases() = CasesNavigationBuilder(registry)
 
-    fun graph(graphId: Int) = GraphNavigationBuilder(registry, graphId)
+    fun graph(graphId: Int) = OpenGraphNavigationBuilder(registry, graphId)
 }
