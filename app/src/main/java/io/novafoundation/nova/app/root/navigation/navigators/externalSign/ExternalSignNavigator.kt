@@ -11,7 +11,7 @@ class ExternalSignNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), ExternalSignRouter {
 
     override fun openExtrinsicDetails(extrinsicContent: String) {
-        navigationBuilder(R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment)
+        navigationBuilder().action(R.id.action_ConfirmSignExtrinsicFragment_to_extrinsicDetailsFragment)
             .setArgs(ExternalExtrinsicDetailsFragment.getBundle(extrinsicContent))
             .navigateInFirstAttachedContext()
     }

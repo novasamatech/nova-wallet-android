@@ -14,23 +14,23 @@ class WalletConnectNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), WalletConnectRouter {
 
     override fun openSessionDetails(payload: WalletConnectSessionDetailsPayload) {
-        navigationBuilder(R.id.action_walletConnectSessionsFragment_to_walletConnectSessionDetailsFragment)
+        navigationBuilder().action(R.id.action_walletConnectSessionsFragment_to_walletConnectSessionDetailsFragment)
             .setArgs(WalletConnectSessionDetailsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openScanPairingQrCode() {
-        navigationBuilder(R.id.action_open_scanWalletConnect)
+        navigationBuilder().action(R.id.action_open_scanWalletConnect)
             .navigateInFirstAttachedContext()
     }
 
     override fun backToSettings() {
-        navigationBuilder(R.id.walletConnectSessionDetailsFragment_to_settings)
+        navigationBuilder().action(R.id.walletConnectSessionDetailsFragment_to_settings)
             .navigateInFirstAttachedContext()
     }
 
     override fun openWalletConnectSessions(payload: WalletConnectSessionsPayload) {
-        navigationBuilder(R.id.action_mainFragment_to_walletConnectGraph)
+        navigationBuilder().action(R.id.action_mainFragment_to_walletConnectGraph)
             .setArgs(WalletConnectSessionsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }

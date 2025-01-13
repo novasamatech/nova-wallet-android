@@ -2,7 +2,6 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.externalSign.ExternalSignCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.externalSign.ExternalSignNavigator
@@ -22,9 +21,9 @@ class ExternalSignNavigationModule {
     @ApplicationScope
     @Provides
     fun provideSignExtrinsicCommunicator(
-        navigationHolder: RootNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         automaticInteractionGate: AutomaticInteractionGate,
     ): ExternalSignCommunicator {
-        return ExternalSignCommunicatorImpl(navigationHolder, automaticInteractionGate)
+        return ExternalSignCommunicatorImpl(navigationHoldersRegistry, automaticInteractionGate)
     }
 }

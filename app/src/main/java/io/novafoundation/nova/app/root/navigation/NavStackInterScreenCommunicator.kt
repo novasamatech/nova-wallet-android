@@ -5,8 +5,9 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import io.novafoundation.nova.app.root.navigation.navigators.NavigationBuilder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.builder.NavigationBuilderRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.navigationBuilder
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
@@ -71,7 +72,7 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
             .asFlow()
     }
 
-    protected fun navigationBuilder(destination: Int? = null): NavigationBuilder {
-        return NavigationBuilder(navigationHoldersRegistry, destination)
+    protected fun navigationBuilder(): NavigationBuilderRegistry {
+        return navigationHoldersRegistry.navigationBuilder()
     }
 }

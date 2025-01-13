@@ -25,37 +25,37 @@ class StartMultiStakingNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), StartMultiStakingRouter {
 
     override fun openStartStakingLanding(payload: StartStakingLandingPayload) {
-        navigationBuilder(R.id.action_mainFragment_to_startStackingLanding)
+        navigationBuilder().action(R.id.action_mainFragment_to_startStackingLanding)
             .setArgs(StartStakingLandingFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openStartParachainStaking() {
-        navigationBuilder(R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph)
+        navigationBuilder().action(R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph)
             .setArgs(StartParachainStakingFragment.getBundle(StartParachainStakingPayload(StartParachainStakingMode.START)))
             .navigateInFirstAttachedContext()
     }
 
     override fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload) {
-        navigationBuilder(R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph)
+        navigationBuilder().action(R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph)
             .setArgs(SetupAmountMultiStakingFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSetupStakingType(payload: SetupStakingTypePayload) {
-        navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
+        navigationBuilder().action(R.id.action_setupAmountMultiStakingFragment_to_setupStakingType)
             .setArgs(SetupStakingTypeFragment.getArguments(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openConfirm(payload: ConfirmMultiStakingPayload) {
-        navigationBuilder(R.id.action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment)
+        navigationBuilder().action(R.id.action_setupAmountMultiStakingFragment_to_confirmMultiStakingFragment)
             .setArgs(ConfirmMultiStakingFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSelectedValidators() {
-        navigationBuilder(R.id.action_confirmMultiStakingFragment_to_confirmNominationsFragment)
+        navigationBuilder().action(R.id.action_confirmMultiStakingFragment_to_confirmNominationsFragment)
             .navigateInFirstAttachedContext()
     }
 

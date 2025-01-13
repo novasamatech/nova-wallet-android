@@ -22,17 +22,17 @@ class LedgerNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), LedgerRouter {
 
     override fun openImportFillWallet() {
-        navigationBuilder(R.id.action_startImportLedgerFragment_to_fillWalletImportLedgerFragment)
+        navigationBuilder().action(R.id.action_startImportLedgerFragment_to_fillWalletImportLedgerFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun returnToImportFillWallet() {
-        navigationBuilder(R.id.action_selectAddressImportLedgerFragment_to_fillWalletImportLedgerFragment)
+        navigationBuilder().action(R.id.action_selectAddressImportLedgerFragment_to_fillWalletImportLedgerFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun openSelectImportAddress(payload: SelectLedgerAddressPayload) {
-        navigationBuilder(R.id.action_selectLedgerImportFragment_to_selectAddressImportLedgerFragment)
+        navigationBuilder().action(R.id.action_selectLedgerImportFragment_to_selectAddressImportLedgerFragment)
             .setArgs(SelectAddressLedgerFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
@@ -46,7 +46,7 @@ class LedgerNavigator(
     }
 
     override fun openFinishImportLedger(payload: FinishImportLedgerPayload) {
-        navigationBuilder(R.id.action_fillWalletImportLedgerFragment_to_finishImportLedgerFragment)
+        navigationBuilder().action(R.id.action_fillWalletImportLedgerFragment_to_finishImportLedgerFragment)
             .setArgs(FinishImportLedgerFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
@@ -56,30 +56,30 @@ class LedgerNavigator(
     }
 
     override fun openAddChainAccountSelectAddress(payload: AddLedgerChainAccountSelectAddressPayload) {
-        navigationBuilder(R.id.action_addChainAccountSelectLedgerFragment_to_addChainAccountSelectAddressLedgerFragment)
+        navigationBuilder().action(R.id.action_addChainAccountSelectLedgerFragment_to_addChainAccountSelectAddressLedgerFragment)
             .setArgs(AddLedgerChainAccountSelectAddressFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSelectLedgerGeneric() {
-        navigationBuilder(R.id.action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment)
+        navigationBuilder().action(R.id.action_startImportGenericLedgerFragment_to_selectLedgerGenericImportFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun openSelectAddressGenericLedger(payload: SelectLedgerAddressPayload) {
-        navigationBuilder(R.id.action_selectLedgerGenericImportFragment_to_selectAddressImportGenericLedgerFragment)
+        navigationBuilder().action(R.id.action_selectLedgerGenericImportFragment_to_selectAddressImportGenericLedgerFragment)
             .setArgs(SelectAddressLedgerFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openPreviewLedgerAccountsGeneric(payload: PreviewImportGenericLedgerPayload) {
-        navigationBuilder(R.id.action_selectAddressImportGenericLedgerFragment_to_previewImportGenericLedgerFragment)
+        navigationBuilder().action(R.id.action_selectAddressImportGenericLedgerFragment_to_previewImportGenericLedgerFragment)
             .setArgs(PreviewImportGenericLedgerFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openFinishImportLedgerGeneric(payload: FinishImportGenericLedgerPayload) {
-        navigationBuilder(R.id.action_previewImportGenericLedgerFragment_to_finishImportGenericLedgerFragment)
+        navigationBuilder().action(R.id.action_previewImportGenericLedgerFragment_to_finishImportGenericLedgerFragment)
             .setArgs(FinishImportGenericLedgerFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }

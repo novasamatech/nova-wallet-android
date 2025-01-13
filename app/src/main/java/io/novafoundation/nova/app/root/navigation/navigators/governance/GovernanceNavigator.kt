@@ -51,7 +51,7 @@ class GovernanceNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), GovernanceRouter {
 
     override fun openReferendum(payload: ReferendumDetailsPayload) {
-        navigationBuilder()
+        navigationBuilder().cases()
             .addCase(R.id.referendumDetailsFragment, R.id.action_referendumDetailsFragment_to_referendumDetailsFragment)
             .addCase(R.id.referendaSearchFragment, R.id.action_open_referendum_details_from_referenda_search)
             .setFallbackCase(R.id.action_open_referendum_details)
@@ -60,37 +60,37 @@ class GovernanceNavigator(
     }
 
     override fun openReferendumFullDetails(payload: ReferendumFullDetailsPayload) {
-        navigationBuilder(R.id.action_referendumDetailsFragment_to_referendumFullDetailsFragment)
+        navigationBuilder().action(R.id.action_referendumDetailsFragment_to_referendumFullDetailsFragment)
             .setArgs(ReferendumFullDetailsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openReferendumVoters(payload: ReferendumVotersPayload) {
-        navigationBuilder(R.id.action_referendumDetailsFragment_to_referendumVotersFragment)
+        navigationBuilder().action(R.id.action_referendumDetailsFragment_to_referendumVotersFragment)
             .setArgs(ReferendumVotersFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSetupReferendumVote(payload: SetupVotePayload) {
-        navigationBuilder(R.id.action_referendumDetailsFragment_to_setupVoteReferendumFragment)
+        navigationBuilder().action(R.id.action_referendumDetailsFragment_to_setupVoteReferendumFragment)
             .setArgs(SetupVoteFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSetupTinderGovVote(payload: SetupVotePayload) {
-        navigationBuilder(R.id.action_tinderGovCards_to_setupTinderGovVoteFragment)
+        navigationBuilder().action(R.id.action_tinderGovCards_to_setupTinderGovVoteFragment)
             .setArgs(SetupVoteFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun backToReferendumDetails() {
-        navigationBuilder(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)
+        navigationBuilder().action(R.id.action_confirmReferendumVote_to_referendumDetailsFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun finishUnlockFlow(shouldCloseLocksScreen: Boolean) {
         if (shouldCloseLocksScreen) {
-            navigationBuilder(R.id.action_confirmReferendumVote_to_mainFragment)
+            navigationBuilder().action(R.id.action_confirmReferendumVote_to_mainFragment)
                 .navigateInFirstAttachedContext()
         } else {
             back()
@@ -102,14 +102,14 @@ class GovernanceNavigator(
     }
 
     override fun openAddDelegation() {
-        navigationBuilder()
+        navigationBuilder().cases()
             .addCase(R.id.mainFragment, R.id.action_mainFragment_to_delegation)
             .addCase(R.id.yourDelegationsFragment, R.id.action_yourDelegations_to_delegationList)
             .navigateInFirstAttachedContext()
     }
 
     override fun openYourDelegations() {
-        navigationBuilder(R.id.action_mainFragment_to_your_delegation)
+        navigationBuilder().action(R.id.action_mainFragment_to_your_delegation)
             .navigateInFirstAttachedContext()
     }
 
@@ -118,55 +118,55 @@ class GovernanceNavigator(
     }
 
     override fun backToYourDelegations() {
-        navigationBuilder(R.id.action_back_to_your_delegations)
+        navigationBuilder().action(R.id.action_back_to_your_delegations)
             .navigateInFirstAttachedContext()
     }
 
     override fun openRevokeDelegationChooseTracks(payload: RevokeDelegationChooseTracksPayload) {
-        navigationBuilder(R.id.action_delegateDetailsFragment_to_revokeDelegationChooseTracksFragment)
+        navigationBuilder().action(R.id.action_delegateDetailsFragment_to_revokeDelegationChooseTracksFragment)
             .setArgs(RevokeDelegationChooseTracksFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openRevokeDelegationsConfirm(payload: RevokeDelegationConfirmPayload) {
-        navigationBuilder(R.id.action_revokeDelegationChooseTracksFragment_to_revokeDelegationConfirmFragment)
+        navigationBuilder().action(R.id.action_revokeDelegationChooseTracksFragment_to_revokeDelegationConfirmFragment)
             .setArgs(RevokeDelegationConfirmFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openDelegateSearch() {
-        navigationBuilder(R.id.action_delegateListFragment_to_delegateSearchFragment)
+        navigationBuilder().action(R.id.action_delegateListFragment_to_delegateSearchFragment)
             .navigateInFirstAttachedContext()
     }
 
     override fun openSelectGovernanceTracks(bundle: Bundle) {
-        navigationBuilder(R.id.action_open_select_governance_tracks)
+        navigationBuilder().action(R.id.action_open_select_governance_tracks)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
 
     override fun openTinderGovCards() {
-        navigationBuilder(R.id.action_openTinderGovCards)
+        navigationBuilder().action(R.id.action_openTinderGovCards)
             .navigateInFirstAttachedContext()
     }
 
     override fun openTinderGovBasket() {
-        navigationBuilder(R.id.action_tinderGovCards_to_tinderGovBasket)
+        navigationBuilder().action(R.id.action_tinderGovCards_to_tinderGovBasket)
             .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmTinderGovVote() {
-        navigationBuilder(R.id.action_setupTinderGovBasket_to_confirmTinderGovVote)
+        navigationBuilder().action(R.id.action_setupTinderGovBasket_to_confirmTinderGovVote)
             .navigateInFirstAttachedContext()
     }
 
     override fun backToTinderGovCards() {
-        navigationBuilder(R.id.action_confirmTinderGovVote_to_tinderGovCards)
+        navigationBuilder().action(R.id.action_confirmTinderGovVote_to_tinderGovCards)
             .navigateInFirstAttachedContext()
     }
 
     override fun openReferendumInfo(payload: ReferendumInfoPayload) {
-        navigationBuilder()
+        navigationBuilder().cases()
             .addCase(R.id.tinderGovCards, R.id.action_tinderGovCards_to_referendumInfo)
             .addCase(R.id.setupTinderGovBasketFragment, R.id.action_setupTinderGovBasket_to_referendumInfo)
             .setArgs(ReferendumInfoFragment.getBundle(payload))
@@ -174,29 +174,29 @@ class GovernanceNavigator(
     }
 
     override fun openReferendaSearch() {
-        navigationBuilder(R.id.action_open_referenda_search)
+        navigationBuilder().action(R.id.action_open_referenda_search)
             .navigateInFirstAttachedContext()
     }
 
     override fun openReferendaFilters() {
-        navigationBuilder(R.id.action_open_referenda_filters)
+        navigationBuilder().action(R.id.action_open_referenda_filters)
             .navigateInFirstAttachedContext()
     }
 
     override fun openRemoveVotes(payload: RemoveVotesPayload) {
-        navigationBuilder(R.id.action_open_remove_votes)
+        navigationBuilder().action(R.id.action_open_remove_votes)
             .setArgs(RemoveVotesFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openDelegateDelegators(payload: DelegateDelegatorsPayload) {
-        navigationBuilder(R.id.action_delegateDetailsFragment_to_delegateDelegatorsFragment)
+        navigationBuilder().action(R.id.action_delegateDetailsFragment_to_delegateDelegatorsFragment)
             .setArgs(DelegateDelegatorsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openDelegateDetails(payload: DelegateDetailsPayload) {
-        navigationBuilder()
+        navigationBuilder().cases()
             .addCase(R.id.delegateListFragment, R.id.action_delegateListFragment_to_delegateDetailsFragment)
             .addCase(R.id.yourDelegationsFragment, R.id.action_yourDelegations_to_delegationDetails)
             .addCase(R.id.delegateSearchFragment, R.id.action_delegateSearchFragment_to_delegateDetailsFragment)
@@ -205,60 +205,60 @@ class GovernanceNavigator(
     }
 
     override fun openNewDelegationChooseTracks(payload: NewDelegationChooseTracksPayload) {
-        navigationBuilder(R.id.action_delegateDetailsFragment_to_selectDelegationTracks)
+        navigationBuilder().action(R.id.action_delegateDetailsFragment_to_selectDelegationTracks)
             .setArgs(NewDelegationChooseTracksFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openNewDelegationChooseAmount(payload: NewDelegationChooseAmountPayload) {
-        navigationBuilder(R.id.action_selectDelegationTracks_to_newDelegationChooseAmountFragment)
+        navigationBuilder().action(R.id.action_selectDelegationTracks_to_newDelegationChooseAmountFragment)
             .setArgs(NewDelegationChooseAmountFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openNewDelegationConfirm(payload: NewDelegationConfirmPayload) {
-        navigationBuilder(R.id.action_newDelegationChooseAmountFragment_to_newDelegationConfirmFragment)
+        navigationBuilder().action(R.id.action_newDelegationChooseAmountFragment_to_newDelegationConfirmFragment)
             .setArgs(NewDelegationConfirmFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openVotedReferenda(payload: VotedReferendaPayload) {
-        navigationBuilder(R.id.action_delegateDetailsFragment_to_votedReferendaFragment)
+        navigationBuilder().action(R.id.action_delegateDetailsFragment_to_votedReferendaFragment)
             .setArgs(VotedReferendaFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openDelegateFullDescription(payload: DescriptionPayload) {
-        navigationBuilder(R.id.action_delegateDetailsFragment_to_delegateFullDescription)
+        navigationBuilder().action(R.id.action_delegateDetailsFragment_to_delegateFullDescription)
             .setArgs(DescriptionFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openDAppBrowser(url: String) {
-        navigationBuilder(R.id.action_referendumDetailsFragment_to_DAppBrowserGraph)
+        navigationBuilder().action(R.id.action_referendumDetailsFragment_to_DAppBrowserGraph)
             .setArgs(DAppBrowserFragment.getBundle(DAppBrowserPayload.Address(url)))
             .navigateInFirstAttachedContext()
     }
 
     override fun openReferendumDescription(payload: DescriptionPayload) {
-        navigationBuilder(R.id.action_referendumDetailsFragment_to_referendumDescription)
+        navigationBuilder().action(R.id.action_referendumDetailsFragment_to_referendumDescription)
             .setArgs(DescriptionFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmVoteReferendum(payload: ConfirmVoteReferendumPayload) {
-        navigationBuilder(R.id.action_setupVoteReferendumFragment_to_confirmReferendumVote)
+        navigationBuilder().action(R.id.action_setupVoteReferendumFragment_to_confirmReferendumVote)
             .setArgs(ConfirmReferendumVoteFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openGovernanceLocksOverview() {
-        navigationBuilder(R.id.action_mainFragment_to_governanceLocksOverview)
+        navigationBuilder().action(R.id.action_mainFragment_to_governanceLocksOverview)
             .navigateInFirstAttachedContext()
     }
 
     override fun openConfirmGovernanceUnlock() {
-        navigationBuilder(R.id.action_governanceLocksOverview_to_confirmGovernanceUnlock)
+        navigationBuilder().action(R.id.action_governanceLocksOverview_to_confirmGovernanceUnlock)
             .navigateInFirstAttachedContext()
     }
 }

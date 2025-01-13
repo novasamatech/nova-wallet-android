@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.navigators
 
+import io.novafoundation.nova.app.root.navigation.navigators.builder.NavigationBuilderRegistry
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 
 abstract class BaseNavigator(
@@ -26,7 +27,7 @@ abstract class BaseNavigator(
         navigationHoldersRegistry.firstAttachedHolder.finishApp()
     }
 
-    fun navigationBuilder(destination: Int? = null): NavigationBuilder {
-        return NavigationBuilder(navigationHoldersRegistry, destination)
+    fun navigationBuilder(): NavigationBuilderRegistry {
+        return navigationHoldersRegistry.navigationBuilder()
     }
 }

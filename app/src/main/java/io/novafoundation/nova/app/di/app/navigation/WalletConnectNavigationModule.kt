@@ -2,7 +2,6 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.walletConnect.ApproveSessionCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.walletConnect.WalletConnectNavigator
@@ -17,9 +16,9 @@ class WalletConnectNavigationModule {
     @Provides
     @ApplicationScope
     fun provideApproveSessionCommunicator(
-        navigationHolder: SplitScreenNavigationHolder,
+        navigationHoldersRegistry: NavigationHoldersRegistry,
         automaticInteractionGate: AutomaticInteractionGate,
-    ): ApproveSessionCommunicator = ApproveSessionCommunicatorImpl(navigationHolder, automaticInteractionGate)
+    ): ApproveSessionCommunicator = ApproveSessionCommunicatorImpl(navigationHoldersRegistry, automaticInteractionGate)
 
     @ApplicationScope
     @Provides

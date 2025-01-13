@@ -12,16 +12,6 @@
         tools:layout="@layout/fragment_dapp_browser">
 
         <action
-            android:id="@+id/action_DAppBrowserFragment_to_DAppBrowserFragment"
-            app:destination="@id/dappBrowserFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/dappBrowserFragment"
-            app:popUpToInclusive="true" />
-
-        <action
             android:id="@+id/action_open_dappSearch_from_browser"
             app:destination="@id/dappSearchFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -37,13 +27,6 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
 
-        <action
-            android:id="@+id/action_DAppBrowserFragment_to_browserTabsFragment"
-            app:destination="@id/dappTabsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -52,41 +35,6 @@
         android:label="AddToFavouritesFragment"
         app:useAdd="true"
         tools:layout="@layout/fragment_add_to_favourites" />
-
-    <fragment
-        android:id="@+id/dappTabsFragment"
-        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.tab.BrowserTabsFragment"
-        android:label="BrowserTabsFragment"
-        tools:layout="@layout/fragment_browser_tabs">
-
-        <action
-            android:id="@+id/action_open_dappSearch_from_browser"
-            app:destination="@id/dappSearchFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
-            android:id="@+id/action_dappTabsFragment_to_dapp_browser_graph"
-            app:destination="@id/dappBrowserFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_slide_out"
-            app:popUpTo="@id/dapp_browser_graph"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_finish_tabs_fragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/dappBrowserFragment"
-            app:popUpToInclusive="true" />
-
-    </fragment>
 
     <fragment
         android:id="@+id/dappSearchFragment"
@@ -99,16 +47,6 @@
             android:id="@+id/action_finish_dapp_search"
             app:popUpTo="@id/dappBrowserFragment"
             app:popUpToInclusive="false" />
-
-        <action
-            android:id="@+id/action_dappSearchFragment_to_dapp_browser_graph"
-            app:destination="@id/dappBrowserFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_slide_out"
-            app:popUpTo="@id/dapp_browser_graph"
-            app:popUpToInclusive="true" />
 
     </fragment>
 
