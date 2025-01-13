@@ -18,3 +18,7 @@ class NavigationHoldersRegistry(
     val firstAttachedNavController: NavController?
         get() = firstAttachedHolder.navController
 }
+
+fun NavigationHoldersRegistry.navigationBuilder(action: Int? = null): NavigationBuilder {
+    return NavigationBuilder(this, action)
+}
