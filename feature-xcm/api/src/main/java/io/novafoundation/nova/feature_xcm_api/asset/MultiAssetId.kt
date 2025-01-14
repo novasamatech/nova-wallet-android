@@ -9,7 +9,8 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Dic
 value class MultiAssetId(val multiLocation: RelativeMultiLocation) : VersionedToDynamicScaleInstance {
 
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
-        return if (xcmVersion >= XcmVersion.V3) {
+        // V4 removed variants of MultiAssetId, leaving only flattened value of Concrete
+        return if (xcmVersion >= XcmVersion.V4) {
             multiLocation.toEncodableInstance(xcmVersion)
         } else {
             DictEnum.Entry(

@@ -16,12 +16,13 @@ fun bindLocatableMultiAsset(decoded: Any?, xcmVersion: XcmVersion): LocatableMul
 
     return LocatableMultiAsset(
         location = bindMultiLocation(asStruct["location"]),
-        assetId = bindMultiAssetId(asStruct["assetId"], xcmVersion)
+        assetId = bindMultiAssetId(asStruct["asset_id"], xcmVersion)
     )
 }
 
 fun bindMultiAssetId(decoded: Any?, xcmVersion: XcmVersion): MultiAssetId {
-    val locationInstance = if (xcmVersion >= XcmVersion.V3) {
+    // V4 removed variants of MultiAssetId, leaving only flattened value of Concrete
+    val locationInstance = if (xcmVersion >= XcmVersion.V4) {
         decoded
     } else {
         extractConcreteLocation(decoded)
