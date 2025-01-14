@@ -44,6 +44,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
@@ -64,15 +65,16 @@ class NativeAssetBalance(
         accountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*> {
-        val runtime = chainRegistry.getRuntime(chain.id)
-        val storage = runtime.metadata.balances().storage("Locks")
-        val key = storage.storageKey(runtime, accountId)
+        return remoteStorage.subscribe(chain.id, subscriptionBuilder) {
+            combine(
+                metadata.balances.locks.observe(accountId),
+                metadata.balances.freezes.observe(accountId)
+            ) { locks, freezes ->
+                val all = locks.orEmpty() + freezes.orEmpty()
 
-        return subscriptionBuilder.subscribe(key)
-            .map { change ->
-                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime)).orEmpty()
-                lockDao.updateLocks(balanceLocks, metaAccount.id, chain.id, chainAsset.id)
+                lockDao.updateLocks(all, metaAccount.id, chain.id, chainAsset.id)
             }
+        }
     }
 
     override suspend fun startSyncingBalanceHolds(

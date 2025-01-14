@@ -39,6 +39,7 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun saveSelectedAccount(account: Account)
 
     suspend fun getSelectedMetaAccount(): MetaAccount
+
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
     suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?

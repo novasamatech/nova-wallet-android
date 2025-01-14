@@ -2,11 +2,11 @@ package io.novafoundation.nova.app.di.app.navigation.staking
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.app.root.navigation.staking.parachain.ParachainStakingNavigator
-import io.novafoundation.nova.app.root.navigation.staking.parachain.SelectCollatorInterScreenCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.staking.parachain.SelectCollatorSettingsInterScreenCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.Navigator
+import io.novafoundation.nova.app.root.navigation.navigators.staking.parachain.ParachainStakingNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.staking.parachain.SelectCollatorInterScreenCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.staking.parachain.SelectCollatorSettingsInterScreenCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -17,19 +17,22 @@ class ParachainStakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideParachainStakingRouter(navigationHolder: NavigationHolder, navigator: Navigator): ParachainStakingRouter {
-        return ParachainStakingNavigator(navigationHolder, navigator)
+    fun provideParachainStakingRouter(
+        navigationHoldersRegistry: NavigationHoldersRegistry,
+        navigator: Navigator
+    ): ParachainStakingRouter {
+        return ParachainStakingNavigator(navigationHoldersRegistry, navigator)
     }
 
     @Provides
     @ApplicationScope
-    fun provideSelectCollatorCommunicator(navigationHolder: NavigationHolder): SelectCollatorInterScreenCommunicator {
-        return SelectCollatorInterScreenCommunicatorImpl(navigationHolder)
+    fun provideSelectCollatorCommunicator(navigationHoldersRegistry: NavigationHoldersRegistry): SelectCollatorInterScreenCommunicator {
+        return SelectCollatorInterScreenCommunicatorImpl(navigationHoldersRegistry)
     }
 
     @Provides
     @ApplicationScope
-    fun provideSelectCollatorSettingsCommunicator(navigationHolder: NavigationHolder): SelectCollatorSettingsInterScreenCommunicator {
-        return SelectCollatorSettingsInterScreenCommunicatorImpl(navigationHolder)
+    fun provideSelectCollatorSettingsCommunicator(navigationHoldersRegistry: NavigationHoldersRegistry): SelectCollatorSettingsInterScreenCommunicator {
+        return SelectCollatorSettingsInterScreenCommunicatorImpl(navigationHoldersRegistry)
     }
 }

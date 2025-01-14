@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dapp_tabs_graph"
+    app:startDestination="@id/dappTabsFragment">
+
+    <fragment
+        android:id="@+id/dappTabsFragment"
+        android:name="io.novafoundation.nova.feature_dapp_impl.presentation.tab.BrowserTabsFragment"
+        android:label="BrowserTabsFragment"
+        tools:layout="@layout/fragment_browser_tabs">
+
+        <action
+            android:id="@+id/action_finish_tabs_fragment"
+            app:popUpTo="@id/splitScreenFragment" />
+    </fragment>
+
+</navigation>
