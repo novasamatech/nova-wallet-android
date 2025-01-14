@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParseContext
+import io.novafoundation.nova.feature_xcm_api.asset.LocatableMultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.bindVersionedLocatableMultiAsset
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainMultiLocationConverterFactory
@@ -36,7 +37,7 @@ class TreasurySpendAdapter(
         )
     }
 
-    private suspend fun resolveChainAsset(locatableMultiAsset: io.novafoundation.nova.feature_xcm_api.asset.LocatableMultiAsset, chain: Chain): Chain.Asset? {
+    private suspend fun resolveChainAsset(locatableMultiAsset: LocatableMultiAsset, chain: Chain): Chain.Asset? {
         val chainLocationConverter = chainLocationConverterFactory.resolveSelfAndChildrenParachains(chain)
         val resolvedChain = chainLocationConverter.toChain(locatableMultiAsset.location) ?: return null
 
