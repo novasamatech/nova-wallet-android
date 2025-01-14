@@ -36,7 +36,7 @@ abstract class MultiLocation(
 
         data class ParachainId(val id: ParaId) : Junction() {
 
-            constructor(id: Int): this(id.toBigInteger())
+            constructor(id: Int) : this(id.toBigInteger())
         }
 
         data class GeneralKey(val key: String) : Junction()
