@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpik
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalFee
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,7 +102,7 @@ class ExternaSignViewModel(
 
         val validationPayload = ConfirmDAppOperationValidationPayload(
             token = commissionTokenFlow?.first(),
-            decimalFee = originFeeMixin?.awaitOptionalDecimalFee()
+            fee = originFeeMixin?.awaitOptionalFee()
         )
 
         validationExecutor.requireValid(
@@ -112,7 +112,7 @@ class ExternaSignViewModel(
             autoFixPayload = ::autoFixPayload,
             progressConsumer = _performingOperationInProgress.progressConsumer()
         ) {
-            performOperation(it.decimalFee?.networkFee)
+            performOperation(it.fee)
         }
     }
 
@@ -180,7 +180,7 @@ class ExternaSignViewModel(
                 handleFeeSpikeDetected(
                     error = reason,
                     resourceManager = resourceManager,
-                    feeLoaderMixin = originFeeMixin,
+                    setFee = originFeeMixin,
                     actions = actions
                 )
             }
@@ -192,7 +192,7 @@ class ExternaSignViewModel(
         failure: ConfirmDAppOperationValidationFailure
     ): ConfirmDAppOperationValidationPayload {
         return when (failure) {
-            is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> payload.copy(decimalFee = failure.payload.newFee)
+            is ConfirmDAppOperationValidationFailure.FeeSpikeDetected -> payload.copy(fee = failure.payload.newFee)
         }
     }
 

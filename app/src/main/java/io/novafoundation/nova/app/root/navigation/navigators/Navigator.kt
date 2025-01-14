@@ -476,6 +476,10 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
+        navController?.navigate(R.id.action_finish_and_open_swap_settings, SwapMainSettingsFragment.getBundle(swapSettingsPayload))
+    }
+
     override fun openNfts() {
         navigationBuilder().action(R.id.action_mainFragment_to_nfts_nav_graph)
             .navigateInFirstAttachedContext()

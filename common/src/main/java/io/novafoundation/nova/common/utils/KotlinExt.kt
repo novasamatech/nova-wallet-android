@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -30,6 +31,9 @@ import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
@@ -64,6 +68,14 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
         null -> this
         else -> Result.failure(transform(exception))
     }
+}
+
+@OptIn(ExperimentalTime::class)
+inline fun <R> measureExecution(label: String, function: () -> R): R {
+    val (value, time) = measureTimedValue(function)
+    Log.d("Performance", "$label took $time")
+
+    return value
 }
 
 inline fun <T, reified E : Throwable> Result<T>.mapErrorNotInstance(transform: (throwable: Throwable) -> Throwable): Result<T> {
@@ -110,6 +122,12 @@ suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     }.awaitAll()
 }
 
+suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> Collection<R>): List<R> {
+    return coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll().flatten()
+}
+
 suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
     mapAsync(operation)
 }
@@ -119,6 +137,18 @@ fun ByteArray.startsWith(prefix: ByteArray): Boolean {
 
     prefix.forEachIndexed { index, byte ->
         if (get(index) != byte) return false
+    }
+
+    return true
+}
+
+fun ByteArray.endsWith(suffix: ByteArray): Boolean {
+    if (suffix.size > size) return false
+
+    val offset = size - suffix.size
+
+    suffix.forEachIndexed { index, byte ->
+        if (get(offset + index) != byte) return false
     }
 
     return true
@@ -256,6 +286,10 @@ fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all {
 fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
+
+fun <T> Result<T?>.requireInnerNotNull(): Result<T> {
+    return mapCatching { requireNotNull(it) }
+}
 
 /**
  * Given a list finds a partition point in O(log2(N)) given that there is only a single partition point present.
@@ -602,3 +636,5 @@ fun Calendar.resetDay() {
 inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
     launch { block() }
 }
+
+fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }

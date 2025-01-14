@@ -20,8 +20,8 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import kotlinx.android.synthetic.main.fragment_select_send.chooseAmountContainer
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendAmount
 import kotlinx.android.synthetic.main.fragment_select_send.selectSendCrossChainFee
@@ -85,8 +85,7 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel>() {
 
         observeValidations(viewModel)
 
-        setupFeeLoading(viewModel.originFeeMixin, selectSendOriginFee)
-        setupFeeLoading(viewModel.crossChainFeeMixin, selectSendCrossChainFee)
+        viewModel.feeMixin.setupFeeLoading(selectSendOriginFee, selectSendCrossChainFee)
 
         setupAmountChooser(viewModel.amountChooserMixin, selectSendAmount)
         setupAddressInput(viewModel.addressInputMixin, selectSendRecipient)

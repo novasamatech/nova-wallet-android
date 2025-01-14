@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPay
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
@@ -47,7 +48,8 @@ class AssetSwapFlowModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        swapFlowScopeAggregator: SwapFlowScopeAggregator,
     ): ViewModel {
         return AssetSwapFlowViewModel(
             interactorFactory = interactorFactory,
@@ -62,7 +64,8 @@ class AssetSwapFlowModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            swapFlowScopeAggregator = swapFlowScopeAggregator
         )
     }
 }

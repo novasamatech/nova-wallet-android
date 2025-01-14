@@ -4,6 +4,9 @@
     <color name="address_icon_background">#eeeeee</color>
     <color name="qr_code_background">#FFFFFF</color>
     <color name="qr_code_content">#101014</color>
+    
+    <color name="timeline_circle_color">#373A49</color>
+    <color name="timeline_line_color">#3DFFFFFF</color>
 
     <!-- Splash background color -->
     <color name="splash_background_color">#05081C</color>

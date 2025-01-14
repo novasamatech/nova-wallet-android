@@ -45,18 +45,21 @@ import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValuePrimary
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueProgress
 import kotlinx.android.synthetic.main.view_table_cell.view.tableCellValueSecondary
 
+private const val DRAW_DIVIDER_DEFAULT = true
+
 open class TableCellView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     defStyleRes: Int = 0,
-) : ConstraintLayout(context, attrs, defStyle, defStyleRes), HasDivider {
+) : ConstraintLayout(context, attrs, defStyle, defStyleRes), TableItem {
 
     enum class FieldStyle {
         PRIMARY, SECONDARY, LINK, POSITIVE
     }
 
     companion object {
+
         fun createTableCellView(context: Context): TableCellView {
             return TableCellView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -85,6 +88,8 @@ open class TableCellView @JvmOverloads constructor(
     private val contentGroup: Group
         get() = tableCellContent
 
+    private var shouldDrawDivider: Boolean = DRAW_DIVIDER_DEFAULT
+
     val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
@@ -96,6 +101,14 @@ open class TableCellView @JvmOverloads constructor(
         minHeight = 44.dp(context)
 
         attrs?.let { applyAttributes(it) }
+    }
+
+    override fun disableOwnDividers() {
+        setOwnDividerVisible(false)
+    }
+
+    override fun shouldDrawDivider(): Boolean {
+        return shouldDrawDivider
     }
 
     fun setTitle(titleRes: Int) {
@@ -151,12 +164,20 @@ open class TableCellView @JvmOverloads constructor(
     }
 
     fun showProgress() {
+        makeVisible()
+
         contentGroup.makeGone()
         valueProgress.makeVisible()
     }
 
-    override fun setDividerVisible(visible: Boolean) {
-        tableCellValueDivider.setVisible(visible)
+    @Deprecated(
+        """
+        TableCellView's own divider is deprecated and will be removed in the future.
+        To show dividers between multiple TableCellViews put them into TableView
+        """
+    )
+    fun setOwnDividerVisible(visible: Boolean) {
+        tableCellValueDivider.setVisible(visible && shouldDrawDivider)
     }
 
     fun setPrimaryValueEndIcon(@DrawableRes icon: Int?, @ColorRes tint: Int? = null) {
@@ -223,6 +244,10 @@ open class TableCellView @JvmOverloads constructor(
         constraintSet.applyTo(this)
     }
 
+    fun setShouldDrawDivider(shouldDrawDivider: Boolean) {
+        this.shouldDrawDivider = shouldDrawDivider
+    }
+
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableCellView) { typedArray ->
         val titleText = typedArray.getString(R.styleable.TableCellView_title)
         setTitle(titleText)
@@ -231,7 +256,7 @@ open class TableCellView @JvmOverloads constructor(
         primaryValueText?.let { showValue(it) }
 
         val dividerVisible = typedArray.getBoolean(R.styleable.TableCellView_dividerVisible, true)
-        setDividerVisible(dividerVisible)
+        setOwnDividerVisible(dividerVisible)
 
         val primaryValueEndIcon = typedArray.getResourceIdOrNull(R.styleable.TableCellView_primaryValueEndIcon)
         primaryValueEndIcon?.let {
@@ -275,6 +300,9 @@ open class TableCellView @JvmOverloads constructor(
 
         val titleEllipsisable = typedArray.getBoolean(R.styleable.TableCellView_titleEllipsisable, false)
         setTitleEllipsisable(titleEllipsisable)
+
+        val shouldDrawDivider = typedArray.getBoolean(R.styleable.TableCellView_shouldDrawDivider, DRAW_DIVIDER_DEFAULT)
+        setShouldDrawDivider(shouldDrawDivider)
     }
 }
 
@@ -297,14 +325,20 @@ fun TableCellView.setExtraInfoAvailable(available: Boolean) {
     }
 }
 
-fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T>, showData: (T) -> Unit) {
+fun <T> TableCellView.showLoadingState(state: ExtendedLoadingState<T?>, showData: (T) -> Unit) {
     when (state) {
         is ExtendedLoadingState.Error -> showValue(context.getString(R.string.common_error_general_title))
-        is ExtendedLoadingState.Loaded -> showData(state.data)
+
+        is ExtendedLoadingState.Loaded -> if (state.data != null) {
+            showData(state.data)
+        } else {
+            makeGone()
+        }
+
         ExtendedLoadingState.Loading -> showProgress()
     }
 }
 
-fun TableCellView.showLoadingValue(state: ExtendedLoadingState<String>) {
+fun TableCellView.showLoadingValue(state: ExtendedLoadingState<String?>) {
     showLoadingState(state, ::showValue)
 }

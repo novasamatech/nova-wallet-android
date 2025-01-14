@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main.input
 
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.feature_swap_impl.presentation.views.SwapAmountInputView
+import io.novafoundation.nova.feature_swap_impl.presentation.common.views.SwapAmountInputView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxAvailableView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooserBase
 

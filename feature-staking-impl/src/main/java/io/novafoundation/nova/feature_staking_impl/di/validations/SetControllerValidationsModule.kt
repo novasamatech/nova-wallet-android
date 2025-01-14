@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 
 @Module
 class SetControllerValidationsModule {
@@ -20,7 +20,7 @@ class SetControllerValidationsModule {
     @FeatureScope
     @Provides
     fun provideFeeValidation(): SetControllerFeeValidation {
-        return EnoughAmountToTransferValidation(
+        return EnoughAmountToTransferValidationGeneric(
             feeExtractor = { it.fee },
             availableBalanceProducer = { it.transferable },
             errorProducer = { SetControllerValidationFailure.NOT_ENOUGH_TO_PAY_FEES }

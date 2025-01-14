@@ -356,6 +356,7 @@
     <string name="common_details">详细信息</string>
     <string name="common_disabled">已禁用</string>
     <string name="common_disconnect">断开</string>
+    <string name="common_do_not_close_app">不要关闭应用程序!</string>
     <string name="common_done">完成</string>
     <string name="common_dont_show_again">不再显示</string>
     <string name="common_edit">编辑</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">操作将移除账户</string>
     <string name="common_expired">已过期</string>
     <string name="common_explore">探索</string>
+    <string name="common_failed">失败</string>
     <string name="common_fee_changed_message" formatted="false">预估的网络费用%s远高于默认的网络费用(%s)。这可能是由于临时网络拥堵。您可以刷新以等待更低的网络费用。</string>
     <string name="common_fee_changed_title">网络费用过高</string>
+    <string name="common_fee_with_label">费用: %s</string>
     <string name="common_filter_sort_header">排序依据：</string>
     <string name="common_filters">过滤器</string>
     <string name="common_find_out_more">了解更多</string>
@@ -427,6 +430,7 @@
     <string name="common_not_available">不可用</string>
     <string name="common_not_enough_funds_message">抱歉，您没有足够的资金支付网络费用。</string>
     <string name="common_not_enough_funds_title">余额不足</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">你的余额不足以支付 %s 的网络费用。当前余额为 %s</string>
     <string name="common_not_now">暂不</string>
     <string name="common_off">关闭</string>
     <string name="common_ok">确定</string>
@@ -466,6 +470,10 @@
     <string name="common_search">搜索</string>
     <string name="common_search_placeholder_default">搜索结果将在这里显示</string>
     <string name="common_search_results_number">搜索结果：%d</string>
+    <string name="common_sec">秒</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d 秒</item>
+    </plurals>
     <string name="common_secret_derivation_path">密钥派生路径</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
@@ -489,6 +497,7 @@
     <string name="common_to_settings">打开设置</string>
     <string name="common_too_small_balance_title">您的余额太小</string>
     <string name="common_total">总计</string>
+    <string name="common_total_fee">总费用</string>
     <string name="common_transaction_id">交易ID</string>
     <string name="common_transaction_submitted">交易已提交</string>
     <string name="common_try_again">再试一次</string>
@@ -1509,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">用于支付网络费用的代币</string>
     <string name="swap_custom_fee_selector_footer">网络费用将添加到输入的金额之上</string>
     <string name="swap_error_pair_not_supported">不支持此对</string>
+    <string name="swap_execution_failure" formatted="false">操作 #%s (%s) 失败</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s 到 %s 的交换在 %s 上</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%s 从 %s 转到 %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s 操作</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s 共 %s 操作</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">正在进行 %s 到 %s 的交换在 %s 上</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">正在传输 %s 到 %s</string>
+    <string name="swap_execution_time">执行时间</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">您在支付%s网络费后至少应保留%s，因为您持有的代币不足</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">您必须至少保留%s，以接收%s代币</string>
     <string name="swap_failure_insufficient_balance_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费</string>
@@ -1528,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">从另一个网络转移%s</string>
     <string name="swap_get_token_receive_description">通过QR或您的地址接收%s</string>
     <string name="swap_get_token_using">使用%s获取</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">在交换执行期间，中间接收金额为 %s，少于最低余额 %s。请尝试指定更大的交换金额。</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">滑点必须指定在%s到%s之间</string>
     <string name="swap_invalid_slippage_failure_title">无效滑点</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">选择一个代币来支付</string>
@@ -1546,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">旧汇率：%1$s ≈ %2$s。\n新汇率：%1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">兑换率已更新</string>
     <string name="swap_repeat_operation">重复操作</string>
+    <string name="swap_route">路线</string>
+    <string name="swap_route_description">你的代币通过不同网络到达所需代币的路径。</string>
+    <string name="swap_route_segment_swap_title">交换</string>
+    <string name="swap_route_segment_transfer_title">转移</string>
     <string name="swap_settings_title">交换设置</string>
     <string name="swap_slippage">滑点</string>
     <string name="swap_slippage_description">在去中心化交易中，交换滑点是一种常见现象，由于市场条件的变化，交易的最终价格可能会与预期价格略有不同。</string>

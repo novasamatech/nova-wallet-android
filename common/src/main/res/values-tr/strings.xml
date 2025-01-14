@@ -356,6 +356,7 @@
     <string name="common_details">Detaylar</string>
     <string name="common_disabled">Devre dışı</string>
     <string name="common_disconnect">Bağlantıyı kes</string>
+    <string name="common_do_not_close_app">Uygulamayı kapatmayın!</string>
     <string name="common_done">Tamam</string>
     <string name="common_dont_show_again">Bunu bir daha gösterme</string>
     <string name="common_edit">Düzenle</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">Hesap kaldırılacak</string>
     <string name="common_expired">Süresi doldu</string>
     <string name="common_explore">Keşfet</string>
+    <string name="common_failed">Başarısız</string>
     <string name="common_fee_changed_message" formatted="false">Tahmini ağ ücreti %s, varsayılan ağ ücretinden (%s) çok daha yüksek. Bu, geçici bir ağ yoğunluğundan kaynaklanıyor olabilir. Daha düşük bir ağ ücreti için yenileyebilirsiniz.</string>
     <string name="common_fee_changed_title">Ağ ücreti çok yüksek</string>
+    <string name="common_fee_with_label">Ücret: %s</string>
     <string name="common_filter_sort_header">Şuna göre sırala:</string>
     <string name="common_filters">Filtreler</string>
     <string name="common_find_out_more">Daha fazla bilgi edinin</string>
@@ -431,6 +434,7 @@
     <string name="common_not_available">Mevcut değil</string>
     <string name="common_not_enough_funds_message">Üzgünüm, ağ ücretini ödeyecek yeterli bakiyeniz yok.</string>
     <string name="common_not_enough_funds_title">Yetersiz bakiye</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Ağ ücreti olan %s ödemesi için yeterli bakiyeniz yok. Mevcut bakiye %s</string>
     <string name="common_not_now">Şimdi değil</string>
     <string name="common_off">Kapalı</string>
     <string name="common_ok">Tamam</string>
@@ -470,6 +474,11 @@
     <string name="common_search">Arama</string>
     <string name="common_search_placeholder_default">Arama sonuçları burada gösterilecek</string>
     <string name="common_search_results_number">Arama sonuçları: %d</string>
+    <string name="common_sec">sn</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d saniye</item>
+        <item quantity="other">%d saniye</item>
+    </plurals>
     <string name="common_secret_derivation_path">Gizli türetme yolu</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
@@ -493,6 +502,7 @@
     <string name="common_to_settings">Ayarları Aç</string>
     <string name="common_too_small_balance_title">Bakiyeniz çok küçük</string>
     <string name="common_total">Toplam</string>
+    <string name="common_total_fee">Toplam Ücret</string>
     <string name="common_transaction_id">İşlem Kimliği</string>
     <string name="common_transaction_submitted">İşlem Gönderildi</string>
     <string name="common_try_again">Tekrar Deneyin</string>
@@ -1519,6 +1529,17 @@
     <string name="swap_custom_fee_selector_description">Ağ ücreti ödemek için token</string>
     <string name="swap_custom_fee_selector_footer">Ağ ücreti girilen miktarın üstüne eklenir</string>
     <string name="swap_error_pair_not_supported">Bu çift desteklenmiyor</string>
+    <string name="swap_execution_failure" formatted="false">#%s (%s) işlemi başarısız oldu</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s\'den %s\'e %s üzerinde swap</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%s\'den %s\'e %s transferi</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s işlem</item>
+        <item quantity="other">%s işlem</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s/%s işlem</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%s\'den %s\'e %s üzerinde takas</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%s\'den %s\'e transfer</string>
+    <string name="swap_execution_time">Gerçekleşme süresi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Ödeme yaptıktan sonra ağ ücreti olarak %s tutarında en azından %s tutmanız gerekmektedir çünkü yeterli olmayan tokenlara sahipsiniz</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s token almak için en az %s tutmalısınız</string>
     <string name="swap_failure_insufficient_balance_message">Ağ ücreti için %2$s ödemeniz gerektiği için en fazla %1$s tutarında takas yapabilirsiniz.</string>
@@ -1538,6 +1559,7 @@
     <string name="swap_get_token_cross_chain_description">Başka bir ağdan %s transfer et</string>
     <string name="swap_get_token_receive_description">QR veya adresinizle %s alın</string>
     <string name="swap_get_token_using">%s kullanarak alın</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Takas gerçekleştirilirken ara alınan miktar %s olarak minimum bakiye olan %s\'in altında. Daha büyük bir takas miktarı belirtmeye çalışın.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Kayma %s ile %s arasında belirtilmeli</string>
     <string name="swap_invalid_slippage_failure_title">Geçersiz kayma</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Ödeme yapmak için bir token seçin</string>
@@ -1556,6 +1578,10 @@
     <string name="swap_rate_was_updated_failure_message">Eski oran: %1$s ≈ %2$s.\nYeni oran: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Takas oranı güncellendi</string>
     <string name="swap_repeat_operation">İşlemi tekrarla</string>
+    <string name="swap_route">Rota</string>
+    <string name="swap_route_description">Token\'ınızın farklı ağlardan geçerek istenen token\'a ulaşmak için alacağı yol.</string>
+    <string name="swap_route_segment_swap_title">Takas</string>
+    <string name="swap_route_segment_transfer_title">Transfer</string>
     <string name="swap_settings_title">Takas ayarları</string>
     <string name="swap_slippage">Kayma</string>
     <string name="swap_slippage_description">Takas kayması, değişken piyasa koşulları nedeniyle, bir takas işleminin nihai fiyatının beklenen fiyattan küçük bir miktar farklılık gösterebileceği merkeziyetsiz ticarette yaygın bir durumdur.</string>

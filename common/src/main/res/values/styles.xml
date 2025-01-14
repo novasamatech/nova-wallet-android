@@ -66,7 +66,7 @@
 
     <style name="TextAppearance.NovaFoundation.SemiBold.Caption1">
         <item name="android:textSize">12sp</item>
-        <item name="lineHeight">11sp</item>
+        <item name="lineHeight">16sp</item>
     </style>
 
     <!-- Bold -->

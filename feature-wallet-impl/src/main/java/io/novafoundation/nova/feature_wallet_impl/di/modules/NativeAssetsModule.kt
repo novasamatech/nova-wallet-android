@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValid
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeAssetBalance
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.utility.NativeAssetEventDetector
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.utility.NativeAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility.NativeAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -100,4 +101,8 @@ class NativeAssetsModule {
         balance = nativeAssetBalance,
         history = nativeAssetHistory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideNativeAssetEventsDetector() = NativeAssetEventDetector()
 }

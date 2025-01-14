@@ -8,6 +8,8 @@ interface SwapAvailabilityInteractor {
 
     suspend fun sync(coroutineScope: CoroutineScope)
 
+    suspend fun warmUpCommonlyUsedChains(computationScope: CoroutineScope)
+
     fun anySwapAvailableFlow(): Flow<Boolean>
 
     suspend fun swapAvailableFlow(asset: Chain.Asset, coroutineScope: CoroutineScope): Flow<Boolean>

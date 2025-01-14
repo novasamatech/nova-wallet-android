@@ -342,6 +342,10 @@ fun View.applyImeInsetts() = applyInsetter {
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
 
+fun View.setBackgroundTintRes(@ColorRes colorRes: Int) {
+    backgroundTintList = ColorStateList.valueOf(context.getColor(colorRes))
+}
+
 fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     setVisible(input is Input.Enabled)
     isEnabled = input is Input.Enabled.Modifiable

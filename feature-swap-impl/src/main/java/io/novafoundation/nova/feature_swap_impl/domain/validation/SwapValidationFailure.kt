@@ -1,21 +1,16 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
-import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
 sealed class SwapValidationFailure {
 
-    class FeeChangeDetected(override val payload: FeeChangeDetectedFailure.Payload<SwapFee>) : SwapValidationFailure(), FeeChangeDetectedFailure<SwapFee>
-
     object NonPositiveAmount : SwapValidationFailure()
 
-    class InvalidSlippage(val minSlippage: Percent, val maxSlippage: Percent) : SwapValidationFailure()
+    class InvalidSlippage(val minSlippage: Fraction, val maxSlippage: Fraction) : SwapValidationFailure()
 
     class NewRateExceededSlippage(
         val assetIn: Chain.Asset,
@@ -28,18 +23,24 @@ sealed class SwapValidationFailure {
 
     sealed class NotEnoughFunds : SwapValidationFailure() {
 
-        class ToPayFeeAndStayAboveED(override val asset: Chain.Asset, override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel) :
-            NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
+        class ToPayFeeAndStayAboveED(
+            override val asset: Chain.Asset,
+            override val errorModel: InsufficientBalanceToStayAboveEDError.ErrorModel
+        ) : NotEnoughFunds(), InsufficientBalanceToStayAboveEDError
 
         object InUsedAsset : NotEnoughFunds()
-
-        object ToPayFee : NotEnoughFunds()
     }
 
     class AmountOutIsTooLowToStayAboveED(
         val asset: Chain.Asset,
         val amountInPlanks: Balance,
         val existentialDeposit: Balance
+    ) : SwapValidationFailure()
+
+    class IntermediateAmountOutIsTooLowToStayAboveED(
+        val asset: Chain.Asset,
+        val existentialDeposit: Balance,
+        val amount: Balance
     ) : SwapValidationFailure()
 
     sealed class InsufficientBalance : SwapValidationFailure() {
@@ -51,47 +52,28 @@ sealed class SwapValidationFailure {
         ) : SwapValidationFailure()
 
         class BalanceNotConsiderConsumers(
-            val nativeAsset: Chain.Asset,
+            val assetIn: Chain.Asset,
+            val assetInED: Balance,
             val feeAsset: Chain.Asset,
-            val existentialDeposit: Balance,
-            val swapFee: SwapFee
+            val fee: Balance
         ) : SwapValidationFailure()
 
-        class NoNeedsToBuyMainAssetED(
+        class CannotPayFeeDueToAmount(
             val assetIn: Chain.Asset,
-            val feeAsset: Chain.Asset,
-            val maxSwapAmount: Balance,
-            val fee: Fee
+            val feeAmount: BigDecimal,
+            val maxSwapAmount: BigDecimal
         ) : SwapValidationFailure()
 
-        class NeedsToBuyMainAssetED(
+        class CannotPayFee(
             val feeAsset: Chain.Asset,
-            val assetIn: Chain.Asset,
-            val nativeAsset: Chain.Asset,
-            val toBuyAmountToKeepEDInCommissionAsset: Balance,
-            val toSellAmountToKeepEDUsingAssetIn: Balance,
-            val maxSwapAmount: Balance,
-            val fee: Fee
+            val balance: Balance,
+            val fee: Balance
         ) : SwapValidationFailure()
     }
 
-    sealed class TooSmallRemainingBalance : SwapValidationFailure() {
-
-        class NoNeedsToBuyMainAssetED(
-            val assetIn: Chain.Asset,
-            val remainingBalance: Balance,
-            val assetInExistentialDeposit: Balance
-        ) : SwapValidationFailure()
-
-        class NeedsToBuyMainAssetED(
-            val feeAsset: Chain.Asset,
-            val assetIn: Chain.Asset,
-            val nativeAsset: Chain.Asset,
-            val assetInExistentialDeposit: Balance,
-            val toBuyAmountToKeepEDInCommissionAsset: Balance,
-            val toSellAmountToKeepEDUsingAssetIn: Balance,
-            val remainingBalance: Balance,
-            val fee: Fee
-        ) : SwapValidationFailure()
-    }
+    class TooSmallRemainingBalance(
+        val assetIn: Chain.Asset,
+        val remainingBalance: Balance,
+        val assetInExistentialDeposit: Balance
+    ) : SwapValidationFailure()
 }

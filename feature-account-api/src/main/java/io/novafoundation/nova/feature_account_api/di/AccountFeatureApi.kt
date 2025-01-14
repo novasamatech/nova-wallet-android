@@ -7,6 +7,8 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -37,7 +39,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.I
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 
 interface AccountFeatureApi {
 
@@ -118,4 +119,6 @@ interface AccountFeatureApi {
     val feePaymentProviderRegistry: FeePaymentProviderRegistry
 
     val customFeeCapabilityFacade: CustomFeeCapabilityFacade
+
+    val hydrationFeeInjector: HydrationFeeInjector
 }

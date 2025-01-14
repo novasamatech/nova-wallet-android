@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSend
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -44,7 +44,7 @@ class SelectSendModule {
         externalActions: ExternalActions.Presentation,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         selectedAccountUseCase: SelectedAccountUseCase,
         addressInputMixinFactory: AddressInputMixinFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,

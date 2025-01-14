@@ -31,7 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
@@ -161,7 +161,7 @@ class NewDelegationChooseAmountViewModel(
 
         val payload = ChooseDelegationAmountValidationPayload(
             asset = selectedAsset.first(),
-            fee = originFeeMixin.awaitDecimalFee(),
+            fee = originFeeMixin.awaitFee(),
             amount = amountChooserMixin.amount.first(),
             delegate = payload.delegate
         )

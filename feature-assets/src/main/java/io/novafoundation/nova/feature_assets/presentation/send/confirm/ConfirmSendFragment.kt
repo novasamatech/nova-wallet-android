@@ -17,8 +17,8 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_assets.presentation.send.common.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendAmount
 import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendConfirm
 import kotlinx.android.synthetic.main.fragment_confirm_send.confirmSendContainer
@@ -79,8 +79,9 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel>() {
     override fun subscribe(viewModel: ConfirmSendViewModel) {
         setupExternalActions(viewModel)
         observeValidations(viewModel)
-        setupFeeLoading(viewModel.originFeeMixin, confirmSendOriginFee)
-        setupFeeLoading(viewModel.crossChainFeeMixin, confirmSendCrossChainFee)
+
+        viewModel.feeMixin.setupFeeLoading(confirmSendOriginFee, confirmSendCrossChainFee)
+
         observeHints(viewModel.hintsMixin, confirmSendHints)
 
         viewModel.recipientModel.observe(confirmSendRecipient::showAddress)

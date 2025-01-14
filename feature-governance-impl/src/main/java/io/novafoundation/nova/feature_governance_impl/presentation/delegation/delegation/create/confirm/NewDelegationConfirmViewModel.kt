@@ -189,7 +189,7 @@ class NewDelegationConfirmViewModel(
     }
 
     private fun setFee() = launch {
-        originFeeMixin.setFee(decimalFee.genericFee)
+        originFeeMixin.setFee(decimalFee)
     }
 
     private fun performDelegate(amountPlanks: Balance) = launch {

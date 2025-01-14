@@ -356,6 +356,7 @@
     <string name="common_details">Chi tiết</string>
     <string name="common_disabled">Đã tắt</string>
     <string name="common_disconnect">Ngắt kết nối</string>
+    <string name="common_do_not_close_app">Không đóng ứng dụng!</string>
     <string name="common_done">Hoàn thành</string>
     <string name="common_dont_show_again">Không hiển thị lại điều này</string>
     <string name="common_edit">Chỉnh sửa</string>
@@ -375,8 +376,10 @@
     <string name="common_existential_warning_title">Thao tác sẽ xóa tài khoản</string>
     <string name="common_expired">Hết hạn</string>
     <string name="common_explore">Khám phá</string>
+    <string name="common_failed">Thất bại</string>
     <string name="common_fee_changed_message" formatted="false">Phí mạng ước tính %s cao hơn nhiều so với phí mạng mặc định (%s). Điều này có thể do tắc nghẽn mạng tạm thời. Bạn có thể làm mới để đợi phí mạng thấp hơn.</string>
     <string name="common_fee_changed_title">Phí mạng quá cao</string>
+    <string name="common_fee_with_label">Phí: %s</string>
     <string name="common_filter_sort_header">Sắp xếp theo:</string>
     <string name="common_filters">Bộ lọc</string>
     <string name="common_find_out_more">Tìm hiểu thêm</string>
@@ -427,6 +430,7 @@
     <string name="common_not_available">Không khả dụng</string>
     <string name="common_not_enough_funds_message">Xin lỗi, bạn không có đủ tiền để trả phí mạng.</string>
     <string name="common_not_enough_funds_title">Số dư không đủ</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Bạn không có đủ số dư để trả phí mạng %s. Số dư hiện tại là %s</string>
     <string name="common_not_now">Không phải bây giờ</string>
     <string name="common_off">Tắt</string>
     <string name="common_ok">OK</string>
@@ -466,6 +470,10 @@
     <string name="common_search">Tìm kiếm</string>
     <string name="common_search_placeholder_default">Kết quả tìm kiếm sẽ hiển thị ở đây</string>
     <string name="common_search_results_number">Kết quả tìm kiếm: %d</string>
+    <string name="common_sec">giây</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d giây</item>
+    </plurals>
     <string name="common_secret_derivation_path">Đường dẫn dẫn xuất bí mật</string>
     <string name="common_settings">Cài đặt</string>
     <string name="common_share">Chia sẻ</string>
@@ -489,6 +497,7 @@
     <string name="common_to_settings">Mở Cài đặt</string>
     <string name="common_too_small_balance_title">Số dư của bạn quá nhỏ</string>
     <string name="common_total">Tổng cộng</string>
+    <string name="common_total_fee">Tổng phí</string>
     <string name="common_transaction_id">ID Giao dịch</string>
     <string name="common_transaction_submitted">Giao dịch đã được gửi</string>
     <string name="common_try_again">Thử lại</string>
@@ -1509,6 +1518,16 @@
     <string name="swap_custom_fee_selector_description">Token để trả phí mạng</string>
     <string name="swap_custom_fee_selector_footer">Phí mạng được thêm vào trên số tiền đã nhập</string>
     <string name="swap_error_pair_not_supported">Cặp này không được hỗ trợ</string>
+    <string name="swap_execution_failure" formatted="false">Thất bại trên hoạt động #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s sang %s hoán đổi trên %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Chuyển %s từ %s sang %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s hoạt động</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s của %s hoạt động</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Đang hoán đổi %s sang %s trên %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Đang chuyển %s sang %s</string>
+    <string name="swap_execution_time">Thời gian thực hiện</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Bạn cần giữ ít nhất %s sau khi trả phí mạng %s vì bạn giữ các token không đủ</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Bạn cần giữ ít nhất %s để nhận được token %s</string>
     <string name="swap_failure_insufficient_balance_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả %2$s cho phí mạng.</string>
@@ -1528,6 +1547,7 @@
     <string name="swap_get_token_cross_chain_description">Chuyển %s từ mạng khác</string>
     <string name="swap_get_token_receive_description">Nhận %s bằng QR hoặc địa chỉ của bạn</string>
     <string name="swap_get_token_using">Nhận %s bằng cách sử dụng</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Trong khi hoán đổi thực hiện, số tiền nhận trung gian là %s, thấp hơn số dư tối thiểu %s. Hãy thử chỉ định số tiền hoán đổi lớn hơn.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Độ trượt giá phải được chỉ định trong khoảng %s đến %s</string>
     <string name="swap_invalid_slippage_failure_title">Độ trượt giá không hợp lệ</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Chọn một token để thanh toán</string>
@@ -1546,6 +1566,10 @@
     <string name="swap_rate_was_updated_failure_message">Tỷ giá cũ: %1$s 	 %2$s.\nTỷ giá mới: %1$s 	 %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Tỷ giá hoán đổi đã được cập nhật</string>
     <string name="swap_repeat_operation">Lặp lại thao tác</string>
+    <string name="swap_route">Lộ trình</string>
+    <string name="swap_route_description">Cách mà token của bạn sẽ đi qua các mạng lưới khác nhau để có được token mong muốn.</string>
+    <string name="swap_route_segment_swap_title">Hoán đổi</string>
+    <string name="swap_route_segment_transfer_title">Chuyển</string>
     <string name="swap_settings_title">Cài đặt hoán đổi</string>
     <string name="swap_slippage">Trượt giá</string>
     <string name="swap_slippage_description">Trượt giá hoán đổi là một hiện tượng phổ biến trong giao dịch phi tập trung nơi giá cuối cùng của một giao dịch hoán đổi có thể hơi khác so với giá dự kiến do điều kiện thị trường thay đổi.</string>

@@ -30,7 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -183,7 +183,7 @@ class AddStakingProxyViewModel(
             asset = selectedAssetFlow.first(),
             proxyAddress = addressInputMixin.getAddress(),
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
-            fee = feeMixin.awaitDecimalFee(),
+            fee = feeMixin.awaitFee(),
             deltaDeposit = proxyDepositDelta.first(),
             currentQuantity = getProxyRepository.getProxiesQuantity(chain.id, proxiedAccountId)
         )

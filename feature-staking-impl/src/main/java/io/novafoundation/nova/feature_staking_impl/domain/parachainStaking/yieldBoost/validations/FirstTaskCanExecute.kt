@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yiel
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmountByExecutingAccount
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.AutomationAction
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.yieldBoost.YieldBoostConfiguration
@@ -20,7 +21,7 @@ class FirstTaskCanExecute(
         val token = value.asset.token
 
         val balanceBeforeTransaction = value.asset.transferable
-        val balanceAfterTransaction = balanceBeforeTransaction - value.fee.networkFeeDecimalAmount
+        val balanceAfterTransaction = balanceBeforeTransaction - value.fee.decimalAmountByExecutingAccount
 
         val chainId = value.asset.token.configuration.chainId
 
@@ -32,7 +33,7 @@ class FirstTaskCanExecute(
         return when {
             taskExecutionFee > balanceAfterTransaction -> YieldBoostValidationFailure.FirstTaskCannotExecute(
                 minimumBalanceRequired = taskExecutionFee,
-                networkFee = value.fee.networkFeeDecimalAmount,
+                networkFee = value.fee.decimalAmountByExecutingAccount,
                 availableBalanceBeforeFees = balanceBeforeTransaction,
                 type = EXECUTION_FEE,
                 chainAsset = token.configuration
@@ -40,7 +41,7 @@ class FirstTaskCanExecute(
 
             threshold > balanceAfterTransaction -> YieldBoostValidationFailure.FirstTaskCannotExecute(
                 minimumBalanceRequired = threshold,
-                networkFee = value.fee.networkFeeDecimalAmount,
+                networkFee = value.fee.decimalAmountByExecutingAccount,
                 availableBalanceBeforeFees = balanceBeforeTransaction,
                 type = THRESHOLD,
                 chainAsset = token.configuration

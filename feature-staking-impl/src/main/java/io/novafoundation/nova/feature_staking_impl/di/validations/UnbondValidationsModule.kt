@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.Unb
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.validation.CrossMinimumBalanceValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 
 typealias RemainingUnbondValidation = CrossMinimumBalanceValidation<UnbondValidationPayload, UnbondValidationFailure>
 
@@ -23,7 +24,7 @@ class UnbondValidationsModule {
 
     @FeatureScope
     @Provides
-    fun provideFeeValidation() = UnbondFeeValidation(
+    fun provideFeeValidation(): UnbondFeeValidation = EnoughAmountToTransferValidationGeneric(
         feeExtractor = { it.fee },
         availableBalanceProducer = { it.asset.transferable },
         errorProducer = { UnbondValidationFailure.CannotPayFees }

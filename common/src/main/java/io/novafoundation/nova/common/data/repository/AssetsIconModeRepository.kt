@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface AssetsIconModeRepository {
+
     fun assetsIconModeFlow(): Flow<AssetIconMode>
 
     fun setAssetsIconMode(assetsViewMode: AssetIconMode)

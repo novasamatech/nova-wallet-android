@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.daysFromMillis
@@ -15,6 +16,7 @@ import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.MinutesDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.RoundMinutesDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.SecondsDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
@@ -104,20 +106,24 @@ fun BigDecimal.formatAsChange(): String {
     return prefix + formatAsPercentage()
 }
 
-fun BigDecimal.formatAsPercentage(): String {
-    return defaultAbbreviationFormatter.format(this) + "%"
+fun BigDecimal.formatAsPercentage(includeSymbol: Boolean = true): String {
+    return defaultAbbreviationFormatter.format(this) + if (includeSymbol) "%" else ""
 }
 
 fun Percent.format(): String {
     return value.toBigDecimal().formatAsPercentage()
 }
 
-fun Percent.formatWithoutSymbol(): String {
-    return defaultAbbreviationFormatter.format(value.toBigDecimal())
+fun Fraction.formatPercents(): String {
+    return inPercents.toBigDecimal().formatAsPercentage()
 }
 
 fun Perbill.format(): String {
     return toPercent().format()
+}
+
+fun Fraction.formatPercents(includeSymbol: Boolean = true): String {
+    return inPercents.toBigDecimal().formatAsPercentage(includeSymbol)
 }
 
 fun BigDecimal.formatFractionAsPercentage(): String {
@@ -258,12 +264,14 @@ fun baseDurationFormatter(
     ),
     hoursDurationFormatter: BoundedDurationFormatter = HoursDurationFormatter(context),
     minutesDurationFormatter: BoundedDurationFormatter = MinutesDurationFormatter(context),
+    secondsDurationFormatter: BoundedDurationFormatter = SecondsDurationFormatter(context),
     zeroDurationFormatter: BoundedDurationFormatter = ZeroDurationFormatter(DayDurationFormatter(context))
 ): DurationFormatter {
     val compoundFormatter = CompoundDurationFormatter(
         dayDurationFormatter,
         hoursDurationFormatter,
         minutesDurationFormatter,
+        secondsDurationFormatter,
         zeroDurationFormatter
     )
 
