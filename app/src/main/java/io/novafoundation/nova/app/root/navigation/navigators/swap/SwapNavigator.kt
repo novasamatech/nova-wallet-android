@@ -18,17 +18,17 @@ class SwapNavigator(
     private val commonDelegate: Navigator
 ) : BaseNavigator(navigationHoldersRegistry), SwapRouter {
 
-    override fun openSwapRoute()  {
+    override fun openSwapRoute() {
         navigationBuilder().action(R.id.action_open_swapRouteFragment)
             .navigateInFirstAttachedContext()
     }
 
-    override fun openSwapFee()  {
+    override fun openSwapFee() {
         navigationBuilder().action(R.id.action_open_swapFeeFragment)
             .navigateInFirstAttachedContext()
     }
 
-    override fun openSwapExecution()  {
+    override fun openSwapExecution() {
         navigationBuilder().action(R.id.action_swapConfirmationFragment_to_swapExecutionFragment)
             .navigateInFirstAttachedContext()
     }
@@ -43,7 +43,7 @@ class SwapNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openRetrySwap(payload: SwapSettingsPayload)  {
+    override fun openRetrySwap(payload: SwapSettingsPayload) {
         navigationBuilder().action(R.id.action_swapExecutionFragment_to_swapSettingsFragment)
             .setArgs(SwapMainSettingsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
