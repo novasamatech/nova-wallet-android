@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_xcm_api.multiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 
-class RelativeMultiLocation(
+data class RelativeMultiLocation(
     val parents: Int,
-    interior: Interior
+    override val interior: Interior
 ) : MultiLocation(interior), VersionedToDynamicScaleInstance {
 
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any {

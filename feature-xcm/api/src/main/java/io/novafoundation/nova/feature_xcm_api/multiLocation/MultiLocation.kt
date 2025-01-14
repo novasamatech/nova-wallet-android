@@ -7,7 +7,7 @@ import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import java.math.BigInteger
 
 abstract class MultiLocation(
-    val interior: Interior
+    open val interior: Interior
 ) {
 
     sealed class Interior {
@@ -16,12 +16,28 @@ abstract class MultiLocation(
 
         class Junctions(junctions: List<Junction>) : Interior() {
             val junctions = junctions.sorted()
+
+            override fun equals(other: Any?): Boolean {
+                if (other !is Junctions) return false
+                return junctions == other.junctions
+            }
+
+            override fun hashCode(): Int {
+                return junctions.hashCode()
+            }
+
+            override fun toString(): String {
+                return junctions.toString()
+            }
         }
     }
 
     sealed class Junction {
 
-        data class ParachainId(val id: ParaId) : Junction()
+        data class ParachainId(val id: ParaId) : Junction() {
+
+            constructor(id: Int): this(id.toBigInteger())
+        }
 
         data class GeneralKey(val key: String) : Junction()
 

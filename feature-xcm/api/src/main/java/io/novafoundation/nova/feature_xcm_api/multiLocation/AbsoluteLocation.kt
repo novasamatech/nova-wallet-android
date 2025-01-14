@@ -6,6 +6,8 @@ class AbsoluteMultiLocation(
     interior: Interior,
 ) : MultiLocation(interior) {
 
+    constructor(vararg junctions: Junction) : this(junctions.toList().toInterior())
+
     fun toRelative(): RelativeMultiLocation {
         return RelativeMultiLocation(parents = 0, interior = interior)
     }

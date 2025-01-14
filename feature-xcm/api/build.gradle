@@ -37,4 +37,6 @@ dependencies {
     api substrateSdkDep
 
     api project(':core-api')
+
+    testImplementation project(":test-shared")
 }
