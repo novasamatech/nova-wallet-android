@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.collectionIndexOrNull
 
 class AbsoluteMultiLocation(
     interior: Interior,
-): MultiLocation(interior) {
+) : MultiLocation(interior) {
 
     fun toRelative(): RelativeMultiLocation {
         return RelativeMultiLocation(parents = 0, interior = interior)

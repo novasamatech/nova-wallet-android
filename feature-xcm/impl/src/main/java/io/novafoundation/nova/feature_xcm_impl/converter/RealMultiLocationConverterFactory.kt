@@ -15,7 +15,7 @@ import javax.inject.Inject
 class RealMultiLocationConverterFactory @Inject constructor(
     private val chainRegistry: ChainRegistry,
     private val xcmVersionDetector: XcmVersionDetector,
-): MultiLocationConverterFactory {
+) : MultiLocationConverterFactory {
 
     override fun defaultAsync(chain: Chain, coroutineScope: CoroutineScope): MultiLocationConverter {
         val runtimeAsync = coroutineScope.async { chainRegistry.getRuntime(chain.id) }

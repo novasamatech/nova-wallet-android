@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_xcm_impl.converter
 
 import io.novafoundation.nova.common.utils.tryFindNonNull
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

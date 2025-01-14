@@ -12,9 +12,8 @@ import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
 
-
 @JvmInline
-value class XcmMessage(val instructions: List<XcmInstruction>): VersionedToDynamicScaleInstance {
+value class XcmMessage(val instructions: List<XcmInstruction>) : VersionedToDynamicScaleInstance {
 
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
         return instructions.map { it.toEncodableInstance(xcmVersion) }
@@ -40,14 +39,14 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
     ) : XcmInstruction() {
 
         override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
-           return DictEnum.Entry(
-               name = "DepositAsset",
-               value = structOf(
-                   "assets" to assets.toEncodableInstance(),
-                   "max_assets" to maxAssets,
-                   "beneficiary" to beneficiary.toEncodableInstance(xcmVersion)
-               )
-           )
+            return DictEnum.Entry(
+                name = "DepositAsset",
+                value = structOf(
+                    "assets" to assets.toEncodableInstance(),
+                    "max_assets" to maxAssets,
+                    "beneficiary" to beneficiary.toEncodableInstance(xcmVersion)
+                )
+            )
         }
     }
 

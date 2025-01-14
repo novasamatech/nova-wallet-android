@@ -21,11 +21,10 @@ fun XcmVersion.Companion.fromEnumerationKey(enumerationKey: String): XcmVersion 
     return fromVersion(version)
 }
 
-
 fun XcmVersion?.orDefault(): XcmVersion {
     return this ?: XcmVersion.GLOBAL_DEFAULT
 }
 
 fun XcmVersion.enumerationKey(): String {
-    return "V${version}"
+    return "V$version"
 }

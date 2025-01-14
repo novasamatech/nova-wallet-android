@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_xcm_api.asset;
+package io.novafoundation.nova.feature_xcm_api.asset
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
@@ -12,10 +12,9 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Dic
 class MultiAsset(
     val id: MultiAssetId,
     val fungibility: Fungibility,
-): VersionedToDynamicScaleInstance {
+) : VersionedToDynamicScaleInstance {
 
     companion object;
-
 
     sealed class Fungibility : ToDynamicScaleInstance {
 

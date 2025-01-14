@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_xcm_api.asset
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
-import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 

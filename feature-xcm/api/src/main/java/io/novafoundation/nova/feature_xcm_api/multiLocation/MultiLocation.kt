@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_xcm_api.multiLocation
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
-import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
-import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import java.math.BigInteger

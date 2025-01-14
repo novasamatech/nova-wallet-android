@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_xcm_impl.di.modules.BindsModule
 
 @Module(
     includes = [
-       BindsModule::class
+        BindsModule::class
     ]
 )
 class XcmFeatureModule
