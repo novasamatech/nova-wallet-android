@@ -10,10 +10,7 @@ class BalanceLock(
     val id: BalanceLockId,
     val amountInPlanks: Balance,
     val chainAsset: Chain.Asset
-) : Identifiable {
-
-    override val identifier: String = id.value
-}
+) : Identifiable by id
 
 @JvmInline
 value class BalanceLockId private constructor(val value: String) : Identifiable {

@@ -2,13 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updat
 
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.*
 
 class StakingUpdaters(
     private val relaychainUpdaters: Group,
@@ -37,6 +31,7 @@ class StakingUpdaters(
             PARACHAIN -> parachainUpdaters.updaters
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
+            MYTHOS -> TODO()
         }
     }
 }

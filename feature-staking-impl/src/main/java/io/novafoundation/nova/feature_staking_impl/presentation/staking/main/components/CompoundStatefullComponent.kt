@@ -7,7 +7,9 @@ import io.novafoundation.nova.common.utils.switchMap
 import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
@@ -81,6 +83,7 @@ private class CompoundStakingComponent<S, E, A>(
             PARACHAIN -> parachainComponentCreator(stakingOption, childHostContext)
             TURING -> turingComponentCreator(stakingOption, childHostContext)
             NOMINATION_POOLS -> nominationPoolsCreator(stakingOption, childHostContext)
+            MYTHOS -> TODO()
         }
     }
 }

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingD
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -19,7 +20,8 @@ class StakingDashboardUpdaterFactory(
     private val remoteStorageSource: StorageDataSource,
     private val nominationPoolBalanceRepository: NominationPoolStateRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
-    private val storageCache: StorageCache
+    private val storageCache: StorageCache,
+    private val balanceLocksRepository: BalanceLocksRepository,
 ) {
 
     fun createUpdater(
@@ -31,7 +33,8 @@ class StakingDashboardUpdaterFactory(
         return when (stakingType.group()) {
             StakingTypeGroup.RELAYCHAIN -> relayChain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
-            StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow, storageCache)
+            StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow)
+            StakingTypeGroup.MYTHOS -> mythos(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }
@@ -75,7 +78,6 @@ class StakingDashboardUpdaterFactory(
         stakingType: Chain.Asset.StakingType,
         metaAccount: MetaAccount,
         stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
-        storageCache: StorageCache,
     ): GlobalScopeUpdater {
         return StakingDashboardNominationPoolsUpdater(
             chain = chain,
@@ -88,6 +90,22 @@ class StakingDashboardUpdaterFactory(
             nominationPoolStateRepository = nominationPoolBalanceRepository,
             poolAccountDerivation = poolAccountDerivation,
             storageCache = storageCache
+        )
+    }
+
+    private fun mythos(
+        chain: Chain,
+        stakingType: Chain.Asset.StakingType,
+        metaAccount: MetaAccount,
+        stakingStatsFlow: Flow<MultiChainOffChainSyncResult>,
+    ): GlobalScopeUpdater {
+        return StakingDashboardMythosUpdater(
+            chain = chain,
+            chainAsset = chain.utilityAsset,
+            stakingType = stakingType,
+            metaAccount = metaAccount,
+            stakingDashboardCache = stakingDashboardCache,
+            balanceLocksRepository = balanceLocksRepository
         )
     }
 }

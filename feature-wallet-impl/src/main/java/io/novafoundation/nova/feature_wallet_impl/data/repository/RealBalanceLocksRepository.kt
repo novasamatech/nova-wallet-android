@@ -21,7 +21,7 @@ class RealBalanceLocksRepository(
     private val lockDao: LockDao
 ) : BalanceLocksRepository {
 
-    override suspend fun observeBalanceLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
+    override fun observeBalanceLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
         return lockDao.observeBalanceLocks(metaId, chain.id, chainAsset.id)
             .mapList { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
     }
