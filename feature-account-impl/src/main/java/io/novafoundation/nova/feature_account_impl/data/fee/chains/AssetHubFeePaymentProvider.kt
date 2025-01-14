@@ -10,8 +10,8 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import kotlinx.coroutines.CoroutineScope
 
 class AssetHubFeePaymentProviderFactory(

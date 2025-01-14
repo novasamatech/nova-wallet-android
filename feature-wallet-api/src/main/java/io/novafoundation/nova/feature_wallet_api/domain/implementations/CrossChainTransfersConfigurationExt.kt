@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.implementations
 
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.graph.Edge
@@ -11,26 +12,27 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
+import io.novafoundation.nova.feature_xcm_api.multiLocation.Junctions
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.junctions
+import io.novafoundation.nova.feature_xcm_api.multiLocation.order
+import io.novafoundation.nova.feature_xcm_api.multiLocation.toInterior
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isParachain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.Junctions
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.junctionList
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.order
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toInterior
 import java.math.BigInteger
 
-fun MultiLocation.localView(): MultiLocation {
-    return MultiLocation(
-        parents = BigInteger.ZERO,
+fun RelativeMultiLocation.localView(): RelativeMultiLocation {
+    return RelativeMultiLocation(
+        parents = 0,
         interior = when (val interior = interior) {
-            MultiLocation.Interior.Here -> interior
+            Interior.Here -> interior
 
-            is MultiLocation.Interior.Junctions -> interior.junctions.takeLastWhile { it !is Junction.ParachainId }
+            is Interior.Junctions -> interior.junctions.takeLastWhile { it !is Junction.ParachainId }
                 .toInterior()
         }
     )
@@ -43,23 +45,24 @@ fun XcmFee.Mode.Proportional.weightToFee(weight: Weight): BigInteger {
     return weight * unitsPerSecond / pico
 }
 
-operator fun MultiLocation.plus(suffix: MultiLocation): MultiLocation {
-    require(suffix.parents == BigInteger.ZERO) {
+operator fun RelativeMultiLocation.plus(suffix: RelativeMultiLocation): RelativeMultiLocation {
+    require(suffix.parents == 0) {
         "Appending multi location that has parents is not supported"
     }
 
-    val newJunctions = interior.junctionList + suffix.interior.junctionList
+    val newJunctions = junctions + suffix.junctions
     require(newJunctions.isAscending(compareBy { it.order })) {
         "Cannot append this multi location due to conflicting junctions"
     }
 
-    return MultiLocation(
+    return RelativeMultiLocation(
         parents = parents,
         interior = newJunctions.toInterior()
     )
 }
 
-fun MultiLocation.childView() = MultiLocation(parents + BigInteger.ONE, interior)
+fun RelativeMultiLocation.childView() =
+    RelativeMultiLocation(parents + 1, interior)
 
 fun CrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
     val assetTransfers = outComingAssetTransfers(origin) ?: return emptyList()
@@ -97,12 +100,12 @@ fun CrossChainTransfersConfiguration.availableInDestinations(): List<Edge<FullCh
     }
 }
 
-fun ByteArray.accountIdToMultiLocation() = MultiLocation(
-    parents = BigInteger.ZERO,
+fun ByteArray.accountIdToMultiLocation() = RelativeMultiLocation(
+    parents = 0,
     interior = Junctions(
         when (size) {
-            32 -> Junction.AccountId32(this)
-            20 -> Junction.AccountKey20(this)
+            32 -> Junction.AccountId32(intoKey())
+            20 -> Junction.AccountKey20(intoKey())
             else -> throw IllegalArgumentException("Unsupported account id length: $size")
         }
     )
@@ -181,28 +184,28 @@ private fun destinationLocation(
     else -> throw UnsupportedOperationException("Unsupported cross-chain transfer")
 }
 
-private fun ChildParachain(paraId: ParaId): MultiLocation {
-    return MultiLocation(
-        parents = BigInteger.ZERO,
+private fun ChildParachain(paraId: ParaId): RelativeMultiLocation {
+    return RelativeMultiLocation(
+        parents = 0,
         interior = listOf(Junction.ParachainId(paraId)).toInterior()
     )
 }
 
-private fun ParentChain(): MultiLocation {
-    return MultiLocation(
-        parents = BigInteger.ONE,
-        interior = MultiLocation.Interior.Here
+private fun ParentChain(): RelativeMultiLocation {
+    return RelativeMultiLocation(
+        parents = 1,
+        interior = Interior.Here
     )
 }
 
-private fun SiblingParachain(paraId: ParaId): MultiLocation {
-    return MultiLocation(
-        parents = BigInteger.ONE,
+private fun SiblingParachain(paraId: ParaId): RelativeMultiLocation {
+    return RelativeMultiLocation(
+        parents = 1,
         listOf(Junction.ParachainId(paraId)).toInterior()
     )
 }
 
-private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: CrossChainTransfersConfiguration.AssetTransfers): MultiLocation {
+private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: CrossChainTransfersConfiguration.AssetTransfers): RelativeMultiLocation {
     return when (val path = assetTransfers.assetLocationPath) {
         is AssetLocationPath.Absolute -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.childView()
         is AssetLocationPath.Relative -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.localView()

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate
 
+import io.novafoundation.nova.feature_xcm_api.multiLocation.bindMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -8,12 +9,10 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.assetTxFeePaidEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findAllOfType
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
@@ -112,7 +111,7 @@ class AssetConversionSwapExtractor(
 
     private suspend fun ExtrinsicVisit.extractFee(
         chain: Chain,
-        multiLocationConverter: MultiLocationConverter
+        multiLocationConverter: io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
     ): ChainAssetWithAmount {
         // We check for fee usage from root extrinsic since `extrinsicVisit` will cut it out when nested calls are present
         val assetFee = rootExtrinsic.events.assetFee(multiLocationConverter)

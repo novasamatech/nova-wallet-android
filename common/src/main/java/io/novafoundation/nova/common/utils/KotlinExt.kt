@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.utils
 
 import android.net.Uri
 import android.util.Log
+import jnr.ffi.annotations.In
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -638,3 +639,7 @@ inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.(
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
+
+fun Int.collectionIndexOrNull(): Int? {
+    return takeIf { it >= 0 }
+}

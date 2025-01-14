@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -23,6 +24,7 @@ class WalletFeatureHolder @Inject constructor(
             .swapCoreApi(getFeature(SwapCoreApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
+            .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))
             .build()
         return DaggerWalletFeatureComponent.factory()
             .create(dependencies)

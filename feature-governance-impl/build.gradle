@@ -45,6 +45,7 @@ dependencies {
     implementation project(':feature-wallet-api')
     implementation project(':feature-governance-api')
     implementation project(':feature-dapp-api')
+    implementation project(':feature-xcm:api')
 
     implementation project(":common")
     implementation project(":runtime")

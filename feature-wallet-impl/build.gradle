@@ -49,6 +49,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(":feature-swap-core")
     implementation project(':runtime')
+    implementation project(':feature-xcm:api')
 
     implementation kotlinDep
 

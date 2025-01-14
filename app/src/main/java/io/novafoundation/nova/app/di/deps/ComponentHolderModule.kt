@@ -62,6 +62,8 @@ import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureHolder
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureHolder
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
+import io.novafoundation.nova.feature_xcm_impl.di.XcmFeatureHolder
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeHolder
 import io.novafoundation.nova.splash.di.SplashFeatureApi
@@ -255,4 +257,10 @@ interface ComponentHolderModule {
     @ClassKey(SwapCoreApi::class)
     @IntoMap
     fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(XcmFeatureApi::class)
+    @IntoMap
+    fun provideXcmFeatureHolder(holder: XcmFeatureHolder): FeatureApiHolder
 }

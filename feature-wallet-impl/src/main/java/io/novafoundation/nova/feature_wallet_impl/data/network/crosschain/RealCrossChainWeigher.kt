@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -24,18 +25,26 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee.Mode
 import io.novafoundation.nova.feature_wallet_api.domain.model.DeliveryFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.XCMInstructionType
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Fungibility
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmMultiAsset.Id
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset.Fungibility
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
+import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction
+import io.novafoundation.nova.feature_xcm_api.message.XcmMessage
+import io.novafoundation.nova.feature_xcm_api.multiLocation.isHere
+import io.novafoundation.nova.feature_xcm_api.multiLocation.paraIdOrNull
+import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
+import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.feature_xcm_api.versions.orDefault
+import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
+import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
+import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.isHere
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.orDefault
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.paraIdOrNull
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.runtime.metadata.call
@@ -71,7 +80,7 @@ class RealCrossChainWeigher(
     private suspend fun CrossChainTransferConfiguration.calculateFee(
         amount: Balance,
         feeConfig: CrossChainFeeConfiguration?,
-        chainLocation: MultiLocation
+        chainLocation: RelativeMultiLocation
     ): CrossChainFeeModel {
         return when (feeConfig) {
             null -> CrossChainFeeModel.zero()
@@ -108,7 +117,7 @@ class RealCrossChainWeigher(
     private suspend fun CrossChainTransferConfiguration.deliveryFeeFor(
         amount: Balance,
         config: CrossChainFeeConfiguration,
-        destinationChainLocation: MultiLocation,
+        destinationChainLocation: RelativeMultiLocation,
         isSendingFromOrigin: Boolean
     ): CrossChainFeeModel {
         val deliveryFeeConfiguration = config.from.deliveryFeeConfiguration ?: return CrossChainFeeModel.zero()
@@ -146,7 +155,7 @@ class RealCrossChainWeigher(
             .size.toBigInteger()
     }
 
-    private fun DeliveryFeeConfiguration.getDeliveryConfig(destinationChainLocation: MultiLocation): DeliveryFeeConfiguration.Type.Exponential {
+    private fun DeliveryFeeConfiguration.getDeliveryConfig(destinationChainLocation: RelativeMultiLocation): DeliveryFeeConfiguration.Type.Exponential {
         val isParent = destinationChainLocation.interior.isHere()
 
         val configType = when {
@@ -164,12 +173,12 @@ class RealCrossChainWeigher(
     private suspend fun queryDeliveryFeeFactor(
         chainId: ChainId,
         pallet: String,
-        destinationMultiLocation: MultiLocation,
+        destinationMultiLocation: RelativeMultiLocation,
     ): BigInteger {
         return when {
             destinationMultiLocation.interior.isHere() -> xcmParentDeliveryFeeFactor(chainId, pallet)
             else -> {
-                val paraId = destinationMultiLocation.interior.paraIdOrNull() ?: throw IllegalStateException("ParaId must be not null")
+                val paraId = destinationMultiLocation.paraIdOrNull() ?: throw IllegalStateException("ParaId must be not null")
                 xcmParachainDeliveryFeeFactor(chainId, pallet, paraId)
             }
         }
@@ -185,19 +194,19 @@ class RealCrossChainWeigher(
         instructionTypes: List<XCMInstructionType>,
         chain: Chain,
         amount: Balance
-    ): VersionedXcm {
+    ): VersionedXcm<XcmMessage> {
         val instructions = instructionTypes.mapNotNull { instructionType -> xcmInstruction(instructionType, chain, amount) }
         val message = XcmMessage(instructions)
         val xcmVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(chain.id).orDefault()
 
-        return message.versioned(xcmVersion)
+        return message.versionedXcm(xcmVersion)
     }
 
     private fun CrossChainTransferConfiguration.xcmInstruction(
         instructionType: XCMInstructionType,
         chain: Chain,
         amount: Balance
-    ): XcmVInstruction? {
+    ): XcmInstruction? {
         return when (instructionType) {
             XCMInstructionType.ReserveAssetDeposited -> reserveAssetDeposited(amount)
             XCMInstructionType.ClearOrigin -> clearOrigin()
@@ -210,62 +219,62 @@ class RealCrossChainWeigher(
         }
     }
 
-    private fun CrossChainTransferConfiguration.reserveAssetDeposited(amount: Balance) = XcmVInstruction.ReserveAssetDeposited(
-        assets = listOf(
+    private fun CrossChainTransferConfiguration.reserveAssetDeposited(amount: Balance) = XcmInstruction.ReserveAssetDeposited(
+        assets = MultiAssets(
             sendingAssetAmountOf(amount)
         )
     )
 
-    private fun CrossChainTransferConfiguration.receiveTeleportedAsset(amount: Balance) = XcmVInstruction.ReceiveTeleportedAsset(
-        assets = listOf(
+    private fun CrossChainTransferConfiguration.receiveTeleportedAsset(amount: Balance) = XcmInstruction.ReceiveTeleportedAsset(
+        assets = MultiAssets(
             sendingAssetAmountOf(amount)
         )
     )
 
     @Suppress("unused")
-    private fun CrossChainTransferConfiguration.clearOrigin() = XcmVInstruction.ClearOrigin
+    private fun CrossChainTransferConfiguration.clearOrigin() = XcmInstruction.ClearOrigin
 
-    private fun CrossChainTransferConfiguration.buyExecution(amount: Balance): XcmVInstruction.BuyExecution {
-        return XcmVInstruction.BuyExecution(
+    private fun CrossChainTransferConfiguration.buyExecution(amount: Balance): XcmInstruction.BuyExecution {
+        return XcmInstruction.BuyExecution(
             fees = sendingAssetAmountOf(amount),
             weightLimit = WeightLimit.Unlimited
         )
     }
 
     @Suppress("unused")
-    private fun CrossChainTransferConfiguration.depositAsset(chain: Chain): XcmVInstruction.DepositAsset {
-        return XcmVInstruction.DepositAsset(
-            assets = XcmMultiAssetFilter.Wild.All,
+    private fun CrossChainTransferConfiguration.depositAsset(chain: Chain): XcmInstruction.DepositAsset {
+        return XcmInstruction.DepositAsset(
+            assets = MultiAssetFilter.Wild.All,
             maxAssets = BigInteger.ONE,
             beneficiary = chain.emptyBeneficiaryMultiLocation()
         )
     }
 
-    private fun CrossChainTransferConfiguration.withdrawAsset(amount: Balance): XcmVInstruction.WithdrawAsset {
-        return XcmVInstruction.WithdrawAsset(
-            assets = listOf(
+    private fun CrossChainTransferConfiguration.withdrawAsset(amount: Balance): XcmInstruction.WithdrawAsset {
+        return XcmInstruction.WithdrawAsset(
+            assets = MultiAssets(
                 sendingAssetAmountOf(amount)
             )
         )
     }
 
-    private fun CrossChainTransferConfiguration.depositReserveAsset(): XcmVInstruction {
-        return XcmVInstruction.DepositReserveAsset(
-            assets = XcmMultiAssetFilter.Wild.All,
+    private fun CrossChainTransferConfiguration.depositReserveAsset(): XcmInstruction {
+        return XcmInstruction.DepositReserveAsset(
+            assets = MultiAssetFilter.Wild.All,
             maxAssets = BigInteger.ONE,
             dest = destinationChainLocation,
             xcm = XcmMessage(emptyList())
         )
     }
 
-    private fun CrossChainTransferConfiguration.sendingAssetAmountOf(planks: Balance): XcmMultiAsset {
-        return XcmMultiAsset(
+    private fun CrossChainTransferConfiguration.sendingAssetAmountOf(planks: Balance): MultiAsset {
+        return MultiAsset(
             fungibility = Fungibility.Fungible(amount = planks),
-            id = Id.Concrete(assetLocation)
+            id = MultiAssetId(assetLocation)
         )
     }
 
-    private fun Chain.emptyBeneficiaryMultiLocation(): MultiLocation = emptyAccountId().accountIdToMultiLocation()
+    private fun Chain.emptyBeneficiaryMultiLocation(): RelativeMultiLocation = emptyAccountId().accountIdToMultiLocation()
 
     private suspend fun xcmParachainDeliveryFeeFactor(chainId: ChainId, moduleName: String, paraId: ParaId): BigInteger {
         return storageDataSource.query(chainId, applyStorageDefault = true) {

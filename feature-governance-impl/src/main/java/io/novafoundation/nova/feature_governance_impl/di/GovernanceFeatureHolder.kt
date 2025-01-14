@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class GovernanceFeatureHolder @Inject constructor(
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .dAppFeatureApi(getFeature(DAppFeatureApi::class.java))
+            .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))
             .build()
 
         return DaggerGovernanceFeatureComponent.factory()
