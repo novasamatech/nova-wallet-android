@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Biztonsági mentés</string>
     <string name="backup_title">Biztonsági mentés</string>
     <string name="biometric_auth_title">Biometrikus hitelesítés</string>
+    <string name="browser_tabs_close_all">Összes bezárása</string>
     <string name="buy_completed">Kérlek várj, a vásárlás megkezdődött, ami eltarthat akár 60 percig is. Az állapotot nyomon követheted az e-mailben.</string>
     <string name="buy_network_flow_title">Válasszon hálózatot a vásárláshoz %s</string>
     <string name="buy_provider_open_confirmation_message">A vásárlás folytatásához átirányítunk a Nova Wallet alkalmazásból ide: %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Átutalási díj</string>
     <string name="choose_amount_network_error">A hálózat nem elérhető</string>
     <string name="choose_amount_to">Ide</string>
+    <string name="close_dapp_tabs_message">Az összes megnyitott fül a DApp böngészőben be lesz zárva.</string>
+    <string name="close_dapp_tabs_title">Összes DApp bezárása?</string>
     <string name="cloud_backup_delete_action_subtitle">%s és ne felejtse el mindig offline módban tartani őket, hogy bármikor visszaállíthassa őket. Ezt megteheti a Biztonsági Mentés Beállításokban.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Kérjük, írja le az összes pénztárca jelszót, mielőtt folytatná</string>
     <string name="cloud_backup_delete_action_title">A biztonsági mentés törölve lesz a Google Drive-ból</string>
@@ -480,6 +483,7 @@
         <item quantity="other">%d másodpercek</item>
     </plurals>
     <string name="common_secret_derivation_path">Titkos származtatási útvonal</string>
+    <string name="common_see_all">Összes megtekintése</string>
     <string name="common_settings">Beállítások</string>
     <string name="common_share">Megosztás</string>
     <string name="common_sign_in">Bejelentkezés</string>
@@ -642,6 +646,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Csak akkor engedélyezd a kérést, ha megbízol ebben az alkalmazásban.\nEllenőrizd a tranzakció részleteit.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApp</string>
+    <string name="dapp_favorites">Kedvencek</string>
     <string name="dapp_favourites">Kedvencek</string>
     <string name="dapp_favourites_add">Hozzáadás a kedvencekhez</string>
     <string name="dapp_favourites_remove_description">A „%s” DApp el lesz távolítva a Kedvencek közül</string>
