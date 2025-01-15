@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 
 private const val MAX_PROGRESS = 100
 
-
 class Web3ChromeClient(
     private val permissionAsker: WebViewPermissionAsker,
     private val fileChooser: WebViewFileChooser,
