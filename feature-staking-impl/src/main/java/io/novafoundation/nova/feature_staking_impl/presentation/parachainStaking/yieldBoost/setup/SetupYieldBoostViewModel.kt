@@ -57,15 +57,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -135,7 +133,7 @@ class SetupYieldBoostViewModel(
 
     override val retryEvent: MutableLiveData<Event<RetryPayload>> = originFeeMixin.retryEvent
 
-    private val maxActionProvider = maxActionProviderFactory.create2(
+    private val maxActionProvider = maxActionProviderFactory.create(
         viewModelScope = viewModelScope,
         assetInFlow = assetFlow,
         feeLoaderMixin = originFeeMixin,
@@ -145,7 +143,6 @@ class SetupYieldBoostViewModel(
         scope = this,
         assetFlow = assetFlow,
         balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable,
         maxActionProvider = maxActionProvider
     )
 

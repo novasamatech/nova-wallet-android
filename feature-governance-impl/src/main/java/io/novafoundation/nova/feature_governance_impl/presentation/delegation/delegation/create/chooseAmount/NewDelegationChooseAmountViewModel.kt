@@ -38,7 +38,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -84,7 +84,7 @@ class NewDelegationChooseAmountViewModel(
 
     override val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
 
-    private val maxActionProvider = maxActionProviderFactory.create2(
+    private val maxActionProvider = maxActionProviderFactory.create(
         viewModelScope = viewModelScope,
         assetInFlow = selectedAsset,
         feeLoaderMixin = originFeeMixin,
@@ -95,7 +95,6 @@ class NewDelegationChooseAmountViewModel(
         scope = this,
         assetFlow = selectedAsset,
         balanceField = Asset::free,
-        balanceLabel = R.string.wallet_balance_available,
         maxActionProvider = maxActionProvider
     )
 

@@ -152,7 +152,6 @@ class StartParachainStakingViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = selectedAsset,
-        balanceLabel = R.string.wallet_balance_available,
         maxActionProvider = maxActionProvider
     )
 

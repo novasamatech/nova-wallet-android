@@ -37,7 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,7 +86,7 @@ abstract class SetupVoteViewModel(
 
     protected val validatingVoteType = MutableStateFlow<VoteType?>(null)
 
-    private val maxActionProvider = maxActionProviderFactory.create2(
+    private val maxActionProvider = maxActionProviderFactory.create(
         viewModelScope = viewModelScope,
         assetInFlow = selectedAsset,
         feeLoaderMixin = originFeeMixin,
@@ -97,7 +97,6 @@ abstract class SetupVoteViewModel(
         scope = this,
         assetFlow = selectedAsset,
         balanceField = Asset::free,
-        balanceLabel = R.string.wallet_balance_available,
         maxActionProvider = maxActionProvider
     )
 

@@ -83,7 +83,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
-            @StringRes balanceLabel: Int?,
             maxActionProvider: MaxActionProvider?,
         ): Presentation
 
@@ -91,7 +90,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
             balanceField: (Asset) -> BigDecimal,
-            @StringRes balanceLabel: Int?,
             maxActionProvider: MaxActionProvider?,
         ): Presentation
     }

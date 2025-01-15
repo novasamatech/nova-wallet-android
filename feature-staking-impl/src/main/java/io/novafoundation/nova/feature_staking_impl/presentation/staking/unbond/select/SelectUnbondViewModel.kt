@@ -92,7 +92,6 @@ class SelectUnbondViewModel(
         scope = this,
         assetFlow = assetFlow,
         balanceField = Asset::bonded,
-        balanceLabel = R.string.staking_main_stake_balance_staked,
         maxActionProvider = maxActionProvider
     )
 

@@ -125,7 +125,6 @@ class ParachainStakingUnbondViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = selectedAsset,
-        balanceLabel = R.string.staking_main_stake_balance_staked,
         maxActionProvider = maxActionProvider
     )
 

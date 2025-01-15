@@ -29,9 +29,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -39,7 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -95,7 +92,7 @@ class SetupAmountMultiStakingViewModel(
 
     private val deductEDForMaxButton = currentSelectionFlow.map { it?.isNominationPoolSelection.orFalse() }
 
-    private val maxActionProvider = maxActionProviderFactory.create2(
+    private val maxActionProvider = maxActionProviderFactory.create(
         viewModelScope = viewModelScope,
         assetInFlow = currentAssetFlow,
         feeLoaderMixin = feeLoaderMixin,
@@ -106,7 +103,6 @@ class SetupAmountMultiStakingViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = viewModelScope,
         assetFlow = currentAssetFlow,
-        balanceLabel = R.string.wallet_balance_available,
         maxActionProvider = maxActionProvider
     )
 

@@ -44,7 +44,7 @@ class MaxActionProviderFactory(
     }
 }
 
-fun <F : MaxAvailableDeduction> MaxActionProviderFactory.create2(
+fun <F : MaxAvailableDeduction> MaxActionProviderFactory.create(
     viewModelScope: CoroutineScope,
     assetInFlow: Flow<Asset>,
     feeLoaderMixin: FeeLoaderMixinV2<F, *>,

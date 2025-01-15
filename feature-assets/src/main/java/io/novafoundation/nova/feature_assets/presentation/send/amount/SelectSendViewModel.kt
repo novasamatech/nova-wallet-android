@@ -49,7 +49,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.isEnabled
@@ -162,7 +162,7 @@ class SelectSendViewModel(
     private val feeFormatter = TransferFeeDisplayFormatter()
     val feeMixin = feeLoaderMixinFactory.createForTransfer(originChainAsset, feeFormatter)
 
-    private val maxActionProvider = maxActionProviderFactory.create2(
+    private val maxActionProvider = maxActionProviderFactory.create(
         viewModelScope = viewModelScope,
         assetInFlow = originAssetFlow,
         feeLoaderMixin = feeMixin,
@@ -171,7 +171,6 @@ class SelectSendViewModel(
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = originAssetFlow,
-        balanceLabel = R.string.wallet_balance_transferable,
         balanceField = Asset::transferable,
         maxActionProvider = maxActionProvider
     )

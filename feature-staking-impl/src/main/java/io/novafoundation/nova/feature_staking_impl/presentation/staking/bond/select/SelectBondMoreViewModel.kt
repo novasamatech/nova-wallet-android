@@ -91,7 +91,6 @@ class SelectBondMoreViewModel(
         scope = this,
         assetFlow = assetFlow,
         balanceField = Asset::stakeable,
-        balanceLabel = R.string.wallet_balance_available,
         maxActionProvider = maxActionProvider
     )
 

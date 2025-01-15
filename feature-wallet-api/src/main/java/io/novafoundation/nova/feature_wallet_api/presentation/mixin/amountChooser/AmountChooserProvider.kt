@@ -13,21 +13,17 @@ import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 
 class AmountChooserProviderFactory(
-    private val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
 ) : AmountChooserMixin.Factory {
 
     override fun create(
         scope: CoroutineScope,
         assetFlow: Flow<Asset>,
-        balanceLabel: Int?,
         maxActionProvider: MaxActionProvider?
     ): AmountChooserProvider {
         return AmountChooserProvider(
             coroutineScope = scope,
             usedAssetFlow = assetFlow,
-            balanceLabel = balanceLabel,
-            resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
             maxActionProvider = maxActionProvider
         )
@@ -37,13 +33,11 @@ class AmountChooserProviderFactory(
         scope: CoroutineScope,
         assetFlow: Flow<Asset>,
         balanceField: (Asset) -> BigDecimal,
-        @StringRes balanceLabel: Int?,
         maxActionProvider: MaxActionProvider?
     ): AmountChooserMixin.Presentation {
         return create(
             scope = scope,
             assetFlow = assetFlow,
-            balanceLabel = balanceLabel,
             maxActionProvider = maxActionProvider
         )
     }
@@ -52,9 +46,7 @@ class AmountChooserProviderFactory(
 class AmountChooserProvider(
     coroutineScope: CoroutineScope,
     override val usedAssetFlow: Flow<Asset>,
-    private val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
-    @StringRes private val balanceLabel: Int?,
     maxActionProvider: MaxActionProvider?
 ) : BaseAmountChooserProvider(
     coroutineScope = coroutineScope,
@@ -64,7 +56,7 @@ class AmountChooserProvider(
     AmountChooserMixin.Presentation {
 
     override val assetModel = usedAssetFlow.map { asset ->
-        ChooseAmountModel(asset, assetIconProvider, resourceManager, balanceLabel)
+        ChooseAmountModel(asset, assetIconProvider)
     }
         .shareInBackground()
 }

@@ -88,7 +88,6 @@ class NominationPoolsSetupBondMoreViewModel(
         scope = this,
         assetFlow = selectedAsset,
         balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable,
         maxActionProvider = maxActionProvider
     )
 
