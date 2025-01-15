@@ -241,7 +241,6 @@
     <string name="backup_settings_toolbar_title">バックアップ</string>
     <string name="backup_title">バックアップ</string>
     <string name="biometric_auth_title">生体認証</string>
-    <string name="browser_tabs_close_all">すべて閉じる</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
     <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
@@ -258,8 +257,6 @@
     <string name="choose_amount_fee">転送手数料</string>
     <string name="choose_amount_network_error">ネットワークが応答していません</string>
     <string name="choose_amount_to">宛先</string>
-    <string name="close_dapp_tabs_message">DAppブラウザーで開いているすべてのタブが閉じられます。</string>
-    <string name="close_dapp_tabs_title">すべてのDAppを閉じますか？</string>
     <string name="cloud_backup_delete_action_subtitle">%s と、いつでも復元できるように必ずオフラインで保持してください。バックアップ設定でこれを行うことができます。</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">進む前にすべてのウォレットのパスフレーズを書き留めてください</string>
     <string name="cloud_backup_delete_action_title">Googleドライブからバックアップが削除されます</string>
@@ -478,7 +475,6 @@
         <item quantity="other">%d秒</item>
     </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
-    <string name="common_see_all">すべて見る</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
     <string name="common_sign_in">サインイン</string>
@@ -640,8 +636,6 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">アプリケーションを信頼する場合はこのリクエストを承認してください。\nトランザクションの詳細を確認してください。</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
-    <string name="dapp_entry_point_title">%d DApps</string>
-    <string name="dapp_favorites">お気に入り</string>
     <string name="dapp_favourites">お気に入り</string>
     <string name="dapp_favourites_add">お気に入りに追加</string>
     <string name="dapp_favourites_remove_description">「%s」DAppはお気に入りから削除されます</string>

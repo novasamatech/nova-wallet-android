@@ -241,7 +241,6 @@
     <string name="backup_settings_toolbar_title">备份</string>
     <string name="backup_title">备份</string>
     <string name="biometric_auth_title">生物认证</string>
-    <string name="browser_tabs_close_all">关闭所有</string>
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
     <string name="buy_network_flow_title">选择购买%s的网络</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
@@ -258,8 +257,6 @@
     <string name="choose_amount_fee">转账费</string>
     <string name="choose_amount_network_error">网络无响应</string>
     <string name="choose_amount_to">至</string>
-    <string name="close_dapp_tabs_message">DApp浏览器中所有打开的标签页将被关闭。</string>
-    <string name="close_dapp_tabs_title">关闭所有DApps？</string>
     <string name="cloud_backup_delete_action_subtitle">%s 并且记住始终将它们离线保存，以便随时恢复它们。您可以在备份设置中执行此操作。</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">请在继续之前记下您钱包的所有助记词</string>
     <string name="cloud_backup_delete_action_title">备份将从Google Drive中删除</string>
@@ -478,7 +475,6 @@
         <item quantity="other">%d 秒</item>
     </plurals>
     <string name="common_secret_derivation_path">密钥派生路径</string>
-    <string name="common_see_all">查看全部</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
     <string name="common_sign_in">登录</string>
@@ -640,8 +636,6 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">如果您信任此应用，请批准此请求。\n检查交易详情。</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
-    <string name="dapp_entry_point_title">%d DApps</string>
-    <string name="dapp_favorites">收藏夹</string>
     <string name="dapp_favourites">收藏夹</string>
     <string name="dapp_favourites_add">添加到收藏夹</string>
     <string name="dapp_favourites_remove_description">“%s”DApp将从收藏夹中移除</string>

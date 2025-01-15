@@ -241,7 +241,6 @@
     <string name="backup_settings_toolbar_title">Sauvegarde</string>
     <string name="backup_title">Sauvegarde</string>
     <string name="biometric_auth_title">Auth biométrique</string>
-    <string name="browser_tabs_close_all">Fermer tout</string>
     <string name="buy_completed">L\'achat est lancé ! Veuillez patienter jusqu\'à 60 minutes. Vous pouvez suivre l\'état d\'avancement sur l\'e-mail.</string>
     <string name="buy_network_flow_title">Sélectionner le réseau pour acheter %s</string>
     <string name="buy_provider_open_confirmation_message">Pour poursuivre l\'achat, vous serez redirigé de l\'application Nova Wallet vers %s</string>
@@ -258,8 +257,6 @@
     <string name="choose_amount_fee">Frais de transfert</string>
     <string name="choose_amount_network_error">Le réseau ne répond pas</string>
     <string name="choose_amount_to">À</string>
-    <string name="close_dapp_tabs_message">Toutes les onglets ouverts dans le navigateur DApp seront fermés.</string>
-    <string name="close_dapp_tabs_title">Fermer toutes les DApps ?</string>
     <string name="cloud_backup_delete_action_subtitle">%s et n\'oubliez pas de toujours les conserver hors ligne pour les restaurer à tout moment. Vous pouvez le faire dans les Réglages de sauvegarde.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Veuillez noter toutes les phrases de passe de votre portefeuille avant de continuer</string>
     <string name="cloud_backup_delete_action_title">La sauvegarde sera supprimée de Google Drive</string>
@@ -483,7 +480,6 @@
         <item quantity="other">%d secondes</item>
     </plurals>
     <string name="common_secret_derivation_path">Chemin de dérivation du secret</string>
-    <string name="common_see_all">Voir tout</string>
     <string name="common_settings">Paramètres</string>
     <string name="common_share">Partager</string>
     <string name="common_sign_in">Se connecter</string>
@@ -646,8 +642,6 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Approuvez cette demande si vous avez confiance en l\'application.\nVérifiez les détails de la transaction.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
-    <string name="dapp_entry_point_title">%d DApps</string>
-    <string name="dapp_favorites">Favoris</string>
     <string name="dapp_favourites">Favoris</string>
     <string name="dapp_favourites_add">Ajouter aux favoris</string>
     <string name="dapp_favourites_remove_description">La dApp «%s» sera retirée des favoris</string>

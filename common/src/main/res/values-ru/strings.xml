@@ -241,7 +241,6 @@
     <string name="backup_settings_toolbar_title">Бэкап</string>
     <string name="backup_title">Бэкап</string>
     <string name="biometric_auth_title">Биометрия</string>
-    <string name="browser_tabs_close_all">Закрыть все</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_network_flow_title">Выберите сеть для покупки %s</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
@@ -258,8 +257,6 @@
     <string name="choose_amount_fee">Комиссия</string>
     <string name="choose_amount_network_error">Сеть недоступна</string>
     <string name="choose_amount_to">Кому</string>
-    <string name="close_dapp_tabs_message">Все открытые вкладки в DApp браузере будут закрыты.</string>
-    <string name="close_dapp_tabs_title">Закрыть все DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s и не забывайте всегда держать их в письменном виде, чтобы иметь возможность восстановить в любое время. Сделать это можно в Настройках Бэкапа.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Пожалуйста, запишите секретные фразы от всех ваших кошельков перед тем как продолжить</string>
     <string name="cloud_backup_delete_action_title">Бэкап будет удалён из Google Диска</string>
@@ -488,12 +485,11 @@
     <string name="common_sec">сек</string>
     <plurals name="common_seconds_format">
         <item quantity="one">%d секунда</item>
-        <item quantity="few">%d секунды</item>
-        <item quantity="many">%d секунд</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
         <item quantity="other">%d секунд</item>
     </plurals>
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
-    <string name="common_see_all">Посмотреть все</string>
     <string name="common_settings">Настройки</string>
     <string name="common_share">Поделиться</string>
     <string name="common_sign_in">Войти</string>
@@ -658,8 +654,6 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Одобрите этот запрос, если вы доверяете приложению.\nПроверьте детали транзакции.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
-    <string name="dapp_entry_point_title">%d DApps</string>
-    <string name="dapp_favorites">Избранное</string>
     <string name="dapp_favourites">Избранное</string>
     <string name="dapp_favourites_add">Добавить в избранное</string>
     <string name="dapp_favourites_remove_description">”%s” DApp будет удален из Избранного</string>

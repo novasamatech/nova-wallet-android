@@ -241,7 +241,6 @@
     <string name="backup_settings_toolbar_title">백업</string>
     <string name="backup_title">백업</string>
     <string name="biometric_auth_title">생체 인증</string>
-    <string name="browser_tabs_close_all">모두 닫기</string>
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
     <string name="buy_network_flow_title">%s 구매를 위한 네트워크 선택</string>
     <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
@@ -258,8 +257,6 @@
     <string name="choose_amount_fee">전송 수수료</string>
     <string name="choose_amount_network_error">네트워크가 응답하지 않습니다</string>
     <string name="choose_amount_to">받는 사람</string>
-    <string name="close_dapp_tabs_message">DApp 브라우저의 모든 열린 탭이 닫힙니다.</string>
-    <string name="close_dapp_tabs_title">모든 DApp 닫기?</string>
     <string name="cloud_backup_delete_action_subtitle">%s 및 언제든지 복원할 수 있도록 항상 오프라인으로 보관하십시오. 백업 설정에서 이 작업을 수행할 수 있습니다.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">진행하기 전에 모든 지갑의 암호 구문을 적어 두십시오</string>
     <string name="cloud_backup_delete_action_title">Google 드라이브에서 백업이 삭제됩니다</string>
@@ -478,7 +475,6 @@
         <item quantity="other">%d초</item>
     </plurals>
     <string name="common_secret_derivation_path">비밀 경로 도출</string>
-    <string name="common_see_all">모두 보기</string>
     <string name="common_settings">설정</string>
     <string name="common_share">공유</string>
     <string name="common_sign_in">로그인</string>
@@ -640,8 +636,6 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">애플리케이션을 신뢰하는 경우 이 요청을 승인하십시오.\n거래 세부 정보를 확인하십시오.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
-    <string name="dapp_entry_point_title">%d DApps</string>
-    <string name="dapp_favorites">즐겨찾기</string>
     <string name="dapp_favourites">즐겨찾기</string>
     <string name="dapp_favourites_add">즐겨찾기에 추가</string>
     <string name="dapp_favourites_remove_description">“%s” DApp이(가) 즐겨찾기에서 제거됩니다.</string>
