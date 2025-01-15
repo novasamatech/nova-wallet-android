@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class BrowserTabsDao {
 
+    @Query("SELECT id FROM browser_tabs WHERE metaId = :metaId")
+    abstract fun getTabIdsFor(metaId: Long): List<String>
+
     @Query("SELECT * FROM browser_tabs WHERE metaId = :metaId ORDER BY creationTime DESC")
     abstract fun observeTabsByMetaId(metaId: Long): Flow<List<BrowserTabLocal>>
 
@@ -19,8 +22,8 @@ abstract class BrowserTabsDao {
     @Query("DELETE FROM browser_tabs WHERE id = :tabId")
     abstract suspend fun removeTab(tabId: String)
 
-    @Query("DELETE FROM browser_tabs")
-    abstract suspend fun removeAllTabs()
+    @Query("DELETE FROM browser_tabs WHERE id IN (:tabIds)")
+    abstract suspend fun removeTabsByIds(tabIds: List<String>)
 
     @Query("UPDATE browser_tabs SET pageName = :pageName, pageIconPath = :pageIconPath, pagePicturePath = :pagePicturePath WHERE id = :tabId")
     abstract suspend fun updatePageSnapshot(tabId: String, pageName: String?, pageIconPath: String?, pagePicturePath: String?)
