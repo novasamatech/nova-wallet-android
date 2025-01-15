@@ -10,6 +10,7 @@ class StakingUpdaters(
     private val commonUpdaters: Group,
     private val turingExtraUpdaters: Group,
     private val nominationPoolsUpdaters: Group,
+    private val mythosUpdaters: Group,
 ) {
 
     class Group(val updaters: List<Updater<*>>) {
@@ -31,7 +32,7 @@ class StakingUpdaters(
             PARACHAIN -> parachainUpdaters.updaters
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
-            MYTHOS -> TODO()
+            MYTHOS -> mythosUpdaters.updaters
         }
     }
 }
