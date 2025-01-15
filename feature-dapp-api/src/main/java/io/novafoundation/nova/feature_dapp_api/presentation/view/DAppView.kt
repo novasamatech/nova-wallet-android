@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.view_dapp.view.itemDAppSubtitle
 import kotlinx.android.synthetic.main.view_dapp.view.itemDAppSubtitleIcon
 import kotlinx.android.synthetic.main.view_dapp.view.itemDAppTitle
 import kotlinx.android.synthetic.main.view_dapp.view.itemDappAction
+import kotlinx.android.synthetic.main.view_dapp.view.itemDappFavorite
 
 class DAppView @JvmOverloads constructor(
     context: Context,
@@ -66,8 +67,8 @@ class DAppView @JvmOverloads constructor(
         itemDAppIcon.showDAppIcon(iconUrl, imageLoader)
     }
 
-    fun activateActionIcon(activate: Boolean) {
-        itemDappAction.isActivated = activate
+    fun setFavoriteIconVisible(visible: Boolean) {
+        itemDappFavorite.setVisible(visible)
     }
 
     fun enableSubtitleIcon(): ImageView {

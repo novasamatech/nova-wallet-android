@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:background="@color/secondary_screen_background">
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/dappBrowserAddressBarGroup"
@@ -13,26 +13,51 @@
         android:layout_height="wrap_content"
         android:background="@color/blur_navigation_background"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/dappBrowserClose"
+            android:id="@+id/dappBrowserHide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/ic_close"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_chevron_down"
             app:tint="@color/actions_color" />
 
         <io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.view.AddressBarView
             android:id="@+id/dappBrowserAddressBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="6dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="6dp"
             android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/dappBrowserRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_refresh"
+            app:tint="@color/actions_color" />
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/dappBrowserWebViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/dappBrowserBottomNavigation"
+        app:layout_constraintTop_toBottomOf="@+id/dappBrowserAddressBarGroup" />
+
+    <io.novafoundation.nova.common.view.TopCropImageView
+        android:id="@+id/dappBrowserTransitionImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/dappBrowserBottomNavigation"
+        app:layout_constraintTop_toBottomOf="@+id/dappBrowserAddressBarGroup" />
 
     <ProgressBar
         android:id="@+id/dappBrowserProgress"
@@ -40,61 +65,87 @@
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:max="100"
+        app:layout_constraintTop_toBottomOf="@+id/dappBrowserAddressBarGroup"
         tools:progress="45" />
-
-    <WebView
-        android:id="@+id/dappBrowserWebView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 
     <LinearLayout
         android:id="@+id/dappBrowserBottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/blur_navigation_background"
+        android:layout_height="46dp"
+        android:background="@color/dapp_blur_navigation_background"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
             android:id="@+id/dappBrowserBack"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_chevron_left"
             app:tint="@color/actions_color" />
 
         <ImageView
             android:id="@+id/dappBrowserForward"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_chevron_right"
             app:tint="@color/actions_color" />
 
-        <ImageView
-            android:id="@+id/dappBrowserRefresh"
+        <FrameLayout
+            android:id="@+id/dappBrowserTabs"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="46dp"
             android:layout_weight="1"
             android:paddingTop="11dp"
-            android:paddingBottom="11dp"
-            android:src="@drawable/ic_refresh"
-            app:tint="@color/actions_color" />
+            android:paddingBottom="11dp">
+
+            <ImageView
+                android:id="@+id/dappBrowserTabsIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_siri_paw"
+                android:visibility="gone"
+                app:tint="@color/actions_color" />
+
+            <TextView
+                android:id="@+id/dappBrowserTabsContent"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caption1"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_browser_tabs_outline"
+                android:backgroundTint="@color/actions_color"
+                android:backgroundTintMode="multiply"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_primary"
+                app:tint="@color/actions_color"
+                tools:text="99" />
+
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/dappBrowserFavorite"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_favorite_heart_outline" />
 
         <ImageView
             android:id="@+id/dappBrowserMore"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingTop="11dp"
-            android:paddingBottom="11dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_more_horizontal"
             app:tint="@color/actions_color" />
 
     </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
