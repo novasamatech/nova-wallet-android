@@ -21,28 +21,20 @@ class StakeSummaryModel(
     val status: StakeStatusModel,
 )
 
-sealed class StakeStatusModel(val details: TitleAndMessage?) {
+sealed class StakeStatusModel {
 
-    class Active(details: TitleAndMessage? = null) : StakeStatusModel(details)
+    object Active : StakeStatusModel()
 
     class Waiting(
         val timeLeft: Long,
         @StringRes val messageFormat: Int,
-        details: TitleAndMessage? = null
-    ) : StakeStatusModel(details)
+    ) : StakeStatusModel()
 
-    class Inactive(details: TitleAndMessage? = null) : StakeStatusModel(details)
+    object Inactive : StakeStatusModel()
 }
 
-sealed class StakeSummaryEvent {
-
-    class ShowStatusDialog(val titleAndMessage: TitleAndMessage) : StakeSummaryEvent()
-}
-
-sealed class StakeSummaryAction {
-
-    object StatusClicked : StakeSummaryAction()
-}
+typealias StakeSummaryEvent = Unit
+typealias StakeSummaryAction = Unit
 
 class StakeSummaryComponentFactory(
     private val relaychainComponentFactory: RelaychainStakeSummaryComponentFactory,

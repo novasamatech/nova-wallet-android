@@ -27,25 +27,6 @@ fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent,
             is LoadingState.Loading -> view.showLoading()
         }
     }
-
-    // actions
-    view.setStatusClickListener {
-        component.onAction(StakeSummaryAction.StatusClicked)
-    }
-
-    // events
-    component.events.observeEvent {
-        when (it) {
-            is StakeSummaryEvent.ShowStatusDialog -> showStatusAlert(it.titleAndMessage)
-        }
-    }
-}
-
-private fun BaseFragment<*>.showStatusAlert(titleAndMessage: TitleAndMessage) {
-    infoDialog(requireContext()) {
-        setTitle(titleAndMessage.first)
-        setMessage(titleAndMessage.second)
-    }
 }
 
 private fun mapStatus(status: StakeStatusModel): StakeSummaryView.Status {

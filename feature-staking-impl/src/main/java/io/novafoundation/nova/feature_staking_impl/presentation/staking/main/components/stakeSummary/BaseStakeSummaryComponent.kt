@@ -17,15 +17,5 @@ abstract class BaseStakeSummaryComponent(
 
     override val events = MutableLiveData<Event<StakeSummaryEvent>>()
 
-    override fun onAction(action: StakeSummaryAction) {
-        launch {
-            when (action) {
-                StakeSummaryAction.StatusClicked -> {
-                    val details = state.firstNotNull().dataOrNull?.status?.details ?: return@launch
-
-                    events.value = StakeSummaryEvent.ShowStatusDialog(details).event()
-                }
-            }
-        }
-    }
+    override fun onAction(action: StakeSummaryAction) {}
 }

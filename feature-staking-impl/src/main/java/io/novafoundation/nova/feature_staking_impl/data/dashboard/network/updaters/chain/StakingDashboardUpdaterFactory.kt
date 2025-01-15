@@ -105,7 +105,9 @@ class StakingDashboardUpdaterFactory(
             stakingType = stakingType,
             metaAccount = metaAccount,
             stakingDashboardCache = stakingDashboardCache,
-            balanceLocksRepository = balanceLocksRepository
+            balanceLocksRepository = balanceLocksRepository,
+            storageCache = storageCache,
+            remoteStorageSource = remoteStorageSource
         )
     }
 }

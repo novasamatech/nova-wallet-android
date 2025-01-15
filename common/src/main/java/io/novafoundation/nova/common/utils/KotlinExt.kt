@@ -32,6 +32,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -45,6 +46,9 @@ fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathC
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
 fun Double.ceil(): Double = kotlin.math.ceil(this)
+
+fun BigInteger.toDuration() = toLong().milliseconds
+
 
 @Suppress("UNCHECKED_CAST")
 inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
