@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
