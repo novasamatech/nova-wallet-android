@@ -142,6 +142,18 @@ fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     return true
 }
 
+fun ByteArray.endsWith(suffix: ByteArray): Boolean {
+    if (suffix.size > size) return false
+
+    val offset = size - suffix.size
+
+    suffix.forEachIndexed { index, byte ->
+        if (get(offset + index) != byte) return false
+    }
+
+    return true
+}
+
 fun ByteArray.windowed(windowSize: Int): List<ByteArray> {
     require(windowSize > 0) {
         "Window size should be positive"

@@ -1,11 +1,7 @@
 package io.novafoundation.nova.common.navigation
 
-import android.os.Parcelable
-
 @Retention(AnnotationRetention.SOURCE)
 annotation class PinRequired
-
-interface DelayedNavigation : Parcelable
 
 interface SecureRouter {
 

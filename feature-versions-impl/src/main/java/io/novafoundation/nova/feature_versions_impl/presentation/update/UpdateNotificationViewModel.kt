@@ -50,11 +50,11 @@ class UpdateNotificationViewModel(
 
     fun skipClicked() = launch {
         interactor.skipNewUpdates()
-        router.back()
+        router.closeUpdateNotifications()
     }
 
     fun installUpdateClicked() {
-        router.back()
+        router.closeUpdateNotifications()
         router.openAppUpdater()
     }
 
