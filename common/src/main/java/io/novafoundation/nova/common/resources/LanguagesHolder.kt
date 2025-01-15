@@ -30,7 +30,22 @@ class LanguagesHolder {
 
     fun getLanguages(): List<Language> {
         val defaultLanguage = listOf(getDefaultLanguage())
-        val otherLanguages = listOf(CHINESE, FRENCH, HUNGARIAN, INDONESIAN, ITALIAN, JAPANESE, KOREAN, POLISH, PORTUGUESE, RUSSIAN, SPANISH, TURKISH, VIETNAMESE)
+        val otherLanguages = listOf(
+            CHINESE,
+            FRENCH,
+            HUNGARIAN,
+            INDONESIAN,
+            ITALIAN,
+            JAPANESE,
+            KOREAN,
+            POLISH,
+            PORTUGUESE,
+            RUSSIAN,
+            SPANISH,
+            TURKISH,
+            VIETNAMESE
+        )
+
         return defaultLanguage + otherLanguages.sortedBy { it.name }
     }
 }
