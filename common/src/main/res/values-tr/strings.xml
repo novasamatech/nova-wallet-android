@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Yedekleme</string>
     <string name="backup_title">Yedekleme</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
+    <string name="browser_tabs_close_all">Hepsini Kapat</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Transfer ücreti</string>
     <string name="choose_amount_network_error">Ağ yanıt vermiyor</string>
     <string name="choose_amount_to">Kime</string>
+    <string name="close_dapp_tabs_message">DApp tarayıcısındaki tüm açık sekmeler kapatılacak.</string>
+    <string name="close_dapp_tabs_title">Tüm DApp\'leri Kapat?</string>
     <string name="cloud_backup_delete_action_subtitle">%s ve her zaman çevrimdışı tutup istediğiniz zaman geri yükleyebilmek için hatırlayın. Bunu Yedekleme Ayarlarında yapabilirsiniz.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Lütfen devam etmeden önce tüm cüzdan şifre kelimelerinizi not edin.</string>
     <string name="cloud_backup_delete_action_title">Yedek Google Drive\'dan silinecek</string>
@@ -480,6 +483,7 @@
         <item quantity="other">%d saniye</item>
     </plurals>
     <string name="common_secret_derivation_path">Gizli türetme yolu</string>
+    <string name="common_see_all">Hepsini Gör</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
     <string name="common_sign_in">Giriş Yap</string>
@@ -642,6 +646,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Uygulamaya güveniyorsanız bu isteği onaylayın.\\nİşlem detaylarını kontrol edin.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApp\'ler</string>
+    <string name="dapp_entry_point_title">%d DApp</string>
+    <string name="dapp_favorites">Favoriler</string>
     <string name="dapp_favourites">Favoriler</string>
     <string name="dapp_favourites_add">Favorilere Ekle</string>
     <string name="dapp_favourites_remove_description">‘%s’ DApp Favorilerden kaldırılacak</string>
