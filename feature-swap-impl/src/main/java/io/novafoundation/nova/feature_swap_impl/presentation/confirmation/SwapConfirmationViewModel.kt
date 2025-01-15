@@ -50,6 +50,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -234,7 +235,7 @@ class SwapConfirmationViewModel(
     }
 
     private fun createMaxActionProvider(): MaxActionProvider {
-        return maxActionProviderFactory.create(
+        return maxActionProviderFactory.create2(
             viewModelScope = viewModelScope,
             assetInFlow = assetInFlow,
             feeLoaderMixin = feeMixin,

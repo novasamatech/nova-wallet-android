@@ -92,6 +92,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.ext.fullId
@@ -444,7 +445,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun createMaxActionProvider(): MaxActionProvider {
-        return maxActionProviderFactory.create(
+        return maxActionProviderFactory.create2(
             viewModelScope = viewModelScope,
             assetInFlow = assetInFlow.filterNotNull(),
             feeLoaderMixin = feeMixin,

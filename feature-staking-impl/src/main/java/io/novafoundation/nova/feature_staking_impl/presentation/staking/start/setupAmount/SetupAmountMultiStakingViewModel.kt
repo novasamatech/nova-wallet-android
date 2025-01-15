@@ -7,11 +7,13 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.isNominationPoolSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationPayload
@@ -27,11 +29,17 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -57,7 +65,8 @@ class SetupAmountMultiStakingViewModel(
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val payload: SetupAmountMultiStakingPayload,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -77,21 +86,29 @@ class SetupAmountMultiStakingViewModel(
         assetId = payload.availableStakingOptions.assetId
     ).shareInBackground()
 
-    val availableBalance = combine(
-        currentAssetFlow,
-        multiStakingSelectionTypeFlow
-    ) { currentAsset, multiStakingSelectionType ->
-        multiStakingSelectionType.availableBalance(currentAsset)
-    }.shareInBackground()
+    val chainAssetFlow = currentAssetFlow.map { it.token.configuration }
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(
+        this,
+        chainAssetFlow
+    )
+
+    private val deductEDForMaxButton = currentSelectionFlow.map { it?.isNominationPoolSelection.orFalse() }
+
+    private val maxActionProvider = maxActionProviderFactory.create2(
+        viewModelScope = viewModelScope,
+        assetInFlow = currentAssetFlow,
+        feeLoaderMixin = feeLoaderMixin,
+        maxBalanceType = MaxBalanceType.FREE,
+        deductEd = deductEDForMaxButton
+    )
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = viewModelScope,
         assetFlow = currentAssetFlow,
-        availableBalanceFlow = availableBalance,
-        balanceLabel = R.string.wallet_balance_available
+        balanceLabel = R.string.wallet_balance_available,
+        maxActionProvider = maxActionProvider
     )
-
-    private val feeLoaderMixin = feeLoaderMixinFactory.create(currentAssetFlow)
 
     private val loadingInProgressFlow = MutableStateFlow(false)
 
@@ -191,11 +208,10 @@ class SetupAmountMultiStakingViewModel(
 
     private fun runFeeUpdates() {
         feeLoaderMixin.connectWith(
-            inputSource = currentSelectionFlow
+            inputSource1 = currentSelectionFlow
                 .filterNotNull()
                 .debounce(DEBOUNCE_RATE_MILLIS.milliseconds),
-            scope = viewModelScope,
-            feeConstructor = { selection -> interactor.calculateFee(selection.selection) },
+            feeConstructor = { _, selection -> interactor.calculateFee(selection.selection) },
         )
     }
 

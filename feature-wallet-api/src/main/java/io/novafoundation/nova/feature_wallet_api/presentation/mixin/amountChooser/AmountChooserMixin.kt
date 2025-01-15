@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
-import java.math.BigInteger
 
 typealias MaxClick = () -> Unit
 
@@ -84,7 +83,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
-            availableBalanceFlow: Flow<BigInteger>,
             @StringRes balanceLabel: Int?,
             maxActionProvider: MaxActionProvider?,
         ): Presentation

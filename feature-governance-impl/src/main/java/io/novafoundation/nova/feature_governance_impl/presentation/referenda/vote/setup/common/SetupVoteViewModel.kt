@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ProgressConsumer
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
@@ -29,11 +30,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create2
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +50,6 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 abstract class SetupVoteViewModel(
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val assetUseCase: AssetUseCase,
     private val amountChooserMixinFactory: AmountChooserMixin.Factory,
     private val interactor: VoteReferendumInteractor,
@@ -58,26 +61,44 @@ abstract class SetupVoteViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val convictionValuesProvider: ConvictionValuesProvider,
     private val locksFormatter: LocksFormatter,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
-    WithFeeLoaderMixin,
+    WithFeeLoaderMixinV2,
     Validatable by validationExecutor {
 
     abstract val title: Flow<String>
 
-    protected val selectedAsset = assetUseCase.currentAssetFlow()
+    private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
+        .shareInBackground()
+
+    private val chainFlow = assetWithOption.map { it.option.assetWithChain.chain }
+
+    protected val selectedAsset = assetWithOption.map { it.asset }
+        .shareInBackground()
+
+    private val selectedChainAsset = selectedAsset.map { it.token.configuration }
         .shareInBackground()
 
     private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
 
-    override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
+    override val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
 
     protected val validatingVoteType = MutableStateFlow<VoteType?>(null)
+
+    private val maxActionProvider = maxActionProviderFactory.create2(
+        viewModelScope = viewModelScope,
+        assetInFlow = selectedAsset,
+        feeLoaderMixin = originFeeMixin,
+        maxBalanceType = MaxBalanceType.FREE
+    )
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = selectedAsset,
         balanceField = Asset::free,
-        balanceLabel = R.string.wallet_balance_available
+        balanceLabel = R.string.wallet_balance_available,
+        maxActionProvider = maxActionProvider
     )
 
     val convictionValues = convictionValuesProvider.convictionValues()
@@ -126,9 +147,12 @@ abstract class SetupVoteViewModel(
         originFeeMixin.connectWith(
             inputSource1 = amountChooserMixin.amount,
             inputSource2 = selectedConvictionFlow,
-            scope = this,
-            feeConstructor = { amount, conviction ->
-                val accountVote = constructAccountVote(amount.toPlanks(), conviction)
+            inputSource3 = chainFlow,
+            feeConstructor = { feePaymentCurrency, amount, conviction, chain ->
+                val accountVote = constructAccountVote(
+                    feePaymentCurrency.toChainAsset(chain).planksFromAmount(amount),
+                    conviction
+                )
                 interactor.estimateFee(
                     referendumId = payload.referendumId,
                     vote = accountVote

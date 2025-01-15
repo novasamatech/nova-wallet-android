@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.asset
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolSelection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -56,3 +57,6 @@ val SelectionTypeSource.isRecommended: Boolean
     }
 
 fun StartMultiStakingSelection.stakeAmount(): BigDecimal = stakingOption.asset.amountFromPlanks(stake)
+
+val RecommendableMultiStakingSelection.isNominationPoolSelection: Boolean
+    get() = selection is NominationPoolSelection

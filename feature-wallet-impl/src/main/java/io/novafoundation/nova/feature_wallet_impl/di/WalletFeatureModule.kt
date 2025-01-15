@@ -434,7 +434,7 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMaxActionProviderFactory(): MaxActionProviderFactory {
-        return MaxActionProviderFactory()
+    fun provideMaxActionProviderFactory(assetSourceRegistry: AssetSourceRegistry): MaxActionProviderFactory {
+        return MaxActionProviderFactory(assetSourceRegistry)
     }
 }

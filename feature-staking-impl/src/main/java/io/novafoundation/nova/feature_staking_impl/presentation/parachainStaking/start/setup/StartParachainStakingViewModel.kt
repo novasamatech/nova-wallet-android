@@ -1,13 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Retriable
+import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -15,6 +18,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.stakeablePlanks
@@ -46,11 +50,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.startParachainStakingValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -76,19 +85,19 @@ class StartParachainStakingViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: StartParachainStakingValidationSystem,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
     private val payload: StartParachainStakingPayload,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val selectedAssetState: StakingSharedState,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
-    Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin {
+    Validatable by validationExecutor {
 
     private val collatorRecommendator by lazyAsync {
         collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), scope = viewModelScope)
@@ -96,23 +105,55 @@ class StartParachainStakingViewModel(
 
     private val validationInProgress = MutableStateFlow(false)
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
-        .share()
+    private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
+        .shareInBackground()
 
+    private val chainFlow = assetWithOption.map { it.option.assetWithChain.chain }
+        .shareInBackground()
+
+    private val selectedAsset = assetWithOption.map { it.asset }
+        .shareInBackground()
+
+    private val selectedChainAsset = selectedAsset.map { it.token.configuration }
+        .shareInBackground()
+
+    private val selectedCollatorFlow = MutableStateFlow<Collator?>(null)
+    private val selectedCollatorIdFlow = selectedCollatorFlow.map { it?.accountIdHex?.fromHex() }
     private val currentDelegatorStateFlow = delegatorStateUseCase.currentDelegatorStateFlow()
         .shareInBackground()
 
     val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
 
-    private val stakeableAmount = combine(assetFlow, currentDelegatorStateFlow) { asset, currentDelegator ->
+    private val stakeableAmount = combine(selectedAsset, currentDelegatorStateFlow) { asset, currentDelegator ->
         currentDelegator.stakeablePlanks(asset.freeInPlanks)
+    }
+
+    private val stakedAmount = combine(
+        currentDelegatorStateFlow,
+        selectedCollatorIdFlow
+    ) { delegatorState, collatorId ->
+        collatorId?.let { delegatorState.delegationAmountTo(collatorId) }.orZero()
+    }
+
+    val originFeeMixin = feeLoaderMixinFactory.createDefault(
+        this,
+        selectedChainAsset,
+        FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
+    )
+
+    override val retryEvent: MutableLiveData<Event<RetryPayload>> = originFeeMixin.retryEvent
+
+    private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
+        selectedChainAsset.providingBalance(stakeableAmount)
+            .deductAmount(stakedAmount)
+            .deductFee(originFeeMixin)
     }
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
-        assetFlow = assetFlow,
-        availableBalanceFlow = stakeableAmount,
-        balanceLabel = R.string.wallet_balance_available
+        assetFlow = selectedAsset,
+        balanceLabel = R.string.wallet_balance_available,
+        maxActionProvider = maxActionProvider
     )
 
     private val isStakeMore = currentDelegatorStateFlow.map { it is DelegatorState.Delegator }
@@ -121,13 +162,10 @@ class StartParachainStakingViewModel(
         .mapLatest(collatorsUseCase::getSelectedCollators)
         .shareInBackground()
 
-    private val selectedCollatorFlow = MutableStateFlow<Collator?>(null)
-    private val selectedCollatorIdFlow = selectedCollatorFlow.map { it?.accountIdHex?.fromHex() }
-
     val selectedCollatorModel = combine(
         selectedCollatorFlow,
         currentDelegatorStateFlow,
-        assetFlow
+        selectedAsset
     ) { selectedCollator, currentDelegatorState, asset ->
         selectedCollator?.let { mapCollatorToSelectCollatorModel(it, currentDelegatorState, asset, addressIconGenerator, resourceManager) }
     }.shareInBackground()
@@ -136,7 +174,7 @@ class StartParachainStakingViewModel(
         currentDelegatorStateFlow,
         selectedCollatorFlow,
         amountChooserMixin.amount,
-        assetFlow
+        selectedAsset
     ) { delegatorState, selectedCollator, enteredAmount, asset ->
         val currentDelegationInPlanks = selectedCollator?.let {
             val collatorId = it.accountIdHex.fromHex()
@@ -152,17 +190,17 @@ class StartParachainStakingViewModel(
 
     val minimumStake = selectedCollatorFlow.map {
         val minimumStake = it?.minimumStakeToGetRewards ?: collatorsUseCase.defaultMinimumStake()
-        val asset = assetFlow.first()
+        val asset = selectedAsset.first()
 
         mapAmountToAmountModel(minimumStake, asset)
     }.shareInBackground()
 
     val rewardsComponent = rewardsComponentFactory.create(
         parentScope = this,
-        assetFlow = assetFlow
+        assetFlow = selectedAsset
     )
 
-    val title = combine(assetFlow, isStakeMore) { asset, isStakeMore ->
+    val title = combine(selectedAsset, isStakeMore) { asset, isStakeMore ->
         if (isStakeMore) {
             resourceManager.getString(R.string.staking_bond_more_v1_9_0)
         } else {
@@ -188,12 +226,13 @@ class StartParachainStakingViewModel(
         rewardsComponent connectWith resultingStakedAmountFlow
         rewardsComponent connectWith selectedCollatorIdFlow
 
-        feeLoaderMixin.connectWith(
+        originFeeMixin.connectWith(
             inputSource1 = amountChooserMixin.backPressuredAmount,
             inputSource2 = selectedCollatorIdFlow,
-            scope = this,
-            feeConstructor = { amount, collatorId -> interactor.estimateFee(amount.toPlanks(), collatorId) },
-            onRetryCancelled = ::backClicked
+            inputSource3 = chainFlow,
+            feeConstructor = { feePaymentCurrency, amount, collatorId, chain ->
+                interactor.estimateFee(feePaymentCurrency.toFeePaymentAsset(chain).planksFromAmount(amount), collatorId)
+            }
         )
 
         listenCollatorChanges()
@@ -242,7 +281,7 @@ class StartParachainStakingViewModel(
         alreadyStakedCollators: List<SelectedCollator>,
         delegatorState: DelegatorState
     ): ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel> {
-        val asset = assetFlow.first()
+        val asset = selectedAsset.first()
         val selectedCollator = selectedCollatorFlow.first()
 
         return withContext(Dispatchers.Default) {
@@ -287,8 +326,8 @@ class StartParachainStakingViewModel(
 
         val payload = StartParachainStakingValidationPayload(
             amount = amount,
-            fee = feeLoaderMixin.awaitFee(),
-            asset = assetFlow.first(),
+            fee = originFeeMixin.awaitFee(),
+            asset = selectedAsset.first(),
             collator = collator,
             delegatorState = currentDelegatorStateFlow.first(),
         )

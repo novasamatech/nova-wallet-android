@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.zipWithLastNonNull
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -13,11 +14,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
-
-interface MaxAvailableDeduction {
-
-    fun maxAmountDeductionFor(amountAsset: Chain.Asset): Balance
-}
 
 class ComplexFeeAwareMaxActionProvider<F : MaxAvailableDeduction>(
     feeMixin: FeeLoaderMixinV2<F, *>,

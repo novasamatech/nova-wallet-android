@@ -36,7 +36,9 @@ class AutomaticMultiStakingSelectionType(
     }
 
     override suspend fun availableBalance(asset: Asset): Balance {
-        return candidates.maxOf { it.availableBalance(asset) }
+        return candidates.filter { it.minStake() <= it.availableBalance(asset) }
+            .maxOfOrNull { it.availableBalance(asset) }
+            ?: candidates.findWithMinimumStake().availableBalance(asset)
     }
 
     override suspend fun updateSelectionFor(stake: Balance) {

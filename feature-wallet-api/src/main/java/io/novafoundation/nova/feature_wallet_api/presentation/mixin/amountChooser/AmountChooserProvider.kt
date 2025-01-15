@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
@@ -12,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class AmountChooserProviderFactory(
     private val resourceManager: ResourceManager,
@@ -22,7 +20,6 @@ class AmountChooserProviderFactory(
     override fun create(
         scope: CoroutineScope,
         assetFlow: Flow<Asset>,
-        availableBalanceFlow: Flow<BigInteger>,
         balanceLabel: Int?,
         maxActionProvider: MaxActionProvider?
     ): AmountChooserProvider {
@@ -46,7 +43,6 @@ class AmountChooserProviderFactory(
         return create(
             scope = scope,
             assetFlow = assetFlow,
-            availableBalanceFlow = assetFlow.map { it.token.planksFromAmount(balanceField(it)) },
             balanceLabel = balanceLabel,
             maxActionProvider = maxActionProvider
         )

@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
@@ -25,7 +24,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingUnbondModule {
@@ -49,10 +49,10 @@ class ParachainStakingUnbondModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: ParachainStakingUnbondValidationSystem,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        maxActionProviderFactory: MaxActionProviderFactory,
         delegatorStateUseCase: DelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        collatorsUseCase: CollatorsUseCase,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory
     ): ViewModel {
@@ -64,10 +64,10 @@ class ParachainStakingUnbondModule {
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            maxActionProviderFactory = maxActionProviderFactory,
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            collatorsUseCase = collatorsUseCase,
             amountChooserMixinFactory = amountChooserMixinFactory,
             hintsMixinFactory = hintsMixinFactory
         )
