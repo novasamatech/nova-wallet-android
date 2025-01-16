@@ -11,14 +11,12 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 
-
 @JvmInline
 value class CollatorStakingRuntimeApi(override val module: Module) : QueryableModule
 
 context(StorageQueryContext)
 val RuntimeMetadata.collatorStaking: CollatorStakingRuntimeApi
     get() = CollatorStakingRuntimeApi(collatorStaking())
-
 
 context(StorageQueryContext)
 val CollatorStakingRuntimeApi.userStake: QueryableStorageEntry1<AccountId, UserStakeInfo>

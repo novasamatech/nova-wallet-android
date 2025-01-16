@@ -21,14 +21,14 @@ interface MythosUserStakeUseCase {
 class RealMythosUserStakeUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val userStakeRepository: UserStakeRepository
-): MythosUserStakeUseCase {
+) : MythosUserStakeUseCase {
 
     context(ComputationalScope)
     override fun currentUserStakeInfo(chain: Chain): Flow<UserStakeInfo> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { selectedMetaAccount ->
             val accountId = selectedMetaAccount.accountIdIn(chain) ?: return@flatMapLatest emptyFlow()
 
-            userStakeRepository.userStakeOrDefaultFlow(chain.id , accountId)
+            userStakeRepository.userStakeOrDefaultFlow(chain.id, accountId)
         }
     }
 }

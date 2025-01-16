@@ -17,7 +17,7 @@ class MythosSharedComputation @Inject constructor(
     private val userStakeRepository: MythosUserStakeUseCase,
     private val sessionRepository: SessionRepository,
     computationalCache: ComputationalCache
-) : SharedComputation(computationalCache){
+) : SharedComputation(computationalCache) {
 
     context(ComputationalScope)
     fun userStakeFlow(chain: Chain): Flow<UserStakeInfo> {

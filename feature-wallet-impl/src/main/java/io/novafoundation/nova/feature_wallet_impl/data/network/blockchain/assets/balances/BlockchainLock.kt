@@ -16,8 +16,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-
-
 class BlockchainLock(
     val id: BalanceLockId,
     val amount: Balance
@@ -73,7 +71,6 @@ private fun bindLockIdString(dynamicInstance: Any?): BalanceLockId {
     val asString = bindString(dynamicInstance)
     return BalanceLockId.fromFullId(asString)
 }
-
 
 fun mapBlockchainLockToLocal(
     metaId: Long,

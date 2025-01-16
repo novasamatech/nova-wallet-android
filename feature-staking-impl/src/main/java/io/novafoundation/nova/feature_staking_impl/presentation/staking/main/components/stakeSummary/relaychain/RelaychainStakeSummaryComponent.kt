@@ -75,7 +75,7 @@ private class RelaychainStakeSummaryComponent(
             is NominatorStatus.Inactive -> StakeStatusModel.Inactive
 
             is NominatorStatus.Waiting -> StakeStatusModel.Waiting(
-                     timeLeft = status.timeLeft,
+                timeLeft = status.timeLeft,
                 messageFormat = R.string.staking_nominator_status_waiting_format,
             )
         }

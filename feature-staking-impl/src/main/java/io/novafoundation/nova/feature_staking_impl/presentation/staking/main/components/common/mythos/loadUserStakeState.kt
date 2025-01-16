@@ -2,17 +2,12 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
-import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.UserStakeRepository
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.PoolMember
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
-import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.loadHasStakingComponentState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOf
 
 fun <T> MythosSharedComputation.loadUserStakeState(
     hostContext: ComponentHostContext,

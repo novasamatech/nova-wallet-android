@@ -2,13 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.data.memory.ComputationalScope
-import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
-import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.utils.firstNotNull
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 abstract class BaseStakeSummaryComponent(
     scope: ComputationalScope

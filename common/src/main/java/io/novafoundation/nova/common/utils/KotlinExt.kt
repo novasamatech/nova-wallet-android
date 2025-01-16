@@ -49,7 +49,6 @@ fun Double.ceil(): Double = kotlin.math.ceil(this)
 
 fun BigInteger.toDuration() = toLong().milliseconds
 
-
 @Suppress("UNCHECKED_CAST")
 inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     return fold(

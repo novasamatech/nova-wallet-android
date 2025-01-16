@@ -19,7 +19,8 @@ import kotlin.coroutines.CoroutineContext
 
 typealias TitleAndMessage = Pair<String, String?>
 
-open class BaseViewModel : ViewModel(),
+open class BaseViewModel :
+    ViewModel(),
     CoroutineScope,
     ComputationalScope,
     WithCoroutineScopeExtensions {

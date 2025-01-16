@@ -18,14 +18,14 @@ class RealMythosSessionDurationCalculator(
     private val blockTime: BigInteger,
     private val currentSlot: BigInteger,
     private val slotsInSession: BigInteger
-): MythosSessionDurationCalculator {
+) : MythosSessionDurationCalculator {
 
     override fun sessionDuration(): Duration {
         return (slotsInSession * blockTime).toDuration()
     }
 
     override fun remainingSessionDuration(): Duration {
-       return (slotsInSession - sessionProgress()).toDuration()
+        return (slotsInSession - sessionProgress()).toDuration()
     }
 
     private fun sessionProgress(): BigInteger {

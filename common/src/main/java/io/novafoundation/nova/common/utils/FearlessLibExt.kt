@@ -306,7 +306,6 @@ fun RuntimeMetadata.utility() = module(Modules.UTILITY)
 
 fun RuntimeMetadata.collatorStaking() = module(Modules.COLLATOR_STAKING)
 
-
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }

@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary
 
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.dialog.infoDialog
 
 fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent, view: StakeSummaryView) {
     // state

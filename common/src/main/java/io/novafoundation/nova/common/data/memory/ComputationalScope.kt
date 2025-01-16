@@ -10,4 +10,4 @@ interface ComputationalScope : CoroutineScope
 fun ComputationalScope(scope: CoroutineScope): ComputationalScope = InlineComputationalScope(scope)
 
 @JvmInline
-private value class InlineComputationalScope(val scope: CoroutineScope): ComputationalScope, CoroutineScope by scope
+private value class InlineComputationalScope(val scope: CoroutineScope) : ComputationalScope, CoroutineScope by scope
