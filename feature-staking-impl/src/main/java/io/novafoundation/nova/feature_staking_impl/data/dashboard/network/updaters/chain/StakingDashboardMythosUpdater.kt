@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.cache.StorageCachingContext
 import io.novafoundation.nova.runtime.storage.cache.cacheValues
-import io.novafoundation.nova.runtime.storage.source.RemoteStorageSource
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId

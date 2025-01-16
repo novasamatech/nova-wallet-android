@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components
 
 import androidx.lifecycle.LiveData
+import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.switchMap
@@ -61,7 +62,7 @@ private class CompoundStakingComponent<S, E, A>(
     private val delegateFlow = singleAssetSharedState.selectedOption
         .withItemScope(parentScope = hostContext.scope)
         .map { (stakingOption, itemScope) ->
-            val childHostContext = hostContext.copy(scope = itemScope)
+            val childHostContext = hostContext.copy(scope = ComputationalScope(itemScope))
             createDelegate(stakingOption, childHostContext)
         }.shareInBackground()
 

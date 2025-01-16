@@ -27,12 +27,12 @@ class StakingUpdaters(
 
     private fun getUpdatersByType(stakingType: StakingType): List<Updater<*>> {
         return when (stakingType) {
-            UNSUPPORTED -> emptyList()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters.updaters
             PARACHAIN -> parachainUpdaters.updaters
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
             MYTHOS -> mythosUpdaters.updaters
+            UNSUPPORTED -> emptyList()
         }
     }
 }

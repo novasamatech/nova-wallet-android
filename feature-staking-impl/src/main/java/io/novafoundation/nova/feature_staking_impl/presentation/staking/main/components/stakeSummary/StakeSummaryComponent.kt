@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.mythos.MythosStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
@@ -40,6 +41,7 @@ class StakeSummaryComponentFactory(
     private val relaychainComponentFactory: RelaychainStakeSummaryComponentFactory,
     private val parachainStakeSummaryComponentFactory: ParachainStakeSummaryComponentFactory,
     private val nominationPoolsStakeSummaryComponentFactory: NominationPoolsStakeSummaryComponentFactory,
+    private val mythos: MythosStakeSummaryComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -49,8 +51,7 @@ class StakeSummaryComponentFactory(
         relaychainComponentCreator = relaychainComponentFactory::create,
         parachainComponentCreator = parachainStakeSummaryComponentFactory::create,
         nominationPoolsCreator = nominationPoolsStakeSummaryComponentFactory::create,
-        // TODO stake summary
-        mythosCreator = UnsupportedComponent.creator(),
+        mythosCreator = mythos::create,
         hostContext = hostContext
     )
 }
