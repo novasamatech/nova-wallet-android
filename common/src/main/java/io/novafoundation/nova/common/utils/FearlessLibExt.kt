@@ -50,6 +50,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import io.novasama.substrate_sdk_android.scale.Schema
@@ -191,9 +192,13 @@ fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(Default
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
 fun Module.numberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(constant(name), runtimeSnapshot)
+
 fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) = constantOrNull(name)?.let {
     bindNumberConstant(it, runtimeSnapshot)
 }
+
+context(RuntimeContext)
+fun Module.numberConstant(name: String) = numberConstant(name, runtime)
 
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
@@ -342,6 +347,21 @@ fun RuntimeMetadata.hasConstant(module: String, constant: String) = moduleOrNull
 fun Module.hasCall(name: String) = callOrNull(name) != null
 
 fun Module.hasStorage(storage: String) = storageOrNull(storage) != null
+
+context(RuntimeContext)
+fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
+    return if (keyArguments.isEmpty()) {
+        storageKey()
+    } else {
+        storageKey(runtime, *keyArguments)
+    }
+}
+
+context(RuntimeContext)
+@JvmName("createStorageKeyArray")
+fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
+    return createStorageKey(*keyArguments)
+}
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 

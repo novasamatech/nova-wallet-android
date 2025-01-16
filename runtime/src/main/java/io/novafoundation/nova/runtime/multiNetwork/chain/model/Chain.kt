@@ -59,7 +59,8 @@ data class Chain(
         val feeViaRuntimeCall: Boolean?,
         val supportLedgerGenericApp: Boolean?,
         val identityChain: ChainId?,
-        val disabledCheckMetadataHash: Boolean?
+        val disabledCheckMetadataHash: Boolean?,
+        val sessionLength: Int?
     )
 
     data class Types(

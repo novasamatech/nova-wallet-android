@@ -56,6 +56,8 @@ enum class FractionUnit {
     PERCENT
 }
 
+fun Fraction?.orZero(): Fraction = this ?: Fraction.ZERO
+
 private fun FractionUnit.convertToFraction(value: Double): Double {
     return when (this) {
         FractionUnit.FRACTION -> value

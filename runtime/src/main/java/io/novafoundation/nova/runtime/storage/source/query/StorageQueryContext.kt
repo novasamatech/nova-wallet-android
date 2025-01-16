@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.utils.ComponentHolder
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -17,13 +18,11 @@ typealias StorageKeyComponents = ComponentHolder
 typealias DynamicInstanceBinder<V> = (dynamicInstance: Any?) -> V
 typealias DynamicInstanceBinderWithKey<K, V> = (dynamicInstance: Any?, key: K) -> V
 
-interface StorageQueryContext {
+interface StorageQueryContext : RuntimeContext {
 
     val chainId: ChainId
 
-    val runtime: RuntimeSnapshot
-
-    fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String
+    override val runtime: RuntimeSnapshot
 
     suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents>
 
@@ -123,5 +122,6 @@ suspend fun StorageQueryContext.multi(
 
 fun Iterable<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
 
+@Deprecated("Use RuntimeContext.metadata")
 val StorageQueryContext.metadata: RuntimeMetadata
     get() = runtime.metadata

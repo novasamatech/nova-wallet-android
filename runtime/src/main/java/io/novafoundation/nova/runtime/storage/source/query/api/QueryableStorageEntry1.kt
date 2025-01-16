@@ -1,5 +1,7 @@
 package io.novafoundation.nova.runtime.storage.source.query.api
 
+import io.novafoundation.nova.common.utils.RuntimeContext
+import io.novafoundation.nova.common.utils.createStorageKey
 import io.novafoundation.nova.runtime.storage.source.query.StorageKeyComponents
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
@@ -36,7 +38,6 @@ interface QueryableStorageEntry1<I, T> {
     context(StorageQueryContext)
     fun observeWithRaw(argument: I): Flow<WithRawValue<T?>>
 
-    context(StorageQueryContext)
     fun storageKey(argument: I): String
 }
 
@@ -49,8 +50,9 @@ suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.queryNonNull(argument: I):
 internal class RealQueryableStorageEntry1<I, T>(
     private val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder1<I, T>,
+    runtimeContext: RuntimeContext,
     @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyBinder<I>? = null
-) : QueryableStorageEntry1<I, T> {
+) : QueryableStorageEntry1<I, T>, RuntimeContext by runtimeContext {
 
     context(StorageQueryContext)
     override suspend fun query(argument: I): T? {
@@ -67,7 +69,6 @@ internal class RealQueryableStorageEntry1<I, T>(
         return storageEntry.queryRaw(argument)
     }
 
-    context(StorageQueryContext)
     override fun storageKey(argument: I): String {
         return storageEntry.createStorageKey(argument)
     }
