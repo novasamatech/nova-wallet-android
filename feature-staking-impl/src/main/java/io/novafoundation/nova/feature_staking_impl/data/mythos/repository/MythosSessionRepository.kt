@@ -18,7 +18,7 @@ interface MythosSessionRepository {
 @FeatureScope
 class RealMythosSessionRepository @Inject constructor(
     private val auraSession: AuraSession,
-): MythosSessionRepository {
+) : MythosSessionRepository {
 
     override suspend fun sessionLength(chain: Chain): BlockNumber {
         return chain.additional?.sessionLength?.toBigInteger()

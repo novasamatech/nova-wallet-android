@@ -18,7 +18,6 @@ interface EraRewardCalculatorComparable {
 
 fun <T : EraRewardCalculatorComparable> Flow<T>.ignoreInsignificantTimeChanges(): Flow<T> {
     return distinctUntilChanged { old, new -> new.canBeIgnoredAfter(old) }
-
 }
 
 private fun EraRewardCalculatorComparable.canBeIgnoredAfter(previous: EraRewardCalculatorComparable): Boolean {

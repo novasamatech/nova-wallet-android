@@ -17,5 +17,3 @@ fun RuntimeContext(runtime: RuntimeSnapshot): RuntimeContext {
 
 @JvmInline
 private value class InlineRuntimeContext(override val runtime: RuntimeSnapshot) : RuntimeContext
-
-

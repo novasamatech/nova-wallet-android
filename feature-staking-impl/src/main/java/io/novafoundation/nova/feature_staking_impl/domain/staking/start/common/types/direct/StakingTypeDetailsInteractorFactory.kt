@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
-import kotlinx.coroutines.CoroutineScope
 
 interface StakingTypeDetailsInteractorFactory {
 

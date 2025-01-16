@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.t
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.StakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 

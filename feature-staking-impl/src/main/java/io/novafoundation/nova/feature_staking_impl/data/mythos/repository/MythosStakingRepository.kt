@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.mythos.repository
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.collatorStaking
 import io.novafoundation.nova.common.utils.metadata
@@ -30,7 +29,7 @@ class RealMythosStakingRepository @Inject constructor(
     @Named(LOCAL_STORAGE_SOURCE)
     private val localStorageDataSource: StorageDataSource,
     private val chainRegistry: ChainRegistry
-): MythosStakingRepository {
+) : MythosStakingRepository {
 
     override fun minStakeFlow(chainId: ChainId): Flow<Balance> {
         return localStorageDataSource.subscribe(chainId) {
@@ -39,8 +38,8 @@ class RealMythosStakingRepository @Inject constructor(
     }
 
     override suspend fun unstakeDurationInSessions(chainId: ChainId): Int {
-       return chainRegistry.withRuntime(chainId) {
-           metadata.collatorStaking().numberConstant("StakeUnlockDelay").toInt()
-       }
+        return chainRegistry.withRuntime(chainId) {
+            metadata.collatorStaking().numberConstant("StakeUnlockDelay").toInt()
+        }
     }
 }

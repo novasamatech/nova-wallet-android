@@ -64,7 +64,6 @@ import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.networkStateFlow
 import io.novasama.substrate_sdk_android.wsrpc.state.SocketStateMachine
 import kotlinx.coroutines.flow.first
-import org.bouncycastle.math.raw.Mod
 import org.web3j.crypto.Sign
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger

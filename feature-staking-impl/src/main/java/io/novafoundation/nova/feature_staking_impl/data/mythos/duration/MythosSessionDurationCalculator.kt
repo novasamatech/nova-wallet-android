@@ -78,4 +78,3 @@ private class RealMythosSessionDurationCalculator(
         return currentSlot % slotsInSession
     }
 }
-

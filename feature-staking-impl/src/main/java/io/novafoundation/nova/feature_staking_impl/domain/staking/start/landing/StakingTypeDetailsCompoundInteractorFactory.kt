@@ -13,7 +13,6 @@ import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
-import kotlinx.coroutines.CoroutineScope
 
 class StakingTypeDetailsCompoundInteractorFactory(
     private val walletRepository: WalletRepository,

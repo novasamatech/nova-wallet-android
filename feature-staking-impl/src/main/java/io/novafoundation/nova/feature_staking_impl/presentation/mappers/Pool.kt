@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.format
