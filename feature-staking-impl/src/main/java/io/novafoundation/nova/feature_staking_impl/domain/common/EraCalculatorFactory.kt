@@ -28,7 +28,7 @@ class EraTimeCalculator(
     private val genesisSlot: BigInteger,
     private val eraStartSessionIndex: BigInteger,
     val activeEra: EraIndex,
-) {
+) : EraRewardCalculatorComparable {
 
     fun calculate(destinationEra: EraIndex? = null): BigInteger {
         val eraRemained = remainingEraBlocks()
@@ -65,12 +65,7 @@ class EraTimeCalculator(
         return tillEraStart - sessionDuration
     }
 
-    /**
-     * Returns a number that can be used to compare different instances of [EraTimeCalculator]
-     * to determine how much their calculations would deffer between each other
-     * This wont correspond to real timestamp and shouldn't be used as such
-     */
-    fun derivedTimestamp(): Duration {
+    override fun derivedTimestamp(): Duration {
         val derivedProgressInBlocks = activeEra * eraLength * sessionLength + eraProgress()
 
         return (derivedProgressInBlocks * blockCreationTime).toDuration()
@@ -95,8 +90,6 @@ fun EraTimeCalculator.erasDuration(numberOfEras: BigInteger): Duration {
 fun EraTimeCalculator.calculateDurationTill(era: EraIndex): Duration {
     return calculate(era).toLong().milliseconds
 }
-
-private val ERA_DURATION_DIFFERENCE_THRESHOLD = 10.minutes
 
 class EraTimeCalculatorFactory(
     private val stakingRepository: StakingRepository,
@@ -136,19 +129,6 @@ class EraTimeCalculatorFactory(
                 eraStartSessionIndex = eraStartSessionIndex,
                 activeEra = activeEra
             )
-        }
-            .distinctUntilChanged { old, new -> new.canBeIgnoredAfter(old) }
-    }
-
-    private fun EraTimeCalculator.canBeIgnoredAfter(previous: EraTimeCalculator): Boolean {
-        val previousTimestamp = previous.derivedTimestamp()
-        val newTimestamp = derivedTimestamp()
-
-        val difference = (newTimestamp - previousTimestamp).absoluteValue
-        val canIgnore = difference < ERA_DURATION_DIFFERENCE_THRESHOLD
-
-        Log.d("EraTimeCalculatorFactory", "New update for RewardCalculator, difference with lastly used is $difference, can ignore: $canIgnore")
-
-        return canIgnore
+        }.ignoreInsignificantTimeChanges()
     }
 }

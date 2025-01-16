@@ -4,6 +4,10 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.data.memory.SharedComputation
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_staking_impl.data.chain
+import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculator
+import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
@@ -19,8 +23,16 @@ class MythosSharedComputation @Inject constructor(
     private val userStakeRepository: MythosUserStakeUseCase,
     private val mythosStakingRepository: MythosStakingRepository,
     private val sessionRepository: SessionRepository,
+    private val mythosSessionDurationCalculatorFactory: MythosSessionDurationCalculatorFactory,
     computationalCache: ComputationalCache
 ) : SharedComputation(computationalCache) {
+
+    context(ComputationalScope)
+    fun eraDurationCalculatorFlow(stakingOption: StakingOption): Flow<MythosSessionDurationCalculator> {
+        return cachedFlow("MythosSharedComputation.eraDurationCalculatorFlow", stakingOption.chain.id) {
+            mythosSessionDurationCalculatorFactory.create(stakingOption)
+        }
+    }
 
     context(ComputationalScope)
     fun minStakeFlow(chainId: ChainId): Flow<Balance> {

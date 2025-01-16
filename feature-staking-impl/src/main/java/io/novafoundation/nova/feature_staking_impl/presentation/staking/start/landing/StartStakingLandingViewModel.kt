@@ -31,6 +31,7 @@ import io.novafoundation.nova.common.utils.formatting.duration.DayDurationFormat
 import io.novafoundation.nova.common.utils.formatting.duration.DayDurationShortcut
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.MinutesDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ShortcutDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.wrapInto
 import io.novafoundation.nova.common.utils.formatting.format
@@ -445,11 +446,10 @@ class StartStakingLandingViewModel(
                 shortcuts = listOf(durationShortcut),
                 nestedFormatter = createDayDurationFormatter()
             ),
-            hoursDurationFormatter = ShortcutDurationFormatter(
-                shortcuts = listOf(durationShortcut),
-                nestedFormatter = HoursDurationFormatter(context)
-                    .wrapInto(context, R.string.start_staking_fragment_reward_frequency_condition_duration)
-            )
+            hoursDurationFormatter = HoursDurationFormatter(context)
+                .wrapInto(context, R.string.start_staking_fragment_reward_frequency_condition_duration),
+            minutesDurationFormatter = MinutesDurationFormatter(context)
+                .wrapInto(context, R.string.start_staking_fragment_reward_frequency_condition_duration)
         )
     }
 

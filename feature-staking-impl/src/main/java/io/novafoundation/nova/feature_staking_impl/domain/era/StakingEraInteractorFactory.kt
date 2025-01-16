@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.era
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -15,7 +17,9 @@ import kotlinx.coroutines.CoroutineScope
 class StakingEraInteractorFactory(
     private val roundDurationEstimator: RoundDurationEstimator,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val stakingConstantsRepository: StakingConstantsRepository
+    private val stakingConstantsRepository: StakingConstantsRepository,
+    private val mythosSharedComputation: MythosSharedComputation,
+    private val mythosStakingRepository: MythosStakingRepository,
 ) {
 
     private val creators = mapOf(
@@ -54,6 +58,6 @@ class StakingEraInteractorFactory(
     }
 
     private fun createMythos(stakingOption: StakingOption, computationScope: ComputationalScope): StakingEraInteractor {
-        return MythosStakingEraInteractor(stakingOption, computationScope)
+        return MythosStakingEraInteractor(mythosSharedComputation, mythosStakingRepository, stakingOption, computationScope)
     }
 }
