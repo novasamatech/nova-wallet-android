@@ -18,7 +18,7 @@ interface BrowserTabService {
 
     suspend fun removeTab(tabId: String)
 
-    suspend fun removeAllTabs()
+    suspend fun removeTabsForMetaAccount(metaId: Long)
 }
 
 suspend fun BrowserTabService.createAndSelectTab(url: String) {

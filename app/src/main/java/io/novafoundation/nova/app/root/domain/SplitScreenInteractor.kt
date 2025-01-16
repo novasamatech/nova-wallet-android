@@ -17,6 +17,7 @@ class SplitScreenInteractor(
     }
 
     suspend fun removeAllTabs() {
-        repository.removeAllTabs()
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        repository.removeTabsForMetaAccount(metaAccount.id)
     }
 }
