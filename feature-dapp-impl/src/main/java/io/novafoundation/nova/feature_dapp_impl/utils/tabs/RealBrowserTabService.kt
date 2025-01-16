@@ -103,10 +103,8 @@ class RealBrowserTabService(
     override suspend fun removeTabsForMetaAccount(metaId: Long) {
         selectTab(null)
 
-        val tabsToRemove = browserTabInternalRepository.getTabIdsForMetaAccount(metaId)
-        browserTabInternalRepository.removeTabsById(tabsToRemove)
-
-        tabsToRemove.forEach {
+        val removedTabs = browserTabInternalRepository.removeTabsForMetaAccount(metaId)
+        removedTabs.forEach {
             activeSessions.remove(it)
         }
     }

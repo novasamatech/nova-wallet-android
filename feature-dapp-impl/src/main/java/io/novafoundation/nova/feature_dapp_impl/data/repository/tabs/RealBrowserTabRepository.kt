@@ -30,19 +30,12 @@ class RealBrowserTabRepository(
             }
     }
 
-    override suspend fun getTabIdsForMetaAccount(metaId: Long): List<String> {
-        return withContext(Dispatchers.Default) { browserTabsDao.getTabIdsFor(metaId) }
-    }
-
-    override suspend fun removeTabsForMetaAccount(metaId: Long) {
-        withContext(Dispatchers.Default) {
+    override suspend fun removeTabsForMetaAccount(metaId: Long): List<String> {
+        return withContext(Dispatchers.Default) {
             val tabIds = browserTabsDao.getTabIdsFor(metaId)
             browserTabsDao.removeTabsByIds(tabIds)
+            tabIds
         }
-    }
-
-    override suspend fun removeTabsById(ids: List<String>) {
-        withContext(Dispatchers.Default) { browserTabsDao.removeTabsByIds(ids) }
     }
 
     override suspend fun savePageSnapshot(tabId: String, snapshot: PageSnapshot) {
