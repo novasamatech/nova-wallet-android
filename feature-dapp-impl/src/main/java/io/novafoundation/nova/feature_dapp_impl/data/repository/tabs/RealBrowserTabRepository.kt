@@ -32,9 +32,7 @@ class RealBrowserTabRepository(
 
     override suspend fun removeTabsForMetaAccount(metaId: Long): List<String> {
         return withContext(Dispatchers.Default) {
-            val tabIds = browserTabsDao.getTabIdsFor(metaId)
-            browserTabsDao.removeTabsByIds(tabIds)
-            tabIds
+            browserTabsDao.removeTabsByMetaId(metaId)
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import io.novafoundation.nova.core_db.model.BrowserTabLocal
 import kotlinx.coroutines.flow.Flow
 
@@ -18,6 +19,13 @@ abstract class BrowserTabsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertTab(tab: BrowserTabLocal)
+
+    @Transaction
+    open suspend fun removeTabsByMetaId(metaId: Long): List<String> {
+        val tabIds = getTabIdsFor(metaId)
+        removeTabsByIds(tabIds)
+        return tabIds
+    }
 
     @Query("DELETE FROM browser_tabs WHERE id = :tabId")
     abstract suspend fun removeTab(tabId: String)
