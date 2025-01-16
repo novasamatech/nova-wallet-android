@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection
 
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -14,7 +15,7 @@ interface StartMultiStakingSelection {
 
     val stakingOption: StakingOption
 
-    val apy: Perbill?
+    val apy: Fraction?
 
     val stake: Balance
 

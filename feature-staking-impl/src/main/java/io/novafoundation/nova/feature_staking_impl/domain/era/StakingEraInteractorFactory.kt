@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.era
 
+import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
@@ -14,20 +15,21 @@ import kotlinx.coroutines.CoroutineScope
 class StakingEraInteractorFactory(
     private val roundDurationEstimator: RoundDurationEstimator,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val stakingConstantsRepository: StakingConstantsRepository,
+    private val stakingConstantsRepository: StakingConstantsRepository
 ) {
 
     private val creators = mapOf(
         StakingTypeGroup.RELAYCHAIN to ::createRelaychain,
-        StakingTypeGroup.PARACHAIN to ::createParachain
+        StakingTypeGroup.PARACHAIN to ::createParachain,
+        StakingTypeGroup.MYTHOS to ::createMythos
     )
 
-    fun create(chain: Chain, chainAsset: Chain.Asset, sharedComputationScope: CoroutineScope): StakingEraInteractor {
+    fun create(chain: Chain, chainAsset: Chain.Asset, computationScope: ComputationalScope): StakingEraInteractor {
         return creators.entries.tryFindNonNull { (stakingTypeGroup, creator) ->
             val stakingType = chainAsset.findStakingTypeByGroup(stakingTypeGroup) ?: return@tryFindNonNull null
             val stakingOption = createStakingOption(chain, chainAsset, stakingType)
 
-            creator(stakingOption, sharedComputationScope)
+            creator(stakingOption, computationScope)
         } ?: UnsupportedStakingEraInteractor()
     }
 
@@ -49,5 +51,9 @@ class StakingEraInteractorFactory(
             stakingOption = stakingOption,
             stakingConstantsRepository = stakingConstantsRepository
         )
+    }
+
+    private fun createMythos(stakingOption: StakingOption, computationScope: ComputationalScope): StakingEraInteractor {
+        return MythosStakingEraInteractor(stakingOption, computationScope)
     }
 }

@@ -2,52 +2,54 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
-import io.novafoundation.nova.feature_staking_impl.data.components
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
-import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
 
-class RelaychainStakingTypeDetailsInteractorFactory(
-    private val stakingSharedComputation: StakingSharedComputation,
+class MythosStakingTypeDetailsInteractorFactory(
+    private val mythosSharedComputation: MythosSharedComputation,
 ) : StakingTypeDetailsInteractorFactory {
 
     override suspend fun create(
         stakingOption: StakingOption,
         computationalScope: ComputationalScope
     ): StakingTypeDetailsInteractor {
-        return RelaychainStakingTypeDetailsInteractor(
-            stakingSharedComputation,
-            stakingOption,
-            computationalScope,
+        return MythosStakingTypeDetailsInteractor(
+            mythosSharedComputation = mythosSharedComputation,
+            stakingOption = stakingOption,
+            computationalScope = computationalScope
         )
     }
 }
 
-class RelaychainStakingTypeDetailsInteractor(
-    private val stakingSharedComputation: StakingSharedComputation,
+private class MythosStakingTypeDetailsInteractor(
+    private val mythosSharedComputation: MythosSharedComputation,
     private val stakingOption: StakingOption,
-    private val computationalScope: ComputationalScope,
-) : StakingTypeDetailsInteractor {
+    computationalScope: ComputationalScope
+) : StakingTypeDetailsInteractor, ComputationalScope by computationalScope {
 
     override fun observeData(): Flow<StakingTypeDetails> {
         val chain = stakingOption.chain
 
-        return stakingSharedComputation.activeEraInfo(chain.id, computationalScope).map { activeEraInfo ->
+        return mythosSharedComputation.minStakeFlow(chain.id).map { minStake ->
             StakingTypeDetails(
-                maxEarningRate = calculateEarningRate(),
-                minStake = activeEraInfo.minStake,
-                payoutType = PayoutType.Automatically.Restake,
-                participationInGovernance = chain.governance.isNotEmpty(),
-                advancedOptionsAvailable = true,
+                // TODO mythos reward calculator
+                maxEarningRate = Fraction.ZERO,
+                minStake = minStake,
+                payoutType = PayoutType.Manual,
+                participationInGovernance = false,
+                advancedOptionsAvailable = false,
                 stakingType = stakingOption.stakingType
             )
         }
@@ -55,13 +57,5 @@ class RelaychainStakingTypeDetailsInteractor(
 
     override suspend fun getAvailableBalance(asset: Asset): BigInteger {
         return asset.freeInPlanks
-    }
-
-    private suspend fun calculateEarningRate(): Fraction {
-        val (chain, chainAsset, stakingType) = stakingOption.components
-
-        return stakingSharedComputation.rewardCalculator(chain, chainAsset, stakingType, computationalScope)
-            .maxAPY
-            .fractions
     }
 }

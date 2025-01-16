@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork
 import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
@@ -306,8 +307,8 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
     }
 }
 
-suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeSnapshot.() -> R): R {
-    return with(getRuntime(chainId)) {
+suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeContext.() -> R): R {
+    return with(RuntimeContext(getRuntime(chainId))) {
         action()
     }
 }

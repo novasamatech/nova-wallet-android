@@ -1,7 +1,10 @@
 package io.novafoundation.nova.runtime.storage.source.query.api
 
+import io.novafoundation.nova.common.utils.RuntimeContext
+import io.novafoundation.nova.common.utils.createStorageKey
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
+import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,7 +25,6 @@ interface QueryableStorageEntry0<T : Any> {
     context(StorageQueryContext)
     fun observeWithRaw(): Flow<WithRawValue<T?>>
 
-    context(StorageQueryContext)
     fun storageKey(): String
 }
 
@@ -34,8 +36,9 @@ suspend fun <T : Any> QueryableStorageEntry0<T>.queryNonNull(): T = requireNotNu
 
 internal class RealQueryableStorageEntry0<T : Any>(
     private val storageEntry: StorageEntry,
-    private val binding: QueryableStorageBinder0<T>
-) : QueryableStorageEntry0<T> {
+    private val binding: QueryableStorageBinder0<T>,
+    runtimeContext: RuntimeContext
+) : QueryableStorageEntry0<T>, RuntimeContext by runtimeContext {
 
     context(StorageQueryContext)
     override suspend fun query(): T? {
@@ -56,7 +59,6 @@ internal class RealQueryableStorageEntry0<T : Any>(
         return storageEntry.queryRaw()
     }
 
-    context(StorageQueryContext)
     override fun storageKey(): String {
         return storageEntry.createStorageKey()
     }

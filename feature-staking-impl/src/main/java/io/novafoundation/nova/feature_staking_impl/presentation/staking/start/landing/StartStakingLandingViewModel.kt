@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
@@ -33,6 +34,7 @@ import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationForm
 import io.novafoundation.nova.common.utils.formatting.duration.ShortcutDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.wrapInto
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
@@ -113,7 +115,7 @@ class StartStakingLandingViewModel(
     private val startStakingInteractor = flowOf {
         stakingTypeDetailsCompoundInteractorFactory.create(
             multiStakingOptionIds = stakingOptionIds,
-            coroutineScope = this
+            computationalScope = this
         )
     }.shareInBackground()
 
@@ -228,10 +230,10 @@ class StartStakingLandingViewModel(
         }
     }
 
-    private fun createTitle(chainAsset: Chain.Asset, earning: Perbill, themeColor: Int): CharSequence {
+    private fun createTitle(chainAsset: Chain.Asset, earning: Fraction, themeColor: Int): CharSequence {
         val apy = resourceManager.getString(
             R.string.start_staking_fragment_title_APY,
-            earning.format()
+            earning.formatPercents()
         ).toSpannable(colorSpan(themeColor))
 
         return SpannableFormatter.format(

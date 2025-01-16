@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.mythos
 
 import dagger.Binds
 import dagger.Module
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.RealMythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.RealUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.UserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosUserStakeUseCase
@@ -14,6 +16,9 @@ interface MythosBindsModule {
 
     @Binds
     fun bindUserStakeRepository(implementation: RealUserStakeRepository): UserStakeRepository
+
+    @Binds
+    fun bindStakingRepository(implementation: RealMythosStakingRepository): MythosStakingRepository
 
     @Binds
     fun bindUserStakeUseCase(implementation: RealMythosUserStakeUseCase): MythosUserStakeUseCase

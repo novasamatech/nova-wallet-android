@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct
 
+import io.novafoundation.nova.common.data.memory.ComputationalScope
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -24,7 +26,7 @@ class ParachainStakingTypeDetailsInteractorFactory(
 
     override suspend fun create(
         stakingOption: StakingOption,
-        coroutineScope: CoroutineScope
+        computationalScope: ComputationalScope
     ): ParachainStakingTypeDetailsInteractor {
         return ParachainStakingTypeDetailsInteractor(
             parachainNetworkInfoInteractor,
@@ -45,9 +47,9 @@ class ParachainStakingTypeDetailsInteractor(
 
         return parachainNetworkInfoInteractor.observeRoundInfo(chain.id).map { activeEraInfo ->
             StakingTypeDetails(
-                maxEarningRate = parachainStakingRewardCalculator.maximumGain(DAYS_IN_YEAR).asPerbill(),
+                maxEarningRate = parachainStakingRewardCalculator.maximumGain(DAYS_IN_YEAR).fractions,
                 minStake = activeEraInfo.minimumStake,
-                payoutType = getPayoutType(),
+                payoutType = PayoutType.Automatically.Payout,
                 participationInGovernance = chain.governance.isNotEmpty(),
                 advancedOptionsAvailable = true,
                 stakingType = stakingOption.stakingType
@@ -57,9 +59,5 @@ class ParachainStakingTypeDetailsInteractor(
 
     override suspend fun getAvailableBalance(asset: Asset): BigInteger {
         return asset.freeInPlanks
-    }
-
-    private fun getPayoutType(): PayoutType {
-        return PayoutType.Automatically.Payout
     }
 }
