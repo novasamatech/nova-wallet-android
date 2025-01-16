@@ -54,7 +54,7 @@ class OrmlAssetBalance(
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->
-                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime)).orEmpty()
+                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime))
                 lockDao.updateLocks(balanceLocks, metaAccount.id, chain.id, chainAsset.id)
             }
     }

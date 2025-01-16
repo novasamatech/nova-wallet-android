@@ -66,8 +66,8 @@ private class NominationPoolsStakeSummaryComponent(
         poolMemberStatus: PoolMemberStatus
     ): StakeStatusModel {
         return when (poolMemberStatus) {
-            PoolMemberStatus.Active -> StakeStatusModel.Active()
-            PoolMemberStatus.Inactive -> StakeStatusModel.Inactive()
+            PoolMemberStatus.Active -> StakeStatusModel.Active
+            PoolMemberStatus.Inactive -> StakeStatusModel.Inactive
             is PoolMemberStatus.Waiting -> StakeStatusModel.Waiting(
                 timeLeft = poolMemberStatus.timeLeft.inWholeMilliseconds,
                 messageFormat = R.string.staking_nominator_status_waiting_format,

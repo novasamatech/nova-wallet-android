@@ -119,7 +119,8 @@ data class Chain(
             UNSUPPORTED,
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
             PARACHAIN, TURING, // parachain-staking like
-            NOMINATION_POOLS
+            NOMINATION_POOLS,
+            MYTHOS
         }
 
         override val identifier = "$chainId:$id"

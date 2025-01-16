@@ -127,6 +127,7 @@ class SubqueryHistoryRequest(
         return when (group()) {
             StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> "reward"
             StakingTypeGroup.NOMINATION_POOL -> "poolReward"
+            StakingTypeGroup.MYTHOS -> TODO()
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }

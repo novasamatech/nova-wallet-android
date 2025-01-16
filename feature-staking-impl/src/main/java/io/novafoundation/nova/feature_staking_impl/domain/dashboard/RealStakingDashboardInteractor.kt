@@ -455,6 +455,7 @@ class RealStakingDashboardInteractor(
             StakingTypeGroup.PARACHAIN -> freeInPlanks
             StakingTypeGroup.NOMINATION_POOL -> transferableInPlanks
             StakingTypeGroup.UNSUPPORTED -> Balance.ZERO
+            StakingTypeGroup.MYTHOS -> freeInPlanks
         }
     }
 

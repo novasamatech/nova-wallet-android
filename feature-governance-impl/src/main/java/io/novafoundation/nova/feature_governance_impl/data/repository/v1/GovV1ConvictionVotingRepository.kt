@@ -42,7 +42,7 @@ class GovV1ConvictionVotingRepository(
     private val balanceLocksRepository: BalanceLocksRepository,
 ) : ConvictionVotingRepository {
 
-    override val voteLockId: String = DEMOCRACY_ID
+    override val voteLockId = DEMOCRACY_ID
 
     override suspend fun voteLockingPeriod(chainId: ChainId): BlockNumber {
         val runtime = chainRegistry.getRuntime(chainId)

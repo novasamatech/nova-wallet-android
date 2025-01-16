@@ -139,9 +139,7 @@ abstract class BaseStorageQueryContext(
     ): V {
         val storageKey = storageKeyWith(keyArguments)
         val scaleResult = queryKey(storageKey, at)
-        val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) } ?: takeDefaultIfAllowed()
-
-        return binding(decoded)
+        return decodeStorageValue(scaleResult, binding)
     }
 
     override suspend fun StorageEntry.queryRaw(vararg keyArguments: Any?): String? {
@@ -227,7 +225,7 @@ abstract class BaseStorageQueryContext(
     ): V {
         val dynamicInstance = scale?.let {
             type.value?.fromHex(runtime, scale)
-        }
+        } ?: takeDefaultIfAllowed()
 
         return binding(dynamicInstance)
     }

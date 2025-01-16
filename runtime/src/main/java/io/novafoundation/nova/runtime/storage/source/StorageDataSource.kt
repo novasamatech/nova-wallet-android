@@ -44,6 +44,7 @@ interface StorageDataSource {
     fun <R> subscribe(
         chainId: String,
         at: BlockHash? = null,
+        applyStorageDefault: Boolean = false,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>
 
@@ -51,6 +52,7 @@ interface StorageDataSource {
         chainId: String,
         subscriptionBuilder: SubstrateSubscriptionBuilder?,
         at: BlockHash? = null,
+        applyStorageDefault: Boolean = false,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>
 

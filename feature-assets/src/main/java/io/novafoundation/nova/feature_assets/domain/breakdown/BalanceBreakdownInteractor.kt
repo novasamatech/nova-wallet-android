@@ -114,7 +114,7 @@ class BalanceBreakdownInteractor(
         return locks.mapNotNull { lock ->
             assetsByChainId[lock.chainAsset.fullId]?.let { asset ->
                 BalanceBreakdown.BreakdownItem(
-                    id = lock.id,
+                    id = lock.id.value,
                     token = asset.token,
                     amountInPlanks = lock.amountInPlanks,
                 )

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.common
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.utils.toDuration
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -85,8 +86,6 @@ class EraTimeCalculator(
     private fun remainingEraBlocks(): BlockNumber {
         return eraLength * sessionLength - eraProgress()
     }
-
-    private fun BigInteger.toDuration() = toLong().milliseconds
 }
 
 fun EraTimeCalculator.erasDuration(numberOfEras: BigInteger): Duration {
