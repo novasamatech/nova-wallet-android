@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 class BrowserTabsViewModel(
     private val router: DAppRouter,
     private val browserTabService: BrowserTabService,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val accountUseCase: SelectedAccountUseCase
 ) : BaseViewModel() {
 
     val closeAllTabsConfirmation = actionAwaitableMixinFactory.confirmingAction<Unit>()
@@ -43,7 +45,8 @@ class BrowserTabsViewModel(
     fun closeAllTabs() = launch {
         closeAllTabsConfirmation.awaitAction()
 
-        browserTabService.removeAllTabs()
+        val metaAccount = accountUseCase.getSelectedMetaAccount()
+        browserTabService.removeTabsForMetaAccount(metaAccount.id)
         router.closeTabsScreen()
     }
 

@@ -7,7 +7,9 @@ import io.novafoundation.nova.feature_dapp_api.data.model.SimpleTabModel
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.PageSnapshot
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class RealBrowserTabRepository(
     private val browserTabsDao: BrowserTabsDao
@@ -28,8 +30,10 @@ class RealBrowserTabRepository(
             }
     }
 
-    override suspend fun removeAllTabs() {
-        browserTabsDao.removeAllTabs()
+    override suspend fun removeTabsForMetaAccount(metaId: Long): List<String> {
+        return withContext(Dispatchers.Default) {
+            browserTabsDao.removeTabsByMetaId(metaId)
+        }
     }
 
     override suspend fun savePageSnapshot(tabId: String, snapshot: PageSnapshot) {
