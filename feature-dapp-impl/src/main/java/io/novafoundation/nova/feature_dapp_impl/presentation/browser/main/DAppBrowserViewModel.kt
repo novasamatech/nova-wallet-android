@@ -12,16 +12,22 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.presentation.addToFavourites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.RemoveFavouritesPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.createAndSelectTab
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.stateId
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session.Authorization.State
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
@@ -42,7 +48,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -66,10 +74,11 @@ class DAppBrowserViewModel(
     private val dAppInteractor: DappInteractor,
     private val interactor: DappBrowserInteractor,
     private val dAppSearchRequester: DAppSearchRequester,
-    private val initialUrl: String,
+    private val payload: DAppBrowserPayload,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val browserTabService: BrowserTabService
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -107,14 +116,33 @@ class DAppBrowserViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
+    private val tabsState = browserTabService.tabStateFlow
+        .distinctUntilChangedBy { it.stateId() }
+        .shareInBackground()
+
+    val currentTabFlow = tabsState.map { it.selectedTab }
+        .distinctUntilChangedBy { it.stateId() }
+        .filterIsInstance<CurrentTabState.Selected>()
+        .shareInBackground()
+
+    val tabsCountFlow = tabsState.map { it.tabs.size }
+        .shareInBackground()
+
     init {
         dAppSearchRequester.responseFlow
-            .onEach { it.newUrl?.let(::forceLoad) }
+            .filterIsInstance<DAppSearchCommunicator.Response.NewUrl>()
+            .onEach { forceLoad(it.url) }
             .launchIn(this)
 
         watchDangerousWebsites()
 
-        forceLoad(initialUrl)
+        launch {
+            when (payload) {
+                is DAppBrowserPayload.Tab -> browserTabService.selectTab(payload.id)
+
+                is DAppBrowserPayload.Address -> browserTabService.createAndSelectTab(payload.address)
+            }
+        }
     }
 
     override suspend fun authorizeDApp(payload: AuthorizeDappBottomSheet.Payload): State {
@@ -147,22 +175,22 @@ class DAppBrowserViewModel(
         _browserCommandEvent.postValue(BrowserCommand.Reload.event())
     }
 
-    fun onPageChanged(url: String, title: String?) {
-        updateCurrentPage(url, title, synchronizedWithBrowser = true)
+    fun detachCurrentSession() {
+        browserTabService.detachCurrentSession()
+    }
+
+    fun onPageChanged(url: String?, title: String?) {
+        updateCurrentPage(url ?: "", title, synchronizedWithBrowser = true)
     }
 
     fun closeClicked() = launch {
-        val confirmationState = awaitConfirmation(DappPendingConfirmation.Action.CloseScreen)
-
-        if (confirmationState == ConfirmationState.ALLOWED) {
-            exitBrowser()
-        }
+        exitBrowser()
     }
 
     fun openSearch() = launch {
         val currentPage = currentPage.first()
 
-        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url))
+        dAppSearchRequester.openRequest(SearchPayload(initialUrl = currentPage.url, SearchPayload.Request.GO_TO_URL))
     }
 
     fun onMoreClicked() {
@@ -172,16 +200,20 @@ class DAppBrowserViewModel(
         }
     }
 
-    fun onFavoriteClick(optionsPayload: DAppOptionsPayload) {
+    fun onFavoriteClick() {
         launch {
-            if (optionsPayload.isFavorite) {
-                removeFromFavouritesConfirmation.awaitAction(optionsPayload.currentPageTitle)
+            val page = currentPageAnalyzed.first()
+            val currentPageTitle = page.title ?: page.display
+            val isCurrentPageFavorite = page.isFavourite
 
-                dAppInteractor.removeDAppFromFavourites(optionsPayload.url)
+            if (isCurrentPageFavorite) {
+                removeFromFavouritesConfirmation.awaitAction(currentPageTitle)
+
+                dAppInteractor.removeDAppFromFavourites(page.url)
             } else {
                 val payload = AddToFavouritesPayload(
-                    url = optionsPayload.url,
-                    label = optionsPayload.currentPageTitle,
+                    url = page.url,
+                    label = currentPageTitle,
                     iconLink = null
                 )
 
@@ -199,6 +231,14 @@ class DAppBrowserViewModel(
             isDesktopModeEnabledFlow.value = newDesktopMode
             _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
         }
+    }
+
+    fun openTabs() {
+        router.openTabs()
+    }
+
+    fun makePageSnapshot() {
+        browserTabService.makeCurrentTabSnapshot()
     }
 
     private fun watchDangerousWebsites() {
@@ -222,14 +262,8 @@ class DAppBrowserViewModel(
     }
 
     private suspend fun getCurrentPageOptionsPayload(): DAppOptionsPayload {
-        val page = currentPageAnalyzed.first()
-        val currentPageTitle = page.title ?: page.display
-        val isCurrentPageFavorite = page.isFavourite
         return DAppOptionsPayload(
-            currentPageTitle,
-            isCurrentPageFavorite,
-            isDesktopModeEnabled = desktopModeChangedModel.first().desktopModeEnabled,
-            url = page.url
+            isDesktopModeEnabled = desktopModeChangedModel.first().desktopModeEnabled
         )
     }
 

@@ -14,6 +14,7 @@ class DappMetadata(
 )
 
 data class DappCategory(
+    val iconUrl: String?,
     val name: String,
     val id: String
 )

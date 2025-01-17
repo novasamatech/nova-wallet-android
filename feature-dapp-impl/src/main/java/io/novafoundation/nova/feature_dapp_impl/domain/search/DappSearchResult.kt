@@ -2,11 +2,17 @@ package io.novafoundation.nova.feature_dapp_impl.domain.search
 
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 
-sealed class DappSearchResult {
+sealed interface DappSearchResult {
 
-    class Url(val url: String) : DappSearchResult()
+    val isTrustedByNova: Boolean
 
-    class Search(val query: String, val searchUrl: String) : DappSearchResult()
+    class Url(val url: String, override val isTrustedByNova: Boolean) : DappSearchResult
 
-    class Dapp(val dapp: DApp) : DappSearchResult()
+    class Search(val query: String, val searchUrl: String) : DappSearchResult {
+        override val isTrustedByNova: Boolean = false
+    }
+
+    class Dapp(val dapp: DApp) : DappSearchResult {
+        override val isTrustedByNova: Boolean = true
+    }
 }

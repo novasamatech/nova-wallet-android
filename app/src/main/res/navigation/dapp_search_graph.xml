@@ -9,18 +9,6 @@
         android:id="@+id/dappSearchFragment"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment"
         android:label="DappSearchFragment"
-        tools:layout="@layout/fragment_search_dapp">
+        tools:layout="@layout/fragment_search_dapp" />
 
-        <action
-            android:id="@+id/action_dappSearchFragment_to_dapp_browser_graph"
-            app:destination="@id/dapp_browser_graph"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/dapp_search_graph"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <include app:graph="@navigation/dapp_browser_graph" />
 </navigation>

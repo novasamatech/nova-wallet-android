@@ -12,6 +12,12 @@ interface DAppSearchResponder : InterScreenResponder<SearchPayload, Response>
 
 interface DAppSearchCommunicator : DAppSearchRequester, DAppSearchResponder {
 
-    @Parcelize
-    class Response(val newUrl: String?) : Parcelable
+    sealed interface Response : Parcelable {
+
+        @Parcelize
+        class NewUrl(val url: String) : Response
+
+        @Parcelize
+        object Cancel : Response
+    }
 }

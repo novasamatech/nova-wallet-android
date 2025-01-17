@@ -40,6 +40,15 @@
     <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
     <string name="swap_route">Route</string>
 
+    <string name="common_see_all">See All</string>
+    <string name="dapp_favorites">Favorites</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+
+    <string name="close_dapp_tabs_title">Close All DApps?</string>
+    <string name="close_dapp_tabs_message">All opened tabs in DApp browser will be closed.</string>
+
+    <string name="browser_tabs_close_all">Close All</string>
+
     <string name="select_network_title">Select network</string>
 
     <string name="assets_search_token_hint">Search by token</string>
