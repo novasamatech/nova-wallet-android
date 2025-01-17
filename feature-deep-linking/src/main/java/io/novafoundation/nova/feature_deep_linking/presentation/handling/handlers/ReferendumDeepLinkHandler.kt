@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.buildDeepLink
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -60,7 +61,7 @@ class ReferendumDeepLinkHandler(
     override suspend fun handleDeepLink(data: Uri) {
         automaticInteractionGate.awaitInteractionAllowed()
 
-        val chainId = data.getChainId() ?: throw ReferendumHandlingException.ChainIsNotFound
+        val chainId = data.getChainIdOrPolkadot()
         val referendumId = data.getReferendumId() ?: throw ReferendumHandlingException.ReferendumIsNotSpecified
 
         val chain = chainRegistry.getChainOrNull(chainId) ?: throw ReferendumHandlingException.ChainIsNotFound
@@ -73,8 +74,8 @@ class ReferendumDeepLinkHandler(
         router.openReferendum(payload)
     }
 
-    private fun Uri.getChainId(): String? {
-        return getQueryParameter(PARAM_CHAIN_ID)
+    private fun Uri.getChainIdOrPolkadot(): String {
+        return getQueryParameter(PARAM_CHAIN_ID) ?: ChainGeneses.POLKADOT
     }
 
     private fun Uri.getReferendumId(): BigInteger? {
