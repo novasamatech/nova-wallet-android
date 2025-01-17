@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.StartParachainStakingViewModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -40,7 +40,7 @@ class SetupStartParachainStakingModule {
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         singleAssetSharedState: StakingSharedState,
         resourceManager: ResourceManager,
-    ) = RealParachainStakingRewardsComponentFactory(rewardCalculatorFactory, singleAssetSharedState, resourceManager)
+    ) = ParachainStakingRewardsComponentFactory(rewardCalculatorFactory, singleAssetSharedState, resourceManager)
 
     @Provides
     @IntoMap
@@ -53,7 +53,7 @@ class SetupStartParachainStakingModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
-        rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
+        rewardsComponentFactory: ParachainStakingRewardsComponentFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         validationSystem: StartParachainStakingValidationSystem,
         addressIconGenerator: AddressIconGenerator,

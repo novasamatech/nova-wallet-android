@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewar
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.hints.ParachainStakingUnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -36,7 +36,7 @@ class ParachainStakingUnbondModule {
         rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
         singleAssetSharedState: StakingSharedState,
         resourceManager: ResourceManager,
-    ) = RealParachainStakingRewardsComponentFactory(rewardCalculatorFactory, singleAssetSharedState, resourceManager)
+    ) = ParachainStakingRewardsComponentFactory(rewardCalculatorFactory, singleAssetSharedState, resourceManager)
 
     @Provides
     @IntoMap

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search
 
 import androidx.lifecycle.viewModelScope
@@ -51,7 +49,7 @@ class SearchCollatorViewModel(
     private val electedCollators by lazyAsync {
         val stakingOption = singleAssetSharedState.selectedOption()
 
-        collatorRecommendatorFactory.create(stakingOption, scope = viewModelScope)
+        collatorRecommendatorFactory.create(stakingOption, computationalScope = this)
             .recommendations(CollatorRecommendationConfig.DEFAULT)
     }
 

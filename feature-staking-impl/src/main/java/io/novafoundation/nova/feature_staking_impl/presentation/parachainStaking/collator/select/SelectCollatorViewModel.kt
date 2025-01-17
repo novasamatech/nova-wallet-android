@@ -54,7 +54,7 @@ class SelectCollatorViewModel(
 ) : BaseViewModel() {
 
     private val collatorRecommendator by lazyAsync {
-        collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), scope = viewModelScope)
+        collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), computationalScope = this)
     }
 
     private val recommendationConfigFlow = MutableStateFlow(defaultConfig())

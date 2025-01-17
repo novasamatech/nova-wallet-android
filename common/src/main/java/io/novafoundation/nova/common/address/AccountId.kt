@@ -17,3 +17,8 @@ fun AccountId.intoKey() = AccountIdKey(this)
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))
 fun <T> Map<AccountIdKey, T>.getValue(key: AccountId) = getValue(AccountIdKey(key))
+
+interface WithAccountId {
+
+    val accountId: AccountIdKey
+}

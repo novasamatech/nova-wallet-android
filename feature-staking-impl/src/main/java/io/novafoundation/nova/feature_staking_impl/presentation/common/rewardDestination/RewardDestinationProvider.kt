@@ -97,8 +97,8 @@ class RewardDestinationProvider(
         val restakeReturns = rewardCalculator.calculateMaxReturns(amount, DAYS_IN_YEAR, true)
         val payoutReturns = rewardCalculator.calculateMaxReturns(amount, DAYS_IN_YEAR, false)
 
-        val restakeEstimations = mapPeriodReturnsToRewardEstimation(restakeReturns, asset.token, resourceManager, RewardSuffix.APY)
-        val payoutEstimations = mapPeriodReturnsToRewardEstimation(payoutReturns, asset.token, resourceManager, RewardSuffix.APR)
+        val restakeEstimations = mapPeriodReturnsToRewardEstimation(restakeReturns, asset.token, resourceManager)
+        val payoutEstimations = mapPeriodReturnsToRewardEstimation(payoutReturns, asset.token, resourceManager)
 
         rewardReturnsLiveData.value = RewardDestinationEstimations(restakeEstimations, payoutEstimations)
     }
