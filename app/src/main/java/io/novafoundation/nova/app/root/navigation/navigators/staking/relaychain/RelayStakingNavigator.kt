@@ -5,7 +5,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -47,6 +47,7 @@ class RelayStakingNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
     private val stakingDashboardRouter: StakingDashboardRouter,
+    private val dAppRouter: DAppRouter
 ) : BaseNavigator(navigationHoldersRegistry), StakingRouter {
 
     override fun returnToStakingMain() {
@@ -286,8 +287,6 @@ class RelayStakingNavigator(
     }
 
     override fun openDAppBrowser(url: String) {
-        navigationBuilder().action(R.id.action_open_dappBrowser)
-            .setArgs(DAppBrowserFragment.getBundle(DAppBrowserPayload.Address(url)))
-            .navigateInFirstAttachedContext()
+        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url))
     }
 }

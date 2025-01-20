@@ -8,7 +8,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_governance_impl.BuildConfig
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionFragment
@@ -47,7 +47,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 class GovernanceNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
-    private val contextManager: ContextManager
+    private val contextManager: ContextManager,
+    private val dAppRouter: DAppRouter
 ) : BaseNavigator(navigationHoldersRegistry), GovernanceRouter {
 
     override fun openReferendum(payload: ReferendumDetailsPayload) {
@@ -235,9 +236,7 @@ class GovernanceNavigator(
     }
 
     override fun openDAppBrowser(url: String) {
-        navigationBuilder().action(R.id.action_referendumDetailsFragment_to_DAppBrowserGraph)
-            .setArgs(DAppBrowserFragment.getBundle(DAppBrowserPayload.Address(url)))
-            .navigateInFirstAttachedContext()
+        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url))
     }
 
     override fun openReferendumDescription(payload: DescriptionPayload) {

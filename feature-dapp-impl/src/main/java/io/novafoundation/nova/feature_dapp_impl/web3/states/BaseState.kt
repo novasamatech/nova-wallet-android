@@ -33,7 +33,7 @@ abstract class BaseState<R : Web3Transport.Request<*>, S>(
             Web3Session.Authorization.State.ALLOWED -> true
             // first time dapp request authorization during this session
             Web3Session.Authorization.State.NONE -> authorizePageWithConfirmation()
-            // user rejected this dapp previosuly - ask for authorization one more time
+            // user rejected this dapp previously - ask for authorization one more time
             Web3Session.Authorization.State.REJECTED -> authorizePageWithConfirmation()
         }
     }
