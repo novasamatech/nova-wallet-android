@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call
 
+import android.util.Log
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -54,7 +55,9 @@ class RealReferendumPreImageParser(
 
         override suspend fun parse(call: GenericCall.Instance): ReferendumCall? {
             return knownAdapters.tryFindNonNull { adapter ->
-                runCatching { adapter.fromCall(call, context = this) }.getOrNull()
+                runCatching { adapter.fromCall(call, context = this) }
+                    .onFailure { Log.e("ReferendumPreImageParser", "Adapter ${adapter::class.simpleName} failed to parse call", it) }
+                    .getOrNull()
             }
         }
     }

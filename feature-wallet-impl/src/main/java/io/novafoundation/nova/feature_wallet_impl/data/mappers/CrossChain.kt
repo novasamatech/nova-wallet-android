@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers
 
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.feature_wallet_api.domain.model.AssetLocationPath
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
@@ -20,10 +23,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.Reserv
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmDestinationRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmFeeRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.XcmTransferRemote
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation.Junction
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toInterior
-import java.math.BigInteger
+import io.novafoundation.nova.feature_xcm_api.multiLocation.toInterior
 
 fun mapCrossChainConfigFromRemote(remote: CrossChainTransfersConfigRemote): CrossChainTransfersConfiguration {
     val assetsLocations = remote.assetsLocation.orEmpty().mapValues { (_, reserveLocationRemote) ->
@@ -147,18 +147,18 @@ private fun mapXcmFeeFromRemote(
 
 private fun mapJunctionsRemoteToMultiLocation(
     junctionsRemote: JunctionsRemote
-): MultiLocation {
+): RelativeMultiLocation {
     return if (PARENTS in junctionsRemote) {
-        val parents = junctionsRemote.getValue(PARENTS).asGsonParsedNumber()
+        val parents = junctionsRemote.getValue(PARENTS).asGsonParsedNumber().toInt()
         val withoutParents = junctionsRemote - PARENTS
 
-        MultiLocation(
+        RelativeMultiLocation(
             parents = parents,
             interior = mapJunctionsRemoteToInterior(withoutParents)
         )
     } else {
-        MultiLocation(
-            parents = BigInteger.ZERO,
+        RelativeMultiLocation(
+            parents = 0,
             interior = mapJunctionsRemoteToInterior(junctionsRemote)
         )
     }

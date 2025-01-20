@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model
 
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import java.math.BigInteger
 
 class CrossChainTransfersConfiguration(
@@ -19,7 +19,7 @@ class CrossChainTransfersConfiguration(
     class ReserveLocation(
         val chainId: ChainId,
         val reserveFee: XcmFee<String>?,
-        val multiLocation: MultiLocation
+        val multiLocation: RelativeMultiLocation
     )
 
     class AssetTransfers(
@@ -60,7 +60,7 @@ sealed class AssetLocationPath {
 
     object Absolute : AssetLocationPath()
 
-    class Concrete(val multiLocation: MultiLocation) : AssetLocationPath()
+    class Concrete(val multiLocation: RelativeMultiLocation) : AssetLocationPath()
 }
 
 enum class XcmTransferType {
@@ -94,9 +94,9 @@ class DeliveryFeeConfiguration(
 
 class CrossChainTransferConfiguration(
     val originChainId: ChainId,
-    val assetLocation: MultiLocation,
-    val reserveChainLocation: MultiLocation,
-    val destinationChainLocation: MultiLocation,
+    val assetLocation: RelativeMultiLocation,
+    val reserveChainLocation: RelativeMultiLocation,
+    val destinationChainLocation: RelativeMultiLocation,
     val destinationFee: CrossChainFeeConfiguration,
     val reserveFee: CrossChainFeeConfiguration?,
     val transferType: XcmTransferType

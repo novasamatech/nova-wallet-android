@@ -638,3 +638,7 @@ inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.(
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
+
+fun Int.collectionIndexOrNull(): Int? {
+    return takeIf { it >= 0 }
+}

@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.web3names.di.Web3NamesApi
 import javax.inject.Inject
@@ -51,6 +52,7 @@ class AccountFeatureHolder @Inject constructor(
             .cloudBackupFeatureApi(getFeature(CloudBackupFeatureApi::class.java))
             .ledgerCoreApi(getFeature(LedgerCoreApi::class.java))
             .swapCoreApi(getFeature(SwapCoreApi::class.java))
+            .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))
             .build()
 
         return DaggerAccountFeatureComponent.factory()
