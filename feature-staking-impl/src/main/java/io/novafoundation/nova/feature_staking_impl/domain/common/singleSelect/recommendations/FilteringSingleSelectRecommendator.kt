@@ -28,9 +28,7 @@ class FilteringSingleSelectRecommendator<T : WithAccountId>(
     }
 
     override fun defaultRecommendation(): T? {
-        return allTargets.firstOrNull()
-
-//        return allTargets.find { it.accountId in recommended }
+        return allTargets.find { it.accountId in recommended }
     }
 }
 
