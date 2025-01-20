@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.buildDeepLink
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -61,7 +62,7 @@ class AssetDetailsDeepLinkHandler(
         automaticInteractionGate.awaitInteractionAllowed()
 
         val address = data.getAddress()
-        val chainId = data.getChainId() ?: throw IllegalStateException()
+        val chainId = data.getChainIdOrPolkadot()
         val assetId = data.getAssetId() ?: throw IllegalStateException()
 
         val chain = chainRegistry.getChain(chainId)
@@ -82,8 +83,8 @@ class AssetDetailsDeepLinkHandler(
         return getQueryParameter(PARAM_ADDRESS)
     }
 
-    private fun Uri.getChainId(): String? {
-        return getQueryParameter(PARAM_CHAIN_ID)
+    private fun Uri.getChainIdOrPolkadot(): String {
+        return getQueryParameter(PARAM_CHAIN_ID) ?: ChainGeneses.POLKADOT
     }
 
     private fun Uri.getAssetId(): Int? {
