@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
+import android.net.Uri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.noties.markwon.Markwon
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -17,6 +20,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.firstIfLoaded
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -32,6 +37,9 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_deep_link_building.presentation.DeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDeepLinkData
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -111,6 +119,7 @@ class ReferendumDetailsViewModel(
     private val validationExecutor: ValidationExecutor,
     private val updateSystem: UpdateSystem,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val referendumLinkConfigurator: ReferendumDetailsDeepLinkConfigurator,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -141,6 +150,9 @@ class ReferendumDetailsViewModel(
 
     private val tokenFlow = tokenUseCase.currentTokenFlow()
         .shareInBackground()
+
+    private val _shareEvent = MutableLiveData<Event<Uri>>()
+    val shareEvent: LiveData<Event<Uri>> = _shareEvent
 
     val proposerAddressModel = referendumDetailsFlow.mapLoading {
         it.proposer?.let { proposer ->
@@ -280,6 +292,18 @@ class ReferendumDetailsViewModel(
         ) {
             val votePayload = SetupVotePayload(payload.referendumId)
             router.openSetupReferendumVote(votePayload)
+        }
+    }
+
+    fun shareButtonClicked() {
+        launch {
+            val chainId = selectedChainFlow.first().id
+            val referendumId = payload.referendumId
+            val governanceVersion = selectedAssetSharedState.selectedOption().additional.governanceType
+            val payload = ReferendumDeepLinkData(chainId, referendumId, governanceVersion)
+
+            val uri = referendumLinkConfigurator.configure(payload, type = DeepLinkConfigurator.Type.APP_LINK)
+            _shareEvent.value = uri.event()
         }
     }
 

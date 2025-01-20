@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationSystem
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.referendumPreVote
@@ -58,7 +59,8 @@ class ReferendumDetailsModule {
         validationSystem: ReferendumPreVoteValidationSystem,
         validationExecutor: ValidationExecutor,
         updateSystem: UpdateSystem,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -77,7 +79,8 @@ class ReferendumDetailsModule {
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
             updateSystem = updateSystem,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            referendumLinkConfigurator = referendumDetailsDeepLinkConfigurator
         )
     }
 

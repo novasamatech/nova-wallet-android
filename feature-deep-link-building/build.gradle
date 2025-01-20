@@ -4,6 +4,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    namespace 'io.novafoundation.nova.feature_deep_link_building'
+
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
@@ -36,13 +38,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
     implementation project(':runtime')
-    implementation project(':feature-assets')
-    implementation project(':feature-account-api')
-    implementation project(':feature-governance-api')
-    implementation project(':feature-currency-api')
-    implementation project(':feature-buy-api')
-    implementation project(':feature-wallet-connect-api')
-    implementation project(':feature-deep-link-building')
 
     implementation kotlinDep
 
