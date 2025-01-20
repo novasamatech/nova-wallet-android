@@ -12,13 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
+        app:iconRight="@drawable/ic_share_outline"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/referendumDetailsToolbarChips"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical|end"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <io.novafoundation.nova.feature_governance_impl.presentation.view.NovaChipView
