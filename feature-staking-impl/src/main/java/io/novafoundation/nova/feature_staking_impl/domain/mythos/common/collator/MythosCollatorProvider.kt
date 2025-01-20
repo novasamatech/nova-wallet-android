@@ -71,7 +71,7 @@ class RealMythosCollatorProvider @Inject constructor(
 
     context(ComputationalScope)
     private suspend fun MythosCollatorSource.requestedCollatorIds(chainId: ChainId): Collection<AccountIdKey> {
-        return when(this) {
+        return when (this) {
             is MythosCollatorSource.Custom -> collatorIds
             MythosCollatorSource.ElectedCandidates -> mythosSharedComputation.get().sessionValidators(chainId)
         }

@@ -20,5 +20,3 @@ interface OnChainIdentityRepository {
     @Deprecated("Use getIdentitiesFromIds instead to avoid extra from/to address conversions")
     suspend fun getIdentitiesFromAddresses(chain: Chain, accountAddresses: List<String>): AccountAddressMap<OnChainIdentity?>
 }
-
-

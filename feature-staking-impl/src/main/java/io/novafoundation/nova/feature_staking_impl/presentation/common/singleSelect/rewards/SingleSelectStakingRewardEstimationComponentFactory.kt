@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
 interface SingleSelectStakingRewardEstimationComponentFactory {
-    
+
     fun create(
         computationalScope: ComputationalScope,
         assetFlow: Flow<Asset>,

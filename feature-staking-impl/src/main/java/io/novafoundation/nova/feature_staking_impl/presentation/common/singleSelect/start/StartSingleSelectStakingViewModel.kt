@@ -28,8 +28,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.selectSta
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.rewards.SingleSelectStakingRewardEstimationComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel.StartSingleSelectStakingLogic
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenRequester
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.openRequest
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -61,7 +59,7 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
 
-abstract class StartSingleSelectStakingViewModel<T, L: StartSingleSelectStakingLogic<T>>(
+abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStakingLogic<T>>(
     logicFactory: StartSingleSelectStakingLogic.Factory<T, L>,
     private val rewardsComponentFactory: SingleSelectStakingRewardEstimationComponentFactory,
     private val assetUseCase: AssetUseCase,
@@ -76,7 +74,7 @@ abstract class StartSingleSelectStakingViewModel<T, L: StartSingleSelectStakingL
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    Retriable where T : Identifiable,T : WithAccountId {
+    Retriable where T : Identifiable, T : WithAccountId {
 
     @Suppress("LeakingThis")
     protected val logic: L = logicFactory.create(this)
@@ -110,7 +108,6 @@ abstract class StartSingleSelectStakingViewModel<T, L: StartSingleSelectStakingL
 
     private val selectedTargetIdFlow = selectedTargetFlow.map { it?.accountId }
         .distinctUntilChanged()
-
 
     private val selectedTargetWithStake = selectedTargetFlow.filterNotNull().flatMapLatest { selectedTarget ->
         logic.alreadyStakedAmountTo(selectedTarget.accountId).map {

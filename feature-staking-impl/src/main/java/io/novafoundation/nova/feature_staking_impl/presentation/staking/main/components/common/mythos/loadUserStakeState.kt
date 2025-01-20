@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.mythos
 
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext

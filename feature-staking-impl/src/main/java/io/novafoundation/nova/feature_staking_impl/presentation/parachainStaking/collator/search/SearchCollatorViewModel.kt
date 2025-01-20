@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search
 
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.invoke
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.ExperimentalTime
 
 class SearchCollatorViewModel(
     private val router: ParachainStakingRouter,

@@ -231,7 +231,7 @@ class StartStakingLandingViewModel(
             StakingTypeGroup.RELAYCHAIN,
             StakingTypeGroup.NOMINATION_POOL -> router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
 
-            StakingTypeGroup.MYTHOS ->  router.openStartMythosStaking()
+            StakingTypeGroup.MYTHOS -> router.openStartMythosStaking()
 
             StakingTypeGroup.UNSUPPORTED -> Unit
         }

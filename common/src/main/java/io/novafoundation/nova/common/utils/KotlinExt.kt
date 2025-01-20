@@ -497,7 +497,7 @@ fun <T> List<T>.added(toAdd: T): List<T> {
     return toMutableList().apply { add(toAdd) }
 }
 
-fun <T: Any> MutableList<T>.removeFirstOrNull(condition: (T) -> Boolean): T? {
+fun <T : Any> MutableList<T>.removeFirstOrNull(condition: (T) -> Boolean): T? {
     val index = indexOfFirstOrNull(condition) ?: return null
     return removeAt(index)
 }

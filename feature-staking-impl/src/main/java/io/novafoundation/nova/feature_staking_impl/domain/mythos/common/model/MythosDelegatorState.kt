@@ -60,7 +60,7 @@ fun MythosDelegatorState.stakeByCollator(): Map<AccountIdKey, Balance> {
 }
 
 fun MythosDelegatorState.hasActiveValidators(sessionValidators: SessionValidators): Boolean {
-    return when(this) {
+    return when (this) {
         is MythosDelegatorState.Locked.Delegating -> userStakeInfo.hasActiveValidators(sessionValidators)
         MythosDelegatorState.NotStarted, is MythosDelegatorState.Locked.NotDelegating -> false
     }

@@ -74,7 +74,18 @@ class StartParachainStakingViewModel(
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<Collator, StartParachainStakingViewModel.ParachainLogic>(
-    logicFactory = { scope -> ParachainLogic(scope, selectCollatorInterScreenRequester, delegatorStateUseCase, collatorsUseCase, selectedAssetState, addressIconGenerator, resourceManager, interactor) },
+    logicFactory = { scope ->
+        ParachainLogic(
+            scope,
+            selectCollatorInterScreenRequester,
+            delegatorStateUseCase,
+            collatorsUseCase,
+            selectedAssetState,
+            addressIconGenerator,
+            resourceManager,
+            interactor
+        )
+    },
     rewardsComponentFactory = rewardsComponentFactory,
     assetUseCase = assetUseCase,
     resourceManager = resourceManager,

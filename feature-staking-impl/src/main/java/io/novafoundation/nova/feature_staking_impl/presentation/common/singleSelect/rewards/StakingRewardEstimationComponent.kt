@@ -7,4 +7,3 @@ interface StakingRewardEstimationComponent {
 
     val rewardEstimation: Flow<RewardEstimation>
 }
-

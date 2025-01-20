@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common
 
 import io.novafoundation.nova.common.address.get
-import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption

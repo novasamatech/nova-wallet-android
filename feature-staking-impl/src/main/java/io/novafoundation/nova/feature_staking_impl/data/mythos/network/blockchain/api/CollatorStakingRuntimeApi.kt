@@ -42,14 +42,16 @@ val CollatorStakingRuntimeApi.minStake: QueryableStorageEntry0<Balance>
 
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.candidates: QueryableStorageEntry1<AccountIdKey, MythCandidateInfo>
-    get() = storage1("Candidates",
+    get() = storage1(
+        "Candidates",
         binding = { decoded, _ -> bindMythCandidateInfo(decoded) },
         keyBinding = ::bindAccountIdKey
     )
 
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.candidateStake: QueryableStorageEntry2<AccountIdKey, AccountIdKey, MythDelegation>
-    get() = storage2("CandidateStake",
+    get() = storage2(
+        "CandidateStake",
         binding = { decoded, _, _, -> bindDelegationInfo(decoded) },
         key1ToInternalConverter = AccountIdKey.scaleEncoder,
         key2ToInternalConverter = AccountIdKey.scaleEncoder,

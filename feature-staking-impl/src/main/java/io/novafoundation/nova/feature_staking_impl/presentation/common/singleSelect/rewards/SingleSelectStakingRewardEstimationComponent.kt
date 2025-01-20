@@ -20,7 +20,7 @@ abstract class SingleSelectStakingRewardEstimationComponent(
     assetFlow: Flow<Asset>,
     selectedAmountFlow: Flow<BigDecimal>,
     selectedTargetFlow: Flow<AccountIdKey?>
-): StakingRewardEstimationComponent,
+) : StakingRewardEstimationComponent,
     ComputationalScope by computationalScope {
 
     abstract suspend fun calculatePeriodReturns(selectedTarget: AccountIdKey?, selectedAmount: BigDecimal): PeriodReturns
@@ -33,7 +33,7 @@ abstract class SingleSelectStakingRewardEstimationComponent(
     }
 
     override val rewardEstimation: Flow<RewardEstimation> = combine(assetFlow, periodReturnsFlow) { asset, periodReturns ->
-         mapPeriodReturnsToRewardEstimation(
+        mapPeriodReturnsToRewardEstimation(
             periodReturns = periodReturns,
             token = asset.token,
             resourceManager = resourceManager,

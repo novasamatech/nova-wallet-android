@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
-import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.takeUnlessZero
 import io.novafoundation.nova.core.storage.StorageCache
@@ -11,13 +10,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.userStake
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythosStakingFreezeIds
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.observeMythosLocks
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.total
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.cache.StorageCachingContext
 import io.novafoundation.nova.runtime.storage.cache.cacheValues

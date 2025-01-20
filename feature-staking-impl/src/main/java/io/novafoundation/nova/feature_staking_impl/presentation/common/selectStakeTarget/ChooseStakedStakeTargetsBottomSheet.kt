@@ -131,13 +131,13 @@ private class ViewHolder<T : Identifiable>(
     }
 }
 
-fun <T: Identifiable> ChooseStakedStakeTargetsBottomSheet(
+fun <T : Identifiable> ChooseStakedStakeTargetsBottomSheet(
     context: Context,
     payload: Payload<SelectStakeTargetModel<T>>,
     onResponse: (ChooseStakedStakeTargetsResponse<T>) -> Unit,
     onCancel: () -> Unit,
     selectionStyle: SelectionStyle = SelectionStyle.RadioGroup
-) : ChooseStakedStakeTargetsBottomSheet<T> {
+): ChooseStakedStakeTargetsBottomSheet<T> {
     return ChooseStakedStakeTargetsBottomSheet(
         context = context,
         payload = payload,
@@ -147,7 +147,6 @@ fun <T: Identifiable> ChooseStakedStakeTargetsBottomSheet(
         selectionStyle = selectionStyle
     )
 }
-
 
 private class DiffCallback<T : Identifiable> : DiffUtil.ItemCallback<SelectStakeTargetModel<T>>() {
 

@@ -55,5 +55,4 @@ class RealUserStakeRepository @Inject constructor(
             }
         }
     }
-
 }

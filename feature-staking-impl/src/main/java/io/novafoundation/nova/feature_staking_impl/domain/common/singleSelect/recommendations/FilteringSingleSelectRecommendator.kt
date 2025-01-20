@@ -32,7 +32,6 @@ class FilteringSingleSelectRecommendator<T : WithAccountId>(
     }
 }
 
-
 abstract class FilteringSingleSelectRecommendatorFactory<T : WithAccountId>(
     private val computationalCache: ComputationalCache,
     private val validatorsPreferencesSource: ValidatorsPreferencesSource
@@ -43,7 +42,8 @@ abstract class FilteringSingleSelectRecommendatorFactory<T : WithAccountId>(
 
     context(ComputationalScope)
     final override suspend fun create(
-        stakingOption: StakingOption, computationalScope: ComputationalScope
+        stakingOption: StakingOption,
+        computationalScope: ComputationalScope
     ) = computationalCache.useCache(javaClass.name, computationalScope) {
         val allTargets = getAllTargets(stakingOption)
 
