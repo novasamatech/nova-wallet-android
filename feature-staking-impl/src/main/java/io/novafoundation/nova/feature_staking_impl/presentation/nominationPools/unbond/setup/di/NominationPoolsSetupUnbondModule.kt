@@ -19,7 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup.NominationPoolsSetupUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonUnbondModule::class])
 class NominationPoolsSetupUnbondModule {
@@ -34,9 +35,10 @@ class NominationPoolsSetupUnbondModule {
         validationExecutor: ValidationExecutor,
         validationSystem: NominationPoolsUnbondValidationSystem,
         stakingSharedState: StakingSharedState,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsUnbondHintsFactory,
+        maxActionProviderFactory: MaxActionProviderFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
     ): ViewModel {
         return NominationPoolsSetupUnbondViewModel(
@@ -49,6 +51,7 @@ class NominationPoolsSetupUnbondModule {
             assetUseCase = assetUseCase,
             hintsFactory = hintsFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
+            maxActionProviderFactory = maxActionProviderFactory,
             stakingSharedState = stakingSharedState
         )
     }

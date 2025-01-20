@@ -62,7 +62,6 @@ private class RealSwapAmountInputMixin(
     tokenFlow = tokenFlow,
     maxActionProvider = maxActionProvider,
     fiatFormatter = fiatFormatter,
-    allowMaxAction = true,
     fieldValidator = fieldValidator
 ),
     SwapAmountInputMixin.Presentation {

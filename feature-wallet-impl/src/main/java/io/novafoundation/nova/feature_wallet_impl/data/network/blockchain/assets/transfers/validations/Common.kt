@@ -112,7 +112,7 @@ fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSys
 )
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
-    return existentialDeposit(transfer.originChain, transfer.originChainAsset)
+    return existentialDeposit(transfer.originChainAsset)
 }
 
 private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveAccount = when (type) {
