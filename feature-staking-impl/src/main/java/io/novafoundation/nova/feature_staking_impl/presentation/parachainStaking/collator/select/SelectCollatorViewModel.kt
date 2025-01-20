@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select
 
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager

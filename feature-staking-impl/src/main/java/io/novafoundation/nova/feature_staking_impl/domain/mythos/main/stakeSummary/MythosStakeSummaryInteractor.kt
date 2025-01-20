@@ -2,11 +2,13 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSumm
 
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.hasActiveValidators
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.activeStake
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.hasActiveValidators
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -15,7 +17,7 @@ interface MythosStakeSummaryInteractor {
 
     context(ComputationalScope)
     fun stakeSummaryFlow(
-        userStakeInfo: UserStakeInfo,
+        mythosDelegatorState: MythosDelegatorState,
         stakingOption: StakingOption,
     ): Flow<StakeSummary<MythosDelegatorStatus>>
 }
@@ -27,20 +29,21 @@ class RealMythosStakeSummaryInteractor @Inject constructor(
 
     context(ComputationalScope)
     override fun stakeSummaryFlow(
-        userStakeInfo: UserStakeInfo,
+        delegatorState: MythosDelegatorState,
         stakingOption: StakingOption,
     ): Flow<StakeSummary<MythosDelegatorStatus>> {
         val chainId = stakingOption.assetWithChain.chain.id
 
         return mythosSharedComputation.sessionValidatorsFlow(chainId).map { sessionValidators ->
             val status = when {
-                userStakeInfo.hasActiveValidators(sessionValidators) -> MythosDelegatorStatus.Active
+                delegatorState.activeStake.isZero -> MythosDelegatorStatus.Inactive
+                delegatorState.hasActiveValidators(sessionValidators) -> MythosDelegatorStatus.Active
                 else -> MythosDelegatorStatus.Inactive
             }
 
             StakeSummary(
                 status = status,
-                activeStake = userStakeInfo.balance
+                activeStake = delegatorState.activeStake
             )
         }
     }

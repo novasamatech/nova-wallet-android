@@ -11,7 +11,7 @@ enum class CollatorSorting(private val collatorComparator: Comparator<Collator>)
     OWN_STAKE(compareByDescending { it.snapshot?.bond.orZero() })
 }
 
-data class CollatorRecommendationConfig(val sorting: CollatorSorting) {
+data class CollatorRecommendationConfig(val sorting: CollatorSorting): Comparator<Collator> by sorting {
 
     companion object {
 

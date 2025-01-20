@@ -7,6 +7,7 @@ interface SingleSelectRecommendator<T> {
 
     interface Factory<T> {
 
+        context(ComputationalScope)
         suspend fun create(stakingOption: StakingOption, computationalScope: ComputationalScope): SingleSelectRecommendator<T>
     }
 

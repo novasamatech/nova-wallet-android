@@ -221,12 +221,19 @@ class StartStakingLandingViewModel(
         router.returnToStakingDashboard()
     }
 
+    // TODO this should be provided by a particular staking implementation
     private fun openStartStaking() {
         val firstStakingType = availableStakingOptionsPayload.stakingTypes.first()
 
         when (firstStakingType.group()) {
             StakingTypeGroup.PARACHAIN -> router.openStartParachainStaking()
-            else -> router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
+
+            StakingTypeGroup.RELAYCHAIN,
+            StakingTypeGroup.NOMINATION_POOL -> router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
+
+            StakingTypeGroup.MYTHOS ->  router.openStartMythosStaking()
+
+            StakingTypeGroup.UNSUPPORTED -> Unit
         }
     }
 

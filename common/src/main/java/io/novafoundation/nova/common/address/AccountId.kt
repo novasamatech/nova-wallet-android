@@ -4,6 +4,8 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class AccountIdKey(val value: AccountId) {
 
+    companion object;
+
     override fun equals(other: Any?): Boolean {
         return this === other || other is AccountIdKey && this.value contentEquals other.value
     }

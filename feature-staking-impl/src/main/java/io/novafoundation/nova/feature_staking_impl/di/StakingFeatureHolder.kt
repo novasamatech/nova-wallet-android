@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
+import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
@@ -27,6 +28,7 @@ class StakingFeatureHolder @Inject constructor(
     private val nominationPoolsRouter: NominationPoolsRouter,
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingDashboardRouter: StakingDashboardRouter,
+    private val mythosStakingRouter: MythosStakingRouter,
     private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
@@ -47,6 +49,7 @@ class StakingFeatureHolder @Inject constructor(
             .create(
                 router = router,
                 parachainStaking = parachainStakingRouter,
+                mythosStakingRouter = mythosStakingRouter,
                 selectCollatorInterScreenCommunicator = selectCollatorInterScreenCommunicator,
                 selectCollatorSettingsInterScreenCommunicator = selectCollatorSettingsInterScreenCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,

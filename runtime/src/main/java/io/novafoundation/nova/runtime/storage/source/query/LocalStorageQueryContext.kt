@@ -42,7 +42,7 @@ class LocalStorageQueryContext(
         }
     }
 
-    override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
+    override fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
         return storageCache.observeEntries(keys, chainId).map { it.toMap() }
     }
 
