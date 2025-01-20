@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import java.io.OutputStream
 
 typealias StorageKey = String
+typealias StorageValue = String?
+typealias StorageEntries = Map<StorageKey, StorageValue>
+
 typealias ChildKeyBuilder = suspend OutputStream.(RuntimeSnapshot) -> Unit
 
 interface StorageDataSource {

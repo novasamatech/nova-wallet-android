@@ -1,15 +1,12 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards
+package io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.rewards
 
 import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationView
 import io.novafoundation.nova.feature_staking_impl.presentation.view.showRewardEstimation
-import kotlinx.coroutines.flow.filterNotNull
 
 fun BaseFragmentMixin<*>.setupParachainStakingRewardsComponent(
-    component: ParachainStakingRewardsComponent,
+    component: StakingRewardEstimationComponent,
     view: RewardDestinationView
 ) {
-    component.state.filterNotNull().observe {
-        view.showRewardEstimation(it.rewardEstimation)
-    }
+    component.rewardEstimation.observe(view::showRewardEstimation)
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.reposit
 
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
@@ -20,7 +21,6 @@ import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
-import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 

@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.mythos
 
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.MythosDelegatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.MythosStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
@@ -44,11 +44,11 @@ private class MythosStakeSummaryComponent(
     override val state: Flow<StakeSummaryState?> = mythosSharedComputation.loadUserStakeState(
         hostContext = hostContext,
         chain = stakingOption.assetWithChain.chain,
-        stateProducer = ::userSTakeSummary
+        stateProducer = ::userStakeSummary
     )
         .shareInBackground()
 
-    private fun userSTakeSummary(userStakeInfo: UserStakeInfo): Flow<StakeSummaryModel> {
+    private fun userStakeSummary(userStakeInfo: MythosDelegatorState): Flow<StakeSummaryModel> {
         return interactor.stakeSummaryFlow(userStakeInfo, stakingOption).flatMapLatest { stakeSummary ->
             val status = stakeSummary.status.toUi()
 

@@ -8,22 +8,25 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculator
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythCandidateInfos
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosCandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @FeatureScope
 class MythosSharedComputation @Inject constructor(
-    private val userStakeRepository: MythosUserStakeUseCase,
+    private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
     private val mythosStakingRepository: MythosStakingRepository,
     private val sessionRepository: SessionRepository,
     private val mythosSessionDurationCalculatorFactory: MythosSessionDurationCalculatorFactory,
+    private val candidatesRepository: MythosCandidatesRepository,
     computationalCache: ComputationalCache
 ) : SharedComputation(computationalCache) {
 
@@ -42,9 +45,9 @@ class MythosSharedComputation @Inject constructor(
     }
 
     context(ComputationalScope)
-    fun userStakeFlow(chain: Chain): Flow<UserStakeInfo> {
-        return cachedFlow("MythosSharedComputation.userStakeFlow", chain.id) {
-            userStakeRepository.currentUserStakeInfo(chain)
+    fun delegatorStateFlow(): Flow<MythosDelegatorState> {
+        return cachedFlow("MythosSharedComputation.userStakeFlow") {
+            mythosDelegatorStateUseCase.currentDelegatorState()
         }
     }
 
@@ -54,4 +57,16 @@ class MythosSharedComputation @Inject constructor(
             sessionRepository.sessionValidatorsFlow(chainId)
         }
     }
+
+    context(ComputationalScope)
+    suspend fun candidateInfos(chainId: ChainId): MythCandidateInfos {
+        return cachedValue("MythosSharedComputation.candidateInfos", chainId) {
+            candidatesRepository.getCandidateInfos(chainId)
+        }
+    }
+}
+
+context(ComputationalScope)
+suspend fun MythosSharedComputation.sessionValidators(chainId: ChainId): SessionValidators {
+    return sessionValidatorsFlow(chainId).first()
 }

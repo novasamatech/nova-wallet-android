@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/staking_mythos_start_graph"
+    app:startDestination="@id/startMythosStakingFragment">
+
+    <action
+        android:id="@+id/action_return_to_start_staking"
+        app:enterAnim="@anim/fragment_close_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_open_exit"
+        app:popUpTo="@id/startMythosStakingFragment" />
+
+    <fragment
+        android:id="@+id/startMythosStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingFragment"
+        android:label="StartMythosStakingFragment"
+        tools:layout="@layout/fragment_parachain_staking_start">
+    </fragment>
+</navigation>

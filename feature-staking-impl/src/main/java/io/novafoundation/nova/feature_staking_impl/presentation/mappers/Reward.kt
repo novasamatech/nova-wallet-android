@@ -11,8 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import java.math.BigDecimal
 
-enum class RewardSuffix(@StringRes val suffixResourceId: Int?) {
-    None(null),
+enum class RewardSuffix(@StringRes val suffixResourceId: Int) {
     APY(R.string.staking_apy),
     APR(R.string.staking_apr)
 }
@@ -20,16 +19,21 @@ enum class RewardSuffix(@StringRes val suffixResourceId: Int?) {
 fun RewardSuffix.format(resourceManager: ResourceManager, gainsFraction: BigDecimal): String {
     val gainsFormatted = gainsFraction.formatFractionAsPercentage()
 
-    return suffixResourceId?.let { resourceManager.getString(it, gainsFormatted) } ?: gainsFormatted
+    return resourceManager.getString(suffixResourceId, gainsFormatted)
+}
+
+fun PeriodReturns.rewardSuffix(): RewardSuffix {
+    return if (isCompound) RewardSuffix.APY else RewardSuffix.APR
 }
 
 fun mapPeriodReturnsToRewardEstimation(
     periodReturns: PeriodReturns,
     token: Token,
     resourceManager: ResourceManager,
-    rewardSuffix: RewardSuffix = RewardSuffix.None,
 ): RewardEstimation {
-    val gainWithSuffix = rewardSuffix.format(resourceManager, periodReturns.gainFraction)
+    val suffix = periodReturns.rewardSuffix()
+
+    val gainWithSuffix = suffix.format(resourceManager, periodReturns.gainFraction)
 
     val amountFormatted = periodReturns.gainAmount.formatTokenAmount(token.configuration)
     val amountWithSuffix = resourceManager.getString(R.string.common_per_year_format, amountFormatted)

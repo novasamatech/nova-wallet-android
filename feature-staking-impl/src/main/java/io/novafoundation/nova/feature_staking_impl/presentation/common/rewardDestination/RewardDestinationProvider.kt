@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.DAYS_IN_YEAR
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.calculateMaxReturns
-import io.novafoundation.nova.feature_staking_impl.presentation.mappers.RewardSuffix
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPeriodReturnsToRewardEstimation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -97,8 +96,8 @@ class RewardDestinationProvider(
         val restakeReturns = rewardCalculator.calculateMaxReturns(amount, DAYS_IN_YEAR, true)
         val payoutReturns = rewardCalculator.calculateMaxReturns(amount, DAYS_IN_YEAR, false)
 
-        val restakeEstimations = mapPeriodReturnsToRewardEstimation(restakeReturns, asset.token, resourceManager, RewardSuffix.APY)
-        val payoutEstimations = mapPeriodReturnsToRewardEstimation(payoutReturns, asset.token, resourceManager, RewardSuffix.APR)
+        val restakeEstimations = mapPeriodReturnsToRewardEstimation(restakeReturns, asset.token, resourceManager)
+        val payoutEstimations = mapPeriodReturnsToRewardEstimation(payoutReturns, asset.token, resourceManager)
 
         rewardReturnsLiveData.value = RewardDestinationEstimations(restakeEstimations, payoutEstimations)
     }

@@ -34,7 +34,8 @@ private fun calculateReward(
 
     return PeriodReturns(
         gainAmount = gainAmount.toBigDecimal(),
-        gainFraction = gainPercentage.toBigDecimal()
+        gainFraction = gainPercentage.toBigDecimal(),
+        isCompound = isCompound
     )
 }
 

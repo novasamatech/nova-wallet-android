@@ -51,7 +51,7 @@ internal class RealQueryableStorageEntry1<I, T>(
     private val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder1<I, T>,
     runtimeContext: RuntimeContext,
-    @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyBinder<I>? = null
+    @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyFromInternalBinder<I>? = null
 ) : QueryableStorageEntry1<I, T>, RuntimeContext by runtimeContext {
 
     context(StorageQueryContext)

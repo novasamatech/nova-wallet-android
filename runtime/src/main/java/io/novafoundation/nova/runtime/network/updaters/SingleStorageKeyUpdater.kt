@@ -39,6 +39,8 @@ abstract class SingleStorageKeyUpdater<V>(
      */
     abstract suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: V): String?
 
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Instead of writing fallback value to cache use 'applyStorageDefault' param on StorageDataSource when querying cache")
     protected open fun fallbackValue(runtime: RuntimeSnapshot): String? = null
 
     override suspend fun listenForUpdates(
