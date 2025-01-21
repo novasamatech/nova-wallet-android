@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.SelectMythosCollatorViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
@@ -38,7 +40,8 @@ class SelectMythosCollatorModule {
         tokenUseCase: TokenUseCase,
         selectedAssetState: StakingSharedState,
         mythosCollatorFormatter: MythosCollatorFormatter,
-        selectCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator
+        selectCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+        settingsRequester: SelectMythCollatorSettingsInterScreenCommunicator
     ): ViewModel {
         return SelectMythosCollatorViewModel(
             router = router,
@@ -47,7 +50,8 @@ class SelectMythosCollatorModule {
             tokenUseCase = tokenUseCase,
             selectedAssetState = selectedAssetState,
             mythosCollatorFormatter = mythosCollatorFormatter,
-            selectCollatorResponder = selectCollatorInterScreenCommunicator
+            selectCollatorResponder = selectCollatorInterScreenCommunicator,
+            settingsRequester = settingsRequester
         )
     }
 

@@ -14,12 +14,15 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMyt
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.details.mythos
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenRequester
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.toDomain
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.toParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 
 class SelectMythosCollatorViewModel(
     private val router: MythosStakingRouter,
@@ -29,17 +32,22 @@ class SelectMythosCollatorViewModel(
     private val selectedAssetState: StakingSharedState,
     private val mythosCollatorFormatter: MythosCollatorFormatter,
     private val selectCollatorResponder: SelectMythosInterScreenResponder,
+    private val settingsRequester: SelectMythCollatorSettingsInterScreenRequester
 ) : SingleSelectChooseTargetViewModel<MythosCollator, MythosCollatorRecommendationConfig>(
     router = router,
     recommendatorFactory = recommendatorFactory,
     resourceManager = resourceManager,
     tokenUseCase = tokenUseCase,
     selectedAssetState = selectedAssetState,
-    state = MythosState(mythosCollatorFormatter, resourceManager)
+    state = MythosState(
+        mythosCollatorFormatter = mythosCollatorFormatter,
+        resourceManager = resourceManager,
+        settingsRequester = settingsRequester
+    )
 ) {
 
     override fun settingsClicked(currentConfig: MythosCollatorRecommendationConfig) {
-        showMessage("TODO")
+        settingsRequester.openRequest(currentConfig.toParcel())
     }
 
     override suspend fun targetInfoClicked(target: MythosCollator) {
@@ -55,6 +63,7 @@ class SelectMythosCollatorViewModel(
     class MythosState(
         private val mythosCollatorFormatter: MythosCollatorFormatter,
         private val resourceManager: ResourceManager,
+        private val settingsRequester: SelectMythCollatorSettingsInterScreenRequester
     ) : SingleSelectChooseTargetState<MythosCollator, MythosCollatorRecommendationConfig> {
 
         override val defaultRecommendatorConfig: MythosCollatorRecommendationConfig = MythosCollatorRecommendationConfig.DEFAULT
@@ -79,8 +88,8 @@ class SelectMythosCollatorViewModel(
         }
 
         override fun recommendationConfigChanges(): Flow<MythosCollatorRecommendationConfig> {
-            // TODO settings
-            return emptyFlow()
+            return settingsRequester.responseFlow
+                .map { it.toDomain() }
         }
     }
 }

@@ -34,6 +34,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.d
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.di.SelectMythosCollatorComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.di.SelectMythCollatorSettingsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.di.SetupStartMythosStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
@@ -245,6 +247,9 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun selectMythosCollatorFactory(): SelectMythosCollatorComponent.Factory
 
+    fun selectMythosSettingsFactory(): SelectMythCollatorSettingsComponent.Factory
+
+
     @Component.Factory
     interface Factory {
 
@@ -257,7 +262,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
 
             @BindsInstance mythosStakingRouter: MythosStakingRouter,
-            @BindsInstance selectMythosCollatorSettingsInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+            @BindsInstance selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+            @BindsInstance selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
 
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 
