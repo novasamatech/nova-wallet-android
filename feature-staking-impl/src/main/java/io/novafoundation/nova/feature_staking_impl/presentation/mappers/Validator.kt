@@ -8,9 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.formatting.formatPercents
-import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator

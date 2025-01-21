@@ -22,7 +22,8 @@ import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorSorting
 import kotlinx.android.synthetic.main.fragment_parachain_staking_select_collator.selectCollatorToolbar
 
-abstract class SingleSelectChooseTargetFragment<T, V : SingleSelectChooseTargetViewModel<T, *>> : BaseFragment<V>(),
+abstract class SingleSelectChooseTargetFragment<T, V : SingleSelectChooseTargetViewModel<T, *>> :
+    BaseFragment<V>(),
     StakeTargetAdapter.ItemHandler<T> {
 
     val adapter by lazy(LazyThreadSafetyMode.NONE) {

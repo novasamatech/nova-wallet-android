@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendationConfig
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.MythCollatorRecommendationConfigParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.toDomain
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.toParcel

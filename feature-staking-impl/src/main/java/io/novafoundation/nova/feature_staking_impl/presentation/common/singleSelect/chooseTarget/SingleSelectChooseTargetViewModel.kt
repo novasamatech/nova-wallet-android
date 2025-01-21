@@ -126,7 +126,6 @@ abstract class SingleSelectChooseTargetViewModel<T, C : SingleSelectRecommendato
         fun scoringHeaderFor(config: C): String
 
         fun recommendationConfigChanges(): Flow<C>
-
     }
 
     private inner class ShownStakeTargets(val targets: List<T>, val usedConfig: C)

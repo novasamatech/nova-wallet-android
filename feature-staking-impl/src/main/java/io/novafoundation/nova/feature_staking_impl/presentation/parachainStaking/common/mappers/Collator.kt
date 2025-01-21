@@ -19,9 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.parce
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.extensions.fromHex
 
 typealias CollatorModel = StakeTargetModel<Collator>
 

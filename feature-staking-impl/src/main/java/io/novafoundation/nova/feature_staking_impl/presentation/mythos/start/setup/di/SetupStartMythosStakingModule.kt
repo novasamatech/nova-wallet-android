@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommen
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory

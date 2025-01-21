@@ -249,7 +249,6 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun selectMythosSettingsFactory(): SelectMythCollatorSettingsComponent.Factory
 
-
     @Component.Factory
     interface Factory {
 

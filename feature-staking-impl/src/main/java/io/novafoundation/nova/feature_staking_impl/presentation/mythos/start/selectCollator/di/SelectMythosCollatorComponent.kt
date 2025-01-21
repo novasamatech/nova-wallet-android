@@ -5,7 +5,6 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.SelectMythosCollatorFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorFragment
 
 @Subcomponent(
     modules = [

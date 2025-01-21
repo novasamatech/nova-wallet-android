@@ -12,9 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.lock
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.stake
-import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosCandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
-import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.RealMythosCandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeByCollator

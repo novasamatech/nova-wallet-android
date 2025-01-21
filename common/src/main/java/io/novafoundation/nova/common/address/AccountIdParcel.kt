@@ -6,7 +6,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class AccountIdParcel(private val value: AccountId): Parcelable {
+class AccountIdParcel(private val value: AccountId) : Parcelable {
 
     companion object {
 

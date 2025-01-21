@@ -60,7 +60,7 @@ fun MythosDelegatorState.stakeByCollator(): Map<AccountIdKey, Balance> {
 }
 
 fun MythosDelegatorState.stakedCollatorsCount(): Int {
-    return  when (this) {
+    return when (this) {
         is MythosDelegatorState.Locked.Delegating -> userStakeInfo.candidates.size
         MythosDelegatorState.NotStarted, is MythosDelegatorState.Locked.NotDelegating -> 0
     }
