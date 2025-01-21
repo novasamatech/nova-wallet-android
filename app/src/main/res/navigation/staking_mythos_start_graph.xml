@@ -18,5 +18,18 @@
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingFragment"
         android:label="StartMythosStakingFragment"
         tools:layout="@layout/fragment_parachain_staking_start">
+
+        <action
+            android:id="@+id/action_startMythosStakingFragment_to_selectMythosCollatorFragment"
+            app:destination="@id/selectMythosCollatorFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/selectMythosCollatorFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.SelectMythosCollatorFragment"
+        android:label="SelectMythosCollatorFragment" />
 </navigation>

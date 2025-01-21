@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSh
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
@@ -45,6 +47,7 @@ class SetupStartMythosStakingModule {
         mythosCollatorFormatter: MythosCollatorFormatter,
         interactor: StartMythosStakingInteractor,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
+        selectCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator
     ): ViewModel {
         return SetupStartMythosStakingViewModel(
             router = router,
@@ -60,7 +63,8 @@ class SetupStartMythosStakingModule {
             mythosSharedComputation = mythosSharedComputation,
             mythosCollatorFormatter = mythosCollatorFormatter,
             interactor = interactor,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator
         )
     }
 

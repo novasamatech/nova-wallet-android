@@ -64,7 +64,7 @@ class RealMythosCollatorProvider @Inject constructor(
                 totalStake = collatorStake.stake,
                 delegators = collatorStake.stakers,
                 // TODO APY calculation
-                apy = Fraction.ZERO
+                apr = Fraction.ZERO
             )
         }
     }

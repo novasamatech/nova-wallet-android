@@ -1,11 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.invoke
-import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
@@ -14,6 +10,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.recommendations.CollatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.chooseTarget.SearchAction
+import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.chooseTarget.SingleSelectChooseTargetViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator.Response
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenResponder
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
@@ -22,22 +20,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.model.mapCollatorRecommendationConfigFromParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.model.mapCollatorRecommendationConfigToParcel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.CollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SelectCollatorViewModel(
@@ -45,120 +37,91 @@ class SelectCollatorViewModel(
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
     private val collatorsUseCase: CollatorsUseCase,
-    private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
-    private val addressIconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager,
-    private val tokenUseCase: TokenUseCase,
-    private val selectedAssetState: StakingSharedState,
-) : BaseViewModel() {
+    collatorRecommendatorFactory: CollatorRecommendatorFactory,
+    addressIconGenerator: AddressIconGenerator,
+    resourceManager: ResourceManager,
+    tokenUseCase: TokenUseCase,
+    selectedAssetState: StakingSharedState,
+) : SingleSelectChooseTargetViewModel<Collator, CollatorRecommendationConfig>(
+    router = router,
+    recommendatorFactory = collatorRecommendatorFactory,
+    resourceManager = resourceManager,
+    tokenUseCase = tokenUseCase,
+    selectedAssetState = selectedAssetState,
+    state = CollatorState(
+        router = router,
+        selectCollatorSettingsInterScreenRequester = selectCollatorSettingsInterScreenRequester,
+        addressIconGenerator = addressIconGenerator,
+        resourceManager = resourceManager,
+        selectedAssetState = selectedAssetState
+    )
+) {
 
-    private val collatorRecommendator by lazyAsync {
-        collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), computationalScope = this)
-    }
+    class CollatorState(
+        private val router: ParachainStakingRouter,
+        private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
+        private val addressIconGenerator: AddressIconGenerator,
+        private val resourceManager: ResourceManager,
+        private val selectedAssetState: StakingSharedState,
+    ) : SingleSelectChooseTargetState<Collator, CollatorRecommendationConfig> {
 
-    private val recommendationConfigFlow = MutableStateFlow(defaultConfig())
+        override val defaultRecommendatorConfig: CollatorRecommendationConfig = CollatorRecommendationConfig.DEFAULT
 
-    val recommendationSettingsIcon = recommendationConfigFlow.map {
-        val isChanged = it != CollatorRecommendationConfig.DEFAULT
-
-        if (isChanged) R.drawable.ic_filter_indicator else R.drawable.ic_filter
-    }
-        .shareInBackground()
-
-    val clearFiltersEnabled = recommendationConfigFlow.map {
-        it != defaultConfig()
-    }.shareInBackground()
-
-    private val shownValidators = recommendationConfigFlow.map {
-        collatorRecommendator().recommendations(it)
-    }.shareInBackground()
-
-    private val tokenFlow = tokenUseCase.currentTokenFlow()
-        .inBackground()
-        .share()
-
-    val collatorModelsFlow = combine(shownValidators, tokenFlow, ::convertToModels)
-        .shareInBackground()
-
-    val collatorsTitle = shownValidators.map {
-        resourceManager.getString(R.string.staking_parachain_collators_number_format, it.size)
-    }.shareInBackground()
-
-    val scoringHeader = recommendationConfigFlow.map {
-        when (it.sorting) {
-            CollatorSorting.REWARDS -> resourceManager.getString(R.string.staking_rewards)
-            CollatorSorting.MIN_STAKE -> resourceManager.getString(R.string.staking_main_minimum_stake_title)
-            CollatorSorting.TOTAL_STAKE -> resourceManager.getString(R.string.staking_validator_total_stake)
-            CollatorSorting.OWN_STAKE -> resourceManager.getString(R.string.staking_parachain_collator_own_stake)
+        override val searchAction: SearchAction = {
+            router.openSearchCollator()
         }
-    }.shareInBackground()
 
-    init {
-        listenRecommendationConfigChanges()
-    }
+        override fun recommendationConfigChanges(): Flow<CollatorRecommendationConfig> {
+            return selectCollatorSettingsInterScreenRequester.responseFlow
+                .map { mapCollatorRecommendationConfigFromParcel(it.newConfig) }
+        }
 
-    fun clearFiltersClicked() {
-        recommendationConfigFlow.value = defaultConfig()
-    }
-
-    fun backClicked() {
-        router.back()
-    }
-
-    fun collatorInfoClicked(collatorModel: CollatorModel) {
-        launch {
-            val payload = withContext(Dispatchers.Default) {
-                val parcel = mapCollatorToDetailsParcelModel(collatorModel.stakeTarget)
-
-                StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase)
+        override fun scoringHeaderFor(config: CollatorRecommendationConfig): String {
+            return when (config.sorting) {
+                CollatorSorting.REWARDS -> resourceManager.getString(R.string.staking_rewards)
+                CollatorSorting.MIN_STAKE -> resourceManager.getString(R.string.staking_main_minimum_stake_title)
+                CollatorSorting.TOTAL_STAKE -> resourceManager.getString(R.string.staking_validator_total_stake)
+                CollatorSorting.OWN_STAKE -> resourceManager.getString(R.string.staking_parachain_collator_own_stake)
             }
+        }
 
-            router.openCollatorDetails(payload)
+        override suspend fun convertTargetsToUi(
+            targets: List<Collator>,
+            token: Token,
+            config: CollatorRecommendationConfig,
+        ): List<StakeTargetModel<Collator>> {
+            return targets.map { collator ->
+                mapCollatorToCollatorModel(
+                    chain = selectedAssetState.chain(),
+                    collator = collator,
+                    addressIconGenerator = addressIconGenerator,
+                    sorting = config.sorting,
+                    resourceManager = resourceManager,
+                    token = token
+                )
+            }
         }
     }
 
-    fun collatorClicked(collatorModel: CollatorModel) = launch {
-        val response = withContext(Dispatchers.Default) {
-            Response(mapCollatorToCollatorParcelModel(collatorModel.stakeTarget))
-        }
+    override fun settingsClicked(currentConfig: CollatorRecommendationConfig) {
+        val configPayload = mapCollatorRecommendationConfigToParcel(currentConfig)
+        selectCollatorSettingsInterScreenRequester.openRequest(Request((configPayload)))
+    }
+
+    override suspend fun targetSelected(target: Collator) {
+        val response = Response(mapCollatorToCollatorParcelModel(target))
 
         selectCollatorInterScreenResponder.respond(response)
         router.returnToStartStaking()
     }
 
-    fun settingsClicked() = launch {
-        val currentConfig = mapCollatorRecommendationConfigToParcel(recommendationConfigFlow.first())
+    override suspend fun targetInfoClicked(target: Collator) {
+        val payload = withContext(Dispatchers.Default) {
+            val parcel = mapCollatorToDetailsParcelModel(target)
 
-        selectCollatorSettingsInterScreenRequester.openRequest(Request((currentConfig)))
-    }
-
-    fun searchClicked() {
-        router.openSearchCollator()
-    }
-
-    private fun listenRecommendationConfigChanges() {
-        selectCollatorSettingsInterScreenRequester.responseFlow
-            .map { mapCollatorRecommendationConfigFromParcel(it.newConfig) }
-            .onEach { recommendationConfigFlow.value = it }
-            .inBackground()
-            .launchIn(this)
-    }
-
-    private fun defaultConfig() = CollatorRecommendationConfig(CollatorSorting.REWARDS)
-
-    private suspend fun convertToModels(
-        collators: List<Collator>,
-        token: Token,
-    ): List<CollatorModel> {
-        return collators.map { collator ->
-            mapCollatorToCollatorModel(
-                chain = selectedAssetState.chain(),
-                collator = collator,
-                addressIconGenerator = addressIconGenerator,
-                sorting = recommendationConfigFlow.first().sorting,
-                resourceManager = resourceManager,
-                token = token
-            )
+            StakeTargetDetailsPayload.parachain(parcel, collatorsUseCase)
         }
+
+        router.openCollatorDetails(payload)
     }
 }

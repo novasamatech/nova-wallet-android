@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.singleSelect.model.TargetWithStakedAmount
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDelegatorStateUseCase
@@ -19,11 +20,16 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.is
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeableBalance
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.openRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.openRequest
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -49,7 +55,8 @@ class SetupStartMythosStakingViewModel(
     private val selectedAssetState: StakingSharedState,
     mythosSharedComputation: MythosSharedComputation,
     mythosCollatorFormatter: MythosCollatorFormatter,
-    interactor: StartMythosStakingInteractor,
+    private val interactor: StartMythosStakingInteractor,
+    private val selectCollatorInterScreenRequester: SelectMythosInterScreenRequester,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<MythosCollator, SetupStartMythosStakingViewModel.MythosLogic>(
     logicFactory = { scope ->
@@ -58,7 +65,8 @@ class SetupStartMythosStakingViewModel(
             mythosSharedComputation = mythosSharedComputation,
             mythosCollatorFormatter = mythosCollatorFormatter,
             interactor = interactor,
-            mythosDelegatorStateUseCase = mythosDelegatorStateUseCase
+            mythosDelegatorStateUseCase = mythosDelegatorStateUseCase,
+            selectCollatorRequester = selectCollatorInterScreenRequester
         )
     },
     rewardsComponentFactory = rewardsComponentFactory,
@@ -76,11 +84,21 @@ class SetupStartMythosStakingViewModel(
     override val hintsMixin = NoHintsMixin()
 
     override suspend fun openSelectNewTarget() {
-        showMessage("TODO")
+        val delegatorState = logic.currentDelegatorStateFlow.first()
+
+        when (val check = interactor.checkDelegationsLimit(delegatorState)) {
+            DelegationsLimit.NotReached -> selectCollatorInterScreenRequester.openRequest()
+            is DelegationsLimit.Reached -> {
+                showError(
+                    title = resourceManager.getString(R.string.staking_parachain_max_delegations_title),
+                    text = resourceManager.getString(R.string.staking_parachain_max_delegations_message, check.limit)
+                )
+            }
+        }
     }
 
     override suspend fun openSelectFirstTarget() {
-        showMessage("TODO")
+        selectCollatorInterScreenRequester.openRequest()
     }
 
     override suspend fun goNext(target: MythosCollator, amount: BigDecimal, fee: Fee, asset: Asset) {
@@ -129,6 +147,7 @@ class SetupStartMythosStakingViewModel(
         private val mythosCollatorFormatter: MythosCollatorFormatter,
         private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
         private val interactor: StartMythosStakingInteractor,
+        private val selectCollatorRequester: SelectMythosInterScreenRequester,
     ) : StartSingleSelectStakingLogic<MythosCollator>,
         ComputationalScope by computationalScope {
 
@@ -136,8 +155,8 @@ class SetupStartMythosStakingViewModel(
             .shareInBackground()
 
         override fun selectedTargetChanges(): Flow<MythosCollator> {
-            // TODO
-            return emptyFlow()
+            return selectCollatorRequester.responseFlow
+                .map { it.toDomain() }
         }
 
         override fun stakeableAmount(assetFlow: Flow<Asset>): Flow<Balance> {
@@ -164,7 +183,7 @@ class SetupStartMythosStakingViewModel(
         }
 
         override suspend fun mapStakedTargetToUi(target: TargetWithStakedAmount<MythosCollator>, asset: Asset): SelectStakeTargetModel<MythosCollator> {
-            return mythosCollatorFormatter.collatorToUi(target, asset)
+            return mythosCollatorFormatter.collatorToSelectUi(target, asset.token)
         }
 
         override suspend fun minimumStakeToGetRewards(selectedStakeTarget: MythosCollator?): Balance {
