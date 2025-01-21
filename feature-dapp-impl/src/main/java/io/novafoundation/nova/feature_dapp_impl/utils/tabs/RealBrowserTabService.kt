@@ -75,6 +75,8 @@ class RealBrowserTabService(
         selectTab(null)
     }
 
+    // Create a new browser tab and save it to persistent storage
+    // Then we sync dapp metadata for this tab asynchronously to not block tab creation
     override suspend fun createNewTab(url: String): BrowserTab {
         val tab = BrowserTab(
             id = UUID.randomUUID().toString(),
@@ -87,7 +89,7 @@ class RealBrowserTabService(
 
         browserTabInternalRepository.saveTab(tab)
 
-        syncKnownDAppMetadata(tab.id, url)
+        deferredSyncKnownDAppMetadata(tab.id, url)
 
         return tab
     }
@@ -149,7 +151,7 @@ class RealBrowserTabService(
             browserTabInternalRepository.changeCurrentUrl(tabId, url)
         }
 
-        syncKnownDAppMetadata(tabId, url)
+        deferredSyncKnownDAppMetadata(tabId, url)
     }
 
     private fun makeTabSnapshot(tabId: String) {
@@ -164,7 +166,7 @@ class RealBrowserTabService(
         }
     }
 
-    private fun syncKnownDAppMetadata(tabId: String, url: String) {
+    private fun deferredSyncKnownDAppMetadata(tabId: String, url: String) {
         launch {
             getKnownDappMetadata(url)?.let {
                 browserTabInternalRepository.changeKnownDAppMetadata(tabId, it.iconLink)

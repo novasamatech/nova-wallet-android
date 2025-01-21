@@ -25,7 +25,7 @@ class RealDAppMetadataRepository(
     private val dappMetadatasFlow = MutableSharedFlow<DappCatalog>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     override suspend fun isDAppsSynced(): Boolean {
-        return dappMetadatasFlow.first().dApps.isNotEmpty()
+        return dappMetadatasFlow.replayCache.isNotEmpty()
     }
 
     override suspend fun syncDAppMetadatas() {
