@@ -82,7 +82,7 @@ val MythosDelegatorState.activeStake: Balance
     }
 
 fun MythosDelegatorState.stakeableBalance(asset: Asset, currentBlockNumber: BlockNumber): Balance {
-    return when(this) {
+    return when (this) {
         // Since there is no staking yet, we can stake the whole free balance
         MythosDelegatorState.NotStarted -> asset.freeInPlanks
 
@@ -105,7 +105,7 @@ fun MythosDelegatorState.stakeableBalance(asset: Asset, currentBlockNumber: Bloc
 }
 
 fun UserStakeInfo.restrictedFromRestake(currentBlockNumber: BlockNumber): Balance {
-    return if (maybeLastUnstake != null && currentBlockNumber< maybeLastUnstake.availableForRestakeAt) {
+    return if (maybeLastUnstake != null && currentBlockNumber < maybeLastUnstake.availableForRestakeAt) {
         maybeLastUnstake.amount
     } else {
         Balance.ZERO

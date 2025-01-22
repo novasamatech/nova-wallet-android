@@ -132,7 +132,7 @@ abstract class ConfirmStartSingleTargetStakingViewModel<S : ConfirmStartSingleTa
 
     interface ConfirmStartSingleTargetStakingState {
 
-        fun interface Factory<S: ConfirmStartSingleTargetStakingState> {
+        fun interface Factory<S : ConfirmStartSingleTargetStakingState> {
 
             fun create(scope: ComputationalScope): S
         }
