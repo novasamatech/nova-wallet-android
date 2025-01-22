@@ -27,14 +27,17 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.openRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.openRequest
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -101,7 +104,7 @@ class SetupStartMythosStakingViewModel(
     }
 
     override suspend fun goNext(target: MythosCollator, amount: BigDecimal, fee: Fee, asset: Asset) {
-        showMessage("TODO")
+        goToNextStep(fee,  asset.token.planksFromAmount(amount), target)
 
 //        val payload = StartParachainStakingValidationPayload(
 //            amount = amount,
@@ -123,22 +126,14 @@ class SetupStartMythosStakingViewModel(
 //        }
     }
 
-//    private fun goToNextStep(
-//        fee: Fee,
-//        amount: BigDecimal,
-//        collator: Collator,
-//    ) = launch {
-//        val payload = withContext(Dispatchers.Default) {
-//            ConfirmStartParachainStakingPayload(
-//                collator = mapCollatorToCollatorParcelModel(collator),
-//                amount = amount,
-//                fee = mapFeeToParcel(fee),
-//                flowMode = payload.flowMode
-//            )
-//        }
-//
-//        router.openConfirmStartStaking(payload)
-//    }
+    private fun goToNextStep(
+        fee: Fee,
+        amount: Balance,
+        collator: MythosCollator,
+    ) {
+        val payload = ConfirmStartMythosStakingPayload(collator.toParcelable(), amount, fee.toParcel())
+        router.openConfirmStartStaking(payload)
+    }
 
     class MythosLogic(
         computationalScope: ComputationalScope,

@@ -26,6 +26,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startMythosStakingFragment_to_confirmStartMythosStakingFragment"
+            app:destination="@id/confirmStartMythosStakingFragment" />
     </fragment>
 
     <fragment
@@ -44,5 +52,11 @@
     <fragment
         android:id="@+id/selectMythCollatorSettingsFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsFragment"
-        android:label="SelectMythCollatorSettingsFragment" />
+        android:label="SelectMythCollatorSettingsFragment">
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmStartMythosStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingFragment"
+        android:label="ConfirmStartMythosStakingFragment" />
 </navigation>
