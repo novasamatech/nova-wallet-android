@@ -14,7 +14,6 @@
         android:layout_height="48dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/dapp_icon_background"
-        android:padding="10dp"
         tools:src="@drawable/ic_sub_id" />
 
     <TextView
