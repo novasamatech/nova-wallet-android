@@ -22,11 +22,6 @@ import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappCategories
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappCategoriesShimmering
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappList
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearch
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhContainer
 
 class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, FragmentSearchDappBinding>(), SearchDappAdapter.Handler, DappCategoriesAdapter.Handler {
 
@@ -42,7 +37,7 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, Fragment
     override fun createBinding() = FragmentSearchDappBinding.inflate(layoutInflater)
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(imageLoader, this) }
 
@@ -88,8 +83,8 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, Fragment
         }
 
         viewModel.categoriesFlow.observe {
-            searchDappCategoriesShimmering.isVisible = it.isLoading()
-            searchDappCategories.isVisible = it.isLoaded()
+            binder.searchDappCategoriesShimmering.isVisible = it.isLoading()
+            binder.searchDappCategories.isVisible = it.isLoaded()
             it.onLoaded { categoriesAdapter.submitList(it) }
         }
     }

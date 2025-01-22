@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappHeaderBinding
@@ -40,6 +40,7 @@ class DAppHeaderAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(
+            imageLoader,
             ItemDappHeaderBinding.inflate(parent.inflater(), parent, false),
             headerHandler,
             categoriesHandler,
@@ -102,7 +103,7 @@ class HeaderHolder(
     headerHandler: DAppHeaderAdapter.Handler,
     categoriesHandler: DappCategoriesAdapter.Handler,
     dAppClickHandler: DAppClickHandler
-) : RecyclerView.ViewHolder(binder) {
+) : RecyclerView.ViewHolder(binder.root) {
 
     private val categoriesAdapter = DappCategoriesAdapter(imageLoader, categoriesHandler)
     private val favoritesAdapter = DappFavoritesAdapter(imageLoader, dAppClickHandler)

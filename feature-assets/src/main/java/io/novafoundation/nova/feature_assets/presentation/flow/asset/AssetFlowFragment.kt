@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.databinding.FragmentAssetFlowSearchBinding
-import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.CompoundAssetDecorationPreferences

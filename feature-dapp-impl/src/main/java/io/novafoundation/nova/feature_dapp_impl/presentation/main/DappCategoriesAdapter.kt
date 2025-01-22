@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.loadOrHide
+import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappCategoryBinding
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 
@@ -79,9 +80,9 @@ class DappCategoryViewHolder(
 
         // We must set tint to image view programmatically since we can't specify the state for default color in state list
         if (isSelected) {
-            itemView.itemDappCategoryIcon.setColorFilter(ContextCompat.getColor(itemView.context, R.color.icon_primary_on_content))
+            itemDappCategoryIcon.setColorFilter(ContextCompat.getColor(itemView.context, R.color.icon_primary_on_content))
         } else {
-            itemView.itemDappCategoryIcon.clearColorFilter()
+            itemDappCategoryIcon.clearColorFilter()
         }
     }
 }
