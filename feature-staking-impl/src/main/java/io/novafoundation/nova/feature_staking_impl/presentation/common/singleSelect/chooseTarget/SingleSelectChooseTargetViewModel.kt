@@ -113,6 +113,7 @@ abstract class SingleSelectChooseTargetViewModel<T, C : SingleSelectRecommendato
     }
 
     interface SingleSelectChooseTargetState<T, C> {
+
         val defaultRecommendatorConfig: C
 
         val searchAction: SearchAction?

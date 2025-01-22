@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
@@ -147,7 +148,7 @@ class StartParachainStakingViewModel(
         val payload = withContext(Dispatchers.Default) {
             ConfirmStartParachainStakingPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
-                amount = amount,
+                amount = fee.asset.planksFromAmount(amount),
                 fee = mapFeeToParcel(fee),
                 flowMode = payload.flowMode
             )
