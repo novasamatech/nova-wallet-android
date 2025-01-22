@@ -63,8 +63,8 @@ class DAppView @JvmOverloads constructor(
         binder.itemDAppIcon.showDAppIcon(iconUrl, imageLoader)
     }
 
-    fun activateActionIcon(activate: Boolean) {
-        binder.itemDappAction.isActivated = activate
+    fun setFavoriteIconVisible(visible: Boolean) {
+        binder.itemDappFavorite.setVisible(visible)
     }
 
     fun enableSubtitleIcon(): ImageView {

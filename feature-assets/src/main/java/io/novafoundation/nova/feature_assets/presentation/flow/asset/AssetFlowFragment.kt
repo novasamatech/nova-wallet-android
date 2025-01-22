@@ -9,13 +9,15 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
-import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_assets.databinding.FragmentAssetFlowSearchBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.CompoundAssetDecorationPreferences
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.NetworkAssetDecorationPreferences
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.TokenAssetGroupDecorationPreferences

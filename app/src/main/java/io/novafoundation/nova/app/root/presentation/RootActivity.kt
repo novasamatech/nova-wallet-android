@@ -10,7 +10,7 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
+import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ContextManager
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashBackgroundHolder {
 
     @Inject
-    lateinit var navigationHolder: NavigationHolder
+    lateinit var rootNavigationHolder: RootNavigationHolder
 
     @Inject
     lateinit var systemCallExecutor: SystemCallExecutor
@@ -62,7 +62,8 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        navigationHolder.attach(navController)
+        rootNavigationHolder.attach(rootNavController)
+
         contextManager.attachActivity(this)
 
         binder.rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
@@ -81,7 +82,7 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
         super.onDestroy()
 
         contextManager.detachActivity()
-        navigationHolder.detach()
+        rootNavigationHolder.detach()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -146,9 +147,8 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 //        }
 //    }
 
-    private val navController: NavController by lazy {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.navHost) as NavHostFragment
+    private val rootNavController: NavController by lazy {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.rootNavHost) as NavHostFragment
 
         navHostFragment.navController
     }

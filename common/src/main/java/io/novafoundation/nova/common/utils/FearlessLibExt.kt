@@ -308,6 +308,14 @@ fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
 
+fun RuntimeMetadata.firstExistingCall(vararg options: Pair<String, String>): MetadataFunction {
+    val result = options.tryFindNonNull { (moduleName, functionName) ->
+        moduleOrNull(moduleName)?.callOrNull(functionName)
+    }
+
+    return requireNotNull(result)
+}
+
 fun RuntimeMetadata.firstExistingModuleOrNull(vararg options: String): Module? {
     return options.tryFindNonNull { moduleOrNull(it) }
 }

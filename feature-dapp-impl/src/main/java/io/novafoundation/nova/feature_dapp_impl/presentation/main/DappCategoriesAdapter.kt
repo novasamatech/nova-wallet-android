@@ -1,16 +1,20 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.loadOrHide
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappCategoryBinding
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 
 class DappCategoriesAdapter(
+    private val imageLoader: ImageLoader,
     private val handler: Handler,
 ) : ListAdapter<DAppCategoryModel, DappCategoryViewHolder>(DappDiffCallback) {
 
@@ -20,7 +24,7 @@ class DappCategoriesAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappCategoryViewHolder {
-        return DappCategoryViewHolder(ItemDappCategoryBinding.inflate(parent.inflater(), parent, false), handler)
+        return DappCategoryViewHolder(ItemDappCategoryBinding.inflate(parent.inflater(), parent, false), imageLoader, handler)
     }
 
     override fun onBindViewHolder(holder: DappCategoryViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -57,11 +61,13 @@ private object DappDiffCallback : DiffUtil.ItemCallback<DAppCategoryModel>() {
 
 class DappCategoryViewHolder(
     private val binder: ItemDappCategoryBinding,
+    private val imageLoader: ImageLoader,
     private val itemHandler: DappCategoriesAdapter.Handler,
 ) : RecyclerView.ViewHolder(binder.root) {
 
     fun bind(item: DAppCategoryModel) = with(binder) {
-        itemDappCategory.text = item.name
+        itemDappCategoryIcon.loadOrHide(item.iconUrl, imageLoader)
+        itemDappCategoryText.text = item.name
 
         bindSelected(item.selected)
 
@@ -69,6 +75,13 @@ class DappCategoryViewHolder(
     }
 
     fun bindSelected(isSelected: Boolean) = with(binder) {
-        itemDappCategory.isSelected = isSelected
+        root.isSelected = isSelected
+
+        // We must set tint to image view programmatically since we can't specify the state for default color in state list
+        if (isSelected) {
+            itemView.itemDappCategoryIcon.setColorFilter(ContextCompat.getColor(itemView.context, R.color.icon_primary_on_content))
+        } else {
+            itemView.itemDappCategoryIcon.clearColorFilter()
+        }
     }
 }

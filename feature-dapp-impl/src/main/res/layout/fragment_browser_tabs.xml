@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/browserTabsList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            android:id="@+id/browserTabsCloseTabs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/browser_tabs_close_all"
+            android:textColor="@color/text_primary" />
+
+        <ImageView
+            android:id="@+id/browserTabsAddTab"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_add_circle"
+            app:tint="@color/icon_primary" />
+
+        <TextView
+            android:id="@+id/browserTabsDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/common_done"
+            android:textColor="@color/text_primary" />
+
+    </FrameLayout>
+
+</LinearLayout>

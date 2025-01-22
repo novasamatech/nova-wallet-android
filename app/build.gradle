@@ -92,8 +92,6 @@ android {
             versionNameSuffix '-github'
             applicationIdSuffix '.github'
 
-            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android/releases\""
-
             buildConfigField "String", "BuildType", "\"releaseGithub\""
         }
         develop {

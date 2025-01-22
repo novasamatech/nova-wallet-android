@@ -33,6 +33,9 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import io.novasama.substrate_sdk_android.scale.dataType.DataType
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.executeAsync
@@ -64,7 +67,7 @@ class RpcCalls(
         val runtime = chainRegistry.getRuntime(chainId)
 
         return when {
-            chain.additional.feeViaRuntimeCall() && runtime.metadata.hasRuntimeApisMetadata() -> queryFeeViaRuntimeApiV15(chainId, extrinsic)
+            chain.additional.feeViaRuntimeCall() && runtime.metadata.hasDetectedPaymentApi() -> queryFeeViaRuntimeApiV15(chainId, extrinsic)
 
             chain.additional.feeViaRuntimeCall() && runtime.hasFeeDecodeType() -> queryFeeViaRuntimeApiPreV15(chainId, extrinsic)
 
@@ -144,6 +147,10 @@ class RpcCalls(
 
     suspend fun getStorageSize(chainId: ChainId, storageKey: String): BigInteger {
         return socketFor(chainId).executeAsync(GetStorageSize(storageKey)).result?.asGsonParsedNumber().orZero()
+    }
+
+    private fun RuntimeMetadata.hasDetectedPaymentApi(): Boolean {
+        return hasRuntimeApisMetadata() && runtimeApiOrNull("TransactionPaymentApi")?.methodOrNull("query_info") != null
     }
 
     private suspend fun socketFor(chainId: ChainId) = chainRegistry.getSocket(chainId)

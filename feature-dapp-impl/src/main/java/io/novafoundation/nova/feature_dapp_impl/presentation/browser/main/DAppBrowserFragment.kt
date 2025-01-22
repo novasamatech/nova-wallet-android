@@ -2,35 +2,56 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
+import android.os.Bundle
+import android.transition.TransitionInflater
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.SharedElementCallback
 import androidx.core.os.bundleOf
-
+import androidx.core.transition.addListener
+import androidx.lifecycle.viewModelScope
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.themed
-import io.novafoundation.nova.common.view.dialog.dialog
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappBrowserBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
-import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClientFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.injectWeb3
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.uninjectWeb3
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewPermissionAsker
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
-
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavorite
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabs
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsContent
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsIcon
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTransitionImage
+import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
+
+private const val OVERFLOW_TABS_COUNT = 100
+
+const val DAPP_SHARED_ELEMENT_ID_IMAGE_TAB = "DAPP_SHARED_ELEMENT_ID_IMAGE_TAB"
 
 class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrowserBinding>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
@@ -38,13 +59,13 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
         private const val PAYLOAD = "DAppBrowserFragment.Payload"
 
-        fun getBundle(initialUrl: String) = bundleOf(PAYLOAD to initialUrl)
+        fun getBundle(payload: DAppBrowserPayload) = bundleOf(PAYLOAD to payload)
     }
 
     override fun createBinding() = FragmentDappBrowserBinding.inflate(layoutInflater)
 
     @Inject
-    lateinit var web3WebViewClientFactory: Web3WebViewClientFactory
+    lateinit var compoundWeb3Injector: CompoundWeb3Injector
 
     @Inject
     lateinit var webViewHolder: WebViewHolder
@@ -52,20 +73,57 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     @Inject
     lateinit var fileChooser: WebViewFileChooser
 
+    @Inject
+    lateinit var permissionAsker: WebViewPermissionAsker
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
     private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
+
+    private val dappBrowserWebView: WebView?
+        get() {
+            return binder.dappBrowserWebViewContainer.getChildAt(0) as? WebView
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        WebView.enableSlowWholeDocumentDraw()
+        super.onCreate(savedInstanceState)
+
+        sharedElementEnterTransition = TransitionInflater.from(requireContext())
+            .inflateTransition(android.R.transition.move).apply {
+                addListener(
+                    onStart = { dappBrowserWebViewContainer.makeGone() }, // Hide WebView during transition animation
+                    onEnd = {
+                        dappBrowserWebViewContainer.makeVisible()
+                        dappBrowserTransitionImage.animate()
+                            .setDuration(300)
+                            .alpha(0f)
+                            .withEndAction { dappBrowserTransitionImage.makeGone() }
+                            .start()
+                    }
+                )
+            }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return layoutInflater.inflate(R.layout.fragment_dapp_browser, container, false)
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         fileChooser.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun initViews() {
-        webViewHolder.set(binder.dappBrowserWebView)
-
         binder.dappBrowserAddressBarGroup.applyStatusBarInsets()
 
-        binder.dappBrowserClose.setOnClickListener { viewModel.closeClicked() }
+        binder.dappBrowserHide.setOnClickListener { viewModel.closeClicked() }
 
         binder.dappBrowserBack.setOnClickListener { backClicked() }
 
@@ -74,25 +132,40 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         }
 
         binder.dappBrowserForward.setOnClickListener { forwardClicked() }
+        binder.dappBrowserTabs.setOnClickListener { viewModel.openTabs() }
         binder.dappBrowserRefresh.setOnClickListener { refreshClicked() }
-
+        binder.dappBrowserFavorite.setOnClickListener { viewModel.onFavoriteClick() }
         binder.dappBrowserMore.setOnClickListener { moreClicked() }
 
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+
+        dappBrowserTransitionImage.transitionName = DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
+
+        setEnterSharedElementCallback(object : SharedElementCallback() {
+            override fun onSharedElementStart(
+                sharedElementNames: MutableList<String>?,
+                sharedElements: MutableList<View>?,
+                sharedElementSnapshots: MutableList<View>?
+            ) {
+                val sharedView = sharedElements?.firstOrNull { it.transitionName == DAPP_SHARED_ELEMENT_ID_IMAGE_TAB }
+                val sharedImageView = sharedView as? ImageView
+                dappBrowserTransitionImage.setImageDrawable(sharedImageView?.drawable) // Set image from shared element
+            }
+        })
     }
 
     override fun onDestroyView() {
+        dappBrowserWebViewContainer.removeAllViews()
+        viewModel.detachCurrentSession()
         super.onDestroyView()
 
-        binder.dappBrowserWebView.uninjectWeb3()
-
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        webViewHolder.release()
     }
 
     override fun onPause() {
         super.onPause()
+        viewModel.makePageSnapshot()
+
         detachBackCallback()
     }
 
@@ -120,12 +193,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
 
-        webViewClient = web3WebViewClientFactory.create(binder.dappBrowserWebView, viewModel.extensionsStore, viewModel::onPageChanged, this)
-        binder.dappBrowserWebView.injectWeb3(
-            progressBar = binder.dappBrowserProgress,
-            fileChooser = fileChooser,
-            web3Client = webViewClient!!
-        )
+        viewModel.currentTabFlow.observe { currentTab ->
+            attachSession(currentTab.browserTabSession)
+        }
 
         viewModel.desktopModeChangedModel.observe {
             webViewClient?.desktopMode = it.desktopModeEnabled
@@ -136,7 +206,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
                 is Action.Authorize -> {
                     showConfirmAuthorizeSheet(it as DappPendingConfirmation<Action.Authorize>)
                 }
-                Action.CloseScreen -> showCloseConfirmation(it)
+
                 Action.AcknowledgePhishingAlert -> {
                     AcknowledgePhishingBottomSheet(requireContext(), it)
                         .show()
@@ -146,12 +216,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
         viewModel.browserCommandEvent.observeEvent {
             when (it) {
-                BrowserCommand.Reload -> binder.dappBrowserWebView.reload()
+                BrowserCommand.Reload -> dappBrowserWebView?.reload()
                 BrowserCommand.GoBack -> backClicked()
-                is BrowserCommand.OpenUrl -> binder.dappBrowserWebView.loadUrl(it.url)
+                is BrowserCommand.OpenUrl -> dappBrowserWebView?.loadUrl(it.url)
                 is BrowserCommand.ChangeDesktopMode -> {
                     webViewClient?.desktopMode = it.enabled
-                    binder.dappBrowserWebView.reload()
+                    dappBrowserWebView?.reload()
                 }
             }
         }
@@ -163,25 +233,43 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
         viewModel.currentPageAnalyzed.observe {
             binder.dappBrowserAddressBar.setAddress(it.display)
-            binder.dappBrowserAddressBar.showSecureIcon(it.isSecure)
+            binder.dappBrowserAddressBar.showSecure(it.isSecure)
+            binder.dappBrowserFavorite.setImageResource(favoriteIcon(it.isFavourite))
 
             updateButtonsState()
         }
-    }
 
-    private fun showCloseConfirmation(pendingConfirmation: DappPendingConfirmation<*>) {
-        dialog(requireContext().themed(R.style.AccentNegativeAlertDialogTheme_Reversed)) {
-            setPositiveButton(R.string.common_close) { _, _ -> pendingConfirmation.onConfirm() }
-            setNegativeButton(R.string.common_cancel) { _, _ -> pendingConfirmation.onCancel() }
-
-            setTitle(R.string.common_confirmation_title)
-            setMessage(R.string.common_close_confirmation_message)
+        viewModel.tabsCountFlow.observe {
+            if (it >= OVERFLOW_TABS_COUNT) {
+                dappBrowserTabsIcon.makeVisible()
+                dappBrowserTabsContent.text = null
+            } else {
+                dappBrowserTabsIcon.makeGone()
+                dappBrowserTabsContent.text = it.toString()
+            }
         }
     }
 
+    private fun attachSession(session: BrowserTabSession) {
+        clearProgress()
+        session.attachToHost(createChromeClient(), this)
+        webViewHolder.set(session.webView)
+        webViewClient = session.webViewClient
+
+        dappBrowserWebViewContainer.removeAllViews()
+        dappBrowserWebViewContainer.addView(session.webView)
+    }
+
+    private fun clearProgress() {
+        dappBrowserProgress.makeGone()
+        dappBrowserProgress.progress = 0
+    }
+
+    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, dappBrowserProgress, viewModel.viewModelScope)
+
     private fun updateButtonsState() {
-        binder.dappBrowserForward.isEnabled = binder.dappBrowserWebView.canGoForward()
-        binder.dappBrowserBack.isEnabled = binder.dappBrowserWebView.canGoBack()
+        binder.dappBrowserForward.isEnabled = binder.dappBrowserWebView?.canGoForward() ?: false
+        binder.dappBrowserBack.isEnabled = binder.dappBrowserWebView?.canGoBack() ?: false
     }
 
     private fun showConfirmAuthorizeSheet(pendingConfirmation: DappPendingConfirmation<Action.Authorize>) {
@@ -194,8 +282,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     }
 
     private fun backClicked() {
-        if (binder.dappBrowserWebView.canGoBack()) {
-            binder.dappBrowserWebView.goBack()
+        if (binder.dappBrowserWebView?.canGoBack() == true) {
+            binder.dappBrowserWebView?.goBack()
         } else {
             viewModel.closeClicked()
         }
@@ -229,12 +317,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         backCallback = null
     }
 
-    override fun onFavoriteClick(payload: DAppOptionsPayload) {
-        viewModel.onFavoriteClick(payload)
-    }
-
     override fun onDesktopModeClick() {
         viewModel.onDesktopClick()
+    }
+
+    override fun onPageStarted(webView: WebView, url: String, favicon: Bitmap?) {
+        compoundWeb3Injector.injectForPage(webView, viewModel.extensionsStore)
     }
 
     override fun handleBrowserIntent(intent: Intent) {
@@ -243,6 +331,18 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         } catch (e: Exception) {
             Toast.makeText(requireContext(), R.string.common_no_app_to_handle_intent, Toast.LENGTH_LONG)
                 .show()
+        }
+    }
+
+    override fun onPageChanged(webView: WebView, url: String?, title: String?) {
+        viewModel.onPageChanged(url, title)
+    }
+
+    private fun favoriteIcon(isFavorite: Boolean): Int {
+        return if (isFavorite) {
+            R.drawable.ic_favorite_heart_filled
+        } else {
+            R.drawable.ic_favorite_heart_outline
         }
     }
 }
