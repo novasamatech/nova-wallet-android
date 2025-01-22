@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.governance.TinderGo
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 
@@ -21,8 +22,9 @@ class GovernanceNavigationModule {
     fun provideRouter(
         navigationHoldersRegistry: NavigationHoldersRegistry,
         commonNavigator: Navigator,
-        contextManager: ContextManager
-    ): GovernanceRouter = GovernanceNavigator(navigationHoldersRegistry, commonNavigator, contextManager)
+        contextManager: ContextManager,
+        dAppRouter: DAppRouter
+    ): GovernanceRouter = GovernanceNavigator(navigationHoldersRegistry, commonNavigator, contextManager, dAppRouter)
 
     @Provides
     @ApplicationScope

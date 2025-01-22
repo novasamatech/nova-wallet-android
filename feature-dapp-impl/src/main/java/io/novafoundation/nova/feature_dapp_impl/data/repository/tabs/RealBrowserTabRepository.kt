@@ -52,11 +52,11 @@ class RealBrowserTabRepository(
     }
 
     override suspend fun changeCurrentUrl(tabId: String, url: String) {
-        browserTabsDao.updateCurrentUrl(tabId, url)
+        withContext(Dispatchers.Default) { browserTabsDao.updateCurrentUrl(tabId, url) }
     }
 
     override suspend fun changeKnownDAppMetadata(tabId: String, dappIconUrl: String?) {
-        browserTabsDao.updateKnownDAppMetadata(tabId, dappIconUrl)
+        withContext(Dispatchers.Default) { browserTabsDao.updateKnownDAppMetadata(tabId, dappIconUrl) }
     }
 }
 

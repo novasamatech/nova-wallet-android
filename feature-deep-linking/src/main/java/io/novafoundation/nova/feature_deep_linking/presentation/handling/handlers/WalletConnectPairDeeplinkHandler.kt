@@ -18,7 +18,7 @@ class WalletConnectPairDeeplinkHandler(
 
     override suspend fun matches(data: Uri): Boolean {
         val newLinkMatch = data.scheme == "novawallet" && data.host == "wc"
-        // Older version of wc send both pair and sign requests through `wc:` deeplink so we additionaly check for `symKey` which is only present in pairing url
+        // Older version of wc send both pair and sign requests through `wc:` deeplink so we additionally check for `symKey` which is only present in pairing url
         val oldLinkMatch = data.scheme == "wc" && "symKey" in data.toString()
 
         return newLinkMatch || oldLinkMatch
