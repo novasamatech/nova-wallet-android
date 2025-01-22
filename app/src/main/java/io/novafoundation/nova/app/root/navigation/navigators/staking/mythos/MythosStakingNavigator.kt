@@ -27,9 +27,19 @@ class MythosStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openClaimRewards() {
+        TODO("Not yet implemented")
+    }
+
     override fun returnToStartStaking() {
         navigationBuilder()
             .action(R.id.action_return_to_start_staking)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun returnToStakingMain() {
+        navigationBuilder()
+            .action(R.id.back_to_staking_main)
             .navigateInFirstAttachedContext()
     }
 }

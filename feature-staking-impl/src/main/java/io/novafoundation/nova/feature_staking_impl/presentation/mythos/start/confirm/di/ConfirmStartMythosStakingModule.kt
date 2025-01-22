@@ -15,10 +15,14 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
@@ -46,6 +50,10 @@ class ConfirmStartMythosStakingModule {
         stakingStartedDetectionService: StakingStartedDetectionService,
         mythosSharedComputation: MythosSharedComputation,
         walletUiUseCase: WalletUiUseCase,
+        validationSystem: StartMythosStakingValidationSystem,
+        stakingBlockNumberUseCase: StakingBlockNumberUseCase,
+        mythosStartStakingValidationFailureFormatter: MythosStartStakingValidationFailureFormatter,
+        interactor: StartMythosStakingInteractor,
     ): ViewModel {
         return ConfirmStartMythosStakingViewModel(
             mythosRouter = mythosRouter,
@@ -61,7 +69,11 @@ class ConfirmStartMythosStakingModule {
             payload = payload,
             stakingStartedDetectionService = stakingStartedDetectionService,
             mythosSharedComputation = mythosSharedComputation,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            validationSystem = validationSystem,
+            stakingBlockNumberUseCase = stakingBlockNumberUseCase,
+            mythosStartStakingValidationFailureFormatter = mythosStartStakingValidationFailureFormatter,
+            interactor = interactor
         )
     }
 

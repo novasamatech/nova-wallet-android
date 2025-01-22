@@ -3,7 +3,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.mythos.common
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.getValue
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -13,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosLocks
-import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.UserStakeRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.observeMythosLocks
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.total
 import io.novafoundation.nova.feature_staking_impl.domain.common.singleSelect.model.TargetWithStakedAmount
@@ -48,7 +47,7 @@ interface MythosDelegatorStateUseCase {
 @FeatureScope
 class RealMythosDelegatorStateUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val userStakeRepository: UserStakeRepository,
+    private val mythosUserStakeRepository: MythosUserStakeRepository,
     private val stakingSharedState: StakingSharedState,
     private val balanceLocksRepository: BalanceLocksRepository,
     private val collatorProvider: MythosCollatorProvider,
@@ -61,7 +60,7 @@ class RealMythosDelegatorStateUseCase @Inject constructor(
                 val accountId = selectedMetaAccount.accountIdIn(chain) ?: return@flatMapLatest flowOf(MythosDelegatorState.NotStarted)
 
                 combineToPair(
-                    userStakeRepository.userStakeFlow(chain.id, accountId),
+                    mythosUserStakeRepository.userStakeFlow(chain.id, accountId),
                     balanceLocksRepository.observeMythosLocks(selectedMetaAccount.id, chain, chainAsset)
                 ).transformLatest<_, MythosDelegatorState> { (userStake, mythosLocks) ->
                     collectDelegatorStake(userStake, mythosLocks, chain.id, accountId.intoKey())
@@ -99,7 +98,7 @@ class RealMythosDelegatorStateUseCase @Inject constructor(
             userStakeInfo == null -> emit(MythosDelegatorState.Locked.NotDelegating(mythosLocks))
 
             else -> {
-                val stakedStateUpdates = userStakeRepository.userDelegationsFlow(chainId, userAccountId, userStakeInfo.candidates)
+                val stakedStateUpdates = mythosUserStakeRepository.userDelegationsFlow(chainId, userAccountId, userStakeInfo.candidates)
                     .map { MythosDelegatorState.Locked.Delegating(userStakeInfo, it, mythosLocks) }
                 emitAll(stakedStateUpdates)
             }

@@ -73,6 +73,8 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
     }
 }
 
+fun Result<*>.coerceToUnit(): Result<Unit> = map { }
+
 @OptIn(ExperimentalTime::class)
 inline fun <R> measureExecution(label: String, function: () -> R): R {
     val (value, time) = measureTimedValue(function)

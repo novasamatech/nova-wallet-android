@@ -8,9 +8,11 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.common.singleSelect.model.TargetWithStakedAmount
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -20,6 +22,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.is
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeableBalance
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
@@ -27,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.openRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
@@ -55,6 +60,9 @@ class SetupStartMythosStakingViewModel(
     private val collatorRecommendatorFactory: MythosCollatorRecommendatorFactory,
     private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
     private val selectedAssetState: StakingSharedState,
+    private val validationSystem: StartMythosStakingValidationSystem,
+    private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
+    private val mythosStartStakingValidationFailureFormatter: MythosStartStakingValidationFailureFormatter,
     mythosSharedComputation: MythosSharedComputation,
     mythosCollatorFormatter: MythosCollatorFormatter,
     private val interactor: StartMythosStakingInteractor,
@@ -68,7 +76,8 @@ class SetupStartMythosStakingViewModel(
             mythosCollatorFormatter = mythosCollatorFormatter,
             interactor = interactor,
             mythosDelegatorStateUseCase = mythosDelegatorStateUseCase,
-            selectCollatorRequester = selectCollatorInterScreenRequester
+            selectCollatorRequester = selectCollatorInterScreenRequester,
+            stakingBlockNumberUseCase = stakingBlockNumberUseCase
         )
     },
     rewardsComponentFactory = rewardsComponentFactory,
@@ -104,26 +113,25 @@ class SetupStartMythosStakingViewModel(
     }
 
     override suspend fun goNext(target: MythosCollator, amount: BigDecimal, fee: Fee, asset: Asset) {
-        goToNextStep(fee,  asset.token.planksFromAmount(amount), target)
+        val payload = StartMythosStakingValidationPayload(
+            amount = amount,
+            fee = fee,
+            asset = asset,
+            collator = target,
+            delegatorState = logic.currentDelegatorStateFlow.first(),
+            currentBlockNumber = logic.currentBlockNumberFlow.first()
+        )
 
-//        val payload = StartParachainStakingValidationPayload(
-//            amount = amount,
-//            fee = feeLoaderMixin.awaitFee(),
-//            asset = assetFlow.first(),
-//            collator = target,
-//            delegatorState = logic.currentDelegatorStateFlow.first(),
-//        )
-//
-//        validationExecutor.requireValid(
-//            validationSystem = validationSystem,
-//            payload = payload,
-//            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
-//            progressConsumer = validationInProgress.progressConsumer()
-//        ) {
-//            validationInProgress.value = false
-//
-//            goToNextStep(fee = it.fee, amount = amount, collator = target)
-//        }
+        validationExecutor.requireValid(
+            validationSystem = validationSystem,
+            payload = payload,
+            validationFailureTransformerCustom = { reason, _ -> mythosStartStakingValidationFailureFormatter.formatValidationFailure(reason) },
+            progressConsumer = validationInProgress.progressConsumer()
+        ) {
+            validationInProgress.value = false
+
+            goToNextStep(fee, asset.token.planksFromAmount(amount), target)
+        }
     }
 
     private fun goToNextStep(
@@ -142,10 +150,14 @@ class SetupStartMythosStakingViewModel(
         private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
         private val interactor: StartMythosStakingInteractor,
         private val selectCollatorRequester: SelectMythosInterScreenRequester,
+        private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
     ) : StartSingleSelectStakingLogic<MythosCollator>,
         ComputationalScope by computationalScope {
 
         val currentDelegatorStateFlow = mythosSharedComputation.delegatorStateFlow()
+            .shareInBackground()
+
+        val currentBlockNumberFlow = stakingBlockNumberUseCase.currentBlockNumberFlow()
             .shareInBackground()
 
         override fun selectedTargetChanges(): Flow<MythosCollator> {
@@ -156,9 +168,10 @@ class SetupStartMythosStakingViewModel(
         override fun stakeableAmount(assetFlow: Flow<Asset>): Flow<Balance> {
             return combine(
                 assetFlow,
-                currentDelegatorStateFlow
-            ) { asset, mythosDelegatorState ->
-                mythosDelegatorState.stakeableBalance(asset)
+                currentDelegatorStateFlow,
+                currentBlockNumberFlow
+            ) { asset, mythosDelegatorState, currentBlockNumberFlow ->
+                mythosDelegatorState.stakeableBalance(asset, currentBlockNumberFlow)
             }
         }
 

@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Named
@@ -20,6 +21,8 @@ import javax.inject.Named
 interface MythosStakingRepository {
 
     fun minStakeFlow(chainId: ChainId): Flow<Balance>
+
+    suspend fun minStake(chainId: ChainId): Balance
 
     suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int
 
@@ -36,6 +39,12 @@ class RealMythosStakingRepository @Inject constructor(
     override fun minStakeFlow(chainId: ChainId): Flow<Balance> {
         return localStorageDataSource.subscribe(chainId) {
             metadata.collatorStaking.minStake.observeNonNull()
+        }
+    }
+
+    override suspend fun minStake(chainId: ChainId): Balance {
+        return localStorageDataSource.query(chainId) {
+            metadata.collatorStaking.minStake.queryNonNull()
         }
     }
 

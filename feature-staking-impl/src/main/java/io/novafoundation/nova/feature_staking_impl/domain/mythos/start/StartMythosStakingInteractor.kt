@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.start
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.removeFirstOrNull
+import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.StakingIntent
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeByCollator
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakedCollatorsCount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -36,6 +36,12 @@ interface StartMythosStakingInteractor {
         candidate: AccountIdKey,
         amount: Balance
     ): Fee
+
+    suspend fun stake(
+        currentState: MythosDelegatorState,
+        candidate: AccountIdKey,
+        amount: Balance
+    ): Result<Unit>
 
     suspend fun checkDelegationsLimit(
         delegatorState: MythosDelegatorState
@@ -62,8 +68,18 @@ class RealStartMythosStakingInteractor @Inject constructor(
     ): Fee {
         val chain = stakingSharedState.chain()
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
-            stakeMore(currentState, candidate, amount)
+            stakeMore(candidate, amount)
         }
+    }
+
+    override suspend fun stake(currentState: MythosDelegatorState, candidate: AccountIdKey, amount: Balance): Result<Unit> {
+        val chain = stakingSharedState.chain()
+
+        return extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.SelectedWallet) {
+            stakeMore(candidate, amount)
+        }
+            .requireOk()
+            .coerceToUnit()
     }
 
     override suspend fun checkDelegationsLimit(delegatorState: MythosDelegatorState): DelegationsLimit {
@@ -80,37 +96,11 @@ class RealStartMythosStakingInteractor @Inject constructor(
     }
 
     private fun ExtrinsicBuilder.stakeMore(
-        currentState: MythosDelegatorState,
         candidate: AccountIdKey,
         amount: Balance
     ) {
         collatorStaking.lock(amount)
 
-        val currentIntents = currentState.stakingIntents()
-        val updatedIntents = currentIntents.increaseStake(candidate, amount)
-
-        collatorStaking.stake(updatedIntents)
-    }
-
-    private fun MythosDelegatorState.stakingIntents(): List<StakingIntent> {
-        return when (this) {
-            is MythosDelegatorState.Locked.Delegating -> stakeByCollator.map { (collator, delegation) ->
-                StakingIntent(collator, delegation.stake)
-            }
-
-            is MythosDelegatorState.Locked.NotDelegating,
-            is MythosDelegatorState.NotStarted -> emptyList()
-        }
-    }
-
-    private fun List<StakingIntent>.increaseStake(candidate: AccountIdKey, value: Balance): List<StakingIntent> {
-        val result = toMutableList()
-
-        val existing = result.removeFirstOrNull { it.candidate == candidate } ?: StakingIntent.zero(candidate)
-        val updated = existing.copy(stake = existing.stake + value)
-
-        result.add(updated)
-
-        return result
+        collatorStaking.stake(listOf(StakingIntent(candidate, amount)))
     }
 }

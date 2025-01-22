@@ -8,4 +8,6 @@ interface MythosStakingRouter : StarkingReturnableRouter {
     fun openCollatorDetails(payload: StakeTargetDetailsPayload)
 
     fun openConfirmStartStaking(payload: ConfirmStartMythosStakingPayload)
+
+    fun openClaimRewards()
 }
