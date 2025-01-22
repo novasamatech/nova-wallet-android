@@ -85,7 +85,7 @@ class RealStartMythosStakingInteractor @Inject constructor(
     override suspend fun checkDelegationsLimit(delegatorState: MythosDelegatorState): DelegationsLimit {
         return withContext(Dispatchers.IO) {
             val chainId = stakingSharedState.chainId()
-            val maxCandidatesPerCollator = stakingRepository.maxCandidatesPerDelegator(chainId)
+            val maxCandidatesPerCollator = stakingRepository.maxCollatorsPerDelegator(chainId)
 
             if (delegatorState.stakedCollatorsCount() < maxCandidatesPerCollator) {
                 DelegationsLimit.NotReached

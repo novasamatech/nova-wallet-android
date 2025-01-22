@@ -24,7 +24,9 @@ interface MythosStakingRepository {
 
     suspend fun minStake(chainId: ChainId): Balance
 
-    suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int
+    suspend fun maxCollatorsPerDelegator(chainId: ChainId): Int
+
+    suspend fun maxDelegatorsPerCollator(chainId: ChainId): Int
 
     suspend fun unstakeDurationInSessions(chainId: ChainId): Int
 }
@@ -48,9 +50,15 @@ class RealMythosStakingRepository @Inject constructor(
         }
     }
 
-    override suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int {
+    override suspend fun maxCollatorsPerDelegator(chainId: ChainId): Int {
         return chainRegistry.withRuntime(chainId) {
             metadata.collatorStaking().numberConstant("MaxStakedCandidates").toInt()
+        }
+    }
+
+    override suspend fun maxDelegatorsPerCollator(chainId: ChainId): Int {
+        return chainRegistry.withRuntime(chainId) {
+            metadata.collatorStaking().numberConstant("MaxStakers").toInt()
         }
     }
 
