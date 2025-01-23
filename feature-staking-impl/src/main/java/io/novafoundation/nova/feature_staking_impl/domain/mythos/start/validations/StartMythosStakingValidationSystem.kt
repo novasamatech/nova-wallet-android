@@ -25,7 +25,10 @@ fun ValidationSystem.Companion.mythosStakingStart(
 
     enoughToPayFees()
 
+    // We should have both this and enoughStakeableAfterFees since we want to show different error messages in those two different cases
     enoughStakeable()
+
+    enoughStakeableAfterFees()
 }
 
 private fun StartMythosStakingValidationSystemBuilder.enoughToPayFees() {
@@ -42,9 +45,23 @@ private fun StartMythosStakingValidationSystemBuilder.enoughToPayFees() {
     )
 }
 
-private fun StartMythosStakingValidationSystemBuilder.enoughStakeable() {
+private fun StartMythosStakingValidationSystemBuilder.enoughStakeableAfterFees() {
     sufficientBalance(
         fee = { it.fee },
+        available = { it.stakeableAmount() },
+        amount = { it.amount },
+        error = {
+            StartMythosStakingValidationFailure.NotEnoughBalanceToPayFees(
+                chainAsset = it.payload.asset.token.configuration,
+                maxUsable = it.maxUsable,
+                fee = it.fee
+            )
+        }
+    )
+}
+
+private fun StartMythosStakingValidationSystemBuilder.enoughStakeable() {
+    sufficientBalance(
         available = { it.stakeableAmount() },
         amount = { it.amount },
         error = { StartMythosStakingValidationFailure.NotEnoughStakeableBalance }
