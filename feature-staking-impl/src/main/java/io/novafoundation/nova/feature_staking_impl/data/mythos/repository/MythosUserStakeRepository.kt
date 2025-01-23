@@ -56,7 +56,7 @@ class RealMythosUserStakeRepository @Inject constructor(
         delegationIds: List<AccountIdKey>
     ): Flow<Map<AccountIdKey, MythDelegation>> {
         return localStorageDataSource.subscribe(chainId) {
-            val allKeys = delegationIds.map { userId to it }
+            val allKeys = delegationIds.map { it to userId }
 
             metadata.collatorStaking.candidateStake.observe(allKeys).map { resultMap ->
                 resultMap.mapKeys { (keys, _) -> keys.first }
