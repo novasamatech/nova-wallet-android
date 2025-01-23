@@ -13,7 +13,7 @@ fun MythosCollator.toTargetDetailsParcel(): StakeTargetDetailsParcelModel {
             totalStake = totalStake,
             ownStake = null,
             minimumStake = null,
-            stakers = emptyList(),
+            stakers = null,
             stakersCount = delegators,
             rewards = apr.inFraction.toBigDecimal(),
             isOversubscribed = false,
