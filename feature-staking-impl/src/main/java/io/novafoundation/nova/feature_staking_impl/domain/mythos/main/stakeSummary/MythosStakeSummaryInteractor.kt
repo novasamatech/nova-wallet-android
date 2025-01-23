@@ -17,7 +17,7 @@ interface MythosStakeSummaryInteractor {
 
     context(ComputationalScope)
     fun stakeSummaryFlow(
-        delegatorState: MythosDelegatorState,
+        delegatorState: MythosDelegatorState.Locked,
         stakingOption: StakingOption,
     ): Flow<StakeSummary<MythosDelegatorStatus>>
 }
@@ -29,7 +29,7 @@ class RealMythosStakeSummaryInteractor @Inject constructor(
 
     context(ComputationalScope)
     override fun stakeSummaryFlow(
-        delegatorState: MythosDelegatorState,
+        delegatorState: MythosDelegatorState.Locked,
         stakingOption: StakingOption,
     ): Flow<StakeSummary<MythosDelegatorStatus>> {
         val chainId = stakingOption.assetWithChain.chain.id

@@ -47,7 +47,7 @@ private class MythosStakeSummaryComponent(
     )
         .shareInBackground()
 
-    private fun userStakeSummary(userStakeInfo: MythosDelegatorState): Flow<StakeSummaryModel> {
+    private fun userStakeSummary(userStakeInfo: MythosDelegatorState.Locked): Flow<StakeSummaryModel> {
         return interactor.stakeSummaryFlow(userStakeInfo, stakingOption).flatMapLatest { stakeSummary ->
             val status = stakeSummary.status.toUi()
 

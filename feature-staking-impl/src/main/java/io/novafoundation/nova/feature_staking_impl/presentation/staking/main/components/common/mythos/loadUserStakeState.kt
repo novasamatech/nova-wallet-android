@@ -6,17 +6,17 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.My
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.loadHasStakingComponentState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 fun <T> MythosSharedComputation.loadUserStakeState(
     hostContext: ComponentHostContext,
-    stateProducer: suspend (MythosDelegatorState) -> Flow<T>,
-    distinctUntilChanged: (MythosDelegatorState, MythosDelegatorState) -> Boolean = { _, _ -> false },
+    stateProducer: suspend (MythosDelegatorState.Locked) -> Flow<T>,
 ): Flow<LoadingState<T>?> = loadHasStakingComponentState(
     hostContext = hostContext,
     hasStakingStateProducer = {
         with(hostContext.scope) {
-            delegatorStateFlow().distinctUntilChanged(distinctUntilChanged)
+            delegatorStateFlow()
+                .map { it as? MythosDelegatorState.Locked }
         }
     },
     componentStateProducer = stateProducer,

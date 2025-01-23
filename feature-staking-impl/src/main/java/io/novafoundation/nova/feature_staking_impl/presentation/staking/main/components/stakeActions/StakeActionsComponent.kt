@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.mythos.MythosStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
@@ -27,6 +27,7 @@ class StakeActionsComponentFactory(
     private val parachainComponentFactory: ParachainStakeActionsComponentFactory,
     private val turingComponentFactory: TuringStakeActionsComponentFactory,
     private val nominationPoolsComponentFactory: NominationPoolsStakeActionsComponentFactory,
+    private val mythosStakeActionsComponentFactory: MythosStakeActionsComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -37,8 +38,7 @@ class StakeActionsComponentFactory(
         parachainComponentCreator = parachainComponentFactory::create,
         nominationPoolsCreator = nominationPoolsComponentFactory::create,
         turingComponentCreator = turingComponentFactory::create,
-        // TODO stake actions
-        mythosCreator = UnsupportedComponent.creator(),
+        mythosCreator = mythosStakeActionsComponentFactory::create,
         hostContext = hostContext
     )
 }
