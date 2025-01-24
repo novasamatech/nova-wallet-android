@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_dapp_api.data.model
 
-import io.novafoundation.nova.common.list.GroupedList
-
 typealias DAppUrl = String
 
 class DappCatalog(
