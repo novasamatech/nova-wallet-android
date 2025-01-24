@@ -11,6 +11,7 @@ data class DappModel(
     val description: String,
     val iconUrl: String?,
     val isFavourite: Boolean,
+    val favoriteIndex: Int?,
     val url: String
 )
 
@@ -27,7 +28,8 @@ fun mapDappToDappModel(dApp: DApp) = with(dApp) {
         description = description,
         iconUrl = iconLink,
         url = url,
-        isFavourite = isFavourite
+        isFavourite = isFavourite,
+        favoriteIndex = favoriteIndex
     )
 }
 
@@ -37,7 +39,8 @@ fun mapDappModelToDApp(dApp: DappModel) = with(dApp) {
         description = description,
         iconLink = iconUrl,
         url = url,
-        isFavourite = isFavourite
+        isFavourite = isFavourite,
+        favoriteIndex = favoriteIndex
     )
 }
 
