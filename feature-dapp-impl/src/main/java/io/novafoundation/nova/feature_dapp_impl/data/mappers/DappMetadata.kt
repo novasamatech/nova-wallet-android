@@ -29,5 +29,5 @@ fun mapDAppMetadataResponseToDAppMetadatas(
         )
     }
 
-    return DappCatalog(categories, metadata)
+    return DappCatalog(response.popular, categories, metadata)
 }

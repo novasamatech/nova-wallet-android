@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.domain
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
+import io.novafoundation.nova.feature_dapp_api.data.model.DAppGroupedCatalog
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
@@ -51,7 +52,7 @@ class DappInteractor(
             .map { it.sortDApps() }
     }
 
-    fun observeDAppsByCategory(): Flow<GroupedList<DappCategory, DApp>> {
+    fun observeDAppsByCategory(): Flow<DAppGroupedCatalog> {
         return combine(
             dAppMetadataRepository.observeDAppCatalog(),
             favouritesDAppRepository.observeFavourites()
@@ -61,12 +62,16 @@ class DappInteractor(
 
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
+            val popular = dAppCatalog.popular.mapNotNull { urlToDAppMapping[it] }
+
             // Regrouping in O(Categories * Dapps)
             // Complexity should be fine for expected amount of dApps
-            categories.associateWith { category ->
+            val catalog = categories.associateWith { category ->
                 dapps.filter { category in it.categories }
                     .map { urlToDAppMapping.getValue(it.url) }
             }
+
+            DAppGroupedCatalog(popular, catalog)
         }
     }
 
