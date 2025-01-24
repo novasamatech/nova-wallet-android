@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 class DappInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
@@ -54,17 +55,22 @@ class DappInteractor(
     }
 
     fun observeDAppsByCategory(): Flow<DAppGroupedCatalog> {
+        val shufflingSeed = Random.nextInt()
+
         return combine(
             dAppMetadataRepository.observeDAppCatalog(),
             favouritesDAppRepository.observeFavourites()
         ) { dAppCatalog, favourites ->
+            // We use random with seed to shuffle dapps in categories the same way during updates
+            val random = Random(shufflingSeed)
+
             val categories = dAppCatalog.categories
             val dapps = dAppCatalog.dApps
 
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
             val popular = dAppCatalog.popular.mapNotNull { urlToDAppMapping[it] }
-            val catalog = categories.associateWith { category -> getShuffledDAppsInCategory(category, dapps, urlToDAppMapping, dAppCatalog.popular) }
+            val catalog = categories.associateWith { getShuffledDAppsInCategory(it, dapps, urlToDAppMapping, dAppCatalog.popular, random) }
 
             DAppGroupedCatalog(popular, catalog)
         }
@@ -74,7 +80,8 @@ class DappInteractor(
         category: DappCategory,
         dapps: List<DappMetadata>,
         urlToDAppMapping: Map<String, DApp>,
-        popular: List<DAppUrl>
+        popular: List<DAppUrl>,
+        shufflingSeed: Random
     ): List<DApp> {
         val categoryDApps = dapps.filter { category in it.categories }
             .map { urlToDAppMapping.getValue(it.url) }
@@ -82,7 +89,7 @@ class DappInteractor(
         val popularDAppsInCategory = categoryDApps.filter { it.url in popular }
         val otherDAppsInCategory = categoryDApps.filterNot { it.url in popular }
 
-        return popularDAppsInCategory.shuffled() + otherDAppsInCategory.shuffled()
+        return popularDAppsInCategory.shuffled(shufflingSeed) + otherDAppsInCategory.shuffled(shufflingSeed)
     }
 
     suspend fun getDAppInfo(dAppUrl: String): DAppInfo {

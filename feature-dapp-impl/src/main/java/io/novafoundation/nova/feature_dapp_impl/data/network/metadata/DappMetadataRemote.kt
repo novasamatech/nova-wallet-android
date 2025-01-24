@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.data.network.metadata
 
 class DappMetadataResponse(
-    val popular: List<String>,
+    val popular: List<DappPopularRemote>,
     val categories: List<DappCategoryRemote>,
     val dapps: List<DappMetadataRemote>
 )
@@ -19,3 +19,5 @@ class DappCategoryRemote(
     val name: String,
     val id: String
 )
+
+class DappPopularRemote(val url: String)
