@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_dapp_impl.domain
 
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DAppGroupedCatalog
+import io.novafoundation.nova.feature_dapp_api.data.model.DAppUrl
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
+import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
@@ -63,16 +64,25 @@ class DappInteractor(
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
             val popular = dAppCatalog.popular.mapNotNull { urlToDAppMapping[it] }
-
-            // Regrouping in O(Categories * Dapps)
-            // Complexity should be fine for expected amount of dApps
-            val catalog = categories.associateWith { category ->
-                dapps.filter { category in it.categories }
-                    .map { urlToDAppMapping.getValue(it.url) }
-            }
+            val catalog = categories.associateWith { category -> getShuffledDAppsInCategory(category, dapps, urlToDAppMapping, dAppCatalog.popular) }
 
             DAppGroupedCatalog(popular, catalog)
         }
+    }
+
+    private fun getShuffledDAppsInCategory(
+        category: DappCategory,
+        dapps: List<DappMetadata>,
+        urlToDAppMapping: Map<String, DApp>,
+        popular: List<DAppUrl>
+    ): List<DApp> {
+        val categoryDApps = dapps.filter { category in it.categories }
+            .map { urlToDAppMapping.getValue(it.url) }
+
+        val popularDAppsInCategory = categoryDApps.filter { it.url in popular }
+        val otherDAppsInCategory = categoryDApps.filterNot { it.url in popular }
+
+        return popularDAppsInCategory.shuffled() + otherDAppsInCategory.shuffled()
     }
 
     suspend fun getDAppInfo(dAppUrl: String): DAppInfo {

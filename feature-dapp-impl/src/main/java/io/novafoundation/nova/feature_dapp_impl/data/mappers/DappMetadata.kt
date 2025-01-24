@@ -25,7 +25,8 @@ fun mapDAppMetadataResponseToDAppMetadatas(
             iconLink = it.icon,
             url = it.url,
             baseUrl = Urls.normalizeUrl(it.url),
-            categories = it.categories.mapNotNullTo(mutableSetOf(), categoriesAssociatedById::get)
+            categories = it.categories.mapNotNullTo(mutableSetOf(), categoriesAssociatedById::get),
+            isPopular = it.url in response.popular
         )
     }
 
