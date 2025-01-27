@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.map
 
 fun <T> MythosSharedComputation.loadUserStakeState(
     hostContext: ComponentHostContext,
-    stateProducer: suspend (MythosDelegatorState.Locked) -> Flow<T>,
+    stateProducer: suspend (MythosDelegatorState.Staked) -> Flow<T>,
 ): Flow<LoadingState<T>?> = loadHasStakingComponentState(
     hostContext = hostContext,
     hasStakingStateProducer = {
         with(hostContext.scope) {
             delegatorStateFlow()
-                .map { it as? MythosDelegatorState.Locked }
+                .map { it as? MythosDelegatorState.Staked }
         }
     },
     componentStateProducer = stateProducer,

@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNum
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosCollator
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.isDelegating
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.hasStakedCollators
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.isNotStarted
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationPayload
@@ -170,7 +170,7 @@ class ConfirmStartMythosStakingViewModel(
         val collator = payload.collator.toDomain()
 
         override fun isStakeMoreFlow(): Flow<Boolean> {
-            return currentDelegatorStateFlow.map { it.isDelegating() }
+            return currentDelegatorStateFlow.map { it.hasStakedCollators() }
         }
 
         override suspend fun collatorAddressModel(chain: Chain): AddressModel {

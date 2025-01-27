@@ -79,7 +79,7 @@ private class MythosStakeActionsComponent(
         }
     }
 
-    private fun stateFor(delegatorState: MythosDelegatorState.Locked): Flow<StakeActionsState> {
+    private fun stateFor(delegatorState: MythosDelegatorState.Staked): Flow<StakeActionsState> {
         return flowOf {
             val availableActions = availableStakingActionsFor(delegatorState)
 
@@ -87,7 +87,7 @@ private class MythosStakeActionsComponent(
         }
     }
 
-    private fun availableStakingActionsFor(delegatorState: MythosDelegatorState.Locked): List<ManageStakeAction> = buildList {
+    private fun availableStakingActionsFor(delegatorState: MythosDelegatorState.Staked): List<ManageStakeAction> = buildList {
         add(ManageStakeAction.bondMore(resourceManager))
 
         if (delegatorState.hasStakedCollators()) {

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDe
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosCollator
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.delegationAmountTo
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.isDelegating
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.hasStakedCollators
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeableBalance
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
@@ -176,7 +176,7 @@ class SetupStartMythosStakingViewModel(
         }
 
         override fun isStakeMore(): Flow<Boolean> {
-            return currentDelegatorStateFlow.map { it.isDelegating() }
+            return currentDelegatorStateFlow.map { it.hasStakedCollators() }
         }
 
         override fun alreadyStakedTargets(): Flow<List<TargetWithStakedAmount<MythosCollator>>> {
