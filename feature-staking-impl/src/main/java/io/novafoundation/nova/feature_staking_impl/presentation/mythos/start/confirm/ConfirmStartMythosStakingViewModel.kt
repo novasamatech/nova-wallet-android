@@ -147,7 +147,7 @@ class ConfirmStartMythosStakingViewModel(
         if (previousState.isNotStarted()) {
             startStakingRouter.returnToStakingDashboard()
         } else {
-            mythosRouter.returnToStartStaking()
+            mythosRouter.returnToStakingMain()
         }
     }
 

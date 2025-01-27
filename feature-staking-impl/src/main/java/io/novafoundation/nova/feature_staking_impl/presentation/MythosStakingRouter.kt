@@ -10,4 +10,8 @@ interface MythosStakingRouter : StarkingReturnableRouter {
     fun openConfirmStartStaking(payload: ConfirmStartMythosStakingPayload)
 
     fun openClaimRewards()
+
+    fun returnToStartStaking()
+
+    fun openBondMore()
 }

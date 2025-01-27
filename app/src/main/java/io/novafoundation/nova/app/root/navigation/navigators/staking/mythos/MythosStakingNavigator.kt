@@ -28,7 +28,13 @@ class MythosStakingNavigator(
     }
 
     override fun openClaimRewards() {
-        TODO("Not yet implemented")
+        // TODO
+    }
+
+    override fun openBondMore() {
+        navigationBuilder()
+            .action(R.id.action_open_MythosBondMoreGraph)
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToStartStaking() {

@@ -12,6 +12,8 @@ interface ParachainStakingRouter : StarkingReturnableRouter {
 
     fun openStartStaking(payload: StartParachainStakingPayload)
 
+    fun returnToStartStaking()
+
     fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload)
 
     fun openSearchCollator()
