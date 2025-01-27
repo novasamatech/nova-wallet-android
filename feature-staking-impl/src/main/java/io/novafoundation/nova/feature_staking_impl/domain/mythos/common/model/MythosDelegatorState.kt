@@ -91,7 +91,7 @@ fun MythosDelegatorState.requiredAdditionalLockToStake(
     desiredStake: Balance,
     currentBlockNumber: BlockNumber
 ): Balance {
-    return when(this) {
+    return when (this) {
         MythosDelegatorState.NotStarted -> desiredStake
 
         is MythosDelegatorState.Staked -> {
