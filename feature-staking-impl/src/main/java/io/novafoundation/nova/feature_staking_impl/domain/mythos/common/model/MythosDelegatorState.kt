@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
@@ -82,6 +83,20 @@ fun MythosDelegatorState.stakeableBalance(asset: Asset, currentBlockNumber: Bloc
             val fromLocked = locks.staked - userStakeInfo.balance - userStakeInfo.restrictedFromRestake(currentBlockNumber)
 
             fromNonLocked + fromLocked
+        }
+    }
+}
+
+fun MythosDelegatorState.requiredAdditionalLockToStake(
+    desiredStake: Balance,
+    currentBlockNumber: BlockNumber
+): Balance {
+    return when(this) {
+        MythosDelegatorState.NotStarted -> desiredStake
+
+        is MythosDelegatorState.Staked -> {
+            val canBeUsedFromLocked = locks.staked - userStakeInfo.balance - userStakeInfo.restrictedFromRestake(currentBlockNumber)
+            (desiredStake - canBeUsedFromLocked).atLeastZero()
         }
     }
 }

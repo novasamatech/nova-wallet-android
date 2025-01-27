@@ -16,10 +16,14 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.requiredAdditionalLockToStake
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakedCollatorsCount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.chain
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -53,6 +57,7 @@ class RealStartMythosStakingInteractor @Inject constructor(
     private val mythosSharedComputation: MythosSharedComputation,
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
+    private val chainStateRepository: ChainStateRepository,
     private val stakingRepository: MythosStakingRepository
 ) : StartMythosStakingInteractor {
 
@@ -68,7 +73,7 @@ class RealStartMythosStakingInteractor @Inject constructor(
     ): Fee {
         val chain = stakingSharedState.chain()
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
-            stakeMore(candidate, amount)
+            stakeMore(chain, currentState, candidate, amount)
         }
     }
 
@@ -76,7 +81,7 @@ class RealStartMythosStakingInteractor @Inject constructor(
         val chain = stakingSharedState.chain()
 
         return extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.SelectedWallet) {
-            stakeMore(candidate, amount)
+            stakeMore(chain, currentState, candidate, amount)
         }
             .requireOk()
             .coerceToUnit()
@@ -95,11 +100,18 @@ class RealStartMythosStakingInteractor @Inject constructor(
         }
     }
 
-    private fun ExtrinsicBuilder.stakeMore(
+    private suspend fun ExtrinsicBuilder.stakeMore(
+        chain: Chain,
+        currentState: MythosDelegatorState,
         candidate: AccountIdKey,
         amount: Balance
     ) {
-        collatorStaking.lock(amount)
+        val currentBlockNumber = chainStateRepository.currentBlock(chain.id)
+
+        val extraToLock = currentState.requiredAdditionalLockToStake(desiredStake = amount, currentBlockNumber)
+        if (extraToLock.isPositive()) {
+            collatorStaking.lock(amount)
+        }
 
         collatorStaking.stake(listOf(StakingIntent(candidate, amount)))
     }
