@@ -13,7 +13,7 @@ class MythosCollator(
     val identity: OnChainIdentity?,
     val totalStake: Balance,
     val delegators: Int,
-    val apy: Fraction?,
+    val apr: Fraction?,
 ) : Identifiable, WithAccountId {
 
     override val identifier: String = accountId.value.toHexString()

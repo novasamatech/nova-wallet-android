@@ -214,6 +214,8 @@ fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
 
 fun Double?.orZero(): Double = this ?: 0.0
 
+fun Int?.orZero(): Int = this ?: 0
+
 fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
 }

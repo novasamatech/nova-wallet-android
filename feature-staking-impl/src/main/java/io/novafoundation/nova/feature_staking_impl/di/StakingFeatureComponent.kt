@@ -32,6 +32,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.di.SelectMythosCollatorComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.di.SelectMythCollatorSettingsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.di.SetupStartMythosStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
@@ -241,6 +245,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun startMythosStakingFactory(): SetupStartMythosStakingComponent.Factory
 
+    fun selectMythosCollatorFactory(): SelectMythosCollatorComponent.Factory
+
+    fun selectMythosSettingsFactory(): SelectMythCollatorSettingsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -248,10 +256,13 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance router: StakingRouter,
 
             @BindsInstance parachainStaking: ParachainStakingRouter,
-            @BindsInstance mythosStakingRouter: MythosStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+
+            @BindsInstance mythosStakingRouter: MythosStakingRouter,
+            @BindsInstance selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+            @BindsInstance selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
 
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 

@@ -17,13 +17,13 @@ class FilteringSingleSelectRecommendator<T : WithAccountId>(
     private val excluded: Set<AccountIdKey>
 ) : SingleSelectRecommendator<T> {
 
-    fun recommendations(sorting: Comparator<T>): List<T> {
+    override fun recommendations(config: SingleSelectRecommendatorConfig<T>): List<T> {
         return allTargets.filter { it.accountId !in excluded }
             .sortedWith(
                 // accounts from recommended list first
                 compareByDescending<T> { it.accountId in recommended }
                     // then by the supplied sorting rule
-                    .then(sorting)
+                    .then(config)
             )
     }
 

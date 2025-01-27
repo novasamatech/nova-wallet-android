@@ -12,12 +12,18 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.lock
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.stake
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeByCollator
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakedCollatorsCount
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface StartMythosStakingInteractor {
@@ -30,6 +36,10 @@ interface StartMythosStakingInteractor {
         candidate: AccountIdKey,
         amount: Balance
     ): Fee
+
+    suspend fun checkDelegationsLimit(
+        delegatorState: MythosDelegatorState
+    ): DelegationsLimit
 }
 
 @FeatureScope
@@ -37,6 +47,7 @@ class RealStartMythosStakingInteractor @Inject constructor(
     private val mythosSharedComputation: MythosSharedComputation,
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
+    private val stakingRepository: MythosStakingRepository
 ) : StartMythosStakingInteractor {
 
     context(ComputationalScope)
@@ -52,6 +63,19 @@ class RealStartMythosStakingInteractor @Inject constructor(
         val chain = stakingSharedState.chain()
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             stakeMore(currentState, candidate, amount)
+        }
+    }
+
+    override suspend fun checkDelegationsLimit(delegatorState: MythosDelegatorState): DelegationsLimit {
+        return withContext(Dispatchers.IO) {
+            val chainId = stakingSharedState.chainId()
+            val maxCandidatesPerCollator = stakingRepository.maxCandidatesPerDelegator(chainId)
+
+            if (delegatorState.stakedCollatorsCount() < maxCandidatesPerCollator) {
+                DelegationsLimit.NotReached
+            } else {
+                DelegationsLimit.Reached(maxCandidatesPerCollator)
+            }
         }
     }
 

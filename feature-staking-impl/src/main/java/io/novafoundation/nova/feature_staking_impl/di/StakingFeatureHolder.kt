@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -32,6 +34,8 @@ class StakingFeatureHolder @Inject constructor(
     private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+    private val selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+    private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -56,6 +60,8 @@ class StakingFeatureHolder @Inject constructor(
                 nominationPoolsRouter = nominationPoolsRouter,
                 startMultiStakingRouter = startMultiStakingRouter,
                 stakingDashboardRouter = stakingDashboardRouter,
+                selectMythosCollatorInterScreenCommunicator = selectMythosCollatorInterScreenCommunicator,
+                selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
                 deps = dependencies
             )
     }

@@ -21,6 +21,8 @@ interface MythosStakingRepository {
 
     fun minStakeFlow(chainId: ChainId): Flow<Balance>
 
+    suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int
+
     suspend fun unstakeDurationInSessions(chainId: ChainId): Int
 }
 
@@ -34,6 +36,12 @@ class RealMythosStakingRepository @Inject constructor(
     override fun minStakeFlow(chainId: ChainId): Flow<Balance> {
         return localStorageDataSource.subscribe(chainId) {
             metadata.collatorStaking.minStake.observeNonNull()
+        }
+    }
+
+    override suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int {
+        return chainRegistry.withRuntime(chainId) {
+            metadata.collatorStaking().numberConstant("MaxStakedCandidates").toInt()
         }
     }
 

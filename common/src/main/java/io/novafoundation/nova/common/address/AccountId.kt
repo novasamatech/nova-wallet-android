@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.address
 
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class AccountIdKey(val value: AccountId) {
@@ -16,6 +17,10 @@ class AccountIdKey(val value: AccountId) {
 }
 
 fun AccountId.intoKey() = AccountIdKey(this)
+
+fun AccountIdKey.toHex(): String {
+    return value.toHexString()
+}
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))
 fun <T> Map<AccountIdKey, T>.getValue(key: AccountId) = getValue(AccountIdKey(key))

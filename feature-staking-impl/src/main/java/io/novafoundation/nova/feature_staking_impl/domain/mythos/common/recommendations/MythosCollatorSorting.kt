@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.My
 
 enum class MythosCollatorSorting(private val collatorComparator: Comparator<MythosCollator>) : Comparator<MythosCollator> by collatorComparator {
 
-    REWARDS(compareByDescending { it.apy }),
+    REWARDS(compareByDescending { it.apr }),
     TOTAL_STAKE(compareByDescending { it.totalStake }),
 }
 
