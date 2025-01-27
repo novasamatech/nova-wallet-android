@@ -77,7 +77,8 @@ class RealParachainStakingRewardCalculator(
 
         return PeriodReturns(
             gainAmount = amount * collatorApr,
-            gainFraction = collatorApr
+            gainFraction = collatorApr,
+            isCompound = false
         )
     }
 
@@ -86,7 +87,8 @@ class RealParachainStakingRewardCalculator(
 
         return PeriodReturns(
             gainAmount = amount * averageApr,
-            gainFraction = averageApr
+            gainFraction = averageApr,
+            isCompound = false
         )
     }
 

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
-import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.utils.takeUnlessZero
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
@@ -10,11 +10,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.userStake
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythosStakingFreezeIds
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.observeMythosLocks
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.total
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.cache.StorageCachingContext
 import io.novafoundation.nova.runtime.storage.cache.cacheValues
@@ -74,8 +74,8 @@ class StakingDashboardMythosUpdater(
     }
 
     private fun subscribeToTotalStake(): Flow<Balance?> {
-        return balanceLocksRepository.observeBalanceLocks(metaAccount.id, chain, chainAsset).map { locks ->
-            locks.getTotalStake()
+        return balanceLocksRepository.observeMythosLocks(metaAccount.id, chain, chainAsset).map { mythosLocks ->
+            mythosLocks.total.takeUnlessZero()
         }
     }
 
@@ -114,15 +114,6 @@ class StakingDashboardMythosUpdater(
                 estimatedEarnings = fromCache?.estimatedEarnings
             )
         }
-    }
-
-    private fun List<BalanceLock>.getTotalStake(): Balance? {
-        val stakingLock = findById(MythosStakingFreezeIds.STAKING)
-        val releasingLock = findById(MythosStakingFreezeIds.RELEASING)
-
-        if (stakingLock == null && releasingLock == null) return null
-
-        return stakingLock?.amountInPlanks.orZero() + releasingLock?.amountInPlanks.orZero()
     }
 
     private class OnChainInfo(

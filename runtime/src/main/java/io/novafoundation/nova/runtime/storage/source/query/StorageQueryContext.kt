@@ -3,6 +3,9 @@ package io.novafoundation.nova.runtime.storage.source.query
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.storage.source.StorageEntries
+import io.novafoundation.nova.runtime.storage.source.StorageKey
+import io.novafoundation.nova.runtime.storage.source.StorageValue
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
@@ -36,7 +39,7 @@ interface StorageQueryContext : RuntimeContext {
         binding: DynamicInstanceBinder<V>
     ): Flow<WithRawValue<V>>
 
-    suspend fun <K, V> StorageEntry.observe(
+    fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>
@@ -57,11 +60,11 @@ interface StorageQueryContext : RuntimeContext {
 
     suspend fun StorageEntry.entriesRaw(
         vararg prefixArgs: Any?,
-    ): Map<String, String?>
+    ): Map<StorageKey, StorageValue>
 
     suspend fun StorageEntry.entriesRaw(
         keysArguments: List<List<Any?>>
-    ): Map<String, String?>
+    ): StorageEntries
 
     suspend fun <K, V> StorageEntry.entries(
         keysArguments: List<List<Any?>>,
@@ -77,7 +80,7 @@ interface StorageQueryContext : RuntimeContext {
 
     suspend fun StorageEntry.queryRaw(
         vararg keyArguments: Any?
-    ): String?
+    ): StorageValue
 
     @Deprecated("Use multi for better smart-casting", replaceWith = ReplaceWith(expression = "multi(builderBlock)"))
     suspend fun multiInternal(

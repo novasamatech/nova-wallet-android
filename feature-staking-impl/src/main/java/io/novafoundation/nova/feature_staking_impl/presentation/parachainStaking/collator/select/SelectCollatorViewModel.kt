@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select
 
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -54,7 +53,7 @@ class SelectCollatorViewModel(
 ) : BaseViewModel() {
 
     private val collatorRecommendator by lazyAsync {
-        collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), scope = viewModelScope)
+        collatorRecommendatorFactory.create(selectedAssetState.selectedOption(), computationalScope = this)
     }
 
     private val recommendationConfigFlow = MutableStateFlow(defaultConfig())

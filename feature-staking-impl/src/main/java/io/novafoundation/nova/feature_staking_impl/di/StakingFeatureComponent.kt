@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.stakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StartMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
@@ -31,6 +32,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.di.SetupStartMythosStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.di.NominationPoolsClaimRewardsComponent
@@ -215,6 +217,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun parachainStakingRebondFactory(): ParachainStakingRebondComponent.Factory
 
+    // turing
+
     fun setupYieldBoostComponentFactory(): SetupYieldBoostComponent.Factory
 
     fun confirmYieldBoostComponentFactory(): YieldBoostConfirmComponent.Factory
@@ -233,6 +237,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun nominationPoolsStakingClaimRewards(): NominationPoolsClaimRewardsComponent.Factory
 
+    // Mythos staking
+
+    fun startMythosStakingFactory(): SetupStartMythosStakingComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -240,6 +248,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance router: StakingRouter,
 
             @BindsInstance parachainStaking: ParachainStakingRouter,
+            @BindsInstance mythosStakingRouter: MythosStakingRouter,
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,

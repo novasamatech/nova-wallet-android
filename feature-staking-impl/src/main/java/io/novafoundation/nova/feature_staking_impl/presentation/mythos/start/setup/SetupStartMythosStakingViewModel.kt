@@ -1,0 +1,178 @@
+package io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup
+
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.data.memory.ComputationalScope
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.hints.NoHintsMixin
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.common.singleSelect.model.TargetWithStakedAmount
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDelegatorStateUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosCollator
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.delegationAmountTo
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.isDelegating
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeableBalance
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import java.math.BigDecimal
+
+class SetupStartMythosStakingViewModel(
+    private val router: MythosStakingRouter,
+    rewardsComponentFactory: MythosStakingRewardsComponentFactory,
+    assetUseCase: AssetUseCase,
+    private val resourceManager: ResourceManager,
+    validationExecutor: ValidationExecutor,
+    feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val collatorRecommendatorFactory: MythosCollatorRecommendatorFactory,
+    private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
+    private val selectedAssetState: StakingSharedState,
+    mythosSharedComputation: MythosSharedComputation,
+    mythosCollatorFormatter: MythosCollatorFormatter,
+    interactor: StartMythosStakingInteractor,
+    amountChooserMixinFactory: AmountChooserMixin.Factory,
+) : StartSingleSelectStakingViewModel<MythosCollator, SetupStartMythosStakingViewModel.MythosLogic>(
+    logicFactory = { scope ->
+        MythosLogic(
+            computationalScope = scope,
+            mythosSharedComputation = mythosSharedComputation,
+            mythosCollatorFormatter = mythosCollatorFormatter,
+            interactor = interactor,
+            mythosDelegatorStateUseCase = mythosDelegatorStateUseCase
+        )
+    },
+    rewardsComponentFactory = rewardsComponentFactory,
+    assetUseCase = assetUseCase,
+    resourceManager = resourceManager,
+    validationExecutor = validationExecutor,
+    feeLoaderMixin = feeLoaderMixin,
+    actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+    recommendatorFactory = collatorRecommendatorFactory,
+    selectedAssetState = selectedAssetState,
+    router = router,
+    amountChooserMixinFactory = amountChooserMixinFactory,
+) {
+
+    override val hintsMixin = NoHintsMixin()
+
+    override suspend fun openSelectNewTarget() {
+        showMessage("TODO")
+    }
+
+    override suspend fun openSelectFirstTarget() {
+        showMessage("TODO")
+    }
+
+    override suspend fun goNext(target: MythosCollator, amount: BigDecimal, fee: Fee, asset: Asset) {
+        showMessage("TODO")
+
+//        val payload = StartParachainStakingValidationPayload(
+//            amount = amount,
+//            fee = feeLoaderMixin.awaitFee(),
+//            asset = assetFlow.first(),
+//            collator = target,
+//            delegatorState = logic.currentDelegatorStateFlow.first(),
+//        )
+//
+//        validationExecutor.requireValid(
+//            validationSystem = validationSystem,
+//            payload = payload,
+//            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+//            progressConsumer = validationInProgress.progressConsumer()
+//        ) {
+//            validationInProgress.value = false
+//
+//            goToNextStep(fee = it.fee, amount = amount, collator = target)
+//        }
+    }
+
+//    private fun goToNextStep(
+//        fee: Fee,
+//        amount: BigDecimal,
+//        collator: Collator,
+//    ) = launch {
+//        val payload = withContext(Dispatchers.Default) {
+//            ConfirmStartParachainStakingPayload(
+//                collator = mapCollatorToCollatorParcelModel(collator),
+//                amount = amount,
+//                fee = mapFeeToParcel(fee),
+//                flowMode = payload.flowMode
+//            )
+//        }
+//
+//        router.openConfirmStartStaking(payload)
+//    }
+
+    class MythosLogic(
+        computationalScope: ComputationalScope,
+        private val mythosSharedComputation: MythosSharedComputation,
+        private val mythosCollatorFormatter: MythosCollatorFormatter,
+        private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
+        private val interactor: StartMythosStakingInteractor,
+    ) : StartSingleSelectStakingLogic<MythosCollator>,
+        ComputationalScope by computationalScope {
+
+        val currentDelegatorStateFlow = mythosSharedComputation.delegatorStateFlow()
+            .shareInBackground()
+
+        override fun selectedTargetChanges(): Flow<MythosCollator> {
+            // TODO
+            return emptyFlow()
+        }
+
+        override fun stakeableAmount(assetFlow: Flow<Asset>): Flow<Balance> {
+            return combine(
+                assetFlow,
+                currentDelegatorStateFlow
+            ) { asset, mythosDelegatorState ->
+                mythosDelegatorState.stakeableBalance(asset)
+            }
+        }
+
+        override fun isStakeMore(): Flow<Boolean> {
+            return currentDelegatorStateFlow.map { it.isDelegating() }
+        }
+
+        override fun alreadyStakedTargets(): Flow<List<TargetWithStakedAmount<MythosCollator>>> {
+            return currentDelegatorStateFlow.map { mythosDelegatorStateUseCase.getStakedCollators(it) }
+        }
+
+        override fun alreadyStakedAmountTo(accountIdKey: AccountIdKey): Flow<Balance> {
+            return currentDelegatorStateFlow.map {
+                it.delegationAmountTo(accountIdKey).orZero()
+            }
+        }
+
+        override suspend fun mapStakedTargetToUi(target: TargetWithStakedAmount<MythosCollator>, asset: Asset): SelectStakeTargetModel<MythosCollator> {
+            return mythosCollatorFormatter.collatorToUi(target, asset)
+        }
+
+        override suspend fun minimumStakeToGetRewards(selectedStakeTarget: MythosCollator?): Balance {
+            return interactor.minStake()
+        }
+
+        override suspend fun estimateFee(amount: Balance, targetId: AccountIdKey): Fee {
+            return interactor.estimateFee(currentDelegatorStateFlow.first(), targetId, amount)
+        }
+    }
+}

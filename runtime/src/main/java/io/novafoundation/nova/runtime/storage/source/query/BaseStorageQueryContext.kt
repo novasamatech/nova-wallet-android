@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.common.utils.createStorageKey
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.storage.source.StorageEntries
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -46,7 +47,7 @@ abstract class BaseStorageQueryContext(
 
     protected abstract fun observeKey(key: String): Flow<StorageUpdate>
 
-    protected abstract suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
+    protected abstract fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
 
     protected abstract suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>>
 
@@ -109,11 +110,11 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-    override suspend fun StorageEntry.entriesRaw(vararg prefixArgs: Any?): Map<String, String?> {
+    override suspend fun StorageEntry.entriesRaw(vararg prefixArgs: Any?): StorageEntries {
         return queryEntriesByPrefix(storageKey(runtime, *prefixArgs), at)
     }
 
-    override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): Map<String, String?> {
+    override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): StorageEntries {
         return queryKeys(storageKeys(runtime, keysArguments), at)
     }
 
@@ -174,7 +175,7 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-    override suspend fun <K, V> StorageEntry.observe(
+    override fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>

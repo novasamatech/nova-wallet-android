@@ -361,6 +361,10 @@ inline fun <K, V> Map<K, V?>.filterNotNull(): Map<K, V> {
     return filterValues { it != null } as Map<K, V>
 }
 
+inline fun <K1, K2, V> Map<Pair<K1, K2>, V>.dropSecondKey(): Map<K1, V> {
+    return mapKeys { (keys, _) -> keys.first }
+}
+
 inline fun <T, R> Array<T>.tryFindNonNull(transform: (T) -> R?): R? {
     for (item in this) {
         val transformed = transform(item)
@@ -491,6 +495,11 @@ fun <T> List<T>.removed(condition: (T) -> Boolean): List<T> {
 
 fun <T> List<T>.added(toAdd: T): List<T> {
     return toMutableList().apply { add(toAdd) }
+}
+
+fun <T : Any> MutableList<T>.removeFirstOrNull(condition: (T) -> Boolean): T? {
+    val index = indexOfFirstOrNull(condition) ?: return null
+    return removeAt(index)
 }
 
 fun <T> List<T>.prepended(toPrepend: T): List<T> {

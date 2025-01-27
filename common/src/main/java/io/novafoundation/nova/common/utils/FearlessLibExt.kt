@@ -117,6 +117,10 @@ fun BigInteger.toUnsignedLittleEndian(): ByteArray {
     return toUnsignedBytes().reversedArray()
 }
 
+fun BigInteger.takeUnlessZero(): BigInteger? {
+    return takeUnless { isZero }
+}
+
 fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
 
 fun <T> DataType<T>.fromHex(hex: String): T {
