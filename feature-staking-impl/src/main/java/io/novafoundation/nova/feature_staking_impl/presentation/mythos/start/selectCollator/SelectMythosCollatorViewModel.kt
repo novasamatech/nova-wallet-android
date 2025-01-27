@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenResponder
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.details.mythos
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.toDomain
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.model.toParcel
@@ -56,7 +56,7 @@ class SelectMythosCollatorViewModel(
     }
 
     override suspend fun targetSelected(target: MythosCollator) {
-        selectCollatorResponder.respond(target.toParcelable())
+        selectCollatorResponder.respond(target.toParcel())
         router.returnToStartStaking()
     }
 

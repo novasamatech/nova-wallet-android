@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 
 interface MythosStakingRouter : StarkingReturnableRouter {
@@ -16,4 +17,6 @@ interface MythosStakingRouter : StarkingReturnableRouter {
     fun openBondMore()
 
     fun openUnbond()
+
+    fun openUnbondConfirm(payload: ConfirmUnbondMythosPayload)
 }

@@ -34,7 +34,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.va
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.openRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -139,7 +139,7 @@ class SetupStartMythosStakingViewModel(
         amount: Balance,
         collator: MythosCollator,
     ) {
-        val payload = ConfirmStartMythosStakingPayload(collator.toParcelable(), amount, fee.toParcel())
+        val payload = ConfirmStartMythosStakingPayload(collator.toParcel(), amount, fee.toParcel())
         router.openConfirmStartStaking(payload)
     }
 

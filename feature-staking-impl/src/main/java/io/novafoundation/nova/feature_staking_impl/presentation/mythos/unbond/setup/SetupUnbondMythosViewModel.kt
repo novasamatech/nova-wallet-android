@@ -26,6 +26,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.My
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.model.MythosCollatorWithAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.model.MythosSelectCollatorModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcel
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -35,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModel
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -208,7 +211,13 @@ class SetupUnbondMythosViewModel(
         }
     }
 
-    private fun goToNextStep(fee: Fee, collator: MythosCollator) {
-        showMessage("TODO Open confirm")
+    private fun goToNextStep(fee: Fee, collator: MythosCollator) = launch {
+        val nextScreenPayload = ConfirmUnbondMythosPayload(
+            collator = collator.toParcel(),
+            amount = stakedAmount.first(),
+            fee = fee.toParcel()
+        )
+
+        router.openUnbondConfirm(nextScreenPayload)
     }
 }

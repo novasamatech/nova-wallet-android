@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.sel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.di.SelectMythCollatorSettingsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.di.SetupStartMythosStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.di.ConfirmUnbondMythosComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup.di.SetupUnbondMythosComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
@@ -254,6 +255,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun confirmStartMythosStakingFactory(): ConfirmStartMythosStakingComponent.Factory
 
     fun setupUnbondMythosFactory(): SetupUnbondMythosComponent.Factory
+
+    fun confirmUnbondMythosFactory(): ConfirmUnbondMythosComponent.Factory
 
     @Component.Factory
     interface Factory {
