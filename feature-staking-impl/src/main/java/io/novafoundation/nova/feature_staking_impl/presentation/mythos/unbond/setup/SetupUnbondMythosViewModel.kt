@@ -209,6 +209,6 @@ class SetupUnbondMythosViewModel(
     }
 
     private fun goToNextStep(fee: Fee, collator: MythosCollator) {
-       showMessage("TODO Open confirm")
+        showMessage("TODO Open confirm")
     }
 }

@@ -6,7 +6,6 @@ import java.math.BigDecimal
 
 sealed class UnbondMythosStakingValidationFailure {
 
-
     class NotEnoughBalanceToPayFees(
         override val chainAsset: Chain.Asset,
         override val maxUsable: BigDecimal,
