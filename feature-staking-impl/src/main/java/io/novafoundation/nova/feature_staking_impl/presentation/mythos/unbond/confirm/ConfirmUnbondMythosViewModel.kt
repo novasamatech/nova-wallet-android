@@ -40,7 +40,7 @@ class ConfirmUnbondMythosViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
     private val validationSystem: UnbondMythosValidationSystem,
-    private val interactor:  UnbondMythosStakingInteractor,
+    private val interactor: UnbondMythosStakingInteractor,
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
@@ -116,7 +116,8 @@ class ConfirmUnbondMythosViewModel(
         )
 
         validationExecutor.requireValid(
-            validationSystem = validationSystem, payload = payload,
+            validationSystem = validationSystem,
+            payload = payload,
             validationFailureTransformerCustom = { failure, _ -> validationFailureFormatter.formatUnbond(failure) },
             progressConsumer = _showNextProgress.progressConsumer(),
             block = ::sendTransaction

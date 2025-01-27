@@ -36,7 +36,7 @@ class ConfirmUnbondMythosModule {
         addressIconGenerator: AddressIconGenerator,
         resourceManager: ResourceManager,
         validationSystem: UnbondMythosValidationSystem,
-        interactor:  UnbondMythosStakingInteractor,
+        interactor: UnbondMythosStakingInteractor,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         externalActions: ExternalActions.Presentation,
         selectedAssetState: StakingSharedState,
