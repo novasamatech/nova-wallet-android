@@ -42,7 +42,27 @@ fun CollatorStakingCalls.stake(intents: List<StakingIntent>) {
     )
 }
 
-private fun StakingIntent.toEncodableInstance(): Any? {
+fun CollatorStakingCalls.unstakeFrom(collatorId: AccountIdKey) {
+    builder.call(
+        moduleName = Modules.COLLATOR_STAKING,
+        callName = "unstake_from",
+        arguments = mapOf(
+            "account" to collatorId.value
+        )
+    )
+}
+
+fun CollatorStakingCalls.unlock(amount: Balance) {
+    builder.call(
+        moduleName = Modules.COLLATOR_STAKING,
+        callName = "unlock",
+        arguments = mapOf(
+            "maybe_amount" to amount
+        )
+    )
+}
+
+private fun StakingIntent.toEncodableInstance(): Any {
     return structOf(
         "candidate" to candidate.value,
         "stake" to stake

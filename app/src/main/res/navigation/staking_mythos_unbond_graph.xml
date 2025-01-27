@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staking_mythos_unbond_graph"
+    app:startDestination="@id/setupUnbondMythosFragment">
+
+    <fragment
+        android:id="@+id/setupUnbondMythosFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup.SetupUnbondMythosFragment"
+        android:label="SetupUnbondMythosFragment" />
+</navigation>

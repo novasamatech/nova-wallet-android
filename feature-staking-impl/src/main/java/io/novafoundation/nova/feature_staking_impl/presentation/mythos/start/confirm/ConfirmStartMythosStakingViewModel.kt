@@ -31,7 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRou
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.startConfirm.ConfirmStartSingleTargetStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.collatorAddressModel
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingViewModel.MythosConfirmStartStakingState
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.details.mythos
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
@@ -63,7 +63,7 @@ class ConfirmStartMythosStakingViewModel(
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val validationSystem: StartMythosStakingValidationSystem,
     private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
-    private val mythosStartStakingValidationFailureFormatter: MythosStartStakingValidationFailureFormatter,
+    private val mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val interactor: StartMythosStakingInteractor,
     mythosSharedComputation: MythosSharedComputation,
     walletUiUseCase: WalletUiUseCase,
@@ -105,7 +105,7 @@ class ConfirmStartMythosStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformerCustom = { reason, _ -> mythosStartStakingValidationFailureFormatter.formatValidationFailure(reason) },
+            validationFailureTransformerCustom = { reason, _ -> mythosStakingValidationFailureFormatter.formatStartStaking(reason) },
             progressConsumer = _showNextProgress.progressConsumer()
         ) {
             sendTransaction(amount, it.collator, it.delegatorState)

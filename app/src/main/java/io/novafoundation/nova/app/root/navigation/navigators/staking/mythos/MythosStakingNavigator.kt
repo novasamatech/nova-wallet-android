@@ -37,6 +37,12 @@ class MythosStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openUnbond() {
+        navigationBuilder()
+            .action(R.id.action_stakingFragment_to_stakingMythosUnbondGraph)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun returnToStartStaking() {
         navigationBuilder()
             .action(R.id.action_return_to_start_staking)

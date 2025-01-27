@@ -30,8 +30,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.selectSta
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.openRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
@@ -62,7 +62,7 @@ class SetupStartMythosStakingViewModel(
     private val selectedAssetState: StakingSharedState,
     private val validationSystem: StartMythosStakingValidationSystem,
     private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
-    private val mythosStartStakingValidationFailureFormatter: MythosStartStakingValidationFailureFormatter,
+    private val mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     mythosSharedComputation: MythosSharedComputation,
     mythosCollatorFormatter: MythosCollatorFormatter,
     private val interactor: StartMythosStakingInteractor,
@@ -125,7 +125,7 @@ class SetupStartMythosStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformerCustom = { reason, _ -> mythosStartStakingValidationFailureFormatter.formatValidationFailure(reason) },
+            validationFailureTransformerCustom = { reason, _ -> mythosStakingValidationFailureFormatter.formatStartStaking(reason) },
             progressConsumer = validationInProgress.progressConsumer()
         ) {
             validationInProgress.value = false

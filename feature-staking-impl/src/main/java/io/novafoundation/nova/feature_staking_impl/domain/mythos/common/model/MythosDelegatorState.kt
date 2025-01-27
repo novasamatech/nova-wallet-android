@@ -66,6 +66,10 @@ fun MythosDelegatorState.stakedCollatorsCount(): Int {
     }
 }
 
+fun MythosDelegatorState.hasStakedCollators(): Boolean {
+    return stakedCollatorsCount() > 0
+}
+
 fun MythosDelegatorState.hasActiveValidators(sessionValidators: SessionValidators): Boolean {
     return when (this) {
         is MythosDelegatorState.Locked.Delegating -> userStakeInfo.hasActiveValidators(sessionValidators)

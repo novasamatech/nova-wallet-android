@@ -14,4 +14,6 @@ interface MythosStakingRouter : StarkingReturnableRouter {
     fun returnToStartStaking()
 
     fun openBondMore()
+
+    fun openUnbond()
 }
