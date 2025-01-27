@@ -6,6 +6,8 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
@@ -34,6 +36,19 @@ class MythosStakingNavigator(
     override fun openBondMore() {
         navigationBuilder()
             .action(R.id.action_open_MythosBondMoreGraph)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openUnbond() {
+        navigationBuilder()
+            .action(R.id.action_stakingFragment_to_stakingMythosUnbondGraph)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openUnbondConfirm(payload: ConfirmUnbondMythosPayload) {
+        navigationBuilder()
+            .action(R.id.action_setupUnbondMythosFragment_to_confirmUnbondMythosFragment)
+            .setArgs(ConfirmUnbondMythosFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 

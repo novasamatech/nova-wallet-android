@@ -9,7 +9,9 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.hasStakedCollators
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.mythos.loadUserStakeState
@@ -19,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.bondMore
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -72,10 +75,11 @@ private class MythosStakeActionsComponent(
     private fun navigateToAction(action: ManageStakeAction) {
         when (action.id) {
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openBondMore()
+            SYSTEM_MANAGE_STAKING_UNBOND -> router.openUnbond()
         }
     }
 
-    private fun stateFor(delegatorState: MythosDelegatorState.Locked): Flow<StakeActionsState> {
+    private fun stateFor(delegatorState: MythosDelegatorState.Staked): Flow<StakeActionsState> {
         return flowOf {
             val availableActions = availableStakingActionsFor(delegatorState)
 
@@ -83,7 +87,11 @@ private class MythosStakeActionsComponent(
         }
     }
 
-    private fun availableStakingActionsFor(delegatorState: MythosDelegatorState.Locked): List<ManageStakeAction> = buildList {
+    private fun availableStakingActionsFor(delegatorState: MythosDelegatorState.Staked): List<ManageStakeAction> = buildList {
         add(ManageStakeAction.bondMore(resourceManager))
+
+        if (delegatorState.hasStakedCollators()) {
+            add(ManageStakeAction.unbond(resourceManager))
+        }
     }
 }

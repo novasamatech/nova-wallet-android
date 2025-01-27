@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staking_mythos_unbond_graph"
+    app:startDestination="@id/setupUnbondMythosFragment">
+
+    <fragment
+        android:id="@+id/setupUnbondMythosFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup.SetupUnbondMythosFragment"
+        android:label="SetupUnbondMythosFragment">
+
+        <action
+            android:id="@+id/action_setupUnbondMythosFragment_to_confirmUnbondMythosFragment"
+            app:destination="@id/confirmUnbondMythosFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+    <fragment
+        android:id="@+id/confirmUnbondMythosFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosFragment"
+        android:label="ConfirmUnbondMythosFragment" />
+</navigation>

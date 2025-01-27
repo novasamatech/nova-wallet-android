@@ -19,7 +19,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_token_ksm" />
+        tools:src="@drawable/ic_token_ksm"
+        app:tint="@color/input_monocrhome_icon_tint" />
 
     <TextView
         android:id="@+id/chooseAmountInputToken"
@@ -28,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:includeFontPadding="false"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/input_text_color"
         app:layout_constraintBottom_toBottomOf="@+id/chooseAmountInputImage"
         app:layout_constraintStart_toEndOf="@id/chooseAmountInputImage"
         app:layout_constraintTop_toTopOf="@+id/chooseAmountInputImage"
@@ -47,7 +48,7 @@
         android:hint="0"
         android:inputType="numberDecimal"
         android:paddingBottom="26dp"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/input_text_color"
         android:textColorHint="@color/hint_text"
         android:textCursorDrawable="@null"
         android:textStyle="bold"

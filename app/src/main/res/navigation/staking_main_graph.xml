@@ -223,6 +223,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_stakingMythosUnbondGraph"
+            app:destination="@id/staking_mythos_unbond_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <action
@@ -521,4 +529,6 @@
         android:label="NominationPoolsClaimRewardsFragment" />
 
     <include app:graph="@navigation/staking_mythos_start_graph" />
+
+    <include app:graph="@navigation/staking_mythos_unbond_graph" />
 </navigation>

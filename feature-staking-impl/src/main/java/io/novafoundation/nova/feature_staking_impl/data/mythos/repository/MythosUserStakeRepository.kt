@@ -15,6 +15,7 @@ import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,7 +24,7 @@ import javax.inject.Named
 
 interface MythosUserStakeRepository {
 
-    fun userStakeFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo?>
+    fun userStakeOrDefaultFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo>
 
     fun userDelegationsFlow(
         chainId: ChainId,
@@ -44,9 +45,9 @@ class RealMythosUserStakeRepository @Inject constructor(
     private val callApi: MultiChainRuntimeCallsApi,
 ) : MythosUserStakeRepository {
 
-    override fun userStakeFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo?> {
-        return localStorageDataSource.subscribe(chainId) {
-            metadata.collatorStaking.userStake.observe(accountId)
+    override fun userStakeOrDefaultFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo> {
+        return localStorageDataSource.subscribe(chainId, applyStorageDefault = true) {
+            metadata.collatorStaking.userStake.observeNonNull(accountId)
         }
     }
 

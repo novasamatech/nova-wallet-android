@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
@@ -18,29 +19,20 @@ sealed class MythosDelegatorState {
 
     object NotStarted : MythosDelegatorState()
 
-    sealed class Locked(
+    class Staked(
+        val userStakeInfo: UserStakeInfo,
+        val stakeByCollator: Map<AccountIdKey, MythDelegation>,
         val locks: MythosLocks
-    ) : MythosDelegatorState() {
-
-        class NotDelegating(
-            locks: MythosLocks
-        ) : Locked(locks)
-
-        class Delegating(
-            val userStakeInfo: UserStakeInfo,
-            val stakeByCollator: Map<AccountIdKey, MythDelegation>,
-            locks: MythosLocks
-        ) : Locked(locks)
-    }
+    ) : MythosDelegatorState()
 }
 
 @OptIn(ExperimentalContracts::class)
-fun MythosDelegatorState.isDelegating(): Boolean {
+fun MythosDelegatorState.hasStakedCollators(): Boolean {
     contract {
-        returns(true) implies (this@isDelegating is MythosDelegatorState.Locked.Delegating)
+        returns(true) implies (this@hasStakedCollators is MythosDelegatorState.Staked)
     }
 
-    return this is MythosDelegatorState.Locked.Delegating
+    return this is MythosDelegatorState.Staked && stakeByCollator.isNotEmpty()
 }
 
 @OptIn(ExperimentalContracts::class)
@@ -54,30 +46,29 @@ fun MythosDelegatorState.isNotStarted(): Boolean {
 
 fun MythosDelegatorState.stakeByCollator(): Map<AccountIdKey, Balance> {
     return when (this) {
-        is MythosDelegatorState.Locked.Delegating -> stakeByCollator.mapValues { it.value.stake }
-        MythosDelegatorState.NotStarted, is MythosDelegatorState.Locked.NotDelegating -> emptyMap()
+        is MythosDelegatorState.Staked -> stakeByCollator.mapValues { it.value.stake }
+        MythosDelegatorState.NotStarted -> emptyMap()
     }
 }
 
 fun MythosDelegatorState.stakedCollatorsCount(): Int {
     return when (this) {
-        is MythosDelegatorState.Locked.Delegating -> userStakeInfo.candidates.size
-        MythosDelegatorState.NotStarted, is MythosDelegatorState.Locked.NotDelegating -> 0
+        is MythosDelegatorState.Staked -> userStakeInfo.candidates.size
+        MythosDelegatorState.NotStarted -> 0
     }
 }
 
 fun MythosDelegatorState.hasActiveValidators(sessionValidators: SessionValidators): Boolean {
     return when (this) {
-        is MythosDelegatorState.Locked.Delegating -> userStakeInfo.hasActiveValidators(sessionValidators)
-        MythosDelegatorState.NotStarted, is MythosDelegatorState.Locked.NotDelegating -> false
+        is MythosDelegatorState.Staked -> userStakeInfo.hasActiveValidators(sessionValidators)
+        MythosDelegatorState.NotStarted -> false
     }
 }
 
 val MythosDelegatorState.activeStake: Balance
     get() = when (this) {
-        is MythosDelegatorState.Locked.Delegating -> userStakeInfo.balance
+        is MythosDelegatorState.Staked -> userStakeInfo.balance
 
-        is MythosDelegatorState.Locked.NotDelegating,
         MythosDelegatorState.NotStarted -> Balance.ZERO
     }
 
@@ -86,20 +77,26 @@ fun MythosDelegatorState.stakeableBalance(asset: Asset, currentBlockNumber: Bloc
         // Since there is no staking yet, we can stake the whole free balance
         MythosDelegatorState.NotStarted -> asset.freeInPlanks
 
-        // We can stake everything from not-yet-staked balance + can restake whats under CollatorStaking::Staking freeze
-        is MythosDelegatorState.Locked.NotDelegating -> {
-            val fromNonLocked = asset.freeInPlanks - locks.total
-            val fromLocked = locks.staked
-
-            fromNonLocked + fromLocked
-        }
-
         // We can stake from not-yet-staked balance + can restake unused part of CollatorStaking::Staking freeze
-        is MythosDelegatorState.Locked.Delegating -> {
+        is MythosDelegatorState.Staked -> {
             val fromNonLocked = asset.freeInPlanks - locks.total
             val fromLocked = locks.staked - userStakeInfo.balance - userStakeInfo.restrictedFromRestake(currentBlockNumber)
 
             fromNonLocked + fromLocked
+        }
+    }
+}
+
+fun MythosDelegatorState.requiredAdditionalLockToStake(
+    desiredStake: Balance,
+    currentBlockNumber: BlockNumber
+): Balance {
+    return when (this) {
+        MythosDelegatorState.NotStarted -> desiredStake
+
+        is MythosDelegatorState.Staked -> {
+            val canBeUsedFromLocked = locks.staked - userStakeInfo.balance - userStakeInfo.restrictedFromRestake(currentBlockNumber)
+            (desiredStake - canBeUsedFromLocked).atLeastZero()
         }
     }
 }
@@ -114,7 +111,7 @@ fun UserStakeInfo.restrictedFromRestake(currentBlockNumber: BlockNumber): Balanc
 
 fun MythosDelegatorState.delegationAmountTo(collator: AccountIdKey): Balance {
     return when (this) {
-        is MythosDelegatorState.Locked.Delegating -> stakeByCollator[collator]?.stake.orZero()
-        is MythosDelegatorState.Locked.NotDelegating, MythosDelegatorState.NotStarted -> Balance.ZERO
+        is MythosDelegatorState.Staked -> stakeByCollator[collator]?.stake.orZero()
+        MythosDelegatorState.NotStarted -> Balance.ZERO
     }
 }

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDe
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosCollator
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.delegationAmountTo
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.isDelegating
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.hasStakedCollators
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakeableBalance
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
@@ -30,11 +30,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.selectSta
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.openRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcelable
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -62,7 +62,7 @@ class SetupStartMythosStakingViewModel(
     private val selectedAssetState: StakingSharedState,
     private val validationSystem: StartMythosStakingValidationSystem,
     private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
-    private val mythosStartStakingValidationFailureFormatter: MythosStartStakingValidationFailureFormatter,
+    private val mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     mythosSharedComputation: MythosSharedComputation,
     mythosCollatorFormatter: MythosCollatorFormatter,
     private val interactor: StartMythosStakingInteractor,
@@ -125,7 +125,7 @@ class SetupStartMythosStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformerCustom = { reason, _ -> mythosStartStakingValidationFailureFormatter.formatValidationFailure(reason) },
+            validationFailureTransformerCustom = { reason, _ -> mythosStakingValidationFailureFormatter.formatStartStaking(reason) },
             progressConsumer = validationInProgress.progressConsumer()
         ) {
             validationInProgress.value = false
@@ -139,7 +139,7 @@ class SetupStartMythosStakingViewModel(
         amount: Balance,
         collator: MythosCollator,
     ) {
-        val payload = ConfirmStartMythosStakingPayload(collator.toParcelable(), amount, fee.toParcel())
+        val payload = ConfirmStartMythosStakingPayload(collator.toParcel(), amount, fee.toParcel())
         router.openConfirmStartStaking(payload)
     }
 
@@ -176,7 +176,7 @@ class SetupStartMythosStakingViewModel(
         }
 
         override fun isStakeMore(): Flow<Boolean> {
-            return currentDelegatorStateFlow.map { it.isDelegating() }
+            return currentDelegatorStateFlow.map { it.hasStakedCollators() }
         }
 
         override fun alreadyStakedTargets(): Flow<List<TargetWithStakedAmount<MythosCollator>>> {

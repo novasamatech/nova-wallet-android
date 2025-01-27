@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validati
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.validations.MythosNoPendingRewardsValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
@@ -29,6 +30,15 @@ fun ValidationSystem.Companion.mythosStakingStart(
     enoughStakeable()
 
     enoughStakeableAfterFees()
+}
+
+context(StartMythosStakingValidationSystemBuilder)
+private fun MythosNoPendingRewardsValidationFactory.noPendingRewards() {
+    noPendingRewards(
+        delegatorState = { it.delegatorState },
+        chainId = { it.chainId },
+        error = { StartMythosStakingValidationFailure.HasNotClaimedRewards }
+    )
 }
 
 private fun StartMythosStakingValidationSystemBuilder.enoughToPayFees() {

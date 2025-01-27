@@ -36,9 +36,7 @@ class MythosSelectedCandidatesUpdater(
         val chain = stakingSharedState.chain()
         val accountId = scopeValue.accountIdIn(chain) ?: return emptyFlow()
 
-        return mythosUserStakeRepository.userStakeFlow(chain.id, accountId).onEachLatest { userStake ->
-            if (userStake == null) return@onEachLatest
-
+        return mythosUserStakeRepository.userStakeOrDefaultFlow(chain.id, accountId).onEachLatest { userStake ->
             syncUserDelegations(chain.id, userStake, accountId.intoKey())
         }.noSideAffects()
     }

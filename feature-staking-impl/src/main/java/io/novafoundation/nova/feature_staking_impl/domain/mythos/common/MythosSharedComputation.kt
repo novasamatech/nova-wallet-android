@@ -70,3 +70,8 @@ context(ComputationalScope)
 suspend fun MythosSharedComputation.sessionValidators(chainId: ChainId): SessionValidators {
     return sessionValidatorsFlow(chainId).first()
 }
+
+context(ComputationalScope)
+suspend fun MythosSharedComputation.delegatorState(): MythosDelegatorState {
+    return delegatorStateFlow().first()
+}

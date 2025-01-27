@@ -60,7 +60,7 @@ class RealMythosDelegatorStateUseCase @Inject constructor(
                 val accountId = selectedMetaAccount.accountIdIn(chain) ?: return@flatMapLatest flowOf(MythosDelegatorState.NotStarted)
 
                 combineToPair(
-                    mythosUserStakeRepository.userStakeFlow(chain.id, accountId),
+                    mythosUserStakeRepository.userStakeOrDefaultFlow(chain.id, accountId),
                     balanceLocksRepository.observeMythosLocks(selectedMetaAccount.id, chain, chainAsset)
                 ).transformLatest<_, MythosDelegatorState> { (userStake, mythosLocks) ->
                     collectDelegatorStake(userStake, mythosLocks, chain.id, accountId.intoKey())
@@ -87,7 +87,7 @@ class RealMythosDelegatorStateUseCase @Inject constructor(
 
     context(FlowCollector<MythosDelegatorState>)
     suspend fun collectDelegatorStake(
-        userStakeInfo: UserStakeInfo?,
+        userStakeInfo: UserStakeInfo,
         mythosLocks: MythosLocks,
         chainId: ChainId,
         userAccountId: AccountIdKey,
@@ -95,11 +95,10 @@ class RealMythosDelegatorStateUseCase @Inject constructor(
         when {
             mythosLocks.total.isZero -> emit(MythosDelegatorState.NotStarted)
 
-            userStakeInfo == null -> emit(MythosDelegatorState.Locked.NotDelegating(mythosLocks))
-
             else -> {
                 val stakedStateUpdates = mythosUserStakeRepository.userDelegationsFlow(chainId, userAccountId, userStakeInfo.candidates)
-                    .map { MythosDelegatorState.Locked.Delegating(userStakeInfo, it, mythosLocks) }
+                    .map { MythosDelegatorState.Staked(userStakeInfo, it, mythosLocks) }
+
                 emitAll(stakedStateUpdates)
             }
         }
