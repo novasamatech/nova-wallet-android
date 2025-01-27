@@ -1,19 +1,18 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm
+package io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm
 
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.startConfirm.ConfirmStartSingleTargetStakingFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 
-class ConfirmStartParachainStakingFragment : ConfirmStartSingleTargetStakingFragment<ConfirmStartParachainStakingViewModel>() {
+class ConfirmStartMythosStakingFragment : ConfirmStartSingleTargetStakingFragment<ConfirmStartMythosStakingViewModel>() {
 
     companion object {
 
-        private const val PAYLOAD = "ConfirmStartParachainStakingFragment.Payload"
+        private const val PAYLOAD = "ConfirmStartMythosStakingFragment.Payload"
 
-        fun getBundle(payload: ConfirmStartParachainStakingPayload) = bundleOf(PAYLOAD to payload)
+        fun getBundle(payload: ConfirmStartMythosStakingPayload) = bundleOf(PAYLOAD to payload)
     }
 
     override fun inject() {
@@ -21,7 +20,7 @@ class ConfirmStartParachainStakingFragment : ConfirmStartSingleTargetStakingFrag
             requireContext(),
             StakingFeatureApi::class.java
         )
-            .confirmStartParachainStakingFactory()
+            .confirmStartMythosStakingFactory()
             .create(this, argument(PAYLOAD))
             .inject(this)
     }

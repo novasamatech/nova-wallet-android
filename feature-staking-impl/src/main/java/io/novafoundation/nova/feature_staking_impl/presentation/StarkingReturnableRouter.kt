@@ -5,4 +5,6 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 interface StarkingReturnableRouter : ReturnableRouter {
 
     fun returnToStartStaking()
+
+    fun returnToStakingMain()
 }

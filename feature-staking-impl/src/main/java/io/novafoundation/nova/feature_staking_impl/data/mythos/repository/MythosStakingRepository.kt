@@ -13,6 +13,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Named
@@ -21,7 +22,11 @@ interface MythosStakingRepository {
 
     fun minStakeFlow(chainId: ChainId): Flow<Balance>
 
-    suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int
+    suspend fun minStake(chainId: ChainId): Balance
+
+    suspend fun maxCollatorsPerDelegator(chainId: ChainId): Int
+
+    suspend fun maxDelegatorsPerCollator(chainId: ChainId): Int
 
     suspend fun unstakeDurationInSessions(chainId: ChainId): Int
 }
@@ -39,9 +44,21 @@ class RealMythosStakingRepository @Inject constructor(
         }
     }
 
-    override suspend fun maxCandidatesPerDelegator(chainId: ChainId): Int {
+    override suspend fun minStake(chainId: ChainId): Balance {
+        return localStorageDataSource.query(chainId) {
+            metadata.collatorStaking.minStake.queryNonNull()
+        }
+    }
+
+    override suspend fun maxCollatorsPerDelegator(chainId: ChainId): Int {
         return chainRegistry.withRuntime(chainId) {
             metadata.collatorStaking().numberConstant("MaxStakedCandidates").toInt()
+        }
+    }
+
+    override suspend fun maxDelegatorsPerCollator(chainId: ChainId): Int {
+        return chainRegistry.withRuntime(chainId) {
+            metadata.collatorStaking().numberConstant("MaxStakers").toInt()
         }
     }
 

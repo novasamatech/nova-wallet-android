@@ -17,7 +17,7 @@ interface MythosStakeSummaryInteractor {
 
     context(ComputationalScope)
     fun stakeSummaryFlow(
-        mythosDelegatorState: MythosDelegatorState,
+        delegatorState: MythosDelegatorState,
         stakingOption: StakingOption,
     ): Flow<StakeSummary<MythosDelegatorStatus>>
 }

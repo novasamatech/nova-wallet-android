@@ -20,8 +20,6 @@ interface ParachainStakingRouter : StarkingReturnableRouter {
 
     fun openWalletDetails(metaId: Long)
 
-    fun returnToStakingMain()
-
     fun openCurrentCollators()
 
     fun openUnbond()

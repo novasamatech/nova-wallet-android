@@ -12,13 +12,16 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -46,7 +49,10 @@ class SetupStartMythosStakingModule {
         mythosCollatorFormatter: MythosCollatorFormatter,
         interactor: StartMythosStakingInteractor,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
-        selectCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator
+        selectCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+        validationSystem: StartMythosStakingValidationSystem,
+        blockNumberUseCase: StakingBlockNumberUseCase,
+        validationFailureFormatter: MythosStartStakingValidationFailureFormatter,
     ): ViewModel {
         return SetupStartMythosStakingViewModel(
             router = router,
@@ -63,7 +69,10 @@ class SetupStartMythosStakingModule {
             mythosCollatorFormatter = mythosCollatorFormatter,
             interactor = interactor,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator
+            selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator,
+            validationSystem = validationSystem,
+            mythosStartStakingValidationFailureFormatter = validationFailureFormatter,
+            stakingBlockNumberUseCase = blockNumberUseCase
         )
     }
 

@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.UserStakeRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosMinStakeUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosSelectedCandidatesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
@@ -50,7 +50,7 @@ class MythosStakingUpdatersModule {
         scope: AccountUpdateScope,
         stakingSharedState: StakingSharedState,
         storageCache: StorageCache,
-        mythosUserStakeRepository: UserStakeRepository,
+        mythosUserStakeRepository: MythosUserStakeRepository,
         @Named(REMOTE_STORAGE_SOURCE)
         remoteStorageDataSource: StorageDataSource,
     ) = MythosSelectedCandidatesUpdater(

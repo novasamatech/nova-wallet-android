@@ -43,7 +43,6 @@ private class MythosStakeSummaryComponent(
 
     override val state: Flow<StakeSummaryState?> = mythosSharedComputation.loadUserStakeState(
         hostContext = hostContext,
-        chain = stakingOption.assetWithChain.chain,
         stateProducer = ::userStakeSummary
     )
         .shareInBackground()

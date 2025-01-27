@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
@@ -81,14 +81,35 @@ val MythosDelegatorState.activeStake: Balance
         MythosDelegatorState.NotStarted -> Balance.ZERO
     }
 
-val MythosDelegatorState.totalLocked: Balance
-    get() = when (this) {
-        is MythosDelegatorState.Locked -> locks.total
-        MythosDelegatorState.NotStarted -> Balance.ZERO
-    }
+fun MythosDelegatorState.stakeableBalance(asset: Asset, currentBlockNumber: BlockNumber): Balance {
+    return when (this) {
+        // Since there is no staking yet, we can stake the whole free balance
+        MythosDelegatorState.NotStarted -> asset.freeInPlanks
 
-fun MythosDelegatorState.stakeableBalance(asset: Asset): Balance {
-    return (asset.freeInPlanks - totalLocked).atLeastZero()
+        // We can stake everything from not-yet-staked balance + can restake whats under CollatorStaking::Staking freeze
+        is MythosDelegatorState.Locked.NotDelegating -> {
+            val fromNonLocked = asset.freeInPlanks - locks.total
+            val fromLocked = locks.staked
+
+            fromNonLocked + fromLocked
+        }
+
+        // We can stake from not-yet-staked balance + can restake unused part of CollatorStaking::Staking freeze
+        is MythosDelegatorState.Locked.Delegating -> {
+            val fromNonLocked = asset.freeInPlanks - locks.total
+            val fromLocked = locks.staked - userStakeInfo.balance - userStakeInfo.restrictedFromRestake(currentBlockNumber)
+
+            fromNonLocked + fromLocked
+        }
+    }
+}
+
+fun UserStakeInfo.restrictedFromRestake(currentBlockNumber: BlockNumber): Balance {
+    return if (maybeLastUnstake != null && currentBlockNumber < maybeLastUnstake.availableForRestakeAt) {
+        maybeLastUnstake.amount
+    } else {
+        Balance.ZERO
+    }
 }
 
 fun MythosDelegatorState.delegationAmountTo(collator: AccountIdKey): Balance {

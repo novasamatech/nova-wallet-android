@@ -28,11 +28,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.di.ConfirmStartMythosStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.di.SelectMythosCollatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.di.SelectMythCollatorSettingsComponent
@@ -78,12 +77,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.d
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.di.SelectUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.story.di.StoryComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.di.ReviewCustomValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.search.di.SearchCustomValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.di.SelectCustomValidatorsComponent
@@ -248,6 +249,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun selectMythosCollatorFactory(): SelectMythosCollatorComponent.Factory
 
     fun selectMythosSettingsFactory(): SelectMythCollatorSettingsComponent.Factory
+
+    fun confirmStartMythosStakingFactory(): ConfirmStartMythosStakingComponent.Factory
 
     @Component.Factory
     interface Factory {

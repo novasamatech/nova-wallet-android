@@ -53,4 +53,4 @@ fun Collator.estimatedAprReturns(amount: BigDecimal): PeriodReturns {
     )
 }
 
-fun Collator.accountId() = accountIdHex.fromHex()
+fun Collator.accountId() = accountId.value
