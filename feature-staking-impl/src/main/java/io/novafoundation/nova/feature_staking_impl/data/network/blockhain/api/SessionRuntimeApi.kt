@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.session
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSessionIndex
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSessionValidators
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry0
@@ -20,3 +22,7 @@ val RuntimeMetadata.session: SessionRuntimeApi
 context(StorageQueryContext)
 val SessionRuntimeApi.currentIndex: QueryableStorageEntry0<BigInteger>
     get() = storage0("CurrentIndex", binding = ::bindSessionIndex)
+
+context(StorageQueryContext)
+val SessionRuntimeApi.validators: QueryableStorageEntry0<List<AccountIdKey>>
+    get() = storage0("Validators", binding = ::bindSessionValidators)

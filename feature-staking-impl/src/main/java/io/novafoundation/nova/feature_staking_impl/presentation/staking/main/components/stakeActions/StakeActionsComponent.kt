@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.nominationPools.NominationPoolsStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.ParachainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
@@ -36,6 +37,8 @@ class StakeActionsComponentFactory(
         parachainComponentCreator = parachainComponentFactory::create,
         nominationPoolsCreator = nominationPoolsComponentFactory::create,
         turingComponentCreator = turingComponentFactory::create,
+        // TODO stake actions
+        mythosCreator = UnsupportedComponent.creator(),
         hostContext = hostContext
     )
 }

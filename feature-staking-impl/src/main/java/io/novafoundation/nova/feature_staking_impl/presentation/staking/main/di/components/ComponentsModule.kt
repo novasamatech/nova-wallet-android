@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.turing.TuringStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.relaychain.RelaychainStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.mythos.MythosStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
@@ -32,7 +33,15 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.nominationPools.NominationPoolsYourPoolComponentFactory
 
-@Module(includes = [RelaychainModule::class, ParachainModule::class, TuringModule::class, NominationPoolsModule::class])
+@Module(
+    includes = [
+        RelaychainModule::class,
+        ParachainModule::class,
+        TuringModule::class,
+        NominationPoolsModule::class,
+        MythosModule::class
+    ]
+)
 class ComponentsModule {
 
     @Provides
@@ -81,10 +90,12 @@ class ComponentsModule {
         parachainComponentFactory: ParachainStakeSummaryComponentFactory,
         nominationPoolsStakeSummaryComponentFactory: NominationPoolsStakeSummaryComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
+        mythosStakeSummaryComponentFactory: MythosStakeSummaryComponentFactory
     ) = StakeSummaryComponentFactory(
         relaychainComponentFactory = relaychainComponentFactory,
         parachainStakeSummaryComponentFactory = parachainComponentFactory,
         nominationPoolsStakeSummaryComponentFactory = nominationPoolsStakeSummaryComponentFactory,
+        mythos = mythosStakeSummaryComponentFactory,
         compoundStakingComponentFactory = compoundStakingComponentFactory
     )
 
