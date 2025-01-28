@@ -11,7 +11,6 @@ class CompoundLedgerDiscoveryService(
     private val delegates: List<LedgerDeviceDiscoveryService>
 ) : LedgerDeviceDiscoveryService {
 
-
     private var discoveringSubscribersManager = DiscoveringSubscribersManager()
 
     constructor(vararg delegates: LedgerDeviceDiscoveryService) : this(delegates.toList())
