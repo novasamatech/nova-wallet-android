@@ -21,8 +21,6 @@ class UsbLedgerDeviceDiscoveryService(
     private val contextManager: ContextManager
 ) : LedgerDeviceDiscoveryService {
 
-    private var discoveringSubscribersManager = DiscoveringSubscribersManager()
-
     private val appContext = contextManager.getApplicationContext()
 
     override val discoveredDevices = MutableStateFlow(emptyList<LedgerDevice>())
@@ -54,21 +52,13 @@ class UsbLedgerDeviceDiscoveryService(
             addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
 
-        if (discoveringSubscribersManager.noSubscribers()) {
-            appContext.registerReceiver(usbReceiver, filter)
-        }
-
-        discoveringSubscribersManager.addSubscriber()
+        appContext.registerReceiver(usbReceiver, filter)
 
         discoverDevices()
     }
 
     override fun stopDiscovery() {
-        discoveringSubscribersManager.removeSubscriber()
-
-        if (discoveringSubscribersManager.noSubscribers()) {
-            appContext.unregisterReceiver(usbReceiver)
-        }
+        appContext.unregisterReceiver(usbReceiver)
 
         coroutineScope.coroutineContext.cancelChildren()
     }
@@ -89,24 +79,5 @@ class UsbLedgerDeviceDiscoveryService(
         val connection = UsbLedgerConnection(appContext, usbDevice, coroutineScope)
 
         return LedgerDevice(id, name, connection = connection)
-    }
-}
-
-private class DiscoveringSubscribersManager {
-
-    private var subscribers = 0
-
-    fun addSubscriber() {
-        subscribers++
-    }
-
-    fun removeSubscriber() {
-        if (subscribers == 0) return
-
-        subscribers--
-    }
-
-    fun noSubscribers(): Boolean {
-        return subscribers == 0
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.sdk.discovery
 
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.usb.DiscoveringSubscribersManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.merge
@@ -9,6 +10,9 @@ import kotlinx.coroutines.flow.merge
 class CompoundLedgerDiscoveryService(
     private val delegates: List<LedgerDeviceDiscoveryService>
 ) : LedgerDeviceDiscoveryService {
+
+
+    private var discoveringSubscribersManager = DiscoveringSubscribersManager()
 
     constructor(vararg delegates: LedgerDeviceDiscoveryService) : this(delegates.toList())
 
@@ -26,10 +30,37 @@ class CompoundLedgerDiscoveryService(
     }
 
     override fun startDiscovery() {
-        delegates.forEach { it.startDiscovery() }
+        if (discoveringSubscribersManager.noSubscribers()) {
+            delegates.forEach { it.startDiscovery() }
+        }
+
+        discoveringSubscribersManager.addSubscriber()
     }
 
     override fun stopDiscovery() {
-        delegates.forEach { it.stopDiscovery() }
+        discoveringSubscribersManager.removeSubscriber()
+
+        if (discoveringSubscribersManager.noSubscribers()) {
+            delegates.forEach { it.stopDiscovery() }
+        }
+    }
+}
+
+private class DiscoveringSubscribersManager {
+
+    private var subscribers = 0
+
+    fun addSubscriber() {
+        subscribers++
+    }
+
+    fun removeSubscriber() {
+        if (subscribers == 0) return
+
+        subscribers--
+    }
+
+    fun noSubscribers(): Boolean {
+        return subscribers == 0
     }
 }
