@@ -59,7 +59,7 @@ class UnbondingComponentFactory(
     private val nominationPoolsUnbondingComponentFactory: NominationPoolsUnbondingComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
     private val mythos: MythosUnbondingComponentFactory,
-    ) {
+) {
 
     fun create(
         hostContext: ComponentHostContext
