@@ -37,7 +37,6 @@ class UsbLedgerDeviceDiscoveryService(
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     device?.let { discoverDevices() }
                 }
-
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     device?.let { discoverDevices() }
@@ -51,9 +50,7 @@ class UsbLedgerDeviceDiscoveryService(
             addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
             addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
-
         appContext.registerReceiver(usbReceiver, filter)
-
         discoverDevices()
     }
 
