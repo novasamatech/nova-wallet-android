@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSumma
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.RealMythosStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.unbonding.MythosUnbondingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.unbonding.RealMythosUnbondingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.userRewards.MythosUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.userRewards.RealMythosUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.MythosRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.RealMythosRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.RealStartMythosStakingInteractor
@@ -57,6 +59,9 @@ interface MythosBindsModule {
 
     @Binds
     fun bindUnbondingInteractor(implementation: RealMythosUnbondingInteractor): MythosUnbondingInteractor
+
+    @Binds
+    fun bindUserRewardsInteractor(implementation: RealMythosUserRewardsInteractor): MythosUserRewardsInteractor
 
     @Binds
     fun bindRedeemInteractor(implementation: RealMythosRedeemInteractor): MythosRedeemInteractor
