@@ -52,6 +52,10 @@ class MythosStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openRedeem() {
+        // TODO
+    }
+
     override fun returnToStartStaking() {
         navigationBuilder()
             .action(R.id.action_return_to_start_staking)
