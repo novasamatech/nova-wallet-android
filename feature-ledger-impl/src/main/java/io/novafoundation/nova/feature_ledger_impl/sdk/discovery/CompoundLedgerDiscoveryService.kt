@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_ledger_impl.sdk.discovery
 
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
-import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.usb.DiscoveringSubscribersManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.merge
