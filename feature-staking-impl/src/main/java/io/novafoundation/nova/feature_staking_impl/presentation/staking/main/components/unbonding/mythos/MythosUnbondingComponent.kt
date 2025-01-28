@@ -58,7 +58,7 @@ private class MythosUnbondingComponent(
 
     override fun onAction(action: UnbondingAction) {
         when (action) {
-            UnbondingAction.RebondClicked -> Unit // rebond is not supported in nomination pools
+            UnbondingAction.RebondClicked -> Unit // rebond is not supported in mythos
             UnbondingAction.RedeemClicked -> router.openRedeem()
         }
     }
