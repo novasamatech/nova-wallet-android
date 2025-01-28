@@ -21,6 +21,8 @@ class UsbLedgerDeviceDiscoveryService(
     private val contextManager: ContextManager
 ) : LedgerDeviceDiscoveryService {
 
+    private var discoveringSubscribersManager = DiscoveringSubscribersManager()
+
     private val appContext = contextManager.getApplicationContext()
 
     override val discoveredDevices = MutableStateFlow(emptyList<LedgerDevice>())
@@ -37,6 +39,7 @@ class UsbLedgerDeviceDiscoveryService(
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     device?.let { discoverDevices() }
                 }
+
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     device?.let { discoverDevices() }
@@ -50,12 +53,22 @@ class UsbLedgerDeviceDiscoveryService(
             addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
             addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
-        appContext.registerReceiver(usbReceiver, filter)
+
+        if (discoveringSubscribersManager.noSubscribers()) {
+            appContext.registerReceiver(usbReceiver, filter)
+        }
+
+        discoveringSubscribersManager.addSubscriber()
+
         discoverDevices()
     }
 
     override fun stopDiscovery() {
-        appContext.unregisterReceiver(usbReceiver)
+        discoveringSubscribersManager.removeSubscriber()
+
+        if (discoveringSubscribersManager.noSubscribers()) {
+            appContext.unregisterReceiver(usbReceiver)
+        }
 
         coroutineScope.coroutineContext.cancelChildren()
     }
@@ -76,5 +89,24 @@ class UsbLedgerDeviceDiscoveryService(
         val connection = UsbLedgerConnection(appContext, usbDevice, coroutineScope)
 
         return LedgerDevice(id, name, connection = connection)
+    }
+}
+
+private class DiscoveringSubscribersManager {
+
+    private var subscribers = 0
+
+    fun addSubscriber() {
+        subscribers++
+    }
+
+    fun removeSubscriber() {
+        if (subscribers == 0) return
+
+        subscribers--
+    }
+
+    fun noSubscribers(): Boolean {
+        return subscribers == 0
     }
 }
