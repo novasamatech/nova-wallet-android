@@ -231,6 +231,14 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_mythosRedeemFragment"
+            app:destination="@id/mythosRedeemFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <action
@@ -531,4 +539,9 @@
     <include app:graph="@navigation/staking_mythos_start_graph" />
 
     <include app:graph="@navigation/staking_mythos_unbond_graph" />
+
+    <fragment
+        android:id="@+id/mythosRedeemFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.MythosRedeemFragment"
+        android:label="MythosRedeemFragment" />
 </navigation>

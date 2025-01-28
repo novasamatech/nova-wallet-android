@@ -3,7 +3,9 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking.mythos
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosFragment
@@ -13,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 
 class MythosStakingNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val stakingDashboardRouter: StakingDashboardRouter,
 ) : BaseNavigator(navigationHoldersRegistry), MythosStakingRouter {
 
     override fun openCollatorDetails(payload: StakeTargetDetailsPayload) {
@@ -53,7 +56,17 @@ class MythosStakingNavigator(
     }
 
     override fun openRedeem() {
-        // TODO
+        navigationBuilder()
+            .action(R.id.action_stakingFragment_to_mythosRedeemFragment)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun finishRedeemFlow(redeemConsequences: RedeemConsequences) {
+        if (redeemConsequences.willKillStash) {
+            stakingDashboardRouter.returnToStakingDashboard()
+        } else {
+            returnToStakingMain()
+        }
     }
 
     override fun returnToStartStaking() {

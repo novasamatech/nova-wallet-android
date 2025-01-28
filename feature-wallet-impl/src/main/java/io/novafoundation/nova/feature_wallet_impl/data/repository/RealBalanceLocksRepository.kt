@@ -26,6 +26,11 @@ class RealBalanceLocksRepository(
             .mapList { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
     }
 
+    override suspend fun getBalanceLocks(metaId: Long, chainAsset: Chain.Asset): List<BalanceLock> {
+        return lockDao.getBalanceLocks(metaId, chainAsset.chainId, chainAsset.id)
+            .map { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
+    }
+
     override suspend fun getBiggestLock(chain: Chain, chainAsset: Chain.Asset): BalanceLock? {
         val metaAccount = accountRepository.getSelectedMetaAccount()
 

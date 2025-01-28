@@ -21,12 +21,20 @@ val MythosLocks.total: Balance
     get() = releasing + staked
 
 fun BalanceLocksRepository.observeMythosLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<MythosLocks> {
-    return observeBalanceLocks(metaId, chain, chainAsset).map { locks ->
-        MythosLocks(
-            releasing = locks.findAmountOrZero(MythosStakingFreezeIds.RELEASING),
-            staked = locks.findAmountOrZero(MythosStakingFreezeIds.STAKING)
-        )
-    }.distinctUntilChanged()
+    return observeBalanceLocks(metaId, chain, chainAsset)
+        .map { locks -> locks.findMythosLocks() }
+        .distinctUntilChanged()
+}
+
+suspend fun BalanceLocksRepository.getMythosLocks(metaId: Long, chainAsset: Chain.Asset): MythosLocks {
+    return getBalanceLocks(metaId, chainAsset).findMythosLocks()
+}
+
+private fun List<BalanceLock>.findMythosLocks(): MythosLocks {
+    return MythosLocks(
+        releasing = findAmountOrZero(MythosStakingFreezeIds.RELEASING),
+        staked = findAmountOrZero(MythosStakingFreezeIds.STAKING)
+    )
 }
 
 private fun List<BalanceLock>.findAmountOrZero(id: BalanceLockId): Balance {
