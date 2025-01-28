@@ -7,8 +7,10 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.candidateStake
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.releaseQueues
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.userStake
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
@@ -36,6 +38,11 @@ interface MythosUserStakeRepository {
         chainId: ChainId,
         accountId: AccountIdKey
     ): Boolean
+
+    fun releaseQueuesFlow(
+        chainId: ChainId,
+        accountId: AccountIdKey
+    ): Flow<List<MythReleaseRequest>>
 }
 
 @FeatureScope
@@ -68,6 +75,13 @@ class RealMythosUserStakeRepository @Inject constructor(
 
     override suspend fun shouldClaimRewards(chainId: ChainId, accountId: AccountIdKey): Boolean {
         return callApi.forChain(chainId).shouldClaimPendingRewards(accountId)
+    }
+
+    override fun releaseQueuesFlow(chainId: ChainId, accountId: AccountIdKey): Flow<List<MythReleaseRequest>> {
+        return localStorageDataSource.subscribe(chainId) {
+            metadata.collatorStaking.releaseQueues.observe(accountId.value)
+                .map { it.orEmpty() }
+        }
     }
 
     private suspend fun RuntimeCallsApi.shouldClaimPendingRewards(accountId: AccountIdKey): Boolean {

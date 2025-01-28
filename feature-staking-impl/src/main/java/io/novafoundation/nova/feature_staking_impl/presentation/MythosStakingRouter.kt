@@ -19,4 +19,6 @@ interface MythosStakingRouter : StarkingReturnableRouter {
     fun openUnbond()
 
     fun openUnbondConfirm(payload: ConfirmUnbondMythosPayload)
+
+    fun openRedeem()
 }

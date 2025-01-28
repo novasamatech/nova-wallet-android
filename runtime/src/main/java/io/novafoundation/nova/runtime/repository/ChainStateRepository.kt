@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.repository
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.utils.babeOrNull
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isParachain
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.optionalNumberConstant
@@ -56,14 +57,16 @@ class ChainStateRepository(
         return weightedAverageBlockTime(sampledBlockTime, blockTimeFromConstants)
     }
 
-    suspend fun predictedBlockTimeFlow(chainId: ChainId): Flow<BigInteger> {
-        val runtime = chainRegistry.getRuntime(chainId)
-        val chain = chainRegistry.getChain(chainId)
+    fun predictedBlockTimeFlow(chainId: ChainId): Flow<BigInteger> {
+        return flowOfAll {
+            val runtime = chainRegistry.getRuntime(chainId)
+            val chain = chainRegistry.getChain(chainId)
 
-        val blockTimeFromConstants = blockTimeFromConstants(chain, runtime)
+            val blockTimeFromConstants = blockTimeFromConstants(chain, runtime)
 
-        return sampledBlockTimeStorage.observe(chainId).map {
-            weightedAverageBlockTime(it, blockTimeFromConstants)
+            sampledBlockTimeStorage.observe(chainId).map {
+                weightedAverageBlockTime(it, blockTimeFromConstants)
+            }
         }
     }
 

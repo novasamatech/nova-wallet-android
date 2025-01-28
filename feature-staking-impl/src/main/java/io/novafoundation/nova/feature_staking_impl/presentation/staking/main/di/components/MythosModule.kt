@@ -6,9 +6,11 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.MythosStakeSummaryInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.unbonding.MythosUnbondingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.mythos.MythosStakeActionsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.mythos.MythosStakeSummaryComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.mythos.MythosUnbondingComponentFactory
 
 @Module
 class MythosModule {
@@ -32,6 +34,18 @@ class MythosModule {
     ) = MythosStakeActionsComponentFactory(
         mythosSharedComputation = mythosSharedComputation,
         resourceManager = resourceManager,
+        router = router
+    )
+
+    @Provides
+    @ScreenScope
+    fun provideUnbondingComponentFactory(
+        mythosSharedComputation: MythosSharedComputation,
+        interactor: MythosUnbondingInteractor,
+        router: MythosStakingRouter,
+    ) = MythosUnbondingComponentFactory(
+        mythosSharedComputation = mythosSharedComputation,
+        interactor = interactor,
         router = router
     )
 }

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosMinStakeUpdater
+import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosReleaseQueuesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosSelectedCandidatesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
@@ -63,6 +64,20 @@ class MythosStakingUpdatersModule {
 
     @Provides
     @FeatureScope
+    fun provideReleaseQueuesUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        accountUpdateScope: AccountUpdateScope,
+    ) = MythosReleaseQueuesUpdater(
+        sharedState,
+        chainRegistry,
+        storageCache,
+        accountUpdateScope
+    )
+
+    @Provides
+    @FeatureScope
     @Mythos
     fun provideMythosStakingUpdaters(
         // UserStake in synced in-place in StakingDashboardMythosUpdater by dashboard
@@ -71,12 +86,14 @@ class MythosStakingUpdatersModule {
         // For syncing aura session info
         currentSlotUpdater: CurrentSlotUpdater,
         selectedCandidatesUpdater: MythosSelectedCandidatesUpdater,
+        releaseQueuesUpdater: MythosReleaseQueuesUpdater,
     ): StakingUpdaters.Group {
         return StakingUpdaters.Group(
             sessionValidatorsUpdater,
             minStakeUpdater,
             currentSlotUpdater,
-            selectedCandidatesUpdater
+            selectedCandidatesUpdater,
+            releaseQueuesUpdater
         )
     }
 }

@@ -7,9 +7,11 @@ import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythCandidateInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindDelegationInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindMythCandidateInfo
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindMythReleaseQueues
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindUserStakeInfo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
@@ -58,3 +60,7 @@ val CollatorStakingRuntimeApi.candidateStake: QueryableStorageEntry2<AccountIdKe
         key1FromInternalConverter = AccountIdKey.scaleDecoder,
         key2FromInternalConverter = AccountIdKey.scaleDecoder
     )
+
+context(RuntimeContext)
+val CollatorStakingRuntimeApi.releaseQueues: QueryableStorageEntry1<AccountId, List<MythReleaseRequest>>
+    get() = storage1("ReleaseQueues", binding = { decoded, _ -> bindMythReleaseQueues(decoded) })

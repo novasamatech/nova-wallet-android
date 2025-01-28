@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import kotlin.time.ExperimentalTime
 
 class DelegationRequestWithCollatorInfo(
     val request: ScheduledDelegationRequest,
@@ -31,7 +30,6 @@ class DelegationRequestWithCollatorInfo(
     override val identifier by lazy { request.collator.toHexString() }
 }
 
-@OptIn(ExperimentalTime::class)
 class ParachainStakingUnbondingsInteractor(
     private val delegatorStateRepository: DelegatorStateRepository,
     private val currentRoundRepository: CurrentRoundRepository,

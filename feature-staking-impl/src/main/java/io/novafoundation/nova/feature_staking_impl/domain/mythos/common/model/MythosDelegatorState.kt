@@ -82,7 +82,7 @@ fun MythosDelegatorState.stakeableBalance(asset: Asset, currentBlockNumber: Bloc
             val fromNonLocked = asset.freeInPlanks - locks.total
             val fromLocked = locks.staked - userStakeInfo.balance - userStakeInfo.restrictedFromRestake(currentBlockNumber)
 
-            fromNonLocked + fromLocked
+            fromNonLocked.atLeastZero() + fromLocked.atLeastZero()
         }
     }
 }
