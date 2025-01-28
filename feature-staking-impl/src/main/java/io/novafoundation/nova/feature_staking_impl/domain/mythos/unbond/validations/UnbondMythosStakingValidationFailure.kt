@@ -14,5 +14,5 @@ sealed class UnbondMythosStakingValidationFailure {
 
     object HasNotClaimedRewards : UnbondMythosStakingValidationFailure()
 
-    class ReleaseRequestsLimitReached(val limit: Int): UnbondMythosStakingValidationFailure()
+    class ReleaseRequestsLimitReached(val limit: Int) : UnbondMythosStakingValidationFailure()
 }

@@ -21,12 +21,14 @@ class MythosReleaseRequestLimitNotReachedValidationFactory @Inject constructor(
 
     context(UnbondMythosValidationSystemBuilder)
     fun releaseRequestsLimitNotReached() {
-        validate(ReleaseRequestLimitNotReachedValidation(
-            stakingRepository = stakingRepository,
-            userStakeRepository = userStakeRepository,
-            accountRepository = accountRepository,
-            chainRegistry = chainRegistry
-        ))
+        validate(
+            ReleaseRequestLimitNotReachedValidation(
+                stakingRepository = stakingRepository,
+                userStakeRepository = userStakeRepository,
+                accountRepository = accountRepository,
+                chainRegistry = chainRegistry
+            )
+        )
     }
 }
 
@@ -35,7 +37,7 @@ private class ReleaseRequestLimitNotReachedValidation(
     private val userStakeRepository: MythosUserStakeRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-): UnbondMythosValidation {
+) : UnbondMythosValidation {
 
     override suspend fun validate(value: UnbondMythosStakingValidationPayload): ValidationStatus<UnbondMythosStakingValidationFailure> {
         val chain = chainRegistry.getChain(value.chainId)

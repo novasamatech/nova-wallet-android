@@ -7,8 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 typealias RedeemMythosValidationSystem = ValidationSystem<RedeemMythosStakingValidationPayload, RedeemMythosStakingValidationFailure>
 typealias RedeemMythosValidationSystemBuilder = ValidationSystemBuilder<RedeemMythosStakingValidationPayload, RedeemMythosStakingValidationFailure>
 
-fun ValidationSystem.Companion.mythosRedeem(
-): RedeemMythosValidationSystem = ValidationSystem {
+fun ValidationSystem.Companion.mythosRedeem(): RedeemMythosValidationSystem = ValidationSystem {
     enoughToPayFees()
 }
 private fun RedeemMythosValidationSystemBuilder.enoughToPayFees() {
