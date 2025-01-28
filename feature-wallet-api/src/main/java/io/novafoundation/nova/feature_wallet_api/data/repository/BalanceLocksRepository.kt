@@ -10,6 +10,8 @@ interface BalanceLocksRepository {
 
     fun observeBalanceLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>>
 
+    suspend fun getBalanceLocks(metaId: Long, chainAsset: Chain.Asset): List<BalanceLock>
+
     suspend fun getBiggestLock(chain: Chain, chainAsset: Chain.Asset): BalanceLock?
 
     suspend fun observeBalanceLock(chainAsset: Chain.Asset, lockId: BalanceLockId): Flow<BalanceLock?>

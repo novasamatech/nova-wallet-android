@@ -62,6 +62,14 @@ fun CollatorStakingCalls.unlock(amount: Balance) {
     )
 }
 
+fun CollatorStakingCalls.release() {
+    builder.call(
+        moduleName = Modules.COLLATOR_STAKING,
+        callName = "release",
+        arguments = emptyMap()
+    )
+}
+
 private fun StakingIntent.toEncodableInstance(): Any {
     return structOf(
         "candidate" to candidate.value,

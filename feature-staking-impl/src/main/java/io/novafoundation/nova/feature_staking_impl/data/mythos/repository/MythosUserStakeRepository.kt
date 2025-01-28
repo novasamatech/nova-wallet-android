@@ -43,6 +43,11 @@ interface MythosUserStakeRepository {
         chainId: ChainId,
         accountId: AccountIdKey
     ): Flow<List<MythReleaseRequest>>
+
+    suspend fun releaseQueues(
+        chainId: ChainId,
+        accountId: AccountIdKey
+    ): List<MythReleaseRequest>
 }
 
 @FeatureScope
@@ -81,6 +86,12 @@ class RealMythosUserStakeRepository @Inject constructor(
         return localStorageDataSource.subscribe(chainId) {
             metadata.collatorStaking.releaseQueues.observe(accountId.value)
                 .map { it.orEmpty() }
+        }
+    }
+
+    override suspend fun releaseQueues(chainId: ChainId, accountId: AccountIdKey): List<MythReleaseRequest> {
+        return localStorageDataSource.query(chainId) {
+            metadata.collatorStaking.releaseQueues.query(accountId.value).orEmpty()
         }
     }
 

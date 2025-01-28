@@ -13,4 +13,6 @@ sealed class UnbondMythosStakingValidationFailure {
     ) : UnbondMythosStakingValidationFailure(), NotEnoughToPayFeesError
 
     object HasNotClaimedRewards : UnbondMythosStakingValidationFailure()
+
+    class ReleaseRequestsLimitReached(val limit: Int): UnbondMythosStakingValidationFailure()
 }
