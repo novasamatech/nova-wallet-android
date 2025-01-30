@@ -70,6 +70,14 @@ fun CollatorStakingCalls.release() {
     )
 }
 
+fun CollatorStakingCalls.claimRewards() {
+    builder.call(
+        moduleName = Modules.COLLATOR_STAKING,
+        callName = "claim_rewards",
+        arguments = emptyMap()
+    )
+}
+
 private fun StakingIntent.toEncodableInstance(): Any {
     return structOf(
         "candidate" to candidate.value,

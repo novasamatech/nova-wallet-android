@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.MythosClaimRewardsValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.mythosClaimRewards
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.validations.MythosNoPendingRewardsValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.RedeemMythosValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.mythosRedeem
@@ -39,5 +41,11 @@ class MythosModule {
     @FeatureScope
     fun provideRedeemValidationSystem(): RedeemMythosValidationSystem {
         return ValidationSystem.mythosRedeem()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideClaimRewardsValidationSystem(): MythosClaimRewardsValidationSystem {
+        return ValidationSystem.mythosClaimRewards()
     }
 }
