@@ -6,12 +6,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.hasStakedCollators
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_BOND_MORE
 import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_STAKING_UNBOND
+import io.novafoundation.nova.feature_staking_impl.domain.validations.main.SYSTEM_MANAGE_VALIDATORS
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.mythos.loadUserStakeState
@@ -21,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.bondMore
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.parachain.collators
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.unbond
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -76,6 +79,7 @@ private class MythosStakeActionsComponent(
         when (action.id) {
             SYSTEM_MANAGE_STAKING_BOND_MORE -> router.openBondMore()
             SYSTEM_MANAGE_STAKING_UNBOND -> router.openUnbond()
+            SYSTEM_MANAGE_VALIDATORS -> router.openStakedCollators()
         }
     }
 
@@ -93,5 +97,8 @@ private class MythosStakeActionsComponent(
         if (delegatorState.hasStakedCollators()) {
             add(ManageStakeAction.unbond(resourceManager))
         }
+
+        val collatorsCount = delegatorState.userStakeInfo.candidates.size.format()
+        add(ManageStakeAction.collators(resourceManager, collatorsCount))
     }
 }

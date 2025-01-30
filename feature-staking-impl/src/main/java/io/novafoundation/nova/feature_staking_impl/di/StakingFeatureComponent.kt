@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.d
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewards.di.MythosClaimRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.currentCollators.di.MythosCurrentCollatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.di.MythosRedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.di.ConfirmStartMythosStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.di.SelectMythosCollatorComponent
@@ -263,6 +264,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun redeemMythosFactory(): MythosRedeemComponent.Factory
 
     fun claimMythosRewardsFactory(): MythosClaimRewardsComponent.Factory
+
+    fun currentMythosCollatorsFactory(): MythosCurrentCollatorsComponent.Factory
 
     @Component.Factory
     interface Factory {

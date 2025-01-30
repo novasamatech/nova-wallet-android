@@ -24,4 +24,6 @@ interface MythosStakingRouter : StarkingReturnableRouter {
     fun openRedeem()
 
     fun finishRedeemFlow(redeemConsequences: RedeemConsequences)
+
+    fun openStakedCollators()
 }

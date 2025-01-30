@@ -1,5 +1,7 @@
 package io.novafoundation.nova.runtime.ext
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
@@ -268,6 +270,10 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
+}
+
+fun Chain.accountIdKeyOf(address: String): AccountIdKey {
+    return accountIdOf(address).intoKey()
 }
 
 fun String.anyAddressToAccountId(): ByteArray {

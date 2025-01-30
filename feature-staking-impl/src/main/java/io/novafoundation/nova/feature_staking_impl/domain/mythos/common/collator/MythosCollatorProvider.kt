@@ -50,6 +50,7 @@ class RealMythosCollatorProvider @Inject constructor(
         if (requestedCollatorIds.isEmpty()) return emptyList()
 
         val collatorStakes = mythosSharedComputation.get().candidateInfos(chainId)
+        val sessionValidators = mythosSharedComputation.get().sessionValidators(chainId).toSet()
 
         val accountIdsRaw = requestedCollatorIds.map { it.value }
         val identities = identityRepository.getIdentitiesFromIds(accountIdsRaw, chainId)
@@ -64,7 +65,7 @@ class RealMythosCollatorProvider @Inject constructor(
                 totalStake = collatorStake.stake,
                 delegators = collatorStake.stakers,
                 // TODO APY calculation
-                apr = Fraction.ZERO
+                apr = Fraction.ZERO.takeIf { collatorId in sessionValidators }
             )
         }
     }
