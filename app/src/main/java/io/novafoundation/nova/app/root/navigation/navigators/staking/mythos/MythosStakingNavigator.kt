@@ -71,6 +71,10 @@ class MythosStakingNavigator(
         }
     }
 
+    override fun openStakedCollators() {
+        // TODO
+    }
+
     override fun returnToStartStaking() {
         navigationBuilder()
             .action(R.id.action_return_to_start_staking)
