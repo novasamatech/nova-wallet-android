@@ -33,7 +33,9 @@ class MythosStakingNavigator(
     }
 
     override fun openClaimRewards() {
-        // TODO
+        navigationBuilder()
+            .action(R.id.action_open_mythos_claim_rewards)
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBondMore() {
