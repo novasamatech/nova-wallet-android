@@ -31,7 +31,7 @@ class RealAssetInAdditionalSwapDeductionUseCase(
 
         return if (shouldKeepEdForAssetIn) {
             val chainIn = chainRegistry.getChain(assetIn.chainId)
-            assetSourceRegistry.existentialDepositInPlanks(chainIn, assetIn)
+            assetSourceRegistry.existentialDepositInPlanks(assetIn)
         } else {
             Balance.ZERO
         }

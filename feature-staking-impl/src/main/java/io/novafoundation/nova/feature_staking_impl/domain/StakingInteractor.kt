@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
 import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
@@ -141,6 +142,18 @@ class StakingInteractor(
         emit(StashNoneStatus.INACTIVE)
     }
 
+    suspend fun observeStakingAmount(
+        stakingState: StakingState,
+        scope: CoroutineScope
+    ): Flow<BigInteger?> = flowOfAll {
+        when (stakingState) {
+            is StakingState.NonStash -> flowOf { null }
+            is StakingState.Stash.Nominator -> observeNominatorSummary(stakingState, scope).map { it.activeStake }
+            is StakingState.Stash.Validator -> observeValidatorSummary(stakingState, scope).map { it.activeStake }
+            is StakingState.Stash.None -> observeStashSummary(stakingState, scope).map { it.activeStake }
+        }
+    }
+
     suspend fun observeValidatorSummary(
         validatorState: StakingState.Stash.Validator,
         scope: CoroutineScope
@@ -235,6 +248,8 @@ class StakingInteractor(
     }
 
     fun currentAssetFlow() = assetUseCase.currentAssetFlow()
+
+    fun chainFlow() = assetUseCase.currentAssetAndOptionFlow().map { it.option.assetWithChain.chain }
 
     fun assetFlow(accountAddress: String): Flow<Asset> {
         return flow {

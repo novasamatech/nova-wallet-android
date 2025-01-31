@@ -44,9 +44,6 @@ private const val DEBOUNCE_DURATION_MILLIS = 500
 open class BaseAmountChooserProvider(
     coroutineScope: CoroutineScope,
     tokenFlow: Flow<Token?>,
-    // TODO this flag should be removed once we apply & test max button on all screens.
-    // After that max button should be always enabled if maxActionProvider is presnet
-    private val allowMaxAction: Boolean,
     private val maxActionProvider: MaxActionProvider?,
     fiatFormatter: AmountChooserMixinBase.FiatFormatter = DefaultFiatFormatter(),
     private val fieldValidator: FieldValidator? = null,
@@ -119,9 +116,7 @@ open class BaseAmountChooserProvider(
             maxAvailableBalance.displayedBalance.formatPlanks(maxAvailableBalance.chainAsset)
         }.inBackground()
 
-        override val maxClick: Flow<MaxClick?> = maxAvailableForActionAmount.map { maxAvailableForAction ->
-            if (!allowMaxAction) return@map null
-
+        override val maxClick: Flow<MaxClick> = maxAvailableForActionAmount.map { maxAvailableForAction ->
             getMaxClickAction(maxAvailableForAction)
         }.shareInBackground()
 

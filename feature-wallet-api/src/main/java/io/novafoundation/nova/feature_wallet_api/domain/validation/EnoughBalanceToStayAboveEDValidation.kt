@@ -35,9 +35,8 @@ class EnoughBalanceToStayAboveEDValidation<P, E, F : Fee>(
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
-        val chain = chainWithAsset(value).chain
         val asset = chainWithAsset(value).asset
-        val existentialDeposit = assetSourceRegistry.existentialDeposit(chain, asset)
+        val existentialDeposit = assetSourceRegistry.existentialDeposit(asset)
         val balance = balance(value)
         val fee = fee(value)?.decimalAmountByExecutingAccount.orZero()
         return validOrError(balance - fee >= existentialDeposit) {
