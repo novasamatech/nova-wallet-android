@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -80,6 +82,8 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumDetailsToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
+
+        referendumDetailsToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
 
         referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.block_background)
         referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
@@ -174,6 +178,17 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumTimelineContainer.letOrHide(model.timeline) {
             referendumDetailsTimeline.setTimeline(it)
         }
+
+        viewModel.shareEvent.observeEvent(::shareReferendum)
+    }
+
+    private fun shareReferendum(referendumLink: Uri) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, referendumLink.toString())
+        }
+
+        startActivity(Intent.createChooser(intent, null))
     }
 
     // TODO we need a better way of managing views for specific calls when multiple calls will be supported

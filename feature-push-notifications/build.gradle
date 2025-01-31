@@ -41,7 +41,7 @@ dependencies {
     implementation project(':feature-governance-api')
     implementation project(':feature-staking-api')
     implementation project(':feature-currency-api')
-    implementation project(':feature-deep-linking')
+    implementation project(':feature-deep-link-building')
 
     implementation kotlinDep
 
