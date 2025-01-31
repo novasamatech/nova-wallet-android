@@ -8,6 +8,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
@@ -15,28 +16,23 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_swap_api.R
+import io.novafoundation.nova.feature_swap_api.databinding.ViewSwapAssetBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetAmount
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetFiat
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetImage
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetNetwork
-import kotlinx.android.synthetic.main.view_swap_asset.view.swapAssetNetworkImage
 
 class SwapAssetView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr),
-    WithContextExtensions by WithContextExtensions(
-        context
-    ) {
+    WithContextExtensions by WithContextExtensions(context) {
+
+    private val binder = ViewSwapAssetBinding.inflate(inflater(), this)
 
     private val imageLoader: ImageLoader by lazy(LazyThreadSafetyMode.NONE) {
         FeatureUtils.getCommonApi(context).imageLoader()
     }
 
     init {
-        inflate(context, R.layout.view_swap_asset, this)
         background = context.getInputBackground()
     }
 
@@ -44,22 +40,22 @@ class SwapAssetView @JvmOverloads constructor(
         setAssetImageUrl(model.assetIcon)
         setAmount(model.amount)
         setNetwork(model.chainUi)
-        swapAssetAmount.setTextColorRes(model.amountTextColorRes)
+        binder.swapAssetAmount.setTextColorRes(model.amountTextColorRes)
     }
 
     private fun setAssetImageUrl(icon: Icon) {
-        swapAssetImage.setTokenIcon(icon, imageLoader)
-        swapAssetImage.setBackgroundResource(R.drawable.bg_token_container)
+        binder.swapAssetImage.setTokenIcon(icon, imageLoader)
+        binder.swapAssetImage.setBackgroundResource(R.drawable.bg_token_container)
     }
 
     private fun setAmount(amount: AmountModel) {
-        swapAssetAmount.text = amount.token
-        swapAssetFiat.setTextOrHide(amount.fiat)
+        binder.swapAssetAmount.text = amount.token
+        binder.swapAssetFiat.setTextOrHide(amount.fiat)
     }
 
     private fun setNetwork(chainUi: ChainUi) {
-        swapAssetNetworkImage.loadChainIcon(chainUi.icon, imageLoader)
-        swapAssetNetwork.text = chainUi.name
+        binder.swapAssetNetworkImage.loadChainIcon(chainUi.icon, imageLoader)
+        binder.swapAssetNetwork.text = chainUi.name
     }
 
     class Model(

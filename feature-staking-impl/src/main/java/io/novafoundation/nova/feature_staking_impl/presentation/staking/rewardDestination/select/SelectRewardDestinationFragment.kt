@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,27 +9,16 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSelectRewardDestinationBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.observeRewardDestinationChooser
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationChooser
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationContainer
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationContinue
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationFee
-import kotlinx.android.synthetic.main.fragment_select_reward_destination.selectRewardDestinationToolbar
 
-class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationViewModel>() {
+class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationViewModel, FragmentSelectRewardDestinationBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_select_reward_destination, container, false)
-    }
+    override fun createBinding() = FragmentSelectRewardDestinationBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        selectRewardDestinationContainer.applyInsetter {
+        binder.selectRewardDestinationContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -41,10 +26,10 @@ class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationView
             consume(true)
         }
 
-        selectRewardDestinationToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectRewardDestinationToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        selectRewardDestinationContinue.prepareForProgress(viewLifecycleOwner)
-        selectRewardDestinationContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.selectRewardDestinationContinue.prepareForProgress(viewLifecycleOwner)
+        binder.selectRewardDestinationContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
@@ -61,16 +46,16 @@ class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationView
         observeRetries(viewModel)
         observeValidations(viewModel)
         observeBrowserEvents(viewModel)
-        observeRewardDestinationChooser(viewModel, selectRewardDestinationChooser)
+        observeRewardDestinationChooser(viewModel, binder.selectRewardDestinationChooser)
 
-        viewModel.showNextProgress.observe(selectRewardDestinationContinue::setProgressState)
+        viewModel.showNextProgress.observe(binder.selectRewardDestinationContinue::setProgressState)
 
-        viewModel.feeLiveData.observe(selectRewardDestinationFee::setFeeStatus)
+        viewModel.feeLiveData.observe(binder.selectRewardDestinationFee::setFeeStatus)
 
         viewModel.continueAvailable.observe {
             val state = if (it) ButtonState.NORMAL else ButtonState.DISABLED
 
-            selectRewardDestinationContinue.setState(state)
+            binder.selectRewardDestinationContinue.setState(state)
         }
     }
 }

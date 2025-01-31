@@ -6,8 +6,8 @@ import android.view.View
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
-import kotlinx.android.synthetic.main.view_titled_search_toolbar.view.titledSearchToolbar
-import kotlinx.android.synthetic.main.view_titled_search_toolbar.view.titledSearchToolbarField
+import io.novafoundation.nova.common.databinding.ViewTitledSearchToolbarBinding
+import io.novafoundation.nova.common.utils.inflater
 
 class TitledSearchToolbar @JvmOverloads constructor(
     context: Context,
@@ -15,15 +15,15 @@ class TitledSearchToolbar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewTitledSearchToolbarBinding.inflate(inflater(), this, true)
+
     val toolbar: Toolbar
-        get() = titledSearchToolbar
+        get() = binder.titledSearchToolbar
 
     val searchField: SearchView
-        get() = titledSearchToolbarField
+        get() = binder.titledSearchToolbarField
 
     init {
-        View.inflate(context, R.layout.view_titled_search_toolbar, this)
-
         applyAttributes(attrs)
     }
 

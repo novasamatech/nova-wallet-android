@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ShowBottomSheetEvent
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
 
-fun BaseFragment<*>.setupAddressInput(
+fun BaseFragment<*, *>.setupAddressInput(
     mixin: AddressInputMixin,
     inputField: AddressInputField
 ) = with(inputField) {
@@ -30,7 +30,7 @@ fun BaseFragment<*>.setupAddressInput(
 /**
  * Make sure that the insets are not consumed by the layer above for this method to work correctly
  */
-fun BaseFragment<*>.setupExternalAccounts(
+fun BaseFragment<*, *>.setupExternalAccounts(
     mixin: AddressInputMixin,
     inputField: AddressInputField
 ) {
@@ -39,7 +39,7 @@ fun BaseFragment<*>.setupExternalAccounts(
     setupExternalAccountsCallback(mixin, inputField)
 }
 
-private fun BaseFragment<*>.setupExternalAccountsCallback(
+private fun BaseFragment<*, *>.setupExternalAccountsCallback(
     mixin: AddressInputMixin,
     inputField: AddressInputField
 ) {
@@ -56,7 +56,7 @@ private fun BaseFragment<*>.setupExternalAccountsCallback(
     addInputKeyboardCallback(mixin, inputField)
 }
 
-fun BaseFragment<*>.addInputKeyboardCallback(mixin: AddressInputMixin, inputField: AddressInputField) {
+fun BaseFragment<*, *>.addInputKeyboardCallback(mixin: AddressInputMixin, inputField: AddressInputField) {
     lifecycle.setKeyboardVisibilityListener(inputField) { keyboardVisible ->
         if (!keyboardVisible && inputField.content.hasFocus()) {
             mixin.loadExternalIdentifiers()
@@ -64,11 +64,11 @@ fun BaseFragment<*>.addInputKeyboardCallback(mixin: AddressInputMixin, inputFiel
     }
 }
 
-fun BaseFragment<*>.removeInputKeyboardCallback(inputField: AddressInputField) {
+fun BaseFragment<*, *>.removeInputKeyboardCallback(inputField: AddressInputField) {
     lifecycle.setKeyboardVisibilityListener(inputField, null)
 }
 
-private fun BaseFragment<*>.handleExternalAccountEvents(mixin: AddressInputMixin) {
+private fun BaseFragment<*, *>.handleExternalAccountEvents(mixin: AddressInputMixin) {
     val singletonDialogHolder = SingletonDialogHolder<ExternalAccountsBottomSheet>()
 
     mixin.externalIdentifierEventLiveData.observeEvent {
@@ -79,7 +79,7 @@ private fun BaseFragment<*>.handleExternalAccountEvents(mixin: AddressInputMixin
     }
 }
 
-private fun BaseFragment<*>.showExternalAccountsBottomSheet(
+private fun BaseFragment<*, *>.showExternalAccountsBottomSheet(
     mixin: AddressInputMixin,
     event: ShowBottomSheetEvent,
     singletonDialogHolder: SingletonDialogHolder<ExternalAccountsBottomSheet>
@@ -103,7 +103,7 @@ private fun BaseFragment<*>.showExternalAccountsBottomSheet(
     }
 }
 
-private fun BaseFragment<*>.handleError(event: ErrorEvent) {
+private fun BaseFragment<*, *>.handleError(event: ErrorEvent) {
     val titleAndMessage = when (val exception = event.exception) {
         is Web3NamesException.ChainProviderNotFoundException -> {
             getString(R.string.web3names_invalid_recepient_title) to getString(R.string.web3names_recepient_not_found_message, exception.web3Name)

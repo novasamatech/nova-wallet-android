@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -72,6 +72,10 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -83,6 +87,7 @@ dependencies {
 
     implementation kotlinDep
 
+    
     implementation androidDep
     implementation cardViewDep
     implementation recyclerViewDep
@@ -147,4 +152,5 @@ dependencies {
     implementation kotlinReflect
 
     implementation playServicesAuthDep
+
 }

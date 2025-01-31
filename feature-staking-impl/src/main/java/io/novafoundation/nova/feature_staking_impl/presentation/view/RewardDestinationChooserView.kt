@@ -2,16 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.view.AccountView
-import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserLearnMore
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayout
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayoutTarget
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserPayoutTitle
-import kotlinx.android.synthetic.main.view_reward_destination_chooser.view.rewardDestinationChooserRestake
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewRewardDestinationChooserBinding
 
 class RewardDestinationChooserView @JvmOverloads constructor(
     context: Context,
@@ -19,24 +14,24 @@ class RewardDestinationChooserView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
+    private val binder = ViewRewardDestinationChooserBinding.inflate(inflater(), this)
+
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_reward_destination_chooser, this)
     }
 
     val learnMore: TextView
-        get() = rewardDestinationChooserLearnMore
+        get() = binder.rewardDestinationChooserLearnMore
 
     val destinationRestake: RewardDestinationView
-        get() = rewardDestinationChooserRestake
+        get() = binder.rewardDestinationChooserRestake
 
     val destinationPayout: RewardDestinationView
-        get() = rewardDestinationChooserPayout
+        get() = binder.rewardDestinationChooserPayout
 
     val payoutTarget: AccountView
-        get() = rewardDestinationChooserPayoutTarget
+        get() = binder.rewardDestinationChooserPayoutTarget
 
     val payoutTitle: TextView
-        get() = rewardDestinationChooserPayoutTitle
+        get() = binder.rewardDestinationChooserPayoutTitle
 }

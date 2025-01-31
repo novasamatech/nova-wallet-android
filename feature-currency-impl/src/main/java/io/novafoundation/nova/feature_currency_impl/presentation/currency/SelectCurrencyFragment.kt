@@ -1,29 +1,21 @@
 package io.novafoundation.nova.feature_currency_impl.presentation.currency
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
-import io.novafoundation.nova.feature_currency_impl.R
+import io.novafoundation.nova.feature_currency_impl.databinding.FragmentSelectCurrencyBinding
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureComponent
-import kotlinx.android.synthetic.main.fragment_select_currency.currencyList
-import kotlinx.android.synthetic.main.fragment_select_currency.currencyToolbar
 
-class SelectCurrencyFragment : BaseFragment<SelectCurrencyViewModel>(), CurrencyAdapter.Handler {
+class SelectCurrencyFragment : BaseFragment<SelectCurrencyViewModel, FragmentSelectCurrencyBinding>(), CurrencyAdapter.Handler {
+
+    override fun createBinding() = FragmentSelectCurrencyBinding.inflate(layoutInflater)
 
     private val adapter = CurrencyAdapter(this)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_select_currency, container, false)
-    }
-
     override fun initViews() {
-        currencyList.adapter = adapter
+        binder.currencyList.adapter = adapter
 
-        currencyToolbar.setHomeButtonListener {
+        binder.currencyToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
     }

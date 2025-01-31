@@ -9,7 +9,7 @@ import kotlinx.android.extensions.LayoutContainer
 
 typealias HolderCreator<T> = (parentView: ViewGroup) -> DynamicListSheetAdapter.Holder<T>
 
-class DynamicListSheetAdapter<T>(
+class DynamicListSheetAdapter<T : Any>(
     private val selected: T?,
     private val handler: DynamicListBottomSheet<T>,
     private val diffCallback: DiffUtil.ItemCallback<T>,

@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders
 
-import android.view.View
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupMnemonicBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.ManualBackupItemHandler
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsViewHolder
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.models.ManualBackupSecretsVisibilityRvItem
-import kotlinx.android.synthetic.main.item_manual_backup_mnemonic.view.manualBackupSecretsMnemonic
 
 data class ManualBackupMnemonicRvItem(
     val mnemonic: List<String>,
@@ -17,13 +16,14 @@ data class ManualBackupMnemonicRvItem(
     }
 }
 
-class ManualBackupMnemonicViewHolder(itemView: View, private val itemHandler: ManualBackupItemHandler) : ManualBackupSecretsViewHolder(itemView) {
+class ManualBackupMnemonicViewHolder(private val binder: ItemManualBackupMnemonicBinding, private val itemHandler: ManualBackupItemHandler) :
+    ManualBackupSecretsViewHolder(binder.root) {
 
     override fun bind(item: ManualBackupSecretsRvItem) {
         require(item is ManualBackupMnemonicRvItem)
 
-        itemView.manualBackupSecretsMnemonic.setWordsString(item.mnemonic)
-        itemView.manualBackupSecretsMnemonic.showContent(item.isShown)
-        itemView.manualBackupSecretsMnemonic.onContentShownListener { itemHandler.onTapToRevealClicked(item) }
+        binder.manualBackupSecretsMnemonic.setWordsString(item.mnemonic)
+        binder.manualBackupSecretsMnemonic.showContent(item.isShown)
+        binder.manualBackupSecretsMnemonic.onContentShownListener { itemHandler.onTapToRevealClicked(item) }
     }
 }

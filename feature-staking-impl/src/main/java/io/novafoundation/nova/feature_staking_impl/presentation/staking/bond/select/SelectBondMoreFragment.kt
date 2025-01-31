@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.select
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -11,20 +9,14 @@ import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBondMoreBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreAmount
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreContainer
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreContinue
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreFee
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreHints
-import kotlinx.android.synthetic.main.fragment_bond_more.bondMoreToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
-class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
+class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel, FragmentBondMoreBinding>() {
 
     companion object {
 
@@ -33,16 +25,10 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_bond_more, container, false)
-    }
+    override fun createBinding() = FragmentBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        bondMoreContainer.applyInsetter {
+        binder.bondMoreContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -50,9 +36,9 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
             consume(true)
         }
 
-        bondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
-        bondMoreContinue.prepareForProgress(viewLifecycleOwner)
-        bondMoreContinue.setOnClickListener { viewModel.nextClicked() }
+        binder.bondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.bondMoreContinue.prepareForProgress(viewLifecycleOwner)
+        binder.bondMoreContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {
@@ -69,12 +55,12 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
 
     override fun subscribe(viewModel: SelectBondMoreViewModel) {
         observeValidations(viewModel)
-        setupAmountChooser(viewModel.amountChooserMixin, bondMoreAmount)
-        setupFeeLoading(viewModel, bondMoreFee)
-        observeHints(viewModel.hintsMixin, bondMoreHints)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.bondMoreAmount)
+        setupFeeLoading(viewModel, binder.bondMoreFee)
+        observeHints(viewModel.hintsMixin, binder.bondMoreHints)
 
-        viewModel.showNextProgress.observe(bondMoreContinue::setProgressState)
+        viewModel.showNextProgress.observe(binder.bondMoreContinue::setProgressState)
 
-        viewModel.feeLiveData.observe(bondMoreFee::setFeeStatus)
+        viewModel.feeLiveData.observe(binder.bondMoreFee::setFeeStatus)
     }
 }

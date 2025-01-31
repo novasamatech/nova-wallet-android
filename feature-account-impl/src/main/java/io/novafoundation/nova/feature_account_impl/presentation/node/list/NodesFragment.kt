@@ -1,46 +1,37 @@
 package io.novafoundation.nova.feature_account_impl.presentation.node.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentNodesBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.accounts.AccountChooserBottomSheetDialog
 import io.novafoundation.nova.feature_account_impl.presentation.node.model.NodeModel
-import kotlinx.android.synthetic.main.fragment_nodes.addConnectionTv
-import kotlinx.android.synthetic.main.fragment_nodes.connectionsList
-import kotlinx.android.synthetic.main.fragment_nodes.novaToolbar
 
-class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandler {
+class NodesFragment : BaseFragment<NodesViewModel, FragmentNodesBinding>(), NodesAdapter.NodeItemHandler {
+
+    override fun createBinding() = FragmentNodesBinding.inflate(layoutInflater)
 
     private lateinit var adapter: NodesAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_nodes, container, false)
 
     override fun initViews() {
         adapter = NodesAdapter(this)
 
-        connectionsList.setHasFixedSize(true)
-        connectionsList.adapter = adapter
+        binder.connectionsList.setHasFixedSize(true)
+        binder.connectionsList.adapter = adapter
 
-        novaToolbar.setHomeButtonListener {
+        binder.novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
-        novaToolbar.setRightActionClickListener {
+        binder.novaToolbar.setRightActionClickListener {
             viewModel.editClicked()
         }
 
-        addConnectionTv.setOnClickListener {
+        binder.addConnectionTv.setOnClickListener {
             viewModel.addNodeClicked()
         }
     }
@@ -70,7 +61,7 @@ class NodesFragment : BaseFragment<NodesViewModel>(), NodesAdapter.NodeItemHandl
 
         viewModel.editMode.observe(adapter::switchToEdit)
 
-        viewModel.toolbarAction.observe(novaToolbar::setTextRight)
+        viewModel.toolbarAction.observe(binder.novaToolbar::setTextRight)
 
         viewModel.deleteNodeEvent.observeEvent(::showDeleteNodeDialog)
     }

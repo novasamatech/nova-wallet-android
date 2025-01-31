@@ -1,38 +1,27 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.filters
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendaFiltersBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
-import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFilterAll
-import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFiltersApplyButton
-import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFiltersToolbar
-import kotlinx.android.synthetic.main.fragment_referenda_filters.referendaFiltersTypeGroup
 
-class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel>() {
+class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel, FragmentReferendaFiltersBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_referenda_filters, container, false)
+    override fun createBinding() = FragmentReferendaFiltersBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        referendaFiltersToolbar.applyStatusBarInsets()
-        referendaFiltersToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
-        referendaFiltersToolbar.setRightActionClickListener { referendaFilterAll.isChecked = true }
+        binder.referendaFiltersToolbar.applyStatusBarInsets()
+        binder.referendaFiltersToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
+        binder.referendaFiltersToolbar.setRightActionClickListener { binder.referendaFilterAll.isChecked = true }
 
-        referendaFiltersApplyButton.setOnClickListener {
+        binder.referendaFiltersApplyButton.setOnClickListener {
             viewModel.onApplyFilters()
         }
 
-        referendaFiltersTypeGroup.check(viewModel.getReferendumTypeSelectedOption())
-        referendaFiltersTypeGroup.setOnCheckedChangeListener { _, checkedId ->
+        binder.referendaFiltersTypeGroup.check(viewModel.getReferendumTypeSelectedOption())
+        binder.referendaFiltersTypeGroup.setOnCheckedChangeListener { _, checkedId ->
             viewModel.onFilterTypeChanged(checkedId)
         }
     }
@@ -49,7 +38,7 @@ class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel>() {
 
     override fun subscribe(viewModel: ReferendaFiltersViewModel) {
         viewModel.isApplyButtonAvailableFlow.observe {
-            referendaFiltersApplyButton.isEnabled = it
+            binder.referendaFiltersApplyButton.isEnabled = it
         }
     }
 }

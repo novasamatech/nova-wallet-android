@@ -3,26 +3,20 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewVotingStatusBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumVotingModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
-import kotlinx.android.synthetic.main.view_voting_status.view.abstainVotersDetails
-import kotlinx.android.synthetic.main.view_voting_status.view.negativeVotersDetails
-import kotlinx.android.synthetic.main.view_voting_status.view.positiveVotersDetails
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatus
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatusStartVote
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatusThreshold
-import kotlinx.android.synthetic.main.view_voting_status.view.votingStatusTimeEstimation
 
 class VotingStatusView @JvmOverloads constructor(
     context: Context,
@@ -32,10 +26,10 @@ class VotingStatusView @JvmOverloads constructor(
 
     override val providedContext: Context = context
 
+    private val binder = ViewVotingStatusBinding.inflate(inflater(), this)
+
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_voting_status, this)
 
         background = getRoundedCornerDrawable(R.color.block_background)
         setPadding(0, 16.dp, 0, 16.dp)
@@ -43,52 +37,52 @@ class VotingStatusView @JvmOverloads constructor(
 
     fun setTimeEstimation(timeEstimation: ReferendumTimeEstimation?) {
         if (timeEstimation == null) {
-            votingStatusTimeEstimation.makeGone()
+            binder.votingStatusTimeEstimation.makeGone()
             return
         }
 
-        votingStatusTimeEstimation.makeVisible()
-        votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation, Gravity.END)
+        binder.votingStatusTimeEstimation.makeVisible()
+        binder.votingStatusTimeEstimation.setReferendumTimeEstimation(timeEstimation, Gravity.END)
     }
 
     fun setStatus(referendumStatusModel: ReferendumStatusModel) {
-        votingStatus.text = referendumStatusModel.name
-        votingStatus.setTextColorRes(referendumStatusModel.colorRes)
+        binder.votingStatus.text = referendumStatusModel.name
+        binder.votingStatus.setTextColorRes(referendumStatusModel.colorRes)
     }
 
     fun setVotingModel(thresholdModel: ReferendumVotingModel?) {
-        votingStatusThreshold.setThresholdModel(thresholdModel)
+        binder.votingStatusThreshold.setThresholdModel(thresholdModel)
     }
 
     fun setPositiveVoters(votersModel: VotersModel?) {
-        positiveVotersDetails.setVotersModel(votersModel)
+        binder.positiveVotersDetails.setVotersModel(votersModel)
     }
 
     fun setPositiveVotersClickListener(listener: OnClickListener?) {
-        positiveVotersDetails.setOnClickListener(listener)
+        binder.positiveVotersDetails.setOnClickListener(listener)
     }
 
     fun setNegativeVoters(votersModel: VotersModel?) {
-        negativeVotersDetails.setVotersModel(votersModel)
+        binder.negativeVotersDetails.setVotersModel(votersModel)
     }
 
     fun setNegativeVotersClickListener(listener: OnClickListener?) {
-        negativeVotersDetails.setOnClickListener(listener)
+        binder.negativeVotersDetails.setOnClickListener(listener)
     }
 
     fun setAbstainVoters(votersModel: VotersModel?) {
-        abstainVotersDetails.setVotersModel(votersModel)
+        binder.abstainVotersDetails.setVotersModel(votersModel)
     }
 
     fun setAbstainVotersClickListener(listener: OnClickListener?) {
-        abstainVotersDetails.setOnClickListener(listener)
+        binder.abstainVotersDetails.setOnClickListener(listener)
     }
 
     fun setStartVoteOnClickListener(listener: OnClickListener?) {
-        votingStatusStartVote.setOnClickListener(listener)
+        binder.votingStatusStartVote.setOnClickListener(listener)
     }
 
     fun setVoteButtonState(state: DescriptiveButtonState) {
-        votingStatusStartVote.setState(state)
+        binder.votingStatusStartVote.setState(state)
     }
 }

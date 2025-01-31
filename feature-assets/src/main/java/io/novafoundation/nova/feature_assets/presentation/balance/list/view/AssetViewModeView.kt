@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.AnticipateOvershootInterpolator
@@ -13,16 +12,18 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.view_asset_view_mode.view.assetViewModeIcon
-import kotlinx.android.synthetic.main.view_asset_view_mode.view.assetViewModeText
+import io.novafoundation.nova.feature_assets.databinding.ViewAssetViewModeBinding
 
 class AssetViewModeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr), WithContextExtensions {
+
+    private val binder = ViewAssetViewModeBinding.inflate(inflater(), this)
 
     override val providedContext: Context = context
 
@@ -47,18 +48,16 @@ class AssetViewModeView @JvmOverloads constructor(
     private val slideBottomOutAnimation = AnimationUtils.loadAnimation(context, R.anim.asset_mode_slide_bottom_out).applyInterpolator()
 
     init {
-        View.inflate(context, R.layout.view_asset_view_mode, this)
-
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
 
-        assetViewModeIcon.setFactory {
+        binder.assetViewModeIcon.setFactory {
             val imageView = ImageView(context, null, 0)
             imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
             imageView
         }
 
-        assetViewModeText.setFactory {
+        binder.assetViewModeText.setFactory {
             val textView = TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_SemiBold_Title3)
             textView.setGravity(Gravity.CLIP_VERTICAL)
             textView.setTextColorRes(R.color.text_primary)
@@ -76,21 +75,21 @@ class AssetViewModeView @JvmOverloads constructor(
     fun switchTextTo(@DrawableRes iconRes: Int, @StringRes textRes: Int) {
         if (!shouldPlayAnimation(textRes)) return
 
-        assetViewModeIcon.setImageResource(iconRes)
+        binder.assetViewModeIcon.setImageResource(iconRes)
 
-        assetViewModeText.currentView
+        binder.assetViewModeText.currentView
 
         if (slideAnimationBottom) {
-            assetViewModeText.inAnimation = slideBottomInAnimation
-            assetViewModeText.outAnimation = slideBottomOutAnimation
+            binder.assetViewModeText.inAnimation = slideBottomInAnimation
+            binder.assetViewModeText.outAnimation = slideBottomOutAnimation
         } else {
-            assetViewModeText.inAnimation = slideTopInAnimation
-            assetViewModeText.outAnimation = slideTopOutAnimation
+            binder.assetViewModeText.inAnimation = slideTopInAnimation
+            binder.assetViewModeText.outAnimation = slideTopOutAnimation
         }
 
         slideAnimationBottom = !slideAnimationBottom
 
-        assetViewModeText.setText(context.getText(textRes))
+        binder.assetViewModeText.setText(context.getText(textRes))
     }
 
     private fun Animation.applyInterpolator(): Animation {
@@ -99,7 +98,7 @@ class AssetViewModeView @JvmOverloads constructor(
     }
 
     private fun shouldPlayAnimation(@StringRes textRes: Int): Boolean {
-        val currentTextView = assetViewModeText.currentView as? TextView ?: return true
+        val currentTextView = binder.assetViewModeText.currentView as? TextView ?: return true
 
         return currentTextView.text != context.getString(textRes)
     }

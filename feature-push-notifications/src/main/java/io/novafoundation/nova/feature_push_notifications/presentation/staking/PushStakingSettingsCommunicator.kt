@@ -4,7 +4,7 @@ import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface PushStakingSettingsRequester : InterScreenRequester<PushStakingSettingsRequester.Request, PushStakingSettingsResponder.Response> {
 

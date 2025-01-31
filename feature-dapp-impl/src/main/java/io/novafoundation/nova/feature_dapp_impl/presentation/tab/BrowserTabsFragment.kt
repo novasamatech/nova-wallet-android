@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.tab
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.GridLayoutManager
 import coil.ImageLoader
@@ -11,16 +8,12 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
-import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentBrowserTabsBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_browser_tabs.browserTabsAddTab
-import kotlinx.android.synthetic.main.fragment_browser_tabs.browserTabsCloseTabs
-import kotlinx.android.synthetic.main.fragment_browser_tabs.browserTabsDone
-import kotlinx.android.synthetic.main.fragment_browser_tabs.browserTabsList
 
-class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAdapter.Handler {
+class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel, FragmentBrowserTabsBinding>(), BrowserTabsAdapter.Handler {
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -29,25 +22,19 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
         BrowserTabsAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_browser_tabs, container, false)
-    }
+    override fun createBinding() = FragmentBrowserTabsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         requireView().applyStatusBarInsets()
 
         onBackPressed { viewModel.done() }
 
-        browserTabsList.layoutManager = GridLayoutManager(requireContext(), 2)
-        browserTabsList.adapter = adapter
+        binder.browserTabsList.layoutManager = GridLayoutManager(requireContext(), 2)
+        binder.browserTabsList.adapter = adapter
 
-        browserTabsCloseTabs.setOnClickListener { viewModel.closeAllTabs() }
-        browserTabsAddTab.setOnClickListener { viewModel.addTab() }
-        browserTabsDone.setOnClickListener { viewModel.done() }
+        binder.browserTabsCloseTabs.setOnClickListener { viewModel.closeAllTabs() }
+        binder.browserTabsAddTab.setOnClickListener { viewModel.addTab() }
+        binder.browserTabsDone.setOnClickListener { viewModel.done() }
     }
 
     override fun inject() {
@@ -62,7 +49,7 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel>(), BrowserTabsAda
 
         viewModel.tabsFlow.observe {
             adapter.submitList(it)
-            browserTabsList.scrollToPosition(it.size - 1)
+            binder.browserTabsList.scrollToPosition(it.size - 1)
         }
     }
 

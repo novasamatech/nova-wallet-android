@@ -1,26 +1,20 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.removeVotes
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentRemoveVotesBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.track.list.TrackListBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteConfirm
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteToolbar
-import kotlinx.android.synthetic.main.fragment_remove_votes.removeVoteTracks
 
-class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel>() {
+class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel, FragmentRemoveVotesBinding>() {
 
     companion object {
 
@@ -29,23 +23,17 @@ class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel>() {
         fun getBundle(payload: RemoveVotesPayload): Bundle = bundleOf(PAYLOAD to payload)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_remove_votes, container, false)
-    }
+    override fun createBinding() = FragmentRemoveVotesBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        removeVoteToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.removeVoteToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        removeVoteConfirm.prepareForProgress(viewLifecycleOwner)
-        removeVoteConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.removeVoteConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.removeVoteConfirm.setOnClickListener { viewModel.confirmClicked() }
 
-        removeVoteExtrinsicInfo.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.removeVoteExtrinsicInfo.setOnAccountClickedListener { viewModel.accountClicked() }
 
-        removeVoteTracks.setOnClickListener { viewModel.tracksClicked() }
+        binder.removeVoteTracks.setOnClickListener { viewModel.tracksClicked() }
     }
 
     override fun inject() {
@@ -62,15 +50,15 @@ class RemoveVotesFragment : BaseFragment<RemoveVotesViewModel>() {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
 
-        setupFeeLoading(viewModel, removeVoteExtrinsicInfo.fee)
-        viewModel.selectedAccount.observe(removeVoteExtrinsicInfo::setAccount)
-        viewModel.walletModel.observe(removeVoteExtrinsicInfo::setWallet)
+        setupFeeLoading(viewModel, binder.removeVoteExtrinsicInfo.fee)
+        viewModel.selectedAccount.observe(binder.removeVoteExtrinsicInfo::setAccount)
+        viewModel.walletModel.observe(binder.removeVoteExtrinsicInfo::setWallet)
 
         viewModel.tracksModelFlow.observe {
-            removeVoteTracks.showValue(it.overview)
+            binder.removeVoteTracks.showValue(it.overview)
         }
 
-        viewModel.showNextProgress.observe(removeVoteConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.removeVoteConfirm::setProgressState)
 
         viewModel.showTracksEvent.observeEvent { tracks ->
             TrackListBottomSheet(

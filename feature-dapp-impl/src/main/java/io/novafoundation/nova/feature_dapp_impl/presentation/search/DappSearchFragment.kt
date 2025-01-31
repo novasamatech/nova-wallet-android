@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -21,17 +17,13 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentSearchDappBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappCategories
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappCategoriesShimmering
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappList
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearch
-import kotlinx.android.synthetic.main.fragment_search_dapp.searchDappSearhContainer
 
-class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), SearchDappAdapter.Handler, DappCategoriesAdapter.Handler {
+class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, FragmentSearchDappBinding>(), SearchDappAdapter.Handler, DappCategoriesAdapter.Handler {
 
     companion object {
 
@@ -42,41 +34,35 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
         )
     }
 
+    override fun createBinding() = FragmentSearchDappBinding.inflate(layoutInflater)
+
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(imageLoader, this) }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_search_dapp, container, false)
-    }
-
     override fun initViews() {
-        searchDappSearch.applyStatusBarInsets()
-        searchDappSearhContainer.applyInsetter {
+        binder.searchDappSearch.applyStatusBarInsets()
+        binder.searchDappSearhContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
 
-        searchDappCategories.adapter = categoriesAdapter
-        searchDappList.adapter = adapter
-        searchDappList.setHasFixedSize(true)
+        binder.searchDappCategories.adapter = categoriesAdapter
+        binder.searchDappList.adapter = adapter
+        binder.searchDappList.setHasFixedSize(true)
 
-        searchDappSearch.cancel.setOnClickListener {
+        binder.searchDappSearch.cancel.setOnClickListener {
             viewModel.cancelClicked()
 
             hideKeyboard()
         }
 
-        searchDappSearch.searchInput.requestFocus()
-        searchDappSearch.searchInput.content.showSoftKeyboard()
+        binder.searchDappSearch.searchInput.requestFocus()
+        binder.searchDappSearch.searchInput.content.showSoftKeyboard()
     }
 
     override fun inject() {
@@ -88,17 +74,17 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
 
     override fun subscribe(viewModel: DAppSearchViewModel) {
         setupDAppNotInCatalogWarning()
-        searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
+        binder.searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchResults.observe(::submitListPreservingViewPoint)
 
         viewModel.selectQueryTextEvent.observeEvent {
-            searchDappSearch.searchInput.content.selectAll()
+            binder.searchDappSearch.searchInput.content.selectAll()
         }
 
         viewModel.categoriesFlow.observe {
-            searchDappCategoriesShimmering.isVisible = it.isLoading()
-            searchDappCategories.isVisible = it.isLoaded()
+            binder.searchDappCategoriesShimmering.isVisible = it.isLoading()
+            binder.searchDappCategories.isVisible = it.isLoaded()
             it.onLoaded { categoriesAdapter.submitList(it) }
         }
     }
@@ -110,14 +96,14 @@ class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel>(), Searc
     }
 
     private fun hideKeyboard() {
-        searchDappSearch.searchInput.hideSoftKeyboard()
+        binder.searchDappSearch.searchInput.hideSoftKeyboard()
     }
 
     private fun submitListPreservingViewPoint(data: List<Any?>) {
-        val recyclerViewState = searchDappList.layoutManager!!.onSaveInstanceState()
+        val recyclerViewState = binder.searchDappList.layoutManager!!.onSaveInstanceState()
 
         adapter.submitList(data) {
-            searchDappList.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+            binder.searchDappList.layoutManager!!.onRestoreInstanceState(recyclerViewState)
         }
     }
 

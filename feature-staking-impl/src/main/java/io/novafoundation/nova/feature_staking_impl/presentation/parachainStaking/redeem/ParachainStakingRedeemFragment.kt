@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -13,34 +9,23 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingRedeemBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemAmount
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemConfirm
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemContainer
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemExtrinsicInfo
-import kotlinx.android.synthetic.main.fragment_parachain_staking_redeem.parachainStakingRedeemToolbar
 
-class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewModel>() {
+class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewModel, FragmentParachainStakingRedeemBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_parachain_staking_redeem, container, false)
-    }
+    override fun createBinding() = FragmentParachainStakingRedeemBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        parachainStakingRedeemContainer.applyStatusBarInsets()
+        binder.parachainStakingRedeemContainer.applyStatusBarInsets()
 
-        parachainStakingRedeemToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.parachainStakingRedeemToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        parachainStakingRedeemExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.parachainStakingRedeemExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        parachainStakingRedeemConfirm.prepareForProgress(viewLifecycleOwner)
-        parachainStakingRedeemConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.parachainStakingRedeemConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.parachainStakingRedeemConfirm.setOnClickListener { viewModel.confirmClicked() }
     }
 
     override fun inject() {
@@ -57,13 +42,13 @@ class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewMo
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, parachainStakingRedeemExtrinsicInfo.fee)
+        setupFeeLoading(viewModel, binder.parachainStakingRedeemExtrinsicInfo.fee)
 
-        viewModel.showNextProgress.observe(parachainStakingRedeemConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.parachainStakingRedeemConfirm::setProgressState)
 
-        viewModel.currentAccountModelFlow.observe(parachainStakingRedeemExtrinsicInfo::setAccount)
-        viewModel.walletFlow.observe(parachainStakingRedeemExtrinsicInfo::setWallet)
+        viewModel.currentAccountModelFlow.observe(binder.parachainStakingRedeemExtrinsicInfo::setAccount)
+        viewModel.walletFlow.observe(binder.parachainStakingRedeemExtrinsicInfo::setWallet)
 
-        viewModel.redeemableAmount.observe(parachainStakingRedeemAmount::showLoadingState)
+        viewModel.redeemableAmount.observe(binder.parachainStakingRedeemAmount::showLoadingState)
     }
 }

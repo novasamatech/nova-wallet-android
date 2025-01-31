@@ -1,25 +1,24 @@
 package io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.annotation.CallSuper
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.databinding.FragmentChainAccountPreviewBinding
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountAccounts
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountContinue
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountDescription
-import kotlinx.android.synthetic.main.fragment_chain_account_preview.previewChainAccountToolbar
+
 import javax.inject.Inject
 
-abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> : BaseFragment<V>(), ChainAccountsAdapter.Handler {
+abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewViewModel> :
+    BaseFragment<V, FragmentChainAccountPreviewBinding>(),
+    ChainAccountsAdapter.Handler {
+
+    override fun createBinding() = FragmentChainAccountPreviewBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -28,24 +27,18 @@ abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewView
         ChainAccountsAdapter(this, imageLoader)
     }
 
-    final override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_chain_account_preview, container, false)
-
     @CallSuper
     override fun initViews() {
-        previewChainAccountToolbar.applyStatusBarInsets()
-        previewChainAccountToolbar.setHomeButtonListener {
+        binder.previewChainAccountToolbar.applyStatusBarInsets()
+        binder.previewChainAccountToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
-        previewChainAccountAccounts.setHasFixedSize(true)
-        previewChainAccountAccounts.adapter = adapter
+        binder.previewChainAccountAccounts.setHasFixedSize(true)
+        binder.previewChainAccountAccounts.adapter = adapter
 
-        previewChainAccountContinue.setOnClickListener { viewModel.continueClicked() }
-        previewChainAccountContinue.prepareForProgress(viewLifecycleOwner)
+        binder.previewChainAccountContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.previewChainAccountContinue.prepareForProgress(viewLifecycleOwner)
     }
 
     @CallSuper
@@ -54,9 +47,9 @@ abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewView
 
         viewModel.chainAccountProjections.observe(adapter::submitList)
 
-        previewChainAccountDescription.setTextOrHide(viewModel.subtitle)
+        binder.previewChainAccountDescription.setTextOrHide(viewModel.subtitle)
 
-        viewModel.buttonState.observe(previewChainAccountContinue::setState)
+        viewModel.buttonState.observe(binder.previewChainAccountContinue::setState)
     }
 
     override fun chainAccountClicked(item: AccountInChainUi) {

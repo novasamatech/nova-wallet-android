@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -16,7 +13,7 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.setModelOrHide
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentAssetFlowSearchBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.AssetBaseDecoration
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.CompoundAssetDecorationPreferences
@@ -27,14 +24,12 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowList
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowPlaceholder
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowSearchContainer
-import kotlinx.android.synthetic.main.fragment_asset_flow_search.assetFlowToolbar
 
 abstract class AssetFlowFragment<T : AssetFlowViewModel> :
-    BaseFragment<T>(),
+    BaseFragment<T, FragmentAssetFlowSearchBinding>(),
     BalanceListAdapter.ItemAssetHandler {
+
+    override fun createBinding() = FragmentAssetFlowSearchBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -43,28 +38,20 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         BalanceListAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_asset_flow_search, container, false)
-    }
-
     fun setTitle(@StringRes titleRes: Int) {
-        assetFlowToolbar.setTitle(titleRes)
+        binder.assetFlowToolbar.setTitle(titleRes)
     }
 
     override fun initViews() {
-        assetFlowToolbar.applyStatusBarInsets()
-        assetFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
-        assetFlowSearchContainer.applyInsetter {
+        binder.assetFlowToolbar.applyStatusBarInsets()
+        binder.assetFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.assetFlowSearchContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
 
-        with(assetFlowList) {
+        with(binder.assetFlowList) {
             setHasFixedSize(true)
             adapter = assetsAdapter
 
@@ -79,29 +66,29 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
             itemAnimator = null
         }
 
-        assetFlowToolbar.searchField.requestFocus()
-        assetFlowToolbar.searchField.content.showSoftKeyboard()
+        binder.assetFlowToolbar.searchField.requestFocus()
+        binder.assetFlowToolbar.searchField.content.showSoftKeyboard()
     }
 
     override fun subscribe(viewModel: T) {
-        assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
+        binder.assetFlowToolbar.searchField.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.searchHint.observe {
-            assetFlowToolbar.searchField.setHint(it)
+            binder.assetFlowToolbar.searchField.setHint(it)
         }
 
         viewModel.searchResults.observe { assets ->
-            assetFlowList.setVisible(assets.isNotEmpty())
+            binder.assetFlowList.setVisible(assets.isNotEmpty())
 
             assetsAdapter.submitListPreservingViewPoint(
                 data = assets,
-                into = assetFlowList,
-                extraDiffCompletedCallback = { assetFlowList.invalidateItemDecorations() }
+                into = binder.assetFlowList,
+                extraDiffCompletedCallback = { binder.assetFlowList.invalidateItemDecorations() }
             )
         }
 
         viewModel.placeholder.observe { placeholder ->
-            assetFlowPlaceholder.setModelOrHide(placeholder)
+            binder.assetFlowPlaceholder.setModelOrHide(placeholder)
         }
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
@@ -116,12 +103,12 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
     override fun assetClicked(asset: Chain.Asset) {
         viewModel.assetClicked(asset)
 
-        assetFlowToolbar.searchField.hideSoftKeyboard()
+        binder.assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 
     override fun tokenGroupClicked(tokenGroup: TokenGroupUi) {
         viewModel.tokenClicked(tokenGroup)
 
-        assetFlowToolbar.searchField.hideSoftKeyboard()
+        binder.assetFlowToolbar.searchField.hideSoftKeyboard()
     }
 }

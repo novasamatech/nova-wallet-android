@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.UserRewardsView
 
-fun BaseFragment<*>.setupUserRewardsComponent(component: UserRewardsComponent, view: UserRewardsView, router: StakingRouter) {
+fun BaseFragment<*, *>.setupUserRewardsComponent(component: UserRewardsComponent, view: UserRewardsView, router: StakingRouter) {
     view.setOnRewardPeriodClickedListener {
         component.onAction(UserRewardsAction.UserRewardPeriodClicked)
     }

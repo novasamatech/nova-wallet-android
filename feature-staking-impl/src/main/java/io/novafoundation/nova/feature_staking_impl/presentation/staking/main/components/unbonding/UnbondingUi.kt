@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.selectSta
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.SelectionStyle
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.rebond.ChooseRebondKindBottomSheet
 
-fun BaseFragment<*>.setupUnbondingComponent(component: UnbondingComponent, view: UnbondingsView) {
+fun BaseFragment<*, *>.setupUnbondingComponent(component: UnbondingComponent, view: UnbondingsView) {
     component.events.observeEvent {
         when (it) {
             is UnbondingEvent.ChooseRebondKind -> {

@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignPayload
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.first
 
 interface ExternalSignRequester : InterScreenRequester<ExternalSignPayload, Response>

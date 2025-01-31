@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,17 +10,11 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
-import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentCustomNodeBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeApplyButton
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeChain
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeNameInput
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeTitle
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeToolbar
-import kotlinx.android.synthetic.main.fragment_custom_node.customNodeUrlInput
 
-class CustomNodeFragment : BaseFragment<CustomNodeViewModel>() {
+class CustomNodeFragment : BaseFragment<CustomNodeViewModel, FragmentCustomNodeBinding>() {
 
     companion object {
 
@@ -35,23 +27,17 @@ class CustomNodeFragment : BaseFragment<CustomNodeViewModel>() {
         }
     }
 
+    override fun createBinding() = FragmentCustomNodeBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_custom_node, container, false)
-    }
-
     override fun initViews() {
-        customNodeToolbar.applyStatusBarInsets()
-        customNodeToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.customNodeToolbar.applyStatusBarInsets()
+        binder.customNodeToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        customNodeApplyButton.prepareForProgress(this)
-        customNodeApplyButton.setOnClickListener { viewModel.saveNodeClicked() }
+        binder.customNodeApplyButton.prepareForProgress(this)
+        binder.customNodeApplyButton.setOnClickListener { viewModel.saveNodeClicked() }
     }
 
     override fun inject() {
@@ -67,15 +53,15 @@ class CustomNodeFragment : BaseFragment<CustomNodeViewModel>() {
     override fun subscribe(viewModel: CustomNodeViewModel) {
         observeValidations(viewModel)
 
-        customNodeTitle.text = viewModel.getTitle()
-        customNodeUrlInput.bindTo(viewModel.nodeUrlInput, viewModel)
-        customNodeNameInput.bindTo(viewModel.nodeNameInput, viewModel)
+        binder.customNodeTitle.text = viewModel.getTitle()
+        binder.customNodeUrlInput.bindTo(viewModel.nodeUrlInput, viewModel)
+        binder.customNodeNameInput.bindTo(viewModel.nodeNameInput, viewModel)
         viewModel.buttonState.observe {
-            customNodeApplyButton.setState(it)
+            binder.customNodeApplyButton.setState(it)
         }
 
         viewModel.chainModel.observe {
-            customNodeChain.setChain(it)
+            binder.customNodeChain.setChain(it)
         }
     }
 }

@@ -2,18 +2,16 @@ package io.novafoundation.nova.feature_account_api.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.databinding.ViewSelectedWalletBinding
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletAccountIcon
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletAccountUpdateIndicator
-import kotlinx.android.synthetic.main.view_selected_wallet.view.viewSelectedWalletTypeIcon
 
 class SelectedWalletView @JvmOverloads constructor(
     context: Context,
@@ -21,14 +19,12 @@ class SelectedWalletView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    init {
-        View.inflate(context, R.layout.view_selected_wallet, this)
-    }
+    private val binder = ViewSelectedWalletBinding.inflate(inflater(), this)
 
     fun setModel(model: SelectedWalletModel) {
-        viewSelectedWalletAccountIcon.setImageDrawable(model.walletIcon)
+        binder.viewSelectedWalletAccountIcon.setImageDrawable(model.walletIcon)
 
-        viewSelectedWalletAccountUpdateIndicator.isVisible = model.hasUpdates
+        binder.viewSelectedWalletAccountUpdateIndicator.isVisible = model.hasUpdates
 
         if (model.typeIcon != null) {
             background = context.getRoundedCornerDrawable(
@@ -36,14 +32,14 @@ class SelectedWalletView @JvmOverloads constructor(
                 cornerSizeInDp = 80,
             )
 
-            viewSelectedWalletTypeIcon.setImageResource(model.typeIcon.icon)
+            binder.viewSelectedWalletTypeIcon.setImageResource(model.typeIcon.icon)
             val tint = R.color.icon_primary.takeIf { model.typeIcon.canApplyOwnTint }
-            viewSelectedWalletTypeIcon.setImageTintRes(tint)
+            binder.viewSelectedWalletTypeIcon.setImageTintRes(tint)
 
-            viewSelectedWalletTypeIcon.makeVisible()
+            binder.viewSelectedWalletTypeIcon.makeVisible()
         } else {
             background = null
-            viewSelectedWalletTypeIcon.makeGone()
+            binder.viewSelectedWalletTypeIcon.makeGone()
         }
     }
 }

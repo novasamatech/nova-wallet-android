@@ -7,15 +7,13 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewAccountInfoBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getColorOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTint
-import kotlinx.android.synthetic.main.view_account_info.view.accountAction
-import kotlinx.android.synthetic.main.view_account_info.view.accountAddressText
-import kotlinx.android.synthetic.main.view_account_info.view.accountIcon
-import kotlinx.android.synthetic.main.view_account_info.view.accountTitle
 
 class AccountInfoView @JvmOverloads constructor(
     context: Context,
@@ -23,9 +21,9 @@ class AccountInfoView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.view_account_info, this)
+    private val binder = ViewAccountInfoBinding.inflate(inflater(), this)
 
+    init {
         background = getRoundedCornerDrawable(fillColorRes = R.color.block_background).withRippleMask()
 
         isFocusable = true
@@ -45,22 +43,22 @@ class AccountInfoView @JvmOverloads constructor(
             setActionIconTint(actionIconTint)
 
             val textVisible = typedArray.getBoolean(R.styleable.AccountInfoView_textVisible, true)
-            accountAddressText.visibility = if (textVisible) View.VISIBLE else View.GONE
+            binder.accountAddressText.visibility = if (textVisible) View.VISIBLE else View.GONE
 
             typedArray.recycle()
         }
     }
 
     fun setActionIcon(icon: Drawable) {
-        accountAction.setImageDrawable(icon)
+        binder.accountAction.setImageDrawable(icon)
     }
 
     fun setActionIconTint(@ColorInt color: Int?) {
-        accountAction.setImageTint(color)
+        binder.accountAction.setImageTint(color)
     }
 
     fun setActionListener(clickListener: (View) -> Unit) {
-        accountAction.setOnClickListener(clickListener)
+        binder.accountAction.setOnClickListener(clickListener)
     }
 
     fun setWholeClickListener(listener: (View) -> Unit) {
@@ -70,22 +68,22 @@ class AccountInfoView @JvmOverloads constructor(
     }
 
     fun setTitle(accountName: String) {
-        accountTitle.text = accountName
+        binder.accountTitle.text = accountName
     }
 
     fun setText(address: String) {
-        accountAddressText.text = address
+        binder.accountAddressText.text = address
     }
 
     fun setAccountIcon(icon: Drawable) {
-        accountIcon.setImageDrawable(icon)
+        binder.accountIcon.setImageDrawable(icon)
     }
 
     fun hideBody() {
-        accountAddressText.makeGone()
+        binder.accountAddressText.makeGone()
     }
 
     fun showBody() {
-        accountAddressText.makeVisible()
+        binder.accountAddressText.makeVisible()
     }
 }

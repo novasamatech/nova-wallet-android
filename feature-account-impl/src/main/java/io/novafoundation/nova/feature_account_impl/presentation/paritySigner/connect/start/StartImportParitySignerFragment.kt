@@ -1,29 +1,22 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.MarginLayoutParams
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.InstructionStepView
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.Connect.Instruction
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentImportParitySignerStartBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.view.InstructionImageView
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerConnectOverview
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerInstructionContainer
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerScanQrCode
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerTitle
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_start.startImportParitySignerToolbar
 
-class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerViewModel>() {
+class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerViewModel, FragmentImportParitySignerStartBinding>() {
 
     companion object {
 
@@ -36,15 +29,13 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_parity_signer_start, container, false)
-    }
+    override fun createBinding() = FragmentImportParitySignerStartBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        startImportParitySignerToolbar.setHomeButtonListener { viewModel.backClicked() }
-        startImportParitySignerToolbar.applyStatusBarInsets()
+        binder.startImportParitySignerToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.startImportParitySignerToolbar.applyStatusBarInsets()
 
-        startImportParitySignerScanQrCode.setOnClickListener { viewModel.scanQrCodeClicked() }
+        binder.startImportParitySignerScanQrCode.setOnClickListener { viewModel.scanQrCodeClicked() }
     }
 
     override fun inject() {
@@ -57,8 +48,8 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
     override fun subscribe(viewModel: StartImportParitySignerViewModel) {
         viewModel.instructions.forEach(::showInstruction)
 
-        startImportParitySignerTitle.text = viewModel.title
-        startImportParitySignerConnectOverview.setTargetImage(viewModel.polkadotVaultVariantIcon)
+        binder.startImportParitySignerTitle.text = viewModel.title
+        binder.startImportParitySignerConnectOverview.setTargetImage(viewModel.polkadotVaultVariantIcon)
     }
 
     private fun showInstruction(instruction: Instruction) {
@@ -78,7 +69,7 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
             setStepText(step.content)
         }
 
-        startImportParitySignerInstructionContainer.addView(view)
+        binder.startImportParitySignerInstructionContainer.addView(view)
     }
 
     private fun showImageInstruction(step: Instruction.Image) {
@@ -86,6 +77,6 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
             setModel(step)
         }
 
-        startImportParitySignerInstructionContainer.addView(view)
+        binder.startImportParitySignerInstructionContainer.addView(view)
     }
 }

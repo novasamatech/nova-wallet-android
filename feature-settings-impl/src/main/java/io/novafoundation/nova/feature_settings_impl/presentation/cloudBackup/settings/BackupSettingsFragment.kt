@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -14,31 +10,22 @@ import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottom
 import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.R
+import io.novafoundation.nova.feature_settings_impl.databinding.FragmentBackupSettingsBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.backupDiff.CloudBackupDiffBottomSheet
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsManualBtn
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsSwitcher
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupSettingsToolbar
-import kotlinx.android.synthetic.main.fragment_backup_settings.backupStateView
 
-class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
+class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel, FragmentBackupSettingsBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_backup_settings, container, false)
-    }
+    override fun createBinding() = FragmentBackupSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        backupSettingsToolbar.applyStatusBarInsets()
+        binder.backupSettingsToolbar.applyStatusBarInsets()
 
-        backupSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        backupStateView.setOnClickListener { viewModel.cloudBackupManageClicked() }
-        backupStateView.setProblemClickListener() { viewModel.problemButtonClicked() }
-        backupSettingsSwitcher.setOnClickListener { viewModel.backupSwitcherClicked() }
-        backupSettingsManualBtn.setOnClickListener { viewModel.manualBackupClicked() }
+        binder.backupSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.backupStateView.setOnClickListener { viewModel.cloudBackupManageClicked() }
+        binder.backupStateView.setProblemClickListener() { viewModel.problemButtonClicked() }
+        binder.backupSettingsSwitcher.setOnClickListener { viewModel.backupSwitcherClicked() }
+        binder.backupSettingsManualBtn.setOnClickListener { viewModel.manualBackupClicked() }
     }
 
     override fun inject() {
@@ -60,11 +47,11 @@ class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel>() {
         setupConfirmationDialog(R.style.AccentAlertDialogTheme, viewModel.neutralConfirmationAwaitableAction)
 
         viewModel.cloudBackupEnabled.observe { enabled ->
-            backupSettingsSwitcher.setChecked(enabled)
+            binder.backupSettingsSwitcher.setChecked(enabled)
         }
 
         viewModel.cloudBackupStateModel.observe { state ->
-            backupStateView.setState(state)
+            binder.backupStateView.setState(state)
         }
 
         viewModel.cloudBackupChangesLiveData.observeEvent {

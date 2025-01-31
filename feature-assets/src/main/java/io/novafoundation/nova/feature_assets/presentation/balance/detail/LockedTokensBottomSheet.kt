@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
@@ -14,7 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 class LockedTokensBottomSheet(
     context: Context,
     private val balanceLocks: BalanceLocksModel
-) : FixedListBottomSheet(context) {
+) : FixedListBottomSheet<BottomSheeetFixedListBinding>(context, viewConfiguration = ViewConfiguration.default(context)) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

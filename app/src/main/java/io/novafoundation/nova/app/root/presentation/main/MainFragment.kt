@@ -1,16 +1,14 @@
 package io.novafoundation.nova.app.root.presentation.main
 
 import android.graphics.RectF
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.databinding.FragmentMainBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
@@ -19,11 +17,12 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur
 import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.updatePadding
-import kotlinx.android.synthetic.main.fragment_main.bottomNavHost
-import kotlinx.android.synthetic.main.fragment_main.bottomNavigationView
+
 import javax.inject.Inject
 
-class MainFragment : BaseFragment<MainViewModel>() {
+class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
+
+    override fun createBinding() = FragmentMainBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var stakingDashboardNavigator: StakingDashboardNavigator
@@ -36,10 +35,6 @@ class MainFragment : BaseFragment<MainViewModel>() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_main, container, false)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
 
@@ -48,17 +43,17 @@ class MainFragment : BaseFragment<MainViewModel>() {
     }
 
     override fun initViews() {
-        bottomNavigationView.setOnApplyWindowInsetsListener { _, insets ->
+        binder.bottomNavigationView.setOnApplyWindowInsetsListener { _, insets ->
             // overwrite BottomNavigation behavior and ignore insets
             insets
         }
 
-        bottomNavHost.setOnApplyWindowInsetsListener { v, insets ->
+        binder.bottomNavHost.setOnApplyWindowInsetsListener { v, insets ->
             val systemWindowInsetBottom = insets.systemWindowInsetBottom
 
             // post to prevent bottomNavigationView.height being 0 if callback is called before view has been measured
             v.post {
-                val padding = (systemWindowInsetBottom - bottomNavigationView.height).coerceAtLeast(0)
+                val padding = (systemWindowInsetBottom - binder.bottomNavigationView.height).coerceAtLeast(0)
                 v.updatePadding(bottom = padding)
             }
 
@@ -70,8 +65,8 @@ class MainFragment : BaseFragment<MainViewModel>() {
         navController = nestedNavHostFragment.navController
         stakingDashboardNavigator.setStakingTabNavController(navController!!)
 
-        bottomNavigationView.setupWithNavController(navController!!)
-        bottomNavigationView.itemIconTintList = null
+        binder.bottomNavigationView.setupWithNavController(navController!!)
+        binder.bottomNavigationView.itemIconTintList = null
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
@@ -102,9 +97,9 @@ class MainFragment : BaseFragment<MainViewModel>() {
             .captureExtraSpace(RectF(0f, offset, 0f, 0f))
             .cutSpace(RectF(0f, offset, 0f, offset))
             .radius(radiusInPx)
-            .captureFrom(bottomNavHost)
-            .toTarget(bottomNavigationView)
-            .catchException { bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
+            .captureFrom(binder.bottomNavHost)
+            .toTarget(binder.bottomNavigationView)
+            .catchException { binder.bottomNavigationView.setBackgroundColorRes(R.color.solid_navigation_background) }
             .build()
 //            .start()
     }

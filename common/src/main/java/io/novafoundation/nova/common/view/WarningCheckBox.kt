@@ -6,14 +6,14 @@ import android.widget.CompoundButton
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewWarningCheckboxBinding
 import io.novafoundation.nova.common.utils.CheckableListener
 import io.novafoundation.nova.common.utils.getColorOrNull
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageResourceOrHide
 import io.novafoundation.nova.common.utils.setImageTint
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_warning_checkbox.view.warningCheckBoxCheckBox
-import kotlinx.android.synthetic.main.view_warning_checkbox.view.warningCheckBoxIcon
 
 class WarningCheckBox @JvmOverloads constructor(
     context: Context,
@@ -21,9 +21,9 @@ class WarningCheckBox @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr), CheckableListener {
 
-    init {
-        inflate(context, R.layout.view_warning_checkbox, this)
+    private val binder = ViewWarningCheckboxBinding.inflate(inflater(), this)
 
+    init {
         orientation = VERTICAL
         setBackgroundResource(R.drawable.secondary_container_ripple_background)
         addStatesFromChildren()
@@ -32,19 +32,19 @@ class WarningCheckBox @JvmOverloads constructor(
     }
 
     fun setText(text: CharSequence?) {
-        warningCheckBoxCheckBox.text = text
+        binder.warningCheckBoxCheckBox.text = text
     }
 
     fun setIconTintColor(color: Int) {
-        warningCheckBoxIcon.setImageTint(color)
+        binder.warningCheckBoxIcon.setImageTint(color)
     }
 
     fun setIcon(@DrawableRes iconRes: Int?) {
-        warningCheckBoxIcon.setImageResourceOrHide(iconRes)
+        binder.warningCheckBoxIcon.setImageResourceOrHide(iconRes)
     }
 
     override fun setOnCheckedChangeListener(listener: CompoundButton.OnCheckedChangeListener) {
-        warningCheckBoxCheckBox.setOnCheckedChangeListener(listener)
+        binder.warningCheckBoxCheckBox.setOnCheckedChangeListener(listener)
     }
 
     private fun applyAttributes(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.WarningCheckBox) {
@@ -58,14 +58,14 @@ class WarningCheckBox @JvmOverloads constructor(
     }
 
     override fun setChecked(checked: Boolean) {
-        warningCheckBoxCheckBox.isChecked = checked
+        binder.warningCheckBoxCheckBox.isChecked = checked
     }
 
     override fun isChecked(): Boolean {
-        return warningCheckBoxCheckBox.isChecked
+        return binder.warningCheckBoxCheckBox.isChecked
     }
 
     override fun toggle() {
-        warningCheckBoxCheckBox.toggle()
+        binder.warningCheckBoxCheckBox.toggle()
     }
 }

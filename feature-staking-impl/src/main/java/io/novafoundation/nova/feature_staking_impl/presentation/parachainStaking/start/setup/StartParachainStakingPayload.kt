@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class StartParachainStakingPayload(

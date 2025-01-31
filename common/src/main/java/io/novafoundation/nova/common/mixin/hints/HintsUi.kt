@@ -53,6 +53,6 @@ fun HintsView.setSingleHint(hint: CharSequence) {
     setHints(listOf(hint))
 }
 
-fun BaseFragment<*>.observeHints(mixin: HintsMixin, view: HintsView) {
+fun BaseFragment<*, *>.observeHints(mixin: HintsMixin, view: HintsView) {
     mixin.hintsFlow.observe(view::setHints)
 }

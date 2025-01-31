@@ -575,6 +575,8 @@
     <style name="BottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
         <item name="colorAccent">@color/android_system_accent</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
     </style>
 
     <style name="bottomSheetStyleWrapper" parent="Widget.MaterialComponents.BottomSheet.Modal">

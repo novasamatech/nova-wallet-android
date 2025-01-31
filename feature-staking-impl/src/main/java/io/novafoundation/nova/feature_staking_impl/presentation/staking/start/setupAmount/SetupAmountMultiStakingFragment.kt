@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -14,17 +12,12 @@ import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisibleViews
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartMultiStakingAmountBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.model.StakingPropertiesModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountAmount
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountContinue
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountRewards
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountSelection
-import kotlinx.android.synthetic.main.fragment_start_multi_staking_amount.startMultiStakingSetupAmountToolbar
 
-class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingViewModel>() {
+class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingViewModel, FragmentStartMultiStakingAmountBinding>() {
 
     companion object {
         private const val KEY_PAYLOAD = "SetupAmountMultiStakingFragment.payload"
@@ -36,30 +29,24 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_start_multi_staking_amount, container, false)
-    }
+    override fun createBinding() = FragmentStartMultiStakingAmountBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        startMultiStakingSetupAmountToolbar.applyStatusBarInsets()
-        startMultiStakingSetupAmountToolbar.setHomeButtonListener { viewModel.back() }
+        binder.startMultiStakingSetupAmountToolbar.applyStatusBarInsets()
+        binder.startMultiStakingSetupAmountToolbar.setHomeButtonListener { viewModel.back() }
 
-        startMultiStakingSetupAmountContinue.prepareForProgress(viewLifecycleOwner)
-        startMultiStakingSetupAmountContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.startMultiStakingSetupAmountContinue.prepareForProgress(viewLifecycleOwner)
+        binder.startMultiStakingSetupAmountContinue.setOnClickListener { viewModel.continueClicked() }
 
-        startMultiStakingSetupAmountSelection.setOnClickListener { viewModel.selectionClicked() }
+        binder.startMultiStakingSetupAmountSelection.setOnClickListener { viewModel.selectionClicked() }
 
-        startMultiStakingSetupAmountAmount.amountInput.showSoftKeyboard()
+        binder.startMultiStakingSetupAmountAmount.amountInput.showSoftKeyboard()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
-        startMultiStakingSetupAmountAmount.amountInput.hideSoftKeyboard()
+        binder.startMultiStakingSetupAmountAmount.amountInput.hideSoftKeyboard()
     }
 
     override fun inject() {
@@ -73,31 +60,31 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
     }
 
     override fun subscribe(viewModel: SetupAmountMultiStakingViewModel) {
-        setupAmountChooser(viewModel.amountChooserMixin, startMultiStakingSetupAmountAmount)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.startMultiStakingSetupAmountAmount)
         observeValidations(viewModel)
 
         viewModel.stakingPropertiesModel.observe(::showStakingProperties)
-        viewModel.title.observe(startMultiStakingSetupAmountToolbar::setTitle)
+        viewModel.title.observe(binder.startMultiStakingSetupAmountToolbar::setTitle)
 
-        viewModel.continueButtonState.observe(startMultiStakingSetupAmountContinue::setState)
+        viewModel.continueButtonState.observe(binder.startMultiStakingSetupAmountContinue::setState)
     }
 
     private fun showStakingProperties(properties: StakingPropertiesModel) {
         when (properties) {
             StakingPropertiesModel.Hidden -> {
-                makeGoneViews(startMultiStakingSetupAmountSelection, startMultiStakingSetupAmountRewards)
+                makeGoneViews(binder.startMultiStakingSetupAmountSelection, binder.startMultiStakingSetupAmountRewards)
             }
 
             is StakingPropertiesModel.Loaded -> {
-                makeVisibleViews(startMultiStakingSetupAmountSelection, startMultiStakingSetupAmountRewards)
-                startMultiStakingSetupAmountSelection.setModel(properties.content.selection)
-                startMultiStakingSetupAmountRewards.showEarnings(properties.content.estimatedReward)
+                makeVisibleViews(binder.startMultiStakingSetupAmountSelection, binder.startMultiStakingSetupAmountRewards)
+                binder.startMultiStakingSetupAmountSelection.setModel(properties.content.selection)
+                binder.startMultiStakingSetupAmountRewards.showEarnings(properties.content.estimatedReward)
             }
 
             StakingPropertiesModel.Loading -> {
-                makeVisibleViews(startMultiStakingSetupAmountSelection, startMultiStakingSetupAmountRewards)
-                startMultiStakingSetupAmountSelection.setLoadingState()
-                startMultiStakingSetupAmountRewards.showLoading()
+                makeVisibleViews(binder.startMultiStakingSetupAmountSelection, binder.startMultiStakingSetupAmountRewards)
+                binder.startMultiStakingSetupAmountSelection.setLoadingState()
+                binder.startMultiStakingSetupAmountRewards.showLoading()
             }
         }
     }

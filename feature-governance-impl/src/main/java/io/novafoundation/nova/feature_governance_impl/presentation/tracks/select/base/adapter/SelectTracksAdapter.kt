@@ -1,17 +1,14 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegationTrackBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.model.DelegationTrackModel
-import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrack
-import kotlinx.android.synthetic.main.item_delegation_track.view.itemDelegationTrackCheckbox
 
 class SelectTracksAdapter(
     private val handler: Handler
@@ -22,9 +19,7 @@ class SelectTracksAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationTrackViewHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegation_track)
-
-        return DelegationTrackViewHolder(containerView, handler)
+        return DelegationTrackViewHolder(ItemDelegationTrackBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: DelegationTrackViewHolder, position: Int) {
@@ -57,16 +52,16 @@ private object DiffCallback : DiffUtil.ItemCallback<DelegationTrackModel>() {
 }
 
 class DelegationTrackViewHolder(
-    containerView: View,
+    private val binder: ItemDelegationTrackBinding,
     handler: SelectTracksAdapter.Handler
-) : ViewHolder(containerView) {
+) : ViewHolder(binder.root) {
 
     init {
-        containerView.setOnClickListener { handler.trackClicked(bindingAdapterPosition) }
+        binder.root.setOnClickListener { handler.trackClicked(bindingAdapterPosition) }
     }
 
     fun bind(item: DelegationTrackModel) {
-        with(itemView) {
+        with(binder) {
             bindSelected(item)
             itemDelegationTrack.setText(item.details.name)
             itemDelegationTrack.setIcon(item.details.icon)
@@ -74,7 +69,7 @@ class DelegationTrackViewHolder(
     }
 
     fun bindSelected(item: DelegationTrackModel) {
-        with(itemView) {
+        with(binder) {
             itemDelegationTrackCheckbox.isChecked = item.isSelected
         }
     }

@@ -41,7 +41,7 @@ class RawSeedImportSource(
         return addAccountInteractor.importFromSeed(rawSeedFlow.value, advancedEncryption, addAccountType)
     }
 
-    override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*>): ImportSourceView<*> {
+    override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*, *>): ImportSourceView<*> {
         return SeedImportView(fragment.requireContext()).apply {
             observeCommon(viewModel, fragment.viewLifecycleOwner)
             observeSource(this@RawSeedImportSource, fragment.viewLifecycleOwner)
