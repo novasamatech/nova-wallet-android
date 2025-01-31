@@ -70,7 +70,7 @@ class DappInteractor(
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
             val popular = dAppCatalog.popular.mapNotNull { urlToDAppMapping[it] }
-            val catalog = categories.associateWith { getShuffledDAppsInCategory(it, dapps, urlToDAppMapping, dAppCatalog.popular, random) }
+            val catalog = categories.associateWith { getShuffledDAppsInCategory(it, dapps, urlToDAppMapping, dAppCatalog.popular.toSet(), random) }
 
             DAppGroupedCatalog(popular, catalog)
         }
@@ -80,7 +80,7 @@ class DappInteractor(
         category: DappCategory,
         dapps: List<DappMetadata>,
         urlToDAppMapping: Map<String, DApp>,
-        popular: List<DAppUrl>,
+        popular: Set<DAppUrl>,
         shufflingSeed: Random
     ): List<DApp> {
         val categoryDApps = dapps.filter { category in it.categories }
