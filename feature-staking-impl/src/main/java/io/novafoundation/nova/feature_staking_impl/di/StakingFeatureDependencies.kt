@@ -51,6 +51,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -118,6 +120,10 @@ interface StakingFeatureDependencies {
     val proxyConstantsRepository: ProxyConstantsRepository
 
     val proxySyncService: ProxySyncService
+
+    val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
+
+    val maxActionProviderFactory: MaxActionProviderFactory
 
     fun contextManager(): ContextManager
 

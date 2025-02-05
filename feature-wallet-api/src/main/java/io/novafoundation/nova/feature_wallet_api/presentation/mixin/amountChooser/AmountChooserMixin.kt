@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
@@ -9,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
-import java.math.BigInteger
 
 typealias MaxClick = () -> Unit
 
@@ -83,15 +82,14 @@ interface AmountChooserMixin : AmountChooserMixinBase {
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
-            availableBalanceFlow: Flow<BigInteger>,
-            @StringRes balanceLabel: Int?,
+            maxActionProvider: MaxActionProvider?,
         ): Presentation
 
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
             balanceField: (Asset) -> BigDecimal,
-            @StringRes balanceLabel: Int?
+            maxActionProvider: MaxActionProvider?,
         ): Presentation
     }
 }
