@@ -3,79 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <io.novafoundation.nova.common.view.ExpandableView
-        android:id="@+id/swapMainSettingsDetails"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/viewBalancesTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        app:chevronId="@+id/viewBalanceChevron"
-        app:collapsedByDefault="true"
-        app:expandableId="@+id/viewBalanceExpandableContainer"
-        app:supportAnimation="false">
-
-        <TextView
-            android:id="@+id/viewBalanceTitle"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@string/wallet_your_balance"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/viewBalanceToken"
-            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/text_primary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewBalanceTitle"
-            tools:text="100 DOT" />
-
-        <TextView
-            android:id="@+id/viewBalanceFiat"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/viewBalanceToken"
-            tools:text="500 $" />
-
-        <!--We use it to add extra space in bottom when balance is collapsed-->
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/viewBalanceFiat" />
-
-        <ImageView
-            android:id="@+id/viewBalanceChevron"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/bg_chip_oval"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_chevron_up"
-            app:layout_constraintBottom_toBottomOf="@+id/viewBalanceToken"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/viewBalanceToken"
-            app:tint="@color/icon_secondary" />
-
-        <LinearLayout
-            android:id="@+id/viewBalanceExpandableContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/viewBalanceFiat" />
-
-    </io.novafoundation.nova.common.view.ExpandableView>
+        android:textColor="@color/text_secondary"
+        android:layout_marginBottom="14dp"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/common_balance" />
 </merge>

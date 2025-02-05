@@ -8,16 +8,15 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.common.utils.updatePadding
+import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.showLoadingState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_balances.view.viewBalanceExpandableContainer
-import kotlinx.android.synthetic.main.view_balances.view.viewBalanceFiat
-import kotlinx.android.synthetic.main.view_balances.view.viewBalanceToken
+import kotlinx.android.synthetic.main.view_balances.view.viewBalancesTitle
 
 abstract class BalancesView @JvmOverloads constructor(
     context: Context,
@@ -29,12 +28,25 @@ abstract class BalancesView @JvmOverloads constructor(
         View.inflate(context, R.layout.view_balances, this)
         orientation = VERTICAL
 
+        val commonPadding = 16.dp(context)
+
+        updatePadding(
+            top = commonPadding,
+            start = commonPadding,
+            end = commonPadding,
+            bottom = 8.dp(context)
+        )
+
+        attrs?.let {
+            applyAttributes(it)
+        }
+
         background = context.getBlockDrawable()
     }
 
-    fun setTotalBalance(token: CharSequence, fiat: CharSequence?) {
-        viewBalanceToken.text = token
-        viewBalanceFiat.setTextOrHide(fiat)
+    private fun applyAttributes(attributes: AttributeSet) = context.useAttributes(attributes, R.styleable.BalancesView) {
+        val title = it.getString(R.styleable.BalancesView_title)
+        viewBalancesTitle.text = title
     }
 
     protected fun item(@StringRes titleRes: Int): TableCellView {
@@ -43,20 +55,14 @@ abstract class BalancesView @JvmOverloads constructor(
 
             valueSecondary.setTextColorRes(R.color.text_secondary)
             title.setTextColorRes(R.color.text_secondary)
-            setPadding(16.dp, 0, 16.dp, 0)
 
-            isClickable = true // To not propagate parent state to children. isDuplicateParentState not working in this case
             setTitle(titleRes)
         }
 
-        viewBalanceExpandableContainer.addView(item)
+        addView(item)
 
         return item
     }
-}
-
-fun BalancesView.setTotalAmount(amountModel: AmountModel) {
-    setTotalBalance(amountModel.token, amountModel.fiat)
 }
 
 fun TableCellView.showAmount(amountModel: AmountModel) {

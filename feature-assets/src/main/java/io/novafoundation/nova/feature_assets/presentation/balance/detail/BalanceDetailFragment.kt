@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNot
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.showState
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
@@ -129,7 +128,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes)
             balanceDetailRateChange.text = asset.token.recentRateChange
 
-            balanceDetailsBalances.setTotalAmount(asset.total)
+            balanceDetailsBalances.total.showAmount(asset.total)
             balanceDetailsBalances.transferable.showAmount(asset.transferable)
             balanceDetailsBalances.locked.showAmount(asset.locked)
         }
