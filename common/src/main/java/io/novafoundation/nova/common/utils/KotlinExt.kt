@@ -638,3 +638,11 @@ inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.(
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
+
+fun Float.multiplier(): Float {
+    return when {
+        this < 0f -> -1f
+        this > 0f -> 1f
+        else -> 0f
+    }
+}
