@@ -7,8 +7,10 @@ import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAc
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
+import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 class PolkadotJsExtensionInteractor(
@@ -20,7 +22,7 @@ class PolkadotJsExtensionInteractor(
     suspend fun getInjectedAccounts(): List<InjectedAccount> {
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
-        val defaultAccount = metaAccount.defaultSubstrateAddress?.let { address ->
+        val defaultSubstrateAccount = metaAccount.defaultSubstrateAddress?.let { address ->
             InjectedAccount(
                 address = address,
                 genesisHash = null,
@@ -29,11 +31,17 @@ class PolkadotJsExtensionInteractor(
             )
         }
 
+        val defaultEthereumAccount = metaAccount.ethereumAddress?.let { adddressBytes ->
+            InjectedAccount(
+                address = adddressBytes.toEthereumAddress(),
+                genesisHash = null,
+                name = metaAccount.name,
+                encryption = EncryptionType.ECDSA
+            )
+        }
+
         val customAccounts = metaAccount.chainAccounts.mapNotNull { (chainId, chainAccount) ->
             val chain = chainRegistry.getChain(chainId)
-
-            // TODO ignore ethereum accounts for now (not all dApps support addresses in ethereum formats)
-            if (chain.isEthereumBased) return@mapNotNull null
 
             InjectedAccount(
                 address = chain.addressOf(chainAccount.accountId),
@@ -44,7 +52,8 @@ class PolkadotJsExtensionInteractor(
         }
 
         return buildList {
-            defaultAccount?.let(::add)
+            defaultSubstrateAccount?.let(::add)
+            defaultEthereumAccount?.let(::add)
             addAll(customAccounts)
         }
     }
