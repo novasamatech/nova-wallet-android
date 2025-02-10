@@ -8,7 +8,6 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.extraReward
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.minStake
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot

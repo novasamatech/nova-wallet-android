@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import java.math.BigDecimal
 import java.math.BigInteger

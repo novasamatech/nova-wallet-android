@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct
 
 import io.novafoundation.nova.common.data.memory.ComputationalScope
-import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -13,7 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.t
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
