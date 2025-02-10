@@ -39,7 +39,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectW
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.state.chain
-import io.novafoundation.nova.runtime.state.chainAsset
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
