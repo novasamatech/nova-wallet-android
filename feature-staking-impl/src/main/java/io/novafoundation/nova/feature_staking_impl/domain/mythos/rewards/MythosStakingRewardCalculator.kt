@@ -21,6 +21,22 @@ interface MythosStakingRewardCalculator {
     fun calculateMaxAnnualReturns(amount: BigDecimal): PeriodReturns
 }
 
+/**
+ * Implementation based on the following derivation:
+ *
+ * x - user stake
+ * T - a particular collator's current total stake
+ * Cn - number of collators
+ * e - per-collator emission (in tokens)
+ * E - total emission
+ * user_yield - user yield per session, in %, for a particular collator
+ *
+ * e = E / Cn
+ * staked_portion = x / (x + T)
+ * user_yield (in %) = staked_portion * e / x = e / (x + T)
+ *
+ * We use min stake for x to not face enormous numbers when total stake in the system is close to zero
+ */
 class RealMythosStakingRewardCalculator(
     private val perBlockRewards: Balance,
     private val blockDuration: Duration,
