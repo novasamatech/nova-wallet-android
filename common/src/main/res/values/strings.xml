@@ -5,7 +5,7 @@
 
     <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
 
-    <string name="popular_dapps_title">Popular DApps</string>
+    <string name="popular_dapps_title">Popular</string>
 
     <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
 

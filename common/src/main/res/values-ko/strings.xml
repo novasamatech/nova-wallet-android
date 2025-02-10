@@ -758,6 +758,8 @@
         <item quantity="other">최소한 %d개의 트랙을 선택해야 합니다</item>
     </plurals>
     <string name="governance_unlock">잠금 해제</string>
+    <string name="high_price_impact_detacted_message">이 스왑을 실행하면 상당한 슬리패지와 재정적 손실이 발생할 것입니다. 거래 크기를 줄이거나 거래를 여러 개로 나누는 것을 고려하세요.</string>
+    <string name="high_price_impact_detacted_title">높은 가격 영향이 감지됨 (%s)</string>
     <string name="history_v1.9.0">역사</string>
     <string name="identity_email_title">이메일</string>
     <string name="identity_legal_name_title">법적 이름</string>
@@ -921,6 +923,7 @@
     <string name="pool_inactive_failure_title">풀은 열려 있지 않습니다</string>
     <string name="pool_staking_conflict_message">더 이상 동일한 계정에서 직접 Staking과 Pool Staking을 동시에 사용할 수 없습니다. Pool Staking을 관리하려면 먼저 직접 Staking에서 토큰을 Unstake해야 합니다.</string>
     <string name="pool_staking_conflict_title">Pool 작업을 사용할 수 없습니다</string>
+    <string name="popular_dapps_title">인기 있는</string>
     <string name="pre_configured_networks_add_custom_button">네트워크 수동 추가</string>
     <string name="pre_configured_networks_progress_text">네트워크 목록을 로드 중...</string>
     <string name="pre_configured_networks_search_hint">네트워크 이름으로 검색</string>

@@ -765,6 +765,8 @@
         <item quantity="other">Válassz legalább %d kategóriát</item>
     </plurals>
     <string name="governance_unlock">Felold</string>
+    <string name="high_price_impact_detacted_message">Ennek a csereügyletnek a végrehajtása jelentős csúszást és pénzügyi veszteségeket eredményez. Fontolja meg a kereskedés méretének csökkentését vagy a kereskedés több tranzakcióra osztását.</string>
+    <string name="high_price_impact_detacted_title">Magas árhatás észlelve (%s)</string>
     <string name="history_v1.9.0">Előzmények</string>
     <string name="identity_email_title">E-mail</string>
     <string name="identity_legal_name_title">Hivatalos név</string>
@@ -929,6 +931,7 @@
     <string name="pool_inactive_failure_title">A pool nincs nyitva</string>
     <string name="pool_staking_conflict_message">Már nem használhatja egy fióknál egyszerre a közvetlen stakelést és a pool stakelést. Ahhoz, hogy a pool stakelést kezelje, előbb ki kell vonnia tokenjeit a közvetlen stakelésből.</string>
     <string name="pool_staking_conflict_title">Pool működés nem elérhető</string>
+    <string name="popular_dapps_title">Népszerűek</string>
     <string name="pre_configured_networks_add_custom_button">Hálózat hozzáadása manuálisan</string>
     <string name="pre_configured_networks_progress_text">Hálózatok listájának betöltése...</string>
     <string name="pre_configured_networks_search_hint">Keresés hálózati név alapján</string>
