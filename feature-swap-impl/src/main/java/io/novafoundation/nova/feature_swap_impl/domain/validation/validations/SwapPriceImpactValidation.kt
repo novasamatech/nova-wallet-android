@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
-import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InvalidSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 
 class SwapPriceImpactValidation(

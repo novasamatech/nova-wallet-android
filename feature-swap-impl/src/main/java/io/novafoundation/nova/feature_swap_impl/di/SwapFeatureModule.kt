@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -133,7 +132,9 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun providePriceImpactThresholds() = PriceImpactThresholds(
-        15.percents, 5.percents, 1.percents
+        15.percents,
+        5.percents,
+        1.percents
     )
 
     @Provides
