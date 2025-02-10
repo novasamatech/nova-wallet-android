@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.di
+package io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -12,67 +12,55 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.recommendations.MythosCollatorRecommendatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.UnbondMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.validations.UnbondMythosValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingViewModel
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup.SetupUnbondMythosViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 
 @Module(includes = [ViewModelModule::class])
-class SetupStartMythosStakingModule {
+class SetupUnbondMythosModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(SetupStartMythosStakingViewModel::class)
+    @ViewModelKey(SetupUnbondMythosViewModel::class)
     fun provideViewModel(
         router: MythosStakingRouter,
-        rewardsComponentFactory: MythosStakingRewardsComponentFactory,
+        interactor: UnbondMythosStakingInteractor,
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
+        validationSystem: UnbondMythosValidationSystem,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
+        delegatorStateUseCase: MythosDelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        collatorRecommendatorFactory: MythosCollatorRecommendatorFactory,
-        mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
-        selectedAssetState: StakingSharedState,
         mythosSharedComputation: MythosSharedComputation,
         mythosCollatorFormatter: MythosCollatorFormatter,
-        interactor: StartMythosStakingInteractor,
+        mythosValidationFailureFormatter: MythosStakingValidationFailureFormatter,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
-        selectCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
-        validationSystem: StartMythosStakingValidationSystem,
-        blockNumberUseCase: StakingBlockNumberUseCase,
-        validationFailureFormatter: MythosStakingValidationFailureFormatter,
+        stakingSharedState: StakingSharedState
     ): ViewModel {
-        return SetupStartMythosStakingViewModel(
+        return SetupUnbondMythosViewModel(
             router = router,
-            rewardsComponentFactory = rewardsComponentFactory,
+            interactor = interactor,
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
+            validationSystem = validationSystem,
             feeLoaderMixin = feeLoaderMixin,
+            delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            collatorRecommendatorFactory = collatorRecommendatorFactory,
-            mythosDelegatorStateUseCase = mythosDelegatorStateUseCase,
-            selectedAssetState = selectedAssetState,
             mythosSharedComputation = mythosSharedComputation,
             mythosCollatorFormatter = mythosCollatorFormatter,
-            interactor = interactor,
+            mythosValidationFailureFormatter = mythosValidationFailureFormatter,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator,
-            validationSystem = validationSystem,
-            mythosStakingValidationFailureFormatter = validationFailureFormatter,
-            stakingBlockNumberUseCase = blockNumberUseCase
+            stakingSharedState = stakingSharedState
         )
     }
 
@@ -80,7 +68,7 @@ class SetupStartMythosStakingModule {
     fun provideViewModelCreator(
         fragment: Fragment,
         viewModelFactory: ViewModelProvider.Factory
-    ): SetupStartMythosStakingViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(SetupStartMythosStakingViewModel::class.java)
+    ): SetupUnbondMythosViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(SetupUnbondMythosViewModel::class.java)
     }
 }

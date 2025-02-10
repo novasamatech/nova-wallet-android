@@ -20,7 +20,7 @@ class MythosCollatorParcel(
     val apr: Double?
 ) : Parcelable
 
-fun MythosCollator.toParcelable(): MythosCollatorParcel {
+fun MythosCollator.toParcel(): MythosCollatorParcel {
     return MythosCollatorParcel(
         accountId = this.accountId.value,
         identity = this.identity?.let { mapIdentityToIdentityParcelModel(it) },

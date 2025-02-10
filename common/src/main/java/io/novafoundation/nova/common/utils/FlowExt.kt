@@ -391,7 +391,7 @@ inline fun <T> EditText.bindTo(
     scope: CoroutineScope,
     moveSelectionToEndOnInsertion: Boolean = false,
     crossinline toT: suspend (String) -> T,
-    crossinline fromT: suspend (T) -> String,
+    crossinline fromT: suspend (T) -> String?,
 ) {
     val textWatcher = onTextChanged {
         scope.launch {
@@ -402,7 +402,7 @@ inline fun <T> EditText.bindTo(
     scope.launch {
         flow.collect { input ->
             val inputString = fromT(input)
-            if (text.toString() != inputString) {
+            if (inputString != null && text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
                 setText(inputString)
                 if (moveSelectionToEndOnInsertion) {

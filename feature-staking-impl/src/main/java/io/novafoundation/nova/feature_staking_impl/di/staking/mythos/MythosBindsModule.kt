@@ -20,10 +20,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSumma
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.RealMythosStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.RealStartMythosStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.StartMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.RealUnbondMythosStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.UnbondMythosStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.RealMythosCollatorFormatter
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.MythosStartStakingValidationFailureFormatter
-import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.common.validations.RealMythosStartStakingValidationFailureFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.RealMythosStakingValidationFailureFormatter
 
 @Module
 interface MythosBindsModule {
@@ -53,11 +55,14 @@ interface MythosBindsModule {
     fun bindStartStakingInteractor(implementation: RealStartMythosStakingInteractor): StartMythosStakingInteractor
 
     @Binds
+    fun bindUnbondInteractor(implementation: RealUnbondMythosStakingInteractor): UnbondMythosStakingInteractor
+
+    @Binds
     fun bindMythosCollatorFormatter(implementation: RealMythosCollatorFormatter): MythosCollatorFormatter
 
     @Binds
     fun bindBlockNumberUseCase(implementation: RealStakingBlockNumberUseCase): StakingBlockNumberUseCase
 
     @Binds
-    fun bindValidationFormatter(implementation: RealMythosStartStakingValidationFailureFormatter): MythosStartStakingValidationFailureFormatter
+    fun bindValidationFormatter(implementation: RealMythosStakingValidationFailureFormatter): MythosStakingValidationFailureFormatter
 }
