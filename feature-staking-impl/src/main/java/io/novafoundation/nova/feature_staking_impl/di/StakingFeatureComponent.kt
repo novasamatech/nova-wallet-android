@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.di.MythosRedeemComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.di.ConfirmStartMythosStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.di.SelectMythosCollatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
@@ -257,6 +258,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun setupUnbondMythosFactory(): SetupUnbondMythosComponent.Factory
 
     fun confirmUnbondMythosFactory(): ConfirmUnbondMythosComponent.Factory
+
+    fun redeemMythosFactory(): MythosRedeemComponent.Factory
 
     @Component.Factory
     interface Factory {

@@ -35,6 +35,9 @@ abstract class LockDao {
     @Query("SELECT * FROM locks WHERE metaId = :metaId AND chainId = :chainId AND assetId = :chainAssetId")
     abstract fun observeBalanceLocks(metaId: Long, chainId: String, chainAssetId: Int): Flow<List<BalanceLockLocal>>
 
+    @Query("SELECT * FROM locks WHERE metaId = :metaId AND chainId = :chainId AND assetId = :chainAssetId")
+    abstract suspend fun getBalanceLocks(metaId: Long, chainId: String, chainAssetId: Int): List<BalanceLockLocal>
+
     @Query(
         """
         SELECT * FROM locks

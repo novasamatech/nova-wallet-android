@@ -29,6 +29,8 @@ interface MythosStakingRepository {
     suspend fun maxDelegatorsPerCollator(chainId: ChainId): Int
 
     suspend fun unstakeDurationInSessions(chainId: ChainId): Int
+
+    suspend fun maxReleaseRequests(chainId: ChainId): Int
 }
 
 @FeatureScope
@@ -66,5 +68,9 @@ class RealMythosStakingRepository @Inject constructor(
         return chainRegistry.withRuntime(chainId) {
             metadata.collatorStaking().numberConstant("StakeUnlockDelay").toInt()
         }
+    }
+
+    override suspend fun maxReleaseRequests(chainId: ChainId): Int {
+        return maxCollatorsPerDelegator(chainId)
     }
 }

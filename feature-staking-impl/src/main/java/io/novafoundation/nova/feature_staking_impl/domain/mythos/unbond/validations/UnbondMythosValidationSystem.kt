@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.validations
 
+import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.validations.MythosNoPendingRewardsValidationFactory
@@ -7,10 +8,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 
 typealias UnbondMythosValidationSystem = ValidationSystem<UnbondMythosStakingValidationPayload, UnbondMythosStakingValidationFailure>
 typealias UnbondMythosValidationSystemBuilder = ValidationSystemBuilder<UnbondMythosStakingValidationPayload, UnbondMythosStakingValidationFailure>
+typealias UnbondMythosValidation = Validation<UnbondMythosStakingValidationPayload, UnbondMythosStakingValidationFailure>
 
 fun ValidationSystem.Companion.mythosUnbond(
-    hasPendingRewardsValidationFactory: MythosNoPendingRewardsValidationFactory
+    hasPendingRewardsValidationFactory: MythosNoPendingRewardsValidationFactory,
+    releaseRequestLimitNotReachedValidation: MythosReleaseRequestLimitNotReachedValidationFactory
 ): UnbondMythosValidationSystem = ValidationSystem {
+    releaseRequestLimitNotReachedValidation.releaseRequestsLimitNotReached()
+
     hasPendingRewardsValidationFactory.noPendingRewards()
 
     enoughToPayFees()

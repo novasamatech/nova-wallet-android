@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
@@ -42,8 +42,7 @@ class RealMythosUnbondingInteractor @Inject constructor(
         val chainId = stakingOption.chain.id
 
         return flowOfAll {
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-            val accountId = metaAccount.requireAccountIdIn(stakingOption.chain).intoKey()
+            val accountId = accountRepository.requireIdOfSelectedMetaAccountIn(stakingOption.chain).intoKey()
 
             combine(
                 userStakeRepository.releaseQueuesFlow(chainId, accountId),

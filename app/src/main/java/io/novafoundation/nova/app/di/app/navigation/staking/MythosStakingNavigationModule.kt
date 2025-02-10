@@ -8,6 +8,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.staking.mythos.Sele
 import io.novafoundation.nova.app.root.navigation.navigators.staking.mythos.SelectMythosCollatorInterScreenCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 
@@ -18,8 +19,9 @@ class MythosStakingNavigationModule {
     @ApplicationScope
     fun provideMythosStakingRouter(
         navigationHoldersRegistry: NavigationHoldersRegistry,
+        stakingDashboardRouter: StakingDashboardRouter,
     ): MythosStakingRouter {
-        return MythosStakingNavigator(navigationHoldersRegistry)
+        return MythosStakingNavigator(navigationHoldersRegistry, stakingDashboardRouter)
     }
 
     @Provides
