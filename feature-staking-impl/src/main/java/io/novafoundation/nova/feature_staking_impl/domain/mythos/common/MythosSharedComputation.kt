@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.Mythos
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.rewards.MythosStakingRewardCalculator
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.rewards.MythosStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +29,7 @@ class MythosSharedComputation @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val mythosSessionDurationCalculatorFactory: MythosSessionDurationCalculatorFactory,
     private val candidatesRepository: MythosCandidatesRepository,
+    private val rewardCalculatorFactory: MythosStakingRewardCalculatorFactory,
     computationalCache: ComputationalCache
 ) : SharedComputation(computationalCache) {
 
@@ -64,6 +67,13 @@ class MythosSharedComputation @Inject constructor(
             candidatesRepository.getCandidateInfos(chainId)
         }
     }
+
+    context(ComputationalScope)
+    suspend fun rewardCalculator(chainId: ChainId): MythosStakingRewardCalculator {
+        return cachedValue("MythosSharedComputation.rewardCalculator", chainId) {
+            rewardCalculatorFactory.create(chainId)
+        }
+    }
 }
 
 context(ComputationalScope)
@@ -74,4 +84,9 @@ suspend fun MythosSharedComputation.sessionValidators(chainId: ChainId): Session
 context(ComputationalScope)
 suspend fun MythosSharedComputation.delegatorState(): MythosDelegatorState {
     return delegatorStateFlow().first()
+}
+
+context(ComputationalScope)
+suspend fun MythosSharedComputation.minStake(chainId: ChainId): Balance {
+    return minStakeFlow(chainId).first()
 }

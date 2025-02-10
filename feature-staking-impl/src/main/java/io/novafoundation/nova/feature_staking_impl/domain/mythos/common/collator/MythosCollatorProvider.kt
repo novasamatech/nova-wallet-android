@@ -49,11 +49,14 @@ class RealMythosCollatorProvider @Inject constructor(
 
         if (requestedCollatorIds.isEmpty()) return emptyList()
 
-        val collatorStakes = mythosSharedComputation.get().candidateInfos(chainId)
-        val sessionValidators = mythosSharedComputation.get().sessionValidators(chainId).toSet()
+        val sharedComputation = mythosSharedComputation.get()
+
+        val collatorStakes = sharedComputation.candidateInfos(chainId)
 
         val accountIdsRaw = requestedCollatorIds.map { it.value }
         val identities = identityRepository.getIdentitiesFromIds(accountIdsRaw, chainId)
+
+        val rewardCalculator = sharedComputation.rewardCalculator(chainId)
 
         return requestedCollatorIds.mapNotNull { collatorId ->
             // if elected does not have a stake entry, it means it is invulnerable => ignore it
@@ -64,8 +67,7 @@ class RealMythosCollatorProvider @Inject constructor(
                 identity = identities[collatorId],
                 totalStake = collatorStake.stake,
                 delegators = collatorStake.stakers,
-                // TODO APY calculation
-                apr = Fraction.ZERO.takeIf { collatorId in sessionValidators }
+                apr = rewardCalculator.collatorApr(collatorId)
             )
         }
     }

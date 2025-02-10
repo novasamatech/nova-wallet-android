@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
@@ -11,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.t
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 
@@ -37,18 +40,21 @@ private class MythosStakingTypeDetailsInteractor(
 ) : StakingTypeDetailsInteractor, ComputationalScope by computationalScope {
 
     override fun observeData(): Flow<StakingTypeDetails> {
-        val chain = stakingOption.chain
+        return flowOfAll {
+            val chain = stakingOption.chain
 
-        return mythosSharedComputation.minStakeFlow(chain.id).map { minStake ->
-            StakingTypeDetails(
-                // TODO mythos reward calculator
-                maxEarningRate = Fraction.ZERO,
-                minStake = minStake,
-                payoutType = PayoutType.Manual,
-                participationInGovernance = false,
-                advancedOptionsAvailable = false,
-                stakingType = stakingOption.stakingType
-            )
+            val rewardCalculator = mythosSharedComputation.rewardCalculator(chain.id)
+
+            mythosSharedComputation.minStakeFlow(chain.id).map { minStake ->
+                StakingTypeDetails(
+                    maxEarningRate = rewardCalculator.maxApr,
+                    minStake = minStake,
+                    payoutType = PayoutType.Manual,
+                    participationInGovernance = false,
+                    advancedOptionsAvailable = false,
+                    stakingType = stakingOption.stakingType
+                )
+            }
         }
     }
 

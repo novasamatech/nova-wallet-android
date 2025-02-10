@@ -7,6 +7,8 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosCollatorRewardPercentageUpdater
+import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosExtraRewardUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosMinStakeUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosReleaseQueuesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosSelectedCandidatesUpdater
@@ -40,6 +42,30 @@ class MythosStakingUpdatersModule {
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
     ) = MythosMinStakeUpdater(
+        sharedState,
+        chainRegistry,
+        storageCache
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideExtraRewardUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+    ) = MythosExtraRewardUpdater(
+        sharedState,
+        chainRegistry,
+        storageCache
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideCollatorRewardPercentageUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+    ) = MythosCollatorRewardPercentageUpdater(
         sharedState,
         chainRegistry,
         storageCache
@@ -87,13 +113,17 @@ class MythosStakingUpdatersModule {
         currentSlotUpdater: CurrentSlotUpdater,
         selectedCandidatesUpdater: MythosSelectedCandidatesUpdater,
         releaseQueuesUpdater: MythosReleaseQueuesUpdater,
+        extraRewardUpdater: MythosExtraRewardUpdater,
+        collatorRewardPercentageUpdater: MythosCollatorRewardPercentageUpdater
     ): StakingUpdaters.Group {
         return StakingUpdaters.Group(
             sessionValidatorsUpdater,
             minStakeUpdater,
             currentSlotUpdater,
             selectedCandidatesUpdater,
-            releaseQueuesUpdater
+            releaseQueuesUpdater,
+            extraRewardUpdater,
+            collatorRewardPercentageUpdater
         )
     }
 }
