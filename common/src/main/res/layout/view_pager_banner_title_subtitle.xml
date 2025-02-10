@@ -12,12 +12,14 @@
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:includeFontPadding="false"
         android:textColor="@color/text_primary" />
 
     <TextView
         android:id="@+id/pagerBannerSubtitle"
         style="@style/TextAppearance.NovaFoundation.Regular"
         android:layout_width="match_parent"
+        android:includeFontPadding="false"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textColor="@color/text_primary" />

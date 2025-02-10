@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
+import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -178,6 +179,8 @@ interface AssetsFeatureDependencies {
     val assetIconProvider: AssetIconProvider
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
+
+    val promotionBannersInteractor: io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

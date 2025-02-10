@@ -27,21 +27,21 @@ class EditablePlaceholderAdapter : SingleItemAdapter<EditableStubHolder>() {
 
     fun setPadding(padding: ViewSpace?) {
         this.padding = padding
-        if (showPlaceholder) {
+        if (showItem) {
             notifyItemChanged(0)
         }
     }
 
     fun setPlaceholderData(model: PlaceholderModel) {
         this.model = model
-        if (showPlaceholder) {
+        if (showItem) {
             notifyItemChanged(0)
         }
     }
 
     fun setButtonClickListener(listener: OnClickListener?) {
         clickListener = listener
-        if (showPlaceholder) {
+        if (showItem) {
             notifyItemChanged(0)
         }
     }

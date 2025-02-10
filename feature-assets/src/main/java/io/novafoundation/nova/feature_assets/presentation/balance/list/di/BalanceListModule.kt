@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -76,6 +77,7 @@ class BalanceListModule {
     @IntoMap
     @ViewModelKey(BalanceListViewModel::class)
     fun provideViewModel(
+        promotionBannersInteractor: io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor,
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
@@ -89,6 +91,7 @@ class BalanceListModule {
         amountFormatter: AmountFormatter
     ): ViewModel {
         return BalanceListViewModel(
+            promotionBannersInteractor = promotionBannersInteractor,
             walletInteractor = walletInteractor,
             assetsListInteractor = assetsListInteractor,
             selectedAccountUseCase = selectedAccountUseCase,

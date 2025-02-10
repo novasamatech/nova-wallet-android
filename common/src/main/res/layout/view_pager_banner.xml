@@ -27,7 +27,7 @@
     <FrameLayout
         android:id="@+id/pagerBannerImage"
         android:layout_width="202dp"
-        android:layout_height="126dp"
+        android:layout_height="0dp"
         android:elevation="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/pagerBannerContent"
@@ -48,7 +48,7 @@
             android:id="@+id/bannerPagerContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="8dp"
             android:clipToPadding="false"
             android:minHeight="56dp"
@@ -65,7 +65,7 @@
             android:layout_width="100dp"
             android:layout_height="6dp"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

@@ -22,6 +22,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
+import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
@@ -33,6 +34,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannersMixinFactory
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -96,6 +98,10 @@ interface CommonApi {
     val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 
     val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val promotionBannersInteractor: io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
+
+    val promotionBannersMixinFactory: io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannersMixinFactory
 
     fun computationalCache(): ComputationalCache
 

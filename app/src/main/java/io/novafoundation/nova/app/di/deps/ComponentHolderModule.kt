@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
+import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
+import io.novafoundation.nova.feature_banners_impl.di.BannersFeatureHolder
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_buy_impl.di.BuyFeatureHolder
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
@@ -255,4 +257,11 @@ interface ComponentHolderModule {
     @ClassKey(SwapCoreApi::class)
     @IntoMap
     fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
+
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(BannersFeatureApi::class)
+    @IntoMap
+    fun provideBannersFeatureApi(holder: BannersFeatureHolder): BannersFeatureApi
 }

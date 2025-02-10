@@ -7,8 +7,10 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannersMixinFactory
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
@@ -53,6 +55,10 @@ interface DAppFeatureDependencies {
     val rootScope: RootScope
 
     val permissionsAskerFactory: PermissionsAskerFactory
+
+    val promotionBannersInteractor: io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
+
+    val promotionBannersMixinFactory: io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannersMixinFactory
 
     fun currencyRepository(): CurrencyRepository
 

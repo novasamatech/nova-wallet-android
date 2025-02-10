@@ -45,6 +45,9 @@ android {
 
         buildConfigField "String", "ASSET_COLORED_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/colored\""
         buildConfigField "String", "ASSET_WHITE_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/white/v1\""
+
+        buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/banners_dev.json\""
+        buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners_dev.json\""
     }
 
     buildTypes {
@@ -54,6 +57,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners.json\""
         }
 
         releaseGithub {

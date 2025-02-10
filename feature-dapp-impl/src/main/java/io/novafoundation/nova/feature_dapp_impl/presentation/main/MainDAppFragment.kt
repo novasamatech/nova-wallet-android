@@ -11,6 +11,8 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannerAdapter
+import io.novafoundation.nova.feature_banners_impl.presentation.banner.bindWithAdapter
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
@@ -21,16 +23,24 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappRecyclerViewCatalog
 
-class MainDAppFragment :
-    BaseFragment<MainDAppViewModel>(),
+class MainDAppFragment : BaseFragment<MainDAppViewModel>(),
     DAppClickHandler,
     DAppHeaderAdapter.Handler,
-    DappCategoriesAdapter.Handler {
+    DappCategoriesAdapter.Handler, MainFavoriteDAppsAdapter.Handler {
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this, this) }
+    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this) }
+
+    private val bannerAdapter: io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannerAdapter(
+            closable = false,
+            bannerCallback = null
+        )
+    }
+
+    private val favoritesAdapter: MainFavoriteDAppsAdapter by lazy(LazyThreadSafetyMode.NONE) { MainFavoriteDAppsAdapter(this, this, imageLoader) }
 
     private val dappsShimmering by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.layout_dapps_shimmering) }
 
@@ -46,7 +56,7 @@ class MainDAppFragment :
 
     override fun initViews() {
         dappRecyclerViewCatalog.applyStatusBarInsets()
-        dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, dappsShimmering, dappCategoriesListAdapter)
+        dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, bannerAdapter, favoritesAdapter, dappsShimmering, dappCategoriesListAdapter)
         dappRecyclerViewCatalog.itemAnimator = null
     }
 
@@ -86,8 +96,11 @@ class MainDAppFragment :
         }
 
         viewModel.favoriteDAppsUIFlow.observe {
-            headerAdapter.setFavorites(it)
+            favoritesAdapter.show(it.isNotEmpty())
+            favoritesAdapter.setDApps(it)
         }
+
+        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
     }
 
     override fun onCategoryClicked(id: String) {
