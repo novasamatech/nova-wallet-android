@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
+
+    <string name="high_price_impact_detacted_message">Executing this swap may result in significant slippage and potential losses. Consider reducing your trade size or splitting into multiple transactions.</string>
+
     <string name="popular_dapps_title">Popular DApps</string>
 
     <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
