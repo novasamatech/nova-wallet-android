@@ -18,3 +18,6 @@ class MythosCollator(
 
     override val identifier: String = accountId.value.toHexString()
 }
+
+val MythosCollator.isActive: Boolean
+    get() = apr != null

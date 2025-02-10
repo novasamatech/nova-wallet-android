@@ -1,15 +1,14 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.view
+package io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.actions
 
 import android.content.Context
 import android.os.Bundle
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.model.ManageCollatorsAction
 
 class CollatorManageActionsBottomSheet(
     context: Context,
-    private val itemSelected: (ManageCollatorsAction) -> Unit,
+    private val itemSelected: (ManageCurrentStakeTargetsAction) -> Unit,
     onCancel: (() -> Unit)? = null,
 ) : FixedListBottomSheet(context, onCancel) {
 
@@ -18,14 +17,12 @@ class CollatorManageActionsBottomSheet(
 
         setTitle(R.string.parachain_staking_manage_collators)
 
-        ManageCollatorsAction.values().forEach {
+        ManageCurrentStakeTargetsAction.values().forEach {
             item(it)
         }
     }
 
-    private fun item(
-        action: ManageCollatorsAction,
-    ) = textItem(action.iconRes, action.titleRes) {
+    private fun item(action: ManageCurrentStakeTargetsAction) = textItem(action.iconRes, action.titleRes) {
         itemSelected(action)
     }
 }

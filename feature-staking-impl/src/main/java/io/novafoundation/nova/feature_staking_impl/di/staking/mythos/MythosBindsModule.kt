@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDe
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.RealMythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collator.MythosCollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collator.RealMythosCollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.currentCollators.MythosCurrentCollatorsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.currentCollators.RealMythosCurrentCollatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.MythosStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.RealMythosStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.unbonding.MythosUnbondingInteractor
@@ -76,6 +78,9 @@ interface MythosBindsModule {
 
     @Binds
     fun bindClaimRewardsInteractor(implementation: RealMythosClaimRewardsInteractor): MythosClaimRewardsInteractor
+
+    @Binds
+    fun bindCurrentCollatorsInteractor(implementation: RealMythosCurrentCollatorsInteractor): MythosCurrentCollatorsInteractor
 
     @Binds
     fun bindMythosCollatorFormatter(implementation: RealMythosCollatorFormatter): MythosCollatorFormatter

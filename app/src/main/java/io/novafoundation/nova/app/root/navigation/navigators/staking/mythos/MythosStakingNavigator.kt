@@ -46,7 +46,7 @@ class MythosStakingNavigator(
 
     override fun openUnbond() {
         navigationBuilder()
-            .action(R.id.action_stakingFragment_to_stakingMythosUnbondGraph)
+            .action(R.id.action_open_stakingMythosUnbondGraph)
             .navigateInFirstAttachedContext()
     }
 
@@ -69,6 +69,12 @@ class MythosStakingNavigator(
         } else {
             returnToStakingMain()
         }
+    }
+
+    override fun openStakedCollators() {
+        navigationBuilder()
+            .action(R.id.action_stakingFragment_to_mythosCurrentCollatorsFragment)
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToStartStaking() {

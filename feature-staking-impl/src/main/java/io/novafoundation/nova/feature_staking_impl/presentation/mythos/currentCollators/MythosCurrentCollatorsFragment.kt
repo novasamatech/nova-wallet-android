@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current
+package io.novafoundation.nova.feature_staking_impl.presentation.mythos.currentCollators
 
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -6,22 +6,22 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.CurrentStakeTargetsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.actions.CollatorManageActionsBottomSheet
 
-class CurrentCollatorsFragment : CurrentStakeTargetsFragment<CurrentCollatorsViewModel>() {
+class MythosCurrentCollatorsFragment : CurrentStakeTargetsFragment<MythosCurrentCollatorsViewModel>() {
 
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(
             requireContext(),
             StakingFeatureApi::class.java
         )
-            .currentCollatorsFactory()
+            .currentMythosCollatorsFactory()
             .create(this)
             .inject(this)
     }
 
-    override fun subscribe(viewModel: CurrentCollatorsViewModel) {
+    override fun subscribe(viewModel: MythosCurrentCollatorsViewModel) {
         super.subscribe(viewModel)
 
-        viewModel.selectManageCollatorsAction.awaitableActionLiveData.observeEvent {
+        viewModel.selectManageCurrentStakeTargetsAction.awaitableActionLiveData.observeEvent {
             CollatorManageActionsBottomSheet(
                 context = requireContext(),
                 itemSelected = it.onSuccess,
