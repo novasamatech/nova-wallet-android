@@ -132,9 +132,9 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun providePriceImpactThresholds() = PriceImpactThresholds(
-        15.percents,
-        5.percents,
-        1.percents
+        lowPriceImpact = 1.percents,
+        mediumPriceImpact = 5.percents,
+        highPriceImpact = 15.percents
     )
 
     @Provides
