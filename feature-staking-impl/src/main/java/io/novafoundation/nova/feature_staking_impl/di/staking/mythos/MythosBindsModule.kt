@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.RealMy
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.RealMythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.RealStakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.MythosClaimRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.RealMythosClaimRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.RealMythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collator.MythosCollatorProvider
@@ -20,6 +22,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSumma
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.stakeSummary.RealMythosStakeSummaryInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.unbonding.MythosUnbondingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.unbonding.RealMythosUnbondingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.userRewards.MythosUserRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.userRewards.RealMythosUserRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.MythosRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.RealMythosRedeemInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.RealStartMythosStakingInteractor
@@ -59,6 +63,9 @@ interface MythosBindsModule {
     fun bindUnbondingInteractor(implementation: RealMythosUnbondingInteractor): MythosUnbondingInteractor
 
     @Binds
+    fun bindUserRewardsInteractor(implementation: RealMythosUserRewardsInteractor): MythosUserRewardsInteractor
+
+    @Binds
     fun bindRedeemInteractor(implementation: RealMythosRedeemInteractor): MythosRedeemInteractor
 
     @Binds
@@ -66,6 +73,9 @@ interface MythosBindsModule {
 
     @Binds
     fun bindUnbondInteractor(implementation: RealUnbondMythosStakingInteractor): UnbondMythosStakingInteractor
+
+    @Binds
+    fun bindClaimRewardsInteractor(implementation: RealMythosClaimRewardsInteractor): MythosClaimRewardsInteractor
 
     @Binds
     fun bindMythosCollatorFormatter(implementation: RealMythosCollatorFormatter): MythosCollatorFormatter

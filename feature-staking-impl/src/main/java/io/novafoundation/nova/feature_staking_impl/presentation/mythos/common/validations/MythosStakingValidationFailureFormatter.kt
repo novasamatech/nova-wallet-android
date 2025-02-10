@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.MythosClaimRewardsValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.RedeemMythosStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.validations.UnbondMythosStakingValidationFailure
@@ -26,6 +27,8 @@ interface MythosStakingValidationFailureFormatter {
     fun formatUnbond(failure: ValidationStatus.NotValid<UnbondMythosStakingValidationFailure>): TransformedFailure
 
     fun formatRedeem(reason: RedeemMythosStakingValidationFailure): TitleAndMessage
+
+    fun formatClaimRewards(reason: MythosClaimRewardsValidationFailure): TitleAndMessage
 }
 
 @FeatureScope
@@ -73,6 +76,15 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
     override fun formatRedeem(reason: RedeemMythosStakingValidationFailure): TitleAndMessage {
         return when (reason) {
             is RedeemMythosStakingValidationFailure.NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(reason, resourceManager)
+        }
+    }
+
+    override fun formatClaimRewards(reason: MythosClaimRewardsValidationFailure): TitleAndMessage {
+        return when (reason) {
+            MythosClaimRewardsValidationFailure.NonProfitableClaim -> resourceManager.getString(R.string.common_confirmation_title) to
+                resourceManager.getString(R.string.staking_warning_tiny_payout)
+
+            is MythosClaimRewardsValidationFailure.NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(reason, resourceManager)
         }
     }
 
