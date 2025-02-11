@@ -81,7 +81,7 @@ class MythosSharedComputation @Inject constructor(
     }
 
     context(ComputationalScope)
-    fun releaseQueuesFlow(chainId: ChainId, accountId: AccountIdKey) : Flow<List<MythReleaseRequest>> {
+    fun releaseQueuesFlow(chainId: ChainId, accountId: AccountIdKey): Flow<List<MythReleaseRequest>> {
         return cachedFlow("MythosSharedComputation.releaseQueuesFlow", chainId, accountId.toHex()) {
             userStakeRepository.releaseQueuesFlow(chainId, accountId)
         }

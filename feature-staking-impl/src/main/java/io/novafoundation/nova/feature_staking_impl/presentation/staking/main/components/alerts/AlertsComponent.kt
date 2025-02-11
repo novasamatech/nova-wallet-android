@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.mythos.MythosAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.nominationPools.NominationPoolsAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.parachain.ParachainAlertsComponentFactory

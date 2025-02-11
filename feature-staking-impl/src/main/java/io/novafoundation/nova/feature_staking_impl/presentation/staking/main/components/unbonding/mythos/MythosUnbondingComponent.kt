@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
