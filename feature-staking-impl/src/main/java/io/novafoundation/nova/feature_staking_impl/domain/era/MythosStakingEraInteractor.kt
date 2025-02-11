@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.toDuration
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculator
-import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.sessionsDuration
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.model.StartStakingEraInfo

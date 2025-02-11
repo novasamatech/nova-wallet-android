@@ -27,10 +27,6 @@ interface MythosSessionDurationCalculator : EraRewardCalculatorComparable {
     fun remainingSessionDuration(): Duration
 }
 
-fun MythosSessionDurationCalculator.sessionsDuration(numberOfSessions: Int): Duration {
-    return sessionDuration() * numberOfSessions
-}
-
 @FeatureScope
 class MythosSessionDurationCalculatorFactory @Inject constructor(
     private val mythosSessionRepository: RealMythosSessionRepository,
