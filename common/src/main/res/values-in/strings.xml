@@ -758,6 +758,8 @@
         <item quantity="other">Anda perlu memilih setidaknya %d trek</item>
     </plurals>
     <string name="governance_unlock">Buka kunci</string>
+    <string name="high_price_impact_detacted_message">Melakukan tukar ini akan mengakibatkan slippage signifikan dan kerugian finansial. Pertimbangkan untuk mengurangi ukuran perdagangan Anda atau membagi perdagangan Anda ke dalam beberapa transaksi.</string>
+    <string name="high_price_impact_detacted_title">Dampak harga tinggi terdeteksi (%s)</string>
     <string name="history_v1.9.0">Riwayat</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Nama Legal</string>
@@ -921,6 +923,7 @@
     <string name="pool_inactive_failure_title">Pool tidak terbuka</string>
     <string name="pool_staking_conflict_message">Anda tidak dapat lagi menggunakan Staking Langsung dan Staking Pool dari akun yang sama. Untuk mengelola Staking Pool Anda, pertama-tama Anda perlu melepaskan token Anda dari Staking Langsung.</string>
     <string name="pool_staking_conflict_title">Operasi pool tidak tersedia</string>
+    <string name="popular_dapps_title">Populer</string>
     <string name="pre_configured_networks_add_custom_button">Tambahkan jaringan secara manual</string>
     <string name="pre_configured_networks_progress_text">Memuat daftar jaringan...</string>
     <string name="pre_configured_networks_search_hint">Cari berdasarkan nama jaringan</string>
