@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_banners_impl.presentation.banner.view.switcher.animation
+package io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation
 
 import android.view.View
 import android.view.animation.Interpolator

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_banners_impl.presentation.banner
+package io.novafoundation.nova.feature_banners_api.presentation
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel

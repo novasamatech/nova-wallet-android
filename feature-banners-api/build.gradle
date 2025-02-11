@@ -13,6 +13,8 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/banners_dev.json\""
+        buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners_dev.json\""
     }
 
     kotlinOptions {
@@ -25,7 +27,13 @@ dependencies {
     implementation coroutinesDep
     implementation project(":common")
 
+    implementation cardViewDep
+    implementation recyclerViewDep
+    implementation materialDep
     implementation androidDep
+    implementation androidDep
+
+    implementation shimmerDep
 
     implementation daggerDep
     kapt daggerKapt

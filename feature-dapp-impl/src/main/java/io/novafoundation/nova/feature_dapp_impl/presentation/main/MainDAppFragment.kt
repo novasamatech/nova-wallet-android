@@ -11,9 +11,9 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannerAdapter
-import io.novafoundation.nova.feature_banners_impl.presentation.banner.bindWithAdapter
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
+import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
@@ -33,8 +33,8 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(),
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this) }
 
-    private val bannerAdapter: io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        io.novafoundation.nova.feature_banners_impl.presentation.banner.PromotionBannerAdapter(
+    private val bannerAdapter: PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        PromotionBannerAdapter(
             closable = false,
             bannerCallback = null
         )

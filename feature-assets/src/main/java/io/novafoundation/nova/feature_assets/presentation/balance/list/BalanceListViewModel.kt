@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetViewMode
-import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -61,7 +60,6 @@ private typealias SyncAction = suspend (MetaAccount) -> Unit
 
 @OptIn(ExperimentalTime::class)
 class BalanceListViewModel(
-    private val promotionBannersInteractor: io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor,
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,

@@ -7,7 +7,7 @@ class BannerPageModel(
     val title: String,
     val subtitle: String,
     val image: ClipableImage,
-    val background: ClipableImage,
+    val background: Drawable,
 )
 
 class ClipableImage(val drawable: Drawable, val clip: Boolean)

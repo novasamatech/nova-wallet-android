@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.LanguagesHolder
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_impl.data.BannersApi
 import io.novafoundation.nova.feature_banners_impl.data.BannersRepository
@@ -56,7 +57,7 @@ class BannersFeatureModule {
         promotionBannersInteractor: PromotionBannersInteractor,
         imageLoader: ImageLoader,
         context: Context
-    ): RealPromotionBannersMixinFactory {
+    ): PromotionBannersMixinFactory {
         return RealPromotionBannersMixinFactory(imageLoader, context, promotionBannersInteractor)
     }
 }

@@ -12,7 +12,7 @@ class BannersFeatureHolder @Inject constructor(
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
-        val accountFeatureDependencies = DaggerBannersFeatureComponent_BannersDependenciesComponent.builder()
+        val accountFeatureDependencies = DaggerBannersFeatureComponent_BannersFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .build()
 

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_banners_impl.presentation.banner.view
+package io.novafoundation.nova.feature_banners_api.presentation.view
 
 import android.animation.ArgbEvaluator
 import android.content.Context

@@ -81,10 +81,7 @@ class RealPromotionBannersMixin(
                 resources.getValue(banner.imageUrl),
                 banner.clipToBounds
             ),
-            background = ClipableImage(
-                resources.getValue(banner.backgroundUrl),
-                false
-            ),
+            background = resources.getValue(banner.backgroundUrl),
         )
     }
 }

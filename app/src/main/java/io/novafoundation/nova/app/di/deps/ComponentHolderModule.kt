@@ -263,5 +263,5 @@ interface ComponentHolderModule {
     @Binds
     @ClassKey(BannersFeatureApi::class)
     @IntoMap
-    fun provideBannersFeatureApi(holder: BannersFeatureHolder): BannersFeatureApi
+    fun provideBannersFeatureApi(holder: BannersFeatureHolder): FeatureApiHolder
 }

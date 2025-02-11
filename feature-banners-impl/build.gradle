@@ -26,6 +26,9 @@ dependencies {
     implementation project(":common")
     implementation project(':feature-banners-api')
 
+    implementation cardViewDep
+    implementation recyclerViewDep
+    implementation materialDep
     implementation androidDep
 
     implementation daggerDep

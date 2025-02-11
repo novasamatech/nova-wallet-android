@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <io.novafoundation.nova.common.view.banner.BannerPagerView
+    <io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerView
         android:id="@+id/bannerPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
