@@ -17,6 +17,8 @@ import kotlin.time.Duration
 
 interface MythosSessionDurationCalculator : EraRewardCalculatorComparable {
 
+    val blockTime: BigInteger
+
     fun sessionDuration(): Duration
 
     /**
@@ -56,7 +58,7 @@ class MythosSessionDurationCalculatorFactory @Inject constructor(
 }
 
 private class RealMythosSessionDurationCalculator(
-    private val blockTime: BigInteger,
+    override val blockTime: BigInteger,
     private val currentSlot: BigInteger,
     private val slotsInSession: BigInteger
 ) : MythosSessionDurationCalculator {
@@ -66,7 +68,8 @@ private class RealMythosSessionDurationCalculator(
     }
 
     override fun remainingSessionDuration(): Duration {
-        return (slotsInSession - sessionProgress()).toDuration()
+        val remainingBlocks = slotsInSession - sessionProgress()
+        return (remainingBlocks * blockTime).toDuration()
     }
 
     override fun derivedTimestamp(): Duration {

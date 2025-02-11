@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.era
 
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.toDuration
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculator
@@ -23,11 +24,11 @@ class MythosStakingEraInteractor(
     override fun observeEraInfo(): Flow<StartStakingEraInfo> {
         return flowOfAll {
             val chainId = stakingOption.chain.id
-            val unstakingSessions = mythosStakingRepository.unstakeDurationInSessions(chainId)
+            val unstakingDurationInBlocks = mythosStakingRepository.unstakeDurationInBlocks(chainId)
 
             mythosSharedComputation.eraDurationCalculatorFlow(stakingOption).map { sessionDurationCalculator ->
                 StartStakingEraInfo(
-                    unstakeTime = sessionDurationCalculator.sessionsDuration(unstakingSessions),
+                    unstakeTime = (unstakingDurationInBlocks * sessionDurationCalculator.blockTime).toDuration(),
                     eraDuration = sessionDurationCalculator.sessionDuration(),
                     firstRewardReceivingDuration = sessionDurationCalculator.firstRewardDelay()
                 )
