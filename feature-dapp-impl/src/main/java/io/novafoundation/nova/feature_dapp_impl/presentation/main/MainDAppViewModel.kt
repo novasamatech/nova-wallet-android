@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.indexOfFirstOrNull
@@ -18,7 +19,7 @@ import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBro
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoryToDappCategoryModel
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDAppCatalogToDAppCategoryModels
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapFavoriteDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
 import kotlinx.coroutines.flow.filterNotNull
@@ -32,6 +33,7 @@ class MainDAppViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val dappInteractor: DappInteractor,
+    private val resourceManager: ResourceManager
 ) : BaseViewModel(), Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -49,9 +51,7 @@ class MainDAppViewModel(
         .share()
 
     private val groupedDAppsUiFlow = groupedDAppsFlow
-        .map {
-            it.map { (category, dapps) -> mapDappCategoryToDappCategoryModel(category, dapps) }
-        }
+        .map { mapDAppCatalogToDAppCategoryModels(resourceManager, it) }
         .inBackground()
         .share()
 
@@ -65,7 +65,7 @@ class MainDAppViewModel(
         .share()
 
     val categoriesStateFlow = groupedDAppsFlow
-        .map { catalog -> catalog.keys.map { dappCategoryToUi(it, isSelected = false) } }
+        .map { catalog -> catalog.categoriesWithDApps.keys.map { dappCategoryToUi(it, isSelected = false) } }
         .map { categories ->
             DAppCategoryState(
                 categories = categories,

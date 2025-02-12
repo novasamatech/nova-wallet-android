@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
@@ -33,7 +34,8 @@ class MainDAppModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: DAppRouter,
-        dappInteractor: DappInteractor
+        dappInteractor: DappInteractor,
+        resourceManager: ResourceManager
     ): ViewModel {
         return MainDAppViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -41,7 +43,8 @@ class MainDAppModule {
             router = router,
             selectedAccountUseCase = selectedAccountUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            dappInteractor = dappInteractor
+            dappInteractor = dappInteractor,
+            resourceManager = resourceManager
         )
     }
 }

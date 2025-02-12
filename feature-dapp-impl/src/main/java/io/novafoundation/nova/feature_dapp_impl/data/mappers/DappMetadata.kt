@@ -25,9 +25,9 @@ fun mapDAppMetadataResponseToDAppMetadatas(
             iconLink = it.icon,
             url = it.url,
             baseUrl = Urls.normalizeUrl(it.url),
-            categories = it.categories.mapNotNullTo(mutableSetOf(), categoriesAssociatedById::get)
+            categories = it.categories.mapNotNullTo(mutableSetOf(), categoriesAssociatedById::get),
         )
     }
 
-    return DappCatalog(categories, metadata)
+    return DappCatalog(response.popular.map { it.url }, categories, metadata)
 }
