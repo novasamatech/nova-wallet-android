@@ -16,7 +16,9 @@ private const val NO_PAGE = -1
 private class Indicator(var size: Float, var marginToNext: Float, @ColorInt var color: Int)
 
 class PageIndicatorView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
     private var pagesCount = 0

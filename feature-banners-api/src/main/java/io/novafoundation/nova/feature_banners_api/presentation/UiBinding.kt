@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerV
 
 context(BaseFragment<T>)
 fun <T : BaseViewModel> PromotionBannersMixin.bindWithAdapter(adapter: PromotionBannerAdapter) {
-
     adapter.setCallback(object : BannerPagerView.Callback {
         override fun onBannerClicked(page: BannerPageModel) {
             this@bindWithAdapter.handleBannerAction(page)

@@ -11,7 +11,7 @@ interface BannersRepository {
 }
 
 class RealBannersRepository(
-    private val bannersApi: io.novafoundation.nova.feature_banners_impl.data.BannersApi,
+    private val bannersApi: BannersApi,
     private val languagesHolder: LanguagesHolder
 ) : BannersRepository {
 
@@ -37,7 +37,7 @@ class RealBannersRepository(
         }
     }
 
-    private suspend fun getLocalisation(url: String, language: Language): Map<String, io.novafoundation.nova.feature_banners_impl.data.BannerLocalisationResponse> {
+    private suspend fun getLocalisation(url: String, language: Language): Map<String, BannerLocalisationResponse> {
         try {
             val localisationUrl = getLocalisationLink(url, language)
             return bannersApi.getBannersLocalisation(localisationUrl)

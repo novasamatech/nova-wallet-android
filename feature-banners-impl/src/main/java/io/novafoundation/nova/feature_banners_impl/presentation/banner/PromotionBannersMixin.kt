@@ -11,13 +11,10 @@ import coil.request.ImageRequest
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asError
 import io.novafoundation.nova.common.domain.asLoaded
-import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_banners_api.domain.PromotionBanner
 import io.novafoundation.nova.common.utils.asyncWithContext
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.toMap
-import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_banners_api.presentation.BannerPageModel
 import io.novafoundation.nova.feature_banners_api.presentation.ClipableImage
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixin
@@ -26,7 +23,6 @@ import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSou
 import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 class RealPromotionBannersMixinFactory(

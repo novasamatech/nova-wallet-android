@@ -10,7 +10,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.min
 
-private const val MIN_FLING_VELOCITY = 1000 //px/s
+private const val MIN_FLING_VELOCITY = 1000 // px/s
 
 enum class PageOffset(val scrollDirection: Int, val pageOffset: Int) {
     NEXT(-1, 1), PREVIOUS(1, -1), SAME(0, 0)

@@ -6,7 +6,6 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_banners_api.presentation.view
 import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -18,7 +17,6 @@ import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.Con
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.getContentSwitchingController
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.getImageSwitchingController
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerBackground
-import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerCardView
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerClose
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerContent
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerIndicators
@@ -26,7 +24,9 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 class BannerPagerView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), BannerPagerScrollController.ScrollCallback {
 
     private val scrollController = BannerPagerScrollController(context, this)
@@ -114,7 +114,6 @@ class BannerPagerView @JvmOverloads constructor(
 
             closeAnimator.setFloatValues(0f, 1f)
             closeAnimator.addUpdateListener {
-
                 if (isLastPageAfterClose) {
                     pagerBannerIndicators.alpha = 1f - it.animatedFraction
                 } else {

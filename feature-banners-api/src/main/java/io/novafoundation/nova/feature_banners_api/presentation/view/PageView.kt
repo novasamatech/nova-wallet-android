@@ -15,7 +15,9 @@ import kotlinx.android.synthetic.main.view_pager_banner_page.view.pagerBannerSub
 import kotlinx.android.synthetic.main.view_pager_banner_page.view.pagerBannerTitle
 
 class PageView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     val title: TextView

@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ani
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.InterpolationRange
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.OffsetXInterpolatedAnimator
 
-
 private const val OFFSET = 36
 
 fun BannerPagerView.getImageSwitchingController(): ImageSwitchingController {

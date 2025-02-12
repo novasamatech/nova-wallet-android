@@ -23,10 +23,12 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappRecyclerViewCatalog
 
-class MainDAppFragment : BaseFragment<MainDAppViewModel>(),
+class MainDAppFragment :
+    BaseFragment<MainDAppViewModel>(),
     DAppClickHandler,
     DAppHeaderAdapter.Handler,
-    DappCategoriesAdapter.Handler, MainFavoriteDAppsAdapter.Handler {
+    DappCategoriesAdapter.Handler,
+    MainFavoriteDAppsAdapter.Handler {
 
     @Inject
     protected lateinit var imageLoader: ImageLoader

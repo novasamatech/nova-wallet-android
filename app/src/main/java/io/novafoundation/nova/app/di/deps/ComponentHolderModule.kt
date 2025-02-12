@@ -258,7 +258,6 @@ interface ComponentHolderModule {
     @IntoMap
     fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
 
-
     @ApplicationScope
     @Binds
     @ClassKey(BannersFeatureApi::class)

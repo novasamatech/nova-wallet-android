@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_banners_api.presentation.view.switcher
 
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
-import io.novafoundation.nova.feature_banners_api.presentation.ClipableImage
 
 class ImageSwitchingController(
     rightSwitchingAnimators: InOutAnimators,

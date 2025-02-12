@@ -37,7 +37,8 @@ import javax.inject.Inject
 class BalanceListFragment :
     BaseFragment<BalanceListViewModel>(),
     BalanceListAdapter.ItemAssetHandler,
-    AssetsHeaderAdapter.Handler, ManageAssetsAdapter.Handler {
+    AssetsHeaderAdapter.Handler,
+    ManageAssetsAdapter.Handler {
 
     @Inject
     protected lateinit var imageLoader: ImageLoader

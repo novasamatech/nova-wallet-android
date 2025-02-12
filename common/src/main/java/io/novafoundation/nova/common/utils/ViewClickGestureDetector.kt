@@ -13,7 +13,6 @@ private class ViewClickGestureDetectorListener(private val view: View) : Gesture
     }
 
     override fun onShowPress(e: MotionEvent) {
-
     }
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
@@ -26,11 +25,9 @@ private class ViewClickGestureDetectorListener(private val view: View) : Gesture
     }
 
     override fun onLongPress(e: MotionEvent) {
-
     }
 
     override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-
         return false
     }
 }

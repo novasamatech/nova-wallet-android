@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_banners_api.presentation.view.switcher.an
 import android.view.View
 import android.view.animation.Interpolator
 import io.novafoundation.nova.common.utils.multiplier
-import io.novafoundation.nova.common.utils.recyclerView.expandable.flippedFraction
 import kotlin.math.absoluteValue
 
 interface FractionAnimator {

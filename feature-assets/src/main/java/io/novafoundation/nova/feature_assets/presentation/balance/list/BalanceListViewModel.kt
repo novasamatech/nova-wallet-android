@@ -31,7 +31,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.view.Asse
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.assetsSource
-import io.novafoundation.nova.feature_banners_api.presentation.source.dappsSource
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency

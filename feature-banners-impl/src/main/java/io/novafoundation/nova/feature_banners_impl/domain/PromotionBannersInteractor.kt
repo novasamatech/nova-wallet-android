@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_banners_impl.domain
 
-import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_banners_api.domain.PromotionBanner
 
