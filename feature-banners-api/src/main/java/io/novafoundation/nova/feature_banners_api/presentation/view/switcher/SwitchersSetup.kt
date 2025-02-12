@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_banners_api.presentation.view.switcher
 
 import android.graphics.Rect
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.Interpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
