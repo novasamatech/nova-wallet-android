@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.InputType
@@ -210,7 +211,10 @@ inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
 }
 
 fun View.setVisible(visible: Boolean, falseState: Int = View.GONE) {
-    visibility = if (visible) View.VISIBLE else falseState
+    val newVisibility = if (visible) View.VISIBLE else falseState
+    if (newVisibility != visibility) {
+        visibility = newVisibility
+    }
 }
 
 fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {
@@ -405,4 +409,8 @@ fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharS
     TabLayoutMediator(this, viewPager) { tab, position ->
         tab.text = tabText(position)
     }.attach()
+}
+
+fun View.bounds(): Rect {
+    return Rect(0, 0, width, height)
 }

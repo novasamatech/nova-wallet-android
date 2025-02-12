@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    namespace 'io.novafoundation.nova.feature_banners_api'
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/banners_dev.json\""
+        buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners_dev.json\""
+    }
+
+    buildTypes {
+        debug {
+
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/banners.json\""
+            buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners.json\""
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+}
+
+dependencies {
+    implementation coroutinesDep
+    implementation project(":common")
+
+    implementation cardViewDep
+    implementation recyclerViewDep
+    implementation materialDep
+    implementation androidDep
+    implementation androidDep
+
+    implementation shimmerDep
+
+    implementation daggerDep
+    kapt daggerKapt
+
+    implementation androidDep
+
+    testImplementation project(':test-shared')
+}

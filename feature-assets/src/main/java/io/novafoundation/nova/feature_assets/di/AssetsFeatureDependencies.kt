@@ -40,6 +40,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
+import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
@@ -178,6 +180,10 @@ interface AssetsFeatureDependencies {
     val assetIconProvider: AssetIconProvider
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
+
+    val bannerSourceFactory: BannersSourceFactory
+
+    val bannersMixinFactory: PromotionBannersMixinFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

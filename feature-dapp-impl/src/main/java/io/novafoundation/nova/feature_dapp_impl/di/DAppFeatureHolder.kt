@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
@@ -28,6 +29,7 @@ class DAppFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
+            .bannersFeatureApi(getFeature(BannersFeatureApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .build()
 

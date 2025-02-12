@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp">
+ё
+    <TextView
+        android:id="@+id/dAppMainFavoriteDAppTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:drawablePadding="8dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:text="@string/dapp_favorites"
+        android:textColor="@color/text_primary"
+        app:drawableStartCompat="@drawable/ic_favorite_heart_filled_20"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/dAppMainFavoriteDAppsShow"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:padding="8dp"
+        android:text="@string/common_see_all"
+        android:textColor="@color/button_text_accent"
+        app:layout_constraintBottom_toBottomOf="@+id/dAppMainFavoriteDAppTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dAppMainFavoriteDAppTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dAppMainFavoriteDAppList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        android:paddingVertical="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/dAppMainFavoriteDAppTitle"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

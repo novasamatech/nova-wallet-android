@@ -254,6 +254,9 @@ dependencies {
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')
 
+    implementation project(':feature-banners-api')
+    implementation project(':feature-banners-impl')
+
     implementation project(':bindings:metadata_shortener')
 
     implementation project(':test-shared')
