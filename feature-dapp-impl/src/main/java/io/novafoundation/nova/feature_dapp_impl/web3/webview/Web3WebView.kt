@@ -15,6 +15,7 @@ fun WebView.injectWeb3(web3Client: Web3WebViewClient) {
     settings.loadWithOverviewMode = true
     settings.domStorageEnabled = true
     settings.javaScriptCanOpenWindowsAutomatically = true
+    settings.mediaPlaybackRequiresUserGesture = false
 
     this.webViewClient = web3Client
 
