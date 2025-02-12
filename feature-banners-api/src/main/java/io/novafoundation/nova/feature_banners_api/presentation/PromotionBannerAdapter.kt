@@ -61,6 +61,7 @@ class BannerHolder(view: View, closable: Boolean) : RecyclerView.ViewHolder(view
     }
 
     fun showBanners(banners: List<BannerPageModel>) = with(itemView) {
+        bannerPager.isGone = banners.isEmpty()
         bannerPager.setBanners(banners)
     }
 }

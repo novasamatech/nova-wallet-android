@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_banners_api.presentation.view.switcher
 import android.graphics.Rect
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.Interpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import io.novafoundation.nova.common.utils.dp
@@ -17,10 +18,10 @@ import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ani
 
 private const val OFFSET = 36
 
-fun BannerPagerView.getImageSwitchingController(): ImageSwitchingController {
+fun BannerPagerView.getImageSwitchingController(interpolator: Interpolator): ImageSwitchingController {
     return ImageSwitchingController(
-        rightSwitchingAnimators = alphaAnimator(),
-        leftSwitchingAnimators = alphaAnimator(),
+        rightSwitchingAnimators = alphaAnimator(interpolator),
+        leftSwitchingAnimators = alphaAnimator(interpolator),
         imageViewFactory = {
             ImageView(context).apply {
                 scaleType = ImageView.ScaleType.FIT_XY
@@ -30,18 +31,18 @@ fun BannerPagerView.getImageSwitchingController(): ImageSwitchingController {
     )
 }
 
-private fun alphaAnimator(): InOutAnimators {
+private fun alphaAnimator(interpolator: Interpolator): InOutAnimators {
     return InOutAnimators(
-        inAnimator = AlphaInterpolatedAnimator(DecelerateInterpolator(), InterpolationRange(0f, 1f)),
-        outAnimator = AlphaInterpolatedAnimator(DecelerateInterpolator(), InterpolationRange(1f, 0f))
+        inAnimator = AlphaInterpolatedAnimator(interpolator, InterpolationRange(0f, 1f)),
+        outAnimator = AlphaInterpolatedAnimator(interpolator, InterpolationRange(1f, 0f))
     )
 }
 
-fun BannerPagerView.getContentSwitchingController(): ContentSwitchingController {
+fun BannerPagerView.getContentSwitchingController(interpolator: Interpolator): ContentSwitchingController {
     return ContentSwitchingController(
         clipMargin = Rect(0, 8.dp, 0, 8.dp),
-        rightSwitchingAnimators = getRightAnimator(),
-        leftSwitchingAnimators = getLeftAnimator(),
+        rightSwitchingAnimators = getRightAnimator(interpolator),
+        leftSwitchingAnimators = getLeftAnimator(interpolator),
         viewFactory = {
             PageView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -50,31 +51,35 @@ fun BannerPagerView.getContentSwitchingController(): ContentSwitchingController 
     )
 }
 
-private fun BannerPagerView.getRightAnimator() = InOutAnimators(
+private fun BannerPagerView.getRightAnimator(interpolator: Interpolator) = InOutAnimators(
     inAnimator = getContentAnimator(
+        interpolator = interpolator,
         offsetRange = InterpolationRange(from = OFFSET.dpF, to = 0f),
         alphaRange = InterpolationRange(from = 0f, to = 1f)
     ),
     outAnimator = getContentAnimator(
+        interpolator = interpolator,
         offsetRange = InterpolationRange(from = 0f, to = -OFFSET.dpF),
         alphaRange = InterpolationRange(from = 1f, to = 0f)
     )
 )
 
-private fun BannerPagerView.getLeftAnimator() = InOutAnimators(
+private fun BannerPagerView.getLeftAnimator(interpolator: Interpolator) = InOutAnimators(
     inAnimator = getContentAnimator(
+        interpolator = interpolator,
         offsetRange = InterpolationRange(from = -OFFSET.dpF, to = 0f),
         alphaRange = InterpolationRange(from = 0f, to = 1f)
     ),
     outAnimator = getContentAnimator(
+        interpolator = interpolator,
         offsetRange = InterpolationRange(from = 0f, to = OFFSET.dpF),
         alphaRange = InterpolationRange(from = 1f, to = 0f)
     )
 )
 
-private fun getContentAnimator(offsetRange: InterpolationRange, alphaRange: InterpolationRange): FractionAnimator {
+private fun getContentAnimator(interpolator: Interpolator, offsetRange: InterpolationRange, alphaRange: InterpolationRange): FractionAnimator {
     return CompoundInterpolatedAnimator(
-        OffsetXInterpolatedAnimator(DecelerateInterpolator(), offsetRange),
-        AlphaInterpolatedAnimator(DecelerateInterpolator(), alphaRange)
+        OffsetXInterpolatedAnimator(interpolator, offsetRange),
+        AlphaInterpolatedAnimator(interpolator, alphaRange)
     )
 }

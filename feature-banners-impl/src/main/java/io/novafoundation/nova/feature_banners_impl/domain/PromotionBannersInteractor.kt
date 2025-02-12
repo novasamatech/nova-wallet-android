@@ -2,10 +2,11 @@ package io.novafoundation.nova.feature_banners_impl.domain
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_banners_api.domain.PromotionBanner
+import io.novafoundation.nova.feature_banners_impl.data.BannersRepository
 
 class PromotionBannersInteractor(
     private val preferences: Preferences,
-    private val bannersRepository: io.novafoundation.nova.feature_banners_impl.data.BannersRepository,
+    private val bannersRepository: BannersRepository,
 ) {
     suspend fun getBanners(url: String): List<PromotionBanner> {
         val language = preferences.getCurrentLanguage()!!

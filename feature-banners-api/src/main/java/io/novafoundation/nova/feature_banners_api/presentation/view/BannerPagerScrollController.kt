@@ -21,8 +21,6 @@ class BannerPagerScrollController(private val context: Context, private val call
     interface ScrollCallback {
         fun onScrollToPage(pageOffset: Float, toPage: PageOffset)
 
-        fun onScrollDirectionChanged(toPage: PageOffset)
-
         fun onScrollFinished(pageOffset: PageOffset)
 
         fun invalidateScroll()
@@ -32,6 +30,8 @@ class BannerPagerScrollController(private val context: Context, private val call
     private var containerWidth = 0
 
     private var isTouchable: Boolean = true
+
+    val minimumScrollDuration = 200
 
     fun setTouchable(touchable: Boolean) {
         isTouchable = touchable
@@ -52,18 +52,12 @@ class BannerPagerScrollController(private val context: Context, private val call
             }
 
             MotionEvent.ACTION_MOVE -> {
-                val oldScrollDirection = scrollTracking.getPageOffset()
-
                 scrollTracking.addMovement(event)
                 scrollTracking.updateLastX(event.x)
 
-                val newScrollDirection = scrollTracking.getPageOffset()
+                val scrollDirection = scrollTracking.getPageOffset()
 
-                if (oldScrollDirection == PageOffset.SAME || oldScrollDirection != newScrollDirection) {
-                    callback.onScrollDirectionChanged(newScrollDirection)
-                }
-
-                callback.onScrollToPage(currentPageOffset(), newScrollDirection)
+                callback.onScrollToPage(currentPageOffset(), scrollDirection)
 
                 val isHorizontalScroll = scrollTracking.eventDx().absoluteValue > 8.dp(context)
                 isHorizontalScroll
@@ -118,8 +112,8 @@ class BannerPagerScrollController(private val context: Context, private val call
     }
 
     private fun computeScrollDuration(velocityX: Float): Int {
-        val baseDuration = 200 // стандартное время анимации
-        val maxDuration = 600 // максимальное время анимации
+        val baseDuration = minimumScrollDuration
+        val maxDuration = 600
         return (baseDuration - min(velocityX / 2, baseDuration.toFloat())).toInt().coerceAtLeast(150).coerceAtMost(maxDuration)
     }
 
@@ -135,7 +129,6 @@ class BannerPagerScrollController(private val context: Context, private val call
     }
 
     fun swipeToPage(next: PageOffset) {
-        callback.onScrollDirectionChanged(next)
         smoothScrollToPage(next, 0f)
     }
 

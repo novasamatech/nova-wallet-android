@@ -29,6 +29,8 @@ class BannerPagerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), BannerPagerScrollController.ScrollCallback {
 
+    private val scrollInterpolator = DecelerateInterpolator()
+
     private val scrollController = BannerPagerScrollController(context, this)
 
     private val gestureDetector = ViewClickGestureDetector(this)
@@ -42,9 +44,9 @@ class BannerPagerView @JvmOverloads constructor(
     private val canRunScrollAnimation: Boolean
         get() = canScroll && scrollController.isIdle()
 
-    private val contentController = getContentSwitchingController()
+    private val contentController = getContentSwitchingController(scrollInterpolator)
 
-    private val backgroundSwitchingController = getImageSwitchingController()
+    private val backgroundSwitchingController = getImageSwitchingController(scrollInterpolator)
 
     private var autoSwipeCallbackAdded = false
     private val autoSwipeDelay = 3.seconds.inWholeMilliseconds
@@ -60,8 +62,8 @@ class BannerPagerView @JvmOverloads constructor(
     private var callback: Callback? = null
 
     private val closeAnimator = ValueAnimator().apply {
-        interpolator = DecelerateInterpolator()
-        duration = 200
+        interpolator = scrollInterpolator
+        duration = scrollController.minimumScrollDuration.toLong()
     }
 
     val isClosable: Boolean
@@ -152,8 +154,6 @@ class BannerPagerView @JvmOverloads constructor(
     private fun invalidateScrolling() {
         scrollController.setTouchable(pages.size > 1)
     }
-
-    override fun onScrollDirectionChanged(toPage: PageOffset) {}
 
     override fun onScrollToPage(pageOffset: Float, toPage: PageOffset) {
         if (!canScroll) return
