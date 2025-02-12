@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ani
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.OffsetXInterpolatedAnimator
 
 
+private const val OFFSET = 36
+
 fun BannerPagerView.getImageSwitchingController(): ImageSwitchingController {
     return ImageSwitchingController(
         rightSwitchingAnimators = alphaAnimator(),
@@ -38,7 +40,7 @@ private fun alphaAnimator(): InOutAnimators {
 
 fun BannerPagerView.getContentSwitchingController(): ContentSwitchingController {
     return ContentSwitchingController(
-        clipPadding = Rect(0, 8.dp, 0, 8.dp),
+        clipMargin = Rect(0, 8.dp, 0, 8.dp),
         rightSwitchingAnimators = getRightAnimator(),
         leftSwitchingAnimators = getLeftAnimator(),
         viewFactory = {
@@ -51,22 +53,22 @@ fun BannerPagerView.getContentSwitchingController(): ContentSwitchingController 
 
 private fun BannerPagerView.getRightAnimator() = InOutAnimators(
     inAnimator = getContentAnimator(
-        offsetRange = InterpolationRange(from = 30.dpF, to = 0f),
+        offsetRange = InterpolationRange(from = OFFSET.dpF, to = 0f),
         alphaRange = InterpolationRange(from = 0f, to = 1f)
     ),
     outAnimator = getContentAnimator(
-        offsetRange = InterpolationRange(from = 0f, to = -30.dpF),
+        offsetRange = InterpolationRange(from = 0f, to = -OFFSET.dpF),
         alphaRange = InterpolationRange(from = 1f, to = 0f)
     )
 )
 
 private fun BannerPagerView.getLeftAnimator() = InOutAnimators(
     inAnimator = getContentAnimator(
-        offsetRange = InterpolationRange(from = -30.dpF, to = 0f),
+        offsetRange = InterpolationRange(from = -OFFSET.dpF, to = 0f),
         alphaRange = InterpolationRange(from = 0f, to = 1f)
     ),
     outAnimator = getContentAnimator(
-        offsetRange = InterpolationRange(from = 0f, to = 30.dpF),
+        offsetRange = InterpolationRange(from = 0f, to = OFFSET.dpF),
         alphaRange = InterpolationRange(from = 1f, to = 0f)
     )
 )

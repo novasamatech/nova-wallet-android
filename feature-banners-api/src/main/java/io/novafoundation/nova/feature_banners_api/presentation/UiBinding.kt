@@ -3,9 +3,25 @@ package io.novafoundation.nova.feature_banners_api.presentation
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerView
 
 context(BaseFragment<T>)
 fun <T : BaseViewModel> PromotionBannersMixin.bindWithAdapter(adapter: PromotionBannerAdapter) {
+
+    adapter.setCallback(object : BannerPagerView.Callback {
+        override fun onBannerClicked(page: BannerPageModel) {
+            this@bindWithAdapter.handleBannerAction(page)
+        }
+
+        override fun onBannerClosed(page: BannerPageModel) {
+            this@bindWithAdapter.closeBanner(page)
+        }
+
+        override fun onLastPageClosed() {
+            this@bindWithAdapter.closeAllBanners()
+        }
+    })
+
     bannersFlow.observe {
         when (it) {
             is ExtendedLoadingState.Loaded -> {

@@ -33,12 +33,7 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(),
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this) }
 
-    private val bannerAdapter: PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        PromotionBannerAdapter(
-            closable = false,
-            bannerCallback = null
-        )
-    }
+    private val bannerAdapter: PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) { PromotionBannerAdapter(closable = false) }
 
     private val favoritesAdapter: MainFavoriteDAppsAdapter by lazy(LazyThreadSafetyMode.NONE) { MainFavoriteDAppsAdapter(this, this, imageLoader) }
 
@@ -69,6 +64,7 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(),
 
     override fun subscribe(viewModel: MainDAppViewModel) {
         observeBrowserEvents(viewModel)
+        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
 
         viewModel.selectedWalletFlow.observe(headerAdapter::setWallet)
 
@@ -99,8 +95,6 @@ class MainDAppFragment : BaseFragment<MainDAppViewModel>(),
             favoritesAdapter.show(it.isNotEmpty())
             favoritesAdapter.setDApps(it)
         }
-
-        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
     }
 
     override fun onCategoryClicked(id: String) {

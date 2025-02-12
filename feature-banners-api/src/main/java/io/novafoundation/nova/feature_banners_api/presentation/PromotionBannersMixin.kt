@@ -6,4 +6,10 @@ import kotlinx.coroutines.flow.Flow
 interface PromotionBannersMixin {
 
     val bannersFlow: Flow<ExtendedLoadingState<List<BannerPageModel>>>
+
+    fun closeBanner(banner: BannerPageModel)
+
+    fun closeAllBanners()
+
+    fun handleBannerAction(page: BannerPageModel)
 }

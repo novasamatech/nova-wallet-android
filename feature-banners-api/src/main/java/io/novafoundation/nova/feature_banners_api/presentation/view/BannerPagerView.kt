@@ -1,38 +1,29 @@
 package io.novafoundation.nova.feature_banners_api.presentation.view
 
+import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.utils.dpF
+import androidx.core.animation.doOnEnd
+import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.ViewClickGestureDetector
 import io.novafoundation.nova.common.utils.indexOfOrNull
 import io.novafoundation.nova.feature_banners_api.R
 import io.novafoundation.nova.feature_banners_api.presentation.BannerPageModel
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ImageSwitchingController
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ContentSwitchingController
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.InOutAnimators
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.AlphaInterpolatedAnimator
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.CompoundInterpolatedAnimator
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.FractionAnimator
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.InterpolationRange
-import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.OffsetXInterpolatedAnimator
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.getContentSwitchingController
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.getImageSwitchingController
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerBackground
+import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerCardView
+import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerClose
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerContent
 import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerIndicators
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
-
-enum class AnimationDirection(val multiplier: Float) {
-    LEFT(-1f), RIGHT(1f), NONE(0f)
-}
 
 class BannerPagerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -40,8 +31,16 @@ class BannerPagerView @JvmOverloads constructor(
 
     private val scrollController = BannerPagerScrollController(context, this)
 
+    private val gestureDetector = ViewClickGestureDetector(this)
+
     private var currentPage = 0
-    private var pages: List<BannerPageModel> = listOf()
+    private var pages: MutableList<BannerPageModel> = mutableListOf()
+
+    private val canScroll: Boolean
+        get() = !closeAnimator.isRunning && pages.size > 1
+
+    private val canRunScrollAnimation: Boolean
+        get() = canScroll && scrollController.isIdle()
 
     private val contentController = getContentSwitchingController()
 
@@ -51,22 +50,35 @@ class BannerPagerView @JvmOverloads constructor(
     private val autoSwipeDelay = 3.seconds.inWholeMilliseconds
     private val autoSwipeCallback = object : Runnable {
         override fun run() {
-            scrollController.swipeToPage(PageOffset.NEXT)
-            handler?.postDelayed(this, autoSwipeDelay)
+            if (canRunScrollAnimation) {
+                scrollController.swipeToPage(PageOffset.NEXT)
+                handler?.postDelayed(this, autoSwipeDelay)
+            }
         }
     }
 
     private var callback: Callback? = null
+
+    private val closeAnimator = ValueAnimator().apply {
+        interpolator = DecelerateInterpolator()
+        duration = 200
+    }
+
+    val isClosable: Boolean
+        get() = pagerBannerClose.isVisible
 
     init {
         View.inflate(context, R.layout.view_pager_banner, this)
 
         contentController.attachToParent(pagerBannerContent)
         backgroundSwitchingController.attachToParent(pagerBannerBackground)
+
+        pagerBannerClose.setOnClickListener { closeCurrentPage() }
     }
 
     fun setBanners(banners: List<BannerPageModel>) {
-        this.pages = banners
+        this.pages.clear()
+        this.pages.addAll(banners)
         pagerBannerIndicators.setPagesSize(pages.size)
 
         contentController.setPayloads(pages.map { ContentSwitchingController.Payload(it.title, it.subtitle, it.image) })
@@ -79,21 +91,75 @@ class BannerPagerView @JvmOverloads constructor(
     }
 
     fun setClosable(closable: Boolean) {
-
+        pagerBannerClose.isVisible = closable
     }
 
     fun closeCurrentPage() {
+        if (pages.size == 1) {
+            callback?.onBannerClosed(pages.first())
+            callback?.onLastPageClosed()
 
+            return // Don't run animation to let close banner from outside
+        }
+
+        if (isClosable && canRunScrollAnimation) {
+            val isLastPageAfterClose = pages.size == 2 // 2 pages befo
+            val nextPage = (currentPage + 1).wrapPage()
+
+            scrollController.setTouchable(false)
+            stopAutoSwipe()
+
+            closeAnimator.removeAllListeners()
+            closeAnimator.removeAllUpdateListeners()
+
+            closeAnimator.setFloatValues(0f, 1f)
+            closeAnimator.addUpdateListener {
+
+                if (isLastPageAfterClose) {
+                    pagerBannerIndicators.alpha = 1f - it.animatedFraction
+                } else {
+                    pagerBannerIndicators.setCloseProgress(it.animatedFraction, currentPage, nextPage)
+                }
+
+                contentController.setAnimationState(it.animatedFraction, currentPage, nextPage)
+                backgroundSwitchingController.setAnimationState(it.animatedFraction, currentPage, nextPage)
+            }
+            closeAnimator.doOnEnd {
+                closePage(currentPage)
+                invalidateScrolling()
+                startAutoSwipe()
+            }
+            closeAnimator.start()
+        }
     }
 
     fun setCallback(callback: Callback?) {
         this.callback = callback
     }
 
+    private fun closePage(index: Int) {
+        contentController.removePageAt(index)
+        backgroundSwitchingController.removePageAt(index)
+        val closedPage = pages.removeAt(index)
+        currentPage = index.wrapPage()
+        pagerBannerIndicators.setPagesSize(pages.size)
+        pagerBannerIndicators.setCurrentPage(currentPage)
+        contentController.showPageImmediately(currentPage)
+        backgroundSwitchingController.showPageImmediately(currentPage)
+
+        callback?.onBannerClosed(closedPage)
+    }
+
+    private fun invalidateScrolling() {
+        scrollController.setTouchable(pages.size > 1)
+    }
+
     override fun onScrollDirectionChanged(toPage: PageOffset) {}
 
     override fun onScrollToPage(pageOffset: Float, toPage: PageOffset) {
-        val nextPage = (toPage.pageOffset + currentPage).wrapPage()
+        if (!canScroll) return
+
+        val nextPage = (currentPage + toPage.pageOffset).wrapPage()
 
         pagerBannerIndicators.setAnimationProgress(pageOffset.absoluteValue, currentPage, nextPage)
 
@@ -110,6 +176,8 @@ class BannerPagerView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
+
         if (event.action == MotionEvent.ACTION_UP) {
             startAutoSwipe()
         } else {
@@ -119,6 +187,11 @@ class BannerPagerView @JvmOverloads constructor(
         val isScrollIntercepted = scrollController.onTouchEvent(event)
         parent.requestDisallowInterceptTouchEvent(isScrollIntercepted)
         return isScrollIntercepted
+    }
+
+    override fun performClick(): Boolean {
+        callback?.onBannerClicked(pages[currentPage])
+        return true
     }
 
     override fun computeScroll() {
@@ -154,17 +227,10 @@ class BannerPagerView @JvmOverloads constructor(
 
     private fun startAutoSwipe() {
         if (autoSwipeCallbackAdded) return
+        if (!canScroll) return
 
         handler?.postDelayed(autoSwipeCallback, autoSwipeDelay)
         autoSwipeCallbackAdded = true
-    }
-
-    private fun Int.animationDirection(): AnimationDirection {
-        return when {
-            this < 0 -> AnimationDirection.LEFT
-            this > 0 -> AnimationDirection.RIGHT
-            else -> AnimationDirection.NONE
-        }
     }
 
     private fun Int.wrapPage(): Int {
@@ -180,8 +246,12 @@ class BannerPagerView @JvmOverloads constructor(
         }
     }
 
-
     interface Callback {
+
+        fun onBannerClicked(page: BannerPageModel)
+
         fun onBannerClosed(page: BannerPageModel)
+
+        fun onLastPageClosed()
     }
 }

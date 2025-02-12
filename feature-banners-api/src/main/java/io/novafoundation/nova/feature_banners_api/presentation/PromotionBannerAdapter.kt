@@ -12,19 +12,19 @@ import kotlinx.android.synthetic.main.item_promotion_banner.view.bannerPager
 import kotlinx.android.synthetic.main.item_promotion_banner.view.bannerShimmering
 
 class PromotionBannerAdapter(
-    private val closable: Boolean,
-    private val bannerCallback: BannerPagerView.Callback?
+    private val closable: Boolean
 ) : SingleItemAdapter<BannerHolder>(isShownByDefault = true) {
 
     private var showShimmering = true
     private var banners: List<BannerPageModel> = listOf()
+    private var bannerCallback: BannerPagerView.Callback? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerHolder {
-        return BannerHolder(parent.inflateChild(R.layout.item_promotion_banner), closable, bannerCallback)
+        return BannerHolder(parent.inflateChild(R.layout.item_promotion_banner), closable)
     }
 
     override fun onBindViewHolder(holder: BannerHolder, position: Int) {
-        holder.bind(showShimmering, banners)
+        holder.bind(showShimmering, banners, bannerCallback)
     }
 
     fun showShimmering(show: Boolean) {
@@ -36,16 +36,21 @@ class PromotionBannerAdapter(
         this.banners = banners
         notifyChangedIfShown()
     }
+
+    fun setCallback(bannerCallback: BannerPagerView.Callback?) {
+        this.bannerCallback = bannerCallback
+        notifyChangedIfShown()
+    }
 }
 
-class BannerHolder(view: View, closable: Boolean, bannerCallback: BannerPagerView.Callback?) : RecyclerView.ViewHolder(view) {
+class BannerHolder(view: View, closable: Boolean) : RecyclerView.ViewHolder(view) {
 
     init {
         itemView.bannerPager.setClosable(closable)
-        itemView.bannerPager.setCallback(bannerCallback)
     }
 
-    fun bind(showShimmering: Boolean, banners: List<BannerPageModel>) = with(itemView) {
+    fun bind(showShimmering: Boolean, banners: List<BannerPageModel>, bannerCallback: BannerPagerView.Callback?) = with(itemView) {
+        bannerPager.setCallback(bannerCallback)
         showShimmering(showShimmering)
         showBanners(banners)
     }

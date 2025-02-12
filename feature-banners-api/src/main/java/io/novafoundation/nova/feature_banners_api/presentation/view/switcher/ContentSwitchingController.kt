@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_banners_api.presentation.ClipableImage
 import io.novafoundation.nova.feature_banners_api.presentation.view.PageView
 
 class ContentSwitchingController(
-    private val clipPadding: Rect,
+    private val clipMargin: Rect,
     rightSwitchingAnimators: InOutAnimators,
     leftSwitchingAnimators: InOutAnimators,
     private val viewFactory: () -> PageView
@@ -28,9 +28,9 @@ class ContentSwitchingController(
             }
 
             if (imageModel.clip) {
-                view.image.setClipPadding(clipPadding)
+                view.setClipMargin(clipMargin)
             } else {
-                view.image.setClipPadding(Rect())
+                view.setClipMargin(Rect())
             }
 
             view

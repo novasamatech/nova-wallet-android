@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_banners_api.presentation.view.switcher
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isInvisible
+import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.animation.FractionAnimator
 
@@ -32,6 +34,8 @@ abstract class SwitchingController<P, V : View>(
     }
 
     fun setAnimationState(animationOffset: Float, from: Int, to: Int) {
+        if (from >= views.size || to >= views.size) return
+
         if (from == to) {
             showPageImmediately(from)
         } else {
@@ -47,11 +51,21 @@ abstract class SwitchingController<P, V : View>(
     }
 
     fun showPageImmediately(index: Int) {
+        if (index >= views.size) return
+
         val (page) = showPagesByIndex(index)
         rightSwitchingAnimators.outAnimator.animate(page, 0f)
     }
 
-    fun showPagesByIndex(vararg indexes: Int): List<V> {
+    // Pay attention that after using this method removed view is still contains in its parents
+    // We do it this way to have the same size of banners after remove a page
+    fun removePageAt(pageToRemove: Int) {
+        val removedView = views[pageToRemove]
+        views = views.removed { removedView == it }
+        removedView.isInvisible = true
+    }
+
+    private fun showPagesByIndex(vararg indexes: Int): List<V> {
         views.forEachIndexed { index, view ->
             view.setVisible(index in indexes, falseState = View.INVISIBLE)
         }

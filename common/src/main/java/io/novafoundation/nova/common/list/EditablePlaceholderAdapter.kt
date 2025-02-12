@@ -11,11 +11,11 @@ import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.PlaceholderModel
 import kotlinx.android.synthetic.main.item_placeholder.view.itemPlaceholder
 
-class EditablePlaceholderAdapter : SingleItemAdapter<EditableStubHolder>() {
-
-    private var model: PlaceholderModel? = null
-    private var padding: ViewSpace? = null
+class EditablePlaceholderAdapter(
+    private var model: PlaceholderModel? = null,
+    private var padding: ViewSpace? = null,
     private var clickListener: OnClickListener? = null
+) : SingleItemAdapter<EditableStubHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStubHolder {
         return EditableStubHolder(parent.inflateChild(R.layout.item_placeholder))

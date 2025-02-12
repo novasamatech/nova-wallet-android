@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@id/pagerBannerTitle"
         app:layout_constraintVertical_bias="0" />
 
-    <io.novafoundation.nova.common.view.ClipableImageView
+    <ImageView
         android:id="@+id/pagerBannerImage"
         android:layout_width="202dp"
         android:layout_height="0dp"

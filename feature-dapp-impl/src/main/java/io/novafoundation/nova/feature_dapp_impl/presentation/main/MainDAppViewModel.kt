@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Browserable
@@ -38,7 +39,7 @@ class MainDAppViewModel(
     val selectedWalletFlow = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.dappsSource())
+    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.dappsSource(), viewModelScope)
 
     private val favoriteDAppsFlow = dappInteractor.observeFavoriteDApps()
         .shareInBackground()

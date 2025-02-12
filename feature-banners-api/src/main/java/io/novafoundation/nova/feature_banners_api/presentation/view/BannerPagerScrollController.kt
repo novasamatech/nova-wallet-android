@@ -31,15 +31,19 @@ class BannerPagerScrollController(private val context: Context, private val call
     private val scrollTracking: ScrollTracking = ScrollTracking()
     private var containerWidth = 0
 
+    private var isTouchable: Boolean = true
+
+    fun setTouchable(touchable: Boolean) {
+        isTouchable = touchable
+    }
+
     fun setContainerWidth(width: Int) {
         this.containerWidth = width
     }
 
-    fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        return false
-    }
-
     fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!isTouchable) return false
+
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 scrollTracking.onStartScroll(context, event.x)
@@ -133,6 +137,10 @@ class BannerPagerScrollController(private val context: Context, private val call
     fun swipeToPage(next: PageOffset) {
         callback.onScrollDirectionChanged(next)
         smoothScrollToPage(next, 0f)
+    }
+
+    fun isIdle(): Boolean {
+        return scrollTracking.state == ScrollTracking.State.IDLE
     }
 }
 
