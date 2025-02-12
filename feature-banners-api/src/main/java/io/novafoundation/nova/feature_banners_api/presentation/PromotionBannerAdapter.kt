@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_banners_api.presentation
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.SingleItemAdapter
