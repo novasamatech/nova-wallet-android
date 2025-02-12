@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_banners_api.domain.PromotionBanner
 import io.novafoundation.nova.common.utils.asyncWithContext
 import io.novafoundation.nova.common.utils.toMap
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_banners_api.presentation.BannerPageModel
 import io.novafoundation.nova.feature_banners_api.presentation.ClipableImage
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixin
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSou
 import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RealPromotionBannersMixinFactory(
@@ -31,13 +33,12 @@ class RealPromotionBannersMixinFactory(
     private val promotionBannersInteractor: PromotionBannersInteractor
 ) : PromotionBannersMixinFactory {
 
-    override fun create(source: BannersSource, coroutineScope: CoroutineScope): PromotionBannersMixin {
+    override fun create(source: BannersSource): PromotionBannersMixin {
         return RealPromotionBannersMixin(
             promotionBannersInteractor,
             imageLoader,
             context,
-            source,
-            coroutineScope
+            source
         )
     }
 }
@@ -46,30 +47,17 @@ class RealPromotionBannersMixin(
     private val promotionBannersInteractor: PromotionBannersInteractor,
     private val imageLoader: ImageLoader,
     private val context: Context,
-    private val bannersSource: BannersSource,
-    private val coroutineScope: CoroutineScope
+    private val bannersSource: BannersSource
 ) : PromotionBannersMixin {
 
-    override val bannersFlow: MutableStateFlow<ExtendedLoadingState<List<BannerPageModel>>> = MutableStateFlow(ExtendedLoadingState.Loading)
-
-    init {
-        coroutineScope.launch {
-            runCatching {
-                val banners = bannersSource.getBanners()
-                val resources = loadResources(banners)
-
-                banners.map { mapBanner(it, resources) }
-            }.onSuccess { bannersFlow.value = it.asLoaded() }
-                .onFailure { bannersFlow.value = it.asError() }
-        }
-    }
+    override val bannersFlow = bannersSource.observeBanners()
+        .map { banners ->
+            val resources = loadResources(banners)
+            banners.map { mapBanner(it, resources) }
+        }.withSafeLoading()
 
     override fun closeBanner(banner: BannerPageModel) {
         promotionBannersInteractor.closeBanner(banner.id)
-    }
-
-    override fun closeAllBanners() {
-        bannersFlow.value = emptyList<BannerPageModel>().asLoaded()
     }
 
     override fun handleBannerAction(page: BannerPageModel) {

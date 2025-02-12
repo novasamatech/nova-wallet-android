@@ -11,6 +11,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.ViewClickGestureDetector
 import io.novafoundation.nova.common.utils.indexOfOrNull
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_banners_api.R
 import io.novafoundation.nova.feature_banners_api.presentation.BannerPageModel
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ContentSwitchingController
@@ -79,6 +80,10 @@ class BannerPagerView @JvmOverloads constructor(
     }
 
     fun setBanners(banners: List<BannerPageModel>) {
+        val newIds = banners.mapToSet { it.id }
+        val currentIds = pages.mapToSet { it.id }
+        if (newIds == currentIds) return // Check that pages not changed
+
         this.pages.clear()
         this.pages.addAll(banners)
         pagerBannerIndicators.setPagesSize(pages.size)
@@ -99,7 +104,6 @@ class BannerPagerView @JvmOverloads constructor(
     fun closeCurrentPage() {
         if (pages.size == 1) {
             callback?.onBannerClosed(pages.first())
-            callback?.onLastPageClosed()
 
             return // Don't run animation to let close banner from outside
         }
@@ -250,7 +254,5 @@ class BannerPagerView @JvmOverloads constructor(
         fun onBannerClicked(page: BannerPageModel)
 
         fun onBannerClosed(page: BannerPageModel)
-
-        fun onLastPageClosed()
     }
 }

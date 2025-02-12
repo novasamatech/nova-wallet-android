@@ -84,7 +84,7 @@ class BalanceListViewModel(
     private val _showBalanceBreakdownEvent = MutableLiveData<Event<TotalBalanceBreakdownModel>>()
     val showBalanceBreakdownEvent: LiveData<Event<TotalBalanceBreakdownModel>> = _showBalanceBreakdownEvent
 
-    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.assetsSource(), viewModelScope)
+    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.assetsSource())
 
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
         .inBackground()

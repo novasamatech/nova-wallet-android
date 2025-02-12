@@ -35,7 +35,7 @@ class MainDAppFragment :
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this) }
 
-    private val bannerAdapter: PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) { PromotionBannerAdapter(closable = false) }
+    private val bannerAdapter: PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) { PromotionBannerAdapter(closable = true) }
 
     private val favoritesAdapter: MainFavoriteDAppsAdapter by lazy(LazyThreadSafetyMode.NONE) { MainFavoriteDAppsAdapter(this, this, imageLoader) }
 

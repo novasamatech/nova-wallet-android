@@ -15,10 +15,6 @@ fun <T : BaseViewModel> PromotionBannersMixin.bindWithAdapter(adapter: Promotion
         override fun onBannerClosed(page: BannerPageModel) {
             this@bindWithAdapter.closeBanner(page)
         }
-
-        override fun onLastPageClosed() {
-            this@bindWithAdapter.closeAllBanners()
-        }
     })
 
     bannersFlow.observe {
