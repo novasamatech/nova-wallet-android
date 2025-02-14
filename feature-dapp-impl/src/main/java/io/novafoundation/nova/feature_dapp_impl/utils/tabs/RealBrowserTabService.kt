@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import io.novafoundation.nova.common.utils.CallbackLruCache
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.share
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.getDAppIfSyncedOrSync
@@ -24,6 +25,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class RealBrowserTabService(
     private val dAppMetadataRepository: DAppMetadataRepository,
@@ -34,6 +37,8 @@ class RealBrowserTabService(
     private val browserTabSessionFactory: BrowserTabSessionFactory,
     private val rootScope: RootScope
 ) : BrowserTabService, CoroutineScope by rootScope, OnPageChangedCallback {
+
+    private val createTabMutex = Mutex()
 
     private val availableSessionsCount = tabMemoryRestrictionService.getMaximumActiveSessions()
 
@@ -53,7 +58,7 @@ class RealBrowserTabService(
             tabs = allTabs.values.toList(),
             selectedTab = currentTabState(selectedTabId, allTabs)
         )
-    }
+    }.share()
 
     init {
         activeSessions.setOnEntryRemovedCallback {
@@ -132,12 +137,14 @@ class RealBrowserTabService(
     }
 
     private suspend fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
-        val tabId = selectedTabId ?: return CurrentTabState.NotSelected
-        val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
-        return CurrentTabState.Selected(
-            tab,
-            activeSessions[tabId] ?: addNewSession(tab)
-        )
+        return createTabMutex.withLock {
+            val tabId = selectedTabId ?: return CurrentTabState.NotSelected
+            val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
+            CurrentTabState.Selected(
+                tab,
+                activeSessions[tabId] ?: addNewSession(tab)
+            )
+        }
     }
 
     /*
