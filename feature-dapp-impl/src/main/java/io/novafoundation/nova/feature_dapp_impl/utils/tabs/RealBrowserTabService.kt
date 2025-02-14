@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import io.novafoundation.nova.common.utils.CallbackLruCache
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.share
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.getDAppIfSyncedOrSync
@@ -57,7 +58,7 @@ class RealBrowserTabService(
             tabs = allTabs.values.toList(),
             selectedTab = currentTabState(selectedTabId, allTabs)
         )
-    }
+    }.share()
 
     init {
         activeSessions.setOnEntryRemovedCallback {
