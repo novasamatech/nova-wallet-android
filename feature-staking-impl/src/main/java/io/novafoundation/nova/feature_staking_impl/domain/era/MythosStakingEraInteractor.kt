@@ -36,6 +36,6 @@ class MythosStakingEraInteractor(
     }
 
     private fun MythosSessionDurationCalculator.firstRewardDelay(): Duration {
-        return remainingSessionDuration() + sessionDuration()
+        return remainingSessionDuration()
     }
 }
