@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.mythos
 
 import dagger.Binds
 import dagger.Module
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
+import io.novafoundation.nova.feature_staking_impl.data.mythos.RealMythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosCandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosSessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
@@ -95,4 +97,8 @@ interface MythosBindsModule {
 
     @Binds
     fun bindValidationFormatter(implementation: RealMythosStakingValidationFailureFormatter): MythosStakingValidationFailureFormatter
+
+
+    @Binds
+    fun bindMainPotMatcherFactory(implementation: RealMythosMainPotMatcherFactory): MythosMainPotMatcherFactory
 }
