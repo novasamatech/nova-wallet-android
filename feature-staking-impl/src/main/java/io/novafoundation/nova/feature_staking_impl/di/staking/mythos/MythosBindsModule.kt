@@ -98,7 +98,6 @@ interface MythosBindsModule {
     @Binds
     fun bindValidationFormatter(implementation: RealMythosStakingValidationFailureFormatter): MythosStakingValidationFailureFormatter
 
-
     @Binds
     fun bindMainPotMatcherFactory(implementation: RealMythosMainPotMatcherFactory): MythosMainPotMatcherFactory
 }

@@ -14,7 +14,7 @@ import javax.inject.Inject
 @FeatureScope
 class RealMythosMainPotMatcherFactory @Inject constructor(
     private val mythosStakingRepository: MythosStakingRepository
-): MythosMainPotMatcherFactory {
+) : MythosMainPotMatcherFactory {
 
     private val fetchMutex = Mutex()
     private var cache: SystemAccountMatcher? = null

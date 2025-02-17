@@ -2,10 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.common.utils.constantOrNull
 import io.novafoundation.nova.common.utils.nominationPoolsOrNull
-import io.novafoundation.nova.common.utils.startsWith
 import io.novafoundation.nova.common.utils.toByteArray
 import io.novafoundation.nova.feature_account_api.domain.account.system.PrefixSystemAccountMatcher
 import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher

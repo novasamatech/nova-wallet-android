@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBro
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
-import java.math.BigInteger
 
 class DAppNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,

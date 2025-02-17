@@ -5,7 +5,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class PrefixSystemAccountMatcher(private val prefix: ByteArray) : SystemAccountMatcher {
 
-    constructor(utf8Prefix: String): this(utf8Prefix.encodeToByteArray())
+    constructor(utf8Prefix: String) : this(utf8Prefix.encodeToByteArray())
 
     override fun isSystemAccount(accountId: AccountId): Boolean {
         return accountId.startsWith(prefix)

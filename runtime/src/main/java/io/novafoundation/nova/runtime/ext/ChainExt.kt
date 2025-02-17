@@ -186,8 +186,6 @@ fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
     }
 }
 
-
-
 fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
     return group() == StakingTypeGroup.NOMINATION_POOL
 }
