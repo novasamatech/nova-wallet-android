@@ -34,7 +34,6 @@ interface MythosStakingValidationFailureFormatter {
 @FeatureScope
 class RealMythosStakingValidationFailureFormatter @Inject constructor(
     private val resourceManager: ResourceManager,
-    private val router: MythosStakingRouter
 ) : MythosStakingValidationFailureFormatter {
 
     override fun formatStartStaking(failure: ValidationStatus.NotValid<StartMythosStakingValidationFailure>): TransformedFailure {
@@ -44,8 +43,6 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
             StartMythosStakingValidationFailure.NotEnoughStakeableBalance -> resourceManager.amountIsTooBig().asDefault()
 
             StartMythosStakingValidationFailure.NotPositiveAmount -> resourceManager.zeroAmount().asDefault()
-
-            StartMythosStakingValidationFailure.HasNotClaimedRewards -> hasPendingRewardFailure()
 
             is StartMythosStakingValidationFailure.TooLowStakeAmount -> {
                 val formattedMinStake = mapAmountToAmountModel(reason.minimumStake, reason.asset).token
@@ -60,8 +57,6 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
 
     override fun formatUnbond(failure: ValidationStatus.NotValid<UnbondMythosStakingValidationFailure>): TransformedFailure {
         return when (val reason = failure.reason) {
-            UnbondMythosStakingValidationFailure.HasNotClaimedRewards -> hasPendingRewardFailure()
-
             is UnbondMythosStakingValidationFailure.NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(reason, resourceManager).asDefault()
 
             is UnbondMythosStakingValidationFailure.ReleaseRequestsLimitReached -> {
@@ -87,15 +82,4 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
             is MythosClaimRewardsValidationFailure.NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(reason, resourceManager)
         }
     }
-
-    private fun hasPendingRewardFailure() = TransformedFailure.Custom(
-        dialogPayload = CustomDialogDisplayer.Payload(
-            title = resourceManager.getString(R.string.staking_myth_start_validation_pending_rewards_title),
-            message = resourceManager.getString(R.string.staking_myth_start_validation_pending_rewards_description),
-            okAction = DialogAction(
-                title = resourceManager.getString(R.string.common_claim),
-                action = { router.openClaimRewards() }
-            )
-        )
-    )
 }

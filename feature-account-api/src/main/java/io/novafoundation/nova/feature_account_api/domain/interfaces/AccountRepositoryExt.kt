@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_account_api.domain.interfaces
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -16,6 +18,11 @@ suspend fun AccountRepository.requireIdOfSelectedMetaAccountIn(chain: Chain): Ac
 
     return metaAccount.requireAccountIdIn(chain)
 }
+
+suspend fun AccountRepository.requireIdKeyOfSelectedMetaAccountIn(chain: Chain): AccountIdKey {
+    return requireIdOfSelectedMetaAccountIn(chain).intoKey()
+}
+
 
 suspend fun AccountRepository.getIdOfSelectedMetaAccountIn(chain: Chain): AccountId? {
     val metaAccount = getSelectedMetaAccount()

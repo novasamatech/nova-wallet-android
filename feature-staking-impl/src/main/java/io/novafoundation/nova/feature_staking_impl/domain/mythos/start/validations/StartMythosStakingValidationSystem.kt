@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validati
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.validations.MythosNoPendingRewardsValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
@@ -13,7 +12,6 @@ typealias StartMythosStakingValidation = Validation<StartMythosStakingValidation
 
 fun ValidationSystem.Companion.mythosStakingStart(
     minimumDelegationValidationFactory: MythosMinimumDelegationValidationFactory,
-    hasPendingRewardsValidationFactory: MythosNoPendingRewardsValidationFactory
 ): StartMythosStakingValidationSystem = ValidationSystem {
     positiveAmount(
         amount = { it.amount },
@@ -22,23 +20,12 @@ fun ValidationSystem.Companion.mythosStakingStart(
 
     minimumDelegationValidationFactory.minimumDelegation()
 
-    hasPendingRewardsValidationFactory.noPendingRewards()
-
     enoughToPayFees()
 
     // We should have both this and enoughStakeableAfterFees since we want to show different error messages in those two different cases
     enoughStakeable()
 
     enoughStakeableAfterFees()
-}
-
-context(StartMythosStakingValidationSystemBuilder)
-private fun MythosNoPendingRewardsValidationFactory.noPendingRewards() {
-    noPendingRewards(
-        delegatorState = { it.delegatorState },
-        chainId = { it.chainId },
-        error = { StartMythosStakingValidationFailure.HasNotClaimedRewards }
-    )
 }
 
 private fun StartMythosStakingValidationSystemBuilder.enoughToPayFees() {
