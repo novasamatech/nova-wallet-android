@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsComponentFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.mythos.MythosAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.nominationPools.NominationPoolsAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.parachain.ParachainAlertsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.relaychain.RelaychainAlertsComponentFactory
@@ -53,8 +54,15 @@ class ComponentsModule {
         relaychainComponentFactory: RelaychainAlertsComponentFactory,
         parachainComponentFactory: ParachainAlertsComponentFactory,
         nominationPoolsFactory: NominationPoolsAlertsComponentFactory,
+        mythos: MythosAlertsComponentFactory,
         compoundStakingComponentFactory: CompoundStakingComponentFactory,
-    ) = AlertsComponentFactory(relaychainComponentFactory, parachainComponentFactory, nominationPoolsFactory, compoundStakingComponentFactory)
+    ) = AlertsComponentFactory(
+        relaychainComponentFactory = relaychainComponentFactory,
+        parachainAlertsComponentFactory = parachainComponentFactory,
+        nominationPoolsFactory = nominationPoolsFactory,
+        mythos = mythos,
+        compoundStakingComponentFactory = compoundStakingComponentFactory
+    )
 
     @Provides
     @ScreenScope

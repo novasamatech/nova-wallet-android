@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.mythos.common
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.data.memory.SharedComputation
@@ -9,8 +11,10 @@ import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculator
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythCandidateInfos
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosCandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
@@ -30,6 +34,7 @@ class MythosSharedComputation @Inject constructor(
     private val mythosSessionDurationCalculatorFactory: MythosSessionDurationCalculatorFactory,
     private val candidatesRepository: MythosCandidatesRepository,
     private val rewardCalculatorFactory: MythosStakingRewardCalculatorFactory,
+    private val userStakeRepository: MythosUserStakeRepository,
     computationalCache: ComputationalCache
 ) : SharedComputation(computationalCache) {
 
@@ -72,6 +77,13 @@ class MythosSharedComputation @Inject constructor(
     suspend fun rewardCalculator(chainId: ChainId): MythosStakingRewardCalculator {
         return cachedValue("MythosSharedComputation.rewardCalculator", chainId) {
             rewardCalculatorFactory.create(chainId)
+        }
+    }
+
+    context(ComputationalScope)
+    fun releaseQueuesFlow(chainId: ChainId, accountId: AccountIdKey): Flow<List<MythReleaseRequest>> {
+        return cachedFlow("MythosSharedComputation.releaseQueuesFlow", chainId, accountId.toHex()) {
+            userStakeRepository.releaseQueuesFlow(chainId, accountId)
         }
     }
 }

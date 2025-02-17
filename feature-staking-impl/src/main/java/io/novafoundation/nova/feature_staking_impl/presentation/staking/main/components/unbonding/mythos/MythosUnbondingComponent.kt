@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.mythos
 
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -45,7 +45,7 @@ private class MythosUnbondingComponent(
     private val hostContext: ComponentHostContext,
     private val router: MythosStakingRouter
 ) : UnbondingComponent,
-    CoroutineScope by hostContext.scope,
+    ComputationalScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
 
     override val events = MutableLiveData<Event<UnbondingEvent>>()
