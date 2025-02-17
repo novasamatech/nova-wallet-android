@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.MythosClaimRewardsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.mythosClaimRewards
-import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.validations.MythosNoPendingRewardsValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.RedeemMythosValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.mythosRedeem
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.MythosMinimumDelegationValidationFactory
@@ -23,18 +22,16 @@ class MythosModule {
     @FeatureScope
     fun provideStartStakingValidationSystem(
         minimumDelegationValidationFactory: MythosMinimumDelegationValidationFactory,
-        hasPendingRewardsValidationFactory: MythosNoPendingRewardsValidationFactory
     ): StartMythosStakingValidationSystem {
-        return ValidationSystem.mythosStakingStart(minimumDelegationValidationFactory, hasPendingRewardsValidationFactory)
+        return ValidationSystem.mythosStakingStart(minimumDelegationValidationFactory)
     }
 
     @Provides
     @FeatureScope
     fun provideUnbondValidationSystem(
-        hasPendingRewardsValidationFactory: MythosNoPendingRewardsValidationFactory,
         releaseRequestLimitNotReachedValidation: MythosReleaseRequestLimitNotReachedValidationFactory
     ): UnbondMythosValidationSystem {
-        return ValidationSystem.mythosUnbond(hasPendingRewardsValidationFactory, releaseRequestLimitNotReachedValidation)
+        return ValidationSystem.mythosUnbond(releaseRequestLimitNotReachedValidation)
     }
 
     @Provides

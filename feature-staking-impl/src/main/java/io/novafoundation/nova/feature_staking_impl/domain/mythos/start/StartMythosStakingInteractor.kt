@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSh
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.requiredAdditionalLockToStake
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.stakedCollatorsCount
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.rewards.MythosClaimPendingRewardsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -58,7 +59,8 @@ class RealStartMythosStakingInteractor @Inject constructor(
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
     private val chainStateRepository: ChainStateRepository,
-    private val stakingRepository: MythosStakingRepository
+    private val stakingRepository: MythosStakingRepository,
+    private val claimPendingRewardsUseCase: MythosClaimPendingRewardsUseCase,
 ) : StartMythosStakingInteractor {
 
     context(ComputationalScope)
@@ -72,7 +74,10 @@ class RealStartMythosStakingInteractor @Inject constructor(
         amount: Balance
     ): Fee {
         val chain = stakingSharedState.chain()
+
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+            claimPendingRewardsUseCase.claimPendingRewards(chain)
+
             stakeMore(chain, currentState, candidate, amount)
         }
     }
@@ -81,6 +86,8 @@ class RealStartMythosStakingInteractor @Inject constructor(
         val chain = stakingSharedState.chain()
 
         return extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.SelectedWallet) {
+            claimPendingRewardsUseCase.claimPendingRewards(chain)
+
             stakeMore(chain, currentState, candidate, amount)
         }
             .requireOk()

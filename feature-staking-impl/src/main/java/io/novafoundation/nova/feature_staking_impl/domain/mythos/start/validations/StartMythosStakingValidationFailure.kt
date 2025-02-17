@@ -18,8 +18,6 @@ sealed class StartMythosStakingValidationFailure {
 
     object NotEnoughStakeableBalance : StartMythosStakingValidationFailure()
 
-    object HasNotClaimedRewards : StartMythosStakingValidationFailure()
-
     class TooLowStakeAmount(
         val minimumStake: Balance,
         val asset: Asset

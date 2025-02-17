@@ -96,9 +96,9 @@ private class MythosStakeActionsComponent(
 
         if (delegatorState.hasStakedCollators()) {
             add(ManageStakeAction.unbond(resourceManager))
-        }
 
-        val collatorsCount = delegatorState.userStakeInfo.candidates.size.format()
-        add(ManageStakeAction.collators(resourceManager, collatorsCount))
+            val collatorsCount = delegatorState.userStakeInfo.candidates.size.format()
+            add(ManageStakeAction.collators(resourceManager, collatorsCount))
+        }
     }
 }

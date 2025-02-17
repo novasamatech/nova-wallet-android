@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.unstakeFrom
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.delegationAmountTo
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.rewards.MythosClaimPendingRewardsUseCase
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import javax.inject.Inject
@@ -28,11 +29,14 @@ interface UnbondMythosStakingInteractor {
 class RealUnbondMythosStakingInteractor @Inject constructor(
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
+    private val claimPendingRewardsUseCase: MythosClaimPendingRewardsUseCase,
 ) : UnbondMythosStakingInteractor {
 
     override suspend fun estimateFee(delegatorState: MythosDelegatorState, candidate: AccountIdKey): Fee {
         val chain = stakingSharedState.chain()
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+            claimPendingRewardsUseCase.claimPendingRewards(chain)
+
             unbond(delegatorState, candidate)
         }
     }
@@ -41,6 +45,8 @@ class RealUnbondMythosStakingInteractor @Inject constructor(
         val chain = stakingSharedState.chain()
 
         return extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.SelectedWallet) {
+            claimPendingRewardsUseCase.claimPendingRewards(chain)
+
             unbond(delegatorState, candidate)
         }
             .requireOk()

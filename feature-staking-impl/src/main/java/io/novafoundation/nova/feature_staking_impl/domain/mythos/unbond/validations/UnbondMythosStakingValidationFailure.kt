@@ -12,7 +12,5 @@ sealed class UnbondMythosStakingValidationFailure {
         override val fee: BigDecimal
     ) : UnbondMythosStakingValidationFailure(), NotEnoughToPayFeesError
 
-    object HasNotClaimedRewards : UnbondMythosStakingValidationFailure()
-
     class ReleaseRequestsLimitReached(val limit: Int) : UnbondMythosStakingValidationFailure()
 }

@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.v
 
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -13,7 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.va
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.RedeemMythosStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.validations.UnbondMythosStakingValidationFailure
-import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
@@ -34,7 +31,6 @@ interface MythosStakingValidationFailureFormatter {
 @FeatureScope
 class RealMythosStakingValidationFailureFormatter @Inject constructor(
     private val resourceManager: ResourceManager,
-    private val router: MythosStakingRouter
 ) : MythosStakingValidationFailureFormatter {
 
     override fun formatStartStaking(failure: ValidationStatus.NotValid<StartMythosStakingValidationFailure>): TransformedFailure {
@@ -44,8 +40,6 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
             StartMythosStakingValidationFailure.NotEnoughStakeableBalance -> resourceManager.amountIsTooBig().asDefault()
 
             StartMythosStakingValidationFailure.NotPositiveAmount -> resourceManager.zeroAmount().asDefault()
-
-            StartMythosStakingValidationFailure.HasNotClaimedRewards -> hasPendingRewardFailure()
 
             is StartMythosStakingValidationFailure.TooLowStakeAmount -> {
                 val formattedMinStake = mapAmountToAmountModel(reason.minimumStake, reason.asset).token
@@ -60,8 +54,6 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
 
     override fun formatUnbond(failure: ValidationStatus.NotValid<UnbondMythosStakingValidationFailure>): TransformedFailure {
         return when (val reason = failure.reason) {
-            UnbondMythosStakingValidationFailure.HasNotClaimedRewards -> hasPendingRewardFailure()
-
             is UnbondMythosStakingValidationFailure.NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(reason, resourceManager).asDefault()
 
             is UnbondMythosStakingValidationFailure.ReleaseRequestsLimitReached -> {
@@ -87,15 +79,4 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
             is MythosClaimRewardsValidationFailure.NotEnoughBalanceToPayFees -> handleNotEnoughFeeError(reason, resourceManager)
         }
     }
-
-    private fun hasPendingRewardFailure() = TransformedFailure.Custom(
-        dialogPayload = CustomDialogDisplayer.Payload(
-            title = resourceManager.getString(R.string.staking_myth_start_validation_pending_rewards_title),
-            message = resourceManager.getString(R.string.staking_myth_start_validation_pending_rewards_description),
-            okAction = DialogAction(
-                title = resourceManager.getString(R.string.common_claim),
-                action = { router.openClaimRewards() }
-            )
-        )
-    )
 }
