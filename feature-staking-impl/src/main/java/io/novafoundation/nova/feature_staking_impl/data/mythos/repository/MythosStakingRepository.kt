@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.mythos.repository
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.collatorStaking
@@ -31,7 +32,7 @@ interface MythosStakingRepository {
 
     suspend fun maxDelegatorsPerCollator(chainId: ChainId): Int
 
-    suspend fun unstakeDurationInSessions(chainId: ChainId): Int
+    suspend fun unstakeDurationInBlocks(chainId: ChainId): BlockNumber
 
     suspend fun maxReleaseRequests(chainId: ChainId): Int
 
@@ -71,9 +72,9 @@ class RealMythosStakingRepository @Inject constructor(
         }
     }
 
-    override suspend fun unstakeDurationInSessions(chainId: ChainId): Int {
+    override suspend fun unstakeDurationInBlocks(chainId: ChainId): BlockNumber {
         return chainRegistry.withRuntime(chainId) {
-            metadata.collatorStaking().numberConstant("StakeUnlockDelay").toInt()
+            metadata.collatorStaking().numberConstant("StakeUnlockDelay")
         }
     }
 
