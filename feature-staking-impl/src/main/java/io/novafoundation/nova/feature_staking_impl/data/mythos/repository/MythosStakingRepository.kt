@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.data.mythos.repository
 
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.collatorStaking
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorRewardPercentage
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.extraReward
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.minStake
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
@@ -31,6 +34,10 @@ interface MythosStakingRepository {
     suspend fun unstakeDurationInSessions(chainId: ChainId): Int
 
     suspend fun maxReleaseRequests(chainId: ChainId): Int
+
+    suspend fun perBlockReward(chainId: ChainId): Balance
+
+    suspend fun collatorCommission(chainId: ChainId): Fraction
 }
 
 @FeatureScope
@@ -72,5 +79,17 @@ class RealMythosStakingRepository @Inject constructor(
 
     override suspend fun maxReleaseRequests(chainId: ChainId): Int {
         return maxCollatorsPerDelegator(chainId)
+    }
+
+    override suspend fun perBlockReward(chainId: ChainId): Balance {
+        return localStorageDataSource.query(chainId) {
+            metadata.collatorStaking.extraReward.queryNonNull()
+        }
+    }
+
+    override suspend fun collatorCommission(chainId: ChainId): Fraction {
+        return localStorageDataSource.query(chainId) {
+            metadata.collatorStaking.collatorRewardPercentage.queryNonNull()
+        }
     }
 }

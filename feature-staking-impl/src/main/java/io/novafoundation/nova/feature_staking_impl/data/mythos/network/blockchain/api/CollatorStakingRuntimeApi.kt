@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockcha
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.bindPercentFraction
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythCandidateInfo
@@ -41,6 +43,14 @@ val CollatorStakingRuntimeApi.userStake: QueryableStorageEntry1<AccountId, UserS
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.minStake: QueryableStorageEntry0<Balance>
     get() = storage0("MinStake", binding = ::bindNumber)
+
+context(RuntimeContext)
+val CollatorStakingRuntimeApi.extraReward: QueryableStorageEntry0<Balance>
+    get() = storage0("ExtraReward", binding = ::bindNumber)
+
+context(RuntimeContext)
+val CollatorStakingRuntimeApi.collatorRewardPercentage: QueryableStorageEntry0<Fraction>
+    get() = storage0("CollatorRewardPercentage", binding = ::bindPercentFraction)
 
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.candidates: QueryableStorageEntry1<AccountIdKey, MythCandidateInfo>

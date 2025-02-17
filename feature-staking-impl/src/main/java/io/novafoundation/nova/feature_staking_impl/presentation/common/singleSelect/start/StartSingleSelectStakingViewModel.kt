@@ -151,7 +151,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
     val rewardsComponent = rewardsComponentFactory.create(
         computationalScope = this,
         assetFlow = assetFlow,
-        selectedAmount = amountChooserMixin.amount,
+        selectedAmount = resultingStakedAmountFlow,
         selectedTarget = selectedTargetIdFlow
     )
 

@@ -47,12 +47,4 @@ private fun calculateSimplePercentage(days: Int, dailyPercentage: Double): Doubl
     return dailyPercentage * days
 }
 
-suspend fun RewardCalculator.calculateMaxPeriodReturns(
-    days: Int,
-) = calculateMaxReturns(
-    amount = BigDecimal.ONE,
-    days = days,
-    isCompound = true,
-).gainFraction
-
 fun aprToApy(apr: Double) = exp(apr) - 1.0

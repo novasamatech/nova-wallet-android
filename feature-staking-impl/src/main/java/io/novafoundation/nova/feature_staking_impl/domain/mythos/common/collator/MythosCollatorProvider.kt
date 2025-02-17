@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collato
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -49,11 +48,14 @@ class RealMythosCollatorProvider @Inject constructor(
 
         if (requestedCollatorIds.isEmpty()) return emptyList()
 
-        val collatorStakes = mythosSharedComputation.get().candidateInfos(chainId)
-        val sessionValidators = mythosSharedComputation.get().sessionValidators(chainId).toSet()
+        val sharedComputation = mythosSharedComputation.get()
+
+        val collatorStakes = sharedComputation.candidateInfos(chainId)
 
         val accountIdsRaw = requestedCollatorIds.map { it.value }
         val identities = identityRepository.getIdentitiesFromIds(accountIdsRaw, chainId)
+
+        val rewardCalculator = sharedComputation.rewardCalculator(chainId)
 
         return requestedCollatorIds.mapNotNull { collatorId ->
             // if elected does not have a stake entry, it means it is invulnerable => ignore it
@@ -64,8 +66,7 @@ class RealMythosCollatorProvider @Inject constructor(
                 identity = identities[collatorId],
                 totalStake = collatorStake.stake,
                 delegators = collatorStake.stakers,
-                // TODO APY calculation
-                apr = Fraction.ZERO.takeIf { collatorId in sessionValidators }
+                apr = rewardCalculator.collatorApr(collatorId)
             )
         }
     }

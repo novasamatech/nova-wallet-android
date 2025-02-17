@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import java.math.BigDecimal
+import java.math.BigInteger
 
 @JvmInline
 value class Fraction private constructor(private val value: Double) : Comparable<Fraction> {
@@ -17,6 +18,9 @@ value class Fraction private constructor(private val value: Double) : Comparable
             get() = toFraction(FractionUnit.PERCENT)
 
         val BigDecimal.percents: Fraction
+            get() = toDouble().percents
+
+        val BigInteger.percents: Fraction
             get() = toDouble().percents
 
         val BigDecimal.fractions: Fraction
