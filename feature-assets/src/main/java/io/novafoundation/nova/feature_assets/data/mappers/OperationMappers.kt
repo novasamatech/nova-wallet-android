@@ -194,7 +194,8 @@ private fun mapDirectRewardFromLocal(
         isReward = local.isReward,
         eventId = local.eventId,
         kind = RewardKind.Direct(
-            era = local.era,
+            // For a null value of Int? field, Room inserts zero when this Int? is used in Join
+            era = local.era.takeIf { it != 0 },
             validator = local.validator
         ),
         fiatAmount = coinRate?.convertPlanks(chainAsset, local.amount)

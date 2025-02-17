@@ -107,7 +107,8 @@ class StakingDashboardUpdaterFactory(
             stakingDashboardCache = stakingDashboardCache,
             balanceLocksRepository = balanceLocksRepository,
             storageCache = storageCache,
-            remoteStorageSource = remoteStorageSource
+            remoteStorageSource = remoteStorageSource,
+            stakingStatsFlow = stakingStatsFlow
         )
     }
 }

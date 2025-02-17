@@ -363,7 +363,7 @@ suspend fun mapOperationToParcel(
                         time = time,
                         amount = amount,
                         type = resourceManager.getString(typeRes),
-                        era = resourceManager.getString(R.string.staking_era_index_no_prefix, rewardKind.era),
+                        era = rewardKind.era?.let { resourceManager.getString(R.string.staking_era_index_no_prefix, it) },
                         validator = rewardKind.validator,
                         statusAppearance = OperationStatusAppearance.COMPLETED
                     )

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_api.di
 
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTasksRepository
@@ -23,4 +24,6 @@ interface StakingFeatureApi {
     val poolDisplayUseCase: PoolDisplayUseCase
 
     val poolAccountDerivation: PoolAccountDerivation
+
+    val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory
 }
