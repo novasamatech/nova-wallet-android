@@ -87,10 +87,10 @@ class RealMythosStakingRewardCalculator(
     }
 
     private fun calculateCollatorApr(collator: MythosStakingRewardTarget): Double {
-        return calculatorApr(collator.totalStake.toDouble())
+        return collatorApr(collator.totalStake.toDouble())
     }
 
-    private fun calculatorApr(collatorStake: Double): Double {
+    private fun collatorApr(collatorStake: Double): Double {
         val perCollatorRewards = yearlyEmission / collators.size * (1 - collatorCommissionFraction)
         val minUserStake = minStake.toDouble()
 
