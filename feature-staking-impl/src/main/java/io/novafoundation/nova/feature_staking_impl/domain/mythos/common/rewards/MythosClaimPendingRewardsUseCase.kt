@@ -31,4 +31,3 @@ class RealMythosClaimPendingRewardsUseCase @Inject constructor(
         }
     }
 }
-

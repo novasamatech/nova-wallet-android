@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.v
 
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
-import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer.Payload.DialogAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -13,7 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.va
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.redeem.validations.RedeemMythosStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validations.StartMythosStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.validations.UnbondMythosStakingValidationFailure
-import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount

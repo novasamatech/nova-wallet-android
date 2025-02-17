@@ -23,7 +23,6 @@ suspend fun AccountRepository.requireIdKeyOfSelectedMetaAccountIn(chain: Chain):
     return requireIdOfSelectedMetaAccountIn(chain).intoKey()
 }
 
-
 suspend fun AccountRepository.getIdOfSelectedMetaAccountIn(chain: Chain): AccountId? {
     val metaAccount = getSelectedMetaAccount()
 
