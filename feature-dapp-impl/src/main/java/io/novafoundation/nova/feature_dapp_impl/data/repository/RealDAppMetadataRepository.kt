@@ -24,6 +24,10 @@ class RealDAppMetadataRepository(
 
     private val dappMetadatasFlow = MutableSharedFlow<DappCatalog>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
+    override suspend fun isDAppsSynced(): Boolean {
+        return dappMetadatasFlow.replayCache.isNotEmpty()
+    }
+
     override suspend fun syncDAppMetadatas() {
         val response = retryUntilDone { dappMetadataApi.getParachainMetadata(remoteApiUrl) }
         val dappMetadatas = mapDAppMetadataResponseToDAppMetadatas(response)

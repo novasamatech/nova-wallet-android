@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import kotlinx.coroutines.flow.Flow
 
@@ -24,4 +25,10 @@ interface FavouriteDAppsDao {
 
     @Query("DELETE FROM favourite_dapps WHERE url = :dAppUrl")
     suspend fun deleteFavouriteDApp(dAppUrl: String)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateFavourites(dapps: List<FavouriteDAppLocal>)
+
+    @Query("SELECT MAX(orderingIndex) FROM favourite_dapps")
+    suspend fun getMaxOrderingIndex(): Int
 }

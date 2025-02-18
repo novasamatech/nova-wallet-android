@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="popular_dapps_title">Popular DApps</string>
+
     <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
 
     <string name="common_not_enough_to_pay_fee_message">You don\'t have enough balance to pay network fee of %s. Current balance is %s</string>
@@ -39,6 +42,15 @@
     <string name="swap_route_segment_swap_title">Swap</string>
     <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
     <string name="swap_route">Route</string>
+
+    <string name="common_see_all">See All</string>
+    <string name="dapp_favorites">Favorites</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+
+    <string name="close_dapp_tabs_title">Close All DApps?</string>
+    <string name="close_dapp_tabs_message">All opened tabs in DApp browser will be closed.</string>
+
+    <string name="browser_tabs_close_all">Close All</string>
 
     <string name="select_network_title">Select network</string>
 

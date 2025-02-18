@@ -72,6 +72,7 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+    namespace 'io.novafoundation.nova.common'
 }
 
 dependencies {
