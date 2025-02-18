@@ -43,4 +43,8 @@ open class BaseIntegrationTest {
     protected suspend fun ChainRegistry.polkadot(): Chain {
         return getChain(Chain.Geneses.POLKADOT)
     }
+
+    protected suspend fun ChainRegistry.polkadotAssetHub(): Chain {
+        return getChain(Chain.Geneses.POLKADOT_ASSET_HUB)
+    }
 }

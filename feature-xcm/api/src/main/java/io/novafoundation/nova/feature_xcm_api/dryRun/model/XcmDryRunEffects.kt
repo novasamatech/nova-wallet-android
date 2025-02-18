@@ -18,9 +18,9 @@ class XcmDryRunEffects(
         fun bind(decodedInstance: Any?): XcmDryRunEffects {
             val asStruct = decodedInstance.castToStruct()
             return XcmDryRunEffects(
-                executionResult = XcmOutcome.bind(decodedInstance),
-                emittedEvents = bindList(asStruct["emitted_events"], ::bindEvent),
-                forwardedXcms = bindForwardedXcms(asStruct["forwarded_xcms"])
+                executionResult = XcmOutcome.bind(asStruct["executionResult"]),
+                emittedEvents = bindList(asStruct["emittedEvents"], ::bindEvent),
+                forwardedXcms = bindForwardedXcms(asStruct["forwardedXcms"])
             )
         }
     }

@@ -17,9 +17,18 @@ sealed class ScaleResult<out T, out E> {
 
             return when (asEnum.name) {
                 "Ok" -> Ok(bindOk(asEnum.value))
-                "Error" -> Error(bindError(asEnum.value))
+                "Err" -> Error(bindError(asEnum.value))
                 else -> error("Unknown Result variant: ${asEnum.name}")
             }
         }
+    }
+}
+
+class ScaleResultError(val content: Any?): Throwable()
+
+fun <T, R> ScaleResult<T, R>.toResult(): Result<T> {
+    return when(this) {
+        is ScaleResult.Error -> Result.failure(ScaleResultError(error))
+        is ScaleResult.Ok -> Result.success(value)
     }
 }

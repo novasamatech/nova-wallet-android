@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.scale.DynamicScaleInstance
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 
-class VersionedXcm<T>(
+data class VersionedXcm<T>(
     val xcm: T,
     val version: XcmVersion
 )

@@ -23,7 +23,7 @@ sealed class OriginCaller : ToDynamicScaleInstance {
         }
 
         protected fun wrapInSystemDict(inner: Any): DictEnum.Entry<*> {
-            return DictEnum.Entry("System", inner)
+            return DictEnum.Entry("system", inner)
         }
     }
 }

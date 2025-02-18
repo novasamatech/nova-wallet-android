@@ -24,13 +24,13 @@ class CallDryRunEffects(
             val asStruct = decodedInstance.castToStruct()
             return CallDryRunEffects(
                 executionResult = ScaleResult.bind(
-                    dynamicInstance = asStruct["execution_result"],
+                    dynamicInstance = asStruct["executionResult"],
                     bindOk = DispatchPostInfo::bind,
                     bindError = { DispatchErrorWithPostInfo.bind(it) }
                 ),
-                emittedEvents = bindList(asStruct["emitted_events"], ::bindEvent),
-                localXcm = bindVersionedRawXcmMessage(asStruct["local_xcm"]),
-                forwardedXcms = bindForwardedXcms(asStruct["forwarded_xcms"])
+                emittedEvents = bindList(asStruct["emittedEvents"], ::bindEvent),
+                localXcm = asStruct.get<Any?>("localXcm")?.let { bindVersionedRawXcmMessage(it) },
+                forwardedXcms = bindForwardedXcms(asStruct["forwardedXcms"])
             )
         }
     }
