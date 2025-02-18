@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -22,7 +25,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailActions
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
@@ -33,6 +36,7 @@ import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailToken
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
 import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
 private const val KEY_TOKEN = "KEY_TOKEN"
 
@@ -83,15 +87,15 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         balanceDetailBack.setOnClickListener { viewModel.backClicked() }
 
-        balanceDetaiActions.send.setOnClickListener {
+        balanceDetailActions.send.setOnClickListener {
             viewModel.sendClicked()
         }
 
-        balanceDetaiActions.swap.setOnClickListener {
+        balanceDetailActions.swap.setOnClickListener {
             viewModel.swapClicked()
         }
 
-        balanceDetaiActions.receive.setOnClickListener {
+        balanceDetailActions.receive.setOnClickListener {
             viewModel.receiveClicked()
         }
 
@@ -116,7 +120,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         viewModel.state.observe(transfersContainer::showState)
 
         buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
-        buyMixinUi.setupBuyButton(this, balanceDetaiActions.buy, viewModel.buyEnabled) {
+        buyMixinUi.setupBuyButton(this, balanceDetailActions.buy, viewModel.buyEnabled) {
             viewModel.buyClicked()
         }
 
@@ -134,15 +138,32 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailsBalances.locked.showAmount(asset.locked)
         }
 
+        viewModel.priceChartFormatters.observe {
+            priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
+        }
+
+        viewModel.priceChartTitle.observe {
+            priceChartView.setTitle(it)
+        }
+
+        viewModel.priceChartModels.observe {
+            if (it == null) {
+                priceChartView.isGone = true
+                return@observe
+            }
+
+            priceChartView.setCharts(it)
+        }
+
         viewModel.hideRefreshEvent.observeEvent {
             balanceDetailContainer.isRefreshing = false
         }
 
         viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
 
-        viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
+        viewModel.sendEnabled.observe(balanceDetailActions.send::setEnabled)
 
-        viewModel.swapButtonEnabled.observe(balanceDetaiActions.swap::setEnabled)
+        viewModel.swapButtonEnabled.observe(balanceDetailActions.swap::setEnabled)
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
             LedgerNotSupportedWarningBottomSheet(

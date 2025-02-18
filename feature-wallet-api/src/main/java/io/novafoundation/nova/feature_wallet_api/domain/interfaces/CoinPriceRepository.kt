@@ -7,6 +7,10 @@ import retrofit2.HttpException
 import kotlin.jvm.Throws
 import kotlin.time.Duration
 
+enum class Range {
+    DAY, WEEK, MONTH, YEAR, MAX
+}
+
 interface CoinPriceRepository {
 
     @Throws(HttpException::class)
@@ -20,4 +24,7 @@ interface CoinPriceRepository {
 
     @Throws(HttpException::class)
     suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
+
+    @Throws(HttpException::class)
+    suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: Range): List<HistoricalCoinRate>
 }

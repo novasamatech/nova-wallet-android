@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="price_chart_date_format">%s at %s</string>
+    <string name="price_chart_price_change">%s (%s)</string>
+
+    <string name="price_chart_title">%s price</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_chart_max">All</string>
+
     <string name="popular_dapps_title">Popular DApps</string>
 
     <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>

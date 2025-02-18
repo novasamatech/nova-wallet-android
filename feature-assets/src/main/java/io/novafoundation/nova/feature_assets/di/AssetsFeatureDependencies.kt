@@ -58,7 +58,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -259,7 +259,7 @@ interface AssetsFeatureDependencies {
 
     fun ethereumAddressFormat(): EthereumAddressFormat
 
-    fun coingeckoApi(): CoingeckoApi
+    fun coingeckoApi(): PriceApi
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
 

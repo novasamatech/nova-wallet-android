@@ -33,7 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -81,7 +81,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBa
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
-import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_impl.data.source.RealCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
@@ -116,17 +116,17 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): CoingeckoApi {
-        return networkApiCreator.create(CoingeckoApi::class.java)
+    fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): PriceApi {
+        return networkApiCreator.create(PriceApi::class.java)
     }
 
     @Provides
     @FeatureScope
     fun provideCoinPriceRemoteDataSource(
-        coingeckoApi: CoingeckoApi,
+        priceApi: PriceApi,
         httpExceptionHandler: HttpExceptionHandler
     ): CoinPriceRemoteDataSource {
-        return CoingeckoCoinPriceDataSource(coingeckoApi, httpExceptionHandler)
+        return RealCoinPriceDataSource(priceApi, httpExceptionHandler)
     }
 
     @Provides

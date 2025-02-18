@@ -29,6 +29,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInt
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
@@ -208,5 +210,14 @@ class AssetsFeatureModule {
             assetsViewModeRepository,
             amountFormatter
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideChartsInteractor(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ChartsInteractor {
+        return RealChartsInteractor(coinPriceRepository, currencyRepository)
     }
 }

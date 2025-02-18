@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.Range
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import kotlin.time.Duration
@@ -62,6 +63,17 @@ class CoinPriceRepositoryImpl(
 
     override suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange? {
         return remoteCoinPriceDataSource.getCoinRate(priceId, currency)
+    }
+
+    override suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: Range): List<HistoricalCoinRate> {
+        val days = when (range) {
+            Range.DAY -> "1"
+            Range.WEEK -> "7"
+            Range.MONTH -> "30"
+            Range.YEAR -> "365"
+            Range.MAX -> "max"
+        }
+        return remoteCoinPriceDataSource.getLastCoinPriceRange(priceId, currency, days)
     }
 
     private suspend fun loadAndCacheForAllTime(priceId: String, currency: Currency): List<HistoricalCoinRate> {
