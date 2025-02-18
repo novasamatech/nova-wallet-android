@@ -20,6 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDe
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.RealMythosDelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collator.MythosCollatorProvider
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collator.RealMythosCollatorProvider
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.rewards.MythosClaimPendingRewardsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.rewards.RealMythosClaimPendingRewardsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.currentCollators.MythosCurrentCollatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.currentCollators.RealMythosCurrentCollatorsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.main.alerts.MythosStakingAlertsInteractor
@@ -100,4 +102,7 @@ interface MythosBindsModule {
 
     @Binds
     fun bindMainPotMatcherFactory(implementation: RealMythosMainPotMatcherFactory): MythosMainPotMatcherFactory
+
+    @Binds
+    fun bindMythosClaimPendingRewardsUseCase(implementation: RealMythosClaimPendingRewardsUseCase): MythosClaimPendingRewardsUseCase
 }

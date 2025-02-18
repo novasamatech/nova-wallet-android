@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapPerio
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import java.math.BigDecimal
@@ -38,5 +39,5 @@ abstract class SingleSelectStakingRewardEstimationComponent(
             token = asset.token,
             resourceManager = resourceManager,
         )
-    }.shareInBackground()
+    }.shareInBackground(SharingStarted.Lazily)
 }
