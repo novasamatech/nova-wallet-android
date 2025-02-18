@@ -2,16 +2,16 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.Navigator
-import io.novafoundation.nova.app.root.navigation.account.PolkadotVaultVariantSignCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.account.SelectAddressCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.account.SelectMultipleWalletsCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.account.SelectWalletCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.cloudBackup.ChangeBackupPasswordCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.cloudBackup.RestoreBackupPasswordCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.cloudBackup.SyncWalletsBackupPasswordCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.pincode.PinCodeTwoFactorVerificationCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.Navigator
+import io.novafoundation.nova.app.root.navigation.navigators.account.PolkadotVaultVariantSignCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.account.SelectAddressCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.account.SelectMultipleWalletsCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.account.SelectWalletCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.cloudBackup.ChangeBackupPasswordCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.cloudBackup.RestoreBackupPasswordCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.cloudBackup.SyncWalletsBackupPasswordCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.pincode.PinCodeTwoFactorVerificationCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
@@ -30,34 +30,34 @@ class AccountNavigationModule {
     @Provides
     @ApplicationScope
     fun providePinCodeTwoFactorVerificationCommunicator(
-        navigationHolder: NavigationHolder
-    ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PinCodeTwoFactorVerificationCommunicator = PinCodeTwoFactorVerificationCommunicatorImpl(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideSelectWalletCommunicator(
-        navigationHolder: NavigationHolder
-    ): SelectWalletCommunicator = SelectWalletCommunicatorImpl(navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectWalletCommunicator = SelectWalletCommunicatorImpl(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideParitySignerCommunicator(
-        navigationHolder: NavigationHolder
-    ): PolkadotVaultVariantSignCommunicator = PolkadotVaultVariantSignCommunicatorImpl(navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PolkadotVaultVariantSignCommunicator = PolkadotVaultVariantSignCommunicatorImpl(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideSelectAddressCommunicator(
         router: AssetsRouter,
-        navigationHolder: NavigationHolder
-    ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideSelectMultipleWalletsCommunicator(
         router: AssetsRouter,
-        navigationHolder: NavigationHolder
-    ): SelectMultipleWalletsCommunicator = SelectMultipleWalletsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectMultipleWalletsCommunicator = SelectMultipleWalletsCommunicatorImpl(router, navigationHoldersRegistry)
 
     @ApplicationScope
     @Provides
@@ -67,20 +67,20 @@ class AccountNavigationModule {
     @ApplicationScope
     fun providePushGovernanceSettingsCommunicator(
         router: AccountRouter,
-        navigationHolder: NavigationHolder
-    ): SyncWalletsBackupPasswordCommunicator = SyncWalletsBackupPasswordCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SyncWalletsBackupPasswordCommunicator = SyncWalletsBackupPasswordCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideChangeBackupPasswordCommunicator(
         router: AccountRouter,
-        navigationHolder: NavigationHolder
-    ): ChangeBackupPasswordCommunicator = ChangeBackupPasswordCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): ChangeBackupPasswordCommunicator = ChangeBackupPasswordCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun provideRestoreBackupPasswordCommunicator(
         router: AccountRouter,
-        navigationHolder: NavigationHolder
-    ): RestoreBackupPasswordCommunicator = RestoreBackupPasswordCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): RestoreBackupPasswordCommunicator = RestoreBackupPasswordCommunicatorImpl(router, navigationHoldersRegistry)
 }
