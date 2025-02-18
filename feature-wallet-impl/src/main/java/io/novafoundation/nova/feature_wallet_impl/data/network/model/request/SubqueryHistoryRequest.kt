@@ -125,9 +125,10 @@ class SubqueryHistoryRequest(
 
     private fun Asset.StakingType.rewardSection(): String? {
         return when (group()) {
-            StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> "reward"
+            StakingTypeGroup.RELAYCHAIN,
+            StakingTypeGroup.PARACHAIN,
+            StakingTypeGroup.MYTHOS -> "reward"
             StakingTypeGroup.NOMINATION_POOL -> "poolReward"
-            StakingTypeGroup.MYTHOS -> TODO()
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }
