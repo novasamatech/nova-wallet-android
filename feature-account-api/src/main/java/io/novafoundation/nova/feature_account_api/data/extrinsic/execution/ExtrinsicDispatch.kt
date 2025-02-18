@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.data.extrinsic.execution
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
+import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 
 data class ExtrinsicExecutionResult(
