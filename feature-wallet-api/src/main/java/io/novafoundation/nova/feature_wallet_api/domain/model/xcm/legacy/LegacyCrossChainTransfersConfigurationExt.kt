@@ -24,7 +24,6 @@ fun LegacyCrossChainTransfersConfiguration.XcmFee.Mode.Proportional.weightToFee(
     return weight * unitsPerSecond / pico
 }
 
-
 fun LegacyCrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
     val assetTransfers = outComingAssetTransfers(origin) ?: return emptyList()
 

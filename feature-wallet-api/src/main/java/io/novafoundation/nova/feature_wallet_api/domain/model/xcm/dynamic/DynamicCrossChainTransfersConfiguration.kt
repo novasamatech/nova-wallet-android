@@ -20,5 +20,3 @@ class DynamicCrossChainTransfersConfiguration(
         val hasDeliveryFee: Boolean
     )
 }
-
-

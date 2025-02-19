@@ -11,4 +11,4 @@ class DynamicCrossChainTransferConfiguration(
     val assetLocation: RelativeMultiLocation,
     val destinationChainLocation: RelativeMultiLocation,
     val hasDeliveryFee: Boolean
-): CrossChainTransferConfigurationBase
+) : CrossChainTransferConfigurationBase

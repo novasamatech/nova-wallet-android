@@ -90,7 +90,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
-import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -286,8 +285,8 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCrossChainWeigher(
-       dynamic: DynamicCrossChainWeigher,
-       legacy: LegacyCrossChainWeigher
+        dynamic: DynamicCrossChainWeigher,
+        legacy: LegacyCrossChainWeigher
     ): CrossChainWeigher = RealCrossChainWeigher(dynamic, legacy)
 
     @Provides

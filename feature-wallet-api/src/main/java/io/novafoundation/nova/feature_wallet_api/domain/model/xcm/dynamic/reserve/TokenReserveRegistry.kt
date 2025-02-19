@@ -22,6 +22,3 @@ class TokenReserveRegistry(
         return assetToReserveIdOverrides[chainAsset.fullId] ?: chainAsset.normalizeSymbol()
     }
 }
-
-
-

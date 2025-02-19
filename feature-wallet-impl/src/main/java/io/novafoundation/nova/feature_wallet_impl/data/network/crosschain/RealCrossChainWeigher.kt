@@ -7,14 +7,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTran
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainWeigher
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainWeigher
 
-
 class RealCrossChainWeigher(
     private val dynamic: DynamicCrossChainWeigher,
     private val legacy: LegacyCrossChainWeigher
 ) : CrossChainWeigher {
 
     override suspend fun estimateFee(amount: Balance, config: CrossChainTransferConfiguration): CrossChainFeeModel {
-        return when(config) {
+        return when (config) {
             is CrossChainTransferConfiguration.Dynamic -> dynamic.estimateFee(amount, config.config)
             is CrossChainTransferConfiguration.Legacy -> legacy.estimateFee(amount, config.config)
         }

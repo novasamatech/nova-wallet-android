@@ -123,7 +123,6 @@ private fun mapXcmDestinationFromRemote(remote: LegacyXcmDestinationRemote): Xcm
     )
 }
 
-
 private fun mapXcmFeeFromRemote(
     remote: LegacyXcmFeeRemote
 ): XcmFee<String> {

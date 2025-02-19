@@ -37,7 +37,7 @@ class MultiAsset(
             fun bind(decodedInstance: Any?): Fungibility {
                 val asEnum = decodedInstance.castToDictEnum()
 
-                return when(asEnum.name) {
+                return when (asEnum.name) {
                     "Fungible" -> Fungible(bindNumber(asEnum.value))
                     else -> incompatible()
                 }

@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import android.util.Log
-import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.instanceOf
@@ -10,8 +8,6 @@ import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.transformResult
 import io.novafoundation.nova.common.utils.wrapInResult
-import io.novafoundation.nova.common.utils.xTokensName
-import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -28,7 +24,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -45,15 +40,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynami
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.asset.from
-import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
-import io.novafoundation.nova.feature_xcm_api.versions.orDefault
-import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
-import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
-import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
-import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -288,7 +275,7 @@ class RealCrossChainTransactor(
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ) {
-        when(configuration) {
+        when (configuration) {
             is CrossChainTransferConfiguration.Dynamic -> dynamic.crossChainTransfer(configuration.config, transfer, crossChainFee)
             is CrossChainTransferConfiguration.Legacy -> legacy.crossChainTransfer(configuration.config, transfer, crossChainFee)
         }

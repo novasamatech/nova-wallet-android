@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm
 
-import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.availableOutDestinations

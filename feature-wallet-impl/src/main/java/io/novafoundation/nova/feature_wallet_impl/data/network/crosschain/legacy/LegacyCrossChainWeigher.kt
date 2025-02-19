@@ -108,7 +108,8 @@ class LegacyCrossChainWeigher @Inject constructor(
             Mode.Standard -> {
                 val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain, amount)
 
-                val paymentInfo = extrinsicService.paymentInfo(chain,
+                val paymentInfo = extrinsicService.paymentInfo(
+                    chain,
                     TransactionOrigin.SelectedWallet
                 ) {
                     xcmExecute(xcmMessage, maxWeight)

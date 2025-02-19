@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.feature_xcm_api.versions.orDefault
 import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
-import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

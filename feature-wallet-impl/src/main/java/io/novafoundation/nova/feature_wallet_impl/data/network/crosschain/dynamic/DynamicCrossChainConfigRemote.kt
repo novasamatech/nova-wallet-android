@@ -30,4 +30,3 @@ class DynamicXcmTransferRemote(
     val assetId: Int,
     val hasDeliveryFee: Boolean,
 )
-

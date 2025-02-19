@@ -14,7 +14,7 @@ class LegacyCrossChainTransferConfiguration(
     val destinationFee: CrossChainFeeConfiguration,
     val reserveFee: CrossChainFeeConfiguration?,
     val transferType: XcmTransferType
-): CrossChainTransferConfigurationBase {
+) : CrossChainTransferConfigurationBase {
 
     override val destinationChainId: ChainId
         get() = destinationFee.to.chainId

@@ -69,4 +69,3 @@ class LegacyAssetLocationPathRemote(
     val type: String,
     val path: JunctionsRemote?
 )
-
