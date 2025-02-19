@@ -1,23 +1,14 @@
-package io.novafoundation.nova.feature_wallet_api.domain.implementations
+package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy
 
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
-import io.novafoundation.nova.common.utils.isAscending
-import io.novafoundation.nova.feature_wallet_api.domain.model.AssetLocationPath
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainFeeConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
-import io.novafoundation.nova.feature_xcm_api.multiLocation.Junctions
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransfersConfiguration.AssetTransfers
+import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.junctions
-import io.novafoundation.nova.feature_xcm_api.multiLocation.order
 import io.novafoundation.nova.feature_xcm_api.multiLocation.toInterior
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isParachain
@@ -26,45 +17,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 
-fun RelativeMultiLocation.localView(): RelativeMultiLocation {
-    return RelativeMultiLocation(
-        parents = 0,
-        interior = when (val interior = interior) {
-            Interior.Here -> interior
-
-            is Interior.Junctions -> interior.junctions.takeLastWhile { it !is Junction.ParachainId }
-                .toInterior()
-        }
-    )
-}
-
-fun XcmFee.Mode.Proportional.weightToFee(weight: Weight): BigInteger {
+fun LegacyCrossChainTransfersConfiguration.XcmFee.Mode.Proportional.weightToFee(weight: Weight): BigInteger {
     val pico = BigInteger.TEN.pow(12)
 
     // Weight is an amount of picoseconds operation suppose to execute
     return weight * unitsPerSecond / pico
 }
 
-operator fun RelativeMultiLocation.plus(suffix: RelativeMultiLocation): RelativeMultiLocation {
-    require(suffix.parents == 0) {
-        "Appending multi location that has parents is not supported"
-    }
-
-    val newJunctions = junctions + suffix.junctions
-    require(newJunctions.isAscending(compareBy { it.order })) {
-        "Cannot append this multi location due to conflicting junctions"
-    }
-
-    return RelativeMultiLocation(
-        parents = parents,
-        interior = newJunctions.toInterior()
-    )
-}
-
-fun RelativeMultiLocation.childView() =
-    RelativeMultiLocation(parents + 1, interior)
-
-fun CrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
+fun LegacyCrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
     val assetTransfers = outComingAssetTransfers(origin) ?: return emptyList()
 
     return assetTransfers.xcmTransfers
@@ -72,7 +32,7 @@ fun CrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asse
         .map { it.destination.fullDestinationAssetId }
 }
 
-fun CrossChainTransfersConfiguration.availableInDestinations(destination: Chain.Asset): List<FullChainAssetId> {
+fun LegacyCrossChainTransfersConfiguration.availableInDestinations(destination: Chain.Asset): List<FullChainAssetId> {
     val requiredDestinationId = destination.fullId
 
     return chains.flatMap { (originChainId, chainTransfers) ->
@@ -85,7 +45,7 @@ fun CrossChainTransfersConfiguration.availableInDestinations(destination: Chain.
     }
 }
 
-fun CrossChainTransfersConfiguration.availableInDestinations(): List<Edge<FullChainAssetId>> {
+fun LegacyCrossChainTransfersConfiguration.availableInDestinations(): List<Edge<FullChainAssetId>> {
     return chains.flatMap { (originChainId, chainTransfers) ->
         chainTransfers.flatMap { originAssetTransfers ->
             originAssetTransfers.xcmTransfers.mapNotNull {
@@ -100,23 +60,14 @@ fun CrossChainTransfersConfiguration.availableInDestinations(): List<Edge<FullCh
     }
 }
 
-fun ByteArray.accountIdToMultiLocation() = RelativeMultiLocation(
-    parents = 0,
-    interior = Junctions(
-        when (size) {
-            32 -> Junction.AccountId32(intoKey())
-            20 -> Junction.AccountKey20(intoKey())
-            else -> throw IllegalArgumentException("Unsupported account id length: $size")
-        }
-    )
-)
-
-fun CrossChainTransfersConfiguration.transferConfiguration(
-    originChain: Chain,
+fun LegacyCrossChainTransfersConfiguration.transferConfiguration(
+    originXcmChain: XcmChain,
     originAsset: Chain.Asset,
-    destinationChain: Chain,
-    destinationParaId: ParaId? // null in case destination is relaychain
-): CrossChainTransferConfiguration? {
+    destinationXcmChain: XcmChain,
+): LegacyCrossChainTransferConfiguration? {
+    val originChain = originXcmChain.chain
+    val destinationChain = destinationXcmChain.chain
+
     val assetTransfers = outComingAssetTransfers(originAsset) ?: return null
     val destination = assetTransfers.xcmTransfers.find { it.destination.chainId == destinationChain.id } ?: return null
 
@@ -135,19 +86,23 @@ fun CrossChainTransfersConfiguration.transferConfiguration(
         destination.destination.chainId
     )
 
-    return CrossChainTransferConfiguration(
+    return LegacyCrossChainTransferConfiguration(
         originChainId = originChain.id,
         assetLocation = originAssetLocationOf(assetTransfers),
         reserveChainLocation = reserveAssetLocation.multiLocation,
-        destinationChainLocation = destinationLocation(originChain, destinationParaId),
+        destinationChainLocation = destinationLocation(originChain, destinationXcmChain.parachainId),
         destinationFee = destinationFee,
         reserveFee = reserveFee,
         transferType = destination.type
     )
 }
 
-private fun CrossChainTransfersConfiguration.matchInstructions(
-    xcmFee: XcmFee<String>,
+fun LegacyCrossChainTransfersConfiguration.hasDeliveryFee(chainId: ChainId): Boolean {
+    return chainId in deliveryFeeConfigurations
+}
+
+private fun LegacyCrossChainTransfersConfiguration.matchInstructions(
+    xcmFee: LegacyCrossChainTransfersConfiguration.XcmFee<String>,
     fromChainId: ChainId,
     toChainId: ChainId,
 ): CrossChainFeeConfiguration {
@@ -159,7 +114,7 @@ private fun CrossChainTransfersConfiguration.matchInstructions(
         to = CrossChainFeeConfiguration.To(
             chainId = toChainId,
             instructionWeight = instructionBaseWeights.getValue(toChainId),
-            xcmFeeType = XcmFee(
+            xcmFeeType = LegacyCrossChainTransfersConfiguration.XcmFee(
                 mode = xcmFee.mode,
                 instructions = feeInstructions.getValue(xcmFee.instructions),
             )
@@ -205,7 +160,7 @@ private fun SiblingParachain(paraId: ParaId): RelativeMultiLocation {
     )
 }
 
-private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: CrossChainTransfersConfiguration.AssetTransfers): RelativeMultiLocation {
+private fun LegacyCrossChainTransfersConfiguration.originAssetLocationOf(assetTransfers: AssetTransfers): RelativeMultiLocation {
     return when (val path = assetTransfers.assetLocationPath) {
         is AssetLocationPath.Absolute -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.childView()
         is AssetLocationPath.Relative -> assetLocations.getValue(assetTransfers.assetLocation).multiLocation.localView()
@@ -213,9 +168,23 @@ private fun CrossChainTransfersConfiguration.originAssetLocationOf(assetTransfer
     }
 }
 
-private fun CrossChainTransfersConfiguration.outComingAssetTransfers(origin: Chain.Asset): CrossChainTransfersConfiguration.AssetTransfers? {
+private fun LegacyCrossChainTransfersConfiguration.outComingAssetTransfers(origin: Chain.Asset): AssetTransfers? {
     return chains[origin.chainId]?.find { it.assetId == origin.id }
 }
 
-private val CrossChainTransfersConfiguration.XcmDestination.fullDestinationAssetId: FullChainAssetId
+private val LegacyCrossChainTransfersConfiguration.XcmDestination.fullDestinationAssetId: FullChainAssetId
     get() = FullChainAssetId(chainId, assetId)
+
+private fun RelativeMultiLocation.localView(): RelativeMultiLocation {
+    return RelativeMultiLocation(
+        parents = 0,
+        interior = when (val interior = interior) {
+            Interior.Here -> interior
+
+            is Interior.Junctions -> interior.junctions.takeLastWhile { it !is Junction.ParachainId }
+                .toInterior()
+        }
+    )
+}
+
+private fun RelativeMultiLocation.childView() = RelativeMultiLocation(parents + 1, interior)

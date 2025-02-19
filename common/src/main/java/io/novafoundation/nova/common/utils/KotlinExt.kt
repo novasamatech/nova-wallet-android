@@ -281,6 +281,15 @@ fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
 }
 
+fun <K1, K2, KR, V> Map<K1, Map<K2, V>>.flattenKeys(keyTransform: (K1, K2) -> KR): Map<KR, V> {
+    return flatMap { (key1, innerMap) ->
+        innerMap.map { (key2, value) ->
+            val key = keyTransform(key1, key2)
+            key to value
+        }
+    }.toMap()
+}
+
 fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all { (first, second) -> comparator.compare(first, second) < 0 }
 
 fun <T> Result<T>.requireException() = exceptionOrNull()!!

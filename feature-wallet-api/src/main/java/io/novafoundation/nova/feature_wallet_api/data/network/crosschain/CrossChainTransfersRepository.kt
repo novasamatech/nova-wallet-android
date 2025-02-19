@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.crosschain
 
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import kotlinx.coroutines.flow.Flow
 
 interface CrossChainTransfersRepository {

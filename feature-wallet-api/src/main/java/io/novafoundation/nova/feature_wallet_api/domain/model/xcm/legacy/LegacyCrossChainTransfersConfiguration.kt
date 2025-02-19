@@ -1,13 +1,12 @@
-package io.novafoundation.nova.feature_wallet_api.domain.model
+package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy
 
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration.XcmFee
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 
-class CrossChainTransfersConfiguration(
+class LegacyCrossChainTransfersConfiguration(
     // Reserves locations from the Relaychain point of view
     val assetLocations: Map<String, ReserveLocation>,
     val feeInstructions: Map<String, List<XCMInstructionType>>,
@@ -72,7 +71,14 @@ enum class XcmTransferType {
 }
 
 enum class XCMInstructionType {
-    ReserveAssetDeposited, ClearOrigin, BuyExecution, DepositAsset, WithdrawAsset, DepositReserveAsset, ReceiveTeleportedAsset, UNKNOWN
+    ReserveAssetDeposited,
+    ClearOrigin,
+    BuyExecution,
+    DepositAsset,
+    WithdrawAsset,
+    DepositReserveAsset,
+    ReceiveTeleportedAsset,
+    UNKNOWN
 }
 
 class DeliveryFeeConfiguration(
@@ -90,28 +96,4 @@ class DeliveryFeeConfiguration(
 
         object Undefined : Type
     }
-}
-
-class CrossChainTransferConfiguration(
-    val originChainId: ChainId,
-    val assetLocation: RelativeMultiLocation,
-    val reserveChainLocation: RelativeMultiLocation,
-    val destinationChainLocation: RelativeMultiLocation,
-    val destinationFee: CrossChainFeeConfiguration,
-    val reserveFee: CrossChainFeeConfiguration?,
-    val transferType: XcmTransferType
-)
-
-class CrossChainFeeConfiguration(
-    val from: From,
-    val to: To
-) {
-
-    class From(val chainId: ChainId, val deliveryFeeConfiguration: DeliveryFeeConfiguration?)
-
-    class To(
-        val chainId: ChainId,
-        val instructionWeight: Weight,
-        val xcmFeeType: XcmFee<List<XCMInstructionType>>
-    )
 }

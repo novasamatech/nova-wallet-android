@@ -27,7 +27,7 @@ class RealDryRunApi @Inject constructor(
         originLocation: VersionedXcmLocation,
         chainId: ChainId
     ): Result<ScaleResult<XcmDryRunEffects, DryRunEffectsResultErr>> {
-       return multiChainRuntimeCallsApi.forChain(chainId).dryRunXcm(xcm, originLocation)
+        return multiChainRuntimeCallsApi.forChain(chainId).dryRunXcm(xcm, originLocation)
     }
 
     override suspend fun dryRunCall(
@@ -55,7 +55,8 @@ class RealDryRunApi @Inject constructor(
                         ScaleResult.bind(
                             dynamicInstance = it,
                             bindOk = { XcmDryRunEffects.bind(it) },
-                            bindError = DryRunEffectsResultErr::bind)
+                            bindError = DryRunEffectsResultErr::bind
+                        )
                     }
                 }
             )
@@ -79,7 +80,8 @@ class RealDryRunApi @Inject constructor(
                         ScaleResult.bind(
                             dynamicInstance = it,
                             bindOk = { CallDryRunEffects.bind(it) },
-                            bindError = DryRunEffectsResultErr::bind)
+                            bindError = DryRunEffectsResultErr::bind
+                        )
                     }
                 }
             )

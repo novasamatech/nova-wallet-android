@@ -7,4 +7,3 @@ object DryRunEffectsResultErr {
         return this
     }
 }
-

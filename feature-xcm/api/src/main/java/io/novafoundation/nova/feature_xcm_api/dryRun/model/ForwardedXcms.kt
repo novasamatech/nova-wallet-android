@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.message.bindVersionedRawXcmMessage
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.bindVersionedMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcmLocation
 
@@ -20,5 +19,5 @@ fun bindForwardedXcms(decodedInstance: Any?): ForwardedXcms {
     }
 }
 fun ForwardedXcms.getByLocation(location: VersionedXcmLocation): List<VersionedRawXcmMessage> {
-    return find { it.first == location  }?.second.orEmpty()
+    return find { it.first == location }?.second.orEmpty()
 }

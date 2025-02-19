@@ -24,10 +24,10 @@ sealed class ScaleResult<out T, out E> {
     }
 }
 
-class ScaleResultError(val content: Any?): Throwable()
+class ScaleResultError(val content: Any?) : Throwable()
 
 fun <T, R> ScaleResult<T, R>.toResult(): Result<T> {
-    return when(this) {
+    return when (this) {
         is ScaleResult.Error -> Result.failure(ScaleResultError(error))
         is ScaleResult.Ok -> Result.success(value)
     }
