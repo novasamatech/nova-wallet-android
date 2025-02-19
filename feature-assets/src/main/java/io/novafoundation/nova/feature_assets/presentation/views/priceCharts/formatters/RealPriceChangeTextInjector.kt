@@ -21,7 +21,7 @@ class RealPriceChangeTextInjector(
     override fun format(fromValue: Float, toValue: Float, textView: TextView) {
         val change = toValue - fromValue
         val changeInPercent = if (fromValue != 0f) {
-            change / fromValue
+            (change / fromValue) * 100f
         } else {
             0f
         }

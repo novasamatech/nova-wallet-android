@@ -28,7 +28,8 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     fun showYAxis(show: Boolean) {
-        chart.axisRight.isEnabled = show
+        chart.axisRight.setDrawLabels(show)
+        chart.invalidate()
     }
 
     fun useNeutralColor(useNeutral: Boolean) {
@@ -51,7 +52,9 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.axisLeft.isEnabled = false
         chart.xAxis.isEnabled = false
         chart.setScaleEnabled(false)
-        chart.axisRight.typeface
+        chart.minOffset = 0f
+        chart.extraTopOffset = 12f
+        chart.extraBottomOffset = 12f
 
         chart.renderer = PriceChartRenderer(
             highlightColor = context.getColor(R.color.neutral_price_chart_line),
@@ -66,6 +69,8 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             textSize = 9f
             textColor = context.getColor(R.color.text_secondary)
             typeface = Typeface.MONOSPACE
+            setLabelCount(4, true)
+            setDrawTopYLabelEntry(true)
             gridLineWidth = 1.5f
             setDrawAxisLine(false)
             setDrawGridLines(true)
@@ -102,13 +107,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         val entriesBefore = currentEntries.filter { it.x <= entry.x }
         val entriesAfter = currentEntries.subList(entriesBefore.size - 1, currentEntries.size)
 
-        val beforeEntriesColor = entriesBefore.getColorResForEntries()
-        val datasetBefore = entriesBefore.createDataSet(beforeEntriesColor)
+        val entriesColor = currentEntries.getColorResForEntries()
+        val datasetBefore = entriesBefore.createDataSet(entriesColor)
         val datasetAfter = entriesAfter.createDataSet(R.color.neutral_price_chart_line)
 
         chart.priceChartRenderer().apply {
             setDotPoint(entry)
-            setDotColor(context.getColor(beforeEntriesColor))
+            setDotColor(context.getColor(entriesColor))
         }
 
         chart.data = LineData(datasetBefore, datasetAfter)

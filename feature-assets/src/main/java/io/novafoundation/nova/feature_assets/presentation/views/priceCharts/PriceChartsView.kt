@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.form
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.PriceChangeTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.PriceTextInjector
 import java.math.BigDecimal
+import kotlinx.android.synthetic.main.layout_price_chart_button.view.priceChartButtonText
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartButtons
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartCurrentPrice
@@ -104,11 +106,10 @@ class PriceChartsView @JvmOverloads constructor(
         val periods = 2
         val entriesCount = 100
         val entries = List(entriesCount) {
-            val sinY = sin(periods * Math.PI * it / entriesCount)
+            val sinY = sin(periods * Math.PI * 2 * it / entriesCount)
             Entry(it.toFloat(), sinY.toFloat())
         }
 
-        controller.useNeutralColor(true)
         controller.setEntries(entries)
 
         showLoadingState(true)
@@ -121,6 +122,7 @@ class PriceChartsView @JvmOverloads constructor(
         priceChartPriceChangeShimmering.isVisible = show
         priceChartCurrentPriceShimmering.isVisible = show
 
+        controller.useNeutralColor(show)
         controller.showYAxis(!show)
     }
 
@@ -134,7 +136,6 @@ class PriceChartsView @JvmOverloads constructor(
             setEmptyState()
             return
         } else if (currentChart is PriceChartModel.Chart) {
-            controller.useNeutralColor(false)
             controller.setEntries(currentChart.asEntries())
 
             showLoadingState(false)
@@ -147,7 +148,7 @@ class PriceChartsView @JvmOverloads constructor(
             .filterIsInstance<TextView>()
     }
 
-    private fun getButton(text: String, index: Int): TextView {
+    private fun getButton(text: String, index: Int): View {
         val button = View.inflate(context, R.layout.layout_price_chart_button, null) as TextView
         button.text = text
         button.setOnClickListener { selectChart(index) }

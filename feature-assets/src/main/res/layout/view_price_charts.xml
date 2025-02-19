@@ -87,8 +87,7 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/priceChart"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="156dp"
         android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@+id/priceChartDate" />
 
@@ -96,7 +95,7 @@
         android:id="@+id/priceChartButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="4dp"
         android:gravity="center_horizontal"
         android:minHeight="32dp"
         android:orientation="horizontal"
