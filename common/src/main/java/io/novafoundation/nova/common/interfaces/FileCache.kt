@@ -33,7 +33,6 @@ internal class InternalFileSystemCache(
         notifyCallbacks(fileName, value)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeCachedValue(fileName: String): Flow<String> {
         return callbackFlow<String?> {
             val callback: OnCacheValueChanged = {

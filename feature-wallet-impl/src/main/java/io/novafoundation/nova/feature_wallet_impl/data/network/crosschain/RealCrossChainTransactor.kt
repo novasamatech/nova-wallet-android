@@ -29,10 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.accountIdToMultiLocation
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.plus
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.XcmTransferType
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDepositInUsedAsset
@@ -44,6 +41,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientCommissionBalanceToStayAboveED
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
@@ -79,14 +78,14 @@ import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 
 class RealCrossChainTransactor(
-    private val weigher: CrossChainWeigher,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val phishingValidationFactory: PhishingValidationFactory,
-    private val xcmVersionDetector: XcmVersionDetector,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val eventsRepository: EventsRepository,
     private val chainStateRepository: ChainStateRepository,
     private val chainRegistry: ChainRegistry,
+    private val dynamic: DynamicCrossChainTransactor,
+    private val legacy: LegacyCrossChainTransactor
 ) : CrossChainTransactor {
 
     override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
@@ -175,16 +174,16 @@ class RealCrossChainTransactor(
 
     override suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration {
         val originChainId = configuration.originChainId
-        val reserveChainId = configuration.reserveFee?.to?.chainId
-        val destinationChainId = configuration.destinationFee.to.chainId
+        val remoteReserveChainId = configuration.remoteReserveChainId
+        val destinationChainId = configuration.destinationChainId
 
         val relayId = chainRegistry.findRelayChainOrThrow(originChainId)
 
         var totalDuration = ZERO
 
-        if (reserveChainId != null) {
-            totalDuration += maxTimeToTransmitMessage(originChainId, reserveChainId, relayId)
-            totalDuration += maxTimeToTransmitMessage(reserveChainId, destinationChainId, relayId)
+        if (remoteReserveChainId != null) {
+            totalDuration += maxTimeToTransmitMessage(originChainId, remoteReserveChainId, relayId)
+            totalDuration += maxTimeToTransmitMessage(remoteReserveChainId, destinationChainId, relayId)
         } else {
             totalDuration += maxTimeToTransmitMessage(originChainId, destinationChainId, relayId)
         }
@@ -289,120 +288,10 @@ class RealCrossChainTransactor(
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ) {
-        when (configuration.transferType) {
-            XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, crossChainFee)
-            XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
+        when(configuration) {
+            is CrossChainTransferConfiguration.Dynamic -> dynamic.crossChainTransfer(configuration.config, transfer, crossChainFee)
+            is CrossChainTransferConfiguration.Legacy -> legacy.crossChainTransfer(configuration.config, transfer, crossChainFee)
         }
-    }
-
-    private suspend fun ExtrinsicBuilder.xTokensTransfer(
-        configuration: CrossChainTransferConfiguration,
-        assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
-    ) {
-        val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
-        val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
-        val requiredDestWeight = weigher.estimateRequiredDestWeight(configuration)
-
-        val lowestMultiLocationVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(assetTransfer.originChain.id).orDefault()
-        val lowestMultiAssetVersion = xcmVersionDetector.lowestPresentMultiAssetVersion(assetTransfer.originChain.id).orDefault()
-
-        call(
-            moduleName = runtime.metadata.xTokensName(),
-            callName = "transfer_multiasset",
-            arguments = mapOf(
-                "asset" to multiAsset.versionedXcm(lowestMultiAssetVersion).toEncodableInstance(),
-                "dest" to fullDestinationLocation.versionedXcm(lowestMultiLocationVersion).toEncodableInstance(),
-
-                // depending on the version of the pallet, only one of weights arguments going to be encoded
-                "dest_weight" to destWeightEncodable(requiredDestWeight),
-                "dest_weight_limit" to WeightLimit.Unlimited.toEncodableInstance()
-            )
-        )
-    }
-
-    private fun destWeightEncodable(weight: Weight): Any = weight
-
-    private suspend fun ExtrinsicBuilder.xcmPalletTransferAssets(
-        configuration: CrossChainTransferConfiguration,
-        assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
-    ) {
-        xcmPalletTransfer(
-            configuration = configuration,
-            assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
-            callName = "transfer_assets"
-        )
-    }
-
-    private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
-        configuration: CrossChainTransferConfiguration,
-        assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
-    ) {
-        xcmPalletTransfer(
-            configuration = configuration,
-            assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
-            callName = "limited_reserve_transfer_assets"
-        )
-    }
-
-    private suspend fun ExtrinsicBuilder.xcmPalletTeleport(
-        configuration: CrossChainTransferConfiguration,
-        assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
-    ) {
-        xcmPalletTransfer(
-            configuration = configuration,
-            assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
-            callName = "limited_teleport_assets"
-        )
-    }
-
-    private suspend fun ExtrinsicBuilder.xcmPalletTransfer(
-        configuration: CrossChainTransferConfiguration,
-        assetTransfer: AssetTransferBase,
-        crossChainFee: Balance,
-        callName: String
-    ) {
-        val lowestMultiLocationVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(assetTransfer.originChain.id).orDefault()
-        val lowestMultiAssetsVersion = xcmVersionDetector.lowestPresentMultiAssetsVersion(assetTransfer.originChain.id).orDefault()
-
-        val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
-
-        call(
-            moduleName = runtime.metadata.xcmPalletName(),
-            callName = callName,
-            arguments = mapOf(
-                "dest" to configuration.destinationChainLocation.versionedXcm(lowestMultiLocationVersion).toEncodableInstance(),
-                "beneficiary" to assetTransfer.beneficiaryLocation().versionedXcm(lowestMultiLocationVersion).toEncodableInstance(),
-                "assets" to MultiAssets(multiAsset).versionedXcm(lowestMultiAssetsVersion).toEncodableInstance(),
-                "fee_asset_item" to BigInteger.ZERO,
-                "weight_limit" to WeightLimit.Unlimited.toEncodableInstance()
-            )
-        )
-    }
-
-    private fun CrossChainTransferConfiguration.multiAssetFor(
-        transfer: AssetTransferBase,
-        crossChainFee: Balance
-    ): MultiAsset {
-        // we add cross chain fee top of entered amount so received amount will be no less than entered one
-        val planks = transfer.amountPlanks + crossChainFee
-
-        return MultiAsset.from(assetLocation, planks)
-    }
-
-    private fun AssetTransferBase.beneficiaryLocation(): RelativeMultiLocation {
-        val accountId = destinationChain.accountIdOrDefault(recipient)
-
-        return accountId.accountIdToMultiLocation()
     }
 
     private fun AssetTransferBase.ensurePositiveAmount(): AssetTransferBase {

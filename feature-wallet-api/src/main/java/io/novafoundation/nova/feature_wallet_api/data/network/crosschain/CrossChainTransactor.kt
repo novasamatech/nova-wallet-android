@@ -6,7 +6,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.Duration
 

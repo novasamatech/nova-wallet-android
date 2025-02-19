@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_xcm_api.multiLocation
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
+import io.novafoundation.nova.common.utils.isAscending
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import java.math.BigInteger
@@ -55,30 +58,30 @@ abstract class MultiLocation(
     }
 }
 
-val MultiLocation.Junction.order
+val Junction.order
     get() = when (this) {
-        is MultiLocation.Junction.GlobalConsensus -> 0
+        is Junction.GlobalConsensus -> 0
 
-        is MultiLocation.Junction.ParachainId -> 1
+        is Junction.ParachainId -> 1
 
         // All of these are on the same "level" - mutually exhaustive
-        is MultiLocation.Junction.PalletInstance,
-        is MultiLocation.Junction.AccountKey20,
-        is MultiLocation.Junction.AccountId32 -> 2
+        is Junction.PalletInstance,
+        is Junction.AccountKey20,
+        is Junction.AccountId32 -> 2
 
-        is MultiLocation.Junction.GeneralKey,
-        is MultiLocation.Junction.GeneralIndex -> 3
+        is Junction.GeneralKey,
+        is Junction.GeneralIndex -> 3
 
-        MultiLocation.Junction.Unsupported -> Int.MAX_VALUE
+        Junction.Unsupported -> Int.MAX_VALUE
     }
 
-val MultiLocation.junctions: List<MultiLocation.Junction>
+val MultiLocation.junctions: List<Junction>
     get() = when (val interior = interior) {
         MultiLocation.Interior.Here -> emptyList()
         is MultiLocation.Interior.Junctions -> interior.junctions
     }
 
-fun List<MultiLocation.Junction>.toInterior() = when (size) {
+fun List<Junction>.toInterior() = when (size) {
     0 -> MultiLocation.Interior.Here
     else -> MultiLocation.Interior.Junctions(this)
 }
@@ -88,8 +91,8 @@ fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
 fun MultiLocation.accountId(): AccountIdKey? {
     return junctions.tryFindNonNull {
         when (it) {
-            is MultiLocation.Junction.AccountId32 -> it.accountId
-            is MultiLocation.Junction.AccountKey20 -> it.accountId
+            is Junction.AccountId32 -> it.accountId
+            is Junction.AccountKey20 -> it.accountId
             else -> null
         }
     }
@@ -99,14 +102,45 @@ fun MultiLocation.Interior.asLocation(): AbsoluteMultiLocation {
     return AbsoluteMultiLocation(this)
 }
 
-fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())
+fun List<Junction>.toAbsoluteLocation(): AbsoluteMultiLocation {
+    return toInterior().asLocation()
+}
+
+operator fun RelativeMultiLocation.plus(suffix: RelativeMultiLocation): RelativeMultiLocation {
+    require(suffix.parents == 0) {
+        "Appending multi location that has parents is not supported"
+    }
+
+    val newJunctions = junctions + suffix.junctions
+    require(newJunctions.isAscending(compareBy { it.order })) {
+        "Cannot append this multi location due to conflicting junctions"
+    }
+
+    return RelativeMultiLocation(
+        parents = parents,
+        interior = newJunctions.toInterior()
+    )
+}
+
+fun AccountIdKey.toMultiLocation() = RelativeMultiLocation(
+    parents = 0,
+    interior = Junctions(
+        when (value.size) {
+            32 -> Junction.AccountId32(this)
+            20 -> Junction.AccountKey20(this)
+            else -> throw IllegalArgumentException("Unsupported account id length: ${value.size}")
+        }
+    )
+)
+
+fun Junctions(vararg junctions: Junction) = MultiLocation.Interior.Junctions(junctions.toList())
 
 fun MultiLocation.paraIdOrNull(): ParaId? {
-    return junctions.filterIsInstance<MultiLocation.Junction.ParachainId>()
+    return junctions.filterIsInstance<Junction.ParachainId>()
         .firstOrNull()
         ?.id
 }
 
-private fun List<MultiLocation.Junction>.sorted(): List<MultiLocation.Junction> {
-    return sortedBy(MultiLocation.Junction::order)
+private fun List<Junction>.sorted(): List<Junction> {
+    return sortedBy(Junction::order)
 }

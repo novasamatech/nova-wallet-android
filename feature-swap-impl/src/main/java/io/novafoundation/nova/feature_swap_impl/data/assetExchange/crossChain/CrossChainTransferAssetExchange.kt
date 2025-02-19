@@ -33,10 +33,11 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentPro
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.hasDeliveryFee
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -143,7 +144,7 @@ class CrossChainTransferAssetExchange(
 
         private fun hasDeliveryFees(): Boolean {
             val config = crossChainConfig.value ?: return false
-            return delegate.from.chainId in config.deliveryFeeConfigurations
+            return config.hasDeliveryFee(delegate.from, delegate.to)
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {

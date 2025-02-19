@@ -55,12 +55,12 @@ internal class AssetConversionFeePayment(
     }
 
     private suspend fun encodableAssetId(xcmVersion: XcmVersion): Any {
-        return multiLocationConverter.toMultiLocationOrThrow(paymentAsset).versionedXcm(xcmVersion).toEncodableInstance()
+        return multiLocationConverter.toMultiLocationOrThrow(paymentAsset).toEncodableInstance(xcmVersion)
     }
 
     private fun encodableNativeAssetId(xcmVersion: XcmVersion): Any {
         return RelativeMultiLocation(
-            parents = 0,
+            parents = 1,
             interior = Interior.Here
         ).toEncodableInstance(xcmVersion)
     }
