@@ -9,8 +9,6 @@ import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.setTextColorRes

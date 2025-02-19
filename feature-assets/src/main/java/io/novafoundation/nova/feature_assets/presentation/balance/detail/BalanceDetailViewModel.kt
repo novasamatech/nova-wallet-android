@@ -60,7 +60,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,

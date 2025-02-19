@@ -70,4 +70,3 @@ class PriceChartRenderer(
         return Color.argb((255 * alpha).roundToInt(), Color.red(color), Color.green(color), Color.blue(color))
     }
 }
-

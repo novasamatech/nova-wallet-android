@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
@@ -19,7 +18,6 @@ import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.form
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.PriceChangeTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.PriceTextInjector
 import java.math.BigDecimal
-import kotlinx.android.synthetic.main.layout_price_chart_button.view.priceChartButtonText
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartButtons
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartCurrentPrice
