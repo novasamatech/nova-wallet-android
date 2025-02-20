@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_banners_api.presentation.view.switcher.an
 
 import android.view.View
 import android.view.animation.Interpolator
-import io.novafoundation.nova.common.utils.multiplier
+import io.novafoundation.nova.common.utils.signum
 import kotlin.math.absoluteValue
 
 interface FractionAnimator {
@@ -15,7 +15,7 @@ abstract class InterpolatedAnimator(
 ) : FractionAnimator {
 
     override fun animate(view: View, fraction: Float) {
-        val interpolatedValue = interpolator.getInterpolation(fraction.absoluteValue) * fraction.multiplier()
+        val interpolatedValue = interpolator.getInterpolation(fraction.absoluteValue) * fraction.signum()
         animateInternal(view, interpolatedValue)
     }
 

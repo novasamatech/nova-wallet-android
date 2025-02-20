@@ -625,6 +625,12 @@ fun Date.atTheNextDay(): Date {
     return calendar.toDate()
 }
 
+fun Float.signum() = when {
+    this < 0f -> -1f
+    this > 0f -> 1f
+    else -> 0f
+}
+
 fun Calendar.toDate(): Date = Date(time.time)
 
 fun Calendar.resetDay() {
