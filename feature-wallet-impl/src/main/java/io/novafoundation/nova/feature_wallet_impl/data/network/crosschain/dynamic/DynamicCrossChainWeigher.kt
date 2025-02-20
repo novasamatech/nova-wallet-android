@@ -195,7 +195,7 @@ class DynamicCrossChainWeigher @Inject constructor(
     ): CrossChainFeeModel {
         val deliveryFee = origin.deliveryFee + remoteReserve.deliveryFee
         val totalFee = initialAmount - destination.depositedAmount
-        // We do not subtract `origin.deliveryFee` since it is paid by an account and
+        // We do not subtract `origin.deliveryFee` since it is paid directly from the origin account and not from the holding register
         val executionFee = totalFee - remoteReserve.deliveryFee
 
         return CrossChainFeeModel(deliveryFee, executionFee)
@@ -233,7 +233,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val xcmPalletName = runtimeSnapshot.metadata.xcmPalletName()
         val event = dryRunEffects.emittedEvents.findEvent(xcmPalletName, "FeesPaid") ?: return Balance.ZERO
 
-        val usedXcmVersion = dryRunEffects.forwardedXcms.first().first.version
+        val usedXcmVersion = dryRunEffects.usedXcmVersion()
 
         val feesDecoded = event.arguments[FEES_PAID_FEES_ARGUMENT_INDEX]
         val multiAssets = MultiAssets.bind(feesDecoded, usedXcmVersion).value
