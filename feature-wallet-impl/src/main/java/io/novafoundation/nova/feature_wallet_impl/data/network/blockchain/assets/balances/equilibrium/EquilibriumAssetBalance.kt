@@ -93,9 +93,9 @@ class EquilibriumAssetBalance(
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         return if (chainAsset.isUtilityAsset) {
-            remoteStorageSource.query(chain.id) {
+            remoteStorageSource.query(chainAsset.chainId) {
                 runtime.metadata.eqBalances().constantOrNull("ExistentialDepositBasic")?.getAs(number())
                     .orZero()
             }

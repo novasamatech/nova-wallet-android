@@ -22,8 +22,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.referendumId
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,7 @@ class SetupReferendumVoteViewModel(
     private val payload: SetupVotePayload,
     private val router: GovernanceRouter,
     private val resourceManager: ResourceManager,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     interactor: VoteReferendumInteractor,
@@ -44,9 +45,9 @@ class SetupReferendumVoteViewModel(
     referendumFormatter: ReferendumFormatter,
     locksChangeFormatter: LocksChangeFormatter,
     convictionValuesProvider: ConvictionValuesProvider,
+    maxActionProviderFactory: MaxActionProviderFactory,
     locksFormatter: LocksFormatter,
 ) : SetupVoteViewModel(
-    feeLoaderMixinFactory,
     assetUseCase,
     amountChooserMixinFactory,
     interactor,
@@ -57,7 +58,9 @@ class SetupReferendumVoteViewModel(
     validationExecutor,
     locksChangeFormatter,
     convictionValuesProvider,
-    locksFormatter
+    locksFormatter,
+    maxActionProviderFactory,
+    feeLoaderMixinFactory
 ) {
 
     override val title: Flow<String> = flowOf {

@@ -97,8 +97,8 @@ class NativeAssetBalance(
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
-        val runtime = chainRegistry.getRuntime(chain.id)
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
+        val runtime = chainRegistry.getRuntime(chainAsset.chainId)
 
         return runtime.metadata.balances().numberConstant("ExistentialDeposit", runtime)
     }

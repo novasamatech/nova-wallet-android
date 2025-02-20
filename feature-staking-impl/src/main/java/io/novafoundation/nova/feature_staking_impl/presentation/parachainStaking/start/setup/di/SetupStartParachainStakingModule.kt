@@ -29,7 +29,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.RealParachainStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class SetupStartParachainStakingModule {
@@ -52,7 +53,7 @@ class SetupStartParachainStakingModule {
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         rewardsComponentFactory: RealParachainStakingRewardsComponentFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         validationSystem: StartParachainStakingValidationSystem,
@@ -64,6 +65,7 @@ class SetupStartParachainStakingModule {
         selectedAssetState: StakingSharedState,
         collatorRecommendatorFactory: CollatorRecommendatorFactory,
         payload: StartParachainStakingPayload,
+        maxActionProviderFactory: MaxActionProviderFactory,
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
@@ -73,7 +75,7 @@ class SetupStartParachainStakingModule {
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
             addressIconGenerator = addressIconGenerator,
             validationSystem = validationSystem,
@@ -83,7 +85,8 @@ class SetupStartParachainStakingModule {
             hintsMixinFactory = hintsMixinFactory,
             selectedAssetState = selectedAssetState,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
-            payload = payload
+            payload = payload,
+            maxActionProviderFactory = maxActionProviderFactory
         )
     }
 
