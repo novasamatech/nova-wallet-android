@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface BannersRepository {
-    suspend fun observeBanners(url: String): Flow<List<PromotionBanner>>
-
-    fun isBannerClosed(id: String): Boolean
+    suspend fun getBanners(url: String): List<PromotionBanner>
 
     fun closeBanner(id: String)
+
+    fun observeClosedBannerIds(): Flow<Set<String>>
 }
 
 class RealBannersRepository(
@@ -23,7 +23,11 @@ class RealBannersRepository(
     private val languagesHolder: LanguagesHolder
 ) : BannersRepository {
 
-    override suspend fun observeBanners(url: String): Flow<List<PromotionBanner>> {
+    companion object {
+        private const val PREFS_CLOSED_BANNERS = "closed_banners"
+    }
+
+    override suspend fun getBanners(url: String): List<PromotionBanner> {
         val language = preferences.getCurrentLanguage()!!
         val bannersDeferred = scopeAsync { bannersApi.getBanners(url) }
         val localisationDeferred = scopeAsync { getLocalisation(url, language) }
@@ -31,13 +35,12 @@ class RealBannersRepository(
         val banners = bannersDeferred.await()
         val localisation = localisationDeferred.await()
 
-        val bannerModels = mapBanners(banners, localisation)
+        return mapBanners(banners, localisation)
+    }
 
-        val keys = bannerModels.map { getBannerPreferenceKey(it.id) }
-            .toTypedArray()
-
-        return preferences.keysFlow(*keys)
-            .map { bannerModels.filter { !isBannerClosed(it.id) } }
+    override fun observeClosedBannerIds(): Flow<Set<String>> {
+        return preferences.stringSetFlow(PREFS_CLOSED_BANNERS)
+            .map { it.orEmpty() }
     }
 
     private fun mapBanners(
@@ -72,15 +75,8 @@ class RealBannersRepository(
         }
     }
 
-    override fun isBannerClosed(id: String): Boolean {
-        return preferences.getBoolean(getBannerPreferenceKey(id), false)
-    }
-
     override fun closeBanner(id: String) {
-        preferences.putBoolean(getBannerPreferenceKey(id), true)
-    }
-
-    private fun getBannerPreferenceKey(id: String): String {
-        return "closed_banner_$id"
+        val closedBannersId = preferences.getStringSet(PREFS_CLOSED_BANNERS)
+        preferences.putStringSet(PREFS_CLOSED_BANNERS, closedBannersId + id)
     }
 }
