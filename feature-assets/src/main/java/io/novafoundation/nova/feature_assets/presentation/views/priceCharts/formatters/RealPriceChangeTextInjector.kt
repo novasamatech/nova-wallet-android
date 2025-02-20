@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
+import kotlin.math.absoluteValue
 
 interface PriceChangeTextInjector {
     fun format(fromValue: Float, toValue: Float, textView: TextView)
@@ -29,7 +30,7 @@ class RealPriceChangeTextInjector(
         textView.text = resourceManager.getString(
             R.string.price_chart_price_change,
             change.toBigDecimal().formatAsCurrency(currency),
-            changeInPercent.toBigDecimal().formatAsPercentage()
+            changeInPercent.absoluteValue.toBigDecimal().formatAsPercentage() // Always absolute value to avoid negative signs
         )
 
         if (change < 0f) {
