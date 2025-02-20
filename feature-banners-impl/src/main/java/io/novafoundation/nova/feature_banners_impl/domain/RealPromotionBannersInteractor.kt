@@ -9,8 +9,6 @@ interface PromotionBannersInteractor {
 
     suspend fun observeBanners(url: String): Flow<List<PromotionBanner>>
 
-    fun isBannerClosed(id: String): Boolean
-
     fun closeBanner(id: String)
 }
 
@@ -24,10 +22,6 @@ class RealPromotionBannersInteractor(
             .map { closedIds ->
                 banners.filter { it.id !in closedIds }
             }
-    }
-
-    override fun isBannerClosed(id: String): Boolean {
-        return bannersRepository.isBannerClosed(id)
     }
 
     override fun closeBanner(id: String) {

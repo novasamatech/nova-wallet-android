@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.map
 interface BannersRepository {
     suspend fun getBanners(url: String): List<PromotionBanner>
 
-    fun isBannerClosed(id: String): Boolean
-
     fun closeBanner(id: String)
 
     fun observeClosedBannerIds(): Flow<Set<String>>
@@ -75,10 +73,6 @@ class RealBannersRepository(
 
             throw e
         }
-    }
-
-    override fun isBannerClosed(id: String): Boolean {
-        return id in preferences.getStringSet(PREFS_CLOSED_BANNERS)
     }
 
     override fun closeBanner(id: String) {
