@@ -7,12 +7,8 @@ import android.view.ViewOutlineProvider
 
 class RoundCornersOutlineProvider(
     private val cornerRadius: Float,
-    private var margin: Rect = Rect()
+    private val margin: Rect = Rect()
 ) : ViewOutlineProvider() {
-
-    fun setMargin(margin: Rect) {
-        this.margin = margin
-    }
 
     override fun getOutline(view: View, outline: Outline) {
         outline.setRoundRect(

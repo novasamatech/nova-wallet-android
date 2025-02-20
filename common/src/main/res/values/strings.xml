@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-
     <string name="price_chart_date_format">%s at %s</string>
     <string name="price_chart_price_change">%s (%s)</string>
 
@@ -12,12 +11,7 @@
     <string name="price_chart_year">1Y</string>
     <string name="price_chart_max">All</string>
 
-    <!--<string name="dapp_main_welcome_title">Welcome to Nova Browser</string>-->
-    <!--<string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>-->
-
-
     <string name="popular_dapps_title">Popular DApps</string>
-
 
     <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
 
@@ -1289,6 +1283,10 @@
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>
 
     <string name="assets_filter_title">Filter tokens</string>
+
+    <string name="dapp_main_welcome_title">Welcome to Nova Browser</string>
+
+    <string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>
 
     <string name="manage_assets_add_token">Add token</string>
 
