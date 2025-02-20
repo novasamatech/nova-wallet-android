@@ -81,7 +81,7 @@ class PriceChartsView @JvmOverloads constructor(
         if (charts.isEmpty()) {
             setEmptyState()
         } else {
-            if (selectedChartIndex <= charts.size) {
+            if (selectedChartIndex >= charts.size) {
                 selectedChartIndex = 0
             }
 
