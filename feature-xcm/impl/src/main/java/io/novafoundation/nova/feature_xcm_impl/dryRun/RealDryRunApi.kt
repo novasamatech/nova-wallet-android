@@ -23,8 +23,8 @@ class RealDryRunApi @Inject constructor(
 ) : DryRunApi {
 
     override suspend fun dryRunXcm(
-        xcm: VersionedRawXcmMessage,
         originLocation: VersionedXcmLocation,
+        xcm: VersionedRawXcmMessage,
         chainId: ChainId
     ): Result<ScaleResult<XcmDryRunEffects, DryRunEffectsResultErr>> {
         return multiChainRuntimeCallsApi.forChain(chainId).dryRunXcm(xcm, originLocation)

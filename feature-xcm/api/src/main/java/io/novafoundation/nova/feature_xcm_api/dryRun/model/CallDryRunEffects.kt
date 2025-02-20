@@ -11,11 +11,11 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 
 class CallDryRunEffects(
     val executionResult: ScaleResult<DispatchPostInfo, DispatchErrorWithPostInfo>,
-    val emittedEvents: List<GenericEvent.Instance>,
+    override val emittedEvents: List<GenericEvent.Instance>,
     // We don't need to fully decode/encode intermediate xcm messages
     val localXcm: VersionedRawXcmMessage?,
-    val forwardedXcms: ForwardedXcms
-) {
+    override val forwardedXcms: ForwardedXcms
+) : DryRunEffects {
 
     companion object {
 

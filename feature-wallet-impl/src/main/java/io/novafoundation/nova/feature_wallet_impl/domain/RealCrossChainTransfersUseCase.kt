@@ -35,6 +35,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
 private const val INCOMING_DIRECTIONS = "RealCrossChainTransfersUseCase.INCOMING_DIRECTIONS"
@@ -114,7 +117,7 @@ internal class RealCrossChainTransfersUseCase(
     override suspend fun ExtrinsicService.estimateFee(
         transfer: AssetTransferBase,
         cachingScope: CoroutineScope?
-    ): CrossChainTransferFee {
+    ): CrossChainTransferFee = withContext(Dispatchers.IO) {
         val configuration = cachedConfigurationFlow(cachingScope).first()
         val transferConfiguration = configuration.transferConfiguration(
             originChain = parachainInfoRepository.getXcmChain(transfer.originChain),
@@ -122,13 +125,13 @@ internal class RealCrossChainTransfersUseCase(
             destinationChain = parachainInfoRepository.getXcmChain(transfer.destinationChain),
         )!!
 
-        val originFee = with(crossChainTransactor) {
-            estimateOriginFee(transferConfiguration, transfer)
-        }
+        val originFeeAsync = async { crossChainTransactor.estimateOriginFee(transferConfiguration, transfer) }
+        val crossChainFeeAsync = async { crossChainWeigher.estimateFee(transfer, transferConfiguration) }
 
-        val crossChainFee = crossChainWeigher.estimateFee(transfer.amountPlanks, transferConfiguration)
+        val originFee = originFeeAsync.await()
+        val crossChainFee = crossChainFeeAsync.await()
 
-        return CrossChainTransferFee(
+        CrossChainTransferFee(
             submissionFee = originFee,
             deliveryFee = crossChainFee.deliveryFeesOrNull()?.let {
                 // Delivery fees are also paid by an actual account

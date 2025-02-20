@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
@@ -37,6 +39,10 @@ interface AssetTransferBase : AssetTransferDirection {
     val feePaymentCurrency: FeePaymentCurrency
 
     val amountPlanks: Balance
+}
+
+fun AssetTransferBase.amount(): BigDecimal {
+    return originChainAsset.amountFromPlanks(amountPlanks)
 }
 
 fun AssetTransferBase.replaceAmount(newAmount: Balance): AssetTransferBase {

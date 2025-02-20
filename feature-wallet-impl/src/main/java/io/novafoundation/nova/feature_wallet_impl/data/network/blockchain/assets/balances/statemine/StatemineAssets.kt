@@ -1,41 +1,30 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindCollectionEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.StatemineAssetDetails
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.AssetAccount.AccountStatus
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 
-class AssetDetails(
-    val status: Status,
-    val isSufficient: Boolean,
-    val minimumBalance: BigInteger
-) {
-
-    enum class Status {
-        Live, Frozen, Destroying
-    }
-}
-
-val AssetDetails.Status.transfersFrozen: Boolean
-    get() = this != AssetDetails.Status.Live
-
 @UseCaseBinding
-fun bindAssetDetails(decoded: Any?): AssetDetails {
+fun bindAssetDetails(decoded: Any?): StatemineAssetDetails {
     val dynamicInstance = decoded.cast<Struct.Instance>()
 
-    return AssetDetails(
+    return StatemineAssetDetails(
         status = bindAssetStatus(dynamicInstance),
         isSufficient = bindBoolean(dynamicInstance["isSufficient"]),
-        minimumBalance = bindNumber(dynamicInstance["minBalance"])
+        minimumBalance = bindNumber(dynamicInstance["minBalance"]),
+        issuer = bindAccountIdKey(dynamicInstance["issuer"])
     )
 }
 
-private fun bindAssetStatus(assetStruct: Struct.Instance): AssetDetails.Status {
+private fun bindAssetStatus(assetStruct: Struct.Instance): StatemineAssetDetails.Status {
     return when {
         assetStruct.get<Any>("isFrozen") != null -> bindIsFrozen(bindBoolean(assetStruct["isFrozen"]))
         assetStruct.get<Any>("status") != null -> bindCollectionEnum(assetStruct["status"])
@@ -43,7 +32,9 @@ private fun bindAssetStatus(assetStruct: Struct.Instance): AssetDetails.Status {
     }
 }
 
-private fun bindIsFrozen(isFrozen: Boolean): AssetDetails.Status = if (isFrozen) AssetDetails.Status.Frozen else AssetDetails.Status.Live
+private fun bindIsFrozen(isFrozen: Boolean): StatemineAssetDetails.Status {
+    return if (isFrozen) StatemineAssetDetails.Status.Frozen else StatemineAssetDetails.Status.Live
+}
 
 class AssetAccount(
     val balance: BigInteger,

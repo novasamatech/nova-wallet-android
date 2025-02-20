@@ -39,14 +39,14 @@ fun StatemineAssetId.isScaleEncoded(): Boolean {
     return this is StatemineAssetId.ScaleEncoded
 }
 
-fun Chain.Asset.Type.Statemine.prepareIdForEncoding(runtimeSnapshot: RuntimeSnapshot): Any? {
+fun Chain.Asset.Type.Statemine.prepareIdForEncoding(runtimeSnapshot: RuntimeSnapshot): Any {
     return when (val id = id) {
         is StatemineAssetId.Number -> id.value
 
         is StatemineAssetId.ScaleEncoded -> {
             val assetIdType = statemineAssetIdScaleType(runtimeSnapshot, palletNameOrDefault())
 
-            assetIdType!!.fromHex(runtimeSnapshot, id.scaleHex)
+            assetIdType!!.fromHex(runtimeSnapshot, id.scaleHex)!!
         }
     }
 }
