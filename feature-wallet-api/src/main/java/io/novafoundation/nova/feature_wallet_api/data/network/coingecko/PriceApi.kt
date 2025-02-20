@@ -7,7 +7,7 @@ import retrofit2.http.Query
 interface PriceApi {
 
     companion object {
-        const val BASE_URL = "https//tokens-price.novasama-tech.org"
+        const val BASE_URL = "https://tokens-price.novasama-tech.org"
 
         fun getRecentRateFieldName(priceId: String): String {
             return priceId + "_24h_change"
