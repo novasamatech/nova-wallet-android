@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.domain.interfaces
+package io.novafoundation.nova.feature_wallet_api.data.repository
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
@@ -7,7 +7,7 @@ import retrofit2.HttpException
 import kotlin.jvm.Throws
 import kotlin.time.Duration
 
-enum class Range {
+enum class PriceChartPeriod {
     DAY, WEEK, MONTH, YEAR, MAX
 }
 
@@ -26,5 +26,5 @@ interface CoinPriceRepository {
     suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
 
     @Throws(HttpException::class)
-    suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: Range): List<HistoricalCoinRate>
+    suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: PriceChartPeriod): List<HistoricalCoinRate>
 }

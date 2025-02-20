@@ -104,8 +104,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChartWithSelectedEntry(entry: Entry) {
-        val entriesBefore = currentEntries.filter { it.x <= entry.x }
-        val entriesAfter = currentEntries.subList(entriesBefore.size - 1, currentEntries.size)
+        val (entriesBefore, entriesAfter) = currentEntries.partition { it.x <= entry.x }
 
         val entriesColor = currentEntries.getColorResForEntries()
         val datasetBefore = entriesBefore.createDataSet(entriesColor)

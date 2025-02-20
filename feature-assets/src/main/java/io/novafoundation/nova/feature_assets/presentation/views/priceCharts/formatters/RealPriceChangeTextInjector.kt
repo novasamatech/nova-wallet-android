@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.views.priceCharts.for
 
 import android.widget.TextView
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -22,7 +23,7 @@ class RealPriceChangeTextInjector(
     override fun format(fromValue: Float, toValue: Float, textView: TextView) {
         val change = toValue - fromValue
         val changeInPercent = if (fromValue != 0f) {
-            (change / fromValue) * 100f
+            (change / fromValue).fractions.inPercents.toFloat()
         } else {
             0f
         }

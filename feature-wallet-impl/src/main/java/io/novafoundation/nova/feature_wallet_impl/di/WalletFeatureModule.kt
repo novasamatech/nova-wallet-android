@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -48,7 +49,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCas
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -117,7 +118,7 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): PriceApi {
-        return networkApiCreator.create(PriceApi::class.java)
+        return networkApiCreator.create(PriceApi::class.java, PriceApi.BASE_URL)
     }
 
     @Provides

@@ -46,6 +46,7 @@ class PriceChartsView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyle), ChartController.Callback {
 
     private var charts: List<PriceChartModel> = emptyList()
+    private var selectedChartIndex = 0
 
     private val horizontalScrollDetector = HorizontalScrollDetector(5.dpF)
 
@@ -71,16 +72,20 @@ class PriceChartsView @JvmOverloads constructor(
         priceChartButtons.removeAllViews()
         charts.forEachIndexed { index, priceChartModel ->
             if (index > 0) {
-                priceChartButtons.addView(getSpace())
+                priceChartButtons.addView(createSpace())
             }
 
-            priceChartButtons.addView(getButton(priceChartModel.name, index))
+            priceChartButtons.addView(createButton(priceChartModel.name, index))
         }
 
         if (charts.isEmpty()) {
             setEmptyState()
         } else {
-            selectChart(0)
+            if (selectedChartIndex <= charts.size) {
+                selectedChartIndex = 0
+            }
+
+            selectChart(selectedChartIndex)
         }
     }
 
@@ -125,6 +130,8 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun selectChart(index: Int) {
+        selectedChartIndex = index
+
         getButtons().forEachIndexed { i, view ->
             view.isSelected = i == index
         }
@@ -146,19 +153,22 @@ class PriceChartsView @JvmOverloads constructor(
             .filterIsInstance<TextView>()
     }
 
-    private fun getButton(text: String, index: Int): View {
+    private fun createButton(text: String, index: Int): View {
         val button = View.inflate(context, R.layout.layout_price_chart_button, null) as TextView
         button.text = text
         button.setOnClickListener { selectChart(index) }
         return button
     }
 
-    private fun getSpace(): Space {
+    private fun createSpace(): Space {
         val space = Space(context)
         space.layoutParams = LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f)
         return space
     }
 
+    /**
+     * We should disallow intercept touch events by parents when we move horizontally to prevent scrolling in parent
+     */
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         val isHorizontalScroll = horizontalScrollDetector.isHorizontalScroll(ev)
         if (isHorizontalScroll) {

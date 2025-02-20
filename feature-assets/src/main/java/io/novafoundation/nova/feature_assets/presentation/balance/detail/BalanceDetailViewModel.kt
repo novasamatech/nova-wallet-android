@@ -36,7 +36,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.Range
+import io.novafoundation.nova.feature_wallet_api.data.repository.PriceChartPeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
@@ -55,6 +55,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -139,7 +140,7 @@ class BalanceDetailViewModel(
     val priceChartTitle = assetFlow.map {
         val tokenName = it.token.configuration.symbol.value
         resourceManager.getString(R.string.price_chart_title, tokenName)
-    }
+    }.shareInBackground()
 
     val priceChartFormatters: Flow<PriceChartTextInjectors> = flowOf {
         val currency = currencyInteractor.getSelectedCurrency()
@@ -149,16 +150,18 @@ class BalanceDetailViewModel(
             RealPriceChangeTextInjector(resourceManager, currency),
             RealDateChartTextInjector(resourceManager)
         )
-    }
+    }.shareInBackground()
 
-    private val priceCharts: Flow<List<AssetPriceChart>?> = assetFlow.flatMapLatest {
-        val priceId = it.token.configuration.priceId ?: return@flatMapLatest flowOf { null }
-        chartsInteractor.getCharts(priceId)
-    }
+    private val priceCharts: Flow<List<AssetPriceChart>?> = assetFlow.map { it.token.configuration.priceId }
+        .distinctUntilChanged()
+        .flatMapLatest {
+            val priceId = it ?: return@flatMapLatest flowOf { null }
+            chartsInteractor.chartsFlow(priceId)
+        }.shareInBackground()
 
     val priceChartModels = priceCharts.map { charts ->
         charts?.map { mapChartsToUi(it) }
-    }
+    }.shareInBackground()
 
     init {
         sync()
@@ -292,11 +295,11 @@ class BalanceDetailViewModel(
 
     private fun mapChartsToUi(assetPriceChart: AssetPriceChart): PriceChartModel {
         val rangeName = when (assetPriceChart.range) {
-            Range.DAY -> resourceManager.getString(R.string.price_chart_day)
-            Range.WEEK -> resourceManager.getString(R.string.price_chart_week)
-            Range.MONTH -> resourceManager.getString(R.string.price_chart_month)
-            Range.YEAR -> resourceManager.getString(R.string.price_chart_year)
-            Range.MAX -> resourceManager.getString(R.string.price_chart_max)
+            PriceChartPeriod.DAY -> resourceManager.getString(R.string.price_chart_day)
+            PriceChartPeriod.WEEK -> resourceManager.getString(R.string.price_chart_week)
+            PriceChartPeriod.MONTH -> resourceManager.getString(R.string.price_chart_month)
+            PriceChartPeriod.YEAR -> resourceManager.getString(R.string.price_chart_year)
+            PriceChartPeriod.MAX -> resourceManager.getString(R.string.price_chart_max)
         }
 
         return if (assetPriceChart.chart is ExtendedLoadingState.Loaded) {

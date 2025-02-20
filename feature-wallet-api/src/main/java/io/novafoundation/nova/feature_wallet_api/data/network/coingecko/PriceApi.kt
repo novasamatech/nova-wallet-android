@@ -7,12 +7,14 @@ import retrofit2.http.Query
 interface PriceApi {
 
     companion object {
+        const val BASE_URL = "https//tokens-price.novasama-tech.org"
+
         fun getRecentRateFieldName(priceId: String): String {
             return priceId + "_24h_change"
         }
     }
 
-    @GET("//tokens-price.novasama-tech.org/api/v3/coins/{id}/market_chart/range")
+    @GET("/api/v3/coins/{id}/market_chart/range")
     suspend fun getCoinRange(
         @Path("id") id: String,
         @Query("vs_currency") currency: String,
@@ -20,14 +22,14 @@ interface PriceApi {
         @Query("to") toTimestamp: Long
     ): CoinRangeResponse
 
-    @GET("//tokens-price.novasama-tech.org/api/v3/coins/{id}/market_chart")
+    @GET("/api/v3/coins/{id}/market_chart")
     suspend fun getLastCoinRange(
         @Path("id") id: String,
         @Query("vs_currency") currency: String,
         @Query("days") days: String
     ): CoinRangeResponse
 
-    @GET("//tokens-price.novasama-tech.org/api/v3/simple/price")
+    @GET("/api/v3/simple/price")
     suspend fun getAssetPrice(
         @Query("ids") priceIds: String,
         @Query("vs_currencies") currency: String,
