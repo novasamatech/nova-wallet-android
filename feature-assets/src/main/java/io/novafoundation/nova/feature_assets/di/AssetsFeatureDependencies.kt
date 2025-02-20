@@ -40,8 +40,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
-import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
-import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
@@ -60,7 +58,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -69,7 +67,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -181,10 +179,6 @@ interface AssetsFeatureDependencies {
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
-    val bannerSourceFactory: BannersSourceFactory
-
-    val bannersMixinFactory: PromotionBannersMixinFactory
-
     fun web3NamesInteractor(): Web3NamesInteractor
 
     fun contributionsInteractor(): ContributionsInteractor
@@ -265,7 +259,7 @@ interface AssetsFeatureDependencies {
 
     fun ethereumAddressFormat(): EthereumAddressFormat
 
-    fun coingeckoApi(): CoingeckoApi
+    fun coingeckoApi(): PriceApi
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
 

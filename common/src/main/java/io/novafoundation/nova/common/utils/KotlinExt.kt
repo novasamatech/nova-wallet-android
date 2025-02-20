@@ -24,7 +24,6 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -625,12 +624,6 @@ fun Date.atTheNextDay(): Date {
     return calendar.toDate()
 }
 
-fun Float.signum() = when {
-    this < 0f -> -1f
-    this > 0f -> 1f
-    else -> 0f
-}
-
 fun Calendar.toDate(): Date = Date(time.time)
 
 fun Calendar.resetDay() {
@@ -645,12 +638,3 @@ inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.(
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
-
-suspend fun <T> scopeAsync(
-    context: CoroutineContext = Dispatchers.Default,
-    block: suspend CoroutineScope.() -> T
-): Deferred<T> {
-    return coroutineScope {
-        async(context, block = block)
-    }
-}

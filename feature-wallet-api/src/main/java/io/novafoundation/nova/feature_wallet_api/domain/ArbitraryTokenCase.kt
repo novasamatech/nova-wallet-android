@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.domain
 
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalToken
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
