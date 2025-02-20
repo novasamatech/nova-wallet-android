@@ -278,9 +278,9 @@ class LegacyCrossChainWeigher @Inject constructor(
     }
 
     private fun LegacyCrossChainTransferConfiguration.sendingAssetAmountOf(planks: Balance): MultiAsset {
-        return MultiAsset(
-            fungibility = MultiAsset.Fungibility.Fungible(amount = planks),
-            id = MultiAssetId(assetLocation)
+        return MultiAsset.from(
+            amount = planks,
+            multiLocation = assetLocation,
         )
     }
 

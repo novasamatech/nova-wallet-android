@@ -14,12 +14,14 @@ interface CrossChainTransactor {
 
     val validationSystem: AssetTransfersValidationSystem
 
-    suspend fun ExtrinsicService.estimateOriginFee(
+    context(ExtrinsicService)
+    suspend fun estimateOriginFee(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase
     ): Fee
 
-    suspend fun ExtrinsicService.performTransfer(
+    context(ExtrinsicService)
+    suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
         crossChainFee: Balance

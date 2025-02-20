@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
+import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -38,14 +39,12 @@ class StatemineAssetsModule {
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
-        @Named(LOCAL_STORAGE_SOURCE) localStorage: StorageDataSource,
-        storageCache: StorageCache
+        statemineAssetsRepository: StatemineAssetsRepository,
     ) = StatemineAssetBalance(
         chainRegistry = chainRegistry,
         assetCache = assetCache,
         remoteStorage = remoteStorage,
-        localStorage = localStorage,
-        storageCache = storageCache
+        statemineAssetsRepository = statemineAssetsRepository
     )
 
     @Provides

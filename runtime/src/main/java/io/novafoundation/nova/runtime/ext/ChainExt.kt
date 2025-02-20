@@ -467,12 +467,14 @@ fun Chain.Asset.requireEquilibrium(): Type.Equilibrium {
 }
 
 fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
-    val ormlType = requireOrml()
+    return requireOrml().currencyId(runtime)
+}
 
-    val currencyIdType = runtime.typeRegistry[ormlType.currencyIdType]
-        ?: error("Cannot find type ${ormlType.currencyIdType}")
+fun Type.Orml.currencyId(runtime: RuntimeSnapshot): Any? {
+    val currencyIdType = runtime.typeRegistry[currencyIdType]
+        ?: error("Cannot find type $currencyIdType")
 
-    return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
+    return currencyIdType.fromHex(runtime, currencyIdScale)
 }
 
 val Chain.Asset.fullId: FullChainAssetId

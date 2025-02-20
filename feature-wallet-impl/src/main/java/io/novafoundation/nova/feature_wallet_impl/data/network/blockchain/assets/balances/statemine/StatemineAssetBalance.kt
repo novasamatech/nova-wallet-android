@@ -12,8 +12,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.StatemineAssetDetails
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.transfersFrozen
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.statemineModule
@@ -34,12 +37,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 
+// TODO Migrate low-level subscription to storage to AssetsApi
 class StatemineAssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
     private val remoteStorage: StorageDataSource,
-    private val localStorage: StorageDataSource,
-    private val storageCache: StorageCache
+    private val statemineAssetsRepository: StatemineAssetsRepository,
 ) : AssetBalance {
 
     override suspend fun startSyncingBalanceLocks(
@@ -134,25 +137,14 @@ class StatemineAssetBalance(
 
         val module = runtime.metadata.statemineModule(statemineType)
 
-        val assetDetailsStorage = module.storage("Asset")
-        val assetDetailsKey = assetDetailsStorage.storageKey(runtime, encodableAssetId)
-
         val assetAccountStorage = module.storage("Account")
         val assetAccountKey = assetAccountStorage.storageKey(runtime, encodableAssetId, accountId)
 
-        val assetDetailsFlow = subscriptionBuilder.subscribe(assetDetailsKey)
-            .onEach { storageCache.insert(it, chain.id) }
-
-        val isFrozenFlow = assetDetailsFlow
-            .map {
-                val decoded = assetDetailsStorage.decodeValue(it.value, runtime)
-
-                bindAssetDetails(decoded).status.transfersFrozen
-            }
+        val assetDetailsFlow = statemineAssetsRepository.subscribeAndSyncAssetDetails(chain.id, statemineType, subscriptionBuilder)
 
         return combine(
             subscriptionBuilder.subscribe(assetAccountKey),
-            isFrozenFlow
+            assetDetailsFlow.map {it.status.transfersFrozen }
         ) { balanceStorageChange, isAssetFrozen ->
             val assetAccountDecoded = assetAccountStorage.decodeValue(balanceStorageChange.value, runtime)
             val assetAccount = bindAssetAccountOrEmpty(assetAccountDecoded)
@@ -167,13 +159,9 @@ class StatemineAssetBalance(
         }
     }
 
-    private suspend fun queryAssetDetails(chainAsset: Chain.Asset): AssetDetails {
+    private suspend fun queryAssetDetails(chainAsset: Chain.Asset): StatemineAssetDetails {
         val statemineType = chainAsset.requireStatemine()
-        return localStorage.query(chainAsset.chainId) {
-            val encodableAssetId = statemineType.prepareIdForEncoding(runtime)
-
-            runtime.metadata.statemineModule(statemineType).storage("Asset").query(encodableAssetId, binding = ::bindAssetDetails)
-        }
+        return statemineAssetsRepository.getAssetDetails(chainAsset.chainId, statemineType)
     }
 
     private suspend fun updateAssetBalance(

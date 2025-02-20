@@ -398,9 +398,10 @@ fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().value
 fun AccountId.ethereumAccountIdToAddress(withChecksum: Boolean = true) = asEthereumAccountId().toAddress(withChecksum).value
 
+// We do not use all-zeros account here or for emptySubstrateAccountId since most substrate chains forbid transfers from this account
 fun emptyEthereumAccountId() = ByteArray(20) { 1 }
 
-fun emptySubstrateAccountId() = ByteArray(32)
+fun emptySubstrateAccountId() = ByteArray(32) { 1 }
 
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
