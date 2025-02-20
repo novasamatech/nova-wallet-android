@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
@@ -58,9 +59,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         config: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase
     ): CrossChainFeeModel {
-        val minimumSendAmount = transfer.destinationChainAsset.planksFromAmount(MINIMUM_SEND_AMOUNT.toBigDecimal())
-        val safeAmount = transfer.amountPlanks.coerceAtLeast(minimumSendAmount)
-        val safeTransfer = transfer.replaceAmount(newAmount = safeAmount)
+        val safeTransfer = transfer.ensureSafeAmount()
 
         val runtime = chainRegistry.getRuntime(config.originChainId)
 
@@ -74,6 +73,13 @@ class DynamicCrossChainWeigher @Inject constructor(
             remoteReserve = remoteReserveResult,
             destination = destinationResult
         )
+    }
+
+    // Ensure we can calculate fee regardless of what user entered
+    private fun AssetTransferBase.ensureSafeAmount(): AssetTransferBase {
+        val minimumSendAmount = destinationChainAsset.planksFromAmount(MINIMUM_SEND_AMOUNT.toBigDecimal())
+        val safeAmount = amountPlanks.coerceAtLeast(minimumSendAmount)
+        return replaceAmount(newAmount = safeAmount)
     }
 
     private suspend fun dryRunOnOrigin(
