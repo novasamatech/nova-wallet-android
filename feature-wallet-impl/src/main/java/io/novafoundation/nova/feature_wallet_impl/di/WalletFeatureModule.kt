@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
