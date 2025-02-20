@@ -13,18 +13,18 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.Add
 class OrmlAssetIssuer(
     private val ormlType: Chain.Asset.Type.Orml,
     private val runtimeSnapshot: RuntimeSnapshot
-): AssetIssuer {
+) : AssetIssuer {
 
     override suspend fun composeIssueCall(amount: Balance, destination: AccountIdKey): GenericCall.Instance {
-       return runtimeSnapshot.composeCall(
-           moduleName = Modules.TOKENS,
-           callName = "set_balance",
-           args = mapOf(
-               "who" to AddressInstanceConstructor.constructInstance(runtimeSnapshot.typeRegistry, destination.value),
-               "currency_id" to ormlType.currencyId(runtimeSnapshot),
-               "new_free" to amount,
-               "new_reserved" to Balance.ZERO
-           )
-       )
+        return runtimeSnapshot.composeCall(
+            moduleName = Modules.TOKENS,
+            callName = "set_balance",
+            args = mapOf(
+                "who" to AddressInstanceConstructor.constructInstance(runtimeSnapshot.typeRegistry, destination.value),
+                "currency_id" to ormlType.currencyId(runtimeSnapshot),
+                "new_free" to amount,
+                "new_reserved" to Balance.ZERO
+            )
+        )
     }
 }

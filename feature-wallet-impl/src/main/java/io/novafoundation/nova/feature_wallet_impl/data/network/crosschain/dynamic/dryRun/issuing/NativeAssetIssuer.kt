@@ -10,7 +10,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.Add
 
 class NativeAssetIssuer(
     private val runtimeSnapshot: RuntimeSnapshot
-): AssetIssuer {
+) : AssetIssuer {
 
     override suspend fun composeIssueCall(amount: Balance, destination: AccountIdKey): GenericCall.Instance {
         return runtimeSnapshot.composeCall(

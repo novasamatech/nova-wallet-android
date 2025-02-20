@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.weightT
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.xcmExecute
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction
 import io.novafoundation.nova.feature_xcm_api.message.XcmMessage

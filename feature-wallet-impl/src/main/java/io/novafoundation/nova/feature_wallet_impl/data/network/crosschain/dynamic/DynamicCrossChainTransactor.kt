@@ -47,7 +47,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         crossChainFee: Balance
     ): GenericCall.Instance {
         val totalTransferAmount = transfer.amountPlanks + crossChainFee
-        val multiAsset =  MultiAsset.from(configuration.assetLocationOnOrigin, totalTransferAmount)
+        val multiAsset = MultiAsset.from(configuration.assetLocationOnOrigin, totalTransferAmount)
 
         return chainRegistry.withRuntime(configuration.originChainId) {
             composeCall(

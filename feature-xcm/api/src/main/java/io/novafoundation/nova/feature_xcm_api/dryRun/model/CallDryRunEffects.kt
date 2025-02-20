@@ -15,7 +15,7 @@ class CallDryRunEffects(
     // We don't need to fully decode/encode intermediate xcm messages
     val localXcm: VersionedRawXcmMessage?,
     override val forwardedXcms: ForwardedXcms
-): DryRunEffects {
+) : DryRunEffects {
 
     companion object {
 

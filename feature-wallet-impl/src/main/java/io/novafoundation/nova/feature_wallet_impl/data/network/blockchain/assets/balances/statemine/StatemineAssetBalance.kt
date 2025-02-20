@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.decodeValue
-import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
 import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
@@ -25,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
@@ -34,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 
 // TODO Migrate low-level subscription to storage to AssetsApi
@@ -144,7 +141,7 @@ class StatemineAssetBalance(
 
         return combine(
             subscriptionBuilder.subscribe(assetAccountKey),
-            assetDetailsFlow.map {it.status.transfersFrozen }
+            assetDetailsFlow.map { it.status.transfersFrozen }
         ) { balanceStorageChange, isAssetFrozen ->
             val assetAccountDecoded = assetAccountStorage.decodeValue(balanceStorageChange.value, runtime)
             val assetAccount = bindAssetAccountOrEmpty(assetAccountDecoded)

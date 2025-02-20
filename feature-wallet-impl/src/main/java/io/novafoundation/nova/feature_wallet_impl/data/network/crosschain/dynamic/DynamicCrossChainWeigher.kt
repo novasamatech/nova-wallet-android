@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.destinationChainLocationOnOrigin
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeDispatchAs
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.AssetIssuerRegistry
@@ -233,11 +232,11 @@ class DynamicCrossChainWeigher @Inject constructor(
         val feesDecoded = event.arguments[FEES_PAID_FEES_ARGUMENT_INDEX]
         val multiAssets = MultiAssets.bind(feesDecoded, usedXcmVersion).value
 
-       return if (multiAssets.isNotEmpty()) {
-           multiAssets.first().requireFungible().amount
-       } else {
-           Balance.ZERO
-       }
+        return if (multiAssets.isNotEmpty()) {
+            multiAssets.first().requireFungible().amount
+        } else {
+            Balance.ZERO
+        }
     }
 
     private fun searchForwardedXcmInEvents(

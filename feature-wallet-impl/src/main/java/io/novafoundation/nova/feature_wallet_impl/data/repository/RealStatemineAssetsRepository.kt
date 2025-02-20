@@ -32,14 +32,14 @@ class RealStatemineAssetsRepository @Inject constructor(
     private val remoteStorageSource: StorageDataSource,
 
     override val storageCache: StorageCache,
-): StatemineAssetsRepository,
+) : StatemineAssetsRepository,
     StorageCachingContext by StorageCachingContext(storageCache) {
 
     override suspend fun getAssetDetails(chainId: ChainId, assetType: Chain.Asset.Type.Statemine): StatemineAssetDetails {
-       return localStorageSource.query(chainId) {
-           val encodableAssetId = assetType.prepareIdForEncoding(runtime)
-           metadata.assets(assetType.palletNameOrDefault()).asset.queryNonNull(encodableAssetId)
-       }
+        return localStorageSource.query(chainId) {
+            val encodableAssetId = assetType.prepareIdForEncoding(runtime)
+            metadata.assets(assetType.palletNameOrDefault()).asset.queryNonNull(encodableAssetId)
+        }
     }
 
     override suspend fun subscribeAndSyncAssetDetails(
@@ -47,12 +47,12 @@ class RealStatemineAssetsRepository @Inject constructor(
         assetType: Chain.Asset.Type.Statemine,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<StatemineAssetDetails> {
-       return remoteStorageSource.subscribe(chainId, subscriptionBuilder) {
-           val encodableAssetId = assetType.prepareIdForEncoding(runtime)
+        return remoteStorageSource.subscribe(chainId, subscriptionBuilder) {
+            val encodableAssetId = assetType.prepareIdForEncoding(runtime)
 
-           metadata.assets(assetType.palletNameOrDefault()).asset.observeWithRaw(encodableAssetId)
-               .cacheValues()
-               .filterNotNull()
-       }
+            metadata.assets(assetType.palletNameOrDefault()).asset.observeWithRaw(encodableAssetId)
+                .cacheValues()
+                .filterNotNull()
+        }
     }
 }

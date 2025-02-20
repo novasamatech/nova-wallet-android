@@ -10,7 +10,7 @@ class XcmDryRunEffects(
     val executionResult: XcmOutcome,
     override val emittedEvents: List<GenericEvent.Instance>,
     override val forwardedXcms: ForwardedXcms
-): DryRunEffects {
+) : DryRunEffects {
 
     companion object {
 
