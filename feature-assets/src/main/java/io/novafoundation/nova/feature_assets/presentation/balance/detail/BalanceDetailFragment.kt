@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -27,8 +26,6 @@ import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailActio
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRate
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailRateChange
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
@@ -125,11 +122,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)
             balanceDetailTokenName.text = asset.token.configuration.symbol.value
-
-            balanceDetailRate.text = asset.token.rate
-
-            balanceDetailRateChange.setTextColorRes(asset.token.rateChangeColorRes)
-            balanceDetailRateChange.text = asset.token.recentRateChange
 
             balanceDetailsBalances.setTotalAmount(asset.total)
             balanceDetailsBalances.transferable.showAmount(asset.transferable)

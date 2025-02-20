@@ -71,41 +71,12 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="KSM" />
 
-            <TextView
-                android:id="@+id/balanceDetailRate"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="2dp"
-                android:textColor="@color/text_secondary"
-                app:layout_constraintEnd_toStartOf="@+id/balanceDetailRateChange"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/balanceDetailTokenIcon"
-                tools:text="$10.25" />
-
-            <TextView
-                android:id="@+id/balanceDetailRateChange"
-                style="@style/TextAppearance.NovaFoundation.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
-                android:textColor="@color/text_positive"
-                app:layout_constraintBottom_toBottomOf="@+id/balanceDetailRate"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/balanceDetailRate"
-                app:layout_constraintTop_toTopOf="@+id/balanceDetailRate"
-                tools:text="+25%" />
-
             <Space
                 android:id="@+id/balanceDetailBalanceBottomMargin"
                 android:layout_width="wrap_content"
                 android:layout_height="8dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/balanceDetailRate" />
+                app:layout_constraintTop_toBottomOf="@+id/balanceDetailTokenIcon" />
 
             <io.novafoundation.nova.feature_assets.presentation.balance.detail.AssetDetailBalancesView
                 android:id="@+id/balanceDetailsBalances"
