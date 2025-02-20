@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface BannersRepository {
-    suspend fun observeBanners(url: String): Flow<List<PromotionBanner>>
+    suspend fun getBanners(url: String): List<PromotionBanner>
 
     fun isBannerClosed(id: String): Boolean
 
     fun closeBanner(id: String)
+
+    fun observeClosedBannerIds(): Flow<Set<String>>
 }
 
 class RealBannersRepository(
@@ -27,7 +29,7 @@ class RealBannersRepository(
         private const val PREFS_CLOSED_BANNERS = "closed_banners"
     }
 
-    override suspend fun observeBanners(url: String): Flow<List<PromotionBanner>> {
+    override suspend fun getBanners(url: String): List<PromotionBanner> {
         val language = preferences.getCurrentLanguage()!!
         val bannersDeferred = scopeAsync { bannersApi.getBanners(url) }
         val localisationDeferred = scopeAsync { getLocalisation(url, language) }
@@ -35,11 +37,12 @@ class RealBannersRepository(
         val banners = bannersDeferred.await()
         val localisation = localisationDeferred.await()
 
-        val bannerModels = mapBanners(banners, localisation)
+        return mapBanners(banners, localisation)
+    }
 
+    override fun observeClosedBannerIds(): Flow<Set<String>> {
         return preferences.stringSetFlow(PREFS_CLOSED_BANNERS)
             .map { it.orEmpty() }
-            .map { closedIds -> bannerModels.filter { it.id !in closedIds } }
     }
 
     private fun mapBanners(
