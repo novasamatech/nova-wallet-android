@@ -23,6 +23,10 @@ class RealBannersRepository(
     private val languagesHolder: LanguagesHolder
 ) : BannersRepository {
 
+    companion object {
+        private const val PREFS_CLOSED_BANNERS = "closed_banners"
+    }
+
     override suspend fun observeBanners(url: String): Flow<List<PromotionBanner>> {
         val language = preferences.getCurrentLanguage()!!
         val bannersDeferred = scopeAsync { bannersApi.getBanners(url) }
@@ -33,11 +37,9 @@ class RealBannersRepository(
 
         val bannerModels = mapBanners(banners, localisation)
 
-        val keys = bannerModels.map { getBannerPreferenceKey(it.id) }
-            .toTypedArray()
-
-        return preferences.keysFlow(*keys)
-            .map { bannerModels.filter { !isBannerClosed(it.id) } }
+        return preferences.stringSetFlow(PREFS_CLOSED_BANNERS)
+            .map { it.orEmpty() }
+            .map { closedIds -> bannerModels.filter { it.id !in closedIds } }
     }
 
     private fun mapBanners(
@@ -73,14 +75,11 @@ class RealBannersRepository(
     }
 
     override fun isBannerClosed(id: String): Boolean {
-        return preferences.getBoolean(getBannerPreferenceKey(id), false)
+        return id in preferences.getStringSet(PREFS_CLOSED_BANNERS)
     }
 
     override fun closeBanner(id: String) {
-        preferences.putBoolean(getBannerPreferenceKey(id), true)
-    }
-
-    private fun getBannerPreferenceKey(id: String): String {
-        return "closed_banner_$id"
+        val closedBannersId = preferences.getStringSet(PREFS_CLOSED_BANNERS)
+        preferences.putStringSet(PREFS_CLOSED_BANNERS, closedBannersId + id)
     }
 }
