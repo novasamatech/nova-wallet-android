@@ -211,10 +211,7 @@ inline fun View.doOnGlobalLayout(crossinline action: () -> Unit) {
 }
 
 fun View.setVisible(visible: Boolean, falseState: Int = View.GONE) {
-    val newVisibility = if (visible) View.VISIBLE else falseState
-    if (newVisibility != visibility) {
-        visibility = newVisibility
-    }
+    visibility = if (visible) View.VISIBLE else falseState
 }
 
 fun ViewGroup.addAfter(anchor: View, newViews: List<View>) {

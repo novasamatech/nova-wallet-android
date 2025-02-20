@@ -26,7 +26,6 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -641,27 +640,11 @@ inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.(
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
 
-fun Float.multiplier(): Float {
-    return when {
-        this < 0f -> -1f
-        this > 0f -> 1f
-        else -> 0f
-    }
-}
-
-suspend fun <T> asyncWithContext(
+suspend fun <T> scopeAsync(
     context: CoroutineContext = Dispatchers.Default,
     block: suspend CoroutineScope.() -> T
 ): Deferred<T> {
-    return withContext(context) {
-        async(block = block)
-    }
-}
-
-inline fun <T, R> Collection<T>.toMap(block: (T) -> R): Map<T, R> {
-    return buildMap {
-        for (element in this@toMap) {
-            put(element, block(element))
-        }
+    return coroutineScope {
+        async(context, block = block)
     }
 }

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_banners_impl.data.BannersApi
 import io.novafoundation.nova.feature_banners_impl.data.BannersRepository
 import io.novafoundation.nova.feature_banners_impl.data.RealBannersRepository
 import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
+import io.novafoundation.nova.feature_banners_impl.domain.RealPromotionBannersInteractor
 import io.novafoundation.nova.feature_banners_impl.presentation.banner.RealPromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_impl.presentation.banner.source.RealBannersSourceFactory
 
@@ -29,19 +30,19 @@ class BannersFeatureModule {
     @Provides
     @FeatureScope
     fun provideBannersRepository(
+        preferences: Preferences,
         bannersApi: BannersApi,
         languagesHolder: LanguagesHolder
     ): BannersRepository {
-        return RealBannersRepository(bannersApi, languagesHolder)
+        return RealBannersRepository(preferences, bannersApi, languagesHolder)
     }
 
     @Provides
     @FeatureScope
     fun provideBannersInteractor(
-        preferences: Preferences,
         repository: BannersRepository
     ): PromotionBannersInteractor {
-        return PromotionBannersInteractor(preferences, repository)
+        return RealPromotionBannersInteractor(repository)
     }
 
     @Provides

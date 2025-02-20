@@ -9,7 +9,7 @@ context(BaseFragment<T>)
 fun <T : BaseViewModel> PromotionBannersMixin.bindWithAdapter(adapter: PromotionBannerAdapter) {
     adapter.setCallback(object : BannerPagerView.Callback {
         override fun onBannerClicked(page: BannerPageModel) {
-            this@bindWithAdapter.handleBannerAction(page)
+            this@bindWithAdapter.startBannerAction(page)
         }
 
         override fun onBannerClosed(page: BannerPageModel) {

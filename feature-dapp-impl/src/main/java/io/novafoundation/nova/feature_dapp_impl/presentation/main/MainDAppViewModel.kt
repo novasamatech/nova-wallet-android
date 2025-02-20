@@ -41,7 +41,7 @@ class MainDAppViewModel(
     val selectedWalletFlow = selectedAccountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.dappsSource())
+    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.dappsSource(), viewModelScope)
 
     private val favoriteDAppsFlow = dappInteractor.observeFavoriteDApps()
         .shareInBackground()

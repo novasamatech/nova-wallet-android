@@ -9,5 +9,5 @@ interface PromotionBannersMixin {
 
     fun closeBanner(banner: BannerPageModel)
 
-    fun handleBannerAction(page: BannerPageModel)
+    fun startBannerAction(page: BannerPageModel)
 }

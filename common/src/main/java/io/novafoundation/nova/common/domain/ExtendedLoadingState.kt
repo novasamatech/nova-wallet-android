@@ -104,7 +104,7 @@ fun <T> ExtendedLoadingState.Companion.fromOption(value: T?): ExtendedLoadingSta
     }
 }
 
-fun Throwable.asError(): ExtendedLoadingState.Error = ExtendedLoadingState.Error(this)
+fun Throwable.asLoadingError(): ExtendedLoadingState.Error = ExtendedLoadingState.Error(this)
 
 fun <T> T.asLoaded(): ExtendedLoadingState.Loaded<T> = ExtendedLoadingState.Loaded(this)
 

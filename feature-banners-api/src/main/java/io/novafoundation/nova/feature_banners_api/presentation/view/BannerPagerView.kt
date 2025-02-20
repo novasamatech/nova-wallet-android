@@ -24,6 +24,11 @@ import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerIndicato
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * View for viewing banner pages, supporting infinite scrolling
+ * BannerPagerScrollController tracks banner scrolling and triggers a callback, passing a value from -1 to 1 depending on the scroll direction
+ * Animates the scroll to the selected page upon release
+ */
 class BannerPagerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

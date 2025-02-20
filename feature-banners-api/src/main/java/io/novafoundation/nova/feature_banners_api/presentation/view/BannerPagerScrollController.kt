@@ -16,6 +16,12 @@ enum class PageOffset(val scrollDirection: Int, val pageOffset: Int) {
     NEXT(-1, 1), PREVIOUS(1, -1), SAME(0, 0)
 }
 
+/**
+ * BannerPagerScrollController tracks the banner scroll and calls a callback, passing a value from -1 to 1 depending on the scroll direction.
+ * Upon release, it animates the scroll to the selected page.
+ *
+ * - When the scroll animation ends, we replace the Scroller with a new one to reset its scroll value to 0. This is necessary to support infinite scrolling and to remain in the range from -1 to 1.
+ */
 class BannerPagerScrollController(private val context: Context, private val callback: ScrollCallback) {
 
     interface ScrollCallback {
@@ -114,7 +120,7 @@ class BannerPagerScrollController(private val context: Context, private val call
     private fun computeScrollDuration(velocityX: Float): Int {
         val baseDuration = minimumScrollDuration
         val maxDuration = 600
-        return (baseDuration - min(velocityX / 2, baseDuration.toFloat())).toInt().coerceAtLeast(150).coerceAtMost(maxDuration)
+        return (baseDuration - min(velocityX / 2, baseDuration.toFloat())).toInt().coerceIn(150, maxDuration)
     }
 
     private fun currentPageOffset(): Float {
