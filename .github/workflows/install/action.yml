@@ -10,8 +10,13 @@ runs:
         java-version: '17'
         cache: 'gradle'
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+
     - name: Install NDK
-      run: echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;26.1.10909125" --sdk_root=${ANDROID_SDK_ROOT}
+      run: echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/16.0/bin/sdkmanager --install "ndk;26.1.10909125" --sdk_root=${ANDROID_SDK_ROOT}
       shell: bash
 
     - name: Set ndk.dir in local.properties
