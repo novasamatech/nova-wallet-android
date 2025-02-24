@@ -8,7 +8,7 @@ class RealBannersSourceFactory(
     private val bannersInteractor: PromotionBannersInteractor
 ) : BannersSourceFactory {
 
-    override fun create(url: String): BannersSource {
-        return RealBannersSource(url, bannersInteractor)
+    override fun create(bannersUrl: String, localisationUrl: String): BannersSource {
+        return RealBannersSource(bannersUrl, localisationUrl, bannersInteractor)
     }
 }
