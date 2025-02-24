@@ -4,7 +4,7 @@
     <color name="address_icon_background">#eeeeee</color>
     <color name="qr_code_background">#FFFFFF</color>
     <color name="qr_code_content">#101014</color>
-
+    
     <color name="timeline_circle_color">#373A49</color>
     <color name="timeline_line_color">#3DFFFFFF</color>
 
@@ -152,12 +152,8 @@
     <color name="voting_slider_knob_shadow">#B8000000</color>
     <color name="votes_to_pass_indicator_shadow">#B8000000</color>
 
+
     <color name="notification_preview_1_layer_background">#3B3E4E</color>
     <color name="notification_preview_2_layer_background">#252733</color>
     <color name="notification_preview_3_layer_background">#1D1D28</color>
-
-    <color name="price_chart_grid_line">#29999EC7</color>
-    <color name="neutral_price_chart_line">#454968</color>
-    <color name="positive_price_chart_line">#2FC864</color>
-    <color name="negative_price_chart_line">#E53450</color>
 </resources>

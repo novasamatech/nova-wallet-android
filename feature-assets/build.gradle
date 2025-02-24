@@ -53,7 +53,6 @@ dependencies {
     implementation kotlinDep
 
     implementation androidDep
-    implementation swipeRefershLayout
     implementation materialDep
     implementation cardViewDep
     implementation constraintDep
@@ -95,8 +94,6 @@ dependencies {
 
     implementation shimmerDep
     implementation flexBoxDep
-
-    implementation chartsDep
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
