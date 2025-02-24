@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
+import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
