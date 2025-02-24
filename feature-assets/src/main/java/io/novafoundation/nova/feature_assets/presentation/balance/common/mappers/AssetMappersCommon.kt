@@ -21,11 +21,7 @@ import java.math.BigDecimal
 
 fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): String {
     val rateChange = coinRateChange?.rate
-    return mapCoinRateChange(rateChange.orZero(), currency)
-}
-
-fun mapCoinRateChange(rate: BigDecimal, currency: Currency): String {
-    return rate.formatAsCurrency(currency)
+    return rateChange.orZero().formatAsCurrency(currency)
 }
 
 fun mapAssetToAssetModel(

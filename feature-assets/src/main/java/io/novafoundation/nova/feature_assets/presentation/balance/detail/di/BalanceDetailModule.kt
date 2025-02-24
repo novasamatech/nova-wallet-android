@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
-import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -101,8 +100,7 @@ class BalanceDetailModule {
         controllableAssetCheckMixin: ControllableAssetCheckMixin,
         externalBalancesInteractor: ExternalBalancesInteractor,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
-        assetIconProvider: AssetIconProvider,
-        chartsInteractor: ChartsInteractor
+        assetIconProvider: AssetIconProvider
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -118,8 +116,7 @@ class BalanceDetailModule {
             controllableAssetCheck = controllableAssetCheckMixin,
             externalBalancesInteractor = externalBalancesInteractor,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
-            assetIconProvider = assetIconProvider,
-            chartsInteractor = chartsInteractor
+            assetIconProvider = assetIconProvider
         )
     }
 
