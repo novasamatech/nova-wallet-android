@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
+import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.canPayAllFees
@@ -27,6 +28,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughAssetInT
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountIn
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountOut
+import io.novafoundation.nova.feature_swap_impl.domain.validation.priceImpactValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientAmountOutToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringConsumersValidation
@@ -55,6 +57,7 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class SwapInteractor(
+    private val priceImpactThresholds: PriceImpactThresholds,
     private val swapService: SwapService,
     private val buyTokenRegistry: BuyTokenRegistry,
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
@@ -197,6 +200,8 @@ class SwapInteractor(
             swapSmallRemainingBalance(assetsValidationContext)
 
             sufficientAmountOutToStayAboveED(assetsValidationContext)
+
+            priceImpactValidation(priceImpactThresholds)
         }
     }
 }

@@ -779,6 +779,8 @@
         <item quantity="other"></item>
     </plurals>
     <string name="governance_unlock">Разблокировать</string>
+    <string name="high_price_impact_detacted_message">Выполнение этого свапа приведет к значительному проскальзыванию и финансовым потерям. Рассмотрите возможность уменьшения размера вашей сделки или разделения её на несколько транзакций.</string>
+    <string name="high_price_impact_detacted_title">Обнаружено существенное влияние на цену (%s)</string>
     <string name="history_v1.9.0">История</string>
     <string name="identity_email_title">Почта</string>
     <string name="identity_legal_name_title">Официальное имя</string>
@@ -945,6 +947,7 @@
     <string name="pool_inactive_failure_title">Пул не открыт</string>
     <string name="pool_staking_conflict_message">Вы больше не можете использовать одновременно стейкинг напрямую и в пуле с одного аккаунта. Для управления стейкингом в пуле вам сначала нужно вывести ваши токены из стейкинга напрямую.</string>
     <string name="pool_staking_conflict_title">Действия в пуле недоступны</string>
+    <string name="popular_dapps_title">Популярные</string>
     <string name="pre_configured_networks_add_custom_button">Добавить сеть вручную</string>
     <string name="pre_configured_networks_progress_text">Загрузка списка сетей...</string>
     <string name="pre_configured_networks_search_hint">Поиск по имени сети</string>

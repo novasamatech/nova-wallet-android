@@ -758,6 +758,8 @@
         <item quantity="other">您至少需要选择%d轨道</item>
     </plurals>
     <string name="governance_unlock">解锁</string>
+    <string name="high_price_impact_detacted_message">执行此交换将导致显著的滑点和经济损失。建议减小交易规模或将交易分拆为多笔交易。</string>
+    <string name="high_price_impact_detacted_title">检测到高价格影响 (%s)</string>
     <string name="history_v1.9.0">历史</string>
     <string name="identity_email_title">电子邮件</string>
     <string name="identity_legal_name_title">法定名字</string>
@@ -921,6 +923,7 @@
     <string name="pool_inactive_failure_title">池未开放</string>
     <string name="pool_staking_conflict_message">你不能再同时使用同一个账号进行直接质押和池质押。要管理你的池质押，首先需要从直接质押中取消质押你的代币。</string>
     <string name="pool_staking_conflict_title">池操作不可用</string>
+    <string name="popular_dapps_title">流行</string>
     <string name="pre_configured_networks_add_custom_button">手动添加网络</string>
     <string name="pre_configured_networks_progress_text">正在加载网络列表...</string>
     <string name="pre_configured_networks_search_hint">按网络名称搜索</string>
