@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.toResult
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.xcmPalletName
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.accountIdToMultiLocation
+import io.novafoundation.nova.feature_wallet_api.domain.implementations.xcm.legacy.accountIdToMultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets

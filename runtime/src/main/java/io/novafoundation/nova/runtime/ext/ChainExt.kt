@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.ext
 
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
@@ -207,17 +208,12 @@ fun Chain.Asset.normalizeSymbol(): String {
     return normalizeTokenSymbol(this.symbol.value)
 }
 
-private const val MOONBEAM_XC_PREFIX = "xc"
-
 fun TokenSymbol.normalize(): TokenSymbol {
     return normalizeTokenSymbol(value).asTokenSymbol()
 }
 
 fun normalizeTokenSymbol(symbol: String): String {
-    if (symbol.startsWith(XC_PREFIX)) {
-        return symbol.removePrefix(XC_PREFIX)
-    }
-    return symbol
+    return symbol.removePrefix(XC_PREFIX)
 }
 
 val Chain.Node.isWss: Boolean
@@ -287,6 +283,8 @@ fun Chain.emptyAccountId() = if (isEthereumBased) {
 } else {
     emptySubstrateAccountId()
 }
+
+fun Chain.emptyAccountIdKey() = emptyAccountId().intoKey()
 
 fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
     return accountIdOrNull(maybeAddress) ?: emptyAccountId()
