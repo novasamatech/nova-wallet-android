@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy
 
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -12,7 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyC
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.XcmTransferType
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
-import io.novafoundation.nova.feature_xcm_api.asset.from
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.plus
 import io.novafoundation.nova.feature_xcm_api.multiLocation.toMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
@@ -24,7 +23,6 @@ import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.ZERO
 
 @FeatureScope
 class LegacyCrossChainTransactor @Inject constructor(
@@ -144,7 +142,6 @@ class LegacyCrossChainTransactor @Inject constructor(
     ): MultiAsset {
         // we add cross chain fee top of entered amount so received amount will be no less than entered one
         val planks = transfer.amountPlanks + crossChainFee
-
         return MultiAsset.from(assetLocation, planks)
     }
 

@@ -10,3 +10,5 @@ typealias VersionedRawXcmMessage = VersionedXcm<XcmMessageRaw>
 fun bindVersionedRawXcmMessage(decodedInstance: Any?) = bindVersionedXcm(decodedInstance) { inner, _ ->
     DynamicScaleInstance(inner)
 }
+
+fun bindRawXcmMessage(decodedInstance: Any?) = DynamicScaleInstance(decodedInstance)

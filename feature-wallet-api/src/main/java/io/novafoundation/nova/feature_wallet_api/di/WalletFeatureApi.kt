@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
@@ -81,4 +82,6 @@ interface WalletFeatureApi {
     val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 
     val assetsValidationContextFactory: AssetsValidationContext.Factory
+
+    val statemineAssetsRepository: StatemineAssetsRepository
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration.ChainLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemote
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
@@ -58,16 +59,19 @@ fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     val reserve = reserveRegistry.getReserve(originAsset)
 
     val originChainLocation = originXcmChain.absoluteLocation()
-    val assetLocation = reserve.location.fromPointOfViewOf(originChainLocation)
-    val destinationChainLocationFromOrigin = destinationXcmChain.absoluteLocation().fromPointOfViewOf(originChainLocation)
+    val assetLocationOnOrigin = reserve.location.fromPointOfViewOf(originChainLocation)
+
+    val remoteReserveChainLocation = if (reserve.isRemote(originChain.id, destinationChain.id)) {
+        ChainLocation(reserve.chainId, reserve.location)
+    } else {
+        null
+    }
 
     return DynamicCrossChainTransferConfiguration(
-        originChainId = originChain.id,
-        assetLocation = assetLocation,
-        destinationChainId = destinationChain.id,
-        remoteReserveChainId = reserve.chainId.takeIf { reserve.isRemote(originChain.id, destinationChain.id) },
-        destinationChainLocation = destinationChainLocationFromOrigin,
-        hasDeliveryFee = targetTransfer.hasDeliveryFee
+        assetLocationOnOrigin = assetLocationOnOrigin,
+        originChainLocation = ChainLocation(originChain.id, originChainLocation),
+        destinationChainLocation = ChainLocation(destinationChain.id, destinationXcmChain.absoluteLocation()),
+        remoteReserveChainLocation = remoteReserveChainLocation,
     )
 }
 

@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocatio
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
@@ -13,8 +14,9 @@ import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleIn
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import java.math.BigInteger
 
-class MultiAsset(
+class MultiAsset private constructor(
     val id: MultiAssetId,
     val fungibility: Fungibility,
 ) : VersionedToDynamicScaleInstance {
@@ -26,6 +28,19 @@ class MultiAsset(
             return MultiAsset(
                 id = bindMultiAssetId(asStruct["id"], xcmVersion),
                 fungibility = Fungibility.bind(asStruct["fun"])
+            )
+        }
+
+        fun from(
+            multiLocation: RelativeMultiLocation,
+            amount: BalanceOf
+        ): MultiAsset {
+            // Substrate doesn't allow zero balance starting from xcm v3
+            val positiveAmount = amount.coerceAtLeast(BigInteger.ONE)
+
+            return MultiAsset(
+                id = MultiAssetId(multiLocation),
+                fungibility = Fungibility.Fungible(positiveAmount)
             )
         }
     }
@@ -60,13 +75,9 @@ class MultiAsset(
     }
 }
 
-fun MultiAsset.Companion.from(
-    multiLocation: RelativeMultiLocation,
-    amount: BalanceOf
-) = MultiAsset(
-    id = MultiAssetId(multiLocation),
-    fungibility = MultiAsset.Fungibility.Fungible(amount)
-)
+fun MultiAsset.requireFungible(): MultiAsset.Fungibility.Fungible {
+    return fungibility.cast()
+}
 
 @JvmInline
 value class MultiAssets(val value: List<MultiAsset>) : VersionedToDynamicScaleInstance {

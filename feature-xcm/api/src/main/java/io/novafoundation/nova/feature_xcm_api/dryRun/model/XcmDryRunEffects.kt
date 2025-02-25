@@ -8,9 +8,9 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 
 class XcmDryRunEffects(
     val executionResult: XcmOutcome,
-    val emittedEvents: List<GenericEvent.Instance>,
-    val forwardedXcms: ForwardedXcms
-) {
+    override val emittedEvents: List<GenericEvent.Instance>,
+    override val forwardedXcms: ForwardedXcms
+) : DryRunEffects {
 
     companion object {
 

@@ -4,7 +4,6 @@ import android.util.Log
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.instanceOf
-import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.transformResult
 import io.novafoundation.nova.common.utils.wrapInResult
@@ -21,7 +20,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.tryDetectDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
@@ -40,7 +38,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynami
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
-import io.novafoundation.nova.feature_xcm_api.asset.from
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -58,7 +55,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withTimeout
-import java.math.BigInteger
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
@@ -98,7 +94,8 @@ class RealCrossChainTransactor(
         )
     }
 
-    override suspend fun ExtrinsicService.estimateOriginFee(
+    context(ExtrinsicService)
+    override suspend fun estimateOriginFee(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase
     ): Fee {
@@ -109,16 +106,12 @@ class RealCrossChainTransactor(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
         ) {
-            // Starting from XCM V3, Fungible assets cannot have zero amount, this restriction is checked on Decoding level
-            // So even fee calculation will fail with zero amount on V3+
-            // We only modify it for fees - the positive amount check for the transfer itself happens as a part of validation process
-            val alwaysPositiveTransfer = transfer.ensurePositiveAmount()
-
-            crossChainTransfer(configuration, alwaysPositiveTransfer, crossChainFee = Balance.ZERO)
+            crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
         }
     }
 
-    override suspend fun ExtrinsicService.performTransfer(
+    context(ExtrinsicService)
+    override suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
         crossChainFee: Balance
@@ -254,7 +247,7 @@ class RealCrossChainTransactor(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
         ) {
-            // We are transferring the exact amount, so we should nothing on top of the transfer amount
+            // We are transferring the exact amount, so we should add nothing on top of the transfer amount
             crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
         }
     }
@@ -278,14 +271,6 @@ class RealCrossChainTransactor(
         when (configuration) {
             is CrossChainTransferConfiguration.Dynamic -> dynamic.crossChainTransfer(configuration.config, transfer, crossChainFee)
             is CrossChainTransferConfiguration.Legacy -> legacy.crossChainTransfer(configuration.config, transfer, crossChainFee)
-        }
-    }
-
-    private fun AssetTransferBase.ensurePositiveAmount(): AssetTransferBase {
-        return if (amountPlanks.isZero) {
-            replaceAmount(newAmount = BigInteger.ONE)
-        } else {
-            this
         }
     }
 }

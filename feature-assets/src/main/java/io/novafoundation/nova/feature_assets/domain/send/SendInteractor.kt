@@ -61,8 +61,8 @@ class SendInteractor(
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            with(crossChainTransactor) {
-                extrinsicService.performTransfer(config, transfer, crossChainFee!!.amount)
+            with(extrinsicService) {
+                crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amount)
             }
         } else {
             val submissionFee = originFee.submissionFee
