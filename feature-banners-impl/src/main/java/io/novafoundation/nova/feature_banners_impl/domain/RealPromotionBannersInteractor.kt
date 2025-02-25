@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 
 interface PromotionBannersInteractor {
 
-    suspend fun observeBanners(url: String): Flow<List<PromotionBanner>>
+    suspend fun observeBanners(url: String, localisationUrl: String): Flow<List<PromotionBanner>>
 
     fun closeBanner(id: String)
 }
@@ -16,8 +16,8 @@ class RealPromotionBannersInteractor(
     private val bannersRepository: BannersRepository,
 ) : PromotionBannersInteractor {
 
-    override suspend fun observeBanners(url: String): Flow<List<PromotionBanner>> {
-        val banners = bannersRepository.getBanners(url)
+    override suspend fun observeBanners(url: String, localisationUrl: String): Flow<List<PromotionBanner>> {
+        val banners = bannersRepository.getBanners(url, localisationUrl)
         return bannersRepository.observeClosedBannerIds()
             .map { closedIds ->
                 banners.filter { it.id !in closedIds }

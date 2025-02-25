@@ -8,8 +8,7 @@ interface BannersApi {
 
     companion object {
         fun getLocalisationLink(url: String, language: Language): String {
-            val baseBannersUrl = url.substringBeforeLast("/")
-            return "$baseBannersUrl/localized/${language.iso639Code}.json"
+            return "$url/${language.iso639Code}.json"
         }
     }
 

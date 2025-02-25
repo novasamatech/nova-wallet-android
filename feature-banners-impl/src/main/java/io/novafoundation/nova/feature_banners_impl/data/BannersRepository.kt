@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface BannersRepository {
-    suspend fun getBanners(url: String): List<PromotionBanner>
+    suspend fun getBanners(url: String, localisationUrl: String): List<PromotionBanner>
 
     fun closeBanner(id: String)
 
@@ -27,10 +27,10 @@ class RealBannersRepository(
         private const val PREFS_CLOSED_BANNERS = "closed_banners"
     }
 
-    override suspend fun getBanners(url: String): List<PromotionBanner> {
+    override suspend fun getBanners(url: String, localisationUrl: String): List<PromotionBanner> {
         val language = preferences.getCurrentLanguage()!!
         val bannersDeferred = scopeAsync { bannersApi.getBanners(url) }
-        val localisationDeferred = scopeAsync { getLocalisation(url, language) }
+        val localisationDeferred = scopeAsync { getLocalisation(localisationUrl, language) }
 
         val banners = bannersDeferred.await()
         val localisation = localisationDeferred.await()
