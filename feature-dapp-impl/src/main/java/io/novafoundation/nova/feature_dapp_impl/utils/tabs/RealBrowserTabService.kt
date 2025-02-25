@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import io.novafoundation.nova.common.utils.CallbackLruCache
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.common.utils.share
+import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.getDAppIfSyncedOrSync
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 class RealBrowserTabService(
     private val dAppMetadataRepository: DAppMetadataRepository,
@@ -58,7 +57,7 @@ class RealBrowserTabService(
             tabs = allTabs.values.toList(),
             selectedTab = currentTabState(selectedTabId, allTabs)
         )
-    }.share()
+    }.shareInBackground()
 
     init {
         activeSessions.setOnEntryRemovedCallback {
@@ -137,14 +136,13 @@ class RealBrowserTabService(
     }
 
     private suspend fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
-        return createTabMutex.withLock {
-            val tabId = selectedTabId ?: return CurrentTabState.NotSelected
-            val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
-            CurrentTabState.Selected(
-                tab,
-                activeSessions[tabId] ?: addNewSession(tab)
-            )
-        }
+        val tabId = selectedTabId ?: return CurrentTabState.NotSelected
+        val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
+        return CurrentTabState.Selected(tab, getOrCreateSession(tab))
+    }
+
+    private suspend fun getOrCreateSession(tab: BrowserTab): BrowserTabSession {
+        return activeSessions[tab.id] ?: addNewSession(tab)
     }
 
     /*
