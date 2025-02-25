@@ -15,6 +15,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.app.SharedElementCallback
 import androidx.core.os.bundleOf
 import androidx.core.transition.addListener
+import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -37,6 +38,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injecto
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewPermissionAsker
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
 import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
@@ -75,6 +77,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     @Inject
     lateinit var fileChooser: WebViewFileChooser
+
+    @Inject
+    lateinit var permissionAsker: WebViewPermissionAsker
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -265,7 +270,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserProgress.progress = 0
     }
 
-    private fun createChromeClient() = Web3ChromeClient(fileChooser, dappBrowserProgress)
+    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, dappBrowserProgress, viewModel.viewModelScope)
 
     private fun updateButtonsState() {
         dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false

@@ -7,5 +7,5 @@ interface BrowserTabExternalRepository {
 
     fun observeTabsWithNames(metaId: Long): Flow<List<SimpleTabModel>>
 
-    suspend fun removeAllTabs()
+    suspend fun removeTabsForMetaAccount(metaId: Long): List<String>
 }

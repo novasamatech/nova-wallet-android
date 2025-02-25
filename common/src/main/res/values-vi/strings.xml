@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Sao lưu</string>
     <string name="backup_title">Sao lưu</string>
     <string name="biometric_auth_title">Xác thực sinh trắc học</string>
+    <string name="browser_tabs_close_all">Đóng tất cả</string>
     <string name="buy_completed">Mua hàng đã được khởi tạo! Vui lòng đợi tối đa 60 phút. Bạn có thể theo dõi trạng thái trong email.</string>
     <string name="buy_network_flow_title">Chọn mạng để mua %s</string>
     <string name="buy_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Phí chuyển khoản</string>
     <string name="choose_amount_network_error">Mạng không phản hồi</string>
     <string name="choose_amount_to">Đến</string>
+    <string name="close_dapp_tabs_message">Tất cả các tab mở trong trình duyệt DApp sẽ bị đóng.</string>
+    <string name="close_dapp_tabs_title">Đóng tất cả DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s và nhớ luôn giữ chúng ngoại tuyến để khôi phục bất cứ lúc nào. Bạn có thể thực hiện việc này trong Cài đặt Sao lưu.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Vui lòng viết ra tất cả Passphrases của ví trước khi tiếp tục</string>
     <string name="cloud_backup_delete_action_title">Sao lưu sẽ bị xóa khỏi Google Drive</string>
@@ -475,6 +478,7 @@
         <item quantity="other">%d giây</item>
     </plurals>
     <string name="common_secret_derivation_path">Đường dẫn dẫn xuất bí mật</string>
+    <string name="common_see_all">Xem tất cả</string>
     <string name="common_settings">Cài đặt</string>
     <string name="common_share">Chia sẻ</string>
     <string name="common_sign_in">Đăng nhập</string>
@@ -636,6 +640,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Phê duyệt yêu cầu này nếu bạn tin tưởng ứng dụng.\nKiểm tra chi tiết giao dịch.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Yêu thích</string>
     <string name="dapp_favourites">Yêu thích</string>
     <string name="dapp_favourites_add">Thêm vào yêu thích</string>
     <string name="dapp_favourites_remove_description">DApp “%s” sẽ bị xóa khỏi Yêu thích</string>

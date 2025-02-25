@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_dapp_impl.domain
 
-import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
+import io.novafoundation.nova.feature_dapp_api.data.model.DAppGroupedCatalog
+import io.novafoundation.nova.feature_dapp_api.data.model.DAppUrl
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
+import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 class DappInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
@@ -51,23 +54,42 @@ class DappInteractor(
             .map { it.sortDApps() }
     }
 
-    fun observeDAppsByCategory(): Flow<GroupedList<DappCategory, DApp>> {
+    fun observeDAppsByCategory(): Flow<DAppGroupedCatalog> {
+        val shufflingSeed = Random.nextInt()
+
         return combine(
             dAppMetadataRepository.observeDAppCatalog(),
             favouritesDAppRepository.observeFavourites()
         ) { dAppCatalog, favourites ->
+            // We use random with seed to shuffle dapps in categories the same way during updates
+            val random = Random(shufflingSeed)
+
             val categories = dAppCatalog.categories
             val dapps = dAppCatalog.dApps
 
             val urlToDAppMapping = buildUrlToDappMapping(dapps, favourites)
 
-            // Regrouping in O(Categories * Dapps)
-            // Complexity should be fine for expected amount of dApps
-            categories.associateWith { category ->
-                dapps.filter { category in it.categories }
-                    .map { urlToDAppMapping.getValue(it.url) }
-            }
+            val popular = dAppCatalog.popular.mapNotNull { urlToDAppMapping[it] }
+            val catalog = categories.associateWith { getShuffledDAppsInCategory(it, dapps, urlToDAppMapping, dAppCatalog.popular.toSet(), random) }
+
+            DAppGroupedCatalog(popular, catalog)
         }
+    }
+
+    private fun getShuffledDAppsInCategory(
+        category: DappCategory,
+        dapps: List<DappMetadata>,
+        urlToDAppMapping: Map<String, DApp>,
+        popular: Set<DAppUrl>,
+        shufflingSeed: Random
+    ): List<DApp> {
+        val categoryDApps = dapps.filter { category in it.categories }
+            .map { urlToDAppMapping.getValue(it.url) }
+
+        val popularDAppsInCategory = categoryDApps.filter { it.url in popular }
+        val otherDAppsInCategory = categoryDApps.filterNot { it.url in popular }
+
+        return popularDAppsInCategory.shuffled(shufflingSeed) + otherDAppsInCategory.shuffled(shufflingSeed)
     }
 
     suspend fun getDAppInfo(dAppUrl: String): DAppInfo {

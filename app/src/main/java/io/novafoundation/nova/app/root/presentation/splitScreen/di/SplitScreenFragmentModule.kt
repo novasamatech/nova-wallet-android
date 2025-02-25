@@ -26,7 +26,10 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 class SplitScreenFragmentModule {
 
     @Provides
-    fun provideInteractor(repository: BrowserTabExternalRepository, accountRepository: AccountRepository): SplitScreenInteractor {
+    fun provideInteractor(
+        repository: BrowserTabExternalRepository,
+        accountRepository: AccountRepository
+    ): SplitScreenInteractor {
         return SplitScreenInteractor(repository, accountRepository)
     }
 

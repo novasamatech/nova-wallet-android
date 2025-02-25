@@ -157,6 +157,7 @@ android {
         resources.excludes.add("META-INF/versions/9/previous-compilation-data.bin")
         resources.excludes.add("META-INF/DEPENDENCIES")
     }
+    namespace 'io.novafoundation.nova.app'
 }
 
 void createBindReleaseFileTask(String destination) {
@@ -253,6 +254,9 @@ dependencies {
 
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')
+
+    implementation project(':feature-banners-api')
+    implementation project(':feature-banners-impl')
 
     implementation project(':bindings:metadata_shortener')
 
