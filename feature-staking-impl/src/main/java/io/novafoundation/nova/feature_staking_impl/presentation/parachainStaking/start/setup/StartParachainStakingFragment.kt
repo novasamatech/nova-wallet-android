@@ -75,7 +75,7 @@ class StartParachainStakingFragment : BaseFragment<StartParachainStakingViewMode
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, startParachainStakingAmountField)
         setupParachainStakingRewardsComponent(viewModel.rewardsComponent, startParachainStakingRewards)
-        setupFeeLoading(viewModel, startParachainStakingFee)
+        setupFeeLoading(viewModel.originFeeMixin, startParachainStakingFee)
         observeHints(viewModel.hintsMixin, startParachainStakingHints)
 
         viewModel.title.observe(startParachainStakingToolbar::setTitle)

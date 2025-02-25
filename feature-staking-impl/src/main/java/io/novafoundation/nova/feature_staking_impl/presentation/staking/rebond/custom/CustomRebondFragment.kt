@@ -55,7 +55,7 @@ class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
         observeValidations(viewModel)
         observeHints(viewModel.hintsMixin, rebondHints)
         setupAmountChooser(viewModel.amountChooserMixin, rebondAmount)
-        setupFeeLoading(viewModel, rebondFee)
+        setupFeeLoading(viewModel.originFeeMixin, rebondFee)
 
         viewModel.transferableFlow.observe(rebondTransferable::showAmount)
 

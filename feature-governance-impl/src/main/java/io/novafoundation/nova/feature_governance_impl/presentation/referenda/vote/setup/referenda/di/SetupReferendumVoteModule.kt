@@ -21,7 +21,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.referenda.SetupReferendumVoteViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class])
 class SetupReferendumVoteModule {
@@ -30,7 +31,7 @@ class SetupReferendumVoteModule {
     @IntoMap
     @ViewModelKey(SetupReferendumVoteViewModel::class)
     fun provideViewModel(
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         assetUseCase: AssetUseCase,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         interactor: VoteReferendumInteractor,
@@ -42,6 +43,7 @@ class SetupReferendumVoteModule {
         referendumFormatter: ReferendumFormatter,
         locksChangeFormatter: LocksChangeFormatter,
         convictionValuesProvider: ConvictionValuesProvider,
+        maxActionProviderFactory: MaxActionProviderFactory,
         locksFormatter: LocksFormatter,
     ): ViewModel {
         return SetupReferendumVoteViewModel(
@@ -57,6 +59,7 @@ class SetupReferendumVoteModule {
             referendumFormatter = referendumFormatter,
             locksChangeFormatter = locksChangeFormatter,
             convictionValuesProvider = convictionValuesProvider,
+            maxActionProviderFactory = maxActionProviderFactory,
             locksFormatter = locksFormatter,
         )
     }
