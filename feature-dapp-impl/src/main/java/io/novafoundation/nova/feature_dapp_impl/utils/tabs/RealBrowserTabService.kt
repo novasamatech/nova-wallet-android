@@ -37,8 +37,6 @@ class RealBrowserTabService(
     private val rootScope: RootScope
 ) : BrowserTabService, CoroutineScope by rootScope, OnPageChangedCallback {
 
-    private val createTabMutex = Mutex()
-
     private val availableSessionsCount = tabMemoryRestrictionService.getMaximumActiveSessions()
 
     private val selectedTabIdFlow = MutableStateFlow<String?>(null)
