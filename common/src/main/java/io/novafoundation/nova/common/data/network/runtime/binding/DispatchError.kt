@@ -1,8 +1,7 @@
-package io.novafoundation.nova.feature_account_api.data.extrinsic.execution
+package io.novafoundation.nova.common.data.network.runtime.binding
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindInt
-import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
-import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.RuntimeContext
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.error
 import io.novasama.substrate_sdk_android.runtime.metadata.module
@@ -34,7 +33,8 @@ sealed class DispatchError : Throwable() {
     object Unknown : DispatchError()
 }
 
-fun bindDispatchError(decoded: Any?, runtimeSnapshot: RuntimeSnapshot): DispatchError {
+context(RuntimeContext)
+fun bindDispatchError(decoded: Any?): DispatchError {
     val asDictEnum = decoded.castToDictEnum()
 
     return when (asDictEnum.name) {
@@ -44,7 +44,7 @@ fun bindDispatchError(decoded: Any?, runtimeSnapshot: RuntimeSnapshot): Dispatch
             val moduleIndex = bindInt(moduleErrorStruct["index"])
             val errorIndex = bindModuleError(moduleErrorStruct["error"])
 
-            val module = runtimeSnapshot.metadata.module(moduleIndex)
+            val module = metadata.module(moduleIndex)
             val error = module.error(errorIndex)
 
             DispatchError.Module(module, error)

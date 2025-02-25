@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_xcm_api.message
 
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion

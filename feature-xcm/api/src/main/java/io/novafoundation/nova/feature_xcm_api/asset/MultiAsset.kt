@@ -2,6 +2,11 @@ package io.novafoundation.nova.feature_xcm_api.asset
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
+import io.novafoundation.nova.common.data.network.runtime.binding.bindList
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
+import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.scale.ToDynamicScaleInstance
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
@@ -14,9 +19,30 @@ class MultiAsset(
     val fungibility: Fungibility,
 ) : VersionedToDynamicScaleInstance {
 
-    companion object;
+    companion object {
+
+        fun bind(decodedInstance: Any?, xcmVersion: XcmVersion): MultiAsset {
+            val asStruct = decodedInstance.castToStruct()
+            return MultiAsset(
+                id = bindMultiAssetId(asStruct["id"], xcmVersion),
+                fungibility = Fungibility.bind(asStruct["fun"])
+            )
+        }
+    }
 
     sealed class Fungibility : ToDynamicScaleInstance {
+
+        companion object {
+
+            fun bind(decodedInstance: Any?): Fungibility {
+                val asEnum = decodedInstance.castToDictEnum()
+
+                return when(asEnum.name) {
+                    "Fungible" -> Fungible(bindNumber(asEnum.value))
+                    else -> incompatible()
+                }
+            }
+        }
 
         class Fungible(val amount: BalanceOf) : Fungibility() {
 
@@ -44,6 +70,14 @@ fun MultiAsset.Companion.from(
 
 @JvmInline
 value class MultiAssets(val value: List<MultiAsset>) : VersionedToDynamicScaleInstance {
+
+    companion object {
+
+        fun bind(decodedInstance: Any?, xcmVersion: XcmVersion): MultiAssets {
+            val assets = bindList(decodedInstance) { MultiAsset.bind(it, xcmVersion) }
+            return MultiAssets(assets)
+        }
+    }
 
     constructor(vararg assets: MultiAsset) : this(assets.toList())
 

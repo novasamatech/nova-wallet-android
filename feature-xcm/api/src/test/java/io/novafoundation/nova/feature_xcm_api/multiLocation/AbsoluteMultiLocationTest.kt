@@ -14,7 +14,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(Interior.Here)
         val expected = initial.toRelative()
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
         assertEquals(expected, result)
     }
 
@@ -24,7 +24,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(ParachainId(2000))
         val expected = RelativeMultiLocation(parents=1, interior = Junctions(ParachainId(1000)))
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
 
         assertEquals(expected, result)
     }
@@ -35,7 +35,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(ParachainId(1000), ParachainId(3000))
         val expected = RelativeMultiLocation(parents=1, interior = Junctions(ParachainId(2000)))
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
 
         assertEquals(expected, result)
     }
@@ -46,7 +46,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(ParachainId(1000), ParachainId(2000))
         val expected = RelativeMultiLocation(parents=0, interior = Interior.Here)
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
 
         assertEquals(expected, result)
     }
@@ -57,7 +57,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(Interior.Here)
         val expected = initial.toRelative()
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
 
         assertEquals(expected, result)
     }
@@ -68,7 +68,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(ParachainId(1000))
         val expected = RelativeMultiLocation(parents=1, interior = Interior.Here)
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
 
         assertEquals(expected, result)
     }
@@ -79,7 +79,7 @@ class AbsoluteMultiLocationTest {
         val pov = AbsoluteMultiLocation(ParachainId(1000))
         val expected = RelativeMultiLocation(parents=0, interior = Junctions(ParachainId(2000)))
 
-        val result = initial.reanchor(pov)
+        val result = initial.fromPointOfViewOf(pov)
 
         assertEquals(expected, result)
     }

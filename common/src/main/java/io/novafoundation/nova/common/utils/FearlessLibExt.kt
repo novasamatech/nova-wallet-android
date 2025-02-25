@@ -37,6 +37,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadE
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
@@ -149,6 +150,17 @@ fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) 
     bytesOrNull(runtime, value)?.toHexString(withPrefix = true)
 
 fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
+
+fun RuntimeSnapshot.composeCall(
+    moduleName: String,
+    callName: String,
+    args: Map<String, Any?>
+): GenericCall.Instance {
+    val module = metadata.module(moduleName)
+    val call = module.call(callName)
+
+    return GenericCall.Instance(module, call, args)
+}
 
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
 

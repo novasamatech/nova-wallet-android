@@ -95,6 +95,10 @@ fun MultiLocation.accountId(): AccountIdKey? {
     }
 }
 
+fun MultiLocation.Interior.asLocation(): AbsoluteMultiLocation {
+    return AbsoluteMultiLocation(this)
+}
+
 fun Junctions(vararg junctions: MultiLocation.Junction) = MultiLocation.Interior.Junctions(junctions.toList())
 
 fun MultiLocation.paraIdOrNull(): ParaId? {
