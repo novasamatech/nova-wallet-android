@@ -55,12 +55,12 @@ class BannerPagerView @JvmOverloads constructor(
     private val backgroundSwitchingController = getImageSwitchingController(scrollInterpolator)
 
     private var autoSwipeCallbackAdded = false
-    private val autoSwipeDelay = 3.seconds.inWholeMilliseconds
+    private val autoSwipeDelay = 4.seconds.inWholeMilliseconds
     private val autoSwipeCallback = object : Runnable {
         override fun run() {
             if (canRunScrollAnimation) {
                 scrollController.swipeToPage(PageOffset.NEXT)
-                handler?.postDelayed(this, autoSwipeDelay)
+                postDelayed(this, autoSwipeDelay)
             }
         }
     }
@@ -227,7 +227,7 @@ class BannerPagerView @JvmOverloads constructor(
 
     private fun stopAutoSwipe() {
         if (autoSwipeCallbackAdded) {
-            handler?.removeCallbacks(autoSwipeCallback)
+            removeCallbacks(autoSwipeCallback)
 
             autoSwipeCallbackAdded = false
         }
@@ -236,8 +236,8 @@ class BannerPagerView @JvmOverloads constructor(
     private fun startAutoSwipe() {
         if (autoSwipeCallbackAdded) return
         if (!canScroll) return
+        postDelayed(autoSwipeCallback, autoSwipeDelay)
 
-        handler?.postDelayed(autoSwipeCallback, autoSwipeDelay)
         autoSwipeCallbackAdded = true
     }
 
