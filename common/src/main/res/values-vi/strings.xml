@@ -758,6 +758,8 @@
         <item quantity="other">Bạn cần chọn ít nhất %d track</item>
     </plurals>
     <string name="governance_unlock">Mở khóa</string>
+    <string name="high_price_impact_detacted_message">Thực hiện giao dịch này sẽ dẫn đến trượt giá đáng kể và thiệt hại tài chính. Xem xét giảm kích thước giao dịch của bạn hoặc chia giao dịch thành nhiều lần thực hiện.</string>
+    <string name="high_price_impact_detacted_title">Phát hiện tác động giá cao (%s)</string>
     <string name="history_v1.9.0">Lịch sử</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Tên pháp lý</string>
@@ -921,6 +923,7 @@
     <string name="pool_inactive_failure_title">Bể chưa mở</string>
     <string name="pool_staking_conflict_message">Bạn không thể sử dụng cả Staking trực tiếp và Pool Staking từ cùng một tài khoản. Để quản lý Pool Staking bạn trước tiên cần unstake token của mình từ Staking trực tiếp.</string>
     <string name="pool_staking_conflict_title">Các thao tác trong Pool không khả dụng</string>
+    <string name="popular_dapps_title">Phổ biến</string>
     <string name="pre_configured_networks_add_custom_button">Thêm mạng thủ công</string>
     <string name="pre_configured_networks_progress_text">Đang tải danh sách mạng...</string>
     <string name="pre_configured_networks_search_hint">Tìm kiếm theo tên mạng</string>

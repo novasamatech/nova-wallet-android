@@ -6,10 +6,12 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_account_api.data.model.amountByExecutingAccount
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapCanPayExtraFeesValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapDoNotLooseAssetInDustValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapEnoughLiquidityValidation
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapPriceImpactValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapRateChangesValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapSlippageRangeValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.sufficientAmountOutToStayAboveEDValidation
@@ -23,6 +25,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 typealias SwapValidationSystem = ValidationSystem<SwapValidationPayload, SwapValidationFailure>
 typealias SwapValidation = Validation<SwapValidationPayload, SwapValidationFailure>
 typealias SwapValidationSystemBuilder = ValidationSystemBuilder<SwapValidationPayload, SwapValidationFailure>
+
+fun SwapValidationSystemBuilder.priceImpactValidation(
+    priceImpactThresholds: PriceImpactThresholds
+) = validate(SwapPriceImpactValidation(priceImpactThresholds))
 
 fun SwapValidationSystemBuilder.availableSlippage(
     swapService: SwapService

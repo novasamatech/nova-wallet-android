@@ -765,6 +765,8 @@
         <item quantity="other">È necessario selezionare almeno %d tracce</item>
     </plurals>
     <string name="governance_unlock">Sblocca</string>
+    <string name="high_price_impact_detacted_message">Eseguire questo swap comporterà uno slippage significativo e perdite finanziarie. Considera di ridurre la dimensione del tuo scambio o di dividere il tuo scambio in più transazioni.</string>
+    <string name="high_price_impact_detacted_title">Alto impatto sul prezzo rilevato (%s)</string>
     <string name="history_v1.9.0">Cronologia</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Nome legale</string>
@@ -929,6 +931,7 @@
     <string name="pool_inactive_failure_title">Il pool non è aperto</string>
     <string name="pool_staking_conflict_message">Non puoi più utilizzare sia il Direct Staking che il Pool Staking dallo stesso account. Per gestire il tuo Pool Staking devi prima disattivare lo staking dei tuoi token dal Direct Staking.</string>
     <string name="pool_staking_conflict_title">Operazioni del Pool non disponibili</string>
+    <string name="popular_dapps_title">Popolari</string>
     <string name="pre_configured_networks_add_custom_button">Aggiungi rete manualmente</string>
     <string name="pre_configured_networks_progress_text">Caricamento della lista delle reti...</string>
     <string name="pre_configured_networks_search_hint">Cerca per nome rete</string>
