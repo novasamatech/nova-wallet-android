@@ -75,6 +75,8 @@ interface AssetsRouter {
 
     fun openTopUpCard(payload: TopUpCardPayload)
 
+    fun closeTopUp()
+
     fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
     fun openStaking()
