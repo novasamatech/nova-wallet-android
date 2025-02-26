@@ -1,17 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemExternalActionContent"
     style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_primary_list_item"
-    android:paddingStart="16dp"
-    android:paddingTop="12dp"
-    android:paddingEnd="16dp"
     android:gravity="center_vertical"
-    android:paddingBottom="12dp"
-    android:textColor="@color/text_primary"
-    tools:drawablePadding="12dp"
-    tools:drawableStart="@drawable/ic_copy_outline"
-    tools:text="@string/transaction_details_copy_hash" />
+    android:minHeight="48dp"
+    android:orientation="vertical"
+    android:paddingVertical="4dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <TextView
+        android:id="@+id/itemExternalActionContent"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_primary_list_item"
+        android:gravity="center_vertical"
+        android:textColor="@color/text_primary"
+        tools:drawablePadding="12dp"
+        tools:drawableStart="@drawable/ic_copy_outline"
+        tools:text="@string/transaction_details_copy_hash" />
+
+    <TextView
+        android:id="@+id/itemExternalActionContentSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_primary_list_item"
+        android:gravity="center_vertical"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
+        tools:drawablePadding="12dp"
+        tools:text="@string/transaction_details_copy_hash"
+        tools:visibility="visible" />
+
+</LinearLayout>

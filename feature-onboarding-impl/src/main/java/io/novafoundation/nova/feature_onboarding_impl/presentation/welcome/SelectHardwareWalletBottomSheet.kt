@@ -39,7 +39,8 @@ class SelectHardwareWalletBottomSheet(
         if (payload.genericLedgerSupported) {
             textItem(
                 iconRes = R.drawable.ic_ledger,
-                titleRes = R.string.account_ledger_nano_x_generic,
+                titleRes = R.string.account_ledger_generic_item_title,
+                subtitleRes = R.string.account_ledger_generic_item_subtitle,
                 showArrow = true,
                 onClick = { onSuccess(HardwareWalletModel.LedgerGeneric) }
             )
