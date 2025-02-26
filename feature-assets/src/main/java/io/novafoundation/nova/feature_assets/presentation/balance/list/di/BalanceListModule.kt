@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
+import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
@@ -76,6 +78,8 @@ class BalanceListModule {
     @IntoMap
     @ViewModelKey(BalanceListViewModel::class)
     fun provideViewModel(
+        promotionBannersMixinFactory: PromotionBannersMixinFactory,
+        bannerSourceFactory: BannersSourceFactory,
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
@@ -89,6 +93,8 @@ class BalanceListModule {
         amountFormatter: AmountFormatter
     ): ViewModel {
         return BalanceListViewModel(
+            promotionBannersMixinFactory = promotionBannersMixinFactory,
+            bannerSourceFactory = bannerSourceFactory,
             walletInteractor = walletInteractor,
             assetsListInteractor = assetsListInteractor,
             selectedAccountUseCase = selectedAccountUseCase,

@@ -209,7 +209,7 @@ internal class FeeLoaderV2Provider<F, D>(
         val isCustomFee = !feeChainAssetFlow.first().isUtilityAsset
 
         if (isCustomFee && mode.onlyNativeFeeEnabled()) {
-            val utilityAsset = selectedTokenInfo.first().chainAsset
+            val utilityAsset = selectedTokenInfo.first().chain.utilityAsset
             feeChainAssetFlow.emit(utilityAsset)
 
             reloadFeeWithLatestConstructor()

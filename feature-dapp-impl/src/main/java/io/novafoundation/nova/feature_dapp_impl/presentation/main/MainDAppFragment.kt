@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
+import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
@@ -25,12 +27,17 @@ class MainDAppFragment :
     BaseFragment<MainDAppViewModel>(),
     DAppClickHandler,
     DAppHeaderAdapter.Handler,
-    DappCategoriesAdapter.Handler {
+    DappCategoriesAdapter.Handler,
+    MainFavoriteDAppsAdapter.Handler {
 
     @Inject
     protected lateinit var imageLoader: ImageLoader
 
-    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this, this) }
+    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { DAppHeaderAdapter(imageLoader, this, this) }
+
+    private val bannerAdapter: PromotionBannerAdapter by lazy(LazyThreadSafetyMode.NONE) { PromotionBannerAdapter(closable = false) }
+
+    private val favoritesAdapter: MainFavoriteDAppsAdapter by lazy(LazyThreadSafetyMode.NONE) { MainFavoriteDAppsAdapter(this, this, imageLoader) }
 
     private val dappsShimmering by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.layout_dapps_shimmering) }
 
@@ -46,7 +53,7 @@ class MainDAppFragment :
 
     override fun initViews() {
         dappRecyclerViewCatalog.applyStatusBarInsets()
-        dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, dappsShimmering, dappCategoriesListAdapter)
+        dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, bannerAdapter, favoritesAdapter, dappsShimmering, dappCategoriesListAdapter)
         dappRecyclerViewCatalog.itemAnimator = null
     }
 
@@ -59,6 +66,7 @@ class MainDAppFragment :
 
     override fun subscribe(viewModel: MainDAppViewModel) {
         observeBrowserEvents(viewModel)
+        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
 
         viewModel.selectedWalletFlow.observe(headerAdapter::setWallet)
 
@@ -86,7 +94,8 @@ class MainDAppFragment :
         }
 
         viewModel.favoriteDAppsUIFlow.observe {
-            headerAdapter.setFavorites(it)
+            favoritesAdapter.show(it.isNotEmpty())
+            favoritesAdapter.setDApps(it)
         }
     }
 
