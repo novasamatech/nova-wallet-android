@@ -114,15 +114,13 @@ class NovaCardWebViewController(
         val uri = Uri.parse(appLinksProvider.novaCardWidgetUrl).buildUpon()
             .appendQueryParameter("widget_id", widgetId)
             .appendQueryParameter("type", "sell")
-            .appendQueryParameter("currency", setupConfig.spendToken.symbol.value)
-            .appendQueryParameter("payment_method", "fiat_card_open")
-            .appendQueryParameter("fiat_currency", "EUR")
+            .appendQueryParameter("currencies", setupConfig.spendToken.symbol.value)
             .appendQueryParameter("theme", "nova")
+            .appendQueryParameter("show_spend_card_details", "true")
             .appendQueryParameter("hide_refund_address", "true")
             .appendQueryParameter("refund_address", setupConfig.refundAddress)
-            .appendQueryParameter("fix_payment_method", "true")
-            .appendQueryParameter("show_spend_card_details", "true")
             .build()
+
 
         webView.loadUrl(uri.toString())
     }
