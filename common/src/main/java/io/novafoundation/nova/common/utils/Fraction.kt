@@ -29,6 +29,9 @@ value class Fraction private constructor(private val value: Double) : Comparable
         val Double.fractions: Fraction
             get() = toFraction(FractionUnit.FRACTION)
 
+        val Float.fractions: Fraction
+            get() = toDouble().toFraction(FractionUnit.FRACTION)
+
         val Int.percents: Fraction
             get() = toDouble().toFraction(FractionUnit.PERCENT)
     }

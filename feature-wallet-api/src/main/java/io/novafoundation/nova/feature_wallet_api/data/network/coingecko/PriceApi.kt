@@ -4,15 +4,17 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface CoingeckoApi {
+interface PriceApi {
 
     companion object {
-        fun getRecentRateFieldName(coingeckoId: String): String {
-            return coingeckoId + "_24h_change"
+        const val BASE_URL = "https://tokens-price.novasama-tech.org"
+
+        fun getRecentRateFieldName(priceId: String): String {
+            return priceId + "_24h_change"
         }
     }
 
-    @GET("//api.coingecko.com/api/v3/coins/{id}/market_chart/range")
+    @GET("/api/v3/coins/{id}/market_chart/range")
     suspend fun getCoinRange(
         @Path("id") id: String,
         @Query("vs_currency") currency: String,
@@ -20,7 +22,14 @@ interface CoingeckoApi {
         @Query("to") toTimestamp: Long
     ): CoinRangeResponse
 
-    @GET("//api.coingecko.com/api/v3/simple/price")
+    @GET("/api/v3/coins/{id}/market_chart")
+    suspend fun getLastCoinRange(
+        @Path("id") id: String,
+        @Query("vs_currency") currency: String,
+        @Query("days") days: String
+    ): CoinRangeResponse
+
+    @GET("/api/v3/simple/price")
     suspend fun getAssetPrice(
         @Query("ids") priceIds: String,
         @Query("vs_currencies") currency: String,
