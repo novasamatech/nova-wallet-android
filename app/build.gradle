@@ -171,7 +171,18 @@ void createBindReleaseFileTask(String destination) {
     }
 
     afterEvaluate {
-        tasks.getByName("process${destination.capitalize()}GoogleServices").dependsOn task
+        def capitalizedDestination = destination.capitalize()
+        def dependentTasks = [
+                "process${capitalizedDestination}GoogleServices".toString(),
+                "merge${capitalizedDestination}JniLibFolders".toString(),
+                "merge${capitalizedDestination}StartupProfile".toString(),
+                "merge${capitalizedDestination}Shaders".toString(),
+                "merge${capitalizedDestination}ArtProfile".toString()
+        ]
+
+        dependentTasks.forEach {
+            tasks.getByName(it).dependsOn(task)
+        }
     }
 }
 
