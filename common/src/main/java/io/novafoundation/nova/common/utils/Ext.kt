@@ -91,7 +91,7 @@ fun Boolean?.orFalse() = this ?: false
 
 fun Boolean?.orTrue() = this ?: true
 
-fun <T> T.doIfTrue(isTrue: Boolean, block: T.() -> Unit): T {
+fun <T> T.doIf(isTrue: Boolean, block: T.() -> Unit): T {
     if (isTrue) block()
     return this
 }

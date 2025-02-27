@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_deep_link_building.presentation
 import android.net.Uri
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
-import io.novafoundation.nova.common.utils.doIfTrue
+import io.novafoundation.nova.common.utils.doIf
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -28,7 +28,7 @@ class ReferendumDetailsDeepLinkConfigurator(
         val appendChainIdParam = payload.chainId != ChainGeneses.POLKADOT
 
         return buildLink(resourceManager, deepLinkPrefix, type)
-            .doIfTrue(appendChainIdParam) { appendQueryParameter(chainIdParam, payload.chainId) }
+            .doIf(appendChainIdParam) { appendQueryParameter(chainIdParam, payload.chainId) }
             .appendQueryParameter(referendumIdParam, payload.referendumId.toString())
             .appendNullableQueryParameter(governanceTypeParam, payload.governanceType.let(::mapGovTypeToParams))
             .build()
