@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <!--<string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>-->
+    <string name="account_ledger_import_start_guide">Ledger Connection Guide</string>
+
+    <!--<string name="account_ledger_import_start_title">Connect Ledger Nano X</string>-->
+    <string name="account_ledger_import_start_title">Connect Ledger</string>
+
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
 
     <!--<string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>-->
     <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
@@ -1544,9 +1552,6 @@
     <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
     <string name="account_select_hardware_wallet">Select hardware wallet</string>
-
-    <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>
-    <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
     <string name="common_total">Total</string>
 

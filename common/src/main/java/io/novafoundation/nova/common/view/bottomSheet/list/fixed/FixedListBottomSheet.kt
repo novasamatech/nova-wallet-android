@@ -24,7 +24,6 @@ import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemShe
 import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionSubtitle
 import kotlinx.android.synthetic.main.item_sheet_descriptive_action.view.itemSheetDescriptiveActionTitle
 import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContent
-import kotlinx.android.synthetic.main.item_sheet_iconic_label.view.itemExternalActionContentSubtitle
 import kotlinx.android.synthetic.main.item_sheet_switcher.view.itemSheetSwitcher
 
 typealias ViewGetter<V> = FixedListBottomSheet.() -> V
@@ -99,14 +98,12 @@ abstract class FixedListBottomSheet(
 fun FixedListBottomSheet.textItem(
     @DrawableRes iconRes: Int,
     title: String,
-    subtitle: String? = null,
     showArrow: Boolean = false,
     applyIconTint: Boolean = true,
     onClick: (View) -> Unit,
 ) {
     item(R.layout.item_sheet_iconic_label) { view ->
         view.itemExternalActionContent.text = title
-        view.itemExternalActionContentSubtitle.setTextOrHide(subtitle)
 
         val paddingInDp = 12
 
@@ -175,7 +172,6 @@ fun FixedListBottomSheet.textWithDescriptionItem(
 fun FixedListBottomSheet.textItem(
     @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
-    @StringRes subtitleRes: Int? = null,
     showArrow: Boolean = false,
     applyIconTint: Boolean = true,
     onClick: (View) -> Unit
@@ -183,7 +179,6 @@ fun FixedListBottomSheet.textItem(
     textItem(
         iconRes = iconRes,
         title = context.getString(titleRes),
-        subtitle = subtitleRes?.let { context.getString(it) },
         showArrow = showArrow,
         applyIconTint = applyIconTint,
         onClick = onClick

@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/startImportLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.StartImportLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.StartImportLegacyLedgerFragment"
         android:label="StartImportLedgerFragment">
 
         <action

@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textWithDescriptionItem
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
@@ -37,11 +38,11 @@ class SelectHardwareWalletBottomSheet(
         polkadotVaultItem(PolkadotVaultVariant.POLKADOT_VAULT)
 
         if (payload.genericLedgerSupported) {
-            textItem(
+            textWithDescriptionItem(
                 iconRes = R.drawable.ic_ledger,
                 titleRes = R.string.account_ledger_generic_item_title,
-                subtitleRes = R.string.account_ledger_generic_item_subtitle,
-                showArrow = true,
+                descriptionRes = R.string.account_ledger_generic_item_subtitle,
+                showArrowWhenEnabled = true,
                 onClick = { onSuccess(HardwareWalletModel.LedgerGeneric) }
             )
 

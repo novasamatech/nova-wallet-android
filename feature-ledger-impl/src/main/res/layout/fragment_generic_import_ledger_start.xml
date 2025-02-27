@@ -35,14 +35,6 @@
                 android:text="@string/account_ledger_import_start_title"
                 android:textColor="@color/text_primary" />
 
-            <io.novafoundation.nova.common.view.SegmentedTabLayout
-                android:id="@+id/startImportGenericLedgerTitle"
-                style="@style/SegmentedTab"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp" />
-
             <io.novafoundation.nova.common.view.LinkView
                 android:id="@+id/startImportGenericLedgerGuideLink"
                 android:layout_width="wrap_content"
