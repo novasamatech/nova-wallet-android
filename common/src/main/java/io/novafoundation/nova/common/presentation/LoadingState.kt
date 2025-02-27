@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.presentation
 
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -23,6 +24,13 @@ fun <T> LoadingView<T>.showLoadingState(loadingState: LoadingState<T>) {
     when (loadingState) {
         is LoadingState.Loaded -> showData(loadingState.data)
         is LoadingState.Loading -> showLoading()
+    }
+}
+
+fun <T> LoadingView<T>.showLoadingState(loadingState: ExtendedLoadingState<T>) {
+    when (loadingState) {
+        is ExtendedLoadingState.Loaded -> showData(loadingState.data)
+        is ExtendedLoadingState.Loading, is ExtendedLoadingState.Error -> showLoading()
     }
 }
 

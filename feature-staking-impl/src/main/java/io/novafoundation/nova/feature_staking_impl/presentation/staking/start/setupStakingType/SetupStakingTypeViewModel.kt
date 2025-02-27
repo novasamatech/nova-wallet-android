@@ -68,9 +68,9 @@ class SetupStakingTypeViewModel(
 
     private val compoundStakingTypeDetailsProviderFlow = chainWithAssetFlow.map {
         compoundStakingTypeDetailsProvidersFactory.create(
-            viewModelScope,
-            it,
-            payload.availableStakingOptions.stakingTypes
+            computationalScope = this,
+            chainWithAsset = it,
+            availableStakingTypes = payload.availableStakingOptions.stakingTypes
         )
     }
 

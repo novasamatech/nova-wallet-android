@@ -28,7 +28,7 @@ interface StorageCache {
      * First result will be emitted when all keys are found in the cache
      * Thus, result.size == fullKeys.size
      */
-    suspend fun observeEntries(keys: List<String>, chainId: String): Flow<List<StorageEntry>>
+    fun observeEntries(keys: List<String>, chainId: String): Flow<List<StorageEntry>>
 
     suspend fun observeEntries(keyPrefix: String, chainId: String): Flow<List<StorageEntry>>
 

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing
 
-import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -35,7 +35,7 @@ class Payouts(
 class StartStakingCompoundData(
     val chain: Chain,
     val asset: Asset,
-    val maxEarningRate: Perbill,
+    val maxEarningRate: Fraction,
     val minStake: BigInteger,
     val eraInfo: StartStakingEraInfo,
     val participationInGovernance: ParticipationInGovernance,

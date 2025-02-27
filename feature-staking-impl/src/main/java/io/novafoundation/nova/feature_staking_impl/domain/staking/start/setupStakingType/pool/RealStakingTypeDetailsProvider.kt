@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.pool
 
+import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
@@ -30,18 +31,19 @@ class RealStakingTypeDetailsProviderFactory(
 
     override suspend fun create(
         stakingOption: StakingOption,
-        coroutineScope: CoroutineScope,
+        computationalScope: ComputationalScope,
         availableStakingTypes: List<Chain.Asset.StakingType>
     ): StakingTypeDetailsProvider {
-        val singleStakingProperties = singleStakingPropertiesFactory.createProperties(coroutineScope, stakingOption)
+        val singleStakingProperties = singleStakingPropertiesFactory.createProperties(computationalScope, stakingOption)
         val validationSystem = ValidationSystem.editingStakingType(availableStakingTypes)
+
         return RealStakingTypeDetailsProvider(
             validationSystem,
-            poolStakingTypeDetailsInteractorFactory.create(stakingOption, coroutineScope),
+            poolStakingTypeDetailsInteractorFactory.create(stakingOption, computationalScope),
             stakingOption.stakingType,
             singleStakingProperties,
             currentSelectionStoreProvider,
-            coroutineScope
+            computationalScope
         )
     }
 }
