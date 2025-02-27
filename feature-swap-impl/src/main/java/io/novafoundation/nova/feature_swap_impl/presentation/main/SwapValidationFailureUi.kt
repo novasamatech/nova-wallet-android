@@ -45,6 +45,8 @@ fun mapSwapValidationFailureToUI(
             resourceManager.getString(R.string.swap_invalid_slippage_failure_message, reason.minSlippage.formatPercents(), reason.maxSlippage.formatPercents())
         ).asDefault()
 
+        is SwapValidationFailure.HighPriceImpact -> highPriceImpact(reason, resourceManager, actions)
+
         is NewRateExceededSlippage -> TitleAndMessage(
             resourceManager.getString(R.string.swap_rate_was_updated_failure_title),
             resourceManager.getString(
@@ -197,6 +199,30 @@ fun handleErrorToSwapMin(
             okAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = resourceManager.getString(R.string.swap_failure_swap_min_button),
                 action = { swapMinAmountAction(reason.asset, reason.existentialDeposit) }
+            ),
+            cancelAction = CustomDialogDisplayer.Payload.DialogAction(
+                title = resourceManager.getString(R.string.common_cancel),
+                action = { }
+            )
+        )
+    )
+}
+
+fun highPriceImpact(
+    reason: SwapValidationFailure.HighPriceImpact,
+    resourceManager: ResourceManager,
+    actions: ValidationFlowActions<*>
+): TransformedFailure {
+    return TransformedFailure.Custom(
+        CustomDialogDisplayer.Payload(
+            title = resourceManager.getString(R.string.high_price_impact_detacted_title, reason.priceImpact.formatPercents()),
+            message = resourceManager.getString(R.string.high_price_impact_detacted_message),
+            customStyle = R.style.AccentNegativeAlertDialogTheme_Reversed,
+            okAction = CustomDialogDisplayer.Payload.DialogAction(
+                title = resourceManager.getString(R.string.common_continue),
+                action = {
+                    actions.resumeFlow()
+                }
             ),
             cancelAction = CustomDialogDisplayer.Payload.DialogAction(
                 title = resourceManager.getString(R.string.common_cancel),

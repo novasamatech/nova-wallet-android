@@ -32,7 +32,7 @@ interface HydrationFeeInjector {
         object ToNative : ResetMode()
 
         /**
-         * Resets the the fee to the native one only the current fee payment asset is different
+         * Resets the fee to the native one only the current fee payment asset is different
          */
         class ToNativeLazily(val feeAssetBeforeTransaction: BigInteger) : ResetMode()
     }

@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCo
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewPermissionAsker
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -54,6 +57,20 @@ class DAppBrowserModule {
     fun provideFileChooser(
         fragment: Fragment
     ) = WebViewFileChooser(fragment)
+
+    @Provides
+    @ScreenScope
+    fun providePermissionAsker(
+        permissionsAskerFactory: PermissionsAskerFactory,
+        fragment: Fragment,
+        router: DAppRouter
+    ) = permissionsAskerFactory.create(fragment, router)
+
+    @Provides
+    @ScreenScope
+    fun provideWebViewPermissionAsker(permissionsAsker: PermissionsAsker.Presentation): WebViewPermissionAsker {
+        return WebViewPermissionAsker(permissionsAsker)
+    }
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppBrowserViewModel {
