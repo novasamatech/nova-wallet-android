@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +25,7 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.setupReferendumSharing
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
@@ -137,6 +136,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
 
     override fun subscribe(viewModel: ReferendumDetailsViewModel) {
         setupExternalActions(viewModel)
+        setupReferendumSharing(viewModel.shareReferendumMixin)
         observeValidations(viewModel)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.referendumNotAwaitableAction)
 
@@ -178,17 +178,6 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         referendumTimelineContainer.letOrHide(model.timeline) {
             referendumDetailsTimeline.setTimeline(it)
         }
-
-        viewModel.shareEvent.observeEvent(::shareReferendum)
-    }
-
-    private fun shareReferendum(referendumLink: Uri) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, referendumLink.toString())
-        }
-
-        startActivity(Intent.createChooser(intent, null))
     }
 
     // TODO we need a better way of managing views for specific calls when multiple calls will be supported

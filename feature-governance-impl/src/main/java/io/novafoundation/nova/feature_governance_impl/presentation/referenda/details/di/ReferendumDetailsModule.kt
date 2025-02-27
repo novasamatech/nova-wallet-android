@@ -19,7 +19,6 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.ReferendumPreVoteValidationSystem
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.valiadtions.referendumPreVote
@@ -29,6 +28,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.identity.Governance
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
@@ -60,7 +60,7 @@ class ReferendumDetailsModule {
         validationExecutor: ValidationExecutor,
         updateSystem: UpdateSystem,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
+        shareReferendumMixin: ShareReferendumMixin
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -80,7 +80,7 @@ class ReferendumDetailsModule {
             validationSystem = validationSystem,
             updateSystem = updateSystem,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            referendumLinkConfigurator = referendumDetailsDeepLinkConfigurator
+            shareReferendumMixin = shareReferendumMixin,
         )
     }
 

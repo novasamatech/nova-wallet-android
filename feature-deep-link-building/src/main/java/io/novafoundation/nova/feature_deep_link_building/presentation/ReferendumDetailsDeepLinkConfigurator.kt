@@ -34,10 +34,10 @@ class ReferendumDetailsDeepLinkConfigurator(
             .build()
     }
 
-    private fun mapGovTypeToParams(govType: Chain.Governance): String {
+    private fun mapGovTypeToParams(govType: Chain.Governance): String? {
         return when (govType) {
             Chain.Governance.V1 -> 1.toString()
-            Chain.Governance.V2 -> 0.toString()
+            Chain.Governance.V2 -> null // We handle null case as Gov2 by default and it's not necessary to put it in link
         }
     }
 }
