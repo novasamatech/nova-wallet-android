@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.isZero
-import io.novafoundation.nova.common.utils.mapOptional
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.takeUnlessZero
@@ -13,19 +12,14 @@ import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
-import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.ChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.MultiChainStakingStats
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.candidateStake
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.userStake
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.SessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.hasActiveCollators
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.observeMythosLocks
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.total
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.currentIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.session
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.validators
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators

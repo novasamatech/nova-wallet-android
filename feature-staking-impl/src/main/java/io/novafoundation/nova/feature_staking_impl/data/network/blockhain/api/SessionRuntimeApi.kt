@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api
 
-import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.session
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
