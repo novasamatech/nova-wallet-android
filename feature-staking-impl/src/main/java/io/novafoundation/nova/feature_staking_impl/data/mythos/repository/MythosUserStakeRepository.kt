@@ -80,7 +80,6 @@ class RealMythosUserStakeRepository @Inject constructor(
 
             metadata.collatorStaking.candidateStake.observe(allKeys).map { resultMap ->
                 resultMap.mapKeys { (keys, _) -> keys.first }
-                    .filterNotNull()
             }
         }
     }
