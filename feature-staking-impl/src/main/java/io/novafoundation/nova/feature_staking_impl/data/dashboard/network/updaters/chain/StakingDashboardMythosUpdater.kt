@@ -75,12 +75,9 @@ class StakingDashboardMythosUpdater(
     private suspend fun subscribeToOnChainState(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<OnChainInfo?> {
         val accountId = metaAccount.accountIdKeyIn(chain) ?: return flowOf(null)
 
-        val userStakeShared = subscribeToUserStake(storageSubscriptionBuilder, accountId)
-            .shareIn(CoroutineScope(coroutineContext), SharingStarted.Lazily, replay = 1)
-
         return combine(
             subscribeToTotalStake(),
-            userStakeShared,
+            subscribeToUserStake(storageSubscriptionBuilder, accountId),
             sessionValidatorsFlow(storageSubscriptionBuilder)
         ) { totalStake, userStakeInfo, sessionValidators ->
             constructOnChainInfo(totalStake, userStakeInfo, accountId, sessionValidators)
