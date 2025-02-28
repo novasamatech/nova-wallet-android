@@ -9,10 +9,12 @@ import android.widget.Space
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import com.github.mikephil.charting.data.Entry
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.DateChartTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.PriceChangeTextInjector
@@ -25,6 +27,7 @@ import kotlinx.android.synthetic.main.view_price_charts.view.priceChartCurrentPr
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartDate
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartPriceChange
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartPriceChangeShimmering
+import kotlinx.android.synthetic.main.view_price_charts.view.priceChartShimmering
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartTitle
 import kotlin.math.roundToLong
 import kotlin.math.sin
@@ -111,27 +114,17 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun setEmptyState() {
-        val periods = 2
-        val entriesCount = 100
-        val entries = List(entriesCount) {
-            val sinY = sin(periods * Math.PI * 2 * it / entriesCount)
-            Entry(it.toFloat(), sinY.toFloat())
-        }
-
-        controller.setEntries(entries)
-
-        showLoadingState(true)
+        showCharts(false)
     }
 
-    private fun showLoadingState(show: Boolean) {
-        priceChartDate.isInvisible = show
-        priceChartPriceChange.isInvisible = show
-        priceChartCurrentPrice.isInvisible = show
-        priceChartPriceChangeShimmering.isVisible = show
-        priceChartCurrentPriceShimmering.isVisible = show
-
-        controller.useNeutralColor(show)
-        controller.showYAxis(!show)
+    private fun showCharts(show: Boolean) {
+        priceChart.setVisible(show, falseState = View.INVISIBLE)
+        priceChartDate.setVisible(show, falseState = View.INVISIBLE)
+        priceChartPriceChange.setVisible(show, falseState = View.INVISIBLE)
+        priceChartCurrentPrice.setVisible(show, falseState = View.INVISIBLE)
+        priceChartPriceChangeShimmering.isGone = show
+        priceChartCurrentPriceShimmering.isGone = show
+        priceChartShimmering.isGone = show
     }
 
     private fun selectChart(index: Int) {
@@ -148,7 +141,7 @@ class PriceChartsView @JvmOverloads constructor(
         } else if (currentChart is PriceChartModel.Chart) {
             controller.setEntries(currentChart.asEntries())
 
-            showLoadingState(false)
+            showCharts(true)
         }
     }
 

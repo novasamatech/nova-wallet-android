@@ -91,6 +91,82 @@
         android:background="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@+id/priceChartDate" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/priceChartShimmering"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingVertical="9dp"
+        app:layout_constraintBottom_toBottomOf="@+id/priceChart"
+        app:layout_constraintEnd_toEndOf="@+id/priceChart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/priceChart">
+
+        <io.novafoundation.nova.feature_assets.presentation.views.priceCharts.ChartsShimmeringView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="26dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:layout_width="22dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_shimmering" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3333">
+
+            <View
+                android:layout_width="22dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_shimmering" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.6666">
+
+            <View
+                android:layout_width="22dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_shimmering" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                android:layout_width="22dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_shimmering" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <LinearLayout
         android:id="@+id/priceChartButtons"
         android:layout_width="match_parent"

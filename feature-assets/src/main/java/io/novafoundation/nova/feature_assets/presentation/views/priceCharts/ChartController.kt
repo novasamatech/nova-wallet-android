@@ -23,20 +23,9 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private val context = chart.context
 
     private var currentEntries: List<Entry> = emptyList()
-    private var useNeutralColor = false
 
     init {
         setupChartUI()
-    }
-
-    fun showYAxis(show: Boolean) {
-        chart.axisRight.setDrawLabels(show)
-        chart.invalidate()
-    }
-
-    fun useNeutralColor(useNeutral: Boolean) {
-        this.useNeutralColor = useNeutral
-        updateChart()
     }
 
     fun setEntries(entries: List<Entry>) {
@@ -46,6 +35,8 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupChartUI() {
+        val chartUIParams = getSharedChartUIParams(context)
+
         chart.setBackgroundColor(Color.TRANSPARENT)
         chart.setDrawGridBackground(false)
         chart.setDrawBorders(false)
@@ -75,13 +66,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             textSize = 9f
             textColor = context.getColor(R.color.text_secondary)
             typeface = Typeface.MONOSPACE
-            setLabelCount(4, true)
+            setLabelCount(chartUIParams.gridLines, true)
             setDrawTopYLabelEntry(true)
-            gridLineWidth = 1.5f
+            gridLineWidth = chartUIParams.gridLineWidthDp
             setDrawAxisLine(false)
             setDrawGridLines(true)
             gridColor = context.getColor(R.color.price_chart_grid_line)
-            enableGridDashedLine(10f, 10f, 0f)
+            setGridDashedLine(chartUIParams.gridLineDashEffect)
         }
 
         chart.setOnTouchListener { _, event ->
@@ -103,11 +94,12 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChartWithSelectedEntry(entry: Entry) {
+        val chartUIParams = getSharedChartUIParams(context)
         val (entriesBefore, entriesAfter) = currentEntries.partition { it.x <= entry.x }
 
         val entriesColor = currentEntries.getColorResForEntries()
-        val datasetBefore = entriesBefore.createDataSet(entriesColor)
-        val datasetAfter = entriesAfter.createDataSet(R.color.neutral_price_chart_line)
+        val datasetBefore = entriesBefore.createDataSet(chartUIParams, entriesColor)
+        val datasetAfter = entriesAfter.createDataSet(chartUIParams, R.color.neutral_price_chart_line)
 
         chart.priceChartRenderer().apply {
             setDotPoint(entry)
@@ -121,12 +113,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChart() {
+        val chartUIParams = getSharedChartUIParams(context)
         chart.priceChartRenderer().apply {
             setDotPoint(null)
             setDotColor(null)
         }
 
-        val dataSet = currentEntries.createDataSet(currentEntries.getColorResForEntries())
+        val dataSet = currentEntries.createDataSet(chartUIParams, currentEntries.getColorResForEntries())
         chart.data = LineData(dataSet)
         chart.invalidate()
 
@@ -139,21 +132,19 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         callback.onSelectEntry(entries.first(), entries.last(), isEntrySelected)
     }
 
-    private fun List<Entry>.createDataSet(colorRes: Int): LineDataSet {
+    private fun List<Entry>.createDataSet(chartUIParams: ChartUIParams, colorRes: Int): LineDataSet {
         return LineDataSet(this, "").apply {
             color = context.getColor(colorRes)
             setDrawCircles(false)
             setDrawValues(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            lineWidth = 1.5f
+            lineWidth = chartUIParams.chartLineWidthDp
         }
     }
 
     private fun LineChart.priceChartRenderer() = priceChart.renderer as PriceChartRenderer
 
     private fun List<Entry>.getColorResForEntries(): Int {
-        if (useNeutralColor) return R.color.neutral_price_chart_line
-
         return if (isBullish()) R.color.positive_price_chart_line else R.color.negative_price_chart_line
     }
 
