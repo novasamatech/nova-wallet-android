@@ -10,8 +10,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import com.github.mikephil.charting.data.Entry
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.setVisible
@@ -30,7 +28,6 @@ import kotlinx.android.synthetic.main.view_price_charts.view.priceChartPriceChan
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartShimmering
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartTitle
 import kotlin.math.roundToLong
-import kotlin.math.sin
 
 sealed class PriceChartModel(val buttonText: String) {
 

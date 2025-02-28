@@ -49,10 +49,11 @@ class ChartsShimmeringView @JvmOverloads constructor(
         for (point in 0..linePoints) {
             val x = point * pointStep
             val y = centerY + amplitude * sin(periods * Math.PI * 2 * x / measuredWidth).toFloat()
-            if (sinPath.isEmpty)
+            if (sinPath.isEmpty) {
                 sinPath.moveTo(x, y)
-            else
+            } else {
                 sinPath.lineTo(x, y)
+            }
         }
     }
 

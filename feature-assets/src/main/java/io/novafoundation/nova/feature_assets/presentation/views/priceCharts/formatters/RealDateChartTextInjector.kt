@@ -4,12 +4,10 @@ import android.text.format.DateUtils
 import android.view.View
 import android.widget.TextView
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.formatting.formatDateSinceEpoch
 import io.novafoundation.nova.common.utils.formatting.isThisYear
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartModel
-import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 
 interface DateChartTextInjector {
