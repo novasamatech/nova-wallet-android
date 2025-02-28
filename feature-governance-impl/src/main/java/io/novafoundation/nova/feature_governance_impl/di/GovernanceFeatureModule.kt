@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
@@ -47,6 +48,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.RealConvictionValuesProvider
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.RealLocksFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.RealShareReferendumMixin
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.RealVotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
@@ -196,4 +199,10 @@ class GovernanceFeatureModule {
         governanceSharedState: GovernanceSharedState,
         governanceSourceRegistry: GovernanceSourceRegistry,
     ): TracksUseCase = RealTracksUseCase(governanceSharedState, governanceSourceRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideShareReferendumMixin(
+        referendumLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
+    ): ShareReferendumMixin = RealShareReferendumMixin(referendumLinkConfigurator)
 }

@@ -2,9 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
-apply from: '../tests.gradle'
 
 android {
+    namespace 'io.novafoundation.nova.feature_deep_link_building'
+
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
@@ -31,34 +32,20 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
-    namespace 'io.novafoundation.nova.feature_push_notifications'
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
     implementation project(':runtime')
-    implementation project(':feature-account-api')
-    implementation project(':feature-governance-api')
-    implementation project(':feature-staking-api')
-    implementation project(':feature-currency-api')
-    implementation project(':feature-deep-link-building')
 
     implementation kotlinDep
 
     implementation androidDep
     implementation materialDep
-    implementation constraintDep
-
-    implementation platform(firebaseBomDep)
-    implementation firestoreDep
-    implementation firebaseCloudMessagingDep
 
     implementation coroutinesDep
 
     implementation daggerDep
     kapt daggerKapt
-
-    implementation lifecycleDep
-    kapt lifecycleKapt
 }
