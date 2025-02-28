@@ -9,8 +9,6 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.highlight.Highlight
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.feature_assets.R
@@ -19,7 +17,7 @@ import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 class ChartController(private val chart: LineChart, private val callback: Callback) {
 
     interface Callback {
-        fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isLastEntry: Boolean)
+        fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean)
     }
 
     private val context = chart.context
@@ -119,7 +117,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.data = LineData(datasetBefore, datasetAfter)
         chart.invalidate()
 
-        onSelectEntry(entriesBefore, isLastEntry = false)
+        onSelectEntry(entriesBefore, isEntrySelected = true)
     }
 
     private fun updateChart() {
@@ -132,13 +130,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.data = LineData(dataSet)
         chart.invalidate()
 
-        onSelectEntry(currentEntries, isLastEntry = true)
+        onSelectEntry(currentEntries, isEntrySelected = false)
     }
 
-    private fun onSelectEntry(entries: List<Entry>, isLastEntry: Boolean) {
+    private fun onSelectEntry(entries: List<Entry>, isEntrySelected: Boolean) {
         if (entries.isEmpty()) return
 
-        callback.onSelectEntry(entries.first(), entries.last(), isLastEntry)
+        callback.onSelectEntry(entries.first(), entries.last(), isEntrySelected)
     }
 
     private fun List<Entry>.createDataSet(colorRes: Int): LineDataSet {

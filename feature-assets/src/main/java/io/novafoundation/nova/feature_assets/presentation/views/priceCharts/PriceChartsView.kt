@@ -29,11 +29,16 @@ import kotlinx.android.synthetic.main.view_price_charts.view.priceChartTitle
 import kotlin.math.roundToLong
 import kotlin.math.sin
 
-sealed class PriceChartModel(val name: String) {
+sealed class PriceChartModel(val buttonText: String) {
 
-    class Loading(name: String) : PriceChartModel(name)
+    class Loading(buttonText: String) : PriceChartModel(buttonText)
 
-    class Chart(name: String, val priceChart: List<Price>) : PriceChartModel(name) {
+    class Chart(
+        buttonText: String,
+        val periodName: String,
+        val supportTimeShowing: Boolean,
+        val priceChart: List<Price>
+    ) : PriceChartModel(buttonText) {
 
         class Price(val timestamp: Long, val price: BigDecimal)
     }
@@ -75,7 +80,7 @@ class PriceChartsView @JvmOverloads constructor(
                 priceChartButtons.addView(createSpace())
             }
 
-            priceChartButtons.addView(createButton(priceChartModel.name, index))
+            priceChartButtons.addView(createButton(priceChartModel.buttonText, index))
         }
 
         if (charts.isEmpty()) {
@@ -99,10 +104,10 @@ class PriceChartsView @JvmOverloads constructor(
         this.dateTextInjector = dateTextInjector
     }
 
-    override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isLastEntry: Boolean) {
+    override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean) {
         priceTextInjector?.format(selectedEntry.y, priceChartCurrentPrice)
         priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, priceChartPriceChange)
-        dateTextInjector?.format(selectedEntry.x.roundToLong(), isLastEntry, priceChartDate)
+        dateTextInjector?.format(selectedEntry.x.roundToLong(), isEntrySelected, priceChartDate, charts[selectedChartIndex])
     }
 
     private fun setEmptyState() {
