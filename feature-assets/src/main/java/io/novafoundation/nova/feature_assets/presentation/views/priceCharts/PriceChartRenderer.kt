@@ -44,14 +44,15 @@ class PriceChartRenderer(
         this.dotColor = color
     }
 
-    override fun drawHighlightLines(canvas: Canvas, x: Float, y: Float, set: ILineScatterCandleRadarDataSet<*>?) {
-        canvas.drawLine(x, 0f, x, chart.height.toFloat(), linePaint)
+    override fun drawHighlightLines(c: Canvas?, x: Float, y: Float, set: ILineScatterCandleRadarDataSet<*>?) {
+        // Override it to not draw highlight lines
     }
 
     override fun drawExtras(c: Canvas) {
         super.drawExtras(c)
         dot?.let {
             val point = it.toCanvasPoint()
+            c.drawLine(point.x, 0f, point.x, chart.height.toFloat(), linePaint)
             dotPaint.color = getAlphaWithArgb(dotColor ?: Color.WHITE, strokeAlpha)
             c.drawCircle(point.x, point.y, dotRadius + strokeWidth, dotPaint)
             dotPaint.color = dotColor ?: Color.WHITE
