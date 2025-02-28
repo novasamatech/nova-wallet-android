@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetaiActions
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailActions
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
@@ -83,15 +83,15 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         balanceDetailBack.setOnClickListener { viewModel.backClicked() }
 
-        balanceDetaiActions.send.setOnClickListener {
+        balanceDetailActions.send.setOnClickListener {
             viewModel.sendClicked()
         }
 
-        balanceDetaiActions.swap.setOnClickListener {
+        balanceDetailActions.swap.setOnClickListener {
             viewModel.swapClicked()
         }
 
-        balanceDetaiActions.receive.setOnClickListener {
+        balanceDetailActions.receive.setOnClickListener {
             viewModel.receiveClicked()
         }
 
@@ -116,7 +116,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         viewModel.state.observe(transfersContainer::showState)
 
         buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
-        buyMixinUi.setupBuyButton(this, balanceDetaiActions.buy, viewModel.buyEnabled) {
+        buyMixinUi.setupBuyButton(this, balanceDetailActions.buy, viewModel.buyEnabled) {
             viewModel.buyClicked()
         }
 
@@ -140,9 +140,9 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
 
-        viewModel.sendEnabled.observe(balanceDetaiActions.send::setEnabled)
+        viewModel.sendEnabled.observe(balanceDetailActions.send::setEnabled)
 
-        viewModel.swapButtonEnabled.observe(balanceDetaiActions.swap::setEnabled)
+        viewModel.swapButtonEnabled.observe(balanceDetailActions.swap::setEnabled)
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
             LedgerNotSupportedWarningBottomSheet(
