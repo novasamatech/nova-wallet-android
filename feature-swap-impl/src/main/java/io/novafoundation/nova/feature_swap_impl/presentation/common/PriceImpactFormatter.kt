@@ -2,17 +2,11 @@ package io.novafoundation.nova.feature_swap_impl.presentation.common
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_swap_impl.R
-
-private val THRESHOLDS = listOf(
-    15.0.percents to R.color.text_negative,
-    5.0.percents to R.color.text_warning,
-    1.0.percents to R.color.text_secondary,
-)
+import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 
 interface PriceImpactFormatter {
 
@@ -21,7 +15,16 @@ interface PriceImpactFormatter {
     fun formatWithBrackets(priceImpact: Fraction): CharSequence?
 }
 
-class RealPriceImpactFormatter(private val resourceManager: ResourceManager) : PriceImpactFormatter {
+class RealPriceImpactFormatter(
+    private val priceImpactThresholds: PriceImpactThresholds,
+    private val resourceManager: ResourceManager
+) : PriceImpactFormatter {
+
+    private val thresholdsToColors = listOf(
+        priceImpactThresholds.highPriceImpact to R.color.text_negative,
+        priceImpactThresholds.mediumPriceImpact to R.color.text_warning,
+        priceImpactThresholds.lowPriceImpact to R.color.text_secondary,
+    )
 
     override fun format(priceImpact: Fraction): CharSequence? {
         val color = getColor(priceImpact) ?: return null
@@ -36,7 +39,7 @@ class RealPriceImpactFormatter(private val resourceManager: ResourceManager) : P
     }
 
     private fun getColor(priceImpact: Fraction): Int? {
-        return THRESHOLDS.firstOrNull { priceImpact > it.first }
+        return thresholdsToColors.firstOrNull { priceImpact > it.first }
             ?.second
     }
 }

@@ -758,6 +758,8 @@
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
     </plurals>
     <string name="governance_unlock">ロック解除</string>
+    <string name="high_price_impact_detacted_message">この交換を実行すると、大幅なスリッページと財務上の損失が発生します。取引サイズを減らすか、取引を複数のトランザクションに分けることを検討してください。</string>
+    <string name="high_price_impact_detacted_title">高価格インパクト検出 (%s)</string>
     <string name="history_v1.9.0">履歴</string>
     <string name="identity_email_title">メール</string>
     <string name="identity_legal_name_title">法的氏名</string>
@@ -921,6 +923,7 @@
     <string name="pool_inactive_failure_title">プールが開いていません</string>
     <string name="pool_staking_conflict_message">同じアカウントでDirect StakingとPool Stakingの両方を使用することはできなくなりました。Pool Stakingを管理するには、まずDirect Stakingからトークンをアンステークする必要があります。</string>
     <string name="pool_staking_conflict_title">プール操作は利用できません</string>
+    <string name="popular_dapps_title">人気のある</string>
     <string name="pre_configured_networks_add_custom_button">手動でネットワークを追加</string>
     <string name="pre_configured_networks_progress_text">ネットワークリストを読み込み中...</string>
     <string name="pre_configured_networks_search_hint">ネットワーク名で検索</string>
