@@ -22,13 +22,15 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.SessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.hasActiveCollators
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.observeMythosLocks
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.total
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.currentIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.session
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.validators
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
-import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.cache.StorageCachingContext
 import io.novafoundation.nova.runtime.storage.cache.cacheValues
@@ -85,46 +87,15 @@ class StakingDashboardMythosUpdater(
         return combine(
             subscribeToTotalStake(),
             userStakeShared,
-            subscribeToHasWaitingNominations(accountId, userStakeShared, storageSubscriptionBuilder)
-        ) { totalStake, userStakeInfo, hasWaitingNominations ->
-            constructOnChainInfo(totalStake, userStakeInfo, accountId, hasWaitingNominations)
+            sessionValidatorsFlow(storageSubscriptionBuilder)
+        ) { totalStake, userStakeInfo, sessionValidators ->
+            constructOnChainInfo(totalStake, userStakeInfo, accountId, sessionValidators)
         }
     }
 
-    private suspend fun subscribeToHasWaitingNominations(
-        accountId: AccountIdKey,
-        userStakeInfoFlow: Flow<UserStakeInfo?>,
-        storageSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Boolean> {
-        val lastDelegationChangeSessionFlow = userStakeInfoFlow.mapOptional { userStakeInfo ->
-            getLastDelegationChange(accountId, userStakeInfo.candidates)
-        }
-
-        return combine(
-            subscribeToSession(storageSubscriptionBuilder),
-            lastDelegationChangeSessionFlow,
-        ) { currentSession, lastDelegationChangeSession ->
-            currentSession == lastDelegationChangeSession
-        }
-    }
-
-    private suspend fun getLastDelegationChange(userId: AccountIdKey, delegations: List<AccountIdKey>): SessionIndex? {
-        if (delegations.isEmpty()) return null
-
-        return getUserDelegationInfos(userId, delegations)
-            .maxOfOrNull { (_, delegation) -> delegation.session }
-    }
-
-    private suspend fun getUserDelegationInfos(userId: AccountIdKey, delegations: List<AccountIdKey>): Map<Pair<AccountIdKey, AccountIdKey>, MythDelegation> {
-        return remoteStorageSource.query(chain.id) {
-            val allKeys = delegations.map { it to userId }
-            metadata.collatorStaking.candidateStake.entries(allKeys)
-        }
-    }
-
-    private suspend fun subscribeToSession(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<SessionIndex> {
+    private suspend fun sessionValidatorsFlow(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Set<AccountIdKey>> {
         return remoteStorageSource.subscribe(chain.id, storageSubscriptionBuilder) {
-            metadata.session.currentIndex.observeNonNull()
+            metadata.session.validators.observeNonNull()
         }
     }
 
@@ -132,12 +103,14 @@ class StakingDashboardMythosUpdater(
         totalStake: Balance?,
         userStakeInfo: UserStakeInfo?,
         accountId: AccountIdKey,
-        hasWaitingNominations: Boolean
+        sessionValidators: SessionValidators,
     ): OnChainInfo? {
         if (totalStake == null) return null
 
+        val hasActiveValidators = userStakeInfo.hasActiveCollators(sessionValidators)
         val activeStake = userStakeInfo?.balance.orZero()
-        return OnChainInfo(activeStake, accountId, hasWaitingNominations)
+
+        return OnChainInfo(activeStake, accountId, hasActiveValidators)
     }
 
     private fun constructSecondaryInfo(
@@ -149,19 +122,15 @@ class StakingDashboardMythosUpdater(
         return SecondaryInfo(
             rewards = chainStakingStats.rewards,
             estimatedEarnings = chainStakingStats.estimatedEarnings.value,
-            status = determineStakingStatus(baseInfo, chainStakingStats)
+            status = determineStakingStatus(baseInfo)
         )
     }
 
-    private fun determineStakingStatus(
-        baseInfo: OnChainInfo?,
-        chainStakingStats: ChainStakingStats,
-    ): StakingDashboardItemLocal.Status? {
+    private fun determineStakingStatus(baseInfo: OnChainInfo?): StakingDashboardItemLocal.Status? {
         return when {
             baseInfo == null -> null
             baseInfo.activeStake.isZero -> StakingDashboardItemLocal.Status.INACTIVE
-            chainStakingStats.accountPresentInActiveStakers -> StakingDashboardItemLocal.Status.ACTIVE
-            baseInfo.hasWaitingDelegation -> StakingDashboardItemLocal.Status.WAITING
+            baseInfo.hasActiveCollators -> StakingDashboardItemLocal.Status.ACTIVE
             else -> StakingDashboardItemLocal.Status.INACTIVE
         }
     }
@@ -213,7 +182,7 @@ class StakingDashboardMythosUpdater(
     private class OnChainInfo(
         val activeStake: Balance,
         val accountId: AccountIdKey,
-        val hasWaitingDelegation: Boolean
+        val hasActiveCollators: Boolean
     )
 
     private class SecondaryInfo(

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 
-typealias SessionValidators = List<AccountIdKey>
+typealias SessionValidators = Set<AccountIdKey>
 
 fun bindSessionValidators(dynamicInstance: Any?) = bindList(dynamicInstance, ::bindAccountIdKey)
+    .toSet()
