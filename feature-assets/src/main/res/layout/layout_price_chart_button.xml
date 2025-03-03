@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/priceChartButtonText"
+    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_chart_button"
+    android:includeFontPadding="false"
+    android:minHeight="24dp"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="4dp"
+    android:textColor="@color/color_chart_button_text" />

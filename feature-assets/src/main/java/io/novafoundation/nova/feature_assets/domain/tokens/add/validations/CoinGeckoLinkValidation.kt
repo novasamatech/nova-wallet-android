@@ -9,10 +9,10 @@ import io.novafoundation.nova.common.validation.isTrueOrError
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
 
 class CoinGeckoLinkValidationFactory(
-    private val coinGeckoApi: CoingeckoApi,
+    private val coinGeckoApi: PriceApi,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
 ) {
     fun <P, E> create(
@@ -31,7 +31,7 @@ class CoinGeckoLinkValidationFactory(
 }
 
 class CoinGeckoLinkValidation<P, E>(
-    private val coinGeckoApi: CoingeckoApi,
+    private val coinGeckoApi: PriceApi,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
     private val optional: Boolean,
     private val link: (P) -> String?,
