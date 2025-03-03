@@ -216,6 +216,10 @@ buildscript {
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
         cardStackView = "com.github.yuyakaido:cardstackview:$cardStackVersion"
+
+        chartsDep = "com.github.PhilJay:MPAndroidChart:v3.1.0"
+
+        swipeRefershLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
     }
 
     repositories {

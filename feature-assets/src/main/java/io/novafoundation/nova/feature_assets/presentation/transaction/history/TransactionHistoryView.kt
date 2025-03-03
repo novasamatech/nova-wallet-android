@@ -134,7 +134,7 @@ class TransferHistorySheet @JvmOverloads constructor(
 
         adapter.submitList(emptyList())
 
-        bottomSheetBehavior?.isDraggable = false
+        bottomSheetBehavior?.isDraggable = true
     }
 
     fun showTransactions(transactions: List<Any>) {

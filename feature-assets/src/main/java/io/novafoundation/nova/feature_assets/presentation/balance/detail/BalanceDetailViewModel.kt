@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -15,6 +17,8 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
+import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -24,10 +28,15 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayloa
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
+import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartModel
+import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealDateChartTextInjector
+import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPriceChangeTextInjector
+import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPricePriceTextInjector
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
+import io.novafoundation.nova.feature_wallet_api.data.repository.PriceChartPeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
@@ -46,6 +55,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -66,7 +76,8 @@ class BalanceDetailViewModel(
     private val controllableAssetCheck: ControllableAssetCheckMixin,
     private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    private val chartsInteractor: ChartsInteractor
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -125,6 +136,32 @@ class BalanceDetailViewModel(
     }
         .inBackground()
         .share()
+
+    val priceChartTitle = assetFlow.map {
+        val tokenName = it.token.configuration.symbol.value
+        resourceManager.getString(R.string.price_chart_title, tokenName)
+    }.shareInBackground()
+
+    val priceChartFormatters: Flow<PriceChartTextInjectors> = flowOf {
+        val currency = currencyInteractor.getSelectedCurrency()
+
+        PriceChartTextInjectors(
+            RealPricePriceTextInjector(currency),
+            RealPriceChangeTextInjector(resourceManager, currency),
+            RealDateChartTextInjector(resourceManager)
+        )
+    }.shareInBackground()
+
+    private val priceCharts: Flow<List<AssetPriceChart>?> = assetFlow.map { it.token.configuration.priceId }
+        .distinctUntilChanged()
+        .flatMapLatest {
+            val priceId = it ?: return@flatMapLatest flowOf { null }
+            chartsInteractor.chartsFlow(priceId)
+        }.shareInBackground()
+
+    val priceChartModels = priceCharts.map { charts ->
+        charts?.map { mapChartsToUi(it) }
+    }.shareInBackground()
 
     init {
         sync()
@@ -254,5 +291,49 @@ class BalanceDetailViewModel(
         }
 
         return BalanceLocksModel(locks)
+    }
+
+    private fun mapChartsToUi(assetPriceChart: AssetPriceChart): PriceChartModel {
+        val buttonText = mapButtonText(assetPriceChart.range)
+
+        return if (assetPriceChart.chart is ExtendedLoadingState.Loaded) {
+            val periodName = mapPeriodName(assetPriceChart.range)
+            val supportTimeShowing = supportTimeShowing(assetPriceChart.range)
+            val mappedChart = assetPriceChart.chart.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
+            PriceChartModel.Chart(buttonText, periodName, supportTimeShowing, mappedChart)
+        } else {
+            PriceChartModel.Loading(buttonText)
+        }
+    }
+
+    private fun mapButtonText(priceChartPeriod: PriceChartPeriod): String {
+        val buttonTextRes = when (priceChartPeriod) {
+            PriceChartPeriod.DAY -> R.string.price_chart_day
+            PriceChartPeriod.WEEK -> R.string.price_chart_week
+            PriceChartPeriod.MONTH -> R.string.price_chart_month
+            PriceChartPeriod.YEAR -> R.string.price_chart_year
+            PriceChartPeriod.MAX -> R.string.price_chart_max
+        }
+
+        return resourceManager.getString(buttonTextRes)
+    }
+
+    private fun mapPeriodName(priceChartPeriod: PriceChartPeriod): String {
+        val periodNameRes = when (priceChartPeriod) {
+            PriceChartPeriod.DAY -> R.string.price_charts_period_today
+            PriceChartPeriod.WEEK -> R.string.price_charts_period_week
+            PriceChartPeriod.MONTH -> R.string.price_charts_period_month
+            PriceChartPeriod.YEAR -> R.string.price_charts_period_year
+            PriceChartPeriod.MAX -> R.string.price_charts_period_all
+        }
+
+        return resourceManager.getString(periodNameRes)
+    }
+
+    private fun supportTimeShowing(priceChartPeriod: PriceChartPeriod): Boolean {
+        return when (priceChartPeriod) {
+            PriceChartPeriod.DAY, PriceChartPeriod.WEEK, PriceChartPeriod.MONTH -> true
+            PriceChartPeriod.YEAR, PriceChartPeriod.MAX -> false
+        }
     }
 }
