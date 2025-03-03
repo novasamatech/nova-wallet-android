@@ -9,26 +9,28 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.StartImportLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.StartImportLegacyLedgerViewModel
 
 @Module(includes = [ViewModelModule::class])
-class StartImportLedgerModule {
+class StartImportLegacyLedgerModule {
 
     @Provides
     @IntoMap
-    @ViewModelKey(StartImportLedgerViewModel::class)
+    @ViewModelKey(StartImportLegacyLedgerViewModel::class)
     fun provideViewModel(
+        resourceManager: ResourceManager,
         router: LedgerRouter,
         appLinksProvider: AppLinksProvider,
         ledgerMigrationTracker: LedgerMigrationTracker,
     ): ViewModel {
-        return StartImportLedgerViewModel(router, appLinksProvider, ledgerMigrationTracker)
+        return StartImportLegacyLedgerViewModel(resourceManager, router, appLinksProvider, ledgerMigrationTracker)
     }
 
     @Provides
-    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): StartImportLedgerViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(StartImportLedgerViewModel::class.java)
+    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): StartImportLegacyLedgerViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(StartImportLegacyLedgerViewModel::class.java)
     }
 }

@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <!--<string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>-->
+    <string name="account_ledger_import_start_guide">Ledger Connection Guide</string>
+
+    <!--<string name="account_ledger_import_start_title">Connect Ledger Nano X</string>-->
+    <string name="account_ledger_import_start_title">Connect Ledger</string>
+
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
+
+    <!--<string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>-->
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+
+    <!--<string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>-->
+    <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string> <!--Renamed and changed-->
+
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
 
     <!--<string name="dapp_main_welcome_title">Welcome to Nova Browser</string>-->
     <!--<string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>-->
@@ -118,8 +134,6 @@
     <string name="referenda_swipe_gov_banner_subtitle">Swipe to vote on referenda with AI summaries. Fast &amp; easy!</string>
     <string name="referenda_swipe_gov_banner_chip">%d referenda</string>
 
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>
-
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot app is installed</string>
 
     <string name="account_ledger_generic_import_start_step_2_highlighted">Open the Polkadot app</string>
@@ -184,8 +198,6 @@
 
     <string name="account_ledger_legacy_warning_title">New Ledger app has been released</string>
     <string name="account_ledger_legacy_warning_message">To sign operations and migrate your accounts to the new Generic Ledger app install and open Migration app. Legacy Old and Migration Ledger apps will not be supported in the future.</string>
-
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
 
     <string name="account_ledger_nano_x">Ledger Nano X</string>
 
@@ -1540,9 +1552,6 @@
     <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
     <string name="account_select_hardware_wallet">Select hardware wallet</string>
-
-    <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>
-    <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
     <string name="common_total">Total</string>
 
