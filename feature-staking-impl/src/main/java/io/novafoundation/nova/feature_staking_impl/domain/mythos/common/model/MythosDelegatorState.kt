@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
-import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.hasActiveValidators
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.hasActiveCollators
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosLocks
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.total
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
@@ -60,7 +60,7 @@ fun MythosDelegatorState.stakedCollatorsCount(): Int {
 
 fun MythosDelegatorState.hasActiveValidators(sessionValidators: SessionValidators): Boolean {
     return when (this) {
-        is MythosDelegatorState.Staked -> userStakeInfo.hasActiveValidators(sessionValidators)
+        is MythosDelegatorState.Staked -> userStakeInfo.hasActiveCollators(sessionValidators)
         MythosDelegatorState.NotStarted -> false
     }
 }

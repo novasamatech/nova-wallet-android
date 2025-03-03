@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.candidateStake
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
@@ -80,7 +79,6 @@ class RealMythosUserStakeRepository @Inject constructor(
 
             metadata.collatorStaking.candidateStake.observe(allKeys).map { resultMap ->
                 resultMap.mapKeys { (keys, _) -> keys.first }
-                    .filterNotNull()
             }
         }
     }
