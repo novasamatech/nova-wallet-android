@@ -30,7 +30,10 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainByIdFlow
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
+import io.novafoundation.nova.runtime.multiNetwork.findChain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -88,6 +91,11 @@ class WalletInteractorImpl(
 
     override suspend fun syncChainNfts(metaAccount: MetaAccount, chain: Chain) {
         nftRepository.initialNftSync(metaAccount, chain)
+    }
+
+    override fun chainFlow(chainId: ChainId): Flow<Chain> {
+        return chainRegistry.enabledChainByIdFlow()
+            .map { it.getValue(chainId) }
     }
 
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {

@@ -19,17 +19,21 @@
             android:paddingBottom="16dp"
             tools:context=".presentation.balance.list.BalanceListFragment">
 
-            <ImageView
+            <View
                 android:id="@+id/balanceDetailBlur"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:background="@color/blur_navigation_background"
                 app:layout_constraintBottom_toBottomOf="@+id/balanceDetailBalanceBottomMargin"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/navigation_divider"
+                app:layout_constraintTop_toBottomOf="@+id/balanceDetailBlur" />
 
             <ImageView
                 android:id="@+id/balanceDetailBack"
@@ -45,16 +49,16 @@
 
             <ImageView
                 android:id="@+id/balanceDetailTokenIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                style="@style/Widget.Nova.AssetIcon.Primary"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_token_ksm"
                 app:layout_constraintBottom_toBottomOf="@+id/balanceDetailTokenName"
                 app:layout_constraintEnd_toStartOf="@+id/balanceDetailTokenName"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenName" />
+                app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenName"
+                tools:src="@drawable/ic_token_dot_colored" />
 
             <TextView
                 android:id="@+id/balanceDetailTokenName"
@@ -77,6 +81,15 @@
                 android:layout_height="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/balanceDetailTokenIcon" />
+
+            <io.novafoundation.nova.feature_account_api.view.ChainChipView
+                android:id="@+id/balanceDetailsChain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/balanceDetailTokenName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenName" />
 
             <io.novafoundation.nova.feature_assets.presentation.balance.detail.AssetDetailBalancesView
                 android:id="@+id/balanceDetailsBalances"

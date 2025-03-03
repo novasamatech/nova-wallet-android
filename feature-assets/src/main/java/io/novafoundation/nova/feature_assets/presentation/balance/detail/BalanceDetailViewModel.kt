@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -89,6 +91,9 @@ class BalanceDetailViewModel(
     private val _showLockedDetailsEvent = MutableLiveData<Event<BalanceLocksModel>>()
     val showLockedDetailsEvent: LiveData<Event<BalanceLocksModel>> = _showLockedDetailsEvent
 
+    private val chainFlow = walletInteractor.chainFlow(assetPayload.chainId)
+        .shareInBackground()
+
     private val assetFlow = walletInteractor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
         .share()
@@ -117,6 +122,8 @@ class BalanceDetailViewModel(
     }
         .inBackground()
         .share()
+
+    val chainUI = chainFlow.map { mapChainToUi(it) }
 
     val buyMixin = buyMixinFactory.create(scope = this)
 
