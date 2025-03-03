@@ -227,7 +227,7 @@ class BannerPagerView @JvmOverloads constructor(
 
     private fun stopAutoSwipe() {
         if (autoSwipeCallbackAdded) {
-            handler?.removeCallbacks(autoSwipeCallback)
+            removeCallbacks(autoSwipeCallback)
 
             autoSwipeCallbackAdded = false
         }
@@ -236,6 +236,7 @@ class BannerPagerView @JvmOverloads constructor(
     private fun startAutoSwipe() {
         if (autoSwipeCallbackAdded) return
         if (!canScroll) return
+        postDelayed(autoSwipeCallback, autoSwipeDelay)
 
         handler?.postDelayed(autoSwipeCallback, autoSwipeDelay)
         autoSwipeCallbackAdded = true
