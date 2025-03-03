@@ -50,6 +50,12 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountInput.setAssetName(name)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+
+        chooseAmountInput.isEnabled = enabled
+    }
+
     override fun setFiatAmount(fiat: CharSequence?) {
         chooseAmountInput.setFiatAmount(fiat)
     }

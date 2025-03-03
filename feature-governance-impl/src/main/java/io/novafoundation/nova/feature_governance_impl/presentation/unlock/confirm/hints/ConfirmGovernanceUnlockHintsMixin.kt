@@ -48,7 +48,7 @@ private class ConfirmGovernanceUnlockHintsMixin(
     ): CharSequence {
         val amountPart = mapAmountToAmountModel(remainsLockedInfo.amount, asset).token
         val lockedIdsPart = remainsLockedInfo.lockedInIds.joinToString { lockId ->
-            mapBalanceIdToUi(resourceManager, lockId)
+            mapBalanceIdToUi(resourceManager, lockId.value)
         }
 
         return buildSpannable(resourceManager) {

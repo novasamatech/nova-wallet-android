@@ -5,11 +5,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkData
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatusType
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.feature_push_notifications.R
@@ -18,7 +17,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.B
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
-import io.novafoundation.nova.feature_push_notifications.presentation.handling.addReferendumData
+import io.novafoundation.nova.feature_deep_link_building.presentation.addReferendumData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractPayloadFieldsWithPath
@@ -31,7 +30,7 @@ import java.math.BigInteger
 
 class ReferendumStateUpdateNotificationHandler(
     private val context: Context,
-    private val configurator: DeepLinkConfigurator<ReferendumDeepLinkData>,
+    private val configurator: ReferendumDetailsDeepLinkConfigurator,
     private val referendaStatusFormatter: ReferendaStatusFormatter,
     override val chainRegistry: ChainRegistry,
     activityIntentProvider: ActivityIntentProvider,

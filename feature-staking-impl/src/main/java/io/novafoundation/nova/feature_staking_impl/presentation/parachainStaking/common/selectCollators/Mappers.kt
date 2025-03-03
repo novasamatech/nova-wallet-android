@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.castOrNull
+import io.novafoundation.nova.common.utils.takeUnlessZero
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
@@ -43,8 +44,8 @@ suspend fun mapSelectedCollatorToSelectCollatorModel(
     addressIconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
 ): SelectCollatorModel = mapCollatorToSelectCollatorModel(
-    collator = selectedCollator.collator,
-    stakedAmount = selectedCollator.delegation,
+    collator = selectedCollator.target,
+    stakedAmount = selectedCollator.stake.takeUnlessZero(),
     chain = chain,
     active = active,
     asset = asset,

@@ -35,7 +35,7 @@
                 android:text="@string/staking_parachain_collator"
                 android:textColor="@color/text_secondary" />
 
-            <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.SelectCollatorView
+            <io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.view.SelectStakeTargetView
                 android:id="@+id/parachainStakingUnbondCollator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

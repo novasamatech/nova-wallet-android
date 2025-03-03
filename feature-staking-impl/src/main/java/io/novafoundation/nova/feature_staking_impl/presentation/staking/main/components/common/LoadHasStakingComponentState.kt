@@ -2,12 +2,12 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import android.util.Log
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.withIndex
@@ -32,7 +32,7 @@ inline fun <S, C> loadHasStakingComponentState(
                     emit(LoadingState.Loading())
                 }
 
-                val summaryFlow = componentStateProducer(hasStakingState).withLoading()
+                val summaryFlow = componentStateProducer(hasStakingState).map { LoadingState.Loaded(it) }
 
                 emitAll(summaryFlow)
             } else {

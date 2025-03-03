@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.WithAccountId
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
@@ -11,6 +14,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class Collator(
+    // TODO migrate to AccountIdKey
     val accountIdHex: String,
     val address: String,
     val identity: OnChainIdentity?,
@@ -18,9 +22,11 @@ class Collator(
     val candidateMetadata: CandidateMetadata,
     val minimumStakeToGetRewards: BigInteger,
     val apr: BigDecimal?,
-) : Identifiable {
+) : Identifiable, WithAccountId {
 
     override val identifier: String = accountIdHex
+
+    override val accountId: AccountIdKey = accountIdHex.fromHex().intoKey()
 }
 
 val Collator.isElected
@@ -43,7 +49,8 @@ fun Collator.estimatedAprReturns(amount: BigDecimal): PeriodReturns {
     return PeriodReturns(
         gainAmount = amount * apr.orZero(),
         gainFraction = apr.orZero(),
+        isCompound = false
     )
 }
 
-fun Collator.accountId() = accountIdHex.fromHex()
+fun Collator.accountId() = accountId.value

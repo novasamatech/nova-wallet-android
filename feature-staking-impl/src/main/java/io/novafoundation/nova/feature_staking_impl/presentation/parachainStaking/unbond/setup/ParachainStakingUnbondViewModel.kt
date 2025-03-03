@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
@@ -64,7 +63,6 @@ class ParachainStakingUnbondViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val collatorsUseCase: CollatorsUseCase,
     private val hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
@@ -205,7 +203,7 @@ class ParachainStakingUnbondViewModel(
             .filterNot { it.hasPendingUnbonding }
 
         if (collatorsWithoutUnbonding.isNotEmpty()) {
-            selectedCollatorFlow.emit(collatorsWithoutUnbonding.first().collator)
+            selectedCollatorFlow.emit(collatorsWithoutUnbonding.first().target)
         }
     }
 

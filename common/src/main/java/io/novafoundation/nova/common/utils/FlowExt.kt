@@ -69,6 +69,13 @@ inline fun <T, R> Flow<Result<T>>.mapResult(crossinline mapper: suspend (T) -> R
     result.map { item -> mapper(item) }
 }
 
+/**
+ * Maps nullable values by transforming non-null values and  propagating null to downstream
+ */
+inline fun <T : Any, R : Any> Flow<T?>.mapOptional(crossinline mapper: suspend (T) -> R?): Flow<R?> = map { result ->
+    result?.let { mapper(it) }
+}
+
 inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
     list.mapNotNull { item -> mapper(item) }
 }
@@ -391,7 +398,7 @@ inline fun <T> EditText.bindTo(
     scope: CoroutineScope,
     moveSelectionToEndOnInsertion: Boolean = false,
     crossinline toT: suspend (String) -> T,
-    crossinline fromT: suspend (T) -> String,
+    crossinline fromT: suspend (T) -> String?,
 ) {
     val textWatcher = onTextChanged {
         scope.launch {
@@ -402,7 +409,7 @@ inline fun <T> EditText.bindTo(
     scope.launch {
         flow.collect { input ->
             val inputString = fromT(input)
-            if (text.toString() != inputString) {
+            if (inputString != null && text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
                 setText(inputString)
                 if (moveSelectionToEndOnInsertion) {

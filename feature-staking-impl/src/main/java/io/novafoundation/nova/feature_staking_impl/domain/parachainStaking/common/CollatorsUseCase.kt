@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.systemForcedMinStake
+import io.novafoundation.nova.feature_staking_impl.domain.common.singleSelect.model.TargetWithStakedAmount
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.SelectedCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
@@ -83,9 +84,9 @@ class RealCollatorsUseCase(
 
                 collatorProvider.getCollators(stakingOption, collatorSource)
                     .map { collator ->
-                        SelectedCollator(
-                            collator = collator,
-                            delegation = delegationAmountByCollator.getValue(collator.accountIdHex)
+                        TargetWithStakedAmount(
+                            target = collator,
+                            stake = delegationAmountByCollator.getValue(collator.accountIdHex)
                         )
                     }
                     .sortedWith(sorting.ascendingComparator().reversed())
@@ -96,7 +97,7 @@ class RealCollatorsUseCase(
     }
 
     private fun SelectedCollatorSorting.ascendingComparator() = when (this) {
-        SelectedCollatorSorting.DELEGATION -> compareBy<SelectedCollator> { it.delegation }
-        SelectedCollatorSorting.APR -> compareBy { it.collator.apr }
+        SelectedCollatorSorting.DELEGATION -> compareBy<SelectedCollator> { it.stake }
+        SelectedCollatorSorting.APR -> compareBy { it.target.apr }
     }
 }

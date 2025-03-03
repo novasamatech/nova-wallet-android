@@ -5,19 +5,18 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkData
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
-import io.novafoundation.nova.feature_push_notifications.presentation.handling.addAssetDetailsData
+import io.novafoundation.nova.feature_deep_link_building.presentation.addAssetDetailsData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractPayloadFieldsWithPath
@@ -37,7 +36,7 @@ class StakingRewardNotificationHandler(
     private val context: Context,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
-    private val configurator: DeepLinkConfigurator<AssetDetailsDeepLinkData>,
+    private val configurator: AssetDetailsDeepLinkConfigurator,
     override val chainRegistry: ChainRegistry,
     activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,

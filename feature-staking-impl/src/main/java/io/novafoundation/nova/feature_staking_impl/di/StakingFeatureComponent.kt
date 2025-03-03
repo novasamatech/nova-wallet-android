@@ -14,22 +14,33 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.MythosModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.stakingTypeDetails.StakingTypeDetailsModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StartMultiStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.unbond.StakingUnbondModule
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.rewards.NominationPoolRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewards.di.MythosClaimRewardsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.currentCollators.di.MythosCurrentCollatorsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.di.MythosRedeemComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.di.ConfirmStartMythosStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.di.SelectMythosCollatorComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.di.SelectMythCollatorSettingsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.di.SetupStartMythosStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.di.ConfirmUnbondMythosComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup.di.SetupUnbondMythosComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.confirm.di.NominationPoolsConfirmBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.di.NominationPoolsSetupBondMoreComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.di.NominationPoolsClaimRewardsComponent
@@ -71,12 +82,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.d
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.di.ConfirmRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.di.SelectRewardDestinationComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.di.ConfirmMultiStakingComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.di.SelectUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.story.di.StoryComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.di.ReviewCustomValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.search.di.SearchCustomValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.di.SelectCustomValidatorsComponent
@@ -99,6 +112,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         StakingUnbondModule::class,
         ParachainStakingModule::class,
         NominationPoolModule::class,
+        MythosModule::class,
         StakingDashboardModule::class,
         StartMultiStakingModule::class,
         StakingTypeDetailsModule::class
@@ -213,6 +227,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun parachainStakingRebondFactory(): ParachainStakingRebondComponent.Factory
 
+    // turing
+
     fun setupYieldBoostComponentFactory(): SetupYieldBoostComponent.Factory
 
     fun confirmYieldBoostComponentFactory(): YieldBoostConfirmComponent.Factory
@@ -231,6 +247,26 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     fun nominationPoolsStakingClaimRewards(): NominationPoolsClaimRewardsComponent.Factory
 
+    // Mythos staking
+
+    fun startMythosStakingFactory(): SetupStartMythosStakingComponent.Factory
+
+    fun selectMythosCollatorFactory(): SelectMythosCollatorComponent.Factory
+
+    fun selectMythosSettingsFactory(): SelectMythCollatorSettingsComponent.Factory
+
+    fun confirmStartMythosStakingFactory(): ConfirmStartMythosStakingComponent.Factory
+
+    fun setupUnbondMythosFactory(): SetupUnbondMythosComponent.Factory
+
+    fun confirmUnbondMythosFactory(): ConfirmUnbondMythosComponent.Factory
+
+    fun redeemMythosFactory(): MythosRedeemComponent.Factory
+
+    fun claimMythosRewardsFactory(): MythosClaimRewardsComponent.Factory
+
+    fun currentMythosCollatorsFactory(): MythosCurrentCollatorsComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -241,6 +277,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
             @BindsInstance selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
             @BindsInstance selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+
+            @BindsInstance mythosStakingRouter: MythosStakingRouter,
+            @BindsInstance selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+            @BindsInstance selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
 
             @BindsInstance nominationPoolsRouter: NominationPoolsRouter,
 

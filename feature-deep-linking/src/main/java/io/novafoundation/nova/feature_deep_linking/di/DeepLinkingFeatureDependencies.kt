@@ -12,6 +12,8 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
@@ -53,4 +55,8 @@ interface DeepLinkingFeatureDependencies {
     val encryptionDefaults: EncryptionDefaults
 
     val walletConnectService: WalletConnectService
+
+    val referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
+
+    val assetDetailsDeepLinkConfigurator: AssetDetailsDeepLinkConfigurator
 }

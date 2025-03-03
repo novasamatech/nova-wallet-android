@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
@@ -111,6 +112,10 @@ fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
 fun MetaAccount.addressIn(chain: Chain): String? {
     return accountIdIn(chain)?.let(chain::addressOf)
+}
+
+fun MetaAccount.accountIdKeyIn(chain: Chain): AccountIdKey? {
+    return accountIdIn(chain)?.let(::AccountIdKey)
 }
 
 fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()

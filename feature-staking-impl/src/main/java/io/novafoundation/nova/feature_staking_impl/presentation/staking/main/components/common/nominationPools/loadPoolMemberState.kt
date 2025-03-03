@@ -16,10 +16,9 @@ fun <T> NominationPoolSharedComputation.loadPoolMemberState(
     chain: Chain,
     stateProducer: suspend (PoolMember) -> Flow<T>,
     distinctUntilChanged: (PoolMember?, PoolMember?) -> Boolean = { _, _ -> false },
-    onPoolMemberChange: (PoolMember) -> Unit = {}
 ): Flow<LoadingState<T>?> = loadHasStakingComponentState(
     hostContext = hostContext,
     hasStakingStateProducer = { currentPoolMemberFlow(chain, this@CoroutineScope).distinctUntilChanged(distinctUntilChanged) },
     componentStateProducer = stateProducer,
-    onComponentStateChange = onPoolMemberChange
+    onComponentStateChange = {}
 )

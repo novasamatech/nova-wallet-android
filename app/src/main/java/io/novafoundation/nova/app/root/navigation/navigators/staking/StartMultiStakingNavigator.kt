@@ -36,6 +36,11 @@ class StartMultiStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openStartMythosStaking() {
+        navigationBuilder().action(R.id.action_startStakingLandingFragment_to_staking_mythos_start_graph)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload) {
         navigationBuilder().action(R.id.action_startStakingLandingFragment_to_start_multi_staking_nav_graph)
             .setArgs(SetupAmountMultiStakingFragment.getBundle(payload))

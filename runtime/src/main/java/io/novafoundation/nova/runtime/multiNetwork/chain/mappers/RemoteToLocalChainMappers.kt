@@ -41,6 +41,7 @@ private const val FEE_VIA_RUNTIME_CALL = "feeViaRuntimeCall"
 private const val SUPPORT_GENERIC_LEDGER_APP = "supportsGenericLedgerApp"
 private const val IDENTITY_CHAIN = "identityChain"
 private const val DISABLED_CHECK_METADATA_HASH = "disabledCheckMetadataHash"
+private const val SESSION_LENGTH = "sessionLength"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -66,7 +67,8 @@ fun mapRemoteChainToLocal(
             feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
             supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
             identityChain = it[IDENTITY_CHAIN] as? ChainId,
-            disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean
+            disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
+            sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull()
         )
     }
 
@@ -239,6 +241,7 @@ fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingTy
         "aura-relaychain" -> Chain.Asset.StakingType.RELAYCHAIN_AURA
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
+        "mythos" -> Chain.Asset.StakingType.MYTHOS
         else -> Chain.Asset.StakingType.UNSUPPORTED
     }
 }
@@ -252,6 +255,7 @@ fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String?
         Chain.Asset.StakingType.TURING -> "turing"
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
         Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pools"
+        Chain.Asset.StakingType.MYTHOS -> "mythos"
     }
 }
 

@@ -20,8 +20,9 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.Payload
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.SelectionStyle
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.bindSelectedCollator
+import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.view.bindSelectedCollator
 import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCheck
 import kotlinx.android.synthetic.main.item_select_staked_collator.view.itemSelectStakedCollatorCollator
 import kotlinx.android.synthetic.main.item_validator.view.itemStakingTargetInfo
@@ -130,10 +131,27 @@ private class ViewHolder<T : Identifiable>(
     }
 }
 
+fun <T : Identifiable> ChooseStakedStakeTargetsBottomSheet(
+    context: Context,
+    payload: Payload<SelectStakeTargetModel<T>>,
+    onResponse: (ChooseStakedStakeTargetsResponse<T>) -> Unit,
+    onCancel: () -> Unit,
+    selectionStyle: SelectionStyle = SelectionStyle.RadioGroup
+): ChooseStakedStakeTargetsBottomSheet<T> {
+    return ChooseStakedStakeTargetsBottomSheet(
+        context = context,
+        payload = payload,
+        stakedCollatorSelected = { _, targetModel -> onResponse(ChooseStakedStakeTargetsResponse.Existing(targetModel.payload)) },
+        onCancel = onCancel,
+        newStakeTargetClicked = { _, _ -> onResponse(ChooseStakedStakeTargetsResponse.New) },
+        selectionStyle = selectionStyle
+    )
+}
+
 private class DiffCallback<T : Identifiable> : DiffUtil.ItemCallback<SelectStakeTargetModel<T>>() {
 
     override fun areContentsTheSame(oldItem: SelectStakeTargetModel<T>, newItem: SelectStakeTargetModel<T>): Boolean {
-        return oldItem.subtitle == newItem.subtitle && oldItem.active != newItem.active
+        return oldItem.subtitle.toString() == newItem.subtitle.toString() && oldItem.active != newItem.active
     }
 
     override fun areItemsTheSame(oldItem: SelectStakeTargetModel<T>, newItem: SelectStakeTargetModel<T>): Boolean {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
+
     <!--<string name="dapp_main_welcome_title">Welcome to Nova Browser</string>-->
     <!--<string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>-->
 

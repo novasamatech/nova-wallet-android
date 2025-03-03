@@ -49,6 +49,15 @@ interface RuntimeCallsApi {
     ): R
 }
 
+suspend fun <R> RuntimeCallsApi.callCatching(
+    section: String,
+    method: String,
+    arguments: Map<String, Any?>,
+    returnBinding: (Any?) -> R
+): Result<R> {
+    return runCatching { call(section, method, arguments, returnBinding) }
+}
+
 internal class RealRuntimeCallsApi(
     override val runtime: RuntimeSnapshot,
     override val chainId: ChainId,
