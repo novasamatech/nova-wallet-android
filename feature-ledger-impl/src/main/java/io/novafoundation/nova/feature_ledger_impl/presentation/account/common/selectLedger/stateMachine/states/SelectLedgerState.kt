@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states
 
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethod
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothRequired
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothUsing
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothDisabled
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothEnabled
@@ -11,32 +14,32 @@ import java.io.InvalidObjectException
 
 sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffect, SelectLedgerEvent> {
 
-    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.bluetoothDisabled() {
-        missingDiscoveryState(setOf(DiscoveryRequirement.BLUETOOTH))
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.bluetoothDisabled(discoveryMethod: DiscoveryMethod) {
+        missingDiscoveryState(setOf(DiscoveryRequirement.BLUETOOTH), discoveryMethod)
     }
 
-    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.locationDisabled() {
-        missingDiscoveryState(setOf(DiscoveryRequirement.LOCATION))
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.locationDisabled(discoveryMethod: DiscoveryMethod) {
+        missingDiscoveryState(setOf(DiscoveryRequirement.LOCATION), discoveryMethod)
     }
 
-    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.startDiscovery() {
-        emitState(DiscoveringState())
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.startDiscovery(discoveryMethod: DiscoveryMethod) {
+        emitState(DiscoveringState(discoveryMethod))
         emitSideEffect(SideEffect.StartDiscovery)
     }
 
     protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.missingDiscoveryState(
-        missingRequirements: Set<DiscoveryRequirement>
+        missingRequirements: Set<DiscoveryRequirement>,
+        discoveryMethod: DiscoveryMethod
     ) {
-        val sideEffect = when {
-            DiscoveryRequirement.BLUETOOTH in missingRequirements -> SideEffect.EnableBluetooth
-            DiscoveryRequirement.LOCATION in missingRequirements -> SideEffect.EnableLocation
-            else -> {
-                val requirementsJoinedToString = missingRequirements.joinToString { it.toString() }
-                throw InvalidObjectException("missingRequirements contains values that aren't processing: $requirementsJoinedToString")
+        if (discoveryMethod.isBluetoothUsing()) {
+            val sideEffect = getSideEffectFromRequirements(missingRequirements)
+
+            if (discoveryMethod.isBluetoothRequired()) {
+                emitState(MissingDiscoveryRequirementState(missingRequirements, discoveryMethod))
             }
+
+            emitSideEffect(sideEffect)
         }
-        emitState(MissingDiscoveryRequirementState(missingRequirements))
-        emitSideEffect(sideEffect)
     }
 
     protected fun Set<DiscoveryRequirement>.updateByEvent(event: SelectLedgerEvent): Set<DiscoveryRequirement>? {
@@ -47,5 +50,14 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
             BluetoothDisabled -> plus(DiscoveryRequirement.BLUETOOTH)
             else -> null
         }
+    }
+}
+
+private fun getSideEffectFromRequirements(requirements: Set<DiscoveryRequirement>) = when {
+    DiscoveryRequirement.BLUETOOTH in requirements -> SideEffect.EnableBluetooth
+    DiscoveryRequirement.LOCATION in requirements -> SideEffect.EnableLocation
+    else -> {
+        val requirementsJoinedToString = requirements.joinToString { it.toString() }
+        throw InvalidObjectException("missingRequirements contains values that aren't processing: $requirementsJoinedToString")
     }
 }
