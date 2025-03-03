@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.model.FillableChainAccountModel
 import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerAccounts
 import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerContinue

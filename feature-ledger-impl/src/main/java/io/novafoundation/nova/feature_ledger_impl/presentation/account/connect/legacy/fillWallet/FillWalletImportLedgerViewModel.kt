@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.legacy.fillWallet.FillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenRequester

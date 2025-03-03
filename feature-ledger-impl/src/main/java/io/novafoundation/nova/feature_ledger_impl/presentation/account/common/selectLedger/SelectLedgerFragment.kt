@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -21,7 +20,6 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerDevices
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerHints
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress

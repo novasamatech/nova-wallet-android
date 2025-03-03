@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_ledger_select_device_usb_description">Please, enable Ledger device. Unlock your Ledger device and open the %s app.</string>
+
     <!--<string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>-->
     <string name="account_ledger_import_start_guide">Ledger Connection Guide</string>
 

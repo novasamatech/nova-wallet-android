@@ -8,14 +8,12 @@ import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.INVALID_DATA
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor

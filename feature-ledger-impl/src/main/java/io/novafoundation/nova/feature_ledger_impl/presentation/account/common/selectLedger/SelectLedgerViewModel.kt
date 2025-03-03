@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethod
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothRequired
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothUsing
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
@@ -57,7 +59,9 @@ abstract class SelectLedgerViewModel(
     LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
 
-    private val discoveryService = discoveryServiceFactory.create(payload.connectionMode.toDiscoveryMethod())
+    private val discoveryMethod = payload.connectionMode.toDiscoveryMethod()
+
+    private val discoveryService = discoveryServiceFactory.create(discoveryMethod)
 
     private val stateMachine = StateMachine(SelectDiscoveryModeState(), coroutineScope = this)
 
@@ -65,7 +69,11 @@ abstract class SelectLedgerViewModel(
         .shareInBackground()
 
     val hints = flowOf {
-        resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
+        if (discoveryMethod.isBluetoothUsing()) {
+            resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
+        } else {
+            resourceManager.getString(R.string.account_ledger_select_device_usb_description, messageFormatter.appName())
+        }
     }.shareInBackground()
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
@@ -78,7 +86,7 @@ abstract class SelectLedgerViewModel(
     init {
         emitDiscoveryMethod()
 
-        if (payload.connectionMode.requireBle()) {
+        if (discoveryMethod.isBluetoothUsing()) {
             emitInitialBluetoothState()
             emitLocationState()
             requirePermissions()
@@ -202,7 +210,11 @@ abstract class SelectLedgerViewModel(
             listOf(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
-        val granted = permissionsAsker.requirePermissionsOrExit(*permissions.toTypedArray())
+        val granted = if (discoveryMethod.isBluetoothRequired()) {
+            permissionsAsker.requirePermissionsOrExit(*permissions.toTypedArray())
+        } else {
+            permissionsAsker.requirePermissionsOrIgnore(*permissions.toTypedArray())
+        }
 
         if (granted) {
             stateMachine.onEvent(SelectLedgerEvent.PermissionsGranted)
@@ -241,9 +253,5 @@ abstract class SelectLedgerViewModel(
             SelectLedgerPayload.ConnectionMode.USB -> DiscoveryMethod.USB
             SelectLedgerPayload.ConnectionMode.ALL -> DiscoveryMethod.ALL
         }
-    }
-
-    private fun SelectLedgerPayload.ConnectionMode.requireBle(): Boolean {
-        return this == SelectLedgerPayload.ConnectionMode.BLUETOOTH || this == SelectLedgerPayload.ConnectionMode.ALL
     }
 }

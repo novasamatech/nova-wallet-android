@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain
 
 import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload

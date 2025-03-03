@@ -28,6 +28,29 @@ private class RealPermissionsAsker(
     override val showPermissionsDenied = actionAwaitableMixinFactory.create<PermissionDeniedLevel, PermissionDeniedAction>()
 
     override suspend fun requirePermissionsOrExit(vararg permissions: Permission): Boolean {
+        return requirePermissionOrFallback(
+            *permissions,
+            requirePermission = { requirePermissionsOrExit(*it.toTypedArray()) },
+            fallback = {
+                returnableRouter.back()
+                false
+            }
+        )
+    }
+
+    override suspend fun requirePermissionsOrIgnore(vararg permissions: Permission): Boolean {
+        return requirePermissionOrFallback(
+            *permissions,
+            requirePermission = { requirePermissionsOrIgnore(*it.toTypedArray()) },
+            fallback = { false }
+        )
+    }
+
+    private suspend inline fun requirePermissionOrFallback(
+        vararg permissions: Permission,
+        requirePermission: (permissions: List<Permission>) -> Boolean,
+        fallback: () -> Boolean
+    ): Boolean {
         try {
             fragment.askPermission(*permissions)
 
@@ -42,7 +65,7 @@ private class RealPermissionsAsker(
             when (showPermissionsDenied.awaitAction(level)) {
                 PermissionDeniedAction.RETRY -> {
                     if (e.hasDenied()) {
-                        return requirePermissionsOrExit(*permissions)
+                        return requirePermission(permissions.toList())
                     }
 
                     if (e.hasForeverDenied()) {
@@ -53,10 +76,9 @@ private class RealPermissionsAsker(
 
                     return true
                 }
-                PermissionDeniedAction.BACK -> {
-                    returnableRouter.back()
 
-                    return false
+                PermissionDeniedAction.REJECT -> {
+                    return fallback()
                 }
             }
         }

@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
@@ -14,7 +13,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 
 class SelectLedgerLegacyImportViewModel(
