@@ -238,7 +238,6 @@ class BannerPagerView @JvmOverloads constructor(
         if (!canScroll) return
         postDelayed(autoSwipeCallback, autoSwipeDelay)
 
-        handler?.postDelayed(autoSwipeCallback, autoSwipeDelay)
         autoSwipeCallbackAdded = true
     }
 
