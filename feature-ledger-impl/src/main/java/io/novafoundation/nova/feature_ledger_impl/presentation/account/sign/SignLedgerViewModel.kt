@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -46,22 +47,23 @@ class SignLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val signPayloadState: SigningSharedState,
     private val extrinsicValidityUseCase: ExtrinsicValidityUseCase,
-    private val request: SignInterScreenCommunicator.Request,
     private val responder: SignInterScreenResponder,
     private val interactor: SignLedgerInteractor,
     private val messageFormatter: LedgerMessageFormatter,
-    discoveryService: LedgerDeviceDiscoveryService,
+    private val payload: SignLedgerPayload,
+    discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
     locationManager: LocationManager
 ) : SelectLedgerViewModel(
-    discoveryService = discoveryService,
+    discoveryServiceFactory = discoveryServiceFactory,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
     locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
-    messageFormatter = messageFormatter
+    messageFormatter = messageFormatter,
+    payload = payload
 ) {
 
     private val validityPeriod = flowOf {
@@ -125,7 +127,7 @@ class SignLedgerViewModel(
         val signature = signingJob!!.await()
 
         if (interactor.verifySignature(signState, signature)) {
-            responder.respond(request.signed(signature))
+            responder.respond(payload.request.signed(signature))
             hideBottomSheet()
             router.finishSignFlow()
         } else {
@@ -156,10 +158,12 @@ class SignLedgerViewModel(
                 errorTitle = resourceManager.getString(R.string.ledger_sign_tx_not_supported_title)
                 errorMessage = resourceManager.getString(R.string.ledger_sign_tx_not_supported_subtitle)
             }
+
             InvalidDataError.METADATA_OUTDATED -> {
                 errorTitle = resourceManager.getString(R.string.ledger_sign_metadata_outdated_title)
                 errorMessage = resourceManager.getString(R.string.ledger_sign_metadata_outdated_subtitle, messageFormatter.appName())
             }
+
             null -> {
                 errorTitle = resourceManager.getString(R.string.ledger_error_general_title)
                 errorMessage = invalidDataMessage ?: resourceManager.getString(R.string.ledger_error_general_message)
@@ -207,7 +211,7 @@ class SignLedgerViewModel(
     }
 
     private fun exit() {
-        responder.respond(request.cancelled())
+        responder.respond(payload.request.cancelled())
         router.finishSignFlow()
     }
 

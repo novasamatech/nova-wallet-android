@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerDevices
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerHints
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress
@@ -28,13 +29,6 @@ import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
 import javax.inject.Inject
 
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>(), SelectLedgerAdapter.Handler {
-
-    companion object {
-
-        private const val PAYLOAD_KEY = "SelectLedgerFragment.PAYLOAD_KEY"
-
-        fun getBundle(payload: SelectLedgerPayload): Bundle = bundleOf(PAYLOAD_KEY to payload)
-    }
 
     @Inject
     lateinit var ledgerMessagePresentable: LedgerMessagePresentable
@@ -112,8 +106,6 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         disableBluetoothConnectivityTracker()
         disableLocationStateTracker()
     }
-
-    protected fun payload() = argument<SelectLedgerPayload>(PAYLOAD_KEY)
 
     private fun enableLocationStateTracker() {
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)

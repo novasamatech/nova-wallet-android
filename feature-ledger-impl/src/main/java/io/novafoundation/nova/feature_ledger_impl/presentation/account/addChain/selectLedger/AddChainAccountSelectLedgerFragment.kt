@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerFragment
 
 class AddChainAccountSelectLedgerFragment : SelectLedgerFragment<AddChainAccountSelectLedgerViewModel>() {
@@ -12,7 +13,7 @@ class AddChainAccountSelectLedgerFragment : SelectLedgerFragment<AddChainAccount
     companion object {
         private const val KEY_ADD_ACCOUNT_PAYLOAD = "AddChainAccountSelectLedgerFragment.Payload"
 
-        fun getBundle(payload: AddAccountPayload.ChainAccount): Bundle {
+        fun getBundle(payload: AddChainAccountSelectLedgerPayload): Bundle {
             return Bundle().apply {
                 putParcelable(KEY_ADD_ACCOUNT_PAYLOAD, payload)
             }

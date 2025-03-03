@@ -84,7 +84,13 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyImportFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
@@ -650,7 +656,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount) {
+    override fun openAddLedgerChainAccountFlow(addAccountPayload: AddAccountPayload.ChainAccount) {
+        val payload = AddChainAccountSelectLedgerPayload(addAccountPayload, SelectLedgerPayload.ConnectionMode.ALL)
         val bundle = AddChainAccountSelectLedgerFragment.getBundle(payload)
 
         navigationBuilder().action(R.id.action_accountDetailsFragment_to_addLedgerAccountGraph)

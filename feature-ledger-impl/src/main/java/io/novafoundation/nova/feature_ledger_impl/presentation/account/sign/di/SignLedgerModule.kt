@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
@@ -73,7 +74,7 @@ class SignLedgerModule {
     @IntoMap
     @ViewModelKey(SignLedgerViewModel::class)
     fun provideViewModel(
-        discoveryService: LedgerDeviceDiscoveryService,
+        discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
         locationManager: LocationManager,
@@ -87,7 +88,7 @@ class SignLedgerModule {
         messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return SignLedgerViewModel(
-            discoveryService = discoveryService,
+            discoveryServiceFactory = discoveryServiceFactory,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
             locationManager = locationManager,
@@ -96,7 +97,7 @@ class SignLedgerModule {
             messageFormatter = messageFormatter,
             signPayloadState = signPayloadState,
             extrinsicValidityUseCase = extrinsicValidityUseCase,
-            request = payload.request,
+            payload = payload,
             responder = responder,
             interactor = interactor
         )

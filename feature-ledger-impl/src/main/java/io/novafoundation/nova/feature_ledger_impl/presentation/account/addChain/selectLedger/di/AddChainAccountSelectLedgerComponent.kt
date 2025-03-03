@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
 
 @Subcomponent(
@@ -20,7 +21,7 @@ interface AddChainAccountSelectLedgerComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: AddAccountPayload.ChainAccount,
+            @BindsInstance payload: AddChainAccountSelectLedgerPayload,
         ): AddChainAccountSelectLedgerComponent
     }
 

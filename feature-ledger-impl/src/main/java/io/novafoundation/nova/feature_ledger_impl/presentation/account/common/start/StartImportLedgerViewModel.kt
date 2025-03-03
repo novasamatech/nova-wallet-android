@@ -19,7 +19,9 @@ abstract class StartImportLedgerViewModel(
         router.back()
     }
 
-    abstract fun continueClicked()
+    abstract fun continueWithBluetooth()
+
+    abstract fun continueWithUsb()
 
     fun guideClicked() {
         openBrowserEvent.value = appLinksProvider.ledgerBluetoothGuide.event()

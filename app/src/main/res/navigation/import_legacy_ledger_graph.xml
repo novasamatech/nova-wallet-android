@@ -42,7 +42,7 @@
 
     <fragment
         android:id="@+id/selectLedgerImportFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerImportFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyImportFragment"
         android:label="SelectLedgerImportFragment">
 
         <action
