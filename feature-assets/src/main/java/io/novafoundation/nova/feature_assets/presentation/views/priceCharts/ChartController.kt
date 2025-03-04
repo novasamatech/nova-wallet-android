@@ -22,6 +22,8 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private val context = chart.context
 
+    private val chartUIParams = ChartUIParams.default(context)
+
     private var currentEntries: List<Entry> = emptyList()
 
     init {
@@ -35,8 +37,6 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupChartUI() {
-        val chartUIParams = getSharedChartUIParams(context)
-
         chart.setBackgroundColor(Color.TRANSPARENT)
         chart.setDrawGridBackground(false)
         chart.setDrawBorders(false)
@@ -94,12 +94,11 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChartWithSelectedEntry(entry: Entry) {
-        val chartUIParams = getSharedChartUIParams(context)
         val (entriesBefore, entriesAfter) = currentEntries.partition { it.x <= entry.x }
 
         val entriesColor = currentEntries.getColorResForEntries()
-        val datasetBefore = entriesBefore.createDataSet(chartUIParams, entriesColor)
-        val datasetAfter = entriesAfter.createDataSet(chartUIParams, R.color.neutral_price_chart_line)
+        val datasetBefore = entriesBefore.createDataSet(entriesColor)
+        val datasetAfter = entriesAfter.createDataSet(R.color.neutral_price_chart_line)
 
         chart.priceChartRenderer().apply {
             setDotPoint(entry)
@@ -113,13 +112,12 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChart() {
-        val chartUIParams = getSharedChartUIParams(context)
         chart.priceChartRenderer().apply {
             setDotPoint(null)
             setDotColor(null)
         }
 
-        val dataSet = currentEntries.createDataSet(chartUIParams, currentEntries.getColorResForEntries())
+        val dataSet = currentEntries.createDataSet(currentEntries.getColorResForEntries())
         chart.data = LineData(dataSet)
         chart.invalidate()
 
@@ -132,7 +130,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         callback.onSelectEntry(entries.first(), entries.last(), isEntrySelected)
     }
 
-    private fun List<Entry>.createDataSet(chartUIParams: ChartUIParams, colorRes: Int): LineDataSet {
+    private fun List<Entry>.createDataSet(colorRes: Int): LineDataSet {
         return LineDataSet(this, "").apply {
             color = context.getColor(colorRes)
             setDrawCircles(false)

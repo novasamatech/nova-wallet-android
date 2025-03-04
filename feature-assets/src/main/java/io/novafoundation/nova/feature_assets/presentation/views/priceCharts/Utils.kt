@@ -9,11 +9,13 @@ class ChartUIParams(
     val chartLineWidthDp: Float,
     val gridLineDashEffect: DashPathEffect,
     val gridLines: Int
-)
-
-fun getSharedChartUIParams(context: Context) = ChartUIParams(
-    gridLineWidthDp = 1.5f,
-    chartLineWidthDp = 1.5f,
-    gridLineDashEffect = DashPathEffect(floatArrayOf(3f.dpF(context), 3f.dpF(context)), 0f),
-    gridLines = 4
-)
+) {
+    companion object {
+        fun default(context: Context) = ChartUIParams(
+            gridLineWidthDp = 1.5f,
+            chartLineWidthDp = 1.5f,
+            gridLineDashEffect = DashPathEffect(floatArrayOf(3f.dpF(context), 3f.dpF(context)), 0f),
+            gridLines = 4
+        )
+    }
+}
