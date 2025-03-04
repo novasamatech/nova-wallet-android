@@ -54,10 +54,9 @@ class MythosRedeemFragment : BaseFragment<MythosRedeemViewModel>() {
     }
 
     override fun subscribe(viewModel: MythosRedeemViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, mythosRedeemExtrinsicInfo.fee)
+        setupFeeLoading(viewModel.originFeeMixin, mythosRedeemExtrinsicInfo.fee)
 
         viewModel.showNextProgress.observe(mythosRedeemConfirm::setProgressState)
 

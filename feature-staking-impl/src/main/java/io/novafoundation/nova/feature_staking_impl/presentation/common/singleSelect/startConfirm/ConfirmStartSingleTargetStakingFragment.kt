@@ -48,10 +48,9 @@ abstract class ConfirmStartSingleTargetStakingFragment<V : ConfirmStartSingleTar
     }
 
     override fun subscribe(viewModel: V) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, confirmStartParachainStakingExtrinsicInfo.fee)
+        setupFeeLoading(viewModel.feeLoaderMixin, confirmStartParachainStakingExtrinsicInfo.fee)
         observeHints(viewModel.hintsMixin, confirmStartParachainStakingHints)
 
         viewModel.title.observe(confirmStartParachainStakingToolbar::setTitle)

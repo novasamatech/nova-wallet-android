@@ -4,8 +4,10 @@ import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.asset
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools.NominationPoolSelection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
@@ -36,6 +38,7 @@ sealed class SelectionTypeSource {
 data class RecommendableMultiStakingSelection(
     val source: SelectionTypeSource,
     val selection: StartMultiStakingSelection,
+    val properties: SingleStakingProperties
 )
 
 fun StartMultiStakingSelection.copyWith(newAmount: BigDecimal) = copyWith(

@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.creat
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -66,9 +67,9 @@ class MythosClaimRewardsViewModel(
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
-    val feeLoaderMixin = feeLoaderMixinFactory.createDefault<SubmissionFee>(
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(
         scope = viewModelScope,
-        selectedChainAssetFlow = assetFlow.map { it.token.configuration }.distinctUntilChangedBy { it.fullId },
+        selectedChainAssetFlow = stakingSharedState.selectedAssetFlow(),
     )
 
     val originAddressModelFlow = selectedAccountUseCase.selectedAddressModelFlow { stakingSharedState.chain() }

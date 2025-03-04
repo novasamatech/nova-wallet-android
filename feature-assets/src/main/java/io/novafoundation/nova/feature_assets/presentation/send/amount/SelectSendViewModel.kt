@@ -171,7 +171,6 @@ class SelectSendViewModel(
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = originAssetFlow,
-        balanceField = Asset::transferable,
         maxActionProvider = maxActionProvider
     )
 

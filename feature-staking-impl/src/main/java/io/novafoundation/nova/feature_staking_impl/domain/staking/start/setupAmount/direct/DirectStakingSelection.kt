@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.nominate
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.multiAddressOf
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder

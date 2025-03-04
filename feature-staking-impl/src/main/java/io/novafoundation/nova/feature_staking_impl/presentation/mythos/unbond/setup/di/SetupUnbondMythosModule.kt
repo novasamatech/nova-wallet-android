@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.se
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
 class SetupUnbondMythosModule {
@@ -37,7 +38,7 @@ class SetupUnbondMythosModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: UnbondMythosValidationSystem,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
         delegatorStateUseCase: MythosDelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         mythosSharedComputation: MythosSharedComputation,
@@ -53,7 +54,7 @@ class SetupUnbondMythosModule {
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             mythosSharedComputation = mythosSharedComputation,

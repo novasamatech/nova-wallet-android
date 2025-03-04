@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.NominationPoolsBondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationPayload
@@ -19,12 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.hints.NominationPoolsBondMoreHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -79,7 +74,7 @@ class NominationPoolsSetupBondMoreViewModel(
     }.flatMapLatest { it }
 
     private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
-        selectedAsset.providingMaxOf(Asset::freeInPlanks)
+        selectedAsset.providingMaxOf(Asset::transferableInPlanks)
             .deductAmount(currentStakeAmount)
             .deductFee(originFeeMixin)
     }
@@ -87,7 +82,6 @@ class NominationPoolsSetupBondMoreViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = selectedAsset,
-        balanceField = Asset::transferable,
         maxActionProvider = maxActionProvider
     )
 
@@ -115,10 +109,9 @@ class NominationPoolsSetupBondMoreViewModel(
 
     private fun listenFee() {
         originFeeMixin.connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
-            inputSource2 = chainFlow,
-            feeConstructor = { feePaymentCurrency, amount, chain ->
-                interactor.estimateFee(feePaymentCurrency.toFeePaymentAsset(chain).planksFromAmount(amount))
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
+            feeConstructor = { _, amount ->
+                interactor.estimateFee(amount)
             }
         )
     }

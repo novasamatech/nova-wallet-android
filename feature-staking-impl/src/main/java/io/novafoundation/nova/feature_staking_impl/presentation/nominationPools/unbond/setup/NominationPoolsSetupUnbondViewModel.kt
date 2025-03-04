@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.NominationPoolsUnbondInteractor
@@ -20,11 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -57,9 +52,6 @@ class NominationPoolsSetupUnbondViewModel(
     private val showNextProgress = MutableStateFlow(false)
 
     private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
-        .shareInBackground()
-
-    private val chainFlow = assetWithOption.map { it.option.assetWithChain.chain }
         .shareInBackground()
 
     private val selectedAsset = assetWithOption.map { it.asset }
@@ -119,10 +111,9 @@ class NominationPoolsSetupUnbondViewModel(
     private fun listenFee() {
         originFeeMixin.connectWith(
             inputSource1 = poolMemberFlow,
-            inputSource2 = amountChooserMixin.backPressuredAmount,
-            inputSource3 = chainFlow,
-            feeConstructor = { feePaymentCurrency, poolMember, amount, chain ->
-                interactor.estimateFee(poolMember, feePaymentCurrency.toFeePaymentAsset(chain).planksFromAmount(amount))
+            inputSource2 = amountChooserMixin.backPressuredPlanks,
+            feeConstructor = { _, poolMember, amount ->
+                interactor.estimateFee(poolMember, amount)
             }
         )
     }

@@ -110,15 +110,3 @@ fun SubmissionFee.getAmountByExecutingAccount(chainAsset: Chain.Asset): BigInteg
 fun FeeBase.getAmount(expectedAsset: Chain.Asset): BigInteger {
     return if (expectedAsset.fullId == asset.fullId) amount else BigInteger.ZERO
 }
-
-fun FeePaymentCurrency.toFeePaymentAsset(chain: Chain): Chain.Asset {
-    return when (this) {
-        is FeePaymentCurrency.Asset -> asset
-        FeePaymentCurrency.Native -> chain.utilityAsset
-    }
-}
-
-fun FeePaymentCurrency.planksFromAmount(chain: Chain, amount: BigDecimal): BigInteger {
-    val asset = toFeePaymentAsset(chain)
-    return amount.planksFromAmount(asset.precision)
-}

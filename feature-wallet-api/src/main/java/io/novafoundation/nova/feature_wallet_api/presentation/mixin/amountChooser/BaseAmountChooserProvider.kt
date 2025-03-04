@@ -10,20 +10,25 @@ import io.novafoundation.nova.common.utils.mapNullable
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxAvailableBalance
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -37,7 +42,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
 
-private const val DEBOUNCE_DURATION_MILLIS = 500
+private val DEBOUNCE_DURATION = 500.milliseconds
 
 @OptIn(FlowPreview::class)
 @Suppress("LeakingThis")
@@ -83,7 +88,17 @@ open class BaseAmountChooserProvider(
         .shareInBackground()
 
     override val backPressuredAmount: Flow<BigDecimal>
-        get() = _amount.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
+        get() = _amount.debounce(DEBOUNCE_DURATION)
+
+    private val chainAssetFlow = tokenFlow.filterNotNull()
+        .map { it.configuration }
+        .distinctUntilChangedBy { it.fullId }
+        .shareInBackground()
+
+    override val backPressuredPlanks: Flow<Balance> = combine(chainAssetFlow, _amount) { chainAsset, amount ->
+        chainAsset.planksFromAmount(amount)
+    }
+        .debounce(DEBOUNCE_DURATION)
 
     override val maxAction: AmountChooserMixinBase.MaxAction = RealMaxAction()
 

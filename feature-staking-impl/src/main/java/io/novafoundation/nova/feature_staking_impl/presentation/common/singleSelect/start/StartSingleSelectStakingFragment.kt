@@ -52,11 +52,10 @@ abstract class StartSingleSelectStakingFragment<T, V : StartSingleSelectStakingV
     }
 
     override fun subscribe(viewModel: V) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, startParachainStakingAmountField)
         setupParachainStakingRewardsComponent(viewModel.rewardsComponent, startParachainStakingRewards)
-        setupFeeLoading(viewModel, startParachainStakingFee)
+        setupFeeLoading(viewModel.originFeeMixin, startParachainStakingFee)
         observeHints(viewModel.hintsMixin, startParachainStakingHints)
 
         viewModel.title.observe(startParachainStakingToolbar::setTitle)

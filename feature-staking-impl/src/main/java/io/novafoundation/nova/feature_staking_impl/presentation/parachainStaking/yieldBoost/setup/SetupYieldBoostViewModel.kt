@@ -142,7 +142,6 @@ class SetupYieldBoostViewModel(
     val boostThresholdChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::transferable,
         maxActionProvider = maxActionProvider
     )
 

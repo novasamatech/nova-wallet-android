@@ -9,9 +9,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.model.planksFromAmount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.stakeablePlanks
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem
@@ -20,9 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -33,9 +31,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.transferable
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.map
 
 class SelectUnbondViewModel(
     private val router: StakingRouter,
@@ -58,8 +56,6 @@ class SelectUnbondViewModel(
         .filterIsInstance<StakingState.Stash>()
         .shareInBackground()
 
-    private val chainFlow = interactor.chainFlow()
-
     private val assetFlow = accountStakingFlow
         .flatMapLatest { interactor.assetFlow(it.controllerAddress) }
         .shareInBackground()
@@ -78,19 +74,13 @@ class SelectUnbondViewModel(
         FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
     )
 
-    private val stakingAmountFlow = accountStakingFlow.flatMapLatest {
-        interactor.observeStakingAmount(it, viewModelScope)
-    }.map { it.orZero() }
-        .shareInBackground()
-
     private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
-        chainAssetFlow.providingBalance(stakingAmountFlow)
+        assetFlow.providingMaxOf(Asset::bondedInPlanks)
     }
 
     val amountMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::bonded,
         maxActionProvider = maxActionProvider
     )
 
@@ -108,13 +98,11 @@ class SelectUnbondViewModel(
 
     private fun listenFee() {
         originFeeMixin.connectWith(
-            inputSource1 = amountMixin.backPressuredAmount,
-            inputSource2 = chainFlow,
-            feeConstructor = { feePaymentCurrency, amount, chain ->
-                val amountInPlanks = feePaymentCurrency.planksFromAmount(chain, amount)
+            inputSource1 = amountMixin.backPressuredPlanks,
+            feeConstructor = { _, amount ->
                 val asset = assetFlow.first()
 
-                unbondInteractor.estimateFee(accountStakingFlow.first(), asset.bondedInPlanks, amountInPlanks)
+                unbondInteractor.estimateFee(accountStakingFlow.first(), asset.bondedInPlanks, amount)
             }
         )
     }

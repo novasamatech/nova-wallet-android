@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.isNominationPoolSelection
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.stakeAmount
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationPayload
@@ -38,12 +39,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.creat
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -84,22 +87,28 @@ class SetupAmountMultiStakingViewModel(
         assetId = payload.availableStakingOptions.assetId
     ).shareInBackground()
 
-    val chainAssetFlow = currentAssetFlow.map { it.token.configuration }
+    private val maxStakeableBalance = combine(
+        currentAssetFlow,
+        multiStakingSelectionTypeFlow,
+        currentSelectionFlow
+    ) { asset, selectionType, currentSelection ->
+        currentSelection?.properties?.maximumToStake(asset) // If selection is already known, use it directly for more precise estimation
+            ?: selectionType.maxAmountToStake(asset) // if selection is still unset (e.g. empty form), show best-effort estimation from selection type
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
 
-    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(
-        this,
-        chainAssetFlow
-    )
 
-    private val deductEDForMaxButton = currentSelectionFlow.map { it?.isNominationPoolSelection.orFalse() }
+    private val chainAssetFlow = currentAssetFlow.map { it.token.configuration }
+        .distinctUntilChangedBy { it.fullId }
+        .shareInBackground()
 
-    private val maxActionProvider = maxActionProviderFactory.create(
-        viewModelScope = viewModelScope,
-        assetInFlow = currentAssetFlow,
-        feeLoaderMixin = feeLoaderMixin,
-        maxBalanceType = MaxBalanceType.FREE,
-        deductEd = deductEDForMaxButton
-    )
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
+
+    private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
+        chainAssetFlow.providingBalance(maxStakeableBalance)
+            .deductFee(feeLoaderMixin)
+    }
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = viewModelScope,

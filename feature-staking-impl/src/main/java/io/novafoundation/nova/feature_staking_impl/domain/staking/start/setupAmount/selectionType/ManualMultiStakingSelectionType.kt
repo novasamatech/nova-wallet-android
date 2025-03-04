@@ -30,6 +30,10 @@ class ManualMultiStakingSelectionType(
         return selectedType.availableBalance(asset)
     }
 
+    override suspend fun maxAmountToStake(asset: Asset): Balance {
+        return selectedType.maximumToStake(asset)
+    }
+
     override suspend fun updateSelectionFor(stake: Balance) {
         selectionStore.updateStake(stake)
     }

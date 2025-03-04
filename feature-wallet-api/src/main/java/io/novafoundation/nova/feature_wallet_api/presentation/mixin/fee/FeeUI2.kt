@@ -7,17 +7,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 
-interface WithFeeLoaderMixinV2 {
-
-    val originFeeMixin: FeeLoaderMixinV2.Presentation<*, FeeDisplay>
-}
-
-fun BaseFragment<*>.setupFeeLoading(withFeeLoaderMixin: WithFeeLoaderMixinV2, feeView: FeeView) {
-    val mixin = withFeeLoaderMixin.originFeeMixin
-
-    setupFeeLoading(mixin, feeView)
-}
-
 fun BaseFragment<*>.setupFeeLoading(mixin: FeeLoaderMixinV2.Presentation<*, FeeDisplay>, feeView: FeeView) {
     observeRetries(mixin)
 

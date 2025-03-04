@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.asset
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.SingleStakingProperties
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.maximumToStake
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import java.math.BigDecimal
 

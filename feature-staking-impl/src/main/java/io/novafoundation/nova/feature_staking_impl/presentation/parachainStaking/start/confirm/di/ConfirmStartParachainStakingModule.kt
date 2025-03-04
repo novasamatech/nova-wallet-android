@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class ConfirmStartParachainStakingModule {
@@ -46,7 +47,7 @@ class ConfirmStartParachainStakingModule {
         validationExecutor: ValidationExecutor,
         assetUseCase: AssetUseCase,
         interactor: StartParachainStakingInteractor,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
         externalActions: ExternalActions.Presentation,
         selectedAssetState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
@@ -62,7 +63,7 @@ class ConfirmStartParachainStakingModule {
             resourceManager = resourceManager,
             validationSystem = validationSystem,
             interactor = interactor,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
             externalActions = externalActions,
             selectedAssetState = selectedAssetState,
             validationExecutor = validationExecutor,

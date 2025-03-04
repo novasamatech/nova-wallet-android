@@ -58,10 +58,9 @@ class SetupUnbondMythosFragment : BaseFragment<SetupUnbondMythosViewModel>() {
     }
 
     override fun subscribe(viewModel: SetupUnbondMythosViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, mythosUnbondAmountField)
-        setupFeeLoading(viewModel, mythosUnbondFee)
+        setupFeeLoading(viewModel.feeLoaderMixin, mythosUnbondFee)
 
         viewModel.selectedCollatorModel.observe(mythosUnbondCollator::setSelectedTarget)
 

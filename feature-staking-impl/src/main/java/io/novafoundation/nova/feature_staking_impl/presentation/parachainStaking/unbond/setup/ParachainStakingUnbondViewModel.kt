@@ -17,7 +17,6 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.planksFromAmount
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.R
@@ -40,8 +39,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -82,9 +79,6 @@ class ParachainStakingUnbondViewModel(
     private val validationInProgress = MutableStateFlow(false)
 
     private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
-        .shareInBackground()
-
-    private val chainFlow = assetWithOption.map { it.option.assetWithChain.chain }
         .shareInBackground()
 
     private val selectedAsset = assetWithOption.map { it.asset }
@@ -163,11 +157,10 @@ class ParachainStakingUnbondViewModel(
 
     init {
         originFeeMixin.connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
             inputSource2 = selectedCollatorIdFlow,
-            inputSource3 = chainFlow,
-            feeConstructor = { feePaymentCurrency, amount, collatorId, chain ->
-                interactor.estimateFee(feePaymentCurrency.planksFromAmount(chain, amount), collatorId)
+            feeConstructor = { _, amount, collatorId ->
+                interactor.estimateFee(amount, collatorId)
             }
         )
 

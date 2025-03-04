@@ -65,10 +65,9 @@ class ConfirmUnbondMythosFragment : BaseFragment<ConfirmUnbondMythosViewModel>()
     }
 
     override fun subscribe(viewModel: ConfirmUnbondMythosViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, mythosUnbondConfirmExtrinsicInfo.fee)
+        setupFeeLoading(viewModel.feeLoaderMixin, mythosUnbondConfirmExtrinsicInfo.fee)
 
         viewModel.showNextProgress.observe(mythosUnbondConfirmConfirm::setProgressState)
 

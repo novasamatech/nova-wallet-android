@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -52,10 +53,10 @@ import java.math.BigDecimal
 class SetupStartMythosStakingViewModel(
     private val router: MythosStakingRouter,
     rewardsComponentFactory: MythosStakingRewardsComponentFactory,
+    feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
     private val resourceManager: ResourceManager,
     validationExecutor: ValidationExecutor,
-    feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorRecommendatorFactory: MythosCollatorRecommendatorFactory,
     private val mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
@@ -80,11 +81,11 @@ class SetupStartMythosStakingViewModel(
             stakingBlockNumberUseCase = stakingBlockNumberUseCase
         )
     },
+    feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
     rewardsComponentFactory = rewardsComponentFactory,
     assetUseCase = assetUseCase,
     resourceManager = resourceManager,
     validationExecutor = validationExecutor,
-    feeLoaderMixin = feeLoaderMixin,
     actionAwaitableMixinFactory = actionAwaitableMixinFactory,
     recommendatorFactory = collatorRecommendatorFactory,
     selectedAssetState = selectedAssetState,

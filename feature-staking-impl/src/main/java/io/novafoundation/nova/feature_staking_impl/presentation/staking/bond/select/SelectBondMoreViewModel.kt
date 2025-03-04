@@ -11,11 +11,10 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.model.planksFromAmount
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.common.stakeable
+import io.novafoundation.nova.feature_staking_impl.domain.common.stakeablePlanks
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationSystem
@@ -23,9 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.bondMoreValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -35,8 +32,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.Ma
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SelectBondMoreViewModel(
     private val router: StakingRouter,
@@ -61,8 +58,6 @@ class SelectBondMoreViewModel(
         .inBackground()
         .share()
 
-    private val chainFlow = interactor.chainFlow()
-
     private val assetFlow = accountStakingFlow
         .flatMapLatest { interactor.assetFlow(it.stashAddress) }
         .inBackground()
@@ -76,21 +71,14 @@ class SelectBondMoreViewModel(
         selectedChainAsset
     )
 
-    private val stakingAmountFlow = accountStakingFlow.flatMapLatest {
-        interactor.observeStakingAmount(it, viewModelScope)
-    }.map { it.orZero() }
-        .shareInBackground()
-
     private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
-        assetFlow.providingMaxOf(Asset::freeInPlanks)
-            .deductAmount(stakingAmountFlow)
+        assetFlow.providingMaxOf(Asset::stakeablePlanks)
             .deductFee(originFeeMixin)
     }
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::stakeable,
         maxActionProvider = maxActionProvider
     )
 
@@ -113,12 +101,9 @@ class SelectBondMoreViewModel(
 
     private fun listenFee() {
         originFeeMixin.connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
-            inputSource2 = chainFlow,
-            feeConstructor = { feePaymentCurrency, amount, chain ->
-                val amountInPlanks = feePaymentCurrency.planksFromAmount(chain, amount)
-
-                bondMoreInteractor.estimateFee(amountInPlanks, accountStakingFlow.first())
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
+            feeConstructor = { _, amount ->
+                bondMoreInteractor.estimateFee(amount, accountStakingFlow.first())
             }
         )
     }

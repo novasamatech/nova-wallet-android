@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -24,11 +24,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.det
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollator.model.toDomain
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toDomain
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -41,7 +43,7 @@ class ConfirmUnbondMythosViewModel(
     private val resourceManager: ResourceManager,
     private val validationSystem: UnbondMythosValidationSystem,
     private val interactor: UnbondMythosStakingInteractor,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
@@ -52,12 +54,10 @@ class ConfirmUnbondMythosViewModel(
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
-    Retriable,
     Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
-    private val decimalFee = mapFeeFromParcel(payload.fee)
+    private val fee = payload.fee.toDomain()
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -82,6 +82,8 @@ class ConfirmUnbondMythosViewModel(
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: StateFlow<Boolean> = _showNextProgress
 
+    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, selectedAssetState.selectedAssetFlow())
+
     init {
         setInitialFee()
     }
@@ -104,12 +106,12 @@ class ConfirmUnbondMythosViewModel(
     }
 
     private fun setInitialFee() = launch {
-        feeLoaderMixin.setFee(decimalFee)
+        feeLoaderMixin.setFee(fee)
     }
 
     private fun sendTransactionIfValid() = launch {
         val payload = UnbondMythosStakingValidationPayload(
-            fee = decimalFee,
+            fee = fee,
             collator = collator,
             asset = assetFlow.first(),
             delegatorState = mythosSharedComputation.delegatorState()

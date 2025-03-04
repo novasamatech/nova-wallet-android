@@ -142,18 +142,6 @@ class StakingInteractor(
         emit(StashNoneStatus.INACTIVE)
     }
 
-    suspend fun observeStakingAmount(
-        stakingState: StakingState,
-        scope: CoroutineScope
-    ): Flow<BigInteger?> = flowOfAll {
-        when (stakingState) {
-            is StakingState.NonStash -> flowOf { null }
-            is StakingState.Stash.Nominator -> observeNominatorSummary(stakingState, scope).map { it.activeStake }
-            is StakingState.Stash.Validator -> observeValidatorSummary(stakingState, scope).map { it.activeStake }
-            is StakingState.Stash.None -> observeStashSummary(stakingState, scope).map { it.activeStake }
-        }
-    }
-
     suspend fun observeValidatorSummary(
         validatorState: StakingState.Stash.Validator,
         scope: CoroutineScope

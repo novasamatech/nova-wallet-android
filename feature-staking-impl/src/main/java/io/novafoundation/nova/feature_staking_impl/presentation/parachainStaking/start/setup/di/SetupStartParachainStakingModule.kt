@@ -53,7 +53,7 @@ class SetupStartParachainStakingModule {
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
         rewardsComponentFactory: ParachainStakingRewardsComponentFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         validationSystem: StartParachainStakingValidationSystem,
@@ -65,7 +65,6 @@ class SetupStartParachainStakingModule {
         selectedAssetState: StakingSharedState,
         collatorRecommendatorFactory: CollatorRecommendatorFactory,
         payload: StartParachainStakingPayload,
-        maxActionProviderFactory: MaxActionProviderFactory,
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
@@ -75,7 +74,7 @@ class SetupStartParachainStakingModule {
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
             amountChooserMixinFactory = amountChooserMixinFactory,
             addressIconGenerator = addressIconGenerator,
             validationSystem = validationSystem,
@@ -86,7 +85,6 @@ class SetupStartParachainStakingModule {
             selectedAssetState = selectedAssetState,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
             payload = payload,
-            maxActionProviderFactory = maxActionProviderFactory
         )
     }
 
