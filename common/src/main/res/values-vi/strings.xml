@@ -928,6 +928,18 @@
     <string name="pre_configured_networks_progress_text">Đang tải danh sách mạng...</string>
     <string name="pre_configured_networks_search_hint">Tìm kiếm theo tên mạng</string>
     <string name="pre_configured_networks_title">Thêm mạng</string>
+    <string name="price_chart_date_format" formatted="false">%s lúc %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">Tất cả</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">giá của %s</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">Tất cả thời gian</string>
+    <string name="price_charts_period_month">Tháng trước</string>
+    <string name="price_charts_period_week">Tuần trước</string>
+    <string name="price_charts_period_year">Năm trước</string>
     <string name="profile_accounts_title">Tài khoản</string>
     <string name="profile_accounts_title_2_0">Ví tiền</string>
     <string name="profile_language_title">Ngôn ngữ</string>
