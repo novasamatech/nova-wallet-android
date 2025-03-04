@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -119,8 +118,7 @@ class BalanceDetailViewModel(
         .share()
 
     val supportExpandableBalanceDetails = assetFlow.map { it.totalInPlanks.isPositive() }
-        .inBackground()
-        .share()
+        .shareInBackground()
 
     private val lockedBalanceModel = combine(balanceLocksFlow, balanceHoldsFlow, externalBalancesFlow, assetFlow) { locks, holds, externalBalances, asset ->
         mapBalanceLocksToUi(locks, holds, externalBalances, asset)

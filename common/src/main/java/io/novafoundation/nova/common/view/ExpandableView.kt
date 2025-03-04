@@ -94,7 +94,7 @@ class ExpandableView @JvmOverloads constructor(
 
     fun setExpandable(isExpandable: Boolean) {
         this.isExpandable = isExpandable
-        collapse()
+        collapseImmediate()
         chevron?.isVisible = isExpandable
     }
 
