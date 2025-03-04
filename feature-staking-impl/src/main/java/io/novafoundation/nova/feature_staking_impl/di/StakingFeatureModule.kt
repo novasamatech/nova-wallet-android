@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.d
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.config.api.StakingGlobalConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
@@ -80,6 +81,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteracto
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
@@ -142,11 +144,15 @@ class StakingFeatureModule {
     fun provideStakingEraInteractorFactory(
         roundDurationEstimator: RoundDurationEstimator,
         stakingSharedComputation: StakingSharedComputation,
-        stakingConstantsRepository: StakingConstantsRepository
+        stakingConstantsRepository: StakingConstantsRepository,
+        mythosSharedComputation: MythosSharedComputation,
+        mythosStakingRepository: MythosStakingRepository,
     ) = StakingEraInteractorFactory(
         roundDurationEstimator = roundDurationEstimator,
         stakingSharedComputation = stakingSharedComputation,
-        stakingConstantsRepository = stakingConstantsRepository
+        stakingConstantsRepository = stakingConstantsRepository,
+        mythosSharedComputation = mythosSharedComputation,
+        mythosStakingRepository = mythosStakingRepository
     )
 
     @Provides

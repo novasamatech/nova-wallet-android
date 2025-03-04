@@ -49,6 +49,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
@@ -180,6 +181,8 @@ interface AssetsFeatureDependencies {
     val assetIconProvider: AssetIconProvider
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
+
+    val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory
 
     val bannerSourceFactory: BannersSourceFactory
 
