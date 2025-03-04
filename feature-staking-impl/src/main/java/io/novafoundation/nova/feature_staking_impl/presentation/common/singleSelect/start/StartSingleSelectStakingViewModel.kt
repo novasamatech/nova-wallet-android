@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.hints.HintsMixin
 import io.novafoundation.nova.common.navigation.ReturnableRouter

@@ -21,7 +21,7 @@ interface SingleStakingProperties {
     suspend fun minStake(): Balance
 }
 
-suspend fun SingleStakingProperties.maximumToStake(asset: Asset, fee: Balance) : Balance {
+suspend fun SingleStakingProperties.maximumToStake(asset: Asset, fee: Balance): Balance {
     return maximumToStake(asset) - fee
 }
 

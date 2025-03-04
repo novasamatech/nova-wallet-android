@@ -3,12 +3,10 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoos
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.math.BigDecimal
 
 class AmountChooserProviderFactory(
     private val assetIconProvider: AssetIconProvider,

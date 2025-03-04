@@ -6,12 +6,10 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.common.stakeablePlanks
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
 import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger

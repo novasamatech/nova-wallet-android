@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.address.WithAccountId
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.applyStatusBarInsets

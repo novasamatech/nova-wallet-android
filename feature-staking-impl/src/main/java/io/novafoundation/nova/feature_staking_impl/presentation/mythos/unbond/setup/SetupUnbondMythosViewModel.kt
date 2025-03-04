@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setBlockedAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setInputBlocked
@@ -77,7 +76,7 @@ class SetupUnbondMythosViewModel(
     private val assetFlow = assetUseCase.currentAssetFlow()
         .share()
 
-    private val chainAssetFlow =  stakingSharedState.selectedAssetFlow()
+    private val chainAssetFlow = stakingSharedState.selectedAssetFlow()
 
     private val currentDelegatorStateFlow = mythosSharedComputation.delegatorStateFlow()
         .shareInBackground()

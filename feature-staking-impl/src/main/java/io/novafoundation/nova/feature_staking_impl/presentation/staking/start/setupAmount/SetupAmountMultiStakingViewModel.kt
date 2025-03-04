@@ -6,16 +6,12 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.orFalse
 import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.isNominationPoolSelection
-import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.stakeAmount
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationPayload
@@ -37,7 +33,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +92,6 @@ class SetupAmountMultiStakingViewModel(
     }
         .distinctUntilChanged()
         .shareInBackground()
-
 
     private val chainAssetFlow = currentAssetFlow.map { it.token.configuration }
         .distinctUntilChangedBy { it.fullId }
