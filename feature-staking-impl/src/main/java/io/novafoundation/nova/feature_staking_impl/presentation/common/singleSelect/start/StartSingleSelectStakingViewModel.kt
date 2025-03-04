@@ -111,7 +111,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        maxActionProvider = null
+        maxActionProvider = maxAmountProvider
     )
 
     private val isStakeMoreFlow = logic.isStakeMore()

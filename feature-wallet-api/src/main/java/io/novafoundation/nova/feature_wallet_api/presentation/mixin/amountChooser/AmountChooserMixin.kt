@@ -92,13 +92,6 @@ interface AmountChooserMixin : AmountChooserMixinBase {
             assetFlow: Flow<Asset>,
             maxActionProvider: MaxActionProvider?,
         ): Presentation
-
-        fun create(
-            scope: CoroutineScope,
-            assetFlow: Flow<Asset>,
-            balanceField: (Asset) -> BigDecimal,
-            maxActionProvider: MaxActionProvider?,
-        ): Presentation
     }
 }
 

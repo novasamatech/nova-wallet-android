@@ -109,9 +109,8 @@ class SetupUnbondMythosViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        maxActionProvider = MaxActionProvider.create(viewModelScope) {
-            chainAssetFlow.providingBalance(stakedAmount)
-        }
+        // Amount is pre-determined, so we don't show max button at all
+        maxActionProvider = null
     )
 
     val transferable = assetFlow.map(Asset::transferableAmountModel)

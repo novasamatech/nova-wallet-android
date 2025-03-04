@@ -26,19 +26,6 @@ class AmountChooserProviderFactory(
             maxActionProvider = maxActionProvider
         )
     }
-
-    override fun create(
-        scope: CoroutineScope,
-        assetFlow: Flow<Asset>,
-        balanceField: (Asset) -> BigDecimal,
-        maxActionProvider: MaxActionProvider?
-    ): AmountChooserMixin.Presentation {
-        return create(
-            scope = scope,
-            assetFlow = assetFlow,
-            maxActionProvider = maxActionProvider
-        )
-    }
 }
 
 class AmountChooserProvider(
