@@ -765,6 +765,8 @@
         <item quantity="other">En az %d parça seçmelisiniz</item>
     </plurals>
     <string name="governance_unlock">Kilit Aç</string>
+    <string name="high_price_impact_detacted_message">Bu takası gerçekleştirmek, önemli kaymalar ve finansal kayıplarla sonuçlanacaktır. İşlem boyutunuzu küçültmeyi veya işleminizi birden fazla işleme bölmeyi düşünün.</string>
+    <string name="high_price_impact_detacted_title">Yüksek fiyat etkisi tespit edildi (%s)</string>
     <string name="history_v1.9.0">Geçmiş</string>
     <string name="identity_email_title">E-posta</string>
     <string name="identity_legal_name_title">Resmi Ad</string>
@@ -929,6 +931,7 @@
     <string name="pool_inactive_failure_title">Havuz açık değil</string>
     <string name="pool_staking_conflict_message">Artık aynı hesaptan hem Doğrudan Stake hem de Havuz Stake kullanamazsınız. Havuz Stake\'inizi yönetmek için öncelikle token\'larınızı Doğrudan Stake\'ten çözmeniz gerekmektedir.</string>
     <string name="pool_staking_conflict_title">Havuz işlemleri kullanılamıyor</string>
+    <string name="popular_dapps_title">Popüler</string>
     <string name="pre_configured_networks_add_custom_button">Ağı elle ekle</string>
     <string name="pre_configured_networks_progress_text">Ağlar listesi yükleniyor...</string>
     <string name="pre_configured_networks_search_hint">Ağ adına göre ara</string>

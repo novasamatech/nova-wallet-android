@@ -21,9 +21,19 @@
 
     <include app:graph="@navigation/sign_ledger_nav_graph" />
 
+    <include app:graph="@navigation/sign_parity_signer_graph" />
+
     <action
         android:id="@+id/action_open_externalSignGraph"
         app:destination="@id/external_sign_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_sign_ledger"
+        app:destination="@id/sign_ledger_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -78,14 +88,6 @@
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_open_dappBrowser"
-        app:destination="@id/dapp_browser_graph"
-        app:enterAnim="@anim/fragment_slide_in"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_slide_out" />
 
     <action
         android:id="@+id/action_import_nav_graph"

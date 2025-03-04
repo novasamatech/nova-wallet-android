@@ -11,6 +11,7 @@ fun mapStakingTypeToSubQueryId(stakingType: Chain.Asset.StakingType): String? {
         Chain.Asset.StakingType.TURING -> "turing"
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
         Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pool"
+        Chain.Asset.StakingType.MYTHOS -> "mythos"
     }
 }
 
@@ -23,6 +24,7 @@ fun mapSubQueryIdToStakingType(subQueryStakingTypeId: String?): Chain.Asset.Stak
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
         "nomination-pool" -> Chain.Asset.StakingType.NOMINATION_POOLS
+        "mythos" -> Chain.Asset.StakingType.MYTHOS
         else -> Chain.Asset.StakingType.UNSUPPORTED
     }
 }

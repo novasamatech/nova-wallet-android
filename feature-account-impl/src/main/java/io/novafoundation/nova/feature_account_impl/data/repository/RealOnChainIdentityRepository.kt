@@ -49,12 +49,12 @@ class RealOnChainIdentityRepository(
         chainId: ChainId
     ): AccountIdKeyMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
         val identityChainId = findIdentityChain(chainId)
-        val distinctKeys = accountIds.mapToSet(::AccountIdKey)
-
         storageDataSource.query(identityChainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {
                 return@query emptyMap()
             }
+
+            val distinctKeys = accountIds.mapToSet(::AccountIdKey)
 
             val superOfArguments = distinctKeys.map { listOf(it.value) }
             val superOfValues = runtime.metadata.identity().storage("SuperOf").entries(

@@ -176,7 +176,6 @@ class SetupYieldBoostViewModel(
             periodReturns = periodReturns,
             token = assetFlow.first().token,
             resourceManager = resourceManager,
-            rewardSuffix = RewardSuffix.APR
         )
     }.shareInBackground()
 
@@ -189,7 +188,6 @@ class SetupYieldBoostViewModel(
             periodReturns = it.yearlyReturns,
             token = assetFlow.first().token,
             resourceManager = resourceManager,
-            rewardSuffix = RewardSuffix.APY
         )
     }.shareInBackground()
 
@@ -337,13 +335,13 @@ class SetupYieldBoostViewModel(
 
             val collatorModels = stakedCollators.map {
                 SelectCollatorModel(
-                    addressModel = addressIconGenerator.collatorAddressModel(it.collator, chain),
+                    addressModel = addressIconGenerator.collatorAddressModel(it.target, chain),
                     subtitle = selectCollatorSubsTitle(
-                        collator = it.collator,
-                        hasActiveYieldBoost = it.collator.accountIdHex in activeTaskCollatorIds
+                        collator = it.target,
+                        hasActiveYieldBoost = it.target.accountIdHex in activeTaskCollatorIds
                     ),
                     active = true,
-                    payload = it.collator
+                    payload = it.target
                 )
             }
             val selected = collatorModels.findById(selectedCollator)
@@ -358,10 +356,10 @@ class SetupYieldBoostViewModel(
         val yieldBoostedCollatorsSet = activeTasks.yieldBoostedCollatorIdsSet()
 
         val mostRelevantCollator = alreadyStakedCollators
-            .firstOrNull { it.collator.accountIdHex in yieldBoostedCollatorsSet }
+            .firstOrNull { it.target.accountIdHex in yieldBoostedCollatorsSet }
             ?: alreadyStakedCollators.first()
 
-        selectedCollatorFlow.emit(mostRelevantCollator.collator)
+        selectedCollatorFlow.emit(mostRelevantCollator.target)
     }
 
     private fun maybeGoToNext() = launch {

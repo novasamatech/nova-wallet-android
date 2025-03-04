@@ -31,7 +31,7 @@ import java.math.BigInteger
 
 interface StartParachainStakingInteractor {
 
-    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId?): Fee
+    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee
 
     suspend fun delegate(amount: BigInteger, collator: AccountId): Result<ExtrinsicStatus.InBlock>
 
@@ -48,7 +48,7 @@ class RealStartParachainStakingInteractor(
     private val candidatesRepository: CandidatesRepository,
 ) : StartParachainStakingInteractor {
 
-    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId?): Fee {
+    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee {
         val (chain, chainAsset) = singleAssetSharedState.chainAndAsset()
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = metaAccount.accountIdIn(chain)!!
@@ -56,14 +56,14 @@ class RealStartParachainStakingInteractor(
         val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)
 
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
-            if (collatorId != null && currentDelegationState.hasDelegation(collatorId)) {
+            if (currentDelegationState.hasDelegation(collatorId)) {
                 delegatorBondMore(
                     candidate = collatorId,
                     amount = amount
                 )
             } else {
                 delegate(
-                    candidate = collatorId ?: fakeCollatorId(chain.id),
+                    candidate = collatorId,
                     amount = amount,
                     candidateDelegationCount = fakeDelegationCount(),
                     delegationCount = fakeDelegationCount()

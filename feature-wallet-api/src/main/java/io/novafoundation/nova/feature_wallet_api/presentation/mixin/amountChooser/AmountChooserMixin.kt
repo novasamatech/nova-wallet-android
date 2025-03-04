@@ -54,10 +54,15 @@ interface AmountChooserMixinBase : CoroutineScope {
         fun formatFlow(tokenFlow: Flow<Token>, amountFlow: Flow<BigDecimal>): Flow<CharSequence>
     }
 
-    class InputState<T>(val value: T, val initiatedByUser: Boolean, val inputKind: InputKind) {
+    data class InputState<T>(
+        val value: T,
+        // TODO revisit this flag. Seems to only be used in SwapMainSettingsViewModel and its purpose and semantics looks unclear
+        val initiatedByUser: Boolean,
+        val inputKind: InputKind
+    ) {
 
         enum class InputKind {
-            REGULAR, MAX_ACTION
+            REGULAR, MAX_ACTION, BLOCKED
         }
     }
 
@@ -102,6 +107,22 @@ fun AmountChooserMixinBase.Presentation.setAmountInput(amountInput: String, init
     inputState.value = InputState(value = amountInput, initiatedByUser, inputKind = InputKind.REGULAR)
 }
 
+fun AmountChooserMixinBase.Presentation.setInputBlocked() {
+    inputState.value = inputState.value.copy(inputKind = InputKind.BLOCKED)
+}
+
+fun AmountChooserMixinBase.Presentation.setBlockedAmount(amount: BigDecimal) {
+    inputState.value = InputState(value = amount.toStripTrailingZerosString(), initiatedByUser = false, inputKind = InputKind.BLOCKED)
+}
+
 suspend fun AmountChooserMixinBase.Presentation.invokeMaxClick() {
     maxAction.maxClick.first()?.invoke()
+}
+
+fun InputKind.isInputBlocked(): Boolean {
+    return this == InputKind.BLOCKED
+}
+
+fun InputKind.isInputAllowed(): Boolean {
+    return !isInputBlocked()
 }

@@ -233,7 +233,7 @@ class ParachainStakingUnbondViewModel(
             .filterNot { it.hasPendingUnbonding }
 
         if (collatorsWithoutUnbonding.isNotEmpty()) {
-            selectedCollatorFlow.emit(collatorsWithoutUnbonding.first().collator)
+            selectedCollatorFlow.emit(collatorsWithoutUnbonding.first().target)
         }
     }
 

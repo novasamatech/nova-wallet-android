@@ -14,15 +14,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakin
     includes = [
         ParachainStakingNavigationModule::class,
         RelayStakingNavigationModule::class,
-        NominationPoolsStakingNavigationModule::class
+        NominationPoolsStakingNavigationModule::class,
+        MythosStakingNavigationModule::class
     ]
 )
 class StakingNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideStakingDashboardNavigator(): StakingDashboardNavigator {
-        return StakingDashboardNavigator()
+    fun provideStakingDashboardNavigator(navigationHoldersRegistry: NavigationHoldersRegistry): StakingDashboardNavigator {
+        return StakingDashboardNavigator(navigationHoldersRegistry)
     }
 
     @Provides

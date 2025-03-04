@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_dapp_impl.utils.tabs
 import io.novafoundation.nova.common.utils.CallbackLruCache
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_dapp_api.data.repository.getDAppIfSyncedOrSync
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabInternalRepository
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState
@@ -23,7 +25,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RealBrowserTabService(
     private val dAppMetadataRepository: DAppMetadataRepository,
@@ -47,14 +48,13 @@ class RealBrowserTabService(
 
     override val tabStateFlow = combine(
         selectedTabIdFlow,
-        accountRepository.selectedMetaAccountFlow(),
         allTabsFlow
-    ) { selectedTabId, metaAccount, allTabs ->
+    ) { selectedTabId, allTabs ->
         TabsState(
             tabs = allTabs.values.toList(),
             selectedTab = currentTabState(selectedTabId, allTabs)
         )
-    }
+    }.shareInBackground()
 
     init {
         activeSessions.setOnEntryRemovedCallback {
@@ -76,17 +76,21 @@ class RealBrowserTabService(
         selectTab(null)
     }
 
+    // Create a new browser tab and save it to persistent storage
+    // Then we sync dapp metadata for this tab asynchronously to not block tab creation
     override suspend fun createNewTab(url: String): BrowserTab {
         val tab = BrowserTab(
             id = UUID.randomUUID().toString(),
             metaId = accountRepository.getSelectedMetaAccount().id,
             pageSnapshot = PageSnapshot.fromName(Urls.domainOf(url)),
             currentUrl = url,
-            knownDAppMetadata = getKnownDappMetadata(url),
+            knownDAppMetadata = null,
             creationTime = Date()
         )
 
         browserTabInternalRepository.saveTab(tab)
+
+        deferredSyncKnownDAppMetadata(tab.id, url)
 
         return tab
     }
@@ -100,10 +104,13 @@ class RealBrowserTabService(
         activeSessions.remove(tabId)
     }
 
-    override suspend fun removeAllTabs() {
+    override suspend fun removeTabsForMetaAccount(metaId: Long) {
         selectTab(null)
-        browserTabInternalRepository.removeAllTabs()
-        activeSessions.removeAll()
+
+        val removedTabs = browserTabInternalRepository.removeTabsForMetaAccount(metaId)
+        removedTabs.forEach {
+            activeSessions.remove(it)
+        }
     }
 
     override fun makeCurrentTabSnapshot() {
@@ -128,10 +135,11 @@ class RealBrowserTabService(
     private suspend fun currentTabState(selectedTabId: String?, allTabs: Map<String, BrowserTab>): CurrentTabState {
         val tabId = selectedTabId ?: return CurrentTabState.NotSelected
         val tab = allTabs[tabId] ?: return CurrentTabState.NotSelected
-        return CurrentTabState.Selected(
-            tab,
-            activeSessions[tabId] ?: addNewSession(tab)
-        )
+        return CurrentTabState.Selected(tab, getOrCreateSession(tab))
+    }
+
+    private suspend fun getOrCreateSession(tab: BrowserTab): BrowserTabSession {
+        return activeSessions[tab.id] ?: addNewSession(tab)
     }
 
     /*
@@ -141,14 +149,11 @@ class RealBrowserTabService(
         if (url == null) return
 
         launch {
-            withContext(Dispatchers.Default) {
-                activeSessions[tabId].currentUrl = url
-                browserTabInternalRepository.changeCurrentUrl(tabId, url)
-
-                val metadata = getKnownDappMetadata(url)
-                browserTabInternalRepository.changeKnownDAppMetadata(tabId, metadata?.iconLink)
-            }
+            activeSessions[tabId].currentUrl = url
+            browserTabInternalRepository.changeCurrentUrl(tabId, url)
         }
+
+        deferredSyncKnownDAppMetadata(tabId, url)
     }
 
     private fun makeTabSnapshot(tabId: String) {
@@ -163,8 +168,16 @@ class RealBrowserTabService(
         }
     }
 
+    private fun deferredSyncKnownDAppMetadata(tabId: String, url: String) {
+        launch {
+            getKnownDappMetadata(url)?.let {
+                browserTabInternalRepository.changeKnownDAppMetadata(tabId, it.iconLink)
+            }
+        }
+    }
+
     private suspend fun getKnownDappMetadata(url: String): BrowserTab.KnownDAppMetadata? {
-        return dAppMetadataRepository.getDAppMetadata(Urls.normalizeUrl(url))?.let {
+        return dAppMetadataRepository.getDAppIfSyncedOrSync(Urls.normalizeUrl(url))?.let {
             BrowserTab.KnownDAppMetadata(it.iconLink)
         }
     }

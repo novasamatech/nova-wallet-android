@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
+
+    <!--<string name="dapp_main_welcome_title">Welcome to Nova Browser</string>-->
+    <!--<string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>-->
+
+    <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
+
+    <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
+
+    <string name="popular_dapps_title">Popular</string>
+
     <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
 
     <string name="common_not_enough_to_pay_fee_message">You don\'t have enough balance to pay network fee of %s. Current balance is %s</string>
@@ -1270,10 +1282,6 @@
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>
 
     <string name="assets_filter_title">Filter tokens</string>
-
-    <string name="dapp_main_welcome_title">Welcome to Nova Browser</string>
-
-    <string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>
 
     <string name="manage_assets_add_token">Add token</string>
 

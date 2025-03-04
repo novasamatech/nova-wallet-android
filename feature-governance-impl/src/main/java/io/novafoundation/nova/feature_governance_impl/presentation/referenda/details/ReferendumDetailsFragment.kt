@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.setupReferendumSharing
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
@@ -81,6 +82,8 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
             viewModel.backClicked()
         }
 
+        referendumDetailsToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
+
         referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.block_background)
         referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
@@ -133,6 +136,7 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
 
     override fun subscribe(viewModel: ReferendumDetailsViewModel) {
         setupExternalActions(viewModel)
+        setupReferendumSharing(viewModel.shareReferendumMixin)
         observeValidations(viewModel)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.referendumNotAwaitableAction)
 

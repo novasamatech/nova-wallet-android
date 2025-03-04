@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.orFalse
+import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -121,7 +122,7 @@ class SetupAmountMultiStakingViewModel(
             currentSelection == null -> StakingPropertiesModel.Loading
             else -> {
                 val content = StakingPropertiesModel.Content(
-                    estimatedReward = currentSelection.selection.apy.orZero().format(),
+                    estimatedReward = currentSelection.selection.apy.orZero().formatPercents(),
                     selection = multiStakingTargetSelectionFormatter.formatForSetupAmount(currentSelection)
                 )
 

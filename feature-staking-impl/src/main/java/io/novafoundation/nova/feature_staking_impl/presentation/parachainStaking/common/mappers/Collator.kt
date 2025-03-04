@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegationState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.model.Collator
@@ -12,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapIdent
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.rewardsToColoredText
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.rewardsToScoring
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.stakeToScoring
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel
@@ -19,9 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.parce
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.extensions.fromHex
 
 typealias CollatorModel = StakeTargetModel<Collator>
 
@@ -33,12 +31,9 @@ suspend fun mapCollatorToCollatorModel(
     resourceManager: ResourceManager,
     token: Token,
 ): CollatorModel {
-    val address = chain.addressOf(collator.accountIdHex.fromHex())
-
-    val addressModel = addressIconGenerator.createAccountAddressModel(
-        address = address,
-        chain = chain,
-        name = collator.identity?.display
+    val addressModel = addressIconGenerator.collatorAddressModel(
+        collator = collator,
+        chain = chain
     )
 
     val scoring = when (sorting) {

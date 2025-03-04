@@ -67,7 +67,7 @@ class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewMo
         setupFeeLoading(viewModel.originFeeMixin, parachainStakingUnbondFee)
         observeHints(viewModel.hintsMixin, parachainStakingUnbondHints)
 
-        viewModel.selectedCollatorModel.observe(parachainStakingUnbondCollator::setSelectedCollator)
+        viewModel.selectedCollatorModel.observe(parachainStakingUnbondCollator::setSelectedTarget)
 
         viewModel.buttonState.observe(parachainStakingUnbondNext::setState)
 

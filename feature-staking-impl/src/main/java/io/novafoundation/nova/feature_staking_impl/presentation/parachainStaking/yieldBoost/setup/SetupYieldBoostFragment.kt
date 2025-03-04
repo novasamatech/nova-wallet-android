@@ -82,7 +82,7 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
         setupFeeLoading(viewModel.originFeeMixin, setupYieldBoostFee)
 
         viewModel.selectedCollatorModel.observe {
-            setupYieldBoostCollator.setSelectedCollator(it)
+            setupYieldBoostCollator.setSelectedTarget(it)
         }
 
         viewModel.chooseCollatorAction.awaitableActionLiveData.observeEvent { action ->
