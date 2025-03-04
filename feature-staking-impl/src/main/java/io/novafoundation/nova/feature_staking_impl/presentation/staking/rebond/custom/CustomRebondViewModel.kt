@@ -19,19 +19,19 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.rebondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModelOf
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class CustomRebondViewModel(
     private val router: StakingRouter,
@@ -40,11 +40,11 @@ class CustomRebondViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: RebondValidationSystem,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     hintsMixinFactory: ResourcesHintsMixinFactory
 ) : BaseViewModel(),
-    FeeLoaderMixin by feeLoaderMixin,
     Validatable by validationExecutor {
 
     private val _showNextProgress = MutableLiveData(false)
@@ -59,11 +59,23 @@ class CustomRebondViewModel(
     }
         .shareInBackground()
 
+    private val selectedChainAsset = assetFlow.map { it.token.configuration }
+        .shareInBackground()
+
+    val originFeeMixin = feeLoaderMixinFactory.createDefault(
+        this,
+        selectedChainAsset,
+        FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
+    )
+
+    private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
+        assetFlow.providingMaxOf(Asset::unbondingInPlanks)
+    }
+
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::unbonding,
-        balanceLabel = R.string.wallet_balance_unbonding_v1_9_0
+        maxActionProvider = maxActionProvider
     )
 
     val hintsMixin = hintsMixinFactory.create(
@@ -87,26 +99,17 @@ class CustomRebondViewModel(
     }
 
     private fun listenFee() {
-        amountChooserMixin.backPressuredAmount
-            .onEach { loadFee(it) }
-            .launchIn(viewModelScope)
-    }
-
-    private fun loadFee(amount: BigDecimal) {
-        feeLoaderMixin.loadFee(
-            coroutineScope = viewModelScope,
-            feeConstructor = { token ->
-                val amountInPlanks = token.planksFromAmount(amount)
-
-                rebondInteractor.estimateFee(amountInPlanks, accountStakingFlow.first())
-            },
-            onRetryCancelled = ::backClicked
+        originFeeMixin.connectWith(
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
+            feeConstructor = { _, amount ->
+                rebondInteractor.estimateFee(amount, accountStakingFlow.first())
+            }
         )
     }
 
     private fun maybeGoToNext() = launch {
         val payload = RebondValidationPayload(
-            fee = feeLoaderMixin.awaitFee(),
+            fee = originFeeMixin.awaitFee(),
             rebondAmount = amountChooserMixin.amount.first(),
             controllerAsset = assetFlow.first()
         )

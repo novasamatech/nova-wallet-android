@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
@@ -19,11 +19,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRou
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -36,7 +39,7 @@ class MythosRedeemViewModel(
     private val validationSystem: RedeemMythosValidationSystem,
     private val validationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val interactor: MythosRedeemInteractor,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
@@ -44,9 +47,7 @@ class MythosRedeemViewModel(
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
-    Retriable,
     Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin,
     ExternalActions by externalActions {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
@@ -65,15 +66,13 @@ class MythosRedeemViewModel(
     val walletFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
+    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, selectedAssetState.selectedAssetFlow())
+
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: StateFlow<Boolean> = _showNextProgress
 
     init {
-        feeLoaderMixin.loadFee(
-            coroutineScope = this,
-            feeConstructor = { interactor.estimateFee() },
-            onRetryCancelled = {}
-        )
+        originFeeMixin.loadFee { interactor.estimateFee() }
     }
 
     fun confirmClicked() {
@@ -94,7 +93,7 @@ class MythosRedeemViewModel(
         _showNextProgress.value = true
 
         val payload = RedeemMythosStakingValidationPayload(
-            fee = feeLoaderMixin.awaitFee(),
+            fee = originFeeMixin.awaitFee(),
             asset = assetFlow.first()
         )
 

@@ -6,12 +6,13 @@ import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.model.getAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 data class TransferFee(
     val originFee: OriginFee,
     val crossChainFee: FeeBase?
-) {
+) : MaxAvailableDeduction {
 
     fun totalFeeByExecutingAccount(chainAsset: Chain.Asset): Balance {
         val accountThatPaysFees = originFee.submissionFee.submissionOrigin.executingAccount
@@ -24,5 +25,11 @@ data class TransferFee(
 
     fun replaceSubmission(newSubmissionFee: SubmissionFee): TransferFee {
         return copy(originFee = originFee.copy(newSubmissionFee))
+    }
+
+    override fun maxAmountDeductionFor(amountAsset: Chain.Asset): Balance {
+        return originFee.submissionFee.amount +
+            originFee.deliveryFee?.amount.orZero() +
+            crossChainFee?.getAmount(amountAsset).orZero()
     }
 }

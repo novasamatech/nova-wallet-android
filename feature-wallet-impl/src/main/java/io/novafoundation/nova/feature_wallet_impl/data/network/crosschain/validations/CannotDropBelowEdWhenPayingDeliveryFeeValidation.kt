@@ -24,7 +24,7 @@ class CannotDropBelowEdWhenPayingDeliveryFeeValidation(
     override suspend fun validate(value: AssetTransferPayload): ValidationStatus<AssetTransferValidationFailure> {
         if (!value.isSendingCommissionAsset) return valid()
 
-        val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.transfer.originChain, value.transfer.originChainAsset)
+        val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.transfer.originChainAsset)
 
         val deliveryFeePart = value.originFee.deliveryFee?.amount.orZero()
         val paysDeliveryFee = deliveryFeePart.isPositive()

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.showLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -54,10 +53,9 @@ class MythosRedeemFragment : BaseFragment<MythosRedeemViewModel>() {
     }
 
     override fun subscribe(viewModel: MythosRedeemViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, mythosRedeemExtrinsicInfo.fee)
+        setupFeeLoading(viewModel.originFeeMixin, mythosRedeemExtrinsicInfo.fee)
 
         viewModel.showNextProgress.observe(mythosRedeemConfirm::setProgressState)
 

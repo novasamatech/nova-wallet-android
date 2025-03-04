@@ -21,7 +21,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class])
 class NewDelegationChooseAmountModule {
@@ -30,7 +31,6 @@ class NewDelegationChooseAmountModule {
     @IntoMap
     @ViewModelKey(NewDelegationChooseAmountViewModel::class)
     fun provideViewModel(
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         assetUseCase: AssetUseCase,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         interactor: NewDelegationChooseAmountInteractor,
@@ -43,9 +43,10 @@ class NewDelegationChooseAmountModule {
         locksFormatter: LocksFormatter,
         validationSystem: ChooseDelegationAmountValidationSystem,
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
+        maxActionProviderFactory: MaxActionProviderFactory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     ): ViewModel {
         return NewDelegationChooseAmountViewModel(
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
             assetUseCase = assetUseCase,
             amountChooserMixinFactory = amountChooserMixinFactory,
             interactor = interactor,
@@ -57,6 +58,8 @@ class NewDelegationChooseAmountModule {
             convictionValuesProvider = convictionValuesProvider,
             locksFormatter = locksFormatter,
             validationSystem = validationSystem,
+            maxActionProviderFactory = maxActionProviderFactory,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
             resourcesHintsMixinFactory = resourcesHintsMixinFactory
         )
     }

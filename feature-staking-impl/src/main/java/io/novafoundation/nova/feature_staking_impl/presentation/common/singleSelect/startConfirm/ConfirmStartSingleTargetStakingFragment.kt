@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeVisible
@@ -48,10 +47,9 @@ abstract class ConfirmStartSingleTargetStakingFragment<V : ConfirmStartSingleTar
     }
 
     override fun subscribe(viewModel: V) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, confirmStartParachainStakingExtrinsicInfo.fee)
+        setupFeeLoading(viewModel.feeLoaderMixin, confirmStartParachainStakingExtrinsicInfo.fee)
         observeHints(viewModel.hintsMixin, confirmStartParachainStakingHints)
 
         viewModel.title.observe(confirmStartParachainStakingToolbar::setTitle)

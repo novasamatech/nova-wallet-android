@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.set
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
 class SetupStartMythosStakingModule {
@@ -40,7 +40,7 @@ class SetupStartMythosStakingModule {
         assetUseCase: AssetUseCase,
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         collatorRecommendatorFactory: MythosCollatorRecommendatorFactory,
         mythosDelegatorStateUseCase: MythosDelegatorStateUseCase,
@@ -60,7 +60,7 @@ class SetupStartMythosStakingModule {
             assetUseCase = assetUseCase,
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
             mythosDelegatorStateUseCase = mythosDelegatorStateUseCase,

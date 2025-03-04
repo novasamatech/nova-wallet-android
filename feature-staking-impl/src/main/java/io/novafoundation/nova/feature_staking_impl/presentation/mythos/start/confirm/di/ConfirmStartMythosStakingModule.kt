@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.con
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class ConfirmStartMythosStakingModule {
@@ -41,7 +41,7 @@ class ConfirmStartMythosStakingModule {
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
         externalActions: ExternalActions.Presentation,
         selectedAssetState: StakingSharedState,
         validationExecutor: ValidationExecutor,
@@ -61,7 +61,7 @@ class ConfirmStartMythosStakingModule {
             addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
             resourceManager = resourceManager,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
             externalActions = externalActions,
             selectedAssetState = selectedAssetState,
             validationExecutor = validationExecutor,
