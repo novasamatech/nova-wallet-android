@@ -952,6 +952,18 @@
     <string name="pre_configured_networks_progress_text">Ładowanie listy sieci...</string>
     <string name="pre_configured_networks_search_hint">Szukaj wg nazwy sieci</string>
     <string name="pre_configured_networks_title">Dodaj sieć</string>
+    <string name="price_chart_date_format" formatted="false">%s o %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">Wszystko</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">Cena %s</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">Cały czas</string>
+    <string name="price_charts_period_month">Ostatni miesiąc</string>
+    <string name="price_charts_period_week">Ostatni tydzień</string>
+    <string name="price_charts_period_year">Ostatni rok</string>
     <string name="profile_accounts_title">Konta</string>
     <string name="profile_accounts_title_2_0">Portfele</string>
     <string name="profile_language_title">Język</string>
