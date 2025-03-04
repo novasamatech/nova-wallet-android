@@ -18,6 +18,7 @@
         android:paddingEnd="8dp"
         android:paddingBottom="4.5dp"
         android:singleLine="true"
+        android:ellipsize="end"
         android:textColor="@color/chip_text"
         tools:background="@color/chips_background"
         tools:text="Polkadot" />

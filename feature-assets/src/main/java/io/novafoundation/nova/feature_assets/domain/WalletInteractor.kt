@@ -34,6 +34,8 @@ interface WalletInteractor {
 
     suspend fun syncChainNfts(metaAccount: MetaAccount, chain: Chain)
 
+    fun chainFlow(chainId: ChainId): Flow<Chain>
+
     fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset>
 
     fun assetFlow(chainAsset: Chain.Asset): Flow<Asset>

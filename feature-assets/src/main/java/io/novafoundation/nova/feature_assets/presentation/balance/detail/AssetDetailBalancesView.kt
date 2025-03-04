@@ -18,4 +18,8 @@ class AssetDetailBalancesView @JvmOverloads constructor(
         setOwnDividerVisible(false)
         title.setDrawableEnd(R.drawable.ic_info, paddingInDp = 4)
     }
+
+    fun showBalanceDetails(show: Boolean) {
+        expandableView.setExpandable(show)
+    }
 }

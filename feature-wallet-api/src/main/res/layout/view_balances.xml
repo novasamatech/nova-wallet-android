@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.ExpandableView
-        android:id="@+id/swapMainSettingsDetails"
+        android:id="@+id/viewBalanceExpandableView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
