@@ -8,7 +8,7 @@ val Asset.totalStaked: BigDecimal
     get() = bonded + redeemable + unbonding
 
 val Asset.totalStakedPlanks: Balance
-    get() = bondedInPlanks + reservedInPlanks + unbondingInPlanks
+    get() = bondedInPlanks + redeemableInPlanks + unbondingInPlanks
 
 val Asset.stakeable: BigDecimal
     get() = free - totalStaked
