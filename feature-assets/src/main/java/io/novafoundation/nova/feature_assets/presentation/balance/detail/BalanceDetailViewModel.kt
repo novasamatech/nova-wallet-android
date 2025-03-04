@@ -10,10 +10,10 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -52,6 +52,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAss
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
@@ -114,6 +115,10 @@ class BalanceDetailViewModel(
     val assetDetailsModel = combine(assetFlow, externalBalancesFlow) { asset, externalBalances ->
         mapAssetToUi(asset, externalBalances)
     }
+        .inBackground()
+        .share()
+
+    val supportExpandableBalanceDetails = assetFlow.map { it.totalInPlanks.isPositive() }
         .inBackground()
         .share()
 

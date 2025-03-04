@@ -129,6 +129,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailsBalances.locked.showAmount(asset.locked)
         }
 
+        viewModel.supportExpandableBalanceDetails.observe {
+            balanceDetailsBalances.showBalanceDetails(it)
+        }
+
         viewModel.priceChartFormatters.observe {
             priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
         }
