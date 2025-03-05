@@ -30,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailToken
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
 import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsChain
 import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
@@ -65,7 +66,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         balanceDetailBack.applyBarMargin()
 
-        transfersContainer.initializeBehavior(anchorView = balanceDetailContainer)
+        transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
 
         transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
 
