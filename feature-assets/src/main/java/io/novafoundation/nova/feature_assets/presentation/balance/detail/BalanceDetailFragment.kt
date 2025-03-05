@@ -64,7 +64,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         hideKeyboard()
 
         balanceDetailBack.applyBarMargin()
-        balanceDetailTokenName.applyBarMargin()
 
         transfersContainer.initializeBehavior(anchorView = balanceDetailContainer)
 
