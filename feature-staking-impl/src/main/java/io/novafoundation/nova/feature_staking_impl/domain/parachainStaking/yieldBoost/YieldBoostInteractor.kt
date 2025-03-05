@@ -94,7 +94,8 @@ class RealYieldBoostInteractor(
         return YieldBoostParameters(
             yearlyReturns = PeriodReturns(
                 gainFraction = apy,
-                gainAmount = apy * amount
+                gainAmount = apy * amount,
+                isCompound = true
             ),
             periodInDays = optimalAutomationResponse.period
         )

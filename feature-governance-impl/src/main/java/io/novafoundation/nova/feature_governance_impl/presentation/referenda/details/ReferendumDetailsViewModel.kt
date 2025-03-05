@@ -57,6 +57,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDApp
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
@@ -111,6 +112,7 @@ class ReferendumDetailsViewModel(
     private val validationExecutor: ValidationExecutor,
     private val updateSystem: UpdateSystem,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    val shareReferendumMixin: ShareReferendumMixin
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -280,6 +282,17 @@ class ReferendumDetailsViewModel(
         ) {
             val votePayload = SetupVotePayload(payload.referendumId)
             router.openSetupReferendumVote(votePayload)
+        }
+    }
+
+    fun shareButtonClicked() {
+        launch {
+            val selectedOption = selectedAssetSharedState.selectedOption()
+            shareReferendumMixin.shareReferendum(
+                payload.referendumId,
+                selectedOption.assetWithChain.chain,
+                selectedOption.additional.governanceType
+            )
         }
     }
 

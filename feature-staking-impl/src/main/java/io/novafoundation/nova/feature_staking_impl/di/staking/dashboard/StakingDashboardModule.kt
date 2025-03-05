@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Tot
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -68,8 +69,16 @@ class StakingDashboardModule {
         stakingDashboardCache: StakingDashboardCache,
         nominationPoolBalanceRepository: NominationPoolStateRepository,
         poolAccountDerivation: PoolAccountDerivation,
-        storageCache: StorageCache
-    ) = StakingDashboardUpdaterFactory(stakingDashboardCache, remoteStorageSource, nominationPoolBalanceRepository, poolAccountDerivation, storageCache)
+        storageCache: StorageCache,
+        balanceLocksRepository: BalanceLocksRepository,
+    ) = StakingDashboardUpdaterFactory(
+        stakingDashboardCache = stakingDashboardCache,
+        remoteStorageSource = remoteStorageSource,
+        nominationPoolBalanceRepository = nominationPoolBalanceRepository,
+        poolAccountDerivation = poolAccountDerivation,
+        storageCache = storageCache,
+        balanceLocksRepository = balanceLocksRepository
+    )
 
     @Provides
     @FeatureScope

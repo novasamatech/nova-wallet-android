@@ -1,4 +1,4 @@
-@file:Suppress("NOTHING_TO_INLINE")
+@file:Suppress("NOTHING_TO_INLINE", "DeprecatedCallableAddReplaceWith")
 
 package io.novafoundation.nova.common.utils
 
@@ -44,12 +44,17 @@ value class Percent(val value: Double) : Comparable<Percent> {
     }
 }
 
+@Deprecated("Use Fraction instead")
 inline fun BigDecimal.asPerbill(): Perbill = Perbill(this.toDouble())
 
+@Deprecated("Use Fraction instead")
 inline fun Double.asPerbill(): Perbill = Perbill(this)
 
+@Deprecated("Use Fraction instead")
 inline fun Double.asPercent(): Percent = Percent(this)
 
+@Deprecated("Use Fraction instead")
 inline fun Perbill.toPercent(): Percent = Percent(value * 100)
 
+@Deprecated("Use Fraction instead")
 inline fun Perbill?.orZero(): Perbill = this ?: Perbill(0.0)

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct
 
-import io.novafoundation.nova.common.utils.asPerbill
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
@@ -22,7 +22,7 @@ data class DirectStakingSelection(
     override val stake: Balance,
 ) : StartMultiStakingSelection {
 
-    override val apy = validators.mapNotNull { it.electedInfo?.apy?.asPerbill() }
+    override val apy = validators.mapNotNull { it.electedInfo?.apy?.fractions }
         .maxOrNull()
 
     override fun ExtrinsicBuilder.startStaking(metaAccount: MetaAccount) {
