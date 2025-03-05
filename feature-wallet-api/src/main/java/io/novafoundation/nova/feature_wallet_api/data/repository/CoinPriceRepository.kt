@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.data.repository
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import retrofit2.HttpException
 import kotlin.jvm.Throws

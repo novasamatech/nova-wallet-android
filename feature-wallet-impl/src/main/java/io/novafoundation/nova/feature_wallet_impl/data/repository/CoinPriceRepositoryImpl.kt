@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataS
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PriceChartPeriod
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
