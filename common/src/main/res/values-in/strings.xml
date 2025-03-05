@@ -928,6 +928,18 @@
     <string name="pre_configured_networks_progress_text">Memuat daftar jaringan...</string>
     <string name="pre_configured_networks_search_hint">Cari berdasarkan nama jaringan</string>
     <string name="pre_configured_networks_title">Tambahkan jaringan</string>
+    <string name="price_chart_date_format" formatted="false">%s pada %s</string>
+    <string name="price_chart_day">1H</string>
+    <string name="price_chart_max">Semua</string>
+    <string name="price_chart_month">1B</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">harga %s</string>
+    <string name="price_chart_week">1M</string>
+    <string name="price_chart_year">1T</string>
+    <string name="price_charts_period_all">Sepanjang Masa</string>
+    <string name="price_charts_period_month">Bulan Lalu</string>
+    <string name="price_charts_period_week">Minggu Lalu</string>
+    <string name="price_charts_period_year">Tahun Lalu</string>
     <string name="profile_accounts_title">Akun</string>
     <string name="profile_accounts_title_2_0">Dompet</string>
     <string name="profile_language_title">Bahasa</string>
