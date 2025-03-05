@@ -75,7 +75,15 @@ class RealMythosCollatorProvider @Inject constructor(
     private suspend fun MythosCollatorSource.requestedCollatorIds(chainId: ChainId): Collection<AccountIdKey> {
         return when (this) {
             is MythosCollatorSource.Custom -> collatorIds
-            MythosCollatorSource.ElectedCandidates -> mythosSharedComputation.get().sessionValidators(chainId)
+            MythosCollatorSource.ElectedCandidates -> getElectedCandidates(chainId)
         }
+    }
+
+    context(ComputationalScope)
+    private suspend fun getElectedCandidates(chainId: ChainId): Collection<AccountIdKey> {
+        val sessionValidators = mythosSharedComputation.get().sessionValidators(chainId)
+        val invulnerables = mythosSharedComputation.get().getInvulnerableCollators(chainId)
+
+        return sessionValidators - invulnerables
     }
 }

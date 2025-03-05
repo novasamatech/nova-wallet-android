@@ -7,11 +7,13 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindPercentFra
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.collatorStaking
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.Invulnerables
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythCandidateInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindDelegationInfo
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindInvulnerables
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindMythCandidateInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindMythReleaseQueues
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.bindUserStakeInfo
@@ -51,6 +53,10 @@ val CollatorStakingRuntimeApi.extraReward: QueryableStorageEntry0<Balance>
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.collatorRewardPercentage: QueryableStorageEntry0<Fraction>
     get() = storage0("CollatorRewardPercentage", binding = ::bindPercentFraction)
+
+context(RuntimeContext)
+val CollatorStakingRuntimeApi.invulnerables: QueryableStorageEntry0<Invulnerables>
+    get() = storage0("Invulnerables", binding = ::bindInvulnerables)
 
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.candidates: QueryableStorageEntry1<AccountIdKey, MythCandidateInfo>
