@@ -48,8 +48,6 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupChartUI() {
-        val chartUIParams = getSharedChartUIParams(context)
-
         chart.setBackgroundColor(Color.TRANSPARENT)
         chart.setDrawGridBackground(false)
         chart.setDrawBorders(false)
@@ -107,7 +105,6 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChartWithSelectedEntry(entry: Entry) {
-        val chartUIParams = getSharedChartUIParams(context)
         val (entriesBefore, entriesAfter) = currentEntries.partition { it.x <= entry.x }
 
         val entriesColor = currentEntries.getColorResForEntries()
@@ -126,7 +123,6 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun updateChart() {
-        val chartUIParams = getSharedChartUIParams(context)
         chart.priceChartRenderer().apply {
             setDotPoint(null)
             setDotColor(null)
