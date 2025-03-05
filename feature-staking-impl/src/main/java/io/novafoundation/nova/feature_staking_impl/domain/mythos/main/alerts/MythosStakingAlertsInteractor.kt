@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.hasInactiveCollators
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.totalRedeemable
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.SessionValidators
@@ -54,10 +55,10 @@ class RealMythosStakingAlertsInteractor @Inject constructor(
     }
 
     private fun changeCollatorsAlert(context: AlertCalculationContext): MythosStakingAlert.ChangeCollator? {
-        val selectedCollators = context.delegationState.userStakeInfo.candidates
-        val activeCollators = context.sessionValidators.toSet()
+        val userStakeInfo = context.delegationState.userStakeInfo
+        val sessionValidators = context.sessionValidators
 
-        val hasInactiveCollators = selectedCollators.any { it !in activeCollators }
+        val hasInactiveCollators = userStakeInfo.hasInactiveCollators(sessionValidators)
 
         return MythosStakingAlert.ChangeCollator.takeIf { hasInactiveCollators }
     }

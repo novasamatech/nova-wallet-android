@@ -105,7 +105,7 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean) {
-        priceTextInjector?.format(selectedEntry.y, priceChartCurrentPrice)
+        priceTextInjector?.format(selectedEntry.y, priceChartCurrentPrice, isEntrySelected)
         priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, priceChartPriceChange)
         dateTextInjector?.format(selectedEntry.x.roundToLong(), isEntrySelected, priceChartDate, charts[selectedChartIndex])
     }

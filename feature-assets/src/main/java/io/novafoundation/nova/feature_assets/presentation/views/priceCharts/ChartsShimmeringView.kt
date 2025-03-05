@@ -17,7 +17,7 @@ class ChartsShimmeringView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : View(context, attrs, defStyle) {
 
-    private val chartUIParams = getSharedChartUIParams(context)
+    private val chartUIParams = ChartUIParams.default(context)
 
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         .apply {

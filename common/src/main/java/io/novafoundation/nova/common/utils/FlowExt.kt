@@ -69,6 +69,13 @@ inline fun <T, R> Flow<Result<T>>.mapResult(crossinline mapper: suspend (T) -> R
     result.map { item -> mapper(item) }
 }
 
+/**
+ * Maps nullable values by transforming non-null values and  propagating null to downstream
+ */
+inline fun <T : Any, R : Any> Flow<T?>.mapOptional(crossinline mapper: suspend (T) -> R?): Flow<R?> = map { result ->
+    result?.let { mapper(it) }
+}
+
 inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
     list.mapNotNull { item -> mapper(item) }
 }

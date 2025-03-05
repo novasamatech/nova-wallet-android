@@ -19,10 +19,18 @@ class UserStakeInfo(
     val maybeLastRewardSession: SessionIndex?
 )
 
-fun UserStakeInfo.hasActiveValidators(sessionValidators: SessionValidators): Boolean {
-    val validatorSet = sessionValidators.toSet()
+fun UserStakeInfo.hasActiveCollators(sessionValidators: SessionValidators): Boolean {
+    return candidates.any { it in sessionValidators }
+}
 
-    return candidates.any { it in validatorSet }
+fun UserStakeInfo.hasInactiveCollators(sessionValidators: SessionValidators): Boolean {
+    return candidates.any { it !in sessionValidators }
+}
+
+@JvmName("hasActiveCollatorsOrFalse")
+fun UserStakeInfo?.hasActiveCollators(sessionValidators: SessionValidators): Boolean {
+    if (this == null) return false
+    return hasActiveCollators(sessionValidators)
 }
 
 class LastUnstake(
