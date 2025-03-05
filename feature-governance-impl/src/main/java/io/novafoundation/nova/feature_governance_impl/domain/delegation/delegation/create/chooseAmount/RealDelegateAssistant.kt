@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Ch
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
@@ -21,7 +22,7 @@ class RealDelegateAssistant(
     private val voteLockingPeriod: BlockNumber,
     private val balanceLocks: List<BalanceLock>,
     private val blockDurationEstimator: BlockDurationEstimator,
-    private val votingLockId: String,
+    private val votingLockId: BalanceLockId,
 ) : DelegateAssistant {
 
     private val currentMaxGovernanceLocked = balanceLocks.findById(votingLockId)?.amountInPlanks.orZero()

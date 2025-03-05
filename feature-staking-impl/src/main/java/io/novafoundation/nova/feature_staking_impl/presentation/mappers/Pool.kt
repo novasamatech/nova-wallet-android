@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatAsSpannable
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatPercents
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.model.NominationPool
@@ -35,8 +36,8 @@ private fun getSubtitle(
     resourceManager: ResourceManager,
 ): CharSequence {
     val apyColor = resourceManager.getColor(R.color.text_positive)
-    val apy = pool.apy ?: 0.0.asPerbill()
-    val apyString = apy.format().toSpannable(colorSpan(apyColor))
+    val apy = pool.apy.orZero()
+    val apyString = apy.formatPercents().toSpannable(colorSpan(apyColor))
     return resourceManager.getString(R.string.common_per_year_format)
         .formatAsSpannable(apyString)
 }

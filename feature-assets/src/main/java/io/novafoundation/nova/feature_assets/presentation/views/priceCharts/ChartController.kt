@@ -25,9 +25,20 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private val chartUIParams = ChartUIParams.default(context)
 
     private var currentEntries: List<Entry> = emptyList()
+    private var useNeutralColor = false
 
     init {
         setupChartUI()
+    }
+
+    fun showYAxis(show: Boolean) {
+        chart.axisRight.setDrawLabels(show)
+        chart.invalidate()
+    }
+
+    fun useNeutralColor(useNeutral: Boolean) {
+        this.useNeutralColor = useNeutral
+        updateChart()
     }
 
     fun setEntries(entries: List<Entry>) {
@@ -143,6 +154,8 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private fun LineChart.priceChartRenderer() = priceChart.renderer as PriceChartRenderer
 
     private fun List<Entry>.getColorResForEntries(): Int {
+        if (useNeutralColor) return R.color.neutral_price_chart_line
+
         return if (isBullish()) R.color.positive_price_chart_line else R.color.negative_price_chart_line
     }
 

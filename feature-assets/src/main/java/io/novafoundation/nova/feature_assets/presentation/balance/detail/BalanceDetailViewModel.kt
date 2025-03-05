@@ -258,7 +258,7 @@ class BalanceDetailViewModel(
     ): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
-                mapBalanceIdToUi(resourceManager, it.id),
+                mapBalanceIdToUi(resourceManager, it.id.value),
                 mapAmountToAmountModel(it.amountInPlanks, asset)
             )
         }

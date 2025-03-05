@@ -13,6 +13,8 @@ class SelectCollatorSettingsInterScreenCommunicatorImpl(navigationHoldersRegistr
     NavStackInterScreenCommunicator<Request, Response>(navigationHoldersRegistry) {
 
     override fun openRequest(request: Request) {
+        super.openRequest(request)
+
         val bundle = SelectCollatorSettingsFragment.getBundle(request.currentConfig)
         navController.navigate(R.id.action_selectCollatorFragment_to_selectCollatorSettingsFragment, bundle)
     }
