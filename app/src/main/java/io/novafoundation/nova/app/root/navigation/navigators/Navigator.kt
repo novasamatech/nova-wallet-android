@@ -437,15 +437,18 @@ class Navigator(
     }
 
     override fun openNovaCard() {
-        performNavigation(R.id.action_open_novaCard)
+        navigationBuilder().action(R.id.action_open_novaCard)
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishTopUpFlowAndAwaitCardCreation() {
-        performNavigation(R.id.action_finish_top_up_flow)
+        navigationBuilder().action(R.id.action_finish_top_up_flow)
+            .navigateInFirstAttachedContext()
     }
 
     override fun openAwaitingCardCreation() {
-        performNavigation(R.id.action_open_awaiting_card_creation)
+        navigationBuilder().action(R.id.action_open_awaiting_card_creation)
+            .navigateInFirstAttachedContext()
     }
 
     override fun openSendNetworks(payload: NetworkFlowPayload) {
@@ -491,11 +494,14 @@ class Navigator(
     }
 
     override fun openTopUpCard(payload: TopUpCardPayload) {
-        navController?.navigate(R.id.action_open_topUpCard, TopUpCardFragment.getBundle(payload))
+        navigationBuilder().action(R.id.action_open_topUpCard)
+            .setArgs(TopUpCardFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
     }
 
     override fun closeTopUp() {
-        navController?.navigate(R.id.action_close_top_up_with_browser)
+        navigationBuilder().action(R.id.action_close_top_up_with_browser)
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {

@@ -75,11 +75,6 @@ class ChooseAmountInputView @JvmOverloads constructor(
     fun setFiatAmount(priceAmount: CharSequence?) {
         chooseAmountInputFiat.setTextOrHide(priceAmount)
     }
-
-    override fun setEnabled(enabled: Boolean) {
-        amountInput.isEnabled = enabled
-        super.setEnabled(enabled)
-    }
 }
 
 fun ChooseAmountInputView.setChooseAmountInputModel(model: ChooseAmountInputModel) {

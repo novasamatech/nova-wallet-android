@@ -70,11 +70,6 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountMaxButton.setMaxActionAvailability(availability)
     }
 
-    override fun setEnabled(enabled: Boolean) {
-        chooseAmountInput.isEnabled = enabled
-        super.setEnabled(enabled)
-    }
-
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ChooseAmountView) {
         isEnabled = it.getBoolean(R.styleable.ChooseAmountView_android_enabled, true)
 

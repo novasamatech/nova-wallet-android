@@ -82,11 +82,10 @@ class TopUpCardViewModel(
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceLabel = R.string.wallet_balance_transferable,
-        balanceField = Asset::transferable,
+        maxActionProvider = null
     )
 
-    val feeMixin = feeLoaderMixinFactory.createDefault<SubmissionFee>(this, chainAssetFlow)
+    val feeMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
 
     val titleFlow = chainAssetFlow.map {
         resourceManager.getString(R.string.fragment_top_up_card_title, it.symbol)

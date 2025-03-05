@@ -164,7 +164,7 @@ class BalanceListFragment :
             headerAdapter.setNovaCardText(it)
         }
 
-        viewModel.assetViewModeModelFlow.observe { headerAdapter.setAssetViewModeModel(it) }
+        viewModel.assetViewModeModelFlow.observe { manageAssetsAdapter.setAssetViewModeModel(it) }
     }
 
     override fun assetClicked(asset: Chain.Asset) {

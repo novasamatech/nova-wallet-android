@@ -13,7 +13,6 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNovaCard
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListSearch
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
@@ -160,7 +159,7 @@ class HeaderHolder(
         addressModel: SelectedWalletModel?,
         nftCount: String?,
         nftPreviews: List<NftPreviewUi>?,
-        walletConnect: WalletConnectSessionsModel?
+        walletConnect: WalletConnectSessionsModel?,
         novaCardText: CharSequence?,
     ) {
         bindTotalBalance(totalBalance)
