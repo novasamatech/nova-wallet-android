@@ -27,6 +27,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -141,6 +142,12 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
             resourceManager.formatDate(time)
         }
     }
+}
+
+fun Date.isThisYear(): Boolean {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = time
+    return calendar.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)
 }
 
 fun ResourceManager.formatTime(data: Date): String {
