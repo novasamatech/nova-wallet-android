@@ -12,31 +12,26 @@
         android:layout_height="match_parent"
         android:background="@drawable/drawable_background_image">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            android:paddingBottom="126dp">
+            android:orientation="vertical"
+            tools:context=".presentation.balance.list.BalanceListFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/balanceDetailContent"
+                android:id="@+id/balanceDetailsToolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="16dp"
-                tools:context=".presentation.balance.list.BalanceListFragment">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/balanceDetailBlur"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:background="@color/blur_navigation_background"
-                    app:layout_constraintBottom_toBottomOf="@+id/balanceDetailBalanceBottomMargin"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/balanceDetailBack"
@@ -56,12 +51,12 @@
                     android:layout_height="24dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_token_ksm"
-                    app:layout_constraintBottom_toBottomOf="@+id/balanceDetailTokenName"
+                    app:layout_constraintBottom_toBottomOf="@+id/balanceDetailBack"
                     app:layout_constraintEnd_toStartOf="@+id/balanceDetailTokenName"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenName" />
+                    app:layout_constraintTop_toTopOf="@+id/balanceDetailBack" />
 
                 <TextView
                     android:id="@+id/balanceDetailTokenName"
@@ -69,58 +64,70 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:layout_marginTop="26dp"
                     android:includeFontPadding="false"
                     android:textColor="@color/text_primary"
+                    app:layout_constraintBottom_toBottomOf="@+id/balanceDetailTokenIcon"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/balanceDetailTokenIcon"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenIcon"
                     tools:text="KSM" />
-
-            <Space
-                android:id="@+id/balanceDetailBalanceBottomMargin"
-                android:layout_width="wrap_content"
-                android:layout_height="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/balanceDetailTokenIcon" />
-
-                <io.novafoundation.nova.feature_assets.presentation.balance.detail.AssetDetailBalancesView
-                    android:id="@+id/balanceDetailsBalances"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginEnd="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/balanceDetailBlur"
-                    app:title="@string/wallet_your_balance" />
-
-            <io.novafoundation.nova.feature_assets.presentation.balance.assetActions.AssetActionsView
-                android:id="@+id/balanceDetailActions"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/asset_height"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/balanceDetailsBalances" />
-
-                <io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartsView
-                    android:id="@+id/priceChartView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_block_container"
-                    android:padding="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/balanceDetailActions" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </ScrollView>
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingBottom="126dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/balanceDetailContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="16dp"
+                    tools:context=".presentation.balance.list.BalanceListFragment">
+
+                    <io.novafoundation.nova.feature_assets.presentation.balance.detail.AssetDetailBalancesView
+                        android:id="@+id/balanceDetailsBalances"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:title="@string/wallet_your_balance" />
+
+                    <io.novafoundation.nova.feature_assets.presentation.balance.assetActions.AssetActionsView
+                        android:id="@+id/balanceDetailActions"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/asset_height"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/balanceDetailsBalances" />
+
+                    <io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartsView
+                        android:id="@+id/priceChartView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_block_container"
+                        android:padding="16dp"
+                        app:layout_constraintTop_toBottomOf="@id/balanceDetailActions" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <io.novafoundation.nova.feature_assets.presentation.transaction.history.TransferHistorySheet

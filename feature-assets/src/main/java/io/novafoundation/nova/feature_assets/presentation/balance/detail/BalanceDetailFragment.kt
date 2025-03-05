@@ -66,7 +66,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         balanceDetailBack.applyBarMargin()
         balanceDetailTokenName.applyBarMargin()
 
-        transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
+        transfersContainer.initializeBehavior(anchorView = balanceDetailContainer)
 
         transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
 
