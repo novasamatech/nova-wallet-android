@@ -28,7 +28,6 @@ import kotlinx.android.synthetic.main.view_price_charts.view.priceChartPriceChan
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartShimmering
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChartTitle
 import kotlin.math.roundToLong
-import kotlin.math.sin
 
 sealed class PriceChartModel(val buttonText: String) {
 
