@@ -38,6 +38,7 @@ interface GlobalScopeUpdater : Updater<Unit> {
 interface Updater<V> : SideEffectScope {
 
     val requiredModules: List<String>
+        get() = emptyList()
 
     val scope: UpdateScope<V>
 

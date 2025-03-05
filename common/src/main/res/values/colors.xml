@@ -4,7 +4,7 @@
     <color name="address_icon_background">#eeeeee</color>
     <color name="qr_code_background">#FFFFFF</color>
     <color name="qr_code_content">#101014</color>
-    
+
     <color name="timeline_circle_color">#373A49</color>
     <color name="timeline_line_color">#3DFFFFFF</color>
 
@@ -52,6 +52,7 @@
 
     <!-- Icon Colors -->
     <color name="icon_primary">#E0FFFFFF</color>
+    <color name="icon_primary_on_content">#05081C</color>
     <color name="icon_secondary">#52FFFFFF</color>
     <color name="icon_inactive">#29FFFFFF</color>
     <color name="chip_icon">#7AFFFFFF</color>
@@ -62,6 +63,7 @@
     <color name="icon_negative">#E53450</color>
     <color name="icon_favorite">#E53450</color>
     <color name="icon_positive">#2FC864</color>
+    <color name="mimi_icon_favorite">#8E8F9A</color>
 
     <!-- Background Colors -->
     <color name="secondary_screen_background">#08090E</color>
@@ -79,6 +81,8 @@
     <color name="segmented_background">#5208090E</color>
     <color name="segmented_background_on_black">#1A999EC7</color>
     <color name="cloud_backup_button_background">#FFFFFF</color>
+    <color name="selected_dapp_category">#E0FFFFFF</color>
+    <color name="android_history_background">#1E223C</color>
 
     <color name="segmented_tab_active">#3D999EC7</color>
     <color name="switch_background">#3D999EC7</color>
@@ -89,6 +93,7 @@
     <color name="critical_update_chip_background">#1FEDCE36</color>
     <color name="major_update_chip_background">#1F2AB0F2</color>
     <color name="blur_navigation_background">#66151D27</color>
+    <color name="dapp_blur_navigation_background">#CC151D27</color>
     <color name="solid_navigation_background">#0F111A</color>
     <color name="dim_background">#7A08090E</color>
     <color name="waiting_status_background">#3D999EC7</color>
@@ -148,8 +153,12 @@
     <color name="voting_slider_knob_shadow">#B8000000</color>
     <color name="votes_to_pass_indicator_shadow">#B8000000</color>
 
-
     <color name="notification_preview_1_layer_background">#3B3E4E</color>
     <color name="notification_preview_2_layer_background">#252733</color>
     <color name="notification_preview_3_layer_background">#1D1D28</color>
+
+    <color name="price_chart_grid_line">#29999EC7</color>
+    <color name="neutral_price_chart_line">#454968</color>
+    <color name="positive_price_chart_line">#2FC864</color>
+    <color name="negative_price_chart_line">#E53450</color>
 </resources>

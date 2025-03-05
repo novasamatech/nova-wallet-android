@@ -9,7 +9,6 @@
         android:id="@+id/ConfirmSignExtrinsicFragment"
         android:name="io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic.ExternalSignFragment"
         android:label="ConfirmSignExtrinsicFragment"
-        app:useAdd="true"
         tools:layout="@layout/fragment_confirm_sign_extrinsic">
 
         <action

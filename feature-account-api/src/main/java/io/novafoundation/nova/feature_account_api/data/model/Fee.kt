@@ -2,9 +2,8 @@ package io.novafoundation.nova.feature_account_api.data.model
 
 import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigDecimal
@@ -30,11 +29,15 @@ val SubmissionFee.submissionFeesPayer: AccountId
  * Fee that doesn't have a particular origin
  * For example, fees paid during cross chain transfers do not have a specific account that pays them
  */
-interface FeeBase {
+interface FeeBase : MaxAvailableDeduction {
 
     val amount: BigInteger
 
     val asset: Chain.Asset
+
+    override fun maxAmountDeductionFor(amountAsset: Chain.Asset): BigInteger {
+        return if (amountAsset.fullId == asset.fullId) amount else BigInteger.ZERO
+    }
 }
 
 val FeeBase.decimalAmount: BigDecimal
@@ -103,11 +106,4 @@ fun SubmissionFee.getAmountByExecutingAccount(chainAsset: Chain.Asset): BigInteg
 
 fun FeeBase.getAmount(expectedAsset: Chain.Asset): BigInteger {
     return if (expectedAsset.fullId == asset.fullId) amount else BigInteger.ZERO
-}
-
-fun FeePaymentCurrency.toFeePaymentAsset(chain: Chain): Chain.Asset {
-    return when (this) {
-        is FeePaymentCurrency.Asset -> asset
-        FeePaymentCurrency.Native -> chain.utilityAsset
-    }
 }

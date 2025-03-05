@@ -32,13 +32,15 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanc
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
+import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
+import io.novafoundation.nova.feature_banners_api.presentation.source.assetsSource
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -65,6 +67,8 @@ private typealias SyncAction = suspend (MetaAccount) -> Unit
 
 @OptIn(ExperimentalTime::class)
 class BalanceListViewModel(
+    private val promotionBannersMixinFactory: PromotionBannersMixinFactory,
+    private val bannerSourceFactory: BannersSourceFactory,
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
@@ -83,6 +87,8 @@ class BalanceListViewModel(
 
     private val _showBalanceBreakdownEvent = MutableLiveData<Event<TotalBalanceBreakdownModel>>()
     val showBalanceBreakdownEvent: LiveData<Event<TotalBalanceBreakdownModel>> = _showBalanceBreakdownEvent
+
+    val bannersMixin = promotionBannersMixinFactory.create(bannerSourceFactory.assetsSource(), viewModelScope)
 
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
         .inBackground()
@@ -309,16 +315,6 @@ class BalanceListViewModel(
 
     fun buyClicked() {
         router.openBuyFlow()
-    }
-
-    fun crowdloanBannerClicked() {
-        router.openStaking()
-
-        hideCrowdloanBanner()
-    }
-
-    fun crowdloanBannerCloseClicked() {
-        hideCrowdloanBanner()
     }
 
     fun swapClicked() {

@@ -33,6 +33,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInt
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
@@ -42,6 +44,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.filter.His
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -50,7 +53,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFormatter
@@ -166,12 +169,14 @@ class AssetsFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         operationsDao: OperationDao,
         coinPriceRepository: CoinPriceRepository,
-        poolAccountDerivation: PoolAccountDerivation
+        poolAccountDerivation: PoolAccountDerivation,
+        mythosMainPotMatcherFactory: MythosMainPotMatcherFactory,
     ): TransactionHistoryRepository = RealTransactionHistoryRepository(
         assetSourceRegistry = assetSourceRegistry,
         operationDao = operationsDao,
         coinPriceRepository = coinPriceRepository,
-        poolAccountDerivation = poolAccountDerivation
+        poolAccountDerivation = poolAccountDerivation,
+        mythosMainPotMatcherFactory = mythosMainPotMatcherFactory
     )
 
     @Provides
@@ -224,5 +229,14 @@ class AssetsFeatureModule {
             assetsViewModeRepository,
             amountFormatter
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideChartsInteractor(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ChartsInteractor {
+        return RealChartsInteractor(coinPriceRepository, currencyRepository)
     }
 }

@@ -21,11 +21,15 @@ interface Preferences {
 
     fun putInt(field: String, value: Int)
 
+    fun putStringSet(field: String, value: Set<String>?)
+
     fun getInt(field: String, defaultValue: Int): Int
 
     fun putLong(field: String, value: Long)
 
     fun getLong(field: String, defaultValue: Long): Long
+
+    fun getStringSet(field: String): Set<String>
 
     fun getCurrentLanguage(): Language?
 
@@ -42,6 +46,11 @@ interface Preferences {
         field: String,
         defaultValue: Boolean
     ): Flow<Boolean>
+
+    fun stringSetFlow(
+        field: String,
+        initialValueProducer: InitialValueProducer<Set<String>>? = null
+    ): Flow<Set<String>?>
 
     fun keyFlow(key: String): Flow<String>
 

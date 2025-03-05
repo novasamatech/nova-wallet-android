@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.model.getAmount
 import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxAvailableDeduction
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain
 
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
@@ -9,7 +8,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus
-import io.novafoundation.nova.feature_staking_impl.domain.model.NominatorStatus.Inactive.Reason
 import io.novafoundation.nova.feature_staking_impl.domain.model.StakeSummary
 import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
@@ -72,26 +70,13 @@ private class RelaychainStakeSummaryComponent(
         stakingState: StakingState.Stash.Nominator,
     ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeNominatorSummary(stakingState, hostContext.scope)) { status ->
         when (status) {
-            NominatorStatus.Active -> StakeStatusModel.Active(
-                details = string(R.string.staking_nominator_status_alert_active_title) to
-                    string(R.string.staking_nominator_status_alert_active_message)
-            )
+            NominatorStatus.Active -> StakeStatusModel.Active
 
-            is NominatorStatus.Inactive -> StakeStatusModel.Inactive(
-                details = when (status.reason) {
-                    Reason.MIN_STAKE -> string(R.string.staking_nominator_status_alert_inactive_title) to
-                        string(R.string.staking_nominator_status_alert_low_stake)
-
-                    Reason.NO_ACTIVE_VALIDATOR -> string(R.string.staking_nominator_status_alert_inactive_title) to
-                        string(R.string.staking_nominator_status_alert_no_validators)
-                }
-            )
+            is NominatorStatus.Inactive -> StakeStatusModel.Inactive
 
             is NominatorStatus.Waiting -> StakeStatusModel.Waiting(
                 timeLeft = status.timeLeft,
                 messageFormat = R.string.staking_nominator_status_waiting_format,
-                details = string(R.string.staking_nominator_status_waiting) to
-                    string(R.string.staking_nominator_status_alert_waiting_message)
             )
         }
     }
@@ -100,15 +85,9 @@ private class RelaychainStakeSummaryComponent(
         stakingState: StakingState.Stash.Validator
     ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeValidatorSummary(stakingState, hostContext.scope)) { status ->
         when (status) {
-            ValidatorStatus.ACTIVE -> StakeStatusModel.Active(
-                details = string(R.string.staking_nominator_status_alert_active_title) to
-                    string(R.string.staking_nominator_status_alert_active_message)
-            )
+            ValidatorStatus.ACTIVE -> StakeStatusModel.Active
 
-            ValidatorStatus.INACTIVE -> StakeStatusModel.Inactive(
-                details = string(R.string.staking_nominator_status_alert_inactive_title) to
-                    string(R.string.staking_nominator_status_alert_no_validators)
-            )
+            ValidatorStatus.INACTIVE -> StakeStatusModel.Inactive
         }
     }
 
@@ -116,10 +95,7 @@ private class RelaychainStakeSummaryComponent(
         stakingState: StakingState.Stash.None
     ): Flow<StakeSummaryState> = stakeSummaryState(stakingInteractor.observeStashSummary(stakingState, hostContext.scope)) { status ->
         when (status) {
-            StashNoneStatus.INACTIVE -> StakeStatusModel.Inactive(
-                details = string(R.string.staking_nominator_status_alert_inactive_title) to
-                    string(R.string.staking_bonded_inactive)
-            )
+            StashNoneStatus.INACTIVE -> StakeStatusModel.Inactive
         }
     }
 
@@ -135,6 +111,4 @@ private class RelaychainStakeSummaryComponent(
             status = statusMapper(summary.status),
         )
     }.withLoading()
-
-    private fun string(@StringRes stringRes: Int) = resourceManager.getString(stringRes)
 }

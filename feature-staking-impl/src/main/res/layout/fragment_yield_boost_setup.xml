@@ -38,7 +38,7 @@
                 android:textColor="@color/text_primary"
                 android:text="@string/staking_turing_collator_title" />
 
-            <io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.view.SelectCollatorView
+            <io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.view.SelectStakeTargetView
                 android:layout_width="match_parent"
                 android:id="@+id/setupYieldBoostCollator"
                 android:layout_height="wrap_content"

@@ -46,7 +46,7 @@ class EvmNativeAssetBalance(
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         // Evm native tokens do not have ED
         return BigInteger.ZERO
     }

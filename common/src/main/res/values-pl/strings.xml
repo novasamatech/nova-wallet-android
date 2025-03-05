@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Kopia zapasowa</string>
     <string name="backup_title">Kopia zapasowa</string>
     <string name="biometric_auth_title">Autoryzacja biometryczna</string>
+    <string name="browser_tabs_close_all">Zamknij wszystkie</string>
     <string name="buy_completed">Zakup zainicjowany! Proszę czekać do 60 minut. Możesz śledzić status na e-mail.</string>
     <string name="buy_network_flow_title">Wybierz sieć do kupna %s</string>
     <string name="buy_provider_open_confirmation_message">Aby kontynuować zakup, zostaniesz przekierowany z aplikacji Nova Wallet na %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Opłata transferowa</string>
     <string name="choose_amount_network_error">Sieć nie odpowiada</string>
     <string name="choose_amount_to">Do</string>
+    <string name="close_dapp_tabs_message">Wszystkie otwarte karty w przeglądarce DApp zostaną zamknięte.</string>
+    <string name="close_dapp_tabs_title">Zamknąć wszystkie DAppy?</string>
     <string name="cloud_backup_delete_action_subtitle">%s i pamiętaj, aby zawsze trzymać je w formie pisemnej, aby móc je odzyskać w każdej chwili. Możesz to zrobić w ustawieniach kopii zapasowej.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Proszę zapisz wszystkie Passphrases do swoich portfeli przed kontynuacją</string>
     <string name="cloud_backup_delete_action_title">Kopia zapasowa zostanie usunięta z Google Drive</string>
@@ -485,11 +488,12 @@
     <string name="common_sec">sek</string>
     <plurals name="common_seconds_format">
         <item quantity="one">%d sekunda</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
+        <item quantity="few">%d sekunda</item>
+        <item quantity="many">%d sekunda</item>
         <item quantity="other">%d sekund</item>
     </plurals>
     <string name="common_secret_derivation_path">Ścieżka pochodzenia sekretu</string>
+    <string name="common_see_all">Zobacz wszystkie</string>
     <string name="common_settings">Ustawienia</string>
     <string name="common_share">Udostępnij</string>
     <string name="common_sign_in">Zaloguj się</string>
@@ -654,6 +658,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Zatwierdź to żądanie, jeśli ufasz aplikacji. \nSprawdź szczegóły transakcji.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DAppy</string>
+    <string name="dapp_favorites">Ulubione</string>
     <string name="dapp_favourites">Ulubione</string>
     <string name="dapp_favourites_add">Dodaj do ulubionych</string>
     <string name="dapp_favourites_remove_description">„%s” DApp zostanie usunięty z Ulubionych</string>
@@ -773,6 +779,8 @@
         <item quantity="other">Musisz wybrać przynajmniej %d ścieżki</item>
     </plurals>
     <string name="governance_unlock">Odblokować</string>
+    <string name="high_price_impact_detacted_message">Wykonanie tej zamiany spowoduje znaczący poślizg cenowy i straty finansowe. Rozważ zmniejszenie wielkości swojego handlu lub podzielenie go na kilka transakcji.</string>
+    <string name="high_price_impact_detacted_title">Wykryto wysoki wpływ na cenę (%s)</string>
     <string name="history_v1.9.0">Historia</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Imię oficjalne</string>
@@ -939,6 +947,7 @@
     <string name="pool_inactive_failure_title">Pula nie jest otwarta</string>
     <string name="pool_staking_conflict_message">Nie możesz już używać zarówno Direct Staking, jak i Pool Staking z tego samego konta. Aby zarządzać swoim Pool Staking, najpierw musisz unstake swoje tokeny z Direct Staking.</string>
     <string name="pool_staking_conflict_title">Operacje Pool są niedostępne</string>
+    <string name="popular_dapps_title">Popularne</string>
     <string name="pre_configured_networks_add_custom_button">Dodaj sieć ręcznie</string>
     <string name="pre_configured_networks_progress_text">Ładowanie listy sieci...</string>
     <string name="pre_configured_networks_search_hint">Szukaj wg nazwy sieci</string>

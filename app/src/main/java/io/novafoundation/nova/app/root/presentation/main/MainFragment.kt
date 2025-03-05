@@ -13,7 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
-import io.novafoundation.nova.app.root.navigation.staking.StakingDashboardNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur

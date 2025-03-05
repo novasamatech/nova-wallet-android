@@ -5,18 +5,17 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkData
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.addReferendumData
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
-import io.novafoundation.nova.feature_push_notifications.presentation.handling.addReferendumData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
@@ -25,7 +24,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class NewReferendumNotificationHandler(
     private val context: Context,
-    private val configurator: DeepLinkConfigurator<ReferendumDeepLinkData>,
+    private val configurator: ReferendumDetailsDeepLinkConfigurator,
     override val chainRegistry: ChainRegistry,
     activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,

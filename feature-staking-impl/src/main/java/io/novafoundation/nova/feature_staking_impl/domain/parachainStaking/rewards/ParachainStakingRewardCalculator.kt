@@ -17,8 +17,6 @@ class ParachainStakingRewardTarget(
 
 interface ParachainStakingRewardCalculator {
 
-    fun averageApr(): BigDecimal
-
     fun maximumGain(days: Int): BigDecimal
 
     fun collatorApr(collatorIdHex: String): BigDecimal?
@@ -60,10 +58,6 @@ class RealParachainStakingRewardCalculator(
 
     private val maxApr = aprByCollator.values.maxOrNull() ?: 0.0
 
-    override fun averageApr(): BigDecimal {
-        return averageApr.toBigDecimal()
-    }
-
     override fun maximumGain(days: Int): BigDecimal {
         return (maxApr * days / DAYS_IN_YEAR).toBigDecimal()
     }
@@ -77,7 +71,8 @@ class RealParachainStakingRewardCalculator(
 
         return PeriodReturns(
             gainAmount = amount * collatorApr,
-            gainFraction = collatorApr
+            gainFraction = collatorApr,
+            isCompound = false
         )
     }
 
@@ -86,8 +81,13 @@ class RealParachainStakingRewardCalculator(
 
         return PeriodReturns(
             gainAmount = amount * averageApr,
-            gainFraction = averageApr
+            gainFraction = averageApr,
+            isCompound = false
         )
+    }
+
+    private fun averageApr(): BigDecimal {
+        return averageApr.toBigDecimal()
     }
 
     private fun calculateCollatorApr(collator: ParachainStakingRewardTarget): Double {
