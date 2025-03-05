@@ -142,11 +142,12 @@ class BalanceDetailViewModel(
         resourceManager.getString(R.string.price_chart_title, tokenName)
     }.shareInBackground()
 
-    val priceChartFormatters: Flow<PriceChartTextInjectors> = flowOf {
+    val priceChartFormatters: Flow<PriceChartTextInjectors> = assetFlow.map { asset ->
+        val lastCoinRate = asset.token.coinRate?.rate
         val currency = currencyInteractor.getSelectedCurrency()
 
         PriceChartTextInjectors(
-            RealPricePriceTextInjector(currency),
+            RealPricePriceTextInjector(currency, lastCoinRate),
             RealPriceChangeTextInjector(resourceManager, currency),
             RealDateChartTextInjector(resourceManager)
         )
