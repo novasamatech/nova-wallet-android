@@ -30,7 +30,7 @@ class RealPriceChangeTextInjector(
 
         textView.text = resourceManager.getString(
             R.string.price_chart_price_change,
-            change.toBigDecimal().formatAsCurrency(currency),
+            change.absoluteValue.toBigDecimal().formatAsCurrency(currency),
             changeInPercent.absoluteValue.toBigDecimal().formatAsPercentage() // Always absolute value to avoid negative signs
         )
 

@@ -34,7 +34,7 @@ fun Context.shareText(text: String) {
         putExtra(Intent.EXTRA_TEXT, text)
     }
 
-    startActivity(intent)
+    startActivity(Intent.createChooser(intent, null))
 }
 
 inline fun postToUiThread(crossinline action: () -> Unit) {

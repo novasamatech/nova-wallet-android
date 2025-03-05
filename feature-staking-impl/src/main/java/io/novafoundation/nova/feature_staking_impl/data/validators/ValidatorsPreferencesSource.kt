@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.validators
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.mapNotNullToSet
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -16,6 +19,14 @@ interface ValidatorsPreferencesSource {
     suspend fun getRecommendedValidatorIds(chainId: ChainId): Set<String>
 
     suspend fun getExcludedValidatorIds(chainId: ChainId): Set<String>
+}
+
+suspend fun ValidatorsPreferencesSource.getRecommendedValidatorIds(chain: Chain): Set<AccountIdKey> {
+    return getRecommendedValidatorIds(chain.id).mapToSet { chain.accountIdOf(it).intoKey() }
+}
+
+suspend fun ValidatorsPreferencesSource.getExcludedValidatorIds(chain: Chain): Set<AccountIdKey> {
+    return getExcludedValidatorIds(chain.id).mapToSet { chain.accountIdOf(it).intoKey() }
 }
 
 class RemoteValidatorsPreferencesSource(

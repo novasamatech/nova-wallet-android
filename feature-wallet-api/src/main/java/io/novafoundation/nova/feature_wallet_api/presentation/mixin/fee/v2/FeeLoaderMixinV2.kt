@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
@@ -77,7 +78,13 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
 
 typealias FeeConstructor<F> = suspend (FeePaymentCurrency) -> F?
 
-fun <F : SubmissionFee> Factory.createDefault(
+fun Factory.createDefault(
+    scope: CoroutineScope,
+    selectedChainAssetFlow: Flow<Chain.Asset>,
+    configuration: Configuration<Fee, FeeDisplay> = Configuration()
+): FeeLoaderMixinV2.Presentation<Fee, FeeDisplay> = createDefaultBy(scope, selectedChainAssetFlow, configuration)
+
+fun <F : SubmissionFee> Factory.createDefaultBy(
     scope: CoroutineScope,
     selectedChainAssetFlow: Flow<Chain.Asset>,
     configuration: Configuration<F, FeeDisplay> = Configuration()

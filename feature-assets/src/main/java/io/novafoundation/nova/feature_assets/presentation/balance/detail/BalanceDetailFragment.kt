@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsChain
 import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
+import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
 private const val KEY_TOKEN = "KEY_TOKEN"
 
@@ -65,9 +66,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         hideKeyboard()
 
         balanceDetailBack.applyBarMargin()
-        balanceDetailTokenName.applyBarMargin()
 
-        transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
+        transfersContainer.initializeBehavior(anchorView = balanceDetailContainer)
 
         transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
 

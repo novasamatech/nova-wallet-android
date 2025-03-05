@@ -12,6 +12,8 @@ interface NominationPoolsAvailableBalanceResolver {
 
     suspend fun maximumBalanceToStake(asset: Asset, fee: Balance): MaxBalanceToStake
 
+    suspend fun maximumBalanceToStake(asset: Asset): Balance
+
     class MaxBalanceToStake(val maxToStake: Balance, val existentialDeposit: Balance)
 }
 
@@ -29,5 +31,10 @@ class RealNominationPoolsAvailableBalanceResolver(
         val maxToStake = minOf(asset.transferableInPlanks, asset.balanceCountedTowardsEDInPlanks - existentialDeposit) - fee
 
         return MaxBalanceToStake(maxToStake.atLeastZero(), existentialDeposit)
+    }
+
+    override suspend fun maximumBalanceToStake(asset: Asset): Balance {
+        val existentialDeposit = walletConstants.existentialDeposit(asset.token.configuration.chainId)
+        return minOf(asset.transferableInPlanks, asset.balanceCountedTowardsEDInPlanks - existentialDeposit)
     }
 }

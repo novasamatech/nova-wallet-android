@@ -66,7 +66,7 @@ class ProxyHaveEnoughFeeValidation<P, E>(
 
         val accountData = assetBalanceSource.queryAccountBalance(chain, chainAsset, proxyAccountId(value))
 
-        val existentialDeposit = assetBalanceSource.existentialDeposit(chain, chainAsset)
+        val existentialDeposit = assetBalanceSource.existentialDeposit(chainAsset)
         val transferable = asset.transferableMode.calculateTransferable(accountData.free, accountData.frozen, accountData.reserved)
         val balanceCountedTowardsEd = asset.edCountingMode.calculateBalanceCountedTowardsEd(accountData.free, accountData.reserved)
         val balanceWithoutEd = (balanceCountedTowardsEd - existentialDeposit).atLeastZero()

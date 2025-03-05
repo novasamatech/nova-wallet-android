@@ -74,8 +74,8 @@ private class DirectStakingProperties(
         return asset.freeInPlanks
     }
 
-    override suspend fun maximumToStake(asset: Asset, fee: Balance): Balance {
-        return availableBalance(asset) - fee
+    override suspend fun maximumToStake(asset: Asset): Balance {
+        return availableBalance(asset)
     }
 
     override val recommendation: SingleStakingRecommendation = DirectStakingRecommendation(
