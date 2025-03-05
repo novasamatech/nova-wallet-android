@@ -41,9 +41,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -65,7 +64,7 @@ class StartParachainStakingViewModel(
     private val resourceManager: ResourceManager,
     validationExecutor: ValidationExecutor,
     private val validationSystem: StartParachainStakingValidationSystem,
-    feeLoaderMixin: FeeLoaderMixin.Presentation,
+    feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
@@ -91,7 +90,7 @@ class StartParachainStakingViewModel(
     assetUseCase = assetUseCase,
     resourceManager = resourceManager,
     validationExecutor = validationExecutor,
-    feeLoaderMixin = feeLoaderMixin,
+    feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
     actionAwaitableMixinFactory = actionAwaitableMixinFactory,
     recommendatorFactory = collatorRecommendatorFactory,
     selectedAssetState = selectedAssetState,
@@ -122,7 +121,7 @@ class StartParachainStakingViewModel(
     override suspend fun goNext(target: Collator, amount: BigDecimal, fee: Fee, asset: Asset) {
         val payload = StartParachainStakingValidationPayload(
             amount = amount,
-            fee = feeLoaderMixin.awaitFee(),
+            fee = fee,
             asset = assetFlow.first(),
             collator = target,
             delegatorState = logic.currentDelegatorStateFlow.first(),

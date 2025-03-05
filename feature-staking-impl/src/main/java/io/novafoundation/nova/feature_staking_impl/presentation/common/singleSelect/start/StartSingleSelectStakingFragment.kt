@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.address.WithAccountId
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -52,11 +51,10 @@ abstract class StartSingleSelectStakingFragment<T, V : StartSingleSelectStakingV
     }
 
     override fun subscribe(viewModel: V) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, startParachainStakingAmountField)
         setupParachainStakingRewardsComponent(viewModel.rewardsComponent, startParachainStakingRewards)
-        setupFeeLoading(viewModel, startParachainStakingFee)
+        setupFeeLoading(viewModel.originFeeMixin, startParachainStakingFee)
         observeHints(viewModel.hintsMixin, startParachainStakingHints)
 
         viewModel.title.observe(startParachainStakingToolbar::setTitle)

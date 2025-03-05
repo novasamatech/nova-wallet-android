@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRou
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.MythosRedeemViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 
 @Module(includes = [ViewModelModule::class])
@@ -34,7 +34,7 @@ class MythosRedeemModule {
         validationSystem: RedeemMythosValidationSystem,
         validationFailureFormatter: MythosStakingValidationFailureFormatter,
         interactor: MythosRedeemInteractor,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         externalActions: ExternalActions.Presentation,
         selectedAssetState: AnySelectedAssetOptionSharedState,
         validationExecutor: ValidationExecutor,
@@ -48,7 +48,7 @@ class MythosRedeemModule {
             validationSystem = validationSystem,
             validationFailureFormatter = validationFailureFormatter,
             interactor = interactor,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinV2Factory = feeLoaderMixinFactory,
             externalActions = externalActions,
             selectedAssetState = selectedAssetState,
             validationExecutor = validationExecutor,

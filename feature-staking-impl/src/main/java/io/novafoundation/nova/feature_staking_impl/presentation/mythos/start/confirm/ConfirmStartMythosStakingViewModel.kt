@@ -40,7 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +54,7 @@ class ConfirmStartMythosStakingViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
@@ -81,7 +81,7 @@ class ConfirmStartMythosStakingViewModel(
     addressIconGenerator = addressIconGenerator,
     selectedAccountUseCase = selectedAccountUseCase,
     resourceManager = resourceManager,
-    feeLoaderMixin = feeLoaderMixin,
+    feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
     externalActions = externalActions,
     selectedAssetState = selectedAssetState,
     validationExecutor = validationExecutor,

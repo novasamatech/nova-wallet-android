@@ -20,7 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.setup.ParachainStakingUnbondViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingUnbondModule {
@@ -36,7 +37,8 @@ class ParachainStakingUnbondModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: ParachainStakingUnbondValidationSystem,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        maxActionProviderFactory: MaxActionProviderFactory,
         delegatorStateUseCase: DelegatorStateUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -50,7 +52,8 @@ class ParachainStakingUnbondModule {
             resourceManager = resourceManager,
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            maxActionProviderFactory = maxActionProviderFactory,
             delegatorStateUseCase = delegatorStateUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,

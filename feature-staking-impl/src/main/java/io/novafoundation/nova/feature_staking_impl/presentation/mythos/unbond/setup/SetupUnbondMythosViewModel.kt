@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -32,14 +32,17 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setBlockedAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setInputBlocked
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModel
 import io.novafoundation.nova.runtime.state.chainAsset
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -57,7 +60,7 @@ class SetupUnbondMythosViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: UnbondMythosValidationSystem,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
+    private val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val delegatorStateUseCase: MythosDelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val mythosSharedComputation: MythosSharedComputation,
@@ -66,14 +69,14 @@ class SetupUnbondMythosViewModel(
     private val stakingSharedState: StakingSharedState,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
-    Retriable,
-    Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin {
+    Validatable by validationExecutor {
 
     private val validationInProgress = MutableStateFlow(false)
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .share()
+
+    private val chainAssetFlow = stakingSharedState.selectedAssetFlow()
 
     private val currentDelegatorStateFlow = mythosSharedComputation.delegatorStateFlow()
         .shareInBackground()
@@ -105,12 +108,14 @@ class SetupUnbondMythosViewModel(
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        availableBalanceFlow = stakedAmount,
-        balanceLabel = R.string.staking_main_stake_balance_staked
+        // Amount is pre-determined, so we don't show max button at all
+        maxActionProvider = null
     )
 
     val transferable = assetFlow.map(Asset::transferableAmountModel)
         .shareInBackground()
+
+    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)
 
     val buttonState = combine(
         validationInProgress,
@@ -125,10 +130,8 @@ class SetupUnbondMythosViewModel(
 
     init {
         feeLoaderMixin.connectWith(
-            inputSource = selectedCollatorIdFlow,
-            scope = this,
-            feeConstructor = { collatorId -> interactor.estimateFee(currentDelegatorStateFlow.first(), collatorId) },
-            onRetryCancelled = ::backClicked
+            inputSource1 = selectedCollatorIdFlow,
+            feeConstructor = { _, collatorId -> interactor.estimateFee(currentDelegatorStateFlow.first(), collatorId) },
         )
 
         setInitialCollator()

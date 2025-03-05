@@ -79,7 +79,7 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel>() {
     override fun subscribe(viewModel: SetupYieldBoostViewModel) {
         observeValidations(viewModel)
         setupAmountChooser(viewModel.boostThresholdChooserMixin, setupYieldBoostThreshold)
-        setupFeeLoading(viewModel, setupYieldBoostFee)
+        setupFeeLoading(viewModel.originFeeMixin, setupYieldBoostFee)
 
         viewModel.selectedCollatorModel.observe {
             setupYieldBoostCollator.setSelectedTarget(it)

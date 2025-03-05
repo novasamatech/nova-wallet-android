@@ -1,12 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.setup
 
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Retriable
+import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.findById
@@ -48,15 +52,17 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfigurationParcel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -93,27 +99,49 @@ class SetupYieldBoostViewModel(
     private val assetUseCase: AssetUseCase,
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
-    private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val collatorsUseCase: CollatorsUseCase,
     private val validationSystem: YieldBoostValidationSystem,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Retriable,
-    Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin {
+    Validatable by validationExecutor {
 
     private val validationInProgressFlow = MutableStateFlow(false)
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
-        .share()
+    private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
+        .shareInBackground()
+
+    private val chainFlow = assetWithOption.map { it.option.assetWithChain.chain }
+        .shareInBackground()
+
+    private val assetFlow = assetWithOption.map { it.asset }
+        .shareInBackground()
+
+    private val selectedChainAsset = assetFlow.map { it.token.configuration }
+        .shareInBackground()
+
+    val originFeeMixin = feeLoaderMixinFactory.createDefault(
+        this,
+        selectedChainAsset,
+        FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
+    )
+
+    override val retryEvent: MutableLiveData<Event<RetryPayload>> = originFeeMixin.retryEvent
+
+    private val maxActionProvider = maxActionProviderFactory.create(
+        viewModelScope = viewModelScope,
+        assetInFlow = assetFlow,
+        feeLoaderMixin = originFeeMixin,
+    )
 
     val boostThresholdChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable
+        maxActionProvider = maxActionProvider
     )
 
     val chooseCollatorAction = actionAwaitableMixinFactory.create<ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel>, SelectCollatorModel>()
@@ -241,10 +269,11 @@ class SetupYieldBoostViewModel(
 
     @OptIn(FlowPreview::class)
     private fun listenFee() {
-        feeLoaderMixin.connectWith(
-            inputSource = modifiedYieldBoostConfiguration.debounce(FEE_DEBOUNCE_MILLIS),
-            scope = this,
-            feeConstructor = { interactor.calculateFee(it, activeTasksFlow.first()) },
+        originFeeMixin.connectWith(
+            inputSource1 = modifiedYieldBoostConfiguration.debounce(FEE_DEBOUNCE_MILLIS),
+            feeConstructor = { feePaymentCurrency, config ->
+                interactor.calculateFee(config, activeTasksFlow.first())
+            },
         )
     }
 
@@ -337,7 +366,7 @@ class SetupYieldBoostViewModel(
         val payload = YieldBoostValidationPayload(
             collator = selectedCollatorFlow.first(),
             configuration = modifiedYieldBoostConfiguration.first(),
-            fee = feeLoaderMixin.awaitFee(),
+            fee = originFeeMixin.awaitFee(),
             activeTasks = activeTasksFlow.first(),
             asset = assetFlow.first()
         )

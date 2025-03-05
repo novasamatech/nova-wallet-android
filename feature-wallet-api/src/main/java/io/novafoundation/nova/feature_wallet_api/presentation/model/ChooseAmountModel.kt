@@ -1,17 +1,13 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.ensureSuffix
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class ChooseAmountModel(
-    val input: ChooseAmountInputModel,
-    val balanceLabel: String?,
+    val input: ChooseAmountInputModel
 )
 
 class ChooseAmountInputModel(
@@ -21,12 +17,9 @@ class ChooseAmountInputModel(
 
 internal fun ChooseAmountModel(
     asset: Asset,
-    assetIconProvider: AssetIconProvider,
-    resourceManager: ResourceManager,
-    @StringRes balanceLabelRes: Int?,
+    assetIconProvider: AssetIconProvider
 ): ChooseAmountModel = ChooseAmountModel(
-    input = ChooseAmountInputModel(asset.token.configuration, assetIconProvider),
-    balanceLabel = balanceLabelRes?.let(resourceManager::getString)?.ensureSuffix(":"),
+    input = ChooseAmountInputModel(asset.token.configuration, assetIconProvider)
 )
 
 internal fun ChooseAmountInputModel(chainAsset: Chain.Asset, assetIconProvider: AssetIconProvider): ChooseAmountInputModel = ChooseAmountInputModel(

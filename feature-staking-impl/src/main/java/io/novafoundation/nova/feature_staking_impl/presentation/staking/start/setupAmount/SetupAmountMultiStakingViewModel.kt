@@ -27,17 +27,21 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -57,7 +61,8 @@ class SetupAmountMultiStakingViewModel(
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     private val selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
     private val payload: SetupAmountMultiStakingPayload,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -77,21 +82,33 @@ class SetupAmountMultiStakingViewModel(
         assetId = payload.availableStakingOptions.assetId
     ).shareInBackground()
 
-    val availableBalance = combine(
+    private val maxStakeableBalance = combine(
         currentAssetFlow,
-        multiStakingSelectionTypeFlow
-    ) { currentAsset, multiStakingSelectionType ->
-        multiStakingSelectionType.availableBalance(currentAsset)
-    }.shareInBackground()
+        multiStakingSelectionTypeFlow,
+        currentSelectionFlow
+    ) { asset, selectionType, currentSelection ->
+        currentSelection?.properties?.maximumToStake(asset) // If selection is already known, use it directly for more precise estimation
+            ?: selectionType.maxAmountToStake(asset) // if selection is still unset (e.g. empty form), show best-effort estimation from selection type
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    private val chainAssetFlow = currentAssetFlow.map { it.token.configuration }
+        .distinctUntilChangedBy { it.fullId }
+        .shareInBackground()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
+
+    private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
+        chainAssetFlow.providingBalance(maxStakeableBalance)
+            .deductFee(feeLoaderMixin)
+    }
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = viewModelScope,
         assetFlow = currentAssetFlow,
-        availableBalanceFlow = availableBalance,
-        balanceLabel = R.string.wallet_balance_available
+        maxActionProvider = maxActionProvider
     )
-
-    private val feeLoaderMixin = feeLoaderMixinFactory.create(currentAssetFlow)
 
     private val loadingInProgressFlow = MutableStateFlow(false)
 
@@ -191,11 +208,10 @@ class SetupAmountMultiStakingViewModel(
 
     private fun runFeeUpdates() {
         feeLoaderMixin.connectWith(
-            inputSource = currentSelectionFlow
+            inputSource1 = currentSelectionFlow
                 .filterNotNull()
                 .debounce(DEBOUNCE_RATE_MILLIS.milliseconds),
-            scope = viewModelScope,
-            feeConstructor = { selection -> interactor.calculateFee(selection.selection) },
+            feeConstructor = { _, selection -> interactor.calculateFee(selection.selection) },
         )
     }
 
