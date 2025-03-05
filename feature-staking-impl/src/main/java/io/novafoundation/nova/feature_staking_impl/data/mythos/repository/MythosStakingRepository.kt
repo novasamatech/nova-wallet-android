@@ -92,7 +92,7 @@ class RealMythosStakingRepository @Inject constructor(
     }
 
     override suspend fun perBlockReward(chainId: ChainId): Balance {
-        return localStorageDataSource.query(chainId) {
+        return localStorageDataSource.query(chainId, applyStorageDefault = true) {
             metadata.collatorStaking.extraReward.queryNonNull()
         }
     }
