@@ -13,7 +13,5 @@ class DappPendingConfirmation<A : DappPendingConfirmation.Action>(
         class Authorize(val content: AuthorizeDappBottomSheet.Payload) : Action()
 
         object AcknowledgePhishingAlert : Action()
-
-        object CloseScreen : Action()
     }
 }

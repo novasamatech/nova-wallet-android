@@ -75,7 +75,7 @@ class RuntimeFilesCache(
     }
 
     private suspend fun getCacheFile(name: String): File {
-        return fileProvider.getFileInInternalCacheStorage(name)
+        return withContext(Dispatchers.IO) { fileProvider.getFileInInternalCacheStorage(name) }
     }
 
     private fun isMetadataOpaque(chainId: String): Boolean {

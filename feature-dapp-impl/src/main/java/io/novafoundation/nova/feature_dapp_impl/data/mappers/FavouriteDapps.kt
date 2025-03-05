@@ -8,7 +8,8 @@ fun mapFavouriteDAppLocalToFavouriteDApp(favouriteDAppLocal: FavouriteDAppLocal)
         FavouriteDApp(
             url = url,
             label = label,
-            icon = icon
+            icon = icon,
+            orderingIndex = orderingIndex
         )
     }
 }
@@ -18,7 +19,8 @@ fun mapFavouriteDAppToFavouriteDAppLocal(favouriteDApp: FavouriteDApp): Favourit
         FavouriteDAppLocal(
             url = url,
             label = label,
-            icon = icon
+            icon = icon,
+            orderingIndex = orderingIndex
         )
     }
 }

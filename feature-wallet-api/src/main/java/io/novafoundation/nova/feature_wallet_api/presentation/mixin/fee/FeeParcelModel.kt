@@ -62,6 +62,14 @@ fun mapFeeToParcel(fee: Fee): FeeParcelModel {
     }
 }
 
+fun Fee.toParcel(): FeeParcelModel {
+    return mapFeeToParcel(this)
+}
+
+fun FeeParcelModel.toDomain(): Fee {
+    return mapFeeFromParcel(this)
+}
+
 private fun mapSubmissionOriginToParcel(submissionOrigin: SubmissionOrigin): SubmissionOriginParcelModel {
     return with(submissionOrigin) { SubmissionOriginParcelModel(executingAccount = executingAccount, signingAccount = signingAccount) }
 }

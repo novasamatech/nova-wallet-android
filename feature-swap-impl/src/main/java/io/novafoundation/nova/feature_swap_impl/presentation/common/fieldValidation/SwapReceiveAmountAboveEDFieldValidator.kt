@@ -58,8 +58,7 @@ class SwapReceiveAmountAboveEDFieldValidator(
         return assetFlow
             .map { asset ->
                 asset?.let {
-                    val chain = chainRegistry.getChain(asset.token.configuration.chainId)
-                    val existentialDeposit = assetSourceRegistry.existentialDeposit(chain, asset.token.configuration)
+                    val existentialDeposit = assetSourceRegistry.existentialDeposit(asset.token.configuration)
                     asset to existentialDeposit
                 }
             }

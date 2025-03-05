@@ -10,6 +10,8 @@ sealed class SwapValidationFailure {
 
     object NonPositiveAmount : SwapValidationFailure()
 
+    class HighPriceImpact(val priceImpact: Fraction) : SwapValidationFailure()
+
     class InvalidSlippage(val minSlippage: Fraction, val maxSlippage: Fraction) : SwapValidationFailure()
 
     class NewRateExceededSlippage(

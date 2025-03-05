@@ -7,14 +7,16 @@ import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
 import io.novafoundation.nova.core_db.model.operation.OperationJoin
+import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationToOperationLocalDb
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.poolRewardAccountFilter
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.poolRewardAccountMatcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -64,6 +66,7 @@ class RealTransactionHistoryRepository(
     private val operationDao: OperationDao,
     private val coinPriceRepository: CoinPriceRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
+    private val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory,
 ) : TransactionHistoryRepository {
 
     override suspend fun syncOperationsFirstPage(
@@ -171,31 +174,34 @@ class RealTransactionHistoryRepository(
     ): DataPage<Operation> {
         val nonFiltered = getOperations(pageSize, pageOffset, filters, accountId, chain, chainAsset, currency)
 
-        val pageFilters = createTransactionFilters(chain)
+        val pageFilters = createTransactionFilters(chain, chainAsset)
         val filtered = nonFiltered.applyFilters(pageFilters)
 
         return DataPage(nonFiltered.nextOffset, items = filtered)
     }
 
-    private suspend fun AssetHistory.createTransactionFilters(chain: Chain): List<Filter<Operation>> {
-        val isPoolAccountFilter = poolAccountDerivation.poolRewardAccountFilter(chain.id)
+    private suspend fun AssetHistory.createTransactionFilters(chain: Chain, chainAsset: Chain.Asset): List<Filter<Operation>> {
+        val systemAccountFilterCreator = { matcher: SystemAccountMatcher? ->
+            matcher?.let { IgnoreTransfersFromSystemAccount(it, chain) }
+        }
 
         return listOfNotNull(
             IgnoreUnsafeOperations(this),
-            isPoolAccountFilter?.let { IgnorePoolRewardTransfers(it, chain) }
+            systemAccountFilterCreator(poolAccountDerivation.poolRewardAccountMatcher(chain.id)),
+            systemAccountFilterCreator(mythosMainPotMatcherFactory.create(chainAsset))
         )
     }
 
-    private class IgnorePoolRewardTransfers(
-        private val isPoolRewardAccount: Filter<AccountId>,
-        private val chain: Chain,
+    private class IgnoreTransfersFromSystemAccount(
+        private val systemAccountMatcher: SystemAccountMatcher,
+        private val chain: Chain
     ) : Filter<Operation> {
 
         override fun shouldInclude(model: Operation): Boolean {
             val operationType = model.type as? Operation.Type.Transfer ?: return true
             val accountId = chain.accountIdOrNull(operationType.sender) ?: return true
 
-            return !isPoolRewardAccount.shouldInclude(accountId)
+            return !systemAccountMatcher.isSystemAccount(accountId)
         }
     }
 

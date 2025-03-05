@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -31,6 +32,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDedu
 import io.novafoundation.nova.feature_swap_impl.domain.RealAssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.RealSwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
@@ -38,7 +40,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRate
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.RealSwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.navigation.RealSwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
@@ -104,6 +105,7 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideSwapInteractor(
+        priceImpactThresholds: PriceImpactThresholds,
         swapService: SwapService,
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
@@ -114,6 +116,7 @@ class SwapFeatureModule {
         assetsValidationContextFactory: AssetsValidationContext.Factory
     ): SwapInteractor {
         return SwapInteractor(
+            priceImpactThresholds = priceImpactThresholds,
             swapService = swapService,
             buyTokenRegistry = buyTokenRegistry,
             crossChainTransfersUseCase = crossChainTransfersUseCase,
@@ -127,8 +130,19 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun providePriceImpactFormatter(resourceManager: ResourceManager): PriceImpactFormatter {
-        return RealPriceImpactFormatter(resourceManager)
+    fun providePriceImpactThresholds() = PriceImpactThresholds(
+        lowPriceImpact = 1.percents,
+        mediumPriceImpact = 5.percents,
+        highPriceImpact = 15.percents
+    )
+
+    @Provides
+    @FeatureScope
+    fun providePriceImpactFormatter(
+        priceImpactThresholds: PriceImpactThresholds,
+        resourceManager: ResourceManager
+    ): PriceImpactFormatter {
+        return RealPriceImpactFormatter(priceImpactThresholds, resourceManager)
     }
 
     @Provides
@@ -181,12 +195,6 @@ class SwapFeatureModule {
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             accountInfoUpdaterFactory = accountInfoUpdaterFactory
         )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideMaxActionProviderFactory(): MaxActionProviderFactory {
-        return MaxActionProviderFactory()
     }
 
     @Provides

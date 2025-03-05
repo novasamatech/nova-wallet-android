@@ -12,6 +12,18 @@ class AddToFavouritesInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
 ) {
 
+    suspend fun addToFavourites(url: String, label: String, icon: String?) = withContext(Dispatchers.Default) {
+        val nextOrderingIndex = favouritesDAppRepository.getNextOrderingIndex()
+
+        val favorite = FavouriteDApp(
+            url = url,
+            label = label,
+            icon = icon,
+            orderingIndex = nextOrderingIndex
+        )
+        favouritesDAppRepository.addFavourite(favorite)
+    }
+
     suspend fun addToFavourites(favouriteDApp: FavouriteDApp) = withContext(Dispatchers.Default) {
         favouritesDAppRepository.addFavourite(favouriteDApp)
     }
@@ -26,7 +38,8 @@ class AddToFavouritesInteractor(
         FavouriteDApp(
             url = url,
             label = dAppMetadataExactMatch?.name ?: suppliedLabel ?: Urls.hostOf(url),
-            icon = dAppMetadataExactMatch?.iconLink ?: dAppMetadataBaseUrlSingleMatch?.iconLink
+            icon = dAppMetadataExactMatch?.iconLink ?: dAppMetadataBaseUrlSingleMatch?.iconLink,
+            orderingIndex = 0
         )
     }
 }

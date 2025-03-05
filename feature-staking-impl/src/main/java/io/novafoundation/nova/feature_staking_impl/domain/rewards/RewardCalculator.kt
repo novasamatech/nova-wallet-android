@@ -5,6 +5,8 @@ import java.math.BigDecimal
 class PeriodReturns(
     val gainAmount: BigDecimal,
     val gainFraction: BigDecimal,
+    // true = APY, false = APR
+    val isCompound: Boolean,
 )
 
 interface RewardCalculator {

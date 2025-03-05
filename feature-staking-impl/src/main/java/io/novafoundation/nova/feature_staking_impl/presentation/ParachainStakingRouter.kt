@@ -8,9 +8,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 
-interface ParachainStakingRouter {
+interface ParachainStakingRouter : StarkingReturnableRouter {
 
     fun openStartStaking(payload: StartParachainStakingPayload)
+
+    fun returnToStartStaking()
 
     fun openConfirmStartStaking(payload: ConfirmStartParachainStakingPayload)
 
@@ -19,12 +21,6 @@ interface ParachainStakingRouter {
     fun openCollatorDetails(payload: StakeTargetDetailsPayload)
 
     fun openWalletDetails(metaId: Long)
-
-    fun back()
-
-    fun returnToStakingMain()
-
-    fun returnToStartStaking()
 
     fun openCurrentCollators()
 

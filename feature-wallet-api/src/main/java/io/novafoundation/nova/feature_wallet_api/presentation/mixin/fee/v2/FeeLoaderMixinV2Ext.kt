@@ -28,12 +28,50 @@ suspend fun <F> FeeLoaderMixinV2<F, *>.awaitOptionalFee(): F? = fee
 
 context(BaseViewModel)
 fun <F, I1> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
-    input: Flow<I1>,
-    feeConstructor: suspend (FeePaymentCurrency, input: I1) -> F,
+    inputSource1: Flow<I1>,
+    feeConstructor: suspend (FeePaymentCurrency, input1: I1) -> F
 ) {
-    input.map { input ->
+    inputSource1.map { input1 ->
         loadFee(
-            feeConstructor = { paymentCurrency -> feeConstructor(paymentCurrency, input) },
+            feeConstructor = { paymentCurrency -> feeConstructor(paymentCurrency, input1) },
+        )
+    }
+        .inBackground()
+        .launchIn(this@BaseViewModel)
+}
+
+context(BaseViewModel)
+fun <F, I1, I2> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
+    inputSource1: Flow<I1>,
+    inputSource2: Flow<I2>,
+    feeConstructor: suspend (FeePaymentCurrency, input1: I1, input2: I2) -> F
+) {
+    combine(
+        inputSource1,
+        inputSource2
+    ) { input1, input2 ->
+        loadFee(
+            feeConstructor = { paymentCurrency -> feeConstructor(paymentCurrency, input1, input2) },
+        )
+    }
+        .inBackground()
+        .launchIn(this@BaseViewModel)
+}
+
+context(BaseViewModel)
+fun <F, I1, I2, I3> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
+    inputSource1: Flow<I1>,
+    inputSource2: Flow<I2>,
+    inputSource3: Flow<I3>,
+    feeConstructor: suspend (FeePaymentCurrency, input1: I1, input2: I2, input3: I3) -> F,
+) {
+    combine(
+        inputSource1,
+        inputSource2,
+        inputSource3
+    ) { input1, input2, input3 ->
+        loadFee(
+            feeConstructor = { paymentCurrency -> feeConstructor(paymentCurrency, input1, input2, input3) },
         )
     }
         .inBackground()

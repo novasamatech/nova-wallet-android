@@ -2,10 +2,10 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.app.root.navigation.NavigationHolder
-import io.novafoundation.nova.app.root.navigation.push.PushGovernanceSettingsCommunicatorImpl
-import io.novafoundation.nova.app.root.navigation.push.PushNotificationsNavigator
-import io.novafoundation.nova.app.root.navigation.push.PushStakingSettingsCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.push.PushGovernanceSettingsCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.push.PushNotificationsNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.push.PushStakingSettingsCommunicatorImpl
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
@@ -16,19 +16,20 @@ class PushNotificationsNavigationModule {
 
     @ApplicationScope
     @Provides
-    fun provideRouter(navigationHolder: NavigationHolder): PushNotificationsRouter = PushNotificationsNavigator(navigationHolder)
+    fun provideRouter(navigationHoldersRegistry: NavigationHoldersRegistry): PushNotificationsRouter =
+        PushNotificationsNavigator(navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun providePushGovernanceSettingsCommunicator(
         router: PushNotificationsRouter,
-        navigationHolder: NavigationHolder
-    ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PushGovernanceSettingsCommunicator = PushGovernanceSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 
     @Provides
     @ApplicationScope
     fun providePushStakingSettingsCommunicator(
         router: PushNotificationsRouter,
-        navigationHolder: NavigationHolder
-    ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHolder)
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 }

@@ -7,7 +7,7 @@ class WebViewHolder {
     var webView: WebView? = null
         private set
 
-    fun set(new: WebView) {
+    fun set(new: WebView?) {
         webView = new
     }
 

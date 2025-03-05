@@ -12,10 +12,22 @@ class NativeAssetEventDetector : AssetEventDetector {
 
     override fun detectDeposit(event: GenericEvent.Instance): DepositEvent? {
         return detectMinted(event)
+            ?: detectBalancesDeposit(event)
     }
 
     private fun detectMinted(event: GenericEvent.Instance): DepositEvent? {
         if (!event.instanceOf(Modules.BALANCES, "Minted")) return null
+
+        val (who, amount) = event.arguments
+
+        return DepositEvent(
+            destination = bindAccountId(who),
+            amount = bindNumber(amount)
+        )
+    }
+
+    private fun detectBalancesDeposit(event: GenericEvent.Instance): DepositEvent? {
+        if (!event.instanceOf(Modules.BALANCES, "Deposit")) return null
 
         val (who, amount) = event.arguments
 

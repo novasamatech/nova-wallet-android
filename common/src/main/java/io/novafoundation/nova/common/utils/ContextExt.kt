@@ -2,9 +2,12 @@ package io.novafoundation.nova.common.utils
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -31,7 +34,7 @@ fun Context.shareText(text: String) {
         putExtra(Intent.EXTRA_TEXT, text)
     }
 
-    startActivity(intent)
+    startActivity(Intent.createChooser(intent, null))
 }
 
 inline fun postToUiThread(crossinline action: () -> Unit) {
@@ -141,6 +144,16 @@ context(View)
 fun getRippleMask(
     cornerSizeDp: Int = 12,
 ) = context.getRippleMask(cornerSizeDp)
+
+fun Context.launchDeepLink(url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            .addFlags(FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "Error while running an activity", e)
+    }
+}
 
 context(View)
 fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRipple(this, mask)

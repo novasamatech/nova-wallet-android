@@ -20,6 +20,10 @@ fun mapIdentityToIdentityParcelModel(identity: OnChainIdentity): IdentityParcelM
     }
 }
 
+fun OnChainIdentity.toParcel(): IdentityParcelModel {
+    return mapIdentityToIdentityParcelModel(this)
+}
+
 fun mapIdentityParcelModelToIdentity(identity: IdentityParcelModel): OnChainIdentity {
     return with(identity) {
         if (childInfo != null) {

@@ -1,55 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/block_background"
-    tools:orientation="vertical">
+    android:orientation="vertical">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmerFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/dapp_tab_background_selected"
-                android:includeFontPadding="false"
-                android:paddingStart="12dp"
-                android:paddingTop="9dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="9dp"
-                android:text="@string/common_all"
-                android:textColor="@color/text_primary" />
-
-            <View style="@style/Widget.Nova.DappCategory.Shimmering" />
-
-            <View style="@style/Widget.Nova.DappCategory.Shimmering" />
-
-            <View style="@style/Widget.Nova.DappCategory.Shimmering" />
-        </LinearLayout>
-
-    </com.facebook.shimmer.ShimmerFrameLayout>
-
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/categorizedDappsDappsShimmer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/shimmerFrameLayout">
+        android:layout_marginTop="34dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,10 +15,17 @@
             android:gravity="center_vertical"
             android:orientation="vertical">
 
+            <View
+                android:layout_width="88dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_shimmering" />
+
             <include
                 layout="@layout/item_dapp_shimmering"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
 
             <include
                 layout="@layout/item_dapp_shimmering"
@@ -75,4 +40,40 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="34dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="88dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_shimmering" />
+
+            <include
+                layout="@layout/item_dapp_shimmering"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <include
+                layout="@layout/item_dapp_shimmering"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                layout="@layout/item_dapp_shimmering"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+</LinearLayout>

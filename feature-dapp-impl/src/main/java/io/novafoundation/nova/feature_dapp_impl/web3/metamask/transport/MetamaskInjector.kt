@@ -24,11 +24,11 @@ class MetamaskInjector(
     private val webViewScriptInjector: WebViewScriptInjector
 ) : Web3Injector {
 
-    override fun initialInject(into: WebView, extensionStore: ExtensionsStore) {
+    override fun initialInject(into: WebView) {
         webViewScriptInjector.injectJsInterface(into, jsInterface, JS_INTERFACE_NAME)
     }
 
-    override fun injectForPage(into: WebView, url: String, extensionStore: ExtensionsStore) {
+    override fun injectForPage(into: WebView, extensionStore: ExtensionsStore) {
         webViewScriptInjector.injectScript(R.raw.metamask_min, into, scriptId = "novawallet-metamask-bundle")
         injectProvider(extensionStore, into)
     }

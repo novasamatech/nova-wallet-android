@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface DAppMetadataRepository {
 
+    suspend fun isDAppsSynced(): Boolean
+
     suspend fun syncDAppMetadatas()
 
     suspend fun syncAndGetDapp(baseUrl: String): DappMetadata?
@@ -19,4 +21,12 @@ interface DAppMetadataRepository {
     suspend fun getDAppCatalog(): DappCatalog
 
     fun observeDAppCatalog(): Flow<DappCatalog>
+}
+
+suspend fun DAppMetadataRepository.getDAppIfSyncedOrSync(baseUrl: String): DappMetadata? {
+    return if (isDAppsSynced()) {
+        getDAppMetadata(baseUrl)
+    } else {
+        syncAndGetDapp(baseUrl)
+    }
 }

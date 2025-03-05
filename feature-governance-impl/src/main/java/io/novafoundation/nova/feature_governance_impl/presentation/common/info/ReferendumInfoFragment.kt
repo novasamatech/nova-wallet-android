@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.setupReferendumSharing
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoContainer
@@ -49,6 +50,8 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
     override fun initViews() {
         referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
 
+        referendumInfoToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
+
         referendumInfoProposer.setOnClickListener {
             viewModel.proposerClicked()
         }
@@ -63,6 +66,7 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
 
     override fun subscribe(viewModel: ReferendumInfoViewModel) {
         setupExternalActions(viewModel)
+        setupReferendumSharing(viewModel.shareReferendumMixin)
 
         viewModel.titleFlow.observe { referendumInfoTitle.text = it }
         viewModel.subtitleFlow.observe { referendumInfoDescription.text = it }

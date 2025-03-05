@@ -51,7 +51,7 @@ fun handleStartMultiStakingValidationFailure(
         NonPositiveAmount -> resourceManager.zeroAmount().asDefault()
 
         is AvailableBalanceGap -> {
-            val lockDisplay = mapBalanceIdToUi(resourceManager, reason.biggestLockId)
+            val lockDisplay = mapBalanceIdToUi(resourceManager, reason.biggestLockId.value)
             val currentMaxAvailable = reason.currentMaxAvailable.formatPlanks(reason.chainAsset)
             val alternativeMinStake = reason.alternativeMinStake.formatPlanks(reason.chainAsset)
 

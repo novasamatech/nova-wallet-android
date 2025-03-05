@@ -27,7 +27,7 @@ interface GovernanceRouter : ReturnableRouter {
 
     fun openReferendaFilters()
 
-    fun openDAppBrowser(initialUrl: String)
+    fun openDAppBrowser(url: String)
 
     fun openReferendumDescription(payload: DescriptionPayload)
 

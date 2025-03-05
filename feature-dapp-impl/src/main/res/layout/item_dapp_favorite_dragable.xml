@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item">
+
+    <ImageView
+        android:id="@+id/itemDraggableFavoriteDAppIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/dapp_icon_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:src="@drawable/ic_sub_id" />
+
+    <TextView
+        android:id="@+id/itemDraggableFavoriteDAppTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/itemDraggableFavoriteDAppSubtitle"
+        app:layout_constraintEnd_toStartOf="@+id/itemDraggableFavoriteDappFavoriteIcon"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/itemDraggableFavoriteDAppIcon"
+        app:layout_constraintTop_toTopOf="@+id/itemDraggableFavoriteDAppIcon"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Astar" />
+
+    <TextView
+        android:id="@+id/itemDraggableFavoriteDAppSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="@+id/itemDraggableFavoriteDAppIcon"
+        app:layout_constraintEnd_toStartOf="@+id/itemDraggableFavoriteDappFavoriteIcon"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/itemDraggableFavoriteDAppTitle"
+        app:layout_constraintTop_toBottomOf="@+id/itemDraggableFavoriteDAppTitle"
+        app:layout_goneMarginStart="0dp"
+        tools:text="Staking" />
+
+    <ImageView
+        android:id="@+id/itemDraggableFavoriteDappFavoriteIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:src="@drawable/ic_favorite_heart_filled_20"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemDraggableFavoriteDappDragHandle"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/itemDraggableFavoriteDappDragHandle"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:src="@drawable/ic_list_drag"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+</androidx.constraintlayout.widget.ConstraintLayout>

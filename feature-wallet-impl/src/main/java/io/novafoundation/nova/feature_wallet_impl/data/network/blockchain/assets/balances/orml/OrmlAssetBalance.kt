@@ -54,7 +54,7 @@ class OrmlAssetBalance(
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->
-                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime)).orEmpty()
+                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime))
                 lockDao.updateLocks(balanceLocks, metaAccount.id, chain.id, chainAsset.id)
             }
     }
@@ -63,7 +63,7 @@ class OrmlAssetBalance(
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         return chainAsset.requireOrml().existentialDeposit
     }
 

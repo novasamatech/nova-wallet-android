@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_api.data.nominationPools.pool
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.utils.Filter
+import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher
 import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -20,11 +20,11 @@ interface PoolAccountDerivation {
      */
     suspend fun derivePoolAccountsRange(numberOfPools: Int, derivationType: PoolAccountType, chainId: ChainId): Map<PoolId, AccountIdKey>
 
-    suspend fun poolAccountFilter(derivationType: PoolAccountType, chainId: ChainId): Filter<AccountId>?
+    suspend fun poolAccountMatcher(derivationType: PoolAccountType, chainId: ChainId): SystemAccountMatcher?
 }
 
-suspend fun PoolAccountDerivation.poolRewardAccountFilter(chainId: ChainId): Filter<AccountId>? {
-    return poolAccountFilter(PoolAccountDerivation.PoolAccountType.REWARD, chainId)
+suspend fun PoolAccountDerivation.poolRewardAccountMatcher(chainId: ChainId): SystemAccountMatcher? {
+    return poolAccountMatcher(PoolAccountDerivation.PoolAccountType.REWARD, chainId)
 }
 
 suspend fun PoolAccountDerivation.bondedAccountOf(poolId: PoolId, chainId: ChainId): AccountId {

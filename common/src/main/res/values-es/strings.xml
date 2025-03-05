@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Respaldar</string>
     <string name="backup_title">Respaldar</string>
     <string name="biometric_auth_title">Autenticación biométrica</string>
+    <string name="browser_tabs_close_all">Cerrar todo</string>
     <string name="buy_completed">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
     <string name="buy_network_flow_title">Seleccionar red para comprar %s</string>
     <string name="buy_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Tasa de transferencia</string>
     <string name="choose_amount_network_error">La red no responde</string>
     <string name="choose_amount_to">A</string>
+    <string name="close_dapp_tabs_message">Todas las pestañas abiertas en el navegador DApp se cerrarán.</string>
+    <string name="close_dapp_tabs_title">¿Cerrar todas las DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s y recuerda siempre mantenerlos fuera de línea para restaurarlos en cualquier momento. Puedes hacer esto en la Configuración de Respaldo.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Por favor, escribe todas las Frases de Contraseña de tu billetera antes de continuar</string>
     <string name="cloud_backup_delete_action_title">El respaldo será eliminado de Google Drive</string>
@@ -480,6 +483,7 @@
         <item quantity="other">%d segundos</item>
     </plurals>
     <string name="common_secret_derivation_path">Ruta de derivación secreta</string>
+    <string name="common_see_all">Ver todo</string>
     <string name="common_settings">Configuraciones</string>
     <string name="common_share">Compartir</string>
     <string name="common_sign_in">Iniciar sesión</string>
@@ -642,6 +646,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Apruebe esta solicitud si confía en la aplicación.\nVerifique los detalles de la transacción.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Favoritos</string>
     <string name="dapp_favourites">Favoritos</string>
     <string name="dapp_favourites_add">Agregar a favoritos</string>
     <string name="dapp_favourites_remove_description">La DApp “%s” será eliminada de Favoritos</string>
@@ -759,6 +765,8 @@
         <item quantity="other">Necesitas seleccionar al menos %d pistas</item>
     </plurals>
     <string name="governance_unlock">Desbloquear</string>
+    <string name="high_price_impact_detacted_message">Ejecutar este intercambio resultará en un deslizamiento significativo y pérdidas financieras. Considere reducir el tamaño de su transacción o dividir su operación en múltiples transacciones.</string>
+    <string name="high_price_impact_detacted_title">Impacto de precio alto detectado (%s)</string>
     <string name="history_v1.9.0">Historia</string>
     <string name="identity_email_title">Correo electrónico</string>
     <string name="identity_legal_name_title">Nombre legal</string>
@@ -923,6 +931,7 @@
     <string name="pool_inactive_failure_title">El pool no está abierto</string>
     <string name="pool_staking_conflict_message">Ya no puedes usar tanto Staking Directo como Pool Staking desde la misma cuenta. Para gestionar tu Pool Staking, primero necesitas unstakear tus tokens del Staking Directo.</string>
     <string name="pool_staking_conflict_title">Las operaciones de Pool no están disponibles</string>
+    <string name="popular_dapps_title">Populares</string>
     <string name="pre_configured_networks_add_custom_button">Agregar red manualmente</string>
     <string name="pre_configured_networks_progress_text">Cargando lista de redes...</string>
     <string name="pre_configured_networks_search_hint">Buscar por nombre de la red</string>

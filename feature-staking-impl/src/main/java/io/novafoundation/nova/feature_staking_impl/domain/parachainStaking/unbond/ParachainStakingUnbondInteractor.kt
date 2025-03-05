@@ -75,7 +75,7 @@ class RealParachainStakingUnbondInteractor(
                 collators.map { selectedCollator ->
                     UnbondingCollator(
                         selectedCollator = selectedCollator,
-                        hasPendingUnbonding = selectedCollator.collator.accountIdHex in unbondings
+                        hasPendingUnbonding = selectedCollator.target.accountIdHex in unbondings
                     )
                 }
             }

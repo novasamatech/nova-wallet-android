@@ -24,6 +24,7 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -32,6 +33,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -45,6 +47,8 @@ fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathC
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
 fun Double.ceil(): Double = kotlin.math.ceil(this)
+
+fun BigInteger.toDuration() = toLong().milliseconds
 
 @Suppress("UNCHECKED_CAST")
 inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
@@ -69,6 +73,8 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
         else -> Result.failure(transform(exception))
     }
 }
+
+fun Result<*>.coerceToUnit(): Result<Unit> = map { }
 
 @OptIn(ExperimentalTime::class)
 inline fun <R> measureExecution(label: String, function: () -> R): R {
@@ -142,6 +148,18 @@ fun ByteArray.startsWith(prefix: ByteArray): Boolean {
     return true
 }
 
+fun ByteArray.endsWith(suffix: ByteArray): Boolean {
+    if (suffix.size > size) return false
+
+    val offset = size - suffix.size
+
+    suffix.forEachIndexed { index, byte ->
+        if (get(offset + index) != byte) return false
+    }
+
+    return true
+}
+
 fun ByteArray.windowed(windowSize: Int): List<ByteArray> {
     require(windowSize > 0) {
         "Window size should be positive"
@@ -182,6 +200,9 @@ val BigDecimal.isZero: Boolean
 val BigDecimal.isPositive: Boolean
     get() = signum() > 0
 
+val BigDecimal.isNegative: Boolean
+    get() = signum() < 0
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
@@ -198,6 +219,8 @@ fun BigInteger?.orZero(): BigInteger = this ?: BigInteger.ZERO
 fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
 
 fun Double?.orZero(): Double = this ?: 0.0
+
+fun Int?.orZero(): Int = this ?: 0
 
 fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
@@ -346,6 +369,10 @@ inline fun <K, V> Map<K, V?>.filterNotNull(): Map<K, V> {
     return filterValues { it != null } as Map<K, V>
 }
 
+inline fun <K1, K2, V> Map<Pair<K1, K2>, V>.dropSecondKey(): Map<K1, V> {
+    return mapKeys { (keys, _) -> keys.first }
+}
+
 inline fun <T, R> Array<T>.tryFindNonNull(transform: (T) -> R?): R? {
     for (item in this) {
         val transformed = transform(item)
@@ -476,6 +503,11 @@ fun <T> List<T>.removed(condition: (T) -> Boolean): List<T> {
 
 fun <T> List<T>.added(toAdd: T): List<T> {
     return toMutableList().apply { add(toAdd) }
+}
+
+fun <T : Any> MutableList<T>.removeFirstOrNull(condition: (T) -> Boolean): T? {
+    val index = indexOfFirstOrNull(condition) ?: return null
+    return removeAt(index)
 }
 
 fun <T> List<T>.prepended(toPrepend: T): List<T> {
@@ -612,6 +644,12 @@ fun Date.atTheNextDay(): Date {
     return calendar.toDate()
 }
 
+fun Float.signum() = when {
+    this < 0f -> -1f
+    this > 0f -> 1f
+    else -> 0f
+}
+
 fun Calendar.toDate(): Date = Date(time.time)
 
 fun Calendar.resetDay() {
@@ -626,3 +664,12 @@ inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.(
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
+
+suspend fun <T> scopeAsync(
+    context: CoroutineContext = Dispatchers.Default,
+    block: suspend CoroutineScope.() -> T
+): Deferred<T> {
+    return coroutineScope {
+        async(context, block = block)
+    }
+}

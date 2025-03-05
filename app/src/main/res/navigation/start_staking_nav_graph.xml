@@ -27,9 +27,19 @@
             android:id="@+id/action_startStakingLandingFragment_to_staking_parachain_start_graph"
             app:destination="@id/staking_parachain_start_graph" />
 
+        <action
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            android:id="@+id/action_startStakingLandingFragment_to_staking_mythos_start_graph"
+            app:destination="@id/staking_mythos_start_graph" />
+
     </fragment>
 
     <include app:graph="@navigation/staking_parachain_start_graph" />
+
+    <include app:graph="@navigation/staking_mythos_start_graph" />
 
     <include app:graph="@navigation/start_multi_staking_nav_graph" />
 

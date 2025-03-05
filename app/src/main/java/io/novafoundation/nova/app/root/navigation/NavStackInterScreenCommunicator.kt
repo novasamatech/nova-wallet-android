@@ -5,19 +5,22 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.builder.NavigationBuilderRegistry
+import io.novafoundation.nova.app.root.navigation.navigators.navigationBuilder
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
-    private val navigationHolder: NavigationHolder,
+    private val navigationHoldersRegistry: NavigationHoldersRegistry
 ) : InterScreenCommunicator<I, O> {
 
     private val responseKey = UUID.randomUUID().toString()
     private val requestKey = UUID.randomUUID().toString()
 
     protected val navController: NavController
-        get() = navigationHolder.navController!!
+        get() = navigationHoldersRegistry.firstAttachedNavController!!
 
     // from requester - retrieve from current entry
     override val latestResponse: O?
@@ -67,5 +70,9 @@ abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
         return navController.currentBackStackEntry!!.savedStateHandle
             .getLiveData<O>(responseKey)
             .asFlow()
+    }
+
+    protected fun navigationBuilder(): NavigationBuilderRegistry {
+        return navigationHoldersRegistry.navigationBuilder()
     }
 }

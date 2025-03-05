@@ -12,8 +12,6 @@ class AssetDetailBalancesView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : BalancesView(context, attrs, defStyle) {
 
-    val total = item(R.string.common_total)
-
     val transferable = item(R.string.wallet_balance_transferable)
 
     val locked = item(R.string.wallet_balance_locked).apply {

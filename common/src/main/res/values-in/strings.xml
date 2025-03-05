@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Cadangan</string>
     <string name="backup_title">Cadangan</string>
     <string name="biometric_auth_title">Otentikasi Biometrik</string>
+    <string name="browser_tabs_close_all">Tutup Semua</string>
     <string name="buy_completed">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya melalui email.</string>
     <string name="buy_network_flow_title">Pilih jaringan untuk membeli %s</string>
     <string name="buy_provider_open_confirmation_message">Untuk melanjutkan pembelian, Anda akan diarahkan dari aplikasi Nova Wallet ke %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Biaya transfer</string>
     <string name="choose_amount_network_error">Jaringan tidak merespons</string>
     <string name="choose_amount_to">Ke</string>
+    <string name="close_dapp_tabs_message">Semua tab yang terbuka di browser DApp akan ditutup.</string>
+    <string name="close_dapp_tabs_title">Tutup Semua DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">Lakukan %s dan selalu simpan offline untuk memulihkannya kapan saja. Anda dapat melakukannya di Pengaturan Cadangan.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Harap catat semua Frasa Sandi dompet Anda sebelum melanjutkan</string>
     <string name="cloud_backup_delete_action_title">Cadangan akan dihapus dari Google Drive</string>
@@ -475,6 +478,7 @@
         <item quantity="other">%d detik</item>
     </plurals>
     <string name="common_secret_derivation_path">Jalur derivasi rahasia</string>
+    <string name="common_see_all">Lihat Semua</string>
     <string name="common_settings">Pengaturan</string>
     <string name="common_share">Bagikan</string>
     <string name="common_sign_in">Masuk</string>
@@ -636,6 +640,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Setujui permintaan ini jika Anda mempercayai aplikasi ini.\nPeriksa detail transaksi.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Favorit</string>
     <string name="dapp_favourites">Favorit</string>
     <string name="dapp_favourites_add">Tambahkan ke favorit</string>
     <string name="dapp_favourites_remove_description">DApp \"%s\" akan dihapus dari Favorit</string>
@@ -752,6 +758,8 @@
         <item quantity="other">Anda perlu memilih setidaknya %d trek</item>
     </plurals>
     <string name="governance_unlock">Buka kunci</string>
+    <string name="high_price_impact_detacted_message">Melakukan tukar ini akan mengakibatkan slippage signifikan dan kerugian finansial. Pertimbangkan untuk mengurangi ukuran perdagangan Anda atau membagi perdagangan Anda ke dalam beberapa transaksi.</string>
+    <string name="high_price_impact_detacted_title">Dampak harga tinggi terdeteksi (%s)</string>
     <string name="history_v1.9.0">Riwayat</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Nama Legal</string>
@@ -915,6 +923,7 @@
     <string name="pool_inactive_failure_title">Pool tidak terbuka</string>
     <string name="pool_staking_conflict_message">Anda tidak dapat lagi menggunakan Staking Langsung dan Staking Pool dari akun yang sama. Untuk mengelola Staking Pool Anda, pertama-tama Anda perlu melepaskan token Anda dari Staking Langsung.</string>
     <string name="pool_staking_conflict_title">Operasi pool tidak tersedia</string>
+    <string name="popular_dapps_title">Populer</string>
     <string name="pre_configured_networks_add_custom_button">Tambahkan jaringan secara manual</string>
     <string name="pre_configured_networks_progress_text">Memuat daftar jaringan...</string>
     <string name="pre_configured_networks_search_hint">Cari berdasarkan nama jaringan</string>

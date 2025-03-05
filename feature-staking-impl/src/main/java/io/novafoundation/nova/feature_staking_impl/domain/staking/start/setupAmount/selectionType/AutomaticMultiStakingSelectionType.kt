@@ -39,21 +39,25 @@ class AutomaticMultiStakingSelectionType(
         return candidates.maxOf { it.availableBalance(asset) }
     }
 
+    override suspend fun maxAmountToStake(asset: Asset): Balance {
+        return candidates.maxOf { it.maximumToStake(asset) }
+    }
+
     override suspend fun updateSelectionFor(stake: Balance) {
-        val selection = selectionFor(stake) ?: return
+        val stakingProperties = typePropertiesFor(stake)
+        val candidates = stakingProperties.recommendation.recommendedSelection(stake) ?: return
 
         val recommendableSelection = RecommendableMultiStakingSelection(
             source = SelectionTypeSource.Automatic,
-            selection = selection
+            selection = candidates,
+            properties = stakingProperties
         )
 
         selectionStore.updateSelection(recommendableSelection)
     }
 
-    private suspend fun selectionFor(stake: Balance): StartMultiStakingSelection? {
-        val candidate = candidates.firstAllowingToStake(stake) ?: candidates.findWithMinimumStake()
-
-        return candidate.recommendation.recommendedSelection(stake)
+    private suspend fun typePropertiesFor(stake: Balance): SingleStakingProperties {
+        return candidates.firstAllowingToStake(stake) ?: candidates.findWithMinimumStake()
     }
 
     private suspend fun List<SingleStakingProperties>.firstAllowingToStake(stake: Balance): SingleStakingProperties? {

@@ -21,6 +21,7 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+    namespace 'io.novafoundation.nova.feature_currency_api'
 }
 
 dependencies {

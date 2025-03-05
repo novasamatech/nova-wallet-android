@@ -5,9 +5,10 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
-import io.novafoundation.nova.common.utils.fractionToPercentage
+import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_api.domain.model.NominatedValidator
@@ -89,9 +90,13 @@ suspend fun mapValidatorToValidatorModel(
     }
 }
 
-fun rewardsToScoring(rewardsGain: BigDecimal?) = rewardsToColoredText(rewardsGain)?.let(StakeTargetModel.Scoring::OneField)
+fun rewardsToScoring(rewardsGain: BigDecimal?) = rewardsToScoring(rewardsGain?.fractions)
 
-fun rewardsToColoredText(rewardsGain: BigDecimal?) = formatStakeTargetRewardsOrNull(rewardsGain)?.let {
+fun rewardsToScoring(rewardsGain: Fraction?) = rewardsToColoredText(rewardsGain)?.let(StakeTargetModel.Scoring::OneField)
+
+fun rewardsToColoredText(rewardsGain: BigDecimal?) = rewardsToColoredText(rewardsGain?.fractions)
+
+fun rewardsToColoredText(rewardsGain: Fraction?) = formatStakeTargetRewardsOrNull(rewardsGain)?.let {
     ColoredText(it, R.color.text_positive)
 }
 
@@ -199,7 +204,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
             is StakeTargetStakeParcelModel.Active -> {
                 val totalStakeModel = mapAmountToAmountModel(stake.totalStake, asset)
 
-                val nominatorsCount = stake.stakers.size
+                val nominatorsCount = stake.stakersCount
                 val rewardsWithLabel = displayConfig.rewardSuffix.format(resourceManager, stake.rewards)
 
                 val formattedMaxStakers = displayConfig.rewardedStakersPerStakeTarget?.format()
@@ -229,7 +234,8 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
     }
 }
 
-fun formatStakeTargetRewards(rewardsRate: BigDecimal) = rewardsRate.fractionToPercentage().formatAsPercentage()
-fun formatStakeTargetRewardsOrNull(rewardsRate: BigDecimal?) = rewardsRate?.let(::formatStakeTargetRewards)
+fun formatStakeTargetRewards(rewardsRate: Fraction) = rewardsRate.formatPercents()
+fun formatStakeTargetRewardsOrNull(rewardsRate: Fraction?) = rewardsRate?.let(::formatStakeTargetRewards)
+fun formatStakeTargetRewardsOrNull(rewardsRate: BigDecimal?) = formatStakeTargetRewardsOrNull(rewardsRate?.fractions)
 
 fun formatValidatorApy(validator: Validator) = formatStakeTargetRewardsOrNull(validator.electedInfo?.apy)

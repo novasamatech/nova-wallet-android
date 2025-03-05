@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
+import io.novafoundation.nova.common.utils.endsWith
 import io.novafoundation.nova.common.utils.intFromHex
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
+import io.novafoundation.nova.common.utils.startsWith
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -49,7 +51,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromHex
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -178,11 +179,7 @@ class PolkadotExternalSignInteractor(
         val accountId = signBytesPayload.address.anyAddressToAccountId()
 
         val signer = resolveWalletSigner()
-        val payload = runCatching {
-            SignerPayloadRaw.fromHex(signBytesPayload.data, accountId)
-        }.getOrElse {
-            SignerPayloadRaw.fromUtf8(signBytesPayload.data, accountId)
-        }
+        val payload = SignerPayloadRaw.fromUnsafeString(signBytesPayload.data, accountId)
 
         val signature = signer.signRaw(payload).asHexString()
         return SignedResult(signature, modifiedTransaction = null)
@@ -242,6 +239,26 @@ class PolkadotExternalSignInteractor(
             modifiedOriginal = actualMetadataHash.modifiedOriginal,
             actualParsedExtrinsic = actualParsedExtrinsic
         )
+    }
+
+    private fun SignerPayloadRaw.Companion.fromUnsafeString(data: String, signer: AccountId): SignerPayloadRaw {
+        val unsafeMessage = decodeSigningMessage(data)
+        val safeMessage = protectSigningMessage(unsafeMessage)
+
+        return SignerPayloadRaw(safeMessage, signer)
+    }
+
+    private fun decodeSigningMessage(data: String): ByteArray {
+        return kotlin.runCatching { data.fromHex() }.getOrElse { data.encodeToByteArray() }
+    }
+
+    private fun protectSigningMessage(message: ByteArray): ByteArray {
+        val prefix = "<Bytes>".encodeToByteArray()
+        val suffix = "</Bytes>".encodeToByteArray()
+
+        if (message.startsWith(prefix) && message.endsWith(suffix)) return message
+
+        return prefix + message + suffix
     }
 
     private suspend fun PolkadotSignPayload.Json.actualMetadataHash(chain: Chain, signer: NovaSigner): ActualMetadataHash {

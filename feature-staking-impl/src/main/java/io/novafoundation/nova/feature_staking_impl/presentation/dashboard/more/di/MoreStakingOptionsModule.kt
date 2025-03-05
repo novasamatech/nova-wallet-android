@@ -26,7 +26,7 @@ class MoreStakingOptionsModule {
     fun provideViewModel(
         interactor: StakingDashboardInteractor,
         dashboardRouter: StakingDashboardRouter,
-        router: StakingRouter,
+        stakingRouter: StakingRouter,
         stakingSharedState: StakingSharedState,
         presentationMapper: StakingDashboardPresentationMapper,
         startMultiStakingRouter: StartMultiStakingRouter,
@@ -35,7 +35,7 @@ class MoreStakingOptionsModule {
             interactor = interactor,
             startStakingRouter = startMultiStakingRouter,
             dashboardRouter = dashboardRouter,
-            router = router,
+            stakingRouter = stakingRouter,
             stakingSharedState = stakingSharedState,
             presentationMapper = presentationMapper
         )

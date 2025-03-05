@@ -10,7 +10,7 @@ interface DeepLinkingRouter {
 
     fun openDAppBrowser(url: String)
 
-    fun openImportAccountScreen(importAccountPayload: ImportAccountPayload)
+    fun openImportAccountScreen(payload: ImportAccountPayload)
 
     fun openReferendum(payload: ReferendumDetailsPayload)
 

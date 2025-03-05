@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
+import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
@@ -211,5 +212,11 @@ class DbModule {
     @ApplicationScope
     fun provideTinderGovDao(appDatabase: AppDatabase): TinderGovDao {
         return appDatabase.tinderGovDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideBrowserTabsDao(appDatabase: AppDatabase): BrowserTabsDao {
+        return appDatabase.browserTabsDao()
     }
 }

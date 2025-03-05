@@ -80,8 +80,6 @@ interface StakingRouter {
 
     fun openRebag()
 
-    fun openDAppBrowser(url: String)
-
     fun openStakingPeriods()
 
     fun openSetupStakingType()
@@ -103,4 +101,6 @@ interface StakingRouter {
     fun openStakingProxyList()
 
     fun openConfirmRemoveStakingProxy(payload: ConfirmRemoveStakingProxyPayload)
+
+    fun openDAppBrowser(url: String)
 }

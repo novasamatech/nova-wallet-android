@@ -5,6 +5,7 @@ import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
+import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
@@ -31,6 +32,20 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 
 interface DbApi {
+
+    val phishingSitesDao: PhishingSitesDao
+
+    val favouritesDAppsDao: FavouriteDAppsDao
+
+    val currencyDao: CurrencyDao
+
+    val walletConnectSessionsDao: WalletConnectSessionsDao
+
+    val stakingDashboardDao: StakingDashboardDao
+
+    val externalBalanceDao: ExternalBalanceDao
+
+    val holdsDao: HoldsDao
 
     fun provideDatabase(): AppDatabase
 
@@ -76,17 +91,5 @@ interface DbApi {
 
     fun tinderGovDao(): TinderGovDao
 
-    val phishingSitesDao: PhishingSitesDao
-
-    val favouritesDAppsDao: FavouriteDAppsDao
-
-    val currencyDao: CurrencyDao
-
-    val walletConnectSessionsDao: WalletConnectSessionsDao
-
-    val stakingDashboardDao: StakingDashboardDao
-
-    val externalBalanceDao: ExternalBalanceDao
-
-    val holdsDao: HoldsDao
+    fun browserTabsDao(): BrowserTabsDao
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -19,15 +20,18 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NominationPoolsSetupBondMoreViewModel(
@@ -36,31 +40,50 @@ class NominationPoolsSetupBondMoreViewModel(
     private val resourceManager: ResourceManager,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: NominationPoolsBondMoreValidationSystem,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val poolMemberUseCase: NominationPoolMemberUseCase,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsBondMoreHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
     private val showNextProgress = MutableStateFlow(false)
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
+    private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinFactory.create(assetFlow)
+    private val chainFlow = assetWithOption.map { it.option.assetWithChain.chain }
+        .shareInBackground()
 
-    val amountChooserMixin = amountChooserMixinFactory.create(
-        scope = this,
-        assetFlow = assetFlow,
-        balanceField = Asset::transferable,
-        balanceLabel = R.string.wallet_balance_transferable
-    )
+    private val selectedAsset = assetWithOption.map { it.asset }
+        .shareInBackground()
+
+    private val selectedChainAsset = selectedAsset.map { it.token.configuration }
+        .shareInBackground()
 
     val poolMember = poolMemberUseCase.currentPoolMemberFlow()
         .filterNotNull()
         .shareInBackground()
+
+    val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
+
+    private val currentStakeAmount = combine(poolMember, chainFlow) { poolMember, chain ->
+        interactor.stakeAmount(poolMember, chainFlow.first().id, viewModelScope)
+    }.flatMapLatest { it }
+
+    private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
+        selectedAsset.providingMaxOf(Asset::transferableInPlanks)
+            .deductAmount(currentStakeAmount)
+            .deductFee(originFeeMixin)
+    }
+
+    val amountChooserMixin = amountChooserMixinFactory.create(
+        scope = this,
+        assetFlow = selectedAsset,
+        maxActionProvider = maxActionProvider
+    )
 
     val hintsMixin = hintsFactory.create(coroutineScope = this)
 
@@ -86,10 +109,9 @@ class NominationPoolsSetupBondMoreViewModel(
 
     private fun listenFee() {
         originFeeMixin.connectWith(
-            inputSource = amountChooserMixin.backPressuredAmount,
-            scope = this,
-            feeConstructor = { amount ->
-                interactor.estimateFee(amount.toPlanks())
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
+            feeConstructor = { _, amount ->
+                interactor.estimateFee(amount)
             }
         )
     }
@@ -103,7 +125,7 @@ class NominationPoolsSetupBondMoreViewModel(
             fee = fee,
             amount = amountChooserMixin.amount.first(),
             poolMember = poolMember.first(),
-            asset = assetFlow.first()
+            asset = selectedAsset.first()
         )
 
         validationExecutor.requireValid(

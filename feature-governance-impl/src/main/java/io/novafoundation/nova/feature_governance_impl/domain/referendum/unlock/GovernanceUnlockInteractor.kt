@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.ext.fullId
@@ -246,7 +247,7 @@ class RealGovernanceUnlockInteractor(
         }
     }
 
-    private fun List<BalanceLock>.otherLocksPreventingLockBeingLessThan(amount: Balance, thisLockId: String): List<String> {
+    private fun List<BalanceLock>.otherLocksPreventingLockBeingLessThan(amount: Balance, thisLockId: BalanceLockId): List<BalanceLockId> {
         return filter { it.id != thisLockId }.mapNotNull { lock ->
             lock.id.takeIf { lock.amountInPlanks > amount }
         }

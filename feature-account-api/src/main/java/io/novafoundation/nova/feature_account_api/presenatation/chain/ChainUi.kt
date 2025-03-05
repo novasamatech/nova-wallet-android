@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asIcon
+import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -51,11 +52,11 @@ fun ImageView.setTokenIcon(icon: Icon, imageLoader: ImageLoader) {
 }
 
 fun Chain.iconOrFallback(): Icon {
-    return icon?.asIcon() ?: chainIconFallback()
+    return icon?.asUrlIcon() ?: chainIconFallback()
 }
 
 fun String?.asIconOrFallback(): Icon {
-    return this?.asIcon() ?: chainIconFallback()
+    return this?.asUrlIcon() ?: chainIconFallback()
 }
 
 fun chainIconFallback(): Icon {

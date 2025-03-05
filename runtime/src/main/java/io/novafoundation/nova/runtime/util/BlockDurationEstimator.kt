@@ -28,6 +28,10 @@ fun BlockDurationEstimator.timerUntil(block: BlockNumber): TimerValue {
     return durationUntil(block).toTimerValue()
 }
 
+fun BlockDurationEstimator.isBlockedPassed(block: BlockNumber): Boolean {
+    return currentBlock >= block
+}
+
 fun BlockDurationEstimator(currentBlock: BlockNumber, blockTimeMillis: BigInteger): BlockDurationEstimator {
     return RealBlockDurationEstimator(currentBlock, blockTimeMillis)
 }

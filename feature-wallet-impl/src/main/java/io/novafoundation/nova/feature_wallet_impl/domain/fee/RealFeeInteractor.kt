@@ -45,7 +45,7 @@ class RealFeeInteractor(
         val feeChainAsset = feeAsset.token.configuration
         val chain = chainRegistry.getChain(feeChainAsset.chainId)
 
-        val existentialBalance = assetSourceRegistry.existentialDepositInPlanks(chain, feeChainAsset)
+        val existentialBalance = assetSourceRegistry.existentialDepositInPlanks(feeChainAsset)
         val passEdFeeCheck = feeAsset.balanceCountedTowardsEDInPlanks - inspectedFeeAmount.checkedAgainstMinimumBalance >= existentialBalance
 
         val hasEnoughTransferable = feeAsset.transferableInPlanks >= inspectedFeeAmount.deductedFromTransferable

@@ -34,7 +34,8 @@ private fun calculateReward(
 
     return PeriodReturns(
         gainAmount = gainAmount.toBigDecimal(),
-        gainFraction = gainPercentage.toBigDecimal()
+        gainFraction = gainPercentage.toBigDecimal(),
+        isCompound = isCompound
     )
 }
 
@@ -45,13 +46,5 @@ private fun calculateCompoundPercentage(days: Int, dailyPercentage: Double): Dou
 private fun calculateSimplePercentage(days: Int, dailyPercentage: Double): Double {
     return dailyPercentage * days
 }
-
-suspend fun RewardCalculator.calculateMaxPeriodReturns(
-    days: Int,
-) = calculateMaxReturns(
-    amount = BigDecimal.ONE,
-    days = days,
-    isCompound = true,
-).gainFraction
 
 fun aprToApy(apr: Double) = exp(apr) - 1.0

@@ -78,8 +78,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
 
-    fun finishApp()
-
     fun openCreateCloudBackupPassword(walletName: String)
 
     fun restoreCloudBackup()
@@ -99,4 +97,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun openManualBackupSecrets(payload: ManualBackupCommonPayload)
 
     fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload)
+
+    fun finishApp()
 }

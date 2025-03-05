@@ -1,53 +1,61 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.common
 
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappMetadata
-import io.novafoundation.nova.feature_dapp_impl.data.mappers.mapDappCategoriesToDescription
 import io.novafoundation.nova.feature_dapp_impl.data.model.FavouriteDApp
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDappCategoriesToDescription
 
 fun createDAppComparator() = compareByDescending<DApp> { it.isFavourite }
+    .thenBy { it.favoriteIndex }
     .thenBy { it.name }
 
 // Build mapping in O(Metadatas + Favourites) in case of HashMap. It allows constant time access later
 internal fun buildUrlToDappMapping(
-    dAppMetadatas: List<DappMetadata>,
-    favourites: List<FavouriteDApp>
+    dAppMetadatas: Collection<DappMetadata>,
+    favourites: Collection<FavouriteDApp>
 ): Map<String, DApp> {
-    val favouritesUrls: Set<String> = favourites.mapToSet { it.url }
+    val favouritesByUrl = favourites.associateBy { it.url }
 
     return buildMap {
-        val fromFavourites = favourites.associateBy(
-            keySelector = { it.url },
-            valueTransform = ::favouriteToDApp
-        )
+        val fromFavourites = favouritesByUrl.mapValues { favouriteToDApp(it.value) }
         putAll(fromFavourites)
 
         // overlapping metadata urls will override favourites in the map and thus use metadata for display
         val fromMetadatas = dAppMetadatas.associateBy(
             keySelector = { it.url },
-            valueTransform = { dAppMetadataToDApp(it, isFavourite = it.url in favouritesUrls) }
+            valueTransform = { dAppMetadataToDApp(it, favoriteModel = favouritesByUrl[it.url]) }
         )
         putAll(fromMetadatas)
     }
 }
 
-private fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
+fun dappToFavorite(dapp: DApp, orderingIndex: Int): FavouriteDApp {
+    return FavouriteDApp(
+        label = dapp.name,
+        icon = dapp.iconLink,
+        url = dapp.url,
+        orderingIndex = orderingIndex
+    )
+}
+
+fun favouriteToDApp(favouriteDApp: FavouriteDApp): DApp {
     return DApp(
         name = favouriteDApp.label,
         description = favouriteDApp.url,
         iconLink = favouriteDApp.icon,
         url = favouriteDApp.url,
-        isFavourite = true
+        isFavourite = true,
+        favoriteIndex = favouriteDApp.orderingIndex
     )
 }
 
-private fun dAppMetadataToDApp(metadata: DappMetadata, isFavourite: Boolean): DApp {
+private fun dAppMetadataToDApp(metadata: DappMetadata, favoriteModel: FavouriteDApp?): DApp {
     return DApp(
         name = metadata.name,
         description = mapDappCategoriesToDescription(metadata.categories),
         iconLink = metadata.iconLink,
         url = metadata.url,
-        isFavourite = isFavourite
+        isFavourite = favoriteModel != null,
+        favoriteIndex = favoriteModel?.orderingIndex
     )
 }

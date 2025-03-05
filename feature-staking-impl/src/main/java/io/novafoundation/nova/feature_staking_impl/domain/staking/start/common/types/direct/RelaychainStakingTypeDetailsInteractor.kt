@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct
 
-import io.novafoundation.nova.common.utils.Perbill
-import io.novafoundation.nova.common.utils.asPerbill
+import io.novafoundation.nova.common.data.memory.ComputationalScope
+import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
@@ -11,7 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
@@ -22,12 +22,12 @@ class RelaychainStakingTypeDetailsInteractorFactory(
 
     override suspend fun create(
         stakingOption: StakingOption,
-        coroutineScope: CoroutineScope
+        computationalScope: ComputationalScope
     ): StakingTypeDetailsInteractor {
         return RelaychainStakingTypeDetailsInteractor(
             stakingSharedComputation,
             stakingOption,
-            coroutineScope,
+            computationalScope,
         )
     }
 }
@@ -35,13 +35,13 @@ class RelaychainStakingTypeDetailsInteractorFactory(
 class RelaychainStakingTypeDetailsInteractor(
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingOption: StakingOption,
-    private val coroutineScope: CoroutineScope,
+    private val computationalScope: ComputationalScope,
 ) : StakingTypeDetailsInteractor {
 
     override fun observeData(): Flow<StakingTypeDetails> {
         val chain = stakingOption.chain
 
-        return stakingSharedComputation.activeEraInfo(chain.id, coroutineScope).map { activeEraInfo ->
+        return stakingSharedComputation.activeEraInfo(chain.id, computationalScope).map { activeEraInfo ->
             StakingTypeDetails(
                 maxEarningRate = calculateEarningRate(),
                 minStake = activeEraInfo.minStake,
@@ -57,11 +57,11 @@ class RelaychainStakingTypeDetailsInteractor(
         return asset.freeInPlanks
     }
 
-    private suspend fun calculateEarningRate(): Perbill {
+    private suspend fun calculateEarningRate(): Fraction {
         val (chain, chainAsset, stakingType) = stakingOption.components
 
-        return stakingSharedComputation.rewardCalculator(chain, chainAsset, stakingType, coroutineScope)
+        return stakingSharedComputation.rewardCalculator(chain, chainAsset, stakingType, computationalScope)
             .maxAPY
-            .asPerbill()
+            .fractions
     }
 }

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -71,7 +72,7 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
             rewardDetailToolbar.setTitle(time.formatDateTime())
             rewardDetailAmount.setAmount(amount.toAmountModel())
 
-            rewardDetailEra.showValue(era)
+            rewardDetailEra.showValueOrHide(era)
 
             rewardDetailStatus.showOperationStatus(statusAppearance)
 

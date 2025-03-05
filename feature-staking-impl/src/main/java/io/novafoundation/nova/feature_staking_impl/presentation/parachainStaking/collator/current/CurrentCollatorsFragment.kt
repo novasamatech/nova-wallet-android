@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.CurrentStakeTargetsFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.view.CollatorManageActionsBottomSheet
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.actions.CollatorManageActionsBottomSheet
 
 class CurrentCollatorsFragment : CurrentStakeTargetsFragment<CurrentCollatorsViewModel>() {
 
