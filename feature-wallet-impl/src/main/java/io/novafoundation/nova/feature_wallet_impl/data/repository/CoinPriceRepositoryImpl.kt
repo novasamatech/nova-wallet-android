@@ -57,14 +57,6 @@ class CoinPriceRepositoryImpl(
         return coinRates
     }
 
-    override suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?> {
-        return remoteCoinPriceDataSource.getCoinRates(priceIds, currency)
-    }
-
-    override suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange? {
-        return remoteCoinPriceDataSource.getCoinRate(priceId, currency)
-    }
-
     override suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: PriceChartPeriod): List<HistoricalCoinRate> {
         val days = when (range) {
             PriceChartPeriod.DAY -> "1"

@@ -20,11 +20,5 @@ interface CoinPriceRepository {
     suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate>
 
     @Throws(HttpException::class)
-    suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?>
-
-    @Throws(HttpException::class)
-    suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
-
-    @Throws(HttpException::class)
     suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: PriceChartPeriod): List<HistoricalCoinRate>
 }

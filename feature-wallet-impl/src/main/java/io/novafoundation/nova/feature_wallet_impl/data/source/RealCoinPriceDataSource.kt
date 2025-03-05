@@ -38,7 +38,8 @@ class RealCoinPriceDataSource(
     }
 
     override suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?> {
-        return apiCall { priceApi.getAssetPrice(priceIds.asQueryParam(), currency = currency.coingeckoId, includeRateChange = true) }
+        val sortedPriceIds = priceIds.toList().sorted()
+        return apiCall { priceApi.getAssetPrice(sortedPriceIds.asQueryParam(), currency = currency.coingeckoId, includeRateChange = true) }
             .mapValues {
                 val price = it.value[currency.coingeckoId].orZero()
                 val recentRate = it.value[PriceApi.getRecentRateFieldName(currency.coingeckoId)].orZero()
