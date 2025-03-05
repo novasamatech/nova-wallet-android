@@ -38,6 +38,8 @@ class ExpandableView @JvmOverloads constructor(
     private val chevron: View? by lazy { findViewByIdOrNull(chevronResId) }
     private val expandablePart: View? by lazy { findViewByIdOrNull(expandablePartResId) }
 
+    private var isExpandable: Boolean = true
+
     init {
         applyAttributes(attrs)
         setOnClickListener { toggle() }
@@ -90,6 +92,12 @@ class ExpandableView @JvmOverloads constructor(
         chevron?.rotation = 0f
     }
 
+    fun setExpandable(isExpandable: Boolean) {
+        this.isExpandable = isExpandable
+        collapseImmediate()
+        chevron?.isVisible = isExpandable
+    }
+
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ExpandableView)
@@ -104,6 +112,8 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     private fun toggle() {
+        if (!isExpandable) return
+
         if (expandablePart?.isVisible == true) {
             collapse()
         } else {
