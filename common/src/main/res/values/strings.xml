@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="price_charts_period_today">Today</string>
+    <string name="price_charts_period_week">Last Week</string>
+    <string name="price_charts_period_month">Last Month</string>
+    <string name="price_charts_period_year">Last Year</string>
+    <string name="price_charts_period_all">All Time</string>
 
     <string name="price_chart_date_format">%s at %s</string>
     <string name="price_chart_price_change">%s (%s)</string>

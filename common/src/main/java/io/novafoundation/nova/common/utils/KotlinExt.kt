@@ -200,6 +200,9 @@ val BigDecimal.isZero: Boolean
 val BigDecimal.isPositive: Boolean
     get() = signum() > 0
 
+val BigDecimal.isNegative: Boolean
+    get() = signum() < 0
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 

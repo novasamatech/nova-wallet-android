@@ -1,13 +1,15 @@
 package io.novafoundation.nova.feature_assets.presentation.views.priceCharts
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
+import android.view.MotionEvent
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.highlight.Highlight
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.feature_assets.R
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
@@ -15,10 +17,12 @@ import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 class ChartController(private val chart: LineChart, private val callback: Callback) {
 
     interface Callback {
-        fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isLastEntry: Boolean)
+        fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean)
     }
 
     private val context = chart.context
+
+    private val chartUIParams = ChartUIParams.default(context)
 
     private var currentEntries: List<Entry> = emptyList()
     private var useNeutralColor = false
@@ -42,6 +46,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         updateChart()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupChartUI() {
         chart.setBackgroundColor(Color.TRANSPARENT)
         chart.setDrawGridBackground(false)
@@ -55,6 +60,9 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.minOffset = 0f
         chart.extraTopOffset = 12f
         chart.extraBottomOffset = 12f
+        chart.isHighlightPerTapEnabled = false
+        chart.isHighlightPerDragEnabled = false
+        chart.marker = null
 
         chart.renderer = PriceChartRenderer(
             highlightColor = context.getColor(R.color.neutral_price_chart_line),
@@ -69,38 +77,31 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             textSize = 9f
             textColor = context.getColor(R.color.text_secondary)
             typeface = Typeface.MONOSPACE
-            setLabelCount(4, true)
+            setLabelCount(chartUIParams.gridLines, true)
             setDrawTopYLabelEntry(true)
-            gridLineWidth = 1.5f
+            gridLineWidth = chartUIParams.gridLineWidthDp
             setDrawAxisLine(false)
             setDrawGridLines(true)
             gridColor = context.getColor(R.color.price_chart_grid_line)
-            enableGridDashedLine(10f, 10f, 0f)
+            setGridDashedLine(chartUIParams.gridLineDashEffect)
         }
 
-        chart.marker = null
-        chart.onChartGestureListener = PriceChartGestureListener(
-            onGestureStart = {
-                val highlight = chart.getHighlightByTouchPoint(it.x, it.y)
-                chart.highlightValue(highlight)
-                val entry = chart.data?.getEntryForHighlight(highlight)
-                entry?.let { updateChartWithSelectedEntry(it) }
-            },
-            onGestureEnd = {
-                chart.highlightValue(null)
-                updateChart()
-            }
-        )
+        chart.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_DOWN -> {
+                    val entry = chart.getEntryByTouchPoint(event)
+                    if (entry != null) {
+                        updateChartWithSelectedEntry(entry)
+                    }
+                }
 
-        chart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-            override fun onValueSelected(e: Entry, h: Highlight) {
-                updateChartWithSelectedEntry(e)
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    updateChart()
+                }
             }
 
-            override fun onNothingSelected() {
-                updateChart()
-            }
-        })
+            false
+        }
     }
 
     private fun updateChartWithSelectedEntry(entry: Entry) {
@@ -118,7 +119,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.data = LineData(datasetBefore, datasetAfter)
         chart.invalidate()
 
-        onSelectEntry(entriesBefore, isLastEntry = false)
+        onSelectEntry(entriesBefore, isEntrySelected = true)
     }
 
     private fun updateChart() {
@@ -131,13 +132,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.data = LineData(dataSet)
         chart.invalidate()
 
-        onSelectEntry(currentEntries, isLastEntry = true)
+        onSelectEntry(currentEntries, isEntrySelected = false)
     }
 
-    private fun onSelectEntry(entries: List<Entry>, isLastEntry: Boolean) {
+    private fun onSelectEntry(entries: List<Entry>, isEntrySelected: Boolean) {
         if (entries.isEmpty()) return
 
-        callback.onSelectEntry(entries.first(), entries.last(), isLastEntry)
+        callback.onSelectEntry(entries.first(), entries.last(), isEntrySelected)
     }
 
     private fun List<Entry>.createDataSet(colorRes: Int): LineDataSet {
@@ -146,7 +147,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             setDrawCircles(false)
             setDrawValues(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            lineWidth = 1.5f
+            lineWidth = chartUIParams.chartLineWidthDp
         }
     }
 
@@ -160,5 +161,18 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private fun List<Entry>.isBullish(): Boolean {
         return last().y >= first().y
+    }
+
+    private fun LineChart.getEntryByTouchPoint(event: MotionEvent): Entry? {
+        val xTouch = chart.getTransformer(YAxis.AxisDependency.RIGHT)
+            .getValuesByTouchPoint(event.x, event.y)
+            .x
+
+        val foundIndex = currentEntries.binarySearchFloor { it.x.compareTo(xTouch) }
+        if (foundIndex >= 0 && foundIndex < currentEntries.size) {
+            return currentEntries[foundIndex]
+        } else {
+            return null
+        }
     }
 }

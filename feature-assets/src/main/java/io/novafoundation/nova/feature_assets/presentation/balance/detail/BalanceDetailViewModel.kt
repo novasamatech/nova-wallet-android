@@ -142,11 +142,12 @@ class BalanceDetailViewModel(
         resourceManager.getString(R.string.price_chart_title, tokenName)
     }.shareInBackground()
 
-    val priceChartFormatters: Flow<PriceChartTextInjectors> = flowOf {
+    val priceChartFormatters: Flow<PriceChartTextInjectors> = assetFlow.map { asset ->
+        val lastCoinRate = asset.token.coinRate?.rate
         val currency = currencyInteractor.getSelectedCurrency()
 
         PriceChartTextInjectors(
-            RealPricePriceTextInjector(currency),
+            RealPricePriceTextInjector(currency, lastCoinRate),
             RealPriceChangeTextInjector(resourceManager, currency),
             RealDateChartTextInjector(resourceManager)
         )
@@ -294,19 +295,46 @@ class BalanceDetailViewModel(
     }
 
     private fun mapChartsToUi(assetPriceChart: AssetPriceChart): PriceChartModel {
-        val rangeName = when (assetPriceChart.range) {
-            PriceChartPeriod.DAY -> resourceManager.getString(R.string.price_chart_day)
-            PriceChartPeriod.WEEK -> resourceManager.getString(R.string.price_chart_week)
-            PriceChartPeriod.MONTH -> resourceManager.getString(R.string.price_chart_month)
-            PriceChartPeriod.YEAR -> resourceManager.getString(R.string.price_chart_year)
-            PriceChartPeriod.MAX -> resourceManager.getString(R.string.price_chart_max)
-        }
+        val buttonText = mapButtonText(assetPriceChart.range)
 
         return if (assetPriceChart.chart is ExtendedLoadingState.Loaded) {
+            val periodName = mapPeriodName(assetPriceChart.range)
+            val supportTimeShowing = supportTimeShowing(assetPriceChart.range)
             val mappedChart = assetPriceChart.chart.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
-            PriceChartModel.Chart(rangeName, mappedChart)
+            PriceChartModel.Chart(buttonText, periodName, supportTimeShowing, mappedChart)
         } else {
-            PriceChartModel.Loading(rangeName)
+            PriceChartModel.Loading(buttonText)
+        }
+    }
+
+    private fun mapButtonText(priceChartPeriod: PriceChartPeriod): String {
+        val buttonTextRes = when (priceChartPeriod) {
+            PriceChartPeriod.DAY -> R.string.price_chart_day
+            PriceChartPeriod.WEEK -> R.string.price_chart_week
+            PriceChartPeriod.MONTH -> R.string.price_chart_month
+            PriceChartPeriod.YEAR -> R.string.price_chart_year
+            PriceChartPeriod.MAX -> R.string.price_chart_max
+        }
+
+        return resourceManager.getString(buttonTextRes)
+    }
+
+    private fun mapPeriodName(priceChartPeriod: PriceChartPeriod): String {
+        val periodNameRes = when (priceChartPeriod) {
+            PriceChartPeriod.DAY -> R.string.price_charts_period_today
+            PriceChartPeriod.WEEK -> R.string.price_charts_period_week
+            PriceChartPeriod.MONTH -> R.string.price_charts_period_month
+            PriceChartPeriod.YEAR -> R.string.price_charts_period_year
+            PriceChartPeriod.MAX -> R.string.price_charts_period_all
+        }
+
+        return resourceManager.getString(periodNameRes)
+    }
+
+    private fun supportTimeShowing(priceChartPeriod: PriceChartPeriod): Boolean {
+        return when (priceChartPeriod) {
+            PriceChartPeriod.DAY, PriceChartPeriod.WEEK, PriceChartPeriod.MONTH -> true
+            PriceChartPeriod.YEAR, PriceChartPeriod.MAX -> false
         }
     }
 }
