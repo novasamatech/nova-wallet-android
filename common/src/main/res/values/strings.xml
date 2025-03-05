@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="waiting_top_up_card_timer">Estimated %s</string>
+    <string name="waiting_top_up_card_title">Your card is being issued!</string>
+    <string name="waiting_top_up_card_description">It can take up to 5 minutes.\nThis window will be closed automatically.</string>
+
+    <string name="fragment_waiting_top_up_time_out_error_title">Contact support</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Please contact support@novawallet.io. Include email address that you have used for issuing the card.</string>
+
+    <string name="fragment_assets_nova_card_default_highlighted">Manage</string>
+    <string name="fragment_assets_nova_card">%s Debit Card</string>
+
+    <string name="fragment_top_up_card_title">Top up card with %s</string>
+
     <string name="price_charts_period_today">Today</string>
     <string name="price_charts_period_week">Last Week</string>
     <string name="price_charts_period_month">Last Month</string>
@@ -135,18 +147,6 @@
     <string name="swipe_gov_title">SwipeGov</string>
     <string name="referenda_swipe_gov_banner_subtitle">Swipe to vote on referenda with AI summaries. Fast &amp; easy!</string>
     <string name="referenda_swipe_gov_banner_chip">%d referenda</string>
-
-    <string name="waiting_top_up_card_timer">Estimated %s</string>
-    <string name="waiting_top_up_card_title">Your card is being issued!</string>
-    <string name="waiting_top_up_card_description">It can take up to 5 minutes.\nThis window will be closed automatically.</string>
-
-    <string name="fragment_waiting_top_up_time_out_error_title">Contact support</string>
-    <string name="fragment_waiting_top_up_time_out_error_message">Please contact support@novawallet.io. Include email address that you have used for issuing the card.</string>
-
-    <string name="fragment_assets_nova_card_default_highlighted">Pay anywhere</string>
-    <string name="fragment_assets_nova_card">%s Nova Card</string>
-
-    <string name="fragment_top_up_card_title">Top up card with %s</string>
 
     <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>
 

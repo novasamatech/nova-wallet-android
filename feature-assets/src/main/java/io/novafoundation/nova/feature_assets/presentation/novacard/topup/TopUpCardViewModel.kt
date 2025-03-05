@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
-import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setAddress
@@ -25,7 +24,6 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
@@ -33,6 +31,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +50,7 @@ class TopUpCardViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val novaCardInteractor: NovaCardInteractor,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -79,13 +80,19 @@ class TopUpCardViewModel(
         )
     }
 
+    val feeMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
+
+    private val maxActionProvider = maxActionProviderFactory.create(
+        viewModelScope = viewModelScope,
+        assetInFlow = assetFlow,
+        feeLoaderMixin = feeMixin,
+    )
+
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        maxActionProvider = null
+        maxActionProvider = maxActionProvider
     )
-
-    val feeMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
 
     val titleFlow = chainAssetFlow.map {
         resourceManager.getString(R.string.fragment_top_up_card_title, it.symbol)

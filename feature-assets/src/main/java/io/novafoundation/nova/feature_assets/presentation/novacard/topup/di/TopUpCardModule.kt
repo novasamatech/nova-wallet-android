@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCa
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -41,6 +42,7 @@ class TopUpCardModule {
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         novaCardInteractor: NovaCardInteractor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        maxActionProviderFactory: MaxActionProviderFactory,
     ): ViewModel {
         return TopUpCardViewModel(
             chainRegistry = chainRegistry,
@@ -54,7 +56,8 @@ class TopUpCardModule {
             selectedAccountUseCase = selectedAccountUseCase,
             addressInputMixinFactory = addressInputMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            novaCardInteractor = novaCardInteractor
+            novaCardInteractor = novaCardInteractor,
+            maxActionProviderFactory = maxActionProviderFactory
         )
     }
 
