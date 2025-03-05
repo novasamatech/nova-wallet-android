@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailActions
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
@@ -64,9 +63,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         hideKeyboard()
 
         balanceDetailBack.applyBarMargin()
-        balanceDetailTokenName.applyBarMargin()
 
-        transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
+        transfersContainer.initializeBehavior(anchorView = balanceDetailContainer)
 
         transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
 
