@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.common.collato
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -57,15 +58,14 @@ class RealMythosCollatorProvider @Inject constructor(
 
         val rewardCalculator = sharedComputation.rewardCalculator(chainId)
 
-        return requestedCollatorIds.mapNotNull { collatorId ->
-            // if elected does not have a stake entry, it means it is invulnerable => ignore it
-            val collatorStake = collatorStakes[collatorId] ?: return@mapNotNull null
+        return requestedCollatorIds.map { collatorId ->
+            val collatorStake = collatorStakes[collatorId]
 
             MythosCollator(
                 accountId = collatorId,
                 identity = identities[collatorId],
-                totalStake = collatorStake.stake,
-                delegators = collatorStake.stakers,
+                totalStake = collatorStake?.stake.orZero(),
+                delegators = collatorStake?.stakers.orZero(),
                 apr = rewardCalculator.collatorApr(collatorId)
             )
         }
@@ -75,7 +75,15 @@ class RealMythosCollatorProvider @Inject constructor(
     private suspend fun MythosCollatorSource.requestedCollatorIds(chainId: ChainId): Collection<AccountIdKey> {
         return when (this) {
             is MythosCollatorSource.Custom -> collatorIds
-            MythosCollatorSource.ElectedCandidates -> mythosSharedComputation.get().sessionValidators(chainId)
+            MythosCollatorSource.ElectedCandidates -> getElectedCandidates(chainId)
         }
+    }
+
+    context(ComputationalScope)
+    private suspend fun getElectedCandidates(chainId: ChainId): Collection<AccountIdKey> {
+        val sessionValidators = mythosSharedComputation.get().sessionValidators(chainId)
+        val invulnerables = mythosSharedComputation.get().getInvulnerableCollators(chainId)
+
+        return sessionValidators - invulnerables
     }
 }

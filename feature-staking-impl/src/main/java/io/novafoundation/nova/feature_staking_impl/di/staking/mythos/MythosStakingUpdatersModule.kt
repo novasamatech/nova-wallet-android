@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosRe
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosSelectedCandidatesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.InvulnerablesUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.SessionValidatorsUpdater
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -30,6 +31,18 @@ class MythosStakingUpdatersModule {
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
     ) = SessionValidatorsUpdater(
+        sharedState,
+        chainRegistry,
+        storageCache
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideInvulnerablesUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+    ) = InvulnerablesUpdater(
         sharedState,
         chainRegistry,
         storageCache
@@ -108,6 +121,7 @@ class MythosStakingUpdatersModule {
     fun provideMythosStakingUpdaters(
         // UserStake in synced in-place in StakingDashboardMythosUpdater by dashboard
         sessionValidatorsUpdater: SessionValidatorsUpdater,
+        invulnerablesUpdater: InvulnerablesUpdater,
         minStakeUpdater: MythosMinStakeUpdater,
         // For syncing aura session info
         currentSlotUpdater: CurrentSlotUpdater,
@@ -118,6 +132,7 @@ class MythosStakingUpdatersModule {
     ): StakingUpdaters.Group {
         return StakingUpdaters.Group(
             sessionValidatorsUpdater,
+            invulnerablesUpdater,
             minStakeUpdater,
             currentSlotUpdater,
             selectedCandidatesUpdater,
