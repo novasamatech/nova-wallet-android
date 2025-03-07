@@ -11,6 +11,7 @@
         android:id="@+id/balanceListAssets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingBottom="64dp"

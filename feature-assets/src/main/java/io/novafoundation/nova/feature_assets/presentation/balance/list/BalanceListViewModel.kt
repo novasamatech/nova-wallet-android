@@ -165,9 +165,6 @@ class BalanceListViewModel(
         .map { if (it) R.drawable.ic_chip_filter_indicator else R.drawable.ic_chip_filter }
         .shareInBackground()
 
-    val shouldShowCrowdloanBanner = assetsListInteractor.shouldShowCrowdloansBanner()
-        .shareInBackground()
-
     val assetViewModeModelFlow = assetListMixin.assetsViewModeFlow.map {
         when (it) {
             AssetViewMode.NETWORKS -> AssetViewModeModel(R.drawable.ic_asset_view_networks, R.string.asset_view_networks)
@@ -313,10 +310,6 @@ class BalanceListViewModel(
 
     fun swapClicked() {
         router.openSwapFlow()
-    }
-
-    private fun hideCrowdloanBanner() = launch {
-        assetsListInteractor.hideCrowdloanBanner()
     }
 
     fun switchViewMode() {

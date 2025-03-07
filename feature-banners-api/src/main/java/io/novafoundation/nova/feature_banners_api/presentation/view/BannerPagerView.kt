@@ -128,7 +128,7 @@ class BannerPagerView @JvmOverloads constructor(
                 if (isLastPageAfterClose) {
                     pagerBannerIndicators.alpha = 1f - it.animatedFraction
                 } else {
-                    pagerBannerIndicators.setCloseProgress(it.animatedFraction, currentPage, nextPage)
+                    pagerBannerIndicators.setCloseAnimationProgress(it.animatedFraction, currentPage, nextPage)
                 }
 
                 contentController.setAnimationState(it.animatedFraction, currentPage, nextPage)
@@ -153,7 +153,7 @@ class BannerPagerView @JvmOverloads constructor(
         val closedPage = pages.removeAt(index)
         currentPage = index.wrapPage()
         pagerBannerIndicators.setPagesSize(pages.size)
-        pagerBannerIndicators.setCurrentPage(currentPage)
+        pagerBannerIndicators.selectIndicatorInstantly(currentPage)
         contentController.showPageImmediately(currentPage)
         backgroundSwitchingController.showPageImmediately(currentPage)
 
@@ -217,7 +217,7 @@ class BannerPagerView @JvmOverloads constructor(
         contentController.showPageImmediately(index)
         backgroundSwitchingController.showPageImmediately(index)
 
-        pagerBannerIndicators.setCurrentPage(index)
+        pagerBannerIndicators.selectIndicatorInstantly(index)
     }
 
     private fun rerunAutoSwipe() {

@@ -5,13 +5,20 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.SingleItemAdapter
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.recyclerView.asViewType
 import io.novafoundation.nova.feature_banners_api.R
 import io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerView
 import kotlinx.android.synthetic.main.item_promotion_banner.view.bannerPager
 
 class PromotionBannerAdapter(
     private val closable: Boolean
-) : SingleItemAdapter<BannerHolder>(isShownByDefault = true) {
+) : SingleItemAdapter<BannerHolder>(isShownByDefault = false) {
+
+    companion object {
+        const val VIEW_TYPE = 102
+
+        fun getViewType() = VIEW_TYPE.asViewType()
+    }
 
     private var banners: List<BannerPageModel> = listOf()
     private var bannerCallback: BannerPagerView.Callback? = null
@@ -22,6 +29,10 @@ class PromotionBannerAdapter(
 
     override fun onBindViewHolder(holder: BannerHolder, position: Int) {
         holder.bind(banners, bannerCallback)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return VIEW_TYPE
     }
 
     fun setBanners(banners: List<BannerPageModel>) {
