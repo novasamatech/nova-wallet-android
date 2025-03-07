@@ -123,7 +123,6 @@ private class RealStableSwapQuotingSource(
                 sharedAssetRemoteId to it
             }
         }.toMultiSubscription(initialPoolsInfo.size)
-            .onEach { Log.d("StableSwap", "poolSharedAssetBalanceSubscriptions loaded") }
 
         val totalPooledAssets = initialPoolsInfo.sumOf { it.poolAssets.size }
 
@@ -137,7 +136,6 @@ private class RealStableSwapQuotingSource(
                 }
             }
         }.toMultiSubscription(totalPooledAssets)
-            .onEach { Log.d("StableSwap", "poolParticipatingAssetsBalanceSubscription loaded") }
 
         val totalIssuanceSubscriptions = initialPoolsInfo.map { poolInfo ->
             remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
@@ -146,10 +144,6 @@ private class RealStableSwapQuotingSource(
                 }
             }
         }.toMultiSubscription(initialPoolsInfo.size)
-            .onEach { Log.d("StableSwap", "totalIssuanceSubscriptions loaded") }
-
-        val blockNumber = host.sharedSubscriptions.blockNumber(chain.id)
-            .onEach { Log.d("StableSwap", "Block number loaded") }
 
         val precisions = fetchAssetsPrecisionsAsync()
 
@@ -158,9 +152,8 @@ private class RealStableSwapQuotingSource(
             poolSharedAssetBalanceSubscriptions,
             poolParticipatingAssetsBalanceSubscription,
             totalIssuanceSubscriptions,
-            blockNumber,
+            host.sharedSubscriptions.blockNumber(chain.id),
         ) { poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock ->
-            Log.d("StableSwap", "!!! Pool construction triggered")
             createStableSwapPool(poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, precisions.await())
         }
             .onEach(stablePools::emit)
