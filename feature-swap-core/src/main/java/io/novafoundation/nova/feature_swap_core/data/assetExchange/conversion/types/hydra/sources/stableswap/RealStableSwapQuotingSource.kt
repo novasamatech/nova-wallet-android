@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap
 
+import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.orEmpty
@@ -21,13 +22,13 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.quote
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.encrypt.json.asLittleEndianBytes
@@ -50,7 +51,6 @@ class StableSwapQuotingSourceFactory(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val gson: Gson,
-    private val chainStateRepository: ChainStateRepository
 ) : HydraDxQuotingSource.Factory<StableSwapQuotingSource> {
 
     companion object {
@@ -58,13 +58,13 @@ class StableSwapQuotingSourceFactory(
         const val ID = "StableSwap"
     }
 
-    override fun create(chain: Chain): StableSwapQuotingSource {
+    override fun create(chain: Chain, host: SwapQuoting.QuotingHost): StableSwapQuotingSource {
         return RealStableSwapQuotingSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             chain = chain,
             gson = gson,
-            chainStateRepository = chainStateRepository
+            host = host
         )
     }
 }
@@ -74,7 +74,7 @@ private class RealStableSwapQuotingSource(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     override val chain: Chain,
     private val gson: Gson,
-    private val chainStateRepository: ChainStateRepository,
+    private val host: SwapQuoting.QuotingHost,
 ) : StableSwapQuotingSource {
 
     override val identifier: String = StableSwapQuotingSourceFactory.ID
@@ -112,6 +112,7 @@ private class RealStableSwapQuotingSource(
                 }
             }
         }.toMultiSubscription(initialPoolsInfo.size)
+            .onEach { Log.d("StableSwap", "poolInfoSubscriptions loaded") }
 
         val omniPoolAccountId = omniPoolAccountId()
 
@@ -122,6 +123,7 @@ private class RealStableSwapQuotingSource(
                 sharedAssetRemoteId to it
             }
         }.toMultiSubscription(initialPoolsInfo.size)
+            .onEach { Log.d("StableSwap", "poolSharedAssetBalanceSubscriptions loaded") }
 
         val totalPooledAssets = initialPoolsInfo.sumOf { it.poolAssets.size }
 
@@ -135,6 +137,7 @@ private class RealStableSwapQuotingSource(
                 }
             }
         }.toMultiSubscription(totalPooledAssets)
+            .onEach { Log.d("StableSwap", "poolParticipatingAssetsBalanceSubscription loaded") }
 
         val totalIssuanceSubscriptions = initialPoolsInfo.map { poolInfo ->
             remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
@@ -143,6 +146,10 @@ private class RealStableSwapQuotingSource(
                 }
             }
         }.toMultiSubscription(initialPoolsInfo.size)
+            .onEach { Log.d("StableSwap", "totalIssuanceSubscriptions loaded") }
+
+        val blockNumber = host.sharedSubscriptions.blockNumber(chain.id)
+            .onEach { Log.d("StableSwap", "Block number loaded") }
 
         val precisions = fetchAssetsPrecisionsAsync()
 
@@ -151,8 +158,9 @@ private class RealStableSwapQuotingSource(
             poolSharedAssetBalanceSubscriptions,
             poolParticipatingAssetsBalanceSubscription,
             totalIssuanceSubscriptions,
-            chainStateRepository.currentBlockNumberFlow(chain.id),
+            blockNumber,
         ) { poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock ->
+            Log.d("StableSwap", "!!! Pool construction triggered")
             createStableSwapPool(poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, precisions.await())
         }
             .onEach(stablePools::emit)

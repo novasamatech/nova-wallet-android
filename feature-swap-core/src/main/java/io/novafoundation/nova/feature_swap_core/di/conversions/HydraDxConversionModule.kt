@@ -41,13 +41,11 @@ class HydraDxConversionModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
         gson: Gson,
-        chainStateRepository: ChainStateRepository
     ): HydraDxQuotingSource.Factory<*> {
         return StableSwapQuotingSourceFactory(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             gson = gson,
-            chainStateRepository = chainStateRepository
         )
     }
 

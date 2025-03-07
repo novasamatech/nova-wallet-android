@@ -1,0 +1,5 @@
+package io.novafoundation.nova.feature_swap_impl.data.assetExchange
+
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuotingSubscriptions
+
+interface SharedSwapSubscriptions: SwapQuotingSubscriptions
