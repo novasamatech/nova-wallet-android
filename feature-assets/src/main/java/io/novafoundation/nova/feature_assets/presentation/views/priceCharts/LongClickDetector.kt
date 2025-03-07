@@ -1,24 +1,53 @@
-package io.novafoundation.nova.feature_assets.presentation.views.priceCharts
-
-import android.content.Context
-import android.view.GestureDetector
+import android.graphics.PointF
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
+import android.view.View
+import androidx.core.graphics.minus
 
-class LongClickDetector(context: Context, private val onLongClickDetected: (e: MotionEvent) -> Unit) : GestureDetector.OnGestureListener {
+class LongPressDetector(
+    private val cancelDistance: Float,
+    private val timeout: Long,
+    private val onLongPress: (MotionEvent) -> Unit
+) : View.OnTouchListener {
 
-    private val gestureDetector = GestureDetector(context, this)
+    private val handler = Handler(Looper.getMainLooper())
+    private var isLongPressTriggered = false
+    private var lastMotionEvent: MotionEvent? = null
+    private var startTouchPoint = PointF()
 
-    fun onTouchEvent(event: MotionEvent): Boolean {
-        return gestureDetector.onTouchEvent(event)
+    private val longPressRunnable = Runnable {
+        isLongPressTriggered = true
+        lastMotionEvent?.let { onLongPress.invoke(it) }
     }
 
-    override fun onLongPress(e: MotionEvent) {
-        onLongClickDetected(e)
+    override fun onTouch(v: View, event: MotionEvent): Boolean {
+        lastMotionEvent = MotionEvent.obtain(event)
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                startTouchPoint = PointF(event.x, event.y)
+                isLongPressTriggered = false
+                handler.postDelayed(longPressRunnable, timeout)
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                val currentTouchPoint = PointF(event.x, event.y)
+                val delta = currentTouchPoint.minus(startTouchPoint)
+                if (!isLongPressTriggered && delta.length() > cancelDistance) {
+                    cancelLongPress()
+                }
+            }
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                cancelLongPress()
+            }
+        }
+        return true
     }
 
-    override fun onDown(e: MotionEvent): Boolean = false
-    override fun onShowPress(e: MotionEvent) = Unit
-    override fun onSingleTapUp(e: MotionEvent): Boolean = false
-    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = false
-    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = false
+    private fun cancelLongPress() {
+        handler.removeCallbacks(longPressRunnable)
+        isLongPressTriggered = false
+        lastMotionEvent = null
+    }
 }

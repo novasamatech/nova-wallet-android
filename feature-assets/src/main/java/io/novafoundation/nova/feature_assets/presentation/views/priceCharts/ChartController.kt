@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.views.priceCharts
 
+import LongPressDetector
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
@@ -12,6 +13,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.vibrate
 import io.novafoundation.nova.feature_assets.R
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 
@@ -24,7 +26,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private val context = chart.context
 
     private val chartUIParams = ChartUIParams.default(context)
-    private val longClickDetector = LongClickDetector(context, ::onChartsLongClick)
+    private val longClickDetector = LongPressDetector(cancelDistance = 5.dpF(context), timeout = 200, ::onChartsLongClick)
     private var isLongClickDetected = false
 
     private var currentEntries: List<Entry> = emptyList()
@@ -93,7 +95,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        longClickDetector.onTouchEvent(event)
+        longClickDetector.onTouch(v, event)
 
         when (event.action) {
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -104,12 +106,18 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
         handleChartsTouch(event)
 
-        return false
+        return true
     }
 
     fun onChartsLongClick(event: MotionEvent) {
         isLongClickDetected = true
         handleChartsTouch(event)
+
+        context.vibrate(50) // Add very short vibration on long click
+    }
+
+    fun isTouchIntercepted(): Boolean {
+        return isLongClickDetected
     }
 
     private fun handleChartsTouch(event: MotionEvent) {
