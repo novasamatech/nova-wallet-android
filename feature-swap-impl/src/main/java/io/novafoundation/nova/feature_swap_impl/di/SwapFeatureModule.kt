@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdat
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module(includes = [HydraDxExchangeModule::class, AssetConversionExchangeModule::class, CrossChainTransferExchangeModule::class])
 class SwapFeatureModule {
@@ -70,7 +71,8 @@ class SwapFeatureModule {
         defaultFeePaymentRegistry: FeePaymentProviderRegistry,
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
-        assetSourceRegistry: AssetSourceRegistry
+        assetSourceRegistry: AssetSourceRegistry,
+        chainStateRepository: ChainStateRepository
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionFactory,
@@ -83,7 +85,8 @@ class SwapFeatureModule {
             defaultFeePaymentProviderRegistry = defaultFeePaymentRegistry,
             tokenRepository = tokenRepository,
             assetSourceRegistry = assetSourceRegistry,
-            accountRepository = accountRepository
+            accountRepository = accountRepository,
+            chainStateRepository = chainStateRepository
         )
     }
 
@@ -184,14 +187,12 @@ class SwapFeatureModule {
     fun provideSwapUpdateSystemFactory(
         swapSettingsStateProvider: SwapSettingsStateProvider,
         chainRegistry: ChainRegistry,
-        storageCache: StorageCache,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         accountInfoUpdaterFactory: AccountInfoUpdaterFactory
     ): SwapUpdateSystemFactory {
         return SwapUpdateSystemFactory(
             swapSettingsStateProvider = swapSettingsStateProvider,
             chainRegistry = chainRegistry,
-            storageCache = storageCache,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             accountInfoUpdaterFactory = accountInfoUpdaterFactory
         )

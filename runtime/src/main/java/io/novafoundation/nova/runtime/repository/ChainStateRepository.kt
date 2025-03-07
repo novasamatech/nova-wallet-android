@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumbe
 import io.novafoundation.nova.common.utils.babeOrNull
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isParachain
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.optionalNumberConstant
 import io.novafoundation.nova.common.utils.system
@@ -17,7 +18,10 @@ import io.novafoundation.nova.runtime.network.updaters.SampledBlockTime
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
+import io.novafoundation.nova.runtime.storage.typed.number
+import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
@@ -36,6 +40,7 @@ private val REQUIRED_SAMPLED_BLOCKS = 10.toBigInteger()
 
 class ChainStateRepository(
     private val localStorage: StorageDataSource,
+    private val remoteStorage: StorageDataSource,
     private val sampledBlockTimeStorage: SampledBlockTimeStorage,
     private val chainRegistry: ChainRegistry
 ) {
@@ -109,11 +114,13 @@ class ChainStateRepository(
         chainId = chainId
     )
 
-    fun currentBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = localStorage.observeNonNull(
-        keyBuilder = ::currentBlockStorageKey,
-        binding = { scale, runtime -> bindBlockNumber(scale, runtime) },
-        chainId = chainId
-    )
+    fun currentBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = localStorage.observeBlockNumber(chainId)
+
+    fun currentRemoteBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = remoteStorage.observeBlockNumber(chainId)
+
+    private fun StorageDataSource.observeBlockNumber(chainId: ChainId) = subscribe(chainId) {
+        metadata.system.number.observeNonNull()
+    }
 
     private fun currentBlockStorageKey(runtime: RuntimeSnapshot) = runtime.metadata.system().storage("Number").storageKey()
 

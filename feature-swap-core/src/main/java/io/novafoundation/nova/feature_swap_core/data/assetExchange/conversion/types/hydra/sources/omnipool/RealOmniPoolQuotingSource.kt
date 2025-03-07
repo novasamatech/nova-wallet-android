@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.subscribeToTransferableBalance
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
@@ -51,7 +52,7 @@ class OmniPoolQuotingSourceFactory(
         const val SOURCE_ID = "OmniPool"
     }
 
-    override fun create(chain: Chain): OmniPoolQuotingSource {
+    override fun create(chain: Chain, host: SwapQuoting.QuotingHost): OmniPoolQuotingSource {
         return RealOmniPoolQuotingSource(
             remoteStorageSource = remoteStorageSource,
             chainRegistry = chainRegistry,
