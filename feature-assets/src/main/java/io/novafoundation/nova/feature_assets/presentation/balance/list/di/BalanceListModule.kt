@@ -7,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
-import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -40,9 +39,8 @@ class BalanceListModule {
     fun provideInteractor(
         accountRepository: AccountRepository,
         nftRepository: NftRepository,
-        bannerVisibilityRepository: BannerVisibilityRepository,
         assetsViewModeRepository: AssetsViewModeRepository
-    ) = AssetsListInteractor(accountRepository, nftRepository, bannerVisibilityRepository, assetsViewModeRepository)
+    ) = AssetsListInteractor(accountRepository, nftRepository, assetsViewModeRepository)
 
     @Provides
     @ScreenScope

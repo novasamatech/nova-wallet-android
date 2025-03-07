@@ -9,44 +9,46 @@
 
     <ImageView
         android:id="@+id/pagerBannerImage"
-        android:layout_width="202dp"
+        android:layout_width="126dp"
         android:layout_height="0dp"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_min="126dp"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHeight_min="96dp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_android_nav_bar_dapps_active" />
 
-    <TextView
-        android:id="@+id/pagerBannerTitle"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="128dp"
-        android:includeFontPadding="false"
-        app:layout_constraintVertical_chainStyle="spread"
-        app:layout_constraintBottom_toTopOf="@+id/pagerBannerSubtitle"
-        android:textColor="@color/text_primary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/pagerBannerSubtitle"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="128dp"
-        android:layout_marginBottom="36dp"
-        android:includeFontPadding="false"
-        android:textColor="@color/text_primary"
+        android:layout_marginEnd="2dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/pagerBannerImage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pagerBannerTitle" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/pagerBannerTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/pagerBannerSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary"
+            tools:text="Subtitle\nsecond line" />
+
+    </LinearLayout>
 
 </merge>

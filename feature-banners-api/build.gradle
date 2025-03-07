@@ -13,10 +13,10 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/banners_dev.json\""
-        buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners_dev.json\""
-        buildConfigField "String", "ASSETS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/localized_dev\""
-        buildConfigField "String", "DAPPS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/localized_dev\""
+        buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/assets/banners_dev.json\""
+        buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/dapps/banners_dev.json\""
+        buildConfigField "String", "ASSETS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/assets/localized_dev\""
+        buildConfigField "String", "DAPPS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/dapps/localized_dev\""
     }
 
     buildTypes {
@@ -26,10 +26,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/banners.json\""
-            buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/banners.json\""
-            buildConfigField "String", "ASSETS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/assets/localized\""
-            buildConfigField "String", "DAPPS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/content/dapps/localized\""
+            buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/assets/banners.json\""
+            buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/dapps/banners.json\""
+            buildConfigField "String", "ASSETS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/assets/localized\""
+            buildConfigField "String", "DAPPS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/dapps/localized\""
         }
     }
 

@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
 import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -55,6 +56,7 @@ class MainDAppFragment :
         dappRecyclerViewCatalog.applyStatusBarInsets()
         dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, bannerAdapter, favoritesAdapter, dappsShimmering, dappCategoriesListAdapter)
         dappRecyclerViewCatalog.itemAnimator = null
+        setupRecyclerViewSpacing()
     }
 
     override fun inject() {
@@ -66,7 +68,9 @@ class MainDAppFragment :
 
     override fun subscribe(viewModel: MainDAppViewModel) {
         observeBrowserEvents(viewModel)
-        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
+        viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
+            dappRecyclerViewCatalog?.invalidateItemDecorations()
+        }
 
         viewModel.selectedWalletFlow.observe(headerAdapter::setWallet)
 
@@ -121,5 +125,12 @@ class MainDAppFragment :
 
     override fun onManageFavoritesClick() {
         viewModel.openFavorites()
+    }
+
+    private fun setupRecyclerViewSpacing() {
+        dappRecyclerViewCatalog.addSpaceItemDecoration {
+            // Add extra space between items
+            addSpaceBetween(DappCategoryListAdapter.getViewType(), spaceDp = 8)
+        }
     }
 }
