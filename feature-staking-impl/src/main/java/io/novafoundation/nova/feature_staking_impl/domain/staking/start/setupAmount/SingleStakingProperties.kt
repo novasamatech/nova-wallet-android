@@ -12,13 +12,17 @@ interface SingleStakingProperties {
 
     suspend fun availableBalance(asset: Asset): Balance
 
-    suspend fun maximumToStake(asset: Asset, fee: Balance): Balance
+    suspend fun maximumToStake(asset: Asset): Balance
 
     val recommendation: SingleStakingRecommendation
 
     val validationSystem: StartMultiStakingValidationSystem
 
     suspend fun minStake(): Balance
+}
+
+suspend fun SingleStakingProperties.maximumToStake(asset: Asset, fee: Balance): Balance {
+    return maximumToStake(asset) - fee
 }
 
 interface SingleStakingRecommendation {

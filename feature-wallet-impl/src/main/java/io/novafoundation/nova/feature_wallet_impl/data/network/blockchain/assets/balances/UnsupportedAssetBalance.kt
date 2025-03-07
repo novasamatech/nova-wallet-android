@@ -22,7 +22,7 @@ class UnsupportedAssetBalance : AssetBalance {
 
     override fun isSelfSufficient(chainAsset: Chain.Asset) = unsupported()
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset) = unsupported()
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset) = unsupported()
 
     override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
     override suspend fun subscribeTransferableAccountBalance(

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.ext
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
@@ -16,6 +17,7 @@ import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
@@ -164,7 +166,7 @@ fun ChainId.chainIdHexPrefix16(): String {
 
 enum class StakingTypeGroup {
 
-    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, UNSUPPORTED
+    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, UNSUPPORTED
 }
 
 fun Chain.Asset.StakingType.group(): StakingTypeGroup {
@@ -172,6 +174,7 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
         UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
         RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
         PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+        MYTHOS -> StakingTypeGroup.MYTHOS
         NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
     }
 }
@@ -262,6 +265,10 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
+}
+
+fun Chain.accountIdKeyOf(address: String): AccountIdKey {
+    return accountIdOf(address).intoKey()
 }
 
 fun String.anyAddressToAccountId(): ByteArray {

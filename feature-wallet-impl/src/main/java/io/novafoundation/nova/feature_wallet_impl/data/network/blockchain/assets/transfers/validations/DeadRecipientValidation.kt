@@ -34,7 +34,7 @@ class DeadRecipientValidation(
 
         val balanceSource = assetSourceRegistry.sourceFor(chainAsset).balance
 
-        val existentialDeposit = balanceSource.existentialDeposit(chain, chainAsset)
+        val existentialDeposit = balanceSource.existentialDeposit(chainAsset)
         val recipientAccountId = value.transfer.destinationChain.accountIdOf(value.transfer.recipient)
 
         val recipientBalance = balanceSource.queryTotalBalance(chain, chainAsset, recipientAccountId)

@@ -49,10 +49,12 @@ dependencies {
     implementation project(':runtime')
     implementation project(':feature-buy-api')
     implementation project(':feature-xcm:api')
+    implementation project(':feature-banners-api')
 
     implementation kotlinDep
 
     implementation androidDep
+    implementation swipeRefershLayout
     implementation materialDep
     implementation cardViewDep
     implementation constraintDep
@@ -94,6 +96,8 @@ dependencies {
 
     implementation shimmerDep
     implementation flexBoxDep
+
+    implementation chartsDep
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep

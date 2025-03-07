@@ -82,7 +82,7 @@ class RealXcmVersionDetector @Inject constructor(
         argumentName: String,
     ): DictEnum? {
         return chainRegistry.withRuntime(chainId) {
-            val call = getCall(metadata) ?: return@withRuntime null
+            val call = getCall(runtime.metadata) ?: return@withRuntime null
             val argument = call.arguments.find { it.name == argumentName } ?: return@withRuntime null
             argument.type?.skipAliases() as? DictEnum
         }

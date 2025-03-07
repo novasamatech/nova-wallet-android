@@ -70,11 +70,9 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel>() {
     override fun subscribe(viewModel: SelectBondMoreViewModel) {
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, bondMoreAmount)
-        setupFeeLoading(viewModel, bondMoreFee)
+        setupFeeLoading(viewModel.originFeeMixin, bondMoreFee)
         observeHints(viewModel.hintsMixin, bondMoreHints)
 
         viewModel.showNextProgress.observe(bondMoreContinue::setProgressState)
-
-        viewModel.feeLiveData.observe(bondMoreFee::setFeeStatus)
     }
 }

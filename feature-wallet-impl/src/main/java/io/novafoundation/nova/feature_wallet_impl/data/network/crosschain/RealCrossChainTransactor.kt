@@ -128,7 +128,7 @@ class RealCrossChainTransactor(
     }
 
     override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
-        return assetSourceRegistry.sourceFor(sendingAsset).balance.existentialDeposit(originChain, sendingAsset)
+        return assetSourceRegistry.sourceFor(sendingAsset).balance.existentialDeposit(sendingAsset)
     }
 
     context(ExtrinsicService)

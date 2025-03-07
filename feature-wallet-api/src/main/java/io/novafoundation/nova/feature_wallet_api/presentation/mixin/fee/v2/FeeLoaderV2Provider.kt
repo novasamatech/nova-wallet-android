@@ -62,7 +62,9 @@ internal class FeeLoaderV2Provider<F, D>(
     private val feeInspector: FeeInspector<F>,
     private val selectedChainAssetFlow: Flow<Chain.Asset>,
     coroutineScope: CoroutineScope
-) : FeeLoaderMixinV2.Presentation<F, D>, CoroutineScope by coroutineScope, FeeFormatter.Context {
+) : FeeLoaderMixinV2.Presentation<F, D>,
+    CoroutineScope by coroutineScope,
+    FeeFormatter.Context {
 
     private val feeFormatterConfiguration = configuration.toFeeFormatterConfiguration()
 
@@ -209,7 +211,7 @@ internal class FeeLoaderV2Provider<F, D>(
         val isCustomFee = !feeChainAssetFlow.first().isUtilityAsset
 
         if (isCustomFee && mode.onlyNativeFeeEnabled()) {
-            val utilityAsset = selectedTokenInfo.first().chainAsset
+            val utilityAsset = selectedTokenInfo.first().chain.utilityAsset
             feeChainAssetFlow.emit(utilityAsset)
 
             reloadFeeWithLatestConstructor()

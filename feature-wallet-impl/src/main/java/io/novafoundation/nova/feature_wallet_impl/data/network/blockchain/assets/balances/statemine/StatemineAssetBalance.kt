@@ -56,7 +56,7 @@ class StatemineAssetBalance(
         return chainAsset.requireStatemine().isSufficient
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         return queryAssetDetails(chainAsset).minimumBalance
     }
 

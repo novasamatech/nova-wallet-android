@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.errors.shouldIgnore
+import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.validation.ProgressConsumer
@@ -18,7 +19,11 @@ import kotlin.coroutines.CoroutineContext
 
 typealias TitleAndMessage = Pair<String, String?>
 
-open class BaseViewModel : ViewModel(), CoroutineScope, WithCoroutineScopeExtensions {
+open class BaseViewModel :
+    ViewModel(),
+    CoroutineScope,
+    ComputationalScope,
+    WithCoroutineScopeExtensions {
 
     private val _errorLiveData = MutableLiveData<Event<String>>()
     val errorLiveData: LiveData<Event<String>> = _errorLiveData

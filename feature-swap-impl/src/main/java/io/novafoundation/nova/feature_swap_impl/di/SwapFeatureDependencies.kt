@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -146,4 +147,6 @@ interface SwapFeatureDependencies {
     val assetsValidationContextFactory: AssetsValidationContext.Factory
 
     val xcmVersionDetector: XcmVersionDetector
+
+    fun maxActionProviderFactory(): MaxActionProviderFactory
 }

@@ -33,8 +33,8 @@
         android:layout_width="0dp"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="4dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="4dp"
         app:layout_constraintEnd_toStartOf="@id/dappMainManage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
@@ -49,6 +49,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/dappMainSearch"
         app:tint="@color/chip_icon" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/categorizedDappsCategoriesBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="mainDappCategories,categorizedDappsCategoriesShimmering" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mainDappCategories"
@@ -79,97 +86,5 @@
         <include layout="@layout/item_dapp_categories_shimmering" />
 
     </FrameLayout>
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/categorizedDappsCategoriesBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="mainDappCategories,categorizedDappsCategoriesShimmering" />
-
-    <io.novafoundation.nova.common.view.BannerView
-        android:id="@+id/dappMainWelcomeGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_cycle"
-        app:bannerBackground="@drawable/ic_main_banner_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/categorizedDappsCategoriesBarrier">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="110dp"
-            android:layout_marginBottom="24dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/dappMainWelcomeTitle"
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dapp_main_welcome_title"
-                android:textColor="@color/text_primary" />
-
-            <TextView
-                android:id="@+id/dappMainWelcomeSubtitle"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/dapp_main_welcome_subtitle"
-                android:textColor="@color/text_secondary" />
-
-        </LinearLayout>
-
-    </io.novafoundation.nova.common.view.BannerView>
-
-    <TextView
-        android:id="@+id/dAppMainFavoriteDAppTitle"
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        android:drawablePadding="8dp"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:lines="1"
-        android:text="@string/dapp_favorites"
-        android:textColor="@color/text_primary"
-        app:drawableStartCompat="@drawable/ic_favorite_heart_filled_20"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dappMainWelcomeGroup" />
-
-    <TextView
-        android:id="@+id/dAppMainFavoriteDAppsShow"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:padding="8dp"
-        android:text="@string/common_see_all"
-        android:textColor="@color/button_text_accent"
-        app:layout_constraintBottom_toBottomOf="@+id/dAppMainFavoriteDAppTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/dAppMainFavoriteDAppTitle" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dAppMainFavoriteDAppList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:orientation="horizontal"
-        android:overScrollMode="never"
-        android:paddingVertical="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/dAppMainFavoriteDAppTitle"
-        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

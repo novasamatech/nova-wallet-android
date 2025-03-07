@@ -24,9 +24,9 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.Extri
 import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
 import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
@@ -208,7 +208,7 @@ class RealExtrinsicService(
         val totalNativeFee = SubstrateFee(
             totalFeeAmount,
             feeSigner.submissionOrigin(chain),
-            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
+            submissionOptions.feePaymentCurrency.toChainAsset(chain)
         )
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
@@ -351,7 +351,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             BigInteger.ZERO,
             signer.submissionOrigin(chain),
-            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
+            submissionOptions.feePaymentCurrency.toChainAsset(chain)
         )
     }
 

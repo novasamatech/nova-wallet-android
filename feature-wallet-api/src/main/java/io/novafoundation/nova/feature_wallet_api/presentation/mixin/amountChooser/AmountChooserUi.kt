@@ -19,6 +19,8 @@ interface AmountInputView {
     fun setFiatAmount(fiat: CharSequence?)
 
     fun setError(errorState: FieldValidationResult)
+
+    fun setEnabled(enabled: Boolean)
 }
 
 interface MaxAvailableView {
@@ -56,7 +58,7 @@ fun BaseFragment<*>.setupAmountChooserBase(
     amountInputView: AmountInputView,
     maxAvailableView: MaxAvailableView?
 ) {
-    amountInputView.amountInput.bindToAmountInput(mixin.inputState, lifecycleScope)
+    bindInputStateToField(amountInputView, mixin.inputState, lifecycleScope)
     mixin.fiatAmount.observe(amountInputView::setFiatAmount)
     mixin.fieldError.observe(amountInputView::setError)
 
@@ -81,6 +83,12 @@ fun BaseFragment<*>.setupAmountChooserBase(
     }
 }
 
-private fun EditText.bindToAmountInput(flow: MutableSharedFlow<InputState<String>>, scope: CoroutineScope) {
-    bindTo(flow, scope, toT = { InputState(it, initiatedByUser = true, InputState.InputKind.REGULAR) }, fromT = { it.value })
+private fun BaseFragment<*>.bindInputStateToField(
+    amountInputView: AmountInputView,
+    flow: MutableSharedFlow<InputState<String>>,
+    scope: CoroutineScope
+) {
+    amountInputView.amountInput.bindTo(flow, scope, toT = { InputState(it, initiatedByUser = true, InputState.InputKind.REGULAR) }, fromT = { it.value })
+
+    flow.observe { amountInputView.setEnabled(it.inputKind.isInputAllowed()) }
 }

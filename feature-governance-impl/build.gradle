@@ -46,6 +46,7 @@ dependencies {
     implementation project(':feature-governance-api')
     implementation project(':feature-dapp-api')
     implementation project(':feature-xcm:api')
+    implementation project(':feature-deep-link-building')
 
     implementation project(":common")
     implementation project(":runtime")
