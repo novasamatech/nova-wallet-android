@@ -187,14 +187,12 @@ class SwapFeatureModule {
     fun provideSwapUpdateSystemFactory(
         swapSettingsStateProvider: SwapSettingsStateProvider,
         chainRegistry: ChainRegistry,
-        storageCache: StorageCache,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         accountInfoUpdaterFactory: AccountInfoUpdaterFactory
     ): SwapUpdateSystemFactory {
         return SwapUpdateSystemFactory(
             swapSettingsStateProvider = swapSettingsStateProvider,
             chainRegistry = chainRegistry,
-            storageCache = storageCache,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             accountInfoUpdaterFactory = accountInfoUpdaterFactory
         )

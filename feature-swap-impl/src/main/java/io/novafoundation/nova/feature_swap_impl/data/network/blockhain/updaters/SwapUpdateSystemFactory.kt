@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.mapNotNull
 class SwapUpdateSystemFactory(
     private val swapSettingsStateProvider: SwapSettingsStateProvider,
     private val chainRegistry: ChainRegistry,
-    private val storageCache: StorageCache,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val accountInfoUpdaterFactory: AccountInfoUpdaterFactory
 ) {
@@ -36,7 +35,6 @@ class SwapUpdateSystemFactory(
         val sharedStateAdapter = SwapSharedStateAdapter(swapSettingsState, chainRegistry, coroutineScope)
 
         val updaters = listOf(
-            blockNumberUpdater(sharedStateAdapter),
             accountInfoUpdaterFactory.create(ChainUpdateScope(chainFlow), sharedStateAdapter)
         )
 
@@ -46,10 +44,6 @@ class SwapUpdateSystemFactory(
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             updaters = updaters
         )
-    }
-
-    private fun blockNumberUpdater(sharedStateAdapter: SwapSharedStateAdapter): Updater<*> {
-        return SharedAssetBlockNumberUpdater(chainRegistry, sharedStateAdapter, storageCache)
     }
 }
 
