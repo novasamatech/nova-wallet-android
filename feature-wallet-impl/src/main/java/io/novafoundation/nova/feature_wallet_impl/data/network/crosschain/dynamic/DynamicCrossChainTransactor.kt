@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.composeCall
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance

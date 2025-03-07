@@ -167,6 +167,15 @@ fun RuntimeSnapshot.composeCall(
     return GenericCall.Instance(module, call, args)
 }
 
+context(RuntimeContext)
+fun composeCall(
+    moduleName: String,
+    callName: String,
+    args: Map<String, Any?>
+): GenericCall.Instance {
+    return runtime.composeCall(moduleName, callName, args)
+}
+
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
 
 operator fun <S : Schema<S>> S.invoke(block: StructBuilderWithContext<S>? = null): EncodableStruct<S> {
