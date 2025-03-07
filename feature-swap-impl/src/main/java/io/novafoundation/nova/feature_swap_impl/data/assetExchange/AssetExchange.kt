@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
-import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting.QuotingHost
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -25,7 +24,7 @@ interface AssetExchange {
         suspend fun create(swapHost: SwapHost): AssetExchange
     }
 
-    interface SwapHost: QuotingHost {
+    interface SwapHost : QuotingHost {
 
         val scope: CoroutineScope
 

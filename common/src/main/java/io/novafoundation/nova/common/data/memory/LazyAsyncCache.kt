@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-
 interface LazyAsyncCache<K, V> {
 
     suspend fun getOrCompute(key: K): V
@@ -43,7 +42,7 @@ typealias AsyncCacheCompute<K, V> = suspend (key: K, scope: CoroutineScope) -> V
 private class RealLazyAsyncCache<K, V>(
     private val lifetime: CoroutineScope,
     private val compute: AsyncCacheCompute<K, V>,
-): LazyAsyncCache<K, V> {
+) : LazyAsyncCache<K, V> {
 
     private val mutex = Mutex()
     private val cache = mutableMapOf<K, V>()
