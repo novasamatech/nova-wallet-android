@@ -112,7 +112,6 @@ private class RealStableSwapQuotingSource(
                 }
             }
         }.toMultiSubscription(initialPoolsInfo.size)
-            .onEach { Log.d("StableSwap", "poolInfoSubscriptions loaded") }
 
         val omniPoolAccountId = omniPoolAccountId()
 
