@@ -11,13 +11,15 @@ class LongPressDetector(
     private val onLongPress: (MotionEvent) -> Unit
 ) : View.OnTouchListener {
 
+    var isLongClickDetected = false
+        private set
+
     private val handler = Handler(Looper.getMainLooper())
-    private var isLongPressTriggered = false
     private var lastMotionEvent: MotionEvent? = null
     private var startTouchPoint = PointF()
 
     private val longPressRunnable = Runnable {
-        isLongPressTriggered = true
+        isLongClickDetected = true
         lastMotionEvent?.let { onLongPress.invoke(it) }
     }
 
@@ -26,14 +28,14 @@ class LongPressDetector(
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 startTouchPoint = PointF(event.x, event.y)
-                isLongPressTriggered = false
+                isLongClickDetected = false
                 handler.postDelayed(longPressRunnable, timeout)
             }
 
             MotionEvent.ACTION_MOVE -> {
                 val currentTouchPoint = PointF(event.x, event.y)
                 val delta = currentTouchPoint.minus(startTouchPoint)
-                if (!isLongPressTriggered && delta.length() > cancelDistance) {
+                if (!isLongClickDetected && delta.length() > cancelDistance) {
                     cancelLongPress()
                 }
             }
@@ -47,7 +49,7 @@ class LongPressDetector(
 
     private fun cancelLongPress() {
         handler.removeCallbacks(longPressRunnable)
-        isLongPressTriggered = false
+        isLongClickDetected = false
         lastMotionEvent = null
     }
 }

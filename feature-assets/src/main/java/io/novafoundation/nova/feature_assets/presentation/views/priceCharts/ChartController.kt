@@ -27,7 +27,6 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private val chartUIParams = ChartUIParams.default(context)
     private val longClickDetector = LongPressDetector(cancelDistance = 5.dpF(context), timeout = 200, ::onChartsLongClick)
-    private var isLongClickDetected = false
 
     private var currentEntries: List<Entry> = emptyList()
     private var useNeutralColor = false
@@ -99,7 +98,6 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
         when (event.action) {
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                isLongClickDetected = false
                 updateChart()
             }
         }
@@ -110,18 +108,17 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     fun onChartsLongClick(event: MotionEvent) {
-        isLongClickDetected = true
         handleChartsTouch(event)
 
         context.vibrate(50) // Add very short vibration on long click
     }
 
     fun isTouchIntercepted(): Boolean {
-        return isLongClickDetected
+        return longClickDetector.isLongClickDetected
     }
 
     private fun handleChartsTouch(event: MotionEvent) {
-        if (isLongClickDetected) {
+        if (longClickDetector.isLongClickDetected) {
             val entry = chart.getEntryByTouchPoint(event)
             if (entry != null) {
                 updateChartWithSelectedEntry(entry)
