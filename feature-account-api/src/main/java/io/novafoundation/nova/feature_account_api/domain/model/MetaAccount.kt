@@ -87,6 +87,9 @@ interface MetaAccount : LightMetaAccount {
     // TODO we can now subclass MetaAccount and have this field only in subclass
     val proxy: ProxyAccount?
 
+    // TODO this should not be exposed as its a implementation detail
+    // We should rather use something like
+    // fun iterateAccounts(): Iterable<(AccountId, ChainId?, MultiChainEncryption?)>
     val chainAccounts: Map<ChainId, ChainAccount>
 
     class ChainAccount(
@@ -94,6 +97,7 @@ interface MetaAccount : LightMetaAccount {
         val chainId: ChainId,
         val publicKey: ByteArray?,
         val accountId: ByteArray,
+        // TODO this should be MultiChainEncryption
         val cryptoType: CryptoType?,
     )
 
