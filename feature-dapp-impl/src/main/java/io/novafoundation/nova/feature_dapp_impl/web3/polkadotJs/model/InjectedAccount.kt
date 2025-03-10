@@ -16,9 +16,8 @@ fun InjectedAccount(
     encryption: MultiChainEncryption?,
 ) = InjectedAccount(address, genesisHash, name, encryption?.injectedType())
 
-
 private fun MultiChainEncryption.injectedType(): String {
-    return when(this) {
+    return when (this) {
         is MultiChainEncryption.Substrate -> encryptionType.rawName
         MultiChainEncryption.Ethereum -> "ethereum"
     }
