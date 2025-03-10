@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">「%s」DAppはお気に入りから削除されます</string>
     <string name="dapp_favourites_remove_title">お気に入りから削除しますか？</string>
     <string name="dapp_list_placeholder">ここにDAppsのリストが表示されます</string>
-    <string name="dapp_main_welcome_subtitle">Nova Walletのアカウントを使用してウェブを閲覧</string>
-    <string name="dapp_main_welcome_title">Nova Browserへようこそ</string>
     <string name="dapp_options_add_to_favorite">お気に入りに追加</string>
     <string name="dapp_options_desktop_mode">デスクトップモード</string>
     <string name="dapp_options_remove_from_favorite">お気に入りから削除</string>
@@ -938,6 +936,7 @@
     <string name="price_chart_year">1年</string>
     <string name="price_charts_period_all">全期間</string>
     <string name="price_charts_period_month">先月</string>
+    <string name="price_charts_period_today">今日</string>
     <string name="price_charts_period_week">先週</string>
     <string name="price_charts_period_year">昨年</string>
     <string name="profile_accounts_title">アカウント</string>

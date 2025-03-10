@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">A „%s” DApp el lesz távolítva a Kedvencek közül</string>
     <string name="dapp_favourites_remove_title">Eltávolítod a kedvencek közül?</string>
     <string name="dapp_list_placeholder">Itt fog megjelenni a DApp-ok listája</string>
-    <string name="dapp_main_welcome_subtitle">Böngészd az internetet Nova Wallet fiókjaiddal</string>
-    <string name="dapp_main_welcome_title">Üdvözöl a Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Hozzáadás a kedvencekhez</string>
     <string name="dapp_options_desktop_mode">Asztali mód</string>
     <string name="dapp_options_remove_from_favorite">Eltávolítás a kedvencekből</string>
@@ -946,6 +944,7 @@
     <string name="price_chart_year">1É</string>
     <string name="price_charts_period_all">Teljes idő</string>
     <string name="price_charts_period_month">Elmúlt hónap</string>
+    <string name="price_charts_period_today">Ma</string>
     <string name="price_charts_period_week">Elmúlt hét</string>
     <string name="price_charts_period_year">Elmúlt év</string>
     <string name="profile_accounts_title">Fiókok</string>

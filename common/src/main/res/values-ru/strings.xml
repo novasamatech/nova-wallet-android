@@ -665,8 +665,6 @@
     <string name="dapp_favourites_remove_description">”%s” DApp будет удален из Избранного</string>
     <string name="dapp_favourites_remove_title">Удалить из Избранного?</string>
     <string name="dapp_list_placeholder">Список DApps появится здесь</string>
-    <string name="dapp_main_welcome_subtitle">Просматривайте веб-страницы, используя ваши аккаунты из Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Добро пожаловать в Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Добавить в избранное</string>
     <string name="dapp_options_desktop_mode">Версия для ПК</string>
     <string name="dapp_options_remove_from_favorite">Убрать из Избранного</string>
@@ -962,6 +960,7 @@
     <string name="price_chart_year">1Г</string>
     <string name="price_charts_period_all">Все время</string>
     <string name="price_charts_period_month">Прошлый месяц</string>
+    <string name="price_charts_period_today">Сегодня</string>
     <string name="price_charts_period_week">Прошлая неделя</string>
     <string name="price_charts_period_year">Прошлый год</string>
     <string name="profile_accounts_title">Аккаунты</string>

@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">‘%s’ DApp Favorilerden kaldırılacak</string>
     <string name="dapp_favourites_remove_title">Favorilerden Kaldırılsın mı?</string>
     <string name="dapp_list_placeholder">DApp\'lerin listesi burada görünecek</string>
-    <string name="dapp_main_welcome_subtitle">Hesaplarınızı Nova Wallet\'tan kullanarak web\'i gezin</string>
-    <string name="dapp_main_welcome_title">Nova Tarayıcısına Hoş Geldiniz</string>
     <string name="dapp_options_add_to_favorite">Favorilere Ekle</string>
     <string name="dapp_options_desktop_mode">Masaüstü modu</string>
     <string name="dapp_options_remove_from_favorite">Favorilerden Çıkar</string>
@@ -946,6 +944,7 @@
     <string name="price_chart_year">1Yıl</string>
     <string name="price_charts_period_all">Tüm Zamanlar</string>
     <string name="price_charts_period_month">Geçen Ay</string>
+    <string name="price_charts_period_today">Bugün</string>
     <string name="price_charts_period_week">Geçen Hafta</string>
     <string name="price_charts_period_year">Geçen Yıl</string>
     <string name="profile_accounts_title">Hesaplar</string>

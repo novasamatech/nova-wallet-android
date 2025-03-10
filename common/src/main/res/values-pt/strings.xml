@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">O DApp “%s” será removido dos Favoritos</string>
     <string name="dapp_favourites_remove_title">Remover dos Favoritos?</string>
     <string name="dapp_list_placeholder">A lista de DApps aparecerá aqui</string>
-    <string name="dapp_main_welcome_subtitle">Navegue na web usando suas contas do Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Bem-vindo ao Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Adicionar aos Favoritos</string>
     <string name="dapp_options_desktop_mode">Modo Desktop</string>
     <string name="dapp_options_remove_from_favorite">Remover dos Favoritos</string>
@@ -946,6 +944,7 @@
     <string name="price_chart_year">1A</string>
     <string name="price_charts_period_all">Todo o Tempo</string>
     <string name="price_charts_period_month">Último Mês</string>
+    <string name="price_charts_period_today">Hoje</string>
     <string name="price_charts_period_week">Última Semana</string>
     <string name="price_charts_period_year">Último Ano</string>
     <string name="profile_accounts_title">Contas</string>

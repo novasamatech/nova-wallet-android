@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">DApp \"%s\" akan dihapus dari Favorit</string>
     <string name="dapp_favourites_remove_title">Hapus dari Favorit?</string>
     <string name="dapp_list_placeholder">Daftar DApps akan muncul di sini</string>
-    <string name="dapp_main_welcome_subtitle">Jelajahi web menggunakan akun Anda dari Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Selamat datang di Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Tambahkan ke Favorit</string>
     <string name="dapp_options_desktop_mode">Mode Desktop</string>
     <string name="dapp_options_remove_from_favorite">Hapus dari Favorit</string>
@@ -938,6 +936,7 @@
     <string name="price_chart_year">1T</string>
     <string name="price_charts_period_all">Sepanjang Masa</string>
     <string name="price_charts_period_month">Bulan Lalu</string>
+    <string name="price_charts_period_today">Hari ini</string>
     <string name="price_charts_period_week">Minggu Lalu</string>
     <string name="price_charts_period_year">Tahun Lalu</string>
     <string name="profile_accounts_title">Akun</string>
