@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -36,12 +37,16 @@ class LocalStorageQueryContext(
         return storageCache.getEntry(key, chainId).content
     }
 
-    override fun observeKey(key: String): Flow<String?> {
-        return storageCache.observeEntry(key, chainId).map { it.content }
+    override fun observeKey(key: String): Flow<StorageUpdate> {
+        return storageCache.observeEntry(key, chainId).map {
+            StorageUpdate(it.content, at = null)
+        }
     }
 
-    override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
-        return storageCache.observeEntries(keys, chainId).map { it.toMap() }
+    override fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
+        return storageCache.observeEntries(keys, chainId)
+            .map { it.toMap() }
+            .distinctUntilChanged()
     }
 
     override suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>> {

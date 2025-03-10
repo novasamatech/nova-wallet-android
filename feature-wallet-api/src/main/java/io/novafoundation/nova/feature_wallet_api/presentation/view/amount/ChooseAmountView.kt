@@ -5,17 +5,18 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxAvailableView
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
-import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountBalance
-import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountBalanceLabel
 import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountInput
+import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountMaxButton
 import kotlinx.android.synthetic.main.view_choose_amount.view.chooseAmountTitle
 
 class ChooseAmountView @JvmOverloads constructor(
@@ -33,12 +34,8 @@ class ChooseAmountView @JvmOverloads constructor(
         attrs?.let(::applyAttrs)
     }
 
-    fun setBalanceLabel(label: String?) {
-        chooseAmountBalanceLabel.setTextOrHide(label)
-    }
-
-    fun loadAssetImage(imageUrl: String) {
-        chooseAmountInput.loadAssetImage(imageUrl)
+    fun loadAssetImage(icon: Icon) {
+        chooseAmountInput.loadAssetImage(icon)
     }
 
     fun setTitle(title: String?) {
@@ -49,20 +46,28 @@ class ChooseAmountView @JvmOverloads constructor(
         chooseAmountInput.setAssetName(name)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+
+        chooseAmountInput.isEnabled = enabled
+    }
+
     override fun setFiatAmount(fiat: CharSequence?) {
         chooseAmountInput.setFiatAmount(fiat)
     }
 
-    override fun setError(errorState: AmountChooserMixinBase.AmountErrorState) {
+    override fun setError(errorState: FieldValidationResult) {
         // TODO not implemented
     }
 
     override fun setMaxAmountDisplay(maxAmountDisplay: String?) {
-        chooseAmountBalance.setTextOrHide(maxAmountDisplay)
+        chooseAmountMaxButton.setMaxAmountDisplay(maxAmountDisplay)
     }
 
     override fun setMaxActionAvailability(availability: MaxActionAvailability) {
-        // TODO amount chooser max button
+        chooseAmountMaxButton.isVisible = availability is MaxActionAvailability.Available
+
+        chooseAmountMaxButton.setMaxActionAvailability(availability)
     }
 
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ChooseAmountView) {
@@ -72,7 +77,5 @@ class ChooseAmountView @JvmOverloads constructor(
 }
 
 fun ChooseAmountView.setChooseAmountModel(chooseAmountModel: ChooseAmountModel) {
-    setBalanceLabel(chooseAmountModel.balanceLabel)
-
     chooseAmountInput.setChooseAmountInputModel(chooseAmountModel.input)
 }

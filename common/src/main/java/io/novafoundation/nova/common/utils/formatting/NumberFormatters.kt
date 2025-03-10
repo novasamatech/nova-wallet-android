@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Perbill
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.daysFromMillis
@@ -15,6 +16,7 @@ import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.HoursDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.MinutesDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.RoundMinutesDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.SecondsDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
 import io.novafoundation.nova.common.utils.fractionToPercentage
 import io.novafoundation.nova.common.utils.isNonNegative
@@ -25,6 +27,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -104,20 +107,24 @@ fun BigDecimal.formatAsChange(): String {
     return prefix + formatAsPercentage()
 }
 
-fun BigDecimal.formatAsPercentage(): String {
-    return defaultAbbreviationFormatter.format(this) + "%"
+fun BigDecimal.formatAsPercentage(includeSymbol: Boolean = true): String {
+    return defaultAbbreviationFormatter.format(this) + if (includeSymbol) "%" else ""
 }
 
 fun Percent.format(): String {
     return value.toBigDecimal().formatAsPercentage()
 }
 
-fun Percent.formatWithoutSymbol(): String {
-    return defaultAbbreviationFormatter.format(value.toBigDecimal())
+fun Fraction.formatPercents(): String {
+    return inPercents.toBigDecimal().formatAsPercentage()
 }
 
 fun Perbill.format(): String {
     return toPercent().format()
+}
+
+fun Fraction.formatPercents(includeSymbol: Boolean = true): String {
+    return inPercents.toBigDecimal().formatAsPercentage(includeSymbol)
 }
 
 fun BigDecimal.formatFractionAsPercentage(): String {
@@ -128,7 +135,6 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
     val currentDays = System.currentTimeMillis().daysFromMillis()
     val diff = currentDays - time.daysFromMillis()
 
-    if (diff < 0) throw IllegalArgumentException("Past date should be less than current")
     return when (diff) {
         0L -> resourceManager.getString(R.string.today)
         1L -> resourceManager.getString(R.string.yesterday)
@@ -136,6 +142,12 @@ fun Date.formatDateSinceEpoch(resourceManager: ResourceManager): String {
             resourceManager.formatDate(time)
         }
     }
+}
+
+fun Date.isThisYear(): Boolean {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = time
+    return calendar.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR)
 }
 
 fun ResourceManager.formatTime(data: Date): String {
@@ -170,7 +182,7 @@ fun formatDateISO_8601_NoMs(date: Date): String {
     return dateTimeFormatISO_8601_NoMs.format(date)
 }
 
-fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFormat {
+fun decimalFormatterFor(pattern: String): DecimalFormat {
     return DecimalFormat(pattern).apply {
         val symbols = decimalFormatSymbols
 
@@ -179,12 +191,11 @@ fun decimalFormatterFor(pattern: String, roundingMode: RoundingMode): DecimalFor
 
         decimalFormatSymbols = symbols
 
-        this.roundingMode = roundingMode
         decimalFormatSymbols = decimalFormatSymbols
     }
 }
 
-fun String.toAmountWithFraction(): AmountWithFraction {
+fun CharSequence.toAmountWithFraction(): AmountWithFraction {
     val amountAndFraction = this.split(DECIMAL_SEPARATOR)
     val amount = amountAndFraction[0]
     val fraction = amountAndFraction.getOrNull(1)
@@ -260,12 +271,14 @@ fun baseDurationFormatter(
     ),
     hoursDurationFormatter: BoundedDurationFormatter = HoursDurationFormatter(context),
     minutesDurationFormatter: BoundedDurationFormatter = MinutesDurationFormatter(context),
+    secondsDurationFormatter: BoundedDurationFormatter = SecondsDurationFormatter(context),
     zeroDurationFormatter: BoundedDurationFormatter = ZeroDurationFormatter(DayDurationFormatter(context))
 ): DurationFormatter {
     val compoundFormatter = CompoundDurationFormatter(
         dayDurationFormatter,
         hoursDurationFormatter,
         minutesDurationFormatter,
+        secondsDurationFormatter,
         zeroDurationFormatter
     )
 

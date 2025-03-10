@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.InputType
@@ -264,6 +265,10 @@ fun RecyclerView.findFirstVisiblePosition(): Int {
     return (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 }
 
+fun RecyclerView.findLastVisiblePosition(): Int {
+    return (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+}
+
 fun ScrollView.scrollOnFocusTo(vararg focusableTargets: View) {
     val listener = View.OnFocusChangeListener { view, hasFocus ->
         if (hasFocus) {
@@ -338,6 +343,10 @@ fun View.applyImeInsetts() = applyInsetter {
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
 
+fun View.setBackgroundTintRes(@ColorRes colorRes: Int) {
+    backgroundTintList = ColorStateList.valueOf(context.getColor(colorRes))
+}
+
 fun <I> View.useInputValue(input: Input<I>, onValue: (I) -> Unit) {
     setVisible(input is Input.Enabled)
     isEnabled = input is Input.Enabled.Modifiable
@@ -397,4 +406,8 @@ fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharS
     TabLayoutMediator(this, viewPager) { tab, position ->
         tab.text = tabText(position)
     }.attach()
+}
+
+fun View.bounds(): Rect {
+    return Rect(0, 0, width, height)
 }

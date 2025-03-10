@@ -17,12 +17,6 @@ fun <V> BaseFragmentMixin<V>.setupFeeLoading(viewModel: V, feeView: FeeView) whe
     viewModel.feeLiveData.observe(feeView::setFeeStatus)
 }
 
-fun BaseFragmentMixin<*>.setupFeeLoading(mixin: GenericFeeLoaderMixin<*>, feeView: FeeView) {
-    observeRetries(mixin)
-
-    mixin.feeLiveData.observe(feeView::setFeeStatus)
-}
-
 fun BaseFragmentMixin<*>.setupFeeLoading(withFeeLoaderMixin: WithFeeLoaderMixin, feeView: FeeView) {
     val mixin = withFeeLoaderMixin.originFeeMixin
 
@@ -31,4 +25,10 @@ fun BaseFragmentMixin<*>.setupFeeLoading(withFeeLoaderMixin: WithFeeLoaderMixin,
     } else {
         feeView.makeGone()
     }
+}
+
+fun BaseFragmentMixin<*>.setupFeeLoading(mixin: GenericFeeLoaderMixin<*>, feeView: FeeView) {
+    observeRetries(mixin)
+
+    mixin.feeLiveData.observe(feeView::setFeeStatus)
 }

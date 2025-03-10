@@ -42,7 +42,7 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDApp
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForSimpleFeeChanges
+import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -63,7 +63,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionDecoder
-import java.math.BigInteger
 
 class EvmSignInteractorFactory(
     private val chainRegistry: ChainRegistry,
@@ -117,9 +116,9 @@ class EvmSignInteractor(
 
     override val validationSystem: ConfirmDAppOperationValidationSystem = ValidationSystem {
         if (payload is ConfirmTx) {
-            checkForSimpleFeeChanges(
-                calculateFee = { calculateFee() },
-                currentFee = { it.decimalFee },
+            checkForFeeChanges(
+                calculateFee = { calculateFee()!! },
+                currentFee = { it.fee },
                 chainAsset = { it.token!!.configuration },
                 error = ConfirmDAppOperationValidationFailure::FeeSpikeDetected
             )
@@ -159,17 +158,21 @@ class EvmSignInteractor(
         }
     }
 
-    override suspend fun calculateFee(): Fee = withContext(Dispatchers.Default) {
-        if (payload !is ConfirmTx) return@withContext zeroFee()
+    override suspend fun calculateFee(): Fee? = withContext(Dispatchers.Default) {
+        if (payload !is ConfirmTx) return@withContext null
 
         resolveWalletSigner()
 
-        val api = ethereumApi() ?: return@withContext zeroFee()
+        val api = ethereumApi() ?: return@withContext null
+        val chain = chainRegistry.findEvmChain(payload.chainSource.evmChainId)
+
+        // Commission asset for evm
+        val chainAsset = chain?.utilityAsset ?: createAssetFrom(payload.chainSource.unknownChainOptions) ?: return@withContext null
 
         val tx = api.formTransaction(payload.transaction, feeOverride = null)
         mostRecentFormedTx.emit(tx)
 
-        tx.fee()
+        tx.fee(chainAsset)
     }
 
     override suspend fun performOperation(upToDateFee: Fee?): ExternalSignCommunicator.Response? = withContext(Dispatchers.Default) {
@@ -198,10 +201,6 @@ class EvmSignInteractor(
         ethereumApi()?.shutdown()
     }
 
-    private fun zeroFee(): Fee {
-        return EvmFee(gasLimit = BigInteger.ZERO, gasPrice = BigInteger.ZERO, submissionOrigin())
-    }
-
     private suspend fun confirmTx(basedOn: EvmTransaction, upToDateFee: Fee?, evmChainId: Long, action: ConfirmTx.Action): ExternalSignCommunicator.Response {
         val api = requireNotNull(ethereumApi())
 
@@ -215,6 +214,7 @@ class EvmSignInteractor(
                 val signedTx = api.signTransaction(tx, signer, originAccountId, evmChainId)
                 ExternalSignCommunicator.Response.Signed(request.id, signedTx)
             }
+
             ConfirmTx.Action.SEND -> {
                 val txHash = api.sendTransaction(tx, signer, originAccountId, evmChainId)
                 ExternalSignCommunicator.Response.Sent(request.id, txHash)
@@ -295,33 +295,43 @@ class EvmSignInteractor(
 
     private suspend fun createTokenFrom(unknownChainOptions: EvmChainSource.UnknownChainOptions): Token? {
         if (unknownChainOptions !is EvmChainSource.UnknownChainOptions.WithFallBack) return null
-
-        val evmChain = unknownChainOptions.evmChain
-
-        val currency = currencyRepository.getSelectedCurrency()
-        val chainCurrency = evmChain.nativeCurrency
+        val asset = createAssetFrom(unknownChainOptions) ?: return null
 
         return Token(
-            configuration = Chain.Asset(
-                iconUrl = evmChain.iconUrl,
-                id = 0,
-                priceId = null,
-                chainId = evmChain.chainId,
-                symbol = chainCurrency.symbol,
-                precision = chainCurrency.decimals,
-                buyProviders = emptyMap(),
-                staking = emptyList(),
-                type = Chain.Asset.Type.EvmNative,
-                name = chainCurrency.name,
-                source = Chain.Asset.Source.ERC20,
-                enabled = true
-            ),
+            configuration = asset,
             coinRate = null,
-            currency = currency
+            currency = currencyRepository.getSelectedCurrency()
         )
     }
 
-    private fun RawTransaction.fee(): Fee = EvmFee(gasLimit = gasLimit, gasPrice = gasPrice, submissionOrigin = submissionOrigin())
+    private fun createAssetFrom(unknownChainOptions: EvmChainSource.UnknownChainOptions): Chain.Asset? {
+        if (unknownChainOptions !is EvmChainSource.UnknownChainOptions.WithFallBack) return null
+
+        val evmChain = unknownChainOptions.evmChain
+        val chainCurrency = evmChain.nativeCurrency
+
+        return Chain.Asset(
+            icon = null,
+            id = 0,
+            priceId = null,
+            chainId = evmChain.chainId,
+            symbol = chainCurrency.symbol,
+            precision = chainCurrency.decimals,
+            buyProviders = emptyMap(),
+            staking = emptyList(),
+            type = Chain.Asset.Type.EvmNative,
+            name = chainCurrency.name,
+            source = Chain.Asset.Source.ERC20,
+            enabled = true
+        )
+    }
+
+    private fun RawTransaction.fee(chainAsset: Chain.Asset): Fee = EvmFee(
+        gasLimit = gasLimit,
+        gasPrice = gasPrice,
+        submissionOrigin = submissionOrigin(),
+        chainAsset
+    )
 
     private fun submissionOrigin() = SubmissionOrigin.singleOrigin(originAccountId())
 

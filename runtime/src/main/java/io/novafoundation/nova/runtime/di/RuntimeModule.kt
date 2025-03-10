@@ -30,7 +30,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainC
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.RealXcmVersionDetector
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -125,9 +128,10 @@ class RuntimeModule {
     @ApplicationScope
     fun provideChainStateRepository(
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         sampledBlockTimeStorage: SampledBlockTimeStorage,
         chainRegistry: ChainRegistry
-    ) = ChainStateRepository(localStorageSource, sampledBlockTimeStorage, chainRegistry)
+    ) = ChainStateRepository(localStorageSource, remoteStorageSource, sampledBlockTimeStorage, chainRegistry)
 
     @Provides
     @ApplicationScope
@@ -158,9 +162,8 @@ class RuntimeModule {
     @ApplicationScope
     fun provideEventsRepository(
         rpcCalls: RpcCalls,
-        chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
-    ): EventsRepository = RemoteEventsRepository(rpcCalls, chainRegistry, remoteStorageSource)
+    ): EventsRepository = RemoteEventsRepository(rpcCalls, remoteStorageSource)
 
     @Provides
     @ApplicationScope
@@ -219,8 +222,17 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideMultiLocationConverterFactory(chainRegistry: ChainRegistry): MultiLocationConverterFactory {
-        return MultiLocationConverterFactory(chainRegistry)
+    fun provideMultiLocationConverterFactory(
+        chainRegistry: ChainRegistry,
+        xcmVersionDetector: XcmVersionDetector,
+    ): MultiLocationConverterFactory {
+        return MultiLocationConverterFactory(chainRegistry, xcmVersionDetector)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainMultiLocationConverterFactory(chainRegistry: ChainRegistry): ChainMultiLocationConverterFactory {
+        return ChainMultiLocationConverterFactory(chainRegistry)
     }
 
     @Provides
@@ -258,8 +270,12 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideRemoteToDomainChainMapperFacade(gson: Gson): RemoteToDomainChainMapperFacade {
-        return RemoteToDomainChainMapperFacade(gson)
+    fun provideRemoteToDomainChainMapperFacade(
+        gson: Gson
+    ): RemoteToDomainChainMapperFacade {
+        return RemoteToDomainChainMapperFacade(
+            gson
+        )
     }
 
     @Provides
@@ -287,4 +303,10 @@ class RuntimeModule {
             gson
         )
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideXcmPalletRepository(
+        chainRegistry: ChainRegistry
+    ): XcmVersionDetector = RealXcmVersionDetector(chainRegistry)
 }

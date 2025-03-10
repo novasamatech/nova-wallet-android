@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/secondary_screen_background">
+
+    <TextView
+        android:id="@+id/itemRouteTransferTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="13dp"
+        android:text="@string/swap_route_segment_transfer_title"
+        android:textColor="@color/text_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.feature_swap_impl.presentation.route.view.TokenAmountView
+        android:id="@+id/itemRouteTransferAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/itemRouteTransferTitle"
+        app:layout_constraintTop_toBottomOf="@id/itemRouteTransferTitle" />
+
+    <TextView
+        android:id="@+id/itemRouteTransferFee"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="15dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemRouteTransferAmount"
+        app:layout_constraintTop_toBottomOf="@+id/itemRouteTransferAmount"
+        tools:text="Fee: $0.416" />
+
+    <TextView
+        android:id="@+id/itemRouteTransferFrom"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="@+id/itemRouteTransferTo"
+        app:layout_constraintEnd_toStartOf="@+id/itemRouteTransferArrow"
+        app:layout_constraintTop_toTopOf="@+id/itemRouteTransferTo"
+        tools:text="Polkadot" />
+
+    <ImageView
+        android:id="@+id/itemRouteTransferArrow"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/ic_arrow_right"
+        app:layout_constraintBottom_toBottomOf="@id/itemRouteTransferTo"
+        app:layout_constraintEnd_toStartOf="@id/itemRouteTransferTo"
+        app:layout_constraintTop_toTopOf="@id/itemRouteTransferTo"
+        app:tint="@color/icon_secondary" />
+
+    <TextView
+        android:id="@+id/itemRouteTransferTo"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="15dp"
+        android:layout_marginEnd="16dp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemRouteTransferAmount"
+        tools:text="Hydration" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

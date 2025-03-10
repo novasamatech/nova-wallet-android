@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.ReferendaListStateModel
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.toReferendumDetailsPrefilledData
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
@@ -81,7 +82,11 @@ class ReferendaSearchViewModel(
     }
 
     fun openReferendum(referendum: ReferendumModel) {
-        val payload = ReferendumDetailsPayload(referendum.id.value)
+        val payload = ReferendumDetailsPayload(
+            referendum.id.value,
+            allowVoting = referendum.isOngoing,
+            prefilledData = referendum.toReferendumDetailsPrefilledData()
+        )
         governanceRouter.openReferendum(payload)
     }
 

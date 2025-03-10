@@ -21,10 +21,7 @@ class YourPoolComponentState(
 
 typealias YourPoolEvent = Nothing
 
-sealed class YourPoolAction {
-
-    object PoolInfoClicked : YourPoolAction()
-}
+object YourPoolAction
 
 class YourPoolComponentFactory(
     private val nominationPoolsFactory: NominationPoolsYourPoolComponentFactory,
@@ -36,6 +33,7 @@ class YourPoolComponentFactory(
     ): YourPoolComponent = compoundStakingComponentFactory.create(
         relaychainComponentCreator = UnsupportedComponent.creator(),
         parachainComponentCreator = UnsupportedComponent.creator(),
+        mythosCreator = UnsupportedComponent.creator(),
         nominationPoolsCreator = nominationPoolsFactory::create,
         hostContext = hostContext
     )

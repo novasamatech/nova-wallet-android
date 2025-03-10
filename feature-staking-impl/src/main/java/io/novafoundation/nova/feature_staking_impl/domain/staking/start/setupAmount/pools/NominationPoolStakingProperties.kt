@@ -1,17 +1,22 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.pools
 
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidation.ConflictingStakingType
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.pools.recommendation.NominationPoolRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.stakeAmount
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.nominationPools.activePool
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.nominationPools.enoughForMinJoinBond
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.nominationPools.maxPoolMembersNotReached
@@ -30,6 +35,8 @@ class NominationPoolStakingPropertiesFactory(
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
+    private val stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
@@ -41,6 +48,8 @@ class NominationPoolStakingPropertiesFactory(
             poolsAvailableBalanceResolver = poolsAvailableBalanceResolver,
             nominationPoolGlobalsRepository = nominationPoolGlobalsRepository,
             poolAvailableBalanceValidationFactory = poolAvailableBalanceValidationFactory,
+            stakingTypesConflictValidationFactory = stakingTypesConflictValidationFactory,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 }
@@ -53,6 +62,8 @@ private class NominationPoolStakingProperties(
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val poolAvailableBalanceValidationFactory: PoolAvailableBalanceValidationFactory,
+    private val stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : SingleStakingProperties {
 
     override val stakingType: Chain.Asset.StakingType = stakingOption.stakingType
@@ -61,8 +72,8 @@ private class NominationPoolStakingProperties(
         return poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
     }
 
-    override suspend fun maximumToStake(asset: Asset, fee: Balance): Balance {
-        return poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee).maxToStake
+    override suspend fun maximumToStake(asset: Asset): Balance {
+        return poolsAvailableBalanceResolver.maximumBalanceToStake(asset)
     }
 
     override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(
@@ -72,6 +83,8 @@ private class NominationPoolStakingProperties(
     )
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
+        noConflictingStaking()
+
         maxPoolMembersNotReached(nominationPoolGlobalsRepository)
 
         activePool()
@@ -85,6 +98,15 @@ private class NominationPoolStakingProperties(
             fee = { it.fee },
             amount = { it.selection.stakeAmount() },
             error = StartMultiStakingValidationFailure::PoolAvailableBalance
+        )
+    }
+
+    private fun StartMultiStakingValidationSystemBuilder.noConflictingStaking() {
+        stakingTypesConflictValidationFactory.noStakingTypesConflict(
+            accountId = { selectedAccountUseCase.getSelectedMetaAccount().requireAccountIdIn(it.recommendableSelection.selection.stakingOption.chain) },
+            chainId = { it.asset.token.configuration.chainId },
+            error = { StartMultiStakingValidationFailure.HasConflictingStakingType },
+            checkStakingTypeNotPresent = ConflictingStakingType.DIRECT
         )
     }
 

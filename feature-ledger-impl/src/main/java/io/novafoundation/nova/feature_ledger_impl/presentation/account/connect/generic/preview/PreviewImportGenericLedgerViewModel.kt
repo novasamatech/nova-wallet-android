@@ -75,7 +75,7 @@ class PreviewImportGenericLedgerViewModel(
         ).event()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.verifyAddressOnLedger(payload.deviceId)
+            interactor.verifyAddressOnLedger(payload.accountIndex, payload.deviceId)
         }
 
         result.onFailure {

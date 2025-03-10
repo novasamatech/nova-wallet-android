@@ -32,6 +32,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
+import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
@@ -41,16 +42,25 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
+import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.icon.IconGenerator
@@ -136,6 +146,17 @@ interface AccountFeatureDependencies {
 
     fun provideConditionMixinFactory(): ConditionMixinFactory
 
+    fun multiChainRuntimeCallsApi(): MultiChainRuntimeCallsApi
+
+    val hydraDxAssetConversionFactory: HydraDxQuoting.Factory
+
+    val pathQuoterFactory: PathQuoter.Factory
+
+    @Named(REMOTE_STORAGE_SOURCE)
+    fun remoteStorageSource(): StorageDataSource
+
+    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
+
     val systemCallExecutor: SystemCallExecutor
 
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
@@ -154,9 +175,6 @@ interface AccountFeatureDependencies {
 
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 
-    @Named(REMOTE_STORAGE_SOURCE)
-    fun remoteStorageSource(): StorageDataSource
-
     val extrinsicSplitter: ExtrinsicSplitter
 
     val gasPriceProviderFactory: GasPriceProviderFactory
@@ -168,4 +186,16 @@ interface AccountFeatureDependencies {
     val listSelectorMixinFactory: ListSelectorMixin.Factory
 
     val ledgerMigrationTracker: LedgerMigrationTracker
+
+    val multiLocationConverterFactory: MultiLocationConverterFactory
+
+    val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val storageCache: StorageCache
+
+    val eventsRepository: EventsRepository
+
+    val xcmVersionDetector: XcmVersionDetector
+
+    val chainStateRepository: ChainStateRepository
 }

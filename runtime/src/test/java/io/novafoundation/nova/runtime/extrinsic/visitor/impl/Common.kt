@@ -48,7 +48,7 @@ fun createExtrinsic(
     call: GenericCall.Instance,
     events: List<GenericEvent.Instance>
 ) = ExtrinsicWithEvents(
-    extrinsic = Extrinsic.DecodedInstance(
+    extrinsic = Extrinsic.Instance(
         signature = Extrinsic.Signature(
             accountIdentifier = bindMultiAddress(MultiAddress.Id(signer)),
             signature = null,

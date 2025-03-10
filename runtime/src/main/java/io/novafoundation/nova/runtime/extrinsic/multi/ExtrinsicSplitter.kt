@@ -15,6 +15,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -92,7 +93,7 @@ internal class RealExtrinsicSplitter(
         return split
     }
 
-    private suspend fun wrapInFakeExtrinsic(signer: NovaSigner, call: GenericCall.Instance, runtime: RuntimeSnapshot, chain: Chain): String {
+    private suspend fun wrapInFakeExtrinsic(signer: NovaSigner, call: GenericCall.Instance, runtime: RuntimeSnapshot, chain: Chain): SendableExtrinsic {
         val genesisHash = chain.requireGenesisHash().fromHex()
 
         return ExtrinsicBuilder(
@@ -108,6 +109,6 @@ internal class RealExtrinsicSplitter(
             accountId = signer.signerAccountId(chain)
         )
             .call(call)
-            .build()
+            .buildExtrinsic()
     }
 }

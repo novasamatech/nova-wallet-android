@@ -1,65 +1,31 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
-import io.novafoundation.nova.common.utils.Percent
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.commissionAssetToSpendOnBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.totalDeductedPlanks
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
-import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
+import io.novafoundation.nova.feature_swap_api.domain.model.createAggregated
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 
 data class SwapValidationPayload(
-    val detailedAssetIn: SwapAssetData,
-    val detailedAssetOut: SwapAssetData,
-    val slippage: Percent,
-    val feeAsset: Asset,
-    val decimalFee: GenericDecimalFee<SwapFee>,
+    val fee: SwapFee,
     val swapQuote: SwapQuote,
-    val swapQuoteArgs: SwapQuoteArgs,
-    val swapExecuteArgs: SwapExecuteArgs
+    val slippage: Fraction
 ) {
 
-    data class SwapAssetData(
-        val chain: Chain,
-        val asset: Asset,
-        val amountInPlanks: Balance
-    )
+    val amountIn: ChainAssetWithAmount = swapQuote.amountIn
+
+    val amountOut: ChainAssetWithAmount = swapQuote.amountOut
 }
 
-val SwapValidationPayload.isFeePayingByAssetIn: Boolean
-    get() = feeAsset.token.configuration.fullId == detailedAssetIn.asset.token.configuration.fullId
+fun SwapValidationPayload.estimatedSwapLimit(): SwapLimit {
+    val firstLimit = fee.segments.first().operation.estimatedSwapLimit
+    val lastLimit = fee.segments.last().operation.estimatedSwapLimit
 
-val SwapValidationPayload.swapAmountInFeeToken: Balance
-    get() = if (isFeePayingByAssetIn) {
-        detailedAssetIn.amountInPlanks
-    } else {
-        BigInteger.ZERO
-    }
+    return SwapLimit.createAggregated(firstLimit, lastLimit)
+}
 
-val SwapValidationPayload.toBuyAmountToKeepMainEDInFeeAsset: Balance
-    get() = if (isFeePayingByAssetIn) {
-        decimalFee.genericFee.minimumBalanceBuyIn.commissionAssetToSpendOnBuyIn
-    } else {
-        BigInteger.ZERO
-    }
-
-val SwapValidationPayload.totalDeductedAmountInFeeToken: Balance
-    get() = if (isFeePayingByAssetIn) {
-        decimalFee.genericFee.totalDeductedPlanks
-    } else {
-        BigInteger.ZERO
-    }
-
-val SwapValidationPayload.maxAmountToSwap: Balance
-    get() = if (isFeePayingByAssetIn) {
-        val maxAmount = detailedAssetIn.asset.transferableInPlanks - totalDeductedAmountInFeeToken
-        maxAmount.coerceAtLeast(BigInteger.ZERO)
-    } else {
-        detailedAssetIn.asset.transferableInPlanks
-    }
+fun SwapValidationPayload.toSwapState(): SwapState {
+    return SwapState(swapQuote, fee, slippage)
+}

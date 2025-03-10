@@ -8,12 +8,16 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.DelegateStatsByAddressesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.DelegateStatsRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.DirectHistoricalVotesRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumSplitAbstainVotersRequest
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.ReferendumVotesRequest
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.AllVotesResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DelegateDelegatorsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DelegateDetailedStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DelegateStatsResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DirectVotesResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.ReferendumSplitAbstainVotersResponse
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.ReferendumVotersResponse
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.ReferendumVotesResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Url
@@ -61,4 +65,16 @@ interface DelegationsSubqueryApi {
         @Url url: String,
         @Body body: ReferendumVotersRequest
     ): SubQueryResponse<ReferendumVotersResponse>
+
+    @POST
+    suspend fun getReferendumVotes(
+        @Url url: String,
+        @Body body: ReferendumVotesRequest
+    ): SubQueryResponse<ReferendumVotesResponse>
+
+    @POST
+    suspend fun getReferendumAbstainVoters(
+        @Url url: String,
+        @Body body: ReferendumSplitAbstainVotersRequest
+    ): SubQueryResponse<ReferendumSplitAbstainVotersResponse>
 }

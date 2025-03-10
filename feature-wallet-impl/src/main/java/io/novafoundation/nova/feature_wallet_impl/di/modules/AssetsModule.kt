@@ -7,6 +7,9 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.TypeBasedAssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.utility.NativeAssetEventDetector
 
 @Module(
     includes = [
@@ -31,6 +34,10 @@ class AssetsModule {
         @EvmNativeAssets evmNative: Lazy<AssetSource>,
         @EquilibriumAsset equilibrium: Lazy<AssetSource>,
         @UnsupportedAssets unsupported: AssetSource,
+
+        nativeAssetEventDetector: NativeAssetEventDetector,
+        ormlAssetEventDetectorFactory: OrmlAssetEventDetectorFactory,
+        statemineAssetEventDetectorFactory: StatemineAssetEventDetectorFactory,
     ): AssetSourceRegistry = TypeBasedAssetSourceRegistry(
         nativeSource = native,
         statemineSource = statemine,
@@ -38,6 +45,10 @@ class AssetsModule {
         evmErc20Source = evmErc20,
         evmNativeSource = evmNative,
         equilibriumAssetSource = equilibrium,
-        unsupportedBalanceSource = unsupported
+        unsupportedBalanceSource = unsupported,
+
+        nativeAssetEventDetector = nativeAssetEventDetector,
+        ormlAssetEventDetectorFactory = ormlAssetEventDetectorFactory,
+        statemineAssetEventDetectorFactory = statemineAssetEventDetectorFactory
     )
 }

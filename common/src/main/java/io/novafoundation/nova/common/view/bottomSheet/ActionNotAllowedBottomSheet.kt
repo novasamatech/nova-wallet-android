@@ -4,10 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.setPadding
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.view.PrimaryButton
 import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedImage
 import kotlinx.android.synthetic.main.bottom_sheet_action_not_allowed.actionNotAllowedOk
@@ -50,14 +52,16 @@ open class ActionNotAllowedBottomSheet(
         super.setContentView(layoutResId)
     }
 
-    protected fun applySolidIconStyle(@DrawableRes src: Int) = with(iconView) {
+    protected fun applySolidIconStyle(@DrawableRes src: Int, @ColorRes tint: Int? = R.color.icon_primary) = with(iconView) {
         setPadding(12.dp)
+        setImageTintRes(tint)
         setBackgroundResource(R.drawable.bg_icon_big)
         setImageResource(src)
     }
 
-    protected fun applyDashedIconStyle(@DrawableRes src: Int) = with(iconView) {
+    protected fun applyDashedIconStyle(@DrawableRes src: Int, @ColorRes tint: Int? = R.color.icon_primary) = with(iconView) {
         setPadding(12.dp)
+        setImageTintRes(tint)
         setBackgroundResource(R.drawable.bg_icon_big_dashed)
         setImageResource(src)
     }

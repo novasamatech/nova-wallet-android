@@ -22,12 +22,11 @@ class SubSquareV2ReferendaDataSource(
         return response.items.map(::mapPolkassemblyPostToPreview)
     }
 
-    override suspend fun referendumDetails(referendumId: ReferendumId, baseUrl: String, options: Source.SubSquare): OffChainReferendumDetails? {
-        val fullUrl = detailsUrlOf(baseUrl, referendumId)
+    override suspend fun referendumDetails(referendumId: ReferendumId, baseUrl: String, options: Source.SubSquare): OffChainReferendumDetails {
+        val detailsUrl = detailsUrlOf(baseUrl, referendumId)
+        val referendaDetails = subSquareApi.getReferendumDetails(detailsUrl)
 
-        val response = subSquareApi.getReferendumDetails(fullUrl)
-
-        return mapPolkassemblyPostToDetails(response)
+        return mapPolkassemblyPostToDetails(referendaDetails)
     }
 
     private fun mapPolkassemblyPostToPreview(post: ReferendaPreviewV2Response.Referendum): OffChainReferendumPreview {
@@ -37,7 +36,9 @@ class SubSquareV2ReferendaDataSource(
         )
     }
 
-    private fun mapPolkassemblyPostToDetails(referendum: ReferendumDetailsV2Response): OffChainReferendumDetails {
+    private fun mapPolkassemblyPostToDetails(
+        referendum: ReferendumDetailsV2Response
+    ): OffChainReferendumDetails {
         val timeline = referendum.onchainData.timeline.mapNotNull(::mapReferendumStatusToTimelineEntry)
 
         return OffChainReferendumDetails(

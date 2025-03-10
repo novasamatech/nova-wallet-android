@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
@@ -47,7 +47,7 @@ class EquilibriumAssetsModule {
     fun provideTransfers(
         chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
-        extrinsicService: ExtrinsicService,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         phishingValidationFactory: PhishingValidationFactory,
         @Named(REMOTE_STORAGE_SOURCE)
         remoteStorageSource: StorageDataSource,
@@ -55,7 +55,7 @@ class EquilibriumAssetsModule {
     ) = EquilibriumAssetTransfers(
         chainRegistry,
         assetSourceRegistry,
-        extrinsicService,
+        extrinsicServiceFactory,
         phishingValidationFactory,
         remoteStorageSource,
         enoughTotalToStayAboveEDValidationFactory

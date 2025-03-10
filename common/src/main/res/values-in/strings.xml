@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Jalur derivasi Anda mengandung simbol yang tidak didukung atau memiliki struktur yang salah</string>
     <string name="account_invalid_derivation_path_title">Jalur derivasi tidak valid</string>
     <string name="account_json_file">File JSON</string>
-    <string name="account_ledger_generic_import_start_step_1">Pastikan aplikasi Generic terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Buka aplikasi Generic</font> di perangkat Ledger Anda</string>
+    <string name="account_ledger_generic_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Aplikasi Polkadot sudah terinstal</string>
+    <string name="account_ledger_generic_import_start_step_2">%s di perangkat Ledger Anda</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Polkadot</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
     <string name="account_ledger_import_fill_disabled_hint">Tambahkan setidaknya satu akun</string>
     <string name="account_ledger_import_fill_title">Tambahkan akun ke dompet Anda</string>
     <string name="account_ledger_import_start_guide">Panduan Koneksi Bluetooth Resmi Ledger</string>
-    <string name="account_ledger_import_start_step_1">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Buka aplikasi</font> pada perangkat Ledger Anda</string>
-    <string name="account_ledger_import_start_step_3">Izinkan Nova Wallet untuk mengakses Bluetooth dan Lokasi</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Pilih akun</font> untuk ditambahkan ke dompet</string>
+    <string name="account_ledger_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">aplikasi Network terpasang</string>
+    <string name="account_ledger_import_start_step_2">%s pada perangkat Ledger Anda</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Buka aplikasi jaringan</string>
+    <string name="account_ledger_import_start_step_3">Izinkan Nova Wallet untuk %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">akses Bluetooth dan Lokasi</string>
+    <string name="account_ledger_import_start_step_4">%s untuk ditambahkan ke dompet</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Pilih akun</string>
     <string name="account_ledger_import_start_title">Hubungkan Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Untuk menandatangani operasi dan memigrasikan akun Anda ke aplikasi Ledger Generik yang baru, instal dan buka aplikasi Migrasi. Aplikasi Ledger Lama dan Ledger Migrasi tidak akan didukung di masa depan.</string>
     <string name="account_ledger_legacy_warning_title">Aplikasi Ledger Baru Telah Dirilis</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Aplikasi Migrasi akan tidak tersedia dalam waktu dekat. Gunakan untuk memigrasikan akun Anda ke aplikasi Ledger baru untuk menghindari kehilangan dana Anda.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Aplikasi Generik)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (aplikasi Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Harap, aktifkan Bluetooth dalam pengaturan ponsel Anda dan perangkat Ledger. Buka perangkat Ledger Anda dan buka aplikasi %s.</string>
     <string name="account_ledger_select_device_title">Pilih Perangkat Ledger Anda</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Berikut adalah akun Anda</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Kode QR tidak valid, pastikan Anda memindai kode QR dari %s</string>
     <string name="account_parity_signer_import_start_select_top">Pastikan untuk memilih yang paling atas</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer akan memberikan Anda kode QR untuk dipindai</string>
+    <string name="account_parity_signer_import_start_step_1">Aplikasi %s di smartphone Anda</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">buka Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s yang ingin Anda tambahkan ke Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Pergi ke tab Keys. Pilih seed, kemudian akun</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer akan menyediakan Anda %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">kode QR untuk dipindai</string>
     <string name="account_parity_signer_import_start_title">Tambahkan dompet dari %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s tidak mendukung penandatanganan pesan sembarangan — hanya transaksi</string>
     <string name="account_parity_signer_not_supported_title">Penandatanganan tidak didukung</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Tanda tangani dengan %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Perhatikan, nama jalur derivasi harus kosong</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Buka aplikasi Polkadot Vault</font> di ponsel cerdas Anda</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Buka tab “Kumpulan Kunci”.</font> Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda kode QR untuk dipindai</string>
+    <string name="account_polkadot_vault_import_start_step_1">Aplikasi %s di smartphone Anda</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Buka Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Pergi ke tab \'Key Sets\'.</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">kode QR untuk dipindai</string>
     <string name="account_private_key">Kunci privat</string>
     <string name="account_proxieds">Didelegasikan kepada Anda (Proxieds)</string>
     <string name="account_proxy_type_any">Sembarang</string>
@@ -150,7 +162,9 @@
     <string name="accounts_change_chain_account">Ubah akun %s</string>
     <string name="accounts_change_chain_secrets">Ubah akun</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">Tambahkan node kustom</string>
     <string name="add_delegation_missing_account_message">Anda perlu menambahkan akun %s ke dompet untuk mendelagasikan</string>
+    <string name="add_network_title">Masukkan detail jaringan</string>
     <string name="add_proxy_confirmation_delegate_to">Mendelagasi ke</string>
     <string name="add_proxy_confirmation_delegating_account">Akun yang didelagasi</string>
     <string name="add_proxy_confirmation_delegating_wallet">Dompet yang didelagasi</string>
@@ -158,6 +172,11 @@
     <string name="add_proxy_deposit_description_message">Deposit tetap direservasi di akun Anda sampai proxy dihapus.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Anda telah mencapai batas %s proxy yang ditambahkan dalam %s. Hapus proxy untuk menambahkan yang baru.</string>
     <string name="add_proxy_maximum_reached_error_title">Jumlah maksimum proxy telah tercapai</string>
+    <string name="added_networks_empty_placeholder">Jaringan kustom yang ditambahkan\nakan muncul di sini</string>
+    <string name="appearance_colored_icon_title">Berwarna</string>
+    <string name="appearance_title">Penampilan</string>
+    <string name="appearance_token_assets_title">ikon token</string>
+    <string name="appearance_white_icon_title">Putih</string>
     <string name="asset_add_evm_token_already_exist_message">Alamat kontrak yang dimasukkan ada dalam Nova sebagai token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Alamat kontrak yang dimasukkan ada dalam Nova sebagai token %s. Apakah Anda yakin ingin memodifikasinya?</string>
     <string name="asset_add_evm_token_already_exist_title">Token ini sudah ada</string>
@@ -170,10 +189,11 @@
     <string name="asset_add_token_enter_contract_address">Masukkan alamat kontrak</string>
     <string name="asset_add_token_enter_decimals">Masukkan desimal</string>
     <string name="asset_add_token_enter_symbol">Masukkan simbol</string>
+    <string name="asset_view_networks">Jaringan</string>
+    <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Tambahkan token</string>
     <string name="assets_add_token_enter_info_address_label">Alamat kontrak</string>
     <string name="assets_add_token_enter_info_decimals_label">Desimal</string>
-    <string name="assets_add_token_enter_info_price_label">Tautan Coingecko untuk info harga (Opsional)</string>
     <string name="assets_add_token_enter_info_symbol_label">Simbol</string>
     <string name="assets_add_token_enter_info_title">Masukkan detail token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Pilih jaringan untuk menambahkan token ERC-20</string>
@@ -193,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger tidak mendukung token ini</string>
     <string name="assets_search_hint">Cari berdasarkan jaringan atau token</string>
     <string name="assets_search_placeholder">Tidak ada jaringan atau token dengan nama yang dimasukkan ditemukan</string>
+    <string name="assets_search_token_hint">Cari berdasarkan token</string>
     <string name="assets_select_send_your_wallets">Dompet Anda</string>
     <string name="assets_send_flow_placeholder">Anda tidak memiliki token untuk dikirim. Beli atau Terima token ke akun Anda.</string>
     <string name="assets_swap_flow_pay_title">Token untuk membayar</string>
@@ -220,9 +241,13 @@
     <string name="backup_settings_toolbar_title">Cadangan</string>
     <string name="backup_title">Cadangan</string>
     <string name="biometric_auth_title">Otentikasi Biometrik</string>
+    <string name="browser_tabs_close_all">Tutup Semua</string>
     <string name="buy_completed">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya melalui email.</string>
+    <string name="buy_network_flow_title">Pilih jaringan untuk membeli %s</string>
     <string name="buy_provider_open_confirmation_message">Untuk melanjutkan pembelian, Anda akan diarahkan dari aplikasi Nova Wallet ke %s</string>
     <string name="buy_provider_open_confirmation_title">Lanjut di browser?</string>
+    <string name="chain_network_management_auto_balance">Node saldo otomatis</string>
+    <string name="chain_network_management_enabling">Aktifkan koneksi</string>
     <string name="change_cloud_backup_password_subtitle">Silakan masukkan kata sandi yang akan digunakan untuk memulihkan dompet Anda dari cadangan cloud. Kata sandi ini tidak dapat dipulihkan di masa depan, jadi pastikan untuk mengingatnya!</string>
     <string name="change_cloud_backup_password_title">Perbarui kata sandi cadangan</string>
     <string name="choose_amount_asset">Aset</string>
@@ -233,6 +258,8 @@
     <string name="choose_amount_fee">Biaya transfer</string>
     <string name="choose_amount_network_error">Jaringan tidak merespons</string>
     <string name="choose_amount_to">Ke</string>
+    <string name="close_dapp_tabs_message">Semua tab yang terbuka di browser DApp akan ditutup.</string>
+    <string name="close_dapp_tabs_title">Tutup Semua DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">Lakukan %s dan selalu simpan offline untuk memulihkannya kapan saja. Anda dapat melakukannya di Pengaturan Cadangan.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Harap catat semua Frasa Sandi dompet Anda sebelum melanjutkan</string>
     <string name="cloud_backup_delete_action_title">Cadangan akan dihapus dari Google Drive</string>
@@ -280,6 +307,7 @@
     <string name="common_active">Aktif</string>
     <string name="common_add">Tambah</string>
     <string name="common_add_delegation">Tambahkan delegasi</string>
+    <string name="common_add_network">Tambahkan jaringan</string>
     <string name="common_address">Alamat</string>
     <string name="common_advanced">Tingkat lanjut</string>
     <string name="common_all">Semua</string>
@@ -316,6 +344,8 @@
     <string name="common_confirm_title">Konfirmasi</string>
     <string name="common_confirmation_title">Apakah Anda yakin?</string>
     <string name="common_confirmed">Dikonfirmasi</string>
+    <string name="common_connected_ms">%d ms</string>
+    <string name="common_connecting">menghubungkan...</string>
     <string name="common_connection_error_message">Silakan periksa koneksi Anda atau coba lagi nanti</string>
     <string name="common_connection_error_title">Gagal terhubung</string>
     <string name="common_continue">Lanjutkan</string>
@@ -325,9 +355,11 @@
     <string name="common_crypto_type">Tipe kripto kepair</string>
     <string name="common_date">Tanggal</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s dan %s</string>
+    <string name="common_delete">Hapus</string>
     <string name="common_details">Detail</string>
     <string name="common_disabled">Nonaktif</string>
     <string name="common_disconnect">Putus</string>
+    <string name="common_do_not_close_app">Jangan tutup aplikasinya!</string>
     <string name="common_done">Selesai</string>
     <string name="common_dont_show_again">Jangan tampilkan ini lagi</string>
     <string name="common_edit">Edit</string>
@@ -336,17 +368,21 @@
     <string name="common_enable">Aktifkan</string>
     <string name="common_enter_address">Masukkan alamat...</string>
     <string name="common_enter_amount">Masukkan jumlah...</string>
+    <string name="common_enter_details">Masukkan detail</string>
     <string name="common_enter_password">Masukkan kata sandi</string>
     <string name="common_error_general_title">Kesalahan</string>
     <string name="common_error_not_enough_tokens">Token tidak mencukupi</string>
     <string name="common_event">Acara</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">Alamat EVM</string>
     <string name="common_existential_warning_message_v2_2_0">Akun Anda akan dihapus dari blockchain setelah operasi ini karena saldo totalnya lebih rendah dari minimal</string>
     <string name="common_existential_warning_title">Operasi akan menghapus akun</string>
     <string name="common_expired">Kedaluwarsa</string>
     <string name="common_explore">Jelajahi</string>
+    <string name="common_failed">Gagal</string>
     <string name="common_fee_changed_message" formatted="false">Biaya jaringan yang diperkirakan %s jauh lebih tinggi dari biaya jaringan default (%s). Hal ini mungkin disebabkan oleh kemacetan jaringan sementara. Anda dapat menyegarkan untuk menunggu biaya jaringan yang lebih rendah.</string>
     <string name="common_fee_changed_title">Biaya jaringan terlalu tinggi</string>
+    <string name="common_fee_with_label">Biaya: %s</string>
     <string name="common_filter_sort_header">Urutkan berdasarkan:</string>
     <string name="common_filters">Penyaring</string>
     <string name="common_find_out_more">Temukan lebih lanjut</string>
@@ -377,6 +413,7 @@
         <item quantity="other">%d menit</item>
     </plurals>
     <string name="common_missing_account_title">Akun %s tidak ditemukan</string>
+    <string name="common_modify">Ubah</string>
     <string name="common_module">Modul</string>
     <string name="common_network">Jaringan</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -396,6 +433,7 @@
     <string name="common_not_available">Tidak tersedia</string>
     <string name="common_not_enough_funds_message">Maaf, Anda tidak memiliki cukup dana untuk membayar biaya jaringan.</string>
     <string name="common_not_enough_funds_title">Saldo tidak mencukupi</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Saldo Anda tidak cukup untuk membayar biaya jaringan sebesar %s. Saldo saat ini adalah %s</string>
     <string name="common_not_now">Tidak sekarang</string>
     <string name="common_off">Mati</string>
     <string name="common_ok">OK</string>
@@ -435,7 +473,12 @@
     <string name="common_search">Cari</string>
     <string name="common_search_placeholder_default">Hasil pencarian akan ditampilkan di sini</string>
     <string name="common_search_results_number">Hasil pencarian: %d</string>
+    <string name="common_sec">detik</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d detik</item>
+    </plurals>
     <string name="common_secret_derivation_path">Jalur derivasi rahasia</string>
+    <string name="common_see_all">Lihat Semua</string>
     <string name="common_settings">Pengaturan</string>
     <string name="common_share">Bagikan</string>
     <string name="common_sign_in">Masuk</string>
@@ -448,14 +491,17 @@
     <string name="common_something_went_wrong_title">Ada yang salah</string>
     <string name="common_sort_by">Urutkan berdasarkan</string>
     <string name="common_status">Status</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Alamat Substrate</string>
     <string name="common_tap_to_reveal_title">Ketuk untuk mengungkap</string>
     <string name="common_terms_and_conditions_formatting">Syarat dan Ketentuan</string>
+    <string name="common_testnet">Testnet</string>
     <string name="common_time_left">Waktu tersisa</string>
     <string name="common_title">Judul</string>
     <string name="common_to_settings">Buka Pengaturan</string>
     <string name="common_too_small_balance_title">Saldo Anda terlalu kecil</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Biaya total</string>
     <string name="common_transaction_id">ID Transaksi</string>
     <string name="common_transaction_submitted">Transaksi dikirim</string>
     <string name="common_try_again">Coba lagi</string>
@@ -468,6 +514,7 @@
     <string name="common_unlimited">Tidak terbatas</string>
     <string name="common_update">Perbarui</string>
     <string name="common_use">Gunakan</string>
+    <string name="common_use_max">Gunakan maksimum</string>
     <string name="common_validation_invalid_address_message">Penerima harus merupakan alamat %s yang valid</string>
     <string name="common_validation_invalid_address_title">Penerima tidak valid</string>
     <string name="common_waiting">Menunggu</string>
@@ -485,7 +532,6 @@
     <string name="connection_add_already_exists_error">Node sudah ditambahkan sebelumnya. Silakan coba node lain.</string>
     <string name="connection_add_invalid_error">Tidak dapat menjalin koneksi dengan node. Silakan coba yang lain.</string>
     <string name="connection_add_unsupported_error">Sayangnya, jaringan tidak didukung. Silakan coba salah satu yang berikut: %s.</string>
-    <string name="connection_delete_confirm">Hapus</string>
     <string name="connection_delete_description">Konfirmasi penghapusan %s.</string>
     <string name="connection_delete_title">Hapus jaringan?</string>
     <string name="connection_error_message_v2_2_0">Mohon periksa koneksi Anda atau coba lagi nanti</string>
@@ -508,6 +554,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">Kata sandi cocok</string>
     <string name="create_cloud_backup_password_subtitle">Harap masukkan kata sandi untuk mengakses cadangan Anda kapan saja. Kata sandi tidak dapat dipulihkan, pastikan untuk mengingatnya!</string>
     <string name="create_cloud_backup_password_title">Buat kata sandi cadangan Anda</string>
+    <string name="create_network_invalid_chain_id_message">Chain ID yang dimasukkan tidak cocok dengan jaringan di URL RPC.</string>
+    <string name="create_network_invalid_chain_id_title">Chain ID tidak valid</string>
     <string name="crodloan_private_crowdloan_message">Crowdloans pribadi belum didukung.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan pribadi</string>
     <string name="crowdloan_about">Tentang crowdloans</string>
@@ -564,6 +612,24 @@
     <string name="crowdloan_unlock_hint">Token %s Anda akan dikembalikan setelah periode penyewaan berakhir.</string>
     <string name="crowdloan_your_contributions">Kontribusi Anda</string>
     <string name="crownloans_raised_format" formatted="false">Terkumpul: %s dari %s</string>
+    <string name="custom_network_already_exist_failure_message">URL RPC yang dimasukkan sudah ada di Nova sebagai jaringan kustom %s. Apakah Anda yakin ingin mengubahnya?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">URL Block explorer (Opsional)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">ID Chain</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Simbol Mata Uang</string>
+    <string name="custom_network_name_title">Nama Jaringan</string>
+    <string name="custom_node_add_button_state">Tambahkan node</string>
+    <string name="custom_node_add_title">Tambahkan node kustom untuk</string>
+    <string name="custom_node_disabled_button_state">Masukkan detail</string>
+    <string name="custom_node_edit_button_state">Simpan</string>
+    <string name="custom_node_edit_title">Sunting node kustom untuk</string>
+    <string name="custom_node_name_hint">Nama</string>
+    <string name="custom_node_name_title">Nama node</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">URL node</string>
+    <string name="custom_rpc_node_url_title">URL RPC</string>
     <string name="dapp_authorized_description">DApps di mana Anda mengizinkan akses untuk melihat alamat Anda saat Anda menggunakannya</string>
     <string name="dapp_authorized_remove_description">DApp \'%s\' akan dihapus dari DApp yang Diotorisasi</string>
     <string name="dapp_authorized_remove_title">Hapus dari Diotorisasi?</string>
@@ -574,6 +640,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Setujui permintaan ini jika Anda mempercayai aplikasi ini.\nPeriksa detail transaksi.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Favorit</string>
     <string name="dapp_favourites">Favorit</string>
     <string name="dapp_favourites_add">Tambahkan ke favorit</string>
     <string name="dapp_favourites_remove_description">DApp \"%s\" akan dihapus dari Favorit</string>
@@ -592,6 +660,9 @@
     <string name="dapp_sign_error_unsupported_chain">Rantai tidak didukung dengan hash genesis %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Pastikan operasi sudah benar</string>
     <string name="dapp_sign_extrinsic_failed">Gagal menandatangani operasi yang diminta</string>
+    <string name="dapp_url_warning_open_anyway">Buka saja</string>
+    <string name="dapp_url_warning_subtitle">Aplikasi desentralisasi yang berbahaya dapat menarik semua dana Anda. Selalu lakukan penelitian sendiri sebelum menggunakan aplikasi desentralisasi, memberikan izin, atau mengirim dana keluar.\n\nJika seseorang mendesak Anda untuk mengunjungi aplikasi desentralisasi ini, kemungkinan besar itu adalah penipuan. Jika ragu, harap hubungi dukungan Nova Wallet: %s.</string>
+    <string name="dapp_url_warning_title">Peringatan! Aplikasi desentralisasi tidak dikenal</string>
     <string name="deep_linking_chain_id_is_not_found">Rantai tidak ditemukan</string>
     <string name="deep_linking_domain_is_not_matched">Domain dari tautan %s tidak diizinkan</string>
     <string name="deep_linking_governance_type_is_not_specified">Tipe tata kelola tidak ditentukan</string>
@@ -600,6 +671,7 @@
     <string name="deep_linking_invalid_derivation_path">Format derivasi tidak valid</string>
     <string name="deep_linking_invalid_mnemonic">Mnemonic tidak valid</string>
     <string name="deep_linking_url_is_invalid">URL tidak valid</string>
+    <string name="default_network_already_exist_failure_message">URL RPC yang dimasukkan sudah ada di Nova sebagai jaringan %s.</string>
     <string name="default_notification_channel_name">Saluran Notifikasi Default</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Cari berdasarkan alamat atau nama</string>
@@ -650,6 +722,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">Kata sandi cadangan Anda sebelumnya diperbarui. Untuk terus menggunakan Cloud Backup, %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">silakan masukkan kata sandi cadangan baru.</string>
     <string name="deprecated_cloud_backup_password_title">Kata sandi cadangan telah diubah</string>
+    <string name="disabled_chain_error_message">Anda tidak dapat menandatangani transaksi jaringan yang dinonaktifkan. Aktifkan %s di pengaturan dan coba lagi</string>
+    <string name="disabled_chain_error_title">%s dinonaktifkan</string>
     <string name="duplicate_proxy_type_message">Anda sudah melakukan delegasi ke akun ini: %s</string>
     <string name="duplicate_proxy_type_title">Delegasi sudah ada</string>
     <string name="ecdsa_selection_subtitle">(Kompatibel dengan BTC/ETH)</string>
@@ -684,6 +758,8 @@
         <item quantity="other">Anda perlu memilih setidaknya %d trek</item>
     </plurals>
     <string name="governance_unlock">Buka kunci</string>
+    <string name="high_price_impact_detacted_message">Melakukan tukar ini akan mengakibatkan slippage signifikan dan kerugian finansial. Pertimbangkan untuk mengurangi ukuran perdagangan Anda atau membagi perdagangan Anda ke dalam beberapa transaksi.</string>
+    <string name="high_price_impact_detacted_title">Dampak harga tinggi terdeteksi (%s)</string>
     <string name="history_v1.9.0">Riwayat</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Nama Legal</string>
@@ -708,8 +784,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">Gunakan frasa kata 12, 15, 18, 21, atau 24 kata Anda.</string>
     <string name="import_wallet_options_title">Pilih cara Anda ingin mengimpor dompet Anda.</string>
     <string name="import_wallet_options_watch_only_title">Hanya Menonton.</string>
+    <string name="integrate_networks_banner_description">Integrasikan semua fitur jaringan yang Anda bangun ke Nova Wallet, membuatnya dapat diakses oleh semua orang.</string>
+    <string name="integrate_networks_banner_link">Integrasikan jaringan Anda</string>
+    <string name="integrate_networks_banner_title">Membangun untuk Polkadot?</string>
     <string name="invalid_proxy_address_message">Alamat proksi harus berupa alamat %s yang valid.</string>
     <string name="invalid_proxy_address_title">Alamat proksi tidak valid.</string>
+    <string name="invalid_token_symbol_message">Simbol Mata Uang yang dimasukkan (%1$s) tidak cocok dengan jaringan (%2$s). Apakah Anda ingin menggunakan simbol mata uang yang benar?</string>
+    <string name="invalid_token_symbol_title">Simbol Mata Uang tidak valid</string>
     <string name="invoice_scan_error_no_info">QR tidak dapat didekripsi.</string>
     <string name="invoice_scan_qr_code_title">Kode QR.</string>
     <string name="invoice_scan_upload">Unggah dari galeri.</string>
@@ -737,10 +818,21 @@
     <string name="ledger_verify_address_subtitle">Tekan kedua tombol pada %s Anda untuk menyetujui alamat</string>
     <string name="ledger_wallet_details_description">Dompet ini dipasangkan dengan Ledger. Nova akan membantu Anda melakukan operasi apa pun yang Anda inginkan, dan Anda akan diminta untuk menandatanganinya menggunakan Ledger</string>
     <string name="ledher_import_select_address_title">Pilih akun untuk ditambahkan ke dompet</string>
+    <string name="loading_network_info">Memuat info jaringan...</string>
     <string name="loocking_backup_progress">Mencari cadangan Anda...</string>
     <string name="make_payout_transaction_sent">Transaksi pembayaran telah dikirim</string>
     <string name="manage_assets_add_token">Tambahkan token</string>
     <string name="manage_cloud_backup">Kelola cadangan</string>
+    <string name="manage_network_action_delete">Hapus jaringan</string>
+    <string name="manage_network_action_edit">Sunting jaringan</string>
+    <string name="manage_network_actions_title">Kelola jaringan yang ditambahkan</string>
+    <string name="manage_network_delete_message">Anda tidak akan dapat melihat saldo token Anda di jaringan tersebut pada layar Aset</string>
+    <string name="manage_network_delete_title">Hapus jaringan?</string>
+    <string name="manage_node_action_delete">Hapus node</string>
+    <string name="manage_node_action_edit">Sunting node</string>
+    <string name="manage_node_actions_title">Kelola node yang ditambahkan</string>
+    <string name="manage_node_delete_message">Node \"%s\" akan dihapus</string>
+    <string name="manage_node_delete_title">Hapus node?</string>
     <string name="manual_backup_secrets_custom_key_title">Kunci Kustom</string>
     <string name="manual_backup_secrets_default_key_title">Kunci Default</string>
     <string name="manual_backup_secrets_subtitle">Jangan bagikan informasi ini kepada siapa pun - Jika Anda melakukannya, Anda akan kehilangan semua aset Anda secara permanen dan tidak dapat dikembalikan</string>
@@ -761,9 +853,14 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">Pilih setidaknya %d dompet</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Node ini sudah ada</string>
     <string name="network_fee">Biaya jaringan</string>
     <string name="network_info_address">Alamat node</string>
     <string name="network_info_title">Info Node</string>
+    <string name="network_management_added_page_title">Ditambahkan</string>
+    <string name="network_management_custom_nodes">node kustom</string>
+    <string name="network_management_default_nodes">node default</string>
+    <string name="network_management_default_page_title">Default</string>
     <string name="network_status_connecting">Menghubungkan...</string>
     <string name="nft_collection">Koleksi</string>
     <string name="nft_created_by">Dibuat oleh</string>
@@ -774,6 +871,12 @@
     <string name="nft_owned_by">Dimiliki oleh</string>
     <string name="nft_price_not_listed">Tidak terdaftar</string>
     <string name="nft_your_nfts">NFT Anda</string>
+    <string name="node_already_exist_failure_message">URL yang Anda masukkan sudah ada sebagai Node \"%s\".</string>
+    <string name="node_already_exist_failure_title">Node ini sudah ada</string>
+    <string name="node_not_alive_message">URL Node yang Anda masukkan tidak merespons atau formatnya salah. Format URL harus dimulai dengan \"wss://\".</string>
+    <string name="node_not_alive_title">Kesalahan Node</string>
+    <string name="node_not_supported_by_network_message">URL yang Anda masukkan tidak sesuai dengan Node untuk %1$s.\nHarap masukkan URL Node %1$s yang valid.</string>
+    <string name="node_not_supported_by_network_title">Jaringan salah</string>
     <string name="nomination_pool_claim_rewards">Klaim hadiah</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Token Anda akan ditambahkan kembali ke staking</string>
     <string name="nomination_pools_direct">Langsung</string>
@@ -818,6 +921,13 @@
     <string name="pool_full_failure_title">Pool penuh</string>
     <string name="pool_inactive_failure_message">Anda tidak dapat bergabung dengan pool yang tidak terbuka. Silakan hubungi pemilik pool.</string>
     <string name="pool_inactive_failure_title">Pool tidak terbuka</string>
+    <string name="pool_staking_conflict_message">Anda tidak dapat lagi menggunakan Staking Langsung dan Staking Pool dari akun yang sama. Untuk mengelola Staking Pool Anda, pertama-tama Anda perlu melepaskan token Anda dari Staking Langsung.</string>
+    <string name="pool_staking_conflict_title">Operasi pool tidak tersedia</string>
+    <string name="popular_dapps_title">Populer</string>
+    <string name="pre_configured_networks_add_custom_button">Tambahkan jaringan secara manual</string>
+    <string name="pre_configured_networks_progress_text">Memuat daftar jaringan...</string>
+    <string name="pre_configured_networks_search_hint">Cari berdasarkan nama jaringan</string>
+    <string name="pre_configured_networks_title">Tambahkan jaringan</string>
     <string name="profile_accounts_title">Akun</string>
     <string name="profile_accounts_title_2_0">Dompet</string>
     <string name="profile_language_title">Bahasa</string>
@@ -877,6 +987,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Dengan mengaktifkan pemberitahuan push, Anda menyetujui %s dan %s kami</string>
     <string name="push_welcome_timeout_error_message">Harap coba lagi nanti dengan mengakses pengaturan pemberitahuan dari tab Pengaturan</string>
     <string name="push_welcome_title">Jangan lewatkan hal apa pun!</string>
+    <string name="receive_network_flow_title">Pilih jaringan untuk menerima %s</string>
+    <string name="receive_screen_copy_address">Salin Alamat</string>
     <string name="recover_json_hint">Tempelkan json atau unggah file...</string>
     <string name="recover_json_upload">Unggah file</string>
     <string name="recovery_json">Pulihkan JSON</string>
@@ -891,8 +1003,13 @@
     <string name="referenda_list_placeholder">Informasi Referenda akan muncul di sini ketika mereka dimulai</string>
     <string name="referenda_search_placeholder">Tidak ada referenda dengan judul atau ID yang dimasukkan ditemukan</string>
     <string name="referenda_search_toolbar_hint">Cari berdasarkan judul referendum atau ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referendum</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Gesek untuk memberikan suara pada referendum dengan ringkasan AI. Cepat &amp;  mudah!</string>
     <string name="referenda_title">Referenda</string>
     <string name="referendim_details_not_found_title">Referendum tidak ditemukan</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Suara Abstain hanya dapat dilakukan dengan keyakinan 0,1x. Pilih dengan keyakinan 0,1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Pembaruan keyakinan</string>
+    <string name="referendum_abstain_voters_title">Suara abstain</string>
     <string name="referendum_aye_format">Ya: %s</string>
     <string name="referendum_dapp_list_title">Gunakan browser Nova DApp</string>
     <string name="referendum_description_fallback">Hanya penyarankan yang dapat mengedit deskripsi dan judul ini. Jika Anda memiliki akun penyarankan, kunjungi Polkassembly dan isi informasi tentang proposal Anda</string>
@@ -1025,16 +1142,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
+    <string name="select_network_title">Pilih jaringan</string>
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
     <string name="send_address_hint">Address or w3n</string>
+    <string name="send_network_flow_title">Pilih jaringan untuk mengirim %s</string>
     <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual.\nAre you sure you still want to perform this transfer?</string>
     <string name="send_recipient_system_account_title">Tokens will be lost</string>
     <string name="set_staking_proxy_address_description">Give authority to</string>
     <string name="settings_biometric_not_ready_message">Pastikan biometrik diaktifkan dalam Pengaturan</string>
     <string name="settings_biometric_not_ready_title">Biometrik dinonaktifkan dalam Pengaturan</string>
     <string name="settings_community">Komunitas</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Dapatkan dukungan melalui Email</string>
     <string name="settings_general">Umum</string>
     <string name="settings_pin_code_verification_confirmation_message">Setiap operasi tanda tangan pada dompet dengan pasangan kunci (dibuat di dompet nova atau diimpor) harus memerlukan verifikasi PIN sebelum membuat tanda tangan</string>
     <string name="settings_pin_code_verification_confirmation_title">Minta autentikasi untuk penandatanganan operasi</string>
@@ -1046,8 +1165,11 @@
     <string name="settings_security">Keamanan</string>
     <string name="settings_support">Dukungan &amp; Masukan</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Pusat Bantuan</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Keyakinan akan diatur ke 0,1x ketika Abstain</string>
+    <string name="setup_staking_conflict_message">Anda tidak dapat melakukan staking dengan Staking Langsung dan Pool Nominasi pada saat yang sama</string>
+    <string name="setup_staking_conflict_title">Sudah melakukan staking</string>
     <string name="setup_staking_type_advanced_options_condition">Pengelolaan Staking lanjutan</string>
     <string name="setup_staking_type_already_used_title">Jenis Staking tidak dapat diubah</string>
     <string name="setup_staking_type_direct_already_used_message">Anda sudah memiliki Direct Staking</string>
@@ -1405,6 +1527,16 @@
     <string name="swap_custom_fee_selector_description">Token untuk membayar biaya jaringan</string>
     <string name="swap_custom_fee_selector_footer">Biaya jaringan ditambahkan di atas jumlah yang dimasukkan</string>
     <string name="swap_error_pair_not_supported">Pasangan ini tidak didukung</string>
+    <string name="swap_execution_failure" formatted="false">Gagal dalam operasi #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s ke %s swap pada %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transfer %s dari %s ke %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s operasi</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s dari %s operasi</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Menukarkan %s ke %s pada %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Mentransfer %s ke %s</string>
+    <string name="swap_execution_time">Waktu eksekusi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Anda harus menyisihkan setidaknya %s setelah membayar biaya jaringan %s karena Anda memegang token yang tidak mencukupi</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Anda harus menyisihkan setidaknya %s untuk menerima token %s</string>
     <string name="swap_failure_insufficient_balance_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan.</string>
@@ -1424,6 +1556,7 @@
     <string name="swap_get_token_cross_chain_description">Transfer %s dari jaringan lain</string>
     <string name="swap_get_token_receive_description">Terima %s dengan QR atau alamat Anda</string>
     <string name="swap_get_token_using">Dapatkan %s menggunakan</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Selama eksekusi swap, jumlah terima sementara adalah %s yang lebih rendah dari saldo minimum %s. Coba tentukan jumlah swap yang lebih besar.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Prosentase pergeseran harus ditentukan antara %s dan %s</string>
     <string name="swap_invalid_slippage_failure_title">Pergeseran tidak valid</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Pilih token untuk membayar</string>
@@ -1432,6 +1565,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Masukkan jumlah lain</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Untuk membayar biaya jaringan dengan %s, Nova secara otomatis akan menukar %s dengan %s untuk mempertahankan saldo minimum %s akun Anda.</string>
     <string name="swap_network_fee_description">Biaya jaringan yang dibebankan oleh blockchain untuk memproses dan memvalidasi transaksi. Bisa bervariasi tergantung pada kondisi jaringan atau kecepatan transaksi.</string>
+    <string name="swap_network_flow_title">Pilih jaringan untuk menukar %s</string>
     <string name="swap_not_enought_liquidity_failure">Pool tidak memiliki likuiditas yang cukup untuk swap</string>
     <string name="swap_price_difference_description">Perbedaan harga merujuk pada perbedaan harga antara dua aset yang berbeda. Ketika melakukan swap dalam kripto, perbedaan harga biasanya adalah perbedaan antara harga aset yang Anda tukarkan dengan harga aset yang Anda tukar.</string>
     <string name="swap_price_difference_title">Perbedaan harga</string>
@@ -1441,6 +1575,10 @@
     <string name="swap_rate_was_updated_failure_message">Kurs lama: %1$s ≈ %2$s.\nKurs baru: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Kurs pertukaran telah diperbarui</string>
     <string name="swap_repeat_operation">Ulangi operasi</string>
+    <string name="swap_route">Rute</string>
+    <string name="swap_route_description">Jalur yang akan diambil token Anda melalui berbagai jaringan untuk mendapatkan token yang diinginkan.</string>
+    <string name="swap_route_segment_swap_title">Tukar</string>
+    <string name="swap_route_segment_transfer_title">Transfer</string>
     <string name="swap_settings_title">Pengaturan swap</string>
     <string name="swap_slippage">Slippage</string>
     <string name="swap_slippage_description">Slippage adalah kejadian umum dalam perdagangan terdesentralisasi di mana harga akhir dari transaksi swap mungkin sedikit berbeda dari harga yang diharapkan, karena kondisi pasar yang berubah.</string>
@@ -1451,9 +1589,35 @@
     <string name="swap_slippage_warning_too_small">Transaksi mungkin dibalikkan karena toleransi slippage yang rendah.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Jumlah %s kurang dari saldo minimum %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Anda mencoba untuk menukar jumlah yang terlalu kecil</string>
+    <string name="swipe_gov_abstain_format">Abstain: %s</string>
+    <string name="swipe_gov_aye_format">Aye: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Anda selalu bisa memberikan suara untuk referendum ini nanti</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Hapus referendum %s dari daftar suara?</string>
+    <string name="swipe_gov_basket_removed_items_message">Beberapa referendum tidak lagi tersedia untuk pemungutan suara atau Anda mungkin tidak memiliki cukup token yang tersedia untuk memberikan suara. Tersedia untuk memberikan suara: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Beberapa referendum dikeluarkan dari daftar suara</string>
+    <string name="swipe_gov_card_data_loading_error_message">Data referendum tidak dapat dimuat</string>
+    <string name="swipe_gov_card_data_loading_error_title">Tidak ada data yang ditemukan</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Anda telah memberikan suara untuk semua referendum yang tersedia atau tidak ada referendum untuk memberikan suara saat ini. Kembali lagi nanti.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Anda telah memberikan suara untuk semua referendum yang tersedia</string>
+    <string name="swipe_gov_card_requested_title">Diminta:</string>
+    <string name="swipe_gov_cards_basket_title">Daftar suara</string>
+    <string name="swipe_gov_cards_counter">%d tersisa</string>
+    <string name="swipe_gov_cards_full_list">Konfirmasi suara</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Tidak ada referendum untuk memberikan suara</string>
+    <string name="swipe_gov_cards_placeholder_button">Konfirmasi suara Anda</string>
+    <string name="swipe_gov_cards_voting_list_empty">Tidak ada suara</string>
+    <string name="swipe_gov_convirm_votes_success_message">Anda berhasil memberikan suara untuk %d referendum</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Anda tidak memiliki saldo yang cukup untuk memberikan suara dengan kekuatan suara saat ini %s (%sx). Silakan ubah kekuatan suara atau tambahkan lebih banyak dana ke dompet Anda.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Saldo tidak mencukupi untuk memberikan suara</string>
+    <string name="swipe_gov_nay_format">Nay: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Berikan suara untuk %d referendum</string>
+    <string name="swipe_gov_vote_subtitle">Pemungutan suara akan diatur untuk suara di masa depan di SwipeGov</string>
+    <string name="swipe_gov_vote_title">Kekuatan Suara</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Dompet</string>
     <string name="today">Hari ini</string>
+    <string name="token_price_info_provider_label">Tautan Coingecko untuk info harga (Opsional)</string>
     <string name="transaction_details_copy_hash">Salin hash</string>
     <string name="transaction_details_extrinsic_fee">Biaya</string>
     <string name="transaction_details_from">Dari</string>
@@ -1498,6 +1662,7 @@
     <string name="wallet_asset_buy_with">Beli dengan</string>
     <string name="wallet_asset_receive">Terima</string>
     <string name="wallet_asset_receive_token">Terima %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Hanya kirim token %1$s dan token di jaringan %2$s ke alamat ini, atau Anda bisa kehilangan dana Anda</string>
     <string name="wallet_asset_send">Kirim</string>
     <string name="wallet_asset_swap">Tukar</string>
     <string name="wallet_assets">Aset</string>

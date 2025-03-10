@@ -39,6 +39,7 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun saveSelectedAccount(account: Account)
 
     suspend fun getSelectedMetaAccount(): MetaAccount
+
     fun selectedMetaAccountFlow(): Flow<MetaAccount>
 
     suspend fun findMetaAccount(accountId: ByteArray, chainId: ChainId): MetaAccount?
@@ -105,6 +106,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun hasSecretsAccounts(): Boolean
 
     suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+
+    suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

@@ -78,13 +78,16 @@ open class TableView @JvmOverloads constructor(
         setupTableChildrenAppearance()
 
         dividerPath.reset()
-        children.toList()
-            .filter { it != titleView && it.isVisible }
-            .withoutLast()
-            .forEach {
-                dividerPath.moveTo(childHorizontalPadding, it.bottom.toFloat())
-                dividerPath.lineTo(measuredWidth - childHorizontalPadding, it.bottom.toFloat())
+        children.forEachIndexed { idx, child ->
+            val isVisible = child.isVisible
+            val allowsToDrawDividers = child is TableItem && child.shouldDrawDivider()
+            val hasNext = idx < childCount - 1
+
+            if (isVisible && allowsToDrawDividers && hasNext) {
+                dividerPath.moveTo(childHorizontalPadding, child.bottom.toFloat())
+                dividerPath.lineTo(measuredWidth - childHorizontalPadding, child.bottom.toFloat())
             }
+        }
     }
 
     fun setTitle(title: String?) {
@@ -113,7 +116,7 @@ open class TableView @JvmOverloads constructor(
     }
 
     private fun setupTableChildrenAppearance() {
-        val tableChildren = children.filterNot { it == titleView }
+        val tableChildren = children.filter { it != titleView }
             .filter { it.isVisible }
             .toList()
 
@@ -125,8 +128,8 @@ open class TableView @JvmOverloads constructor(
         }
 
         tableChildren.forEach {
-            if (it is HasDivider) {
-                it.setDividerVisible(false)
+            if (it is TableItem) {
+                it.disableOwnDividers()
             }
 
             it.updatePadding(start = 16.dp, end = 16.dp)

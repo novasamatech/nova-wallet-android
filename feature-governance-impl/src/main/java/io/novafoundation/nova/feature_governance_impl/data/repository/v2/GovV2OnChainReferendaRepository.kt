@@ -169,6 +169,7 @@ class GovV2OnChainReferendaRepository(
             "Ongoing" -> {
                 val status = asDictEnum.value.castToStruct()
                 val trackId = TrackId(bindNumber(status["track"]))
+                val track = tracksById.getValue(trackId)
 
                 OnChainReferendumStatus.Ongoing(
                     track = trackId,
@@ -179,7 +180,7 @@ class GovV2OnChainReferendaRepository(
                     deciding = bindDecidingStatus(status["deciding"]),
                     tally = bindTally(status.getTyped("tally")),
                     inQueue = bindBoolean(status["inQueue"]),
-                    threshold = Gov2VotingThreshold(tracksById.getValue(trackId))
+                    threshold = Gov2VotingThreshold(track),
                 )
             }
 
@@ -187,7 +188,7 @@ class GovV2OnChainReferendaRepository(
             "Rejected" -> OnChainReferendumStatus.Rejected(bindCompletedReferendumSince(asDictEnum.value))
             "Cancelled" -> OnChainReferendumStatus.Cancelled(bindCompletedReferendumSince(asDictEnum.value))
             "TimedOut" -> OnChainReferendumStatus.TimedOut(bindCompletedReferendumSince(asDictEnum.value))
-            "Killed" -> OnChainReferendumStatus.Killed(bindCompletedReferendumSince(asDictEnum.value))
+            "Killed" -> OnChainReferendumStatus.Killed(bindNumber(asDictEnum.value))
             else -> throw IllegalArgumentException("Unsupported referendum status")
         }
 
@@ -196,7 +197,7 @@ class GovV2OnChainReferendaRepository(
             status = referendumStatus
         )
     }
-        .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum", it) }
+        .onFailure { Log.e(this.LOG_TAG, "Failed to decode on-chain referendum $id", it) }
         .getOrNull()
 
     private fun bindDecidingStatus(decoded: Any?): DecidingStatus? {
@@ -240,6 +241,7 @@ class GovV2OnChainReferendaRepository(
                 name = bindString(trackInfoStruct["name"]),
                 preparePeriod = bindBlockNumber(trackInfoStruct["preparePeriod"]),
                 decisionPeriod = bindBlockNumber(trackInfoStruct["decisionPeriod"]),
+                confirmPeriod = bindBlockNumber(trackInfoStruct["confirmPeriod"]),
                 minApproval = bindCurve(trackInfoStruct.getTyped("minApproval")),
                 minSupport = bindCurve(trackInfoStruct.getTyped("minSupport"))
             )

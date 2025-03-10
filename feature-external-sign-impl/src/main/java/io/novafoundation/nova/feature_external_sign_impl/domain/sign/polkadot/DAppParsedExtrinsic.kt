@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot
 
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import java.math.BigInteger
 
-class DAppParsedExtrinsic(
+data class DAppParsedExtrinsic(
     val address: String,
     val nonce: BigInteger,
     val specVersion: Int,
@@ -13,5 +13,6 @@ class DAppParsedExtrinsic(
     val era: Era,
     val blockHash: ByteArray,
     val tip: BigInteger,
-    val call: Extrinsic.EncodingInstance.CallRepresentation
+    val metadataHash: ByteArray?,
+    val call: GenericCall.Instance
 )

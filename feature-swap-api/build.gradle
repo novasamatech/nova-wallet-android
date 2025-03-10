@@ -33,6 +33,7 @@ dependencies {
 
     implementation project(':runtime')
     implementation project(':common')
+    implementation project(":feature-swap-core")
 
     api project(":feature-wallet-api")
     api project(":feature-account-api")

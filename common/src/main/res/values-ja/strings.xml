@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">導出パスにはサポートされていない記号が含まれているか、構造が正しくありません</string>
     <string name="account_invalid_derivation_path_title">無効な導出パス</string>
     <string name="account_json_file">JSONファイル</string>
-    <string name="account_ledger_generic_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに<font color="#FFFFFF">Genericアプリをインストール</font>してください</string>
-    <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで<font color="#FFFFFF">汎用アプリを開く</font></string>
+    <string name="account_ledger_generic_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに%sしてください</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadotアプリがインストールされています</string>
+    <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで%s</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">ポルカドットアプリを開く</string>
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
     <string name="account_ledger_import_start_guide">Ledgerの公式Bluetooth接続ガイド</string>
-    <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使用してLedgerデバイスに<font color="#FFFFFF">ネットワークアプリをインストール</font>してください</string>
-    <string name="account_ledger_import_start_step_2">Ledger デバイスで<font color="#FFFFFF">アプリを開く</font></string>
-    <string name="account_ledger_import_start_step_3">Nova Walletに<font color="#FFFFFF">Bluetoothと位置情報へのアクセスを許可</font>してください</string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">ウォレットに追加するアカウント</font> を選択する。</string>
+    <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使ってLedgerデバイスに%sを確実にしてください</string>
+    <string name="account_ledger_import_start_step_1_highlighted">ネットワークアプリがインストールされている</string>
+    <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
+    <string name="account_ledger_import_start_step_2_highlighted">ネットワークアプリを開く</string>
+    <string name="account_ledger_import_start_step_3">Nova Walletに%sしてください</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetoothと位置情報へのアクセスを許可</string>
+    <string name="account_ledger_import_start_step_4">%s を選択する。</string>
+    <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
     <string name="account_ledger_import_start_title">Ledger Nano Xを接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Migrationアプリは近い将来使用できなくなります。新しいLedgerアプリにアカウントを移行して資金を失わないようにしてください。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot 専用水玉アプリ)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">電話の設定とLedgerデバイスでBluetoothを有効にしてください。Ledgerデバイスを解除し、%sアプリを開いてください。</string>
     <string name="account_ledger_select_device_title">Ledgerデバイスを選択</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">これがあなたのアカウントです</string>
     <string name="account_parity_signer_import_scan_invalid_qr">無効なQRコードです。%sのQRコードをスキャンしていることを確認してください</string>
     <string name="account_parity_signer_import_start_select_top">一番上を選択していることを確認してください</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signerが<font color="#FFFFFF">スキャン用のQRコードを提供します</font></string>
+    <string name="account_parity_signer_import_start_step_1">スマートフォンの%sアプリケーション</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Parity Signer を開く</string>
+    <string name="account_parity_signer_import_start_step_2">%sNova Walletに追加したい</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">キータブに行く。シードを選択し、次にアカウントを選択</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signerはあなたに%sを提供します</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">スキャン用のQRコード</string>
     <string name="account_parity_signer_import_start_title">%sからウォレットを追加</string>
     <string name="account_parity_signer_not_supported_subtitle">%sは任意のメッセージの署名をサポートしていません — トランザクションのみをサポートします</string>
     <string name="account_parity_signer_not_supported_title">署名はサポートされていません</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">%sで署名</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">派生パス名が空であることに注意してください</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">スマートフォンでPolkadot Vault </font>アプリケーションを開きます</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">「キーセット」タブに移動します。</font>キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが<font color="#FFFFFF">スキャン用のQRコードを提供します</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">スマートフォンの%sアプリケーション</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Polkadot Vault を開く</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Key Sets タブに行く。</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが%s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">スキャン用のQRコード</string>
     <string name="account_private_key">プライベートキー</string>
     <string name="account_proxieds">あなたに委任された（プロキシ）</string>
     <string name="account_proxy_type_any">任意の操作</string>
@@ -150,7 +162,9 @@
     <string name="accounts_change_chain_account">%s アカウントを変更</string>
     <string name="accounts_change_chain_secrets">アカウントを変更</string>
     <string name="accounts_ledger_legacy">Ledger（Legacy）</string>
+    <string name="add_custom_node">カスタムノードを追加</string>
     <string name="add_delegation_missing_account_message">委任するためにはウォレットに%sアカウントを追加する必要があります</string>
+    <string name="add_network_title">ネットワークの詳細を入力してください</string>
     <string name="add_proxy_confirmation_delegate_to">委任先</string>
     <string name="add_proxy_confirmation_delegating_account">委任アカウント</string>
     <string name="add_proxy_confirmation_delegating_wallet">委任ウォレット</string>
@@ -158,6 +172,11 @@
     <string name="add_proxy_deposit_description_message">デポジットはプロキシが削除されるまであなたのアカウントに予約されたままになります。</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%sで追加できるプロキシの上限に達しました。新しいものを追加するためには既存のプロキシを削除してください。</string>
     <string name="add_proxy_maximum_reached_error_title">プロキシの最大数に達しました</string>
+    <string name="added_networks_empty_placeholder">追加されたカスタムネットワーク\nここに表示されます</string>
+    <string name="appearance_colored_icon_title">カラー</string>
+    <string name="appearance_title">外観</string>
+    <string name="appearance_token_assets_title">トークンアイコン</string>
+    <string name="appearance_white_icon_title">ホワイト</string>
     <string name="asset_add_evm_token_already_exist_message">入力されたコントラクトアドレスは%sトークンとしてNovaに存在します。</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">入力されたコントラクトアドレスは%sトークンとしてNovaに存在します。本当にそれを変更しますか?</string>
     <string name="asset_add_evm_token_already_exist_title">このトークンはすでに存在します</string>
@@ -170,10 +189,11 @@
     <string name="asset_add_token_enter_contract_address">コントラクトアドレスを入力</string>
     <string name="asset_add_token_enter_decimals">小数を入力</string>
     <string name="asset_add_token_enter_symbol">シンボルを入力</string>
+    <string name="asset_view_networks">ネットワーク</string>
+    <string name="asset_view_tokens">トークン</string>
     <string name="assets_add_token">トークンを追加</string>
     <string name="assets_add_token_enter_info_address_label">コントラクトアドレス</string>
     <string name="assets_add_token_enter_info_decimals_label">小数</string>
-    <string name="assets_add_token_enter_info_price_label">価格情報のためのCoingeckoリンク（オプション）</string>
     <string name="assets_add_token_enter_info_symbol_label">シンボル</string>
     <string name="assets_add_token_enter_info_title">ERC-20トークンの詳細を入力</string>
     <string name="assets_add_token_select_chain_title">ERC-20トークンを追加するネットワークを選択</string>
@@ -193,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledgerはこのトークンをサポートしていません</string>
     <string name="assets_search_hint">ネットワークまたはトークンで検索</string>
     <string name="assets_search_placeholder">入力した名前のネットワークやトークンが見つかりませんでした</string>
+    <string name="assets_search_token_hint">トークンで検索</string>
     <string name="assets_select_send_your_wallets">あなたのウォレット</string>
     <string name="assets_send_flow_placeholder">送信するトークンがありません。\nトークンを購入または受け取ってください\nアカウントに。</string>
     <string name="assets_swap_flow_pay_title">支払い用トークン</string>
@@ -220,9 +241,13 @@
     <string name="backup_settings_toolbar_title">バックアップ</string>
     <string name="backup_title">バックアップ</string>
     <string name="biometric_auth_title">生体認証</string>
+    <string name="browser_tabs_close_all">すべて閉じる</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
+    <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
     <string name="buy_provider_open_confirmation_title">ブラウザで続行しますか？</string>
+    <string name="chain_network_management_auto_balance">自動バランスノード</string>
+    <string name="chain_network_management_enabling">接続を有効にする</string>
     <string name="change_cloud_backup_password_subtitle">クラウドバックアップからウォレットを復元するために使用するパスワードを入力してください。このパスワードは将来的に復元できないため、必ず覚えておいてください！</string>
     <string name="change_cloud_backup_password_title">バックアップパスワードを更新</string>
     <string name="choose_amount_asset">アセット</string>
@@ -233,6 +258,8 @@
     <string name="choose_amount_fee">転送手数料</string>
     <string name="choose_amount_network_error">ネットワークが応答していません</string>
     <string name="choose_amount_to">宛先</string>
+    <string name="close_dapp_tabs_message">DAppブラウザーで開いているすべてのタブが閉じられます。</string>
+    <string name="close_dapp_tabs_title">すべてのDAppを閉じますか？</string>
     <string name="cloud_backup_delete_action_subtitle">%s と、いつでも復元できるように必ずオフラインで保持してください。バックアップ設定でこれを行うことができます。</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">進む前にすべてのウォレットのパスフレーズを書き留めてください</string>
     <string name="cloud_backup_delete_action_title">Googleドライブからバックアップが削除されます</string>
@@ -280,6 +307,7 @@
     <string name="common_active">アクティブ</string>
     <string name="common_add">追加</string>
     <string name="common_add_delegation">委任を追加</string>
+    <string name="common_add_network">ネットワークを追加</string>
     <string name="common_address">住所</string>
     <string name="common_advanced">高度な</string>
     <string name="common_all">すべて</string>
@@ -316,6 +344,8 @@
     <string name="common_confirm_title">確認</string>
     <string name="common_confirmation_title">本当に?</string>
     <string name="common_confirmed">確認済み</string>
+    <string name="common_connected_ms">%d ミリ秒</string>
+    <string name="common_connecting">接続中...</string>
     <string name="common_connection_error_message">接続を確認するか、後で再試行してください</string>
     <string name="common_connection_error_title">接続失敗</string>
     <string name="common_continue">続行</string>
@@ -325,9 +355,11 @@
     <string name="common_crypto_type">キーペア暗号タイプ</string>
     <string name="common_date">日付</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s と %s</string>
+    <string name="common_delete">削除</string>
     <string name="common_details">詳細</string>
     <string name="common_disabled">無効</string>
     <string name="common_disconnect">切断する</string>
+    <string name="common_do_not_close_app">アプリを閉じないでください！</string>
     <string name="common_done">完了</string>
     <string name="common_dont_show_again">これを再表示しない</string>
     <string name="common_edit">編集</string>
@@ -336,17 +368,21 @@
     <string name="common_enable">有効にする</string>
     <string name="common_enter_address">アドレスを入力…</string>
     <string name="common_enter_amount">金額を入力...</string>
+    <string name="common_enter_details">詳細を入力してください</string>
     <string name="common_enter_password">パスワードを入力</string>
     <string name="common_error_general_title">エラー</string>
     <string name="common_error_not_enough_tokens">トークンが足りません</string>
     <string name="common_event">イベント</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM アドレス</string>
     <string name="common_existential_warning_message_v2_2_0">この操作を行うと、アカウントの残高が最小限度を下回るため、ブロックチェーンからアカウントが削除されます。</string>
     <string name="common_existential_warning_title">操作によりアカウントが削除されます</string>
     <string name="common_expired">期限切れ</string>
     <string name="common_explore">探索する</string>
+    <string name="common_failed">失敗しました</string>
     <string name="common_fee_changed_message" formatted="false">推定ネットワーク手数料%sがデフォルトのネットワーク手数料(%s)よりも大幅に高くなっています。これは一時的なネットワーク渋滞が原因かもしれません。ネットワーク手数料をリフレッシュして、より低い手数料を待つことができます。</string>
     <string name="common_fee_changed_title">ネットワーク手数料が高すぎます</string>
+    <string name="common_fee_with_label">手数料: %s</string>
     <string name="common_filter_sort_header">ソート順:</string>
     <string name="common_filters">フィルター</string>
     <string name="common_find_out_more">詳しく知る</string>
@@ -377,6 +413,7 @@
         <item quantity="other">%d分</item>
     </plurals>
     <string name="common_missing_account_title">%sアカウントがありません</string>
+    <string name="common_modify">修正</string>
     <string name="common_module">モジュール</string>
     <string name="common_network">ネットワーク</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -396,6 +433,7 @@
     <string name="common_not_available">利用できません</string>
     <string name="common_not_enough_funds_message">申し訳ありませんが、ネットワーク手数料を支払うための十分な資金がありません。</string>
     <string name="common_not_enough_funds_title">残高不足</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">ネットワーク手数料%sを支払うには残高が不足しています。現在の残高は%sです</string>
     <string name="common_not_now">今はしません</string>
     <string name="common_off">オフ</string>
     <string name="common_ok">OK</string>
@@ -435,7 +473,12 @@
     <string name="common_search">検索</string>
     <string name="common_search_placeholder_default">検索結果がここに表示されます</string>
     <string name="common_search_results_number">検索結果：%d</string>
+    <string name="common_sec">秒</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d秒</item>
+    </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
+    <string name="common_see_all">すべて見る</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
     <string name="common_sign_in">サインイン</string>
@@ -448,14 +491,17 @@
     <string name="common_something_went_wrong_title">何かがうまくいきませんでした</string>
     <string name="common_sort_by">並び替え</string>
     <string name="common_status">ステータス</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Substrate アドレス</string>
     <string name="common_tap_to_reveal_title">タップして表示</string>
     <string name="common_terms_and_conditions_formatting">利用規約</string>
+    <string name="common_testnet">Testnet</string>
     <string name="common_time_left">残り時間</string>
     <string name="common_title">タイトル</string>
     <string name="common_to_settings">設定を開く</string>
     <string name="common_too_small_balance_title">残高が少なすぎます</string>
     <string name="common_total">合計</string>
+    <string name="common_total_fee">合計手数料</string>
     <string name="common_transaction_id">取引ID</string>
     <string name="common_transaction_submitted">取引が送信されました</string>
     <string name="common_try_again">もう一度試してください</string>
@@ -468,6 +514,7 @@
     <string name="common_unlimited">無制限</string>
     <string name="common_update">更新</string>
     <string name="common_use">使用</string>
+    <string name="common_use_max">最大を使用</string>
     <string name="common_validation_invalid_address_message">受信者は有効な %s アドレスである必要があります</string>
     <string name="common_validation_invalid_address_title">無効な受信者</string>
     <string name="common_waiting">待機中</string>
@@ -485,7 +532,6 @@
     <string name="connection_add_already_exists_error">このノードは既に追加されています。別のノードを試してください。</string>
     <string name="connection_add_invalid_error">ノードに接続できません。別のノードを試してください。</string>
     <string name="connection_add_unsupported_error">残念ながら、このネットワークはサポートされていません。以下のいずれかをお試しください: %s。</string>
-    <string name="connection_delete_confirm">削除</string>
     <string name="connection_delete_description">%sを削除します。</string>
     <string name="connection_delete_title">ネットワークを削除しますか？</string>
     <string name="connection_error_message_v2_2_0">接続を確認するか、後で再試行してください</string>
@@ -508,6 +554,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">パスワードが一致</string>
     <string name="create_cloud_backup_password_subtitle">バックアップにアクセスするためのパスワードを入力してください。このパスワードは復元できないため、必ず覚えておいてください！</string>
     <string name="create_cloud_backup_password_title">バックアップパスワードを作成する</string>
+    <string name="create_network_invalid_chain_id_message">入力されたチェーンIDはRPC URLのネットワークと一致しません。</string>
+    <string name="create_network_invalid_chain_id_title">無効なチェーンID</string>
     <string name="crodloan_private_crowdloan_message">プライベートクラウドローンはまだサポートされていません。</string>
     <string name="crodloan_private_crowdloan_title">プライベートクラウドローン</string>
     <string name="crowdloan_about">クラウドローンについて</string>
@@ -564,6 +612,24 @@
     <string name="crowdloan_unlock_hint">リース期間の終了後にあなたの %s トークンが返還されます。</string>
     <string name="crowdloan_your_contributions">あなたの貢献</string>
     <string name="crownloans_raised_format" formatted="false">集められた金額: %s の %s</string>
+    <string name="custom_network_already_exist_failure_message">入力されたRPC URLは%sカスタムネットワークとしてNovaに存在します。本当に修正しますか？</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">ブロックエクスプローラーURL（オプション）</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">チェーンID</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">通貨記号</string>
+    <string name="custom_network_name_title">ネットワーク名</string>
+    <string name="custom_node_add_button_state">ノードを追加</string>
+    <string name="custom_node_add_title">カスタムノードを追加する</string>
+    <string name="custom_node_disabled_button_state">詳細を入力してください</string>
+    <string name="custom_node_edit_button_state">保存</string>
+    <string name="custom_node_edit_title">カスタムノードを編集する</string>
+    <string name="custom_node_name_hint">名前</string>
+    <string name="custom_node_name_title">ノード名</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">ノードURL</string>
+    <string name="custom_rpc_node_url_title">RPC URL</string>
     <string name="dapp_authorized_description">使用する際にアドレスへのアクセスを許可したDApps</string>
     <string name="dapp_authorized_remove_description">DApp “%s” は認証済みリストから削除されます</string>
     <string name="dapp_authorized_remove_title">認証済みリストから削除しますか？</string>
@@ -574,6 +640,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">アプリケーションを信頼する場合はこのリクエストを承認してください。\nトランザクションの詳細を確認してください。</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">お気に入り</string>
     <string name="dapp_favourites">お気に入り</string>
     <string name="dapp_favourites_add">お気に入りに追加</string>
     <string name="dapp_favourites_remove_description">「%s」DAppはお気に入りから削除されます</string>
@@ -592,6 +660,9 @@
     <string name="dapp_sign_error_unsupported_chain">生成ハッシュ %s の未対応チェーン</string>
     <string name="dapp_sign_extrinsic_details_subtitle">操作が正しいことを確認してください</string>
     <string name="dapp_sign_extrinsic_failed">要求された操作の署名に失敗しました</string>
+    <string name="dapp_url_warning_open_anyway">それでも開く</string>
+    <string name="dapp_url_warning_subtitle">悪意のあるDAppsはすべての資金を引き出す可能性があります。DAppを使用する前に、許可を与えたり、資金を送金したりする前に、必ず自分で調査してください。\n\n誰かがこのDAppを訪問するよう促している場合、それは詐欺である可能性が高いです。疑わしい場合は、Nova Walletサポートに連絡してください: %s。</string>
+    <string name="dapp_url_warning_title">警告! DAppは未知です</string>
     <string name="deep_linking_chain_id_is_not_found">チェーンが見つかりません</string>
     <string name="deep_linking_domain_is_not_matched">リンクのドメイン %s は許可されていません</string>
     <string name="deep_linking_governance_type_is_not_specified">ガバナンスタイプが指定されていません</string>
@@ -600,6 +671,7 @@
     <string name="deep_linking_invalid_derivation_path">派生パスが無効です</string>
     <string name="deep_linking_invalid_mnemonic">ニモニックが無効です</string>
     <string name="deep_linking_url_is_invalid">URLが無効です</string>
+    <string name="default_network_already_exist_failure_message">入力されたRPC URLは%sネットワークとしてNovaに存在します。</string>
     <string name="default_notification_channel_name">デフォルト通知チャンネル</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">アドレスまたは名前で検索</string>
@@ -650,6 +722,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">以前にバックアップパスワードが更新されました。Cloud Backup を使用し続けるには、%s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">新しいバックアップパスワードを入力してください。</string>
     <string name="deprecated_cloud_backup_password_title">バックアップパスワードが変更されました</string>
+    <string name="disabled_chain_error_message">無効なネットワークのトランザクションにはサインできません。設定で%sを有効にしてもう一度お試しください。</string>
+    <string name="disabled_chain_error_title">%sは無効です</string>
     <string name="duplicate_proxy_type_message">このアカウントにすでに委任しています: %s</string>
     <string name="duplicate_proxy_type_title">委任はすでに存在します</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH 対応)</string>
@@ -684,6 +758,8 @@
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
     </plurals>
     <string name="governance_unlock">ロック解除</string>
+    <string name="high_price_impact_detacted_message">この交換を実行すると、大幅なスリッページと財務上の損失が発生します。取引サイズを減らすか、取引を複数のトランザクションに分けることを検討してください。</string>
+    <string name="high_price_impact_detacted_title">高価格インパクト検出 (%s)</string>
     <string name="history_v1.9.0">履歴</string>
     <string name="identity_email_title">メール</string>
     <string name="identity_legal_name_title">法的氏名</string>
@@ -708,8 +784,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">12, 15, 18, 21または24単語のフレーズを使用</string>
     <string name="import_wallet_options_title">ウォレットのインポート方法を選択してください</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>
+    <string name="integrate_networks_banner_description">あなたが構築しているネットワークのすべての機能をNova Walletに統合し、誰でもアクセスできるようにします。</string>
+    <string name="integrate_networks_banner_link">ネットワークを統合する</string>
+    <string name="integrate_networks_banner_title">Polkadot用に構築していますか？</string>
     <string name="invalid_proxy_address_message">プロキシアドレスは有効な%sアドレスである必要があります</string>
     <string name="invalid_proxy_address_title">無効なプロキシアドレス</string>
+    <string name="invalid_token_symbol_message">入力された通貨記号（%1$s）はネットワーク（%2$s）と一致しません。正しい通貨記号を使用しますか？</string>
+    <string name="invalid_token_symbol_title">無効な通貨記号</string>
     <string name="invoice_scan_error_no_info">QRをデコードできません</string>
     <string name="invoice_scan_qr_code_title">QRコード</string>
     <string name="invoice_scan_upload">ギャラリーからアップロード</string>
@@ -737,10 +818,21 @@
     <string name="ledger_verify_address_subtitle">アドレスを承認するには、%sの両方のボタンを押してください</string>
     <string name="ledger_wallet_details_description">このウォレットはLedgerとペアリングされています。Novaは望む操作を形成する手助けをし、Ledgerを使用してそれらを署名するよう求められます</string>
     <string name="ledher_import_select_address_title">ウォレットに追加するアカウントを選択</string>
+    <string name="loading_network_info">ネットワーク情報を読み込み中...</string>
     <string name="loocking_backup_progress">バックアップを探しています...</string>
     <string name="make_payout_transaction_sent">支払いトランザクションが送信されました</string>
     <string name="manage_assets_add_token">トークンを追加</string>
     <string name="manage_cloud_backup">バックアップの管理</string>
+    <string name="manage_network_action_delete">ネットワークを削除</string>
+    <string name="manage_network_action_edit">ネットワークを編集</string>
+    <string name="manage_network_actions_title">追加されたネットワークの管理</string>
+    <string name="manage_network_delete_message">資産画面でそのネットワークのトークン残高を確認できなくなります</string>
+    <string name="manage_network_delete_title">ネットワークを削除しますか？</string>
+    <string name="manage_node_action_delete">ノードを削除</string>
+    <string name="manage_node_action_edit">ノードを編集</string>
+    <string name="manage_node_actions_title">追加されたノードの管理</string>
+    <string name="manage_node_delete_message">ノード「%s」は削除されます</string>
+    <string name="manage_node_delete_title">ノードを削除しますか？</string>
     <string name="manual_backup_secrets_custom_key_title">カスタムキー</string>
     <string name="manual_backup_secrets_default_key_title">デフォルトキー</string>
     <string name="manual_backup_secrets_subtitle">この情報を他の誰とも共有しないでください - 共有した場合、すべての資産を永久かつ回復不能に失うことになります</string>
@@ -761,9 +853,14 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">%dウォレットを少なくとも選択してください</item>
     </plurals>
+    <string name="network_already_exist_failure_title">このノードはすでに存在します</string>
     <string name="network_fee">ネットワーク手数料</string>
     <string name="network_info_address">ノードアドレス</string>
     <string name="network_info_title">ノード情報</string>
+    <string name="network_management_added_page_title">追加済み</string>
+    <string name="network_management_custom_nodes">カスタムノード</string>
+    <string name="network_management_default_nodes">デフォルトノード</string>
+    <string name="network_management_default_page_title">デフォルト</string>
     <string name="network_status_connecting">接続中…</string>
     <string name="nft_collection">コレクション</string>
     <string name="nft_created_by">作成者</string>
@@ -774,6 +871,12 @@
     <string name="nft_owned_by">所有者</string>
     <string name="nft_price_not_listed">リストされていません</string>
     <string name="nft_your_nfts">あなたのNFT</string>
+    <string name="node_already_exist_failure_message">入力されたURLは「%s」ノードとしてすでに存在します。</string>
+    <string name="node_already_exist_failure_title">このノードはすでに存在します</string>
+    <string name="node_not_alive_message">入力されたノードURLが応答していないか、フォーマットが不正です。URLのフォーマットは「wss://」から始まる必要があります。</string>
+    <string name="node_not_alive_title">ノードエラー</string>
+    <string name="node_not_supported_by_network_message">入力されたURLは%1$sのノードに対応していません。 有効な%1$sノードのURLを入力してください。</string>
+    <string name="node_not_supported_by_network_title">間違ったネットワーク</string>
     <string name="nomination_pool_claim_rewards">報酬を請求</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">トークンが再びStakeに追加されます</string>
     <string name="nomination_pools_direct">直接</string>
@@ -818,6 +921,13 @@
     <string name="pool_full_failure_title">プールが満員です</string>
     <string name="pool_inactive_failure_message">開いていないプールに参加できません。プールのオーナーに連絡してください。</string>
     <string name="pool_inactive_failure_title">プールが開いていません</string>
+    <string name="pool_staking_conflict_message">同じアカウントでDirect StakingとPool Stakingの両方を使用することはできなくなりました。Pool Stakingを管理するには、まずDirect Stakingからトークンをアンステークする必要があります。</string>
+    <string name="pool_staking_conflict_title">プール操作は利用できません</string>
+    <string name="popular_dapps_title">人気のある</string>
+    <string name="pre_configured_networks_add_custom_button">手動でネットワークを追加</string>
+    <string name="pre_configured_networks_progress_text">ネットワークリストを読み込み中...</string>
+    <string name="pre_configured_networks_search_hint">ネットワーク名で検索</string>
+    <string name="pre_configured_networks_title">ネットワークを追加</string>
     <string name="profile_accounts_title">アカウント</string>
     <string name="profile_accounts_title_2_0">ウォレット</string>
     <string name="profile_language_title">言語</string>
@@ -877,6 +987,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">プッシュ通知を有効にすることで、%sと%sに同意したことになります</string>
     <string name="push_welcome_timeout_error_message">設定タブから通知設定にアクセスして、後でもう一度お試しください</string>
     <string name="push_welcome_title">お見逃しなく！</string>
+    <string name="receive_network_flow_title">受信するネットワークを選択 %s</string>
+    <string name="receive_screen_copy_address">住所をコピー</string>
     <string name="recover_json_hint">jsonを貼り付けるかファイルをアップロード...</string>
     <string name="recover_json_upload">ファイルをアップロード</string>
     <string name="recovery_json">JSONを復元</string>
@@ -891,8 +1003,13 @@
     <string name="referenda_list_placeholder">レファレンダム情報は開始されるとここに表示されます</string>
     <string name="referenda_search_placeholder">入力されたタイトルまたはIDのレファレンダムが見つかりませんでした</string>
     <string name="referenda_search_toolbar_hint">レファレンダムのタイトルまたはIDで検索</string>
+    <string name="referenda_swipe_gov_banner_chip">%d レファレンダ</string>
+    <string name="referenda_swipe_gov_banner_subtitle">スワイプしてAIサマリーでレファレンダに投票。迅速かつ簡単！</string>
     <string name="referenda_title">レファレンダム</string>
     <string name="referendim_details_not_found_title">レファレンダムが見つかりません</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">棄権票は0.1xの信念でのみ行うことができます。0.1xの信念で投票しますか？</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">信念の更新</string>
+    <string name="referendum_abstain_voters_title">棄権票</string>
     <string name="referendum_aye_format">賛成: %s</string>
     <string name="referendum_dapp_list_title">Nova DAppブラウザを使用</string>
     <string name="referendum_description_fallback">提案者のみがこの説明とタイトルを編集できます。提案者のアカウントをお持ちの場合は、Polkassembly にアクセスして提案に関する情報を入力してください</string>
@@ -1025,16 +1142,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
+    <string name="select_network_title">ネットワークを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="send_address_hint">アドレスまたはw3n</string>
+    <string name="send_network_flow_title">送信するネットワークを選択 %s</string>
     <string name="send_recipient_system_account_message">受信者はシステムアカウントです。どの会社や個人にも管理されていません。\nそれでもこの転送を実行してもよろしいですか？</string>
     <string name="send_recipient_system_account_title">トークンが失われます</string>
     <string name="set_staking_proxy_address_description">権限を与える</string>
     <string name="settings_biometric_not_ready_message">設定で生体認証が有効になっていることを確認してください</string>
     <string name="settings_biometric_not_ready_title">設定で生体認証が無効になっています</string>
     <string name="settings_community">コミュニティ</string>
-    <string name="settings_email">Eメール</string>
+    <string name="settings_email">メールでサポートを受ける</string>
     <string name="settings_general">一般</string>
     <string name="settings_pin_code_verification_confirmation_message">ウォレットでの署名操作（Nova Walletで作成またはインポートされたもの）は、署名の作成前にPIN確認が必要です</string>
     <string name="settings_pin_code_verification_confirmation_title">操作の署名に認証を要求</string>
@@ -1046,8 +1165,11 @@
     <string name="settings_security">セキュリティ</string>
     <string name="settings_support">サポート＆フィードバック</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">ウィキ</string>
+    <string name="settings_wiki">ウィキとヘルプセンター</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">棄権時には信念が0.1xに設定されます</string>
+    <string name="setup_staking_conflict_message">Direct StakingとNomination Poolsを同時にステークすることはできません</string>
+    <string name="setup_staking_conflict_title">すでにステーキング中</string>
     <string name="setup_staking_type_advanced_options_condition">高度なStaking管理</string>
     <string name="setup_staking_type_already_used_title">Stakingタイプを変更できません</string>
     <string name="setup_staking_type_direct_already_used_message">すでに直接Stakingを行っています</string>
@@ -1405,6 +1527,16 @@
     <string name="swap_custom_fee_selector_description">ネットワーク手数料を支払うトークン</string>
     <string name="swap_custom_fee_selector_footer">入力された金額の上にネットワーク手数料が追加されます</string>
     <string name="swap_error_pair_not_supported">このペアはサポートされていません</string>
+    <string name="swap_execution_failure" formatted="false">操作 #%s (%s) が失敗しました</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">%sから%sへの%s転送</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s操作</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s/%sの操作</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">%sを%sに転送</string>
+    <string name="swap_execution_time">実行時間</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">十分なトークンを保持していないため、%sのネットワーク手数料を支払った後に少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%sトークンを受け取るために少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_insufficient_balance_message">ネットワーク手数料として%2$sを支払うため、最大%1$sをスワップできます。</string>
@@ -1424,6 +1556,7 @@
     <string name="swap_get_token_cross_chain_description">他のネットワークから %s を転送</string>
     <string name="swap_get_token_receive_description">QRコードまたはあなたのアドレスで %s を受け取る</string>
     <string name="swap_get_token_using">%s を使って取得</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">スワップ実行中に中間受取額が%sで、これは最小残高%sを下回っています。より大きなスワップ額を指定してみてください。</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">スリッページは %s から %s の間で指定する必要があります</string>
     <string name="swap_invalid_slippage_failure_title">無効なスリッページ</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">支払うトークンを選択</string>
@@ -1432,6 +1565,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">別の金額を入力</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">ネットワーク手数料を %s で支払うため、Novaは %s を %s に自動的にスワップして、アカウントの最低 %s 残高を維持します。</string>
     <string name="swap_network_fee_description">ブロックチェーンによって取引や検証を処理するためのネットワーク手数料。ネットワークの状況や取引速度によって異なる場合があります。</string>
+    <string name="swap_network_flow_title">スワップするネットワークを選択 %s</string>
     <string name="swap_not_enought_liquidity_failure">プールにスワップするための十分な流動性がありません</string>
     <string name="swap_price_difference_description">価格差とは、二つの異なる資産間の価格差を指します。暗号通貨のスワップを行う際、価格差は通常、交換する資産の価格と交換される資産の価格の違いを意味します。</string>
     <string name="swap_price_difference_title">価格差</string>
@@ -1441,6 +1575,10 @@
     <string name="swap_rate_was_updated_failure_message">旧レート: %1$s ≈ %2$s。\n新レート: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">交換レートが更新されました</string>
     <string name="swap_repeat_operation">操作を繰り返す</string>
+    <string name="swap_route">ルート</string>
+    <string name="swap_route_description">異なるネットワークを通じて希望するトークンを得るためにトークンが通る経路です。</string>
+    <string name="swap_route_segment_swap_title">スワップ</string>
+    <string name="swap_route_segment_transfer_title">転送</string>
     <string name="swap_settings_title">スワップ設定</string>
     <string name="swap_slippage">スリッページ</string>
     <string name="swap_slippage_description">スワップのスリッページは、分散型取引でよく見られる現象で、取引の最終価格が市場状況の変化により予想価格から少し異なる場合があります。</string>
@@ -1451,9 +1589,35 @@
     <string name="swap_slippage_warning_too_small">低スリッページ許容のため、トランザクションがリバートされる可能性があります。</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">%sの金額は%sの最低残高を下回っています</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">交換する金額が小さすぎます</string>
+    <string name="swipe_gov_abstain_format">棄権: %s</string>
+    <string name="swipe_gov_aye_format">賛成: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">後でこのレファレンダムに投票することができます</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">投票リストからレファレンダ %s を削除しますか？</string>
+    <string name="swipe_gov_basket_removed_items_message">一部のレファレンダはもはや投票に利用できないか、投票に必要なトークンが不足している可能性があります。利用可能な投票：%s。</string>
+    <string name="swipe_gov_basket_removed_items_title">投票リストから除外されたレファレンダの一部</string>
+    <string name="swipe_gov_card_data_loading_error_message">レファレンダのデータを読み込むことができませんでした</string>
+    <string name="swipe_gov_card_data_loading_error_title">データが取得できません</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">利用可能なレファレンダに既に投票したか、現在投票できるレファレンダがありません。後で戻ってきてください。</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">利用可能なレファレンダに既に投票しています</string>
+    <string name="swipe_gov_card_requested_title">リクエスト済み：</string>
+    <string name="swipe_gov_cards_basket_title">投票リスト</string>
+    <string name="swipe_gov_cards_counter">残り %d</string>
+    <string name="swipe_gov_cards_full_list">投票を確認</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">投票するレファレンダはありません</string>
+    <string name="swipe_gov_cards_placeholder_button">投票を確認する</string>
+    <string name="swipe_gov_cards_voting_list_empty">投票がありません</string>
+    <string name="swipe_gov_convirm_votes_success_message">%d レファレンダへの投票に成功しました</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">現在の投票力 %s (%sx) で投票するには残高が不足しています。投票力を変更するか、ウォレットに資金を追加してください。</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">投票に必要な残高が不足しています</string>
+    <string name="swipe_gov_nay_format">反対: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">%d レファレンダに投票</string>
+    <string name="swipe_gov_vote_subtitle">SwipeGovで将来の投票を設定します</string>
+    <string name="swipe_gov_vote_title">投票力</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">ウォレット</string>
     <string name="today">今日</string>
+    <string name="token_price_info_provider_label">価格情報のためのCoingeckoリンク（オプション）</string>
     <string name="transaction_details_copy_hash">ハッシュをコピー</string>
     <string name="transaction_details_extrinsic_fee">手数料</string>
     <string name="transaction_details_from">送信元</string>
@@ -1498,6 +1662,7 @@
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>
     <string name="wallet_asset_receive_token">受け取る %s</string>
+    <string name="wallet_asset_receive_token_subtitle">送信するのは%1$sトークンと%2$sネットワークのトークンのみ可能です、それ以外の場合、資金を失う可能性があります</string>
     <string name="wallet_asset_send">送信</string>
     <string name="wallet_asset_swap">スワップ</string>
     <string name="wallet_assets">資産</string>

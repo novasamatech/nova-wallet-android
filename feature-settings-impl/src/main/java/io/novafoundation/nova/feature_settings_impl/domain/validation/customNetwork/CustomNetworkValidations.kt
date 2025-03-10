@@ -30,7 +30,11 @@ sealed interface CustomNetworkFailure {
 
 fun CustomNetworkValidationSystemBuilder.validateNetworkNodeIsAlive(
     nodeHealthStateCheckRequest: suspend (CustomNetworkPayload) -> Unit
-) = validateNetworkNodeIsAlive(nodeHealthStateCheckRequest, failure = { CustomNetworkFailure.NodeIsNotAlive })
+) = validateNetworkNodeIsAlive(
+    nodeHealthStateCheckRequest,
+    nodeUrl = { it.nodeUrl },
+    failure = { CustomNetworkFailure.NodeIsNotAlive }
+)
 
 fun CustomNetworkValidationSystemBuilder.validateNodeSupportedByNetwork(
     nodeChainIdRequester: suspend (CustomNetworkPayload) -> String

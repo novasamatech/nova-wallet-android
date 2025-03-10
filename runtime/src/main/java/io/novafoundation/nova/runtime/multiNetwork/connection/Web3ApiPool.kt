@@ -2,7 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.connection
 
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
-import io.novafoundation.nova.runtime.ext.httpNodes
+import io.novafoundation.nova.runtime.ext.hasHttpNodes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Node.ConnectionType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -25,19 +25,19 @@ class Web3ApiPool(private val web3ApiFactory: Web3ApiFactory) {
     }
 
     fun setupHttpsApi(chain: Chain): Web3Api? {
-        val httpNodes = chain.nodes.httpNodes()
+        val chainNodes = chain.nodes
 
-        if (httpNodes.nodes.isEmpty()) {
+        if (!chainNodes.hasHttpNodes()) {
             removeApi(chain.id, ConnectionType.HTTPS)
 
             return null
         }
 
         val (web3Api, updatableNodes) = pool.getOrPut(chain.id to ConnectionType.HTTPS) {
-            web3ApiFactory.createHttps(httpNodes)
+            web3ApiFactory.createHttps(chainNodes)
         }
 
-        updatableNodes?.updateNodes(httpNodes)
+        updatableNodes?.updateNodes(chainNodes)
 
         return web3Api
     }

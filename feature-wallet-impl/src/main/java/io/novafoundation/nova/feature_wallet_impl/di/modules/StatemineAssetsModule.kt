@@ -9,11 +9,12 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.StatemineAssetBalance
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.statemine.StatemineAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine.StatemineAssetTransfers
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -52,14 +53,14 @@ class StatemineAssetsModule {
     fun provideTransfers(
         chainRegistry: ChainRegistry,
         assetSourceRegistry: AssetSourceRegistry,
-        extrinsicService: ExtrinsicService,
+        extrinsicServiceFactory: ExtrinsicService.Factory,
         phishingValidationFactory: PhishingValidationFactory,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
     ) = StatemineAssetTransfers(
         chainRegistry,
         assetSourceRegistry,
-        extrinsicService,
+        extrinsicServiceFactory,
         phishingValidationFactory,
         enoughTotalToStayAboveEDValidationFactory,
         remoteStorage
@@ -93,4 +94,8 @@ class StatemineAssetsModule {
         balance = statemineAssetBalance,
         history = statemineAssetHistory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideStatemineAssetEventDetectorFactory(chainRegistry: ChainRegistry) = StatemineAssetEventDetectorFactory(chainRegistry)
 }

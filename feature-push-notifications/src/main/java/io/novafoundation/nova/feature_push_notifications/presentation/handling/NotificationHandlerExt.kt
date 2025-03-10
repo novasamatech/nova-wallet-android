@@ -5,13 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
-import io.novafoundation.nova.app.root.presentation.deepLinks.handlers.AssetDetailsDeepLinkData
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkData
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatusType
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -75,35 +72,6 @@ fun Context.makePendingIntent(intent: Intent): PendingIntent {
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
-}
-
-fun Intent.addReferendumData(
-    deepLinkConfigurator: DeepLinkConfigurator<ReferendumDeepLinkData>,
-    chainId: String,
-    referendumId: BigInteger
-): Intent {
-    val payload = ReferendumDeepLinkData(chainId, referendumId, Chain.Governance.V2)
-    data = deepLinkConfigurator.configure(payload)
-    return this
-}
-
-fun Intent.addAssetDetailsData(
-    deepLinkConfigurator: DeepLinkConfigurator<AssetDetailsDeepLinkData>,
-    address: String,
-    chainId: String,
-    assetId: Int
-): Intent {
-    val payload = AssetDetailsDeepLinkData(address, chainId, assetId)
-    data = deepLinkConfigurator.configure(payload)
-    return this
-}
-
-fun <T> Intent.addData(
-    deepLinkConfigurator: DeepLinkConfigurator<T>,
-    payload: T
-): Intent {
-    data = deepLinkConfigurator.configure(payload)
-    return this
 }
 
 fun NotificationCompat.Builder.buildWithDefaults(

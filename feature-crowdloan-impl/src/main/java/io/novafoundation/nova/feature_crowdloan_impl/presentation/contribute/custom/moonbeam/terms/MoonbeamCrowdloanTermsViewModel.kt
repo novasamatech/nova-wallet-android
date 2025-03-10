@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.moonbeam.MoonbeamTermsPayload
@@ -20,8 +21,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.sel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -97,12 +97,11 @@ class MoonbeamCrowdloanTermsViewModel(
     fun submitClicked() = launch {
         submittingInProgressFlow.value = true
 
-        val fee = feeLoaderMixin.awaitDecimalFee()
-
+        val fee = feeLoaderMixin.awaitFee()
         submitAfterValidation(fee)
     }
 
-    private fun submitAfterValidation(fee: DecimalFee) = launch {
+    private fun submitAfterValidation(fee: Fee) = launch {
         val validationPayload = MoonbeamTermsPayload(
             fee = fee,
             asset = assetUseCase.getCurrentAsset()

@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.TinderGovBannerModel
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
+import io.novafoundation.nova.feature_governance_impl.presentation.view.setTextOrHide
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
 import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksDelegations
 import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocksHeader
@@ -19,6 +21,8 @@ import kotlinx.android.synthetic.main.item_referenda_header.view.governanceLocks
 import kotlinx.android.synthetic.main.item_referenda_header.view.referendaAssetHeader
 import kotlinx.android.synthetic.main.item_referenda_header.view.referendaHeaderFilter
 import kotlinx.android.synthetic.main.item_referenda_header.view.referendaHeaderSearch
+import kotlinx.android.synthetic.main.item_referenda_header.view.referendaTinderGovChip
+import kotlinx.android.synthetic.main.item_referenda_header.view.referendaTindergovBanner
 
 class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -32,11 +36,14 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         fun onClickReferendaSearch()
 
         fun onClickReferendaFilters()
+
+        fun onTinderGovBannerClicked()
     }
 
     private var assetModel: AssetSelectorModel? = null
     private var locksModel: GovernanceLocksModel? = null
     private var delegationsModel: GovernanceLocksModel? = null
+    private var tinderGovBannerModel: TinderGovBannerModel? = null
     private var filterIconRes: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
@@ -44,7 +51,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
-        holder.bind(assetModel, locksModel, delegationsModel, filterIconRes)
+        holder.bind(assetModel, locksModel, delegationsModel, tinderGovBannerModel, filterIconRes)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int, payloads: MutableList<Any>) {
@@ -56,6 +63,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
                     Payload.ASSET -> holder.bindAsset(assetModel)
                     Payload.LOCKS -> holder.bindLocks(locksModel)
                     Payload.DELEGATIONS -> holder.bindDelegations(delegationsModel)
+                    Payload.TINDER_GOV -> holder.bindTinderGovBanner(tinderGovBannerModel)
                     Payload.FILTERS -> holder.bindFilters(filterIconRes)
                 }
             }
@@ -81,6 +89,11 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
         notifyItemChanged(0, Payload.DELEGATIONS)
     }
 
+    fun setTinderGovBanner(tinderGovBannerModel: TinderGovBannerModel?) {
+        this.tinderGovBannerModel = tinderGovBannerModel
+        notifyItemChanged(0, Payload.TINDER_GOV)
+    }
+
     fun setFilterIcon(filterIconRes: Int) {
         this.filterIconRes = filterIconRes
         notifyItemChanged(0, Payload.FILTERS)
@@ -88,7 +101,7 @@ class ReferendaListHeaderAdapter(val imageLoader: ImageLoader, val handler: Hand
 }
 
 private enum class Payload {
-    ASSET, LOCKS, DELEGATIONS, FILTERS
+    ASSET, LOCKS, DELEGATIONS, TINDER_GOV, FILTERS
 }
 
 class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: ReferendaListHeaderAdapter.Handler) : RecyclerView.ViewHolder(view) {
@@ -104,6 +117,7 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
 
             referendaHeaderSearch.setOnClickListener { handler.onClickReferendaSearch() }
             referendaHeaderFilter.setOnClickListener { handler.onClickReferendaFilters() }
+            referendaTindergovBanner.setOnClickListener { handler.onTinderGovBannerClicked() }
         }
     }
 
@@ -111,11 +125,13 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
         assetModel: AssetSelectorModel?,
         locksModel: GovernanceLocksModel?,
         delegationsModel: GovernanceLocksModel?,
+        tinderGovBannerModel: TinderGovBannerModel?,
         filterIconRes: Int?
     ) {
         bindAsset(assetModel)
         bindLocks(locksModel)
         bindDelegations(delegationsModel)
+        bindTinderGovBanner(tinderGovBannerModel)
         bindFilters(filterIconRes)
     }
 
@@ -134,6 +150,14 @@ class HeaderHolder(private val imageLoader: ImageLoader, view: View, handler: Re
     fun bindDelegations(model: GovernanceLocksModel?) {
         itemView.governanceLocksDelegations.letOrHide(model) {
             itemView.governanceLocksDelegations.setModel(it)
+        }
+
+        updateLocksContainerVisibility()
+    }
+
+    fun bindTinderGovBanner(model: TinderGovBannerModel?) {
+        itemView.referendaTindergovBanner.letOrHide(model) {
+            itemView.referendaTinderGovChip.setTextOrHide(it.chipText)
         }
 
         updateLocksContainerVisibility()

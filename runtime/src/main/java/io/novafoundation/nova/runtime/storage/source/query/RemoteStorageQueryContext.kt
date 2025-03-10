@@ -41,16 +41,28 @@ class RemoteStorageQueryContext(
     }
 
     @Suppress("IfThenToElvis")
-    override fun observeKey(key: String): Flow<String?> {
+    override fun observeKey(key: String): Flow<StorageUpdate> {
         return if (subscriptionBuilder != null) {
-            subscriptionBuilder.subscribe(key).map { it.value }
+            subscriptionBuilder.subscribe(key).map {
+                StorageUpdate(
+                    value = it.value,
+                    at = it.block
+                )
+            }
         } else {
             socketService.subscriptionFlow(SubscribeStorageRequest(key))
-                .map { it.storageChange().getSingleChange() }
+                .map {
+                    val storageChange = it.storageChange()
+
+                    StorageUpdate(
+                        value = storageChange.getSingleChange(),
+                        at = storageChange.block
+                    )
+                }
         }
     }
 
-    override suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
+    override fun observeKeys(keys: List<String>): Flow<Map<String, String?>> {
         TODO("Not yet needed")
     }
 

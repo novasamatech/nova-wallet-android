@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -8,7 +9,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import java.math.BigDecimal
 import java.math.BigInteger
 
 interface WalletRepository {
@@ -51,7 +51,7 @@ interface WalletRepository {
     suspend fun insertPendingTransfer(
         hash: String,
         assetTransfer: AssetTransfer,
-        fee: BigDecimal
+        fee: SubmissionFee
     )
 
     suspend fun clearAssets(assetIds: List<FullChainAssetId>)

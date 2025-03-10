@@ -5,11 +5,11 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
@@ -31,11 +31,12 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
+import kotlinx.coroutines.CoroutineScope
 
 abstract class BaseAssetTransfers(
     internal val chainRegistry: ChainRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val extrinsicService: ExtrinsicService,
+    private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val phishingValidationFactory: PhishingValidationFactory,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) : AssetTransfers {
@@ -48,16 +49,24 @@ abstract class BaseAssetTransfers(
      */
     protected abstract suspend fun transferFunctions(chainAsset: Chain.Asset): List<Pair<String, String>>
 
-    override suspend fun performTransfer(transfer: WeightedAssetTransfer): Result<ExtrinsicSubmission> {
-        return extrinsicService.submitExtrinsic(transfer.originChain, transfer.sender.intoOrigin()) {
-            transfer(transfer)
-        }
+    override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
+        val submissionOptions = ExtrinsicService.SubmissionOptions(transfer.feePaymentCurrency)
+
+        return extrinsicServiceFactory
+            .createDefault(coroutineScope)
+            .submitExtrinsic(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
+                transfer(transfer)
+            }
     }
 
-    override suspend fun calculateFee(transfer: AssetTransfer): Fee {
-        return extrinsicService.estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet) {
-            transfer(transfer)
-        }
+    override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
+        val submissionOptions = ExtrinsicService.SubmissionOptions(transfer.feePaymentCurrency)
+
+        return extrinsicServiceFactory
+            .createDefault(coroutineScope)
+            .estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet, submissionOptions = submissionOptions) {
+                transfer(transfer)
+            }
     }
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
@@ -68,7 +77,7 @@ abstract class BaseAssetTransfers(
         }
     }
 
-    protected fun defaultValidationSystem(): AssetTransfersValidationSystem = ValidationSystem {
+    override fun getValidationSystem(coroutineScope: CoroutineScope) = ValidationSystem {
         validAddress()
         recipientIsNotSystemAccount()
 

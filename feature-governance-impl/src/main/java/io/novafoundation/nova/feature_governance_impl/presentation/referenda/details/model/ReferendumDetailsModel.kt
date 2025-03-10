@@ -10,14 +10,15 @@ import io.novafoundation.nova.feature_governance_impl.presentation.view.YourMult
 
 class ReferendumDetailsModel(
     val track: ReferendumTrackModel?,
-    val number: String,
-    val title: String,
+    val number: String?,
+    val title: String?,
     val description: ShortenedTextModel?,
     val voting: ReferendumVotingModel?,
-    val statusModel: ReferendumStatusModel,
+    val statusModel: ReferendumStatusModel?,
     val yourVote: YourMultiVoteModel?,
     val ayeVoters: VotersModel?,
     val nayVoters: VotersModel?,
+    val abstainVoters: VotersModel?,
     val timeEstimation: ReferendumTimeEstimation?,
-    val timeline: TimelineLayout.Timeline
+    val timeline: TimelineLayout.Timeline?
 )

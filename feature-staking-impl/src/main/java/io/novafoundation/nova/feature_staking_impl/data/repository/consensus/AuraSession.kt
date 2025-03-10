@@ -2,14 +2,14 @@ package io.novafoundation.nova.feature_staking_impl.data.repository.consensus
 
 import io.novafoundation.nova.common.utils.committeeManagementOrNull
 import io.novafoundation.nova.common.utils.electionsOrNull
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
-import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.typed.number
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -42,7 +42,7 @@ class AuraSession(
 
     override suspend fun currentSlotStorageKey(chainId: ChainId): String? {
         /**
-         * we're already syncing system number as part of [BlockNumberUpdater]
+         * we're already syncing system number as part of [SharedAssetBlockNumberUpdater]
          */
         return null
     }

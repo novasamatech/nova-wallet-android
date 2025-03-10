@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.StakingMinimumBondError
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.validation.NotEnoughToPayFeesError
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -26,7 +27,7 @@ sealed class StartMultiStakingValidationFailure {
     class AvailableBalanceGap(
         val currentMaxAvailable: Balance,
         val alternativeMinStake: Balance,
-        val biggestLockId: String,
+        val biggestLockId: BalanceLockId,
         val chainAsset: Chain.Asset,
     ) : StartMultiStakingValidationFailure()
 
@@ -35,4 +36,6 @@ sealed class StartMultiStakingValidationFailure {
     ) : PoolAvailableBalanceValidation.ValidationError, StartMultiStakingValidationFailure()
 
     object InactivePool : StartMultiStakingValidationFailure()
+
+    object HasConflictingStakingType : StartMultiStakingValidationFailure()
 }

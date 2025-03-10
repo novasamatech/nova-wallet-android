@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
@@ -33,7 +33,7 @@ class ValidatorProvider(
     private val rewardCalculatorFactory: RewardCalculatorFactory,
     private val stakingConstantsRepository: StakingConstantsRepository,
     private val stakingSharedComputation: StakingSharedComputation,
-    private val knownNovaValidators: KnownNovaValidators,
+    private val validatorsPreferencesSource: ValidatorsPreferencesSource,
 ) {
 
     suspend fun getValidators(
@@ -44,7 +44,7 @@ class ValidatorProvider(
         val chain = stakingOption.assetWithChain.chain
         val chainId = chain.id
 
-        val novaValidatorIds = knownNovaValidators.getValidatorIds(chainId).toSet()
+        val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
         val electedValidatorExposures = stakingSharedComputation.electedExposuresInActiveEra(chainId, scope)
 
         val requestedValidatorIds = sources.allValidatorIds(chainId, electedValidatorExposures, novaValidatorIds)
@@ -55,7 +55,7 @@ class ValidatorProvider(
         val identities = identityRepository.getIdentitiesFromIdsHex(chainId, requestedValidatorIds)
         val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
 
-        val rewardCalculator = rewardCalculatorFactory.create(stakingOption, electedValidatorExposures, validatorPrefs)
+        val rewardCalculator = rewardCalculatorFactory.create(stakingOption, electedValidatorExposures, validatorPrefs, scope)
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->
@@ -91,7 +91,7 @@ class ValidatorProvider(
 
         val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
 
-        val novaValidatorIds = knownNovaValidators.getValidatorIds(chainId).toSet()
+        val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
 
         return Validator(
             slashed = slashes.getOrDefault(accountId, false),

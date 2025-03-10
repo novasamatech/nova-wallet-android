@@ -1,6 +1,7 @@
 package io.novafoundation.nova.core.updater
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.transform
 
@@ -23,6 +24,11 @@ object GlobalScope : UpdateScope<Unit> {
     override fun invalidationFlow() = flowOf(Unit)
 }
 
+class EmptyScope<T> : UpdateScope<T> {
+
+    override fun invalidationFlow() = emptyFlow<T>()
+}
+
 interface GlobalScopeUpdater : Updater<Unit> {
 
     override val scope
@@ -32,6 +38,7 @@ interface GlobalScopeUpdater : Updater<Unit> {
 interface Updater<V> : SideEffectScope {
 
     val requiredModules: List<String>
+        get() = emptyList()
 
     val scope: UpdateScope<V>
 

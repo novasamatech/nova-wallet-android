@@ -41,7 +41,7 @@ class RealRemoveTrackVotesInteractor(
         val (chain, governance) = useSelectedGovernance()
 
         extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
-            governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountIdToRemoveVotes = origin.requestedOrigin)
+            governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountIdToRemoveVotes = origin.executingAccount)
         }.awaitInBlock()
     }
 

@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,8 +18,8 @@ import io.novafoundation.nova.common.utils.makeVisible
 import kotlinx.android.synthetic.main.view_banner.view.bannerImage
 
 enum class ExpandableViewState {
-    COLLAPSE,
-    EXPAND
+    COLLAPSED,
+    EXPANDED
 }
 
 class ExpandableView @JvmOverloads constructor(
@@ -29,13 +28,17 @@ class ExpandableView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
+    private var supportAnimation: Boolean = true
+    private var collapsedByDefault: Boolean = false
     private var chevronResId: Int? = null
     private var expandablePartResId: Int? = null
 
-    private var chevron: View? = null
-    private var expandablePart: View? = null
-
     private val expandCollapseAnimator = ValueAnimator()
+
+    private val chevron: View? by lazy { findViewByIdOrNull(chevronResId) }
+    private val expandablePart: View? by lazy { findViewByIdOrNull(expandablePartResId) }
+
+    private var isExpandable: Boolean = true
 
     init {
         applyAttributes(attrs)
@@ -58,21 +61,49 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+
+        if (collapsedByDefault) {
+            collapseImmediate()
+        } else {
+            expandImmediate()
+        }
+    }
+
     fun setImage(@DrawableRes imageRes: Int) {
         bannerImage.setImageResource(imageRes)
     }
 
     fun setState(state: ExpandableViewState) {
         when (state) {
-            ExpandableViewState.COLLAPSE -> collapse()
-            ExpandableViewState.EXPAND -> expand()
+            ExpandableViewState.COLLAPSED -> collapse()
+            ExpandableViewState.EXPANDED -> expand()
         }
+    }
+
+    fun collapseImmediate() {
+        expandablePart?.makeGone()
+        chevron?.rotation = -180f
+    }
+
+    fun expandImmediate() {
+        expandablePart?.makeVisible()
+        chevron?.rotation = 0f
+    }
+
+    fun setExpandable(isExpandable: Boolean) {
+        this.isExpandable = isExpandable
+        collapseImmediate()
+        chevron?.isVisible = isExpandable
     }
 
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ExpandableView)
 
+            supportAnimation = typedArray.getBoolean(R.styleable.ExpandableView_supportAnimation, true)
+            collapsedByDefault = typedArray.getBoolean(R.styleable.ExpandableView_collapsedByDefault, false)
             chevronResId = typedArray.getResourceIdOrNull(R.styleable.ExpandableView_chevronId)
             expandablePartResId = typedArray.getResourceIdOrNull(R.styleable.ExpandableView_expandableId)
 
@@ -81,6 +112,8 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     private fun toggle() {
+        if (!isExpandable) return
+
         if (expandablePart?.isVisible == true) {
             collapse()
         } else {
@@ -89,26 +122,26 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     private fun collapse() {
-        expandCollapseAnimator.removeAllListeners()
-        expandCollapseAnimator.setFloatValues(0f, -1f)
-        expandCollapseAnimator.doOnEnd { expandablePart?.makeGone() }
-        expandCollapseAnimator.start()
+        if (supportAnimation) {
+            expandCollapseAnimator.removeAllListeners()
+            expandCollapseAnimator.setFloatValues(0f, -1f)
+            expandCollapseAnimator.doOnEnd { expandablePart?.makeGone() }
+            expandCollapseAnimator.start()
+        } else {
+            collapseImmediate()
+        }
     }
 
     private fun expand() {
-        expandCollapseAnimator.removeAllListeners()
-        expandCollapseAnimator.setFloatValues(-1f, 0f)
-        expandCollapseAnimator.doOnStart { expandablePart?.makeVisible() }
-        expandCollapseAnimator.start()
-    }
-
-    override fun addView(child: View, params: ViewGroup.LayoutParams?) {
-        if (child.id == expandablePartResId) {
-            expandablePart = child
-        } else if (child.id == chevronResId) {
-            chevron = child
+        if (supportAnimation) {
+            expandCollapseAnimator.removeAllListeners()
+            expandCollapseAnimator.setFloatValues(-1f, 0f)
+            expandCollapseAnimator.doOnStart { expandablePart?.makeVisible() }
+            expandCollapseAnimator.start()
+        } else {
+            expandImmediate()
         }
-
-        super.addView(child, params)
     }
+
+    private fun findViewByIdOrNull(id: Int?): View? = id?.let { findViewById(it) }
 }

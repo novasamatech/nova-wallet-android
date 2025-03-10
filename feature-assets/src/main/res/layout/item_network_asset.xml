@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemAssetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_weight="1"
+    android:background="@drawable/bg_primary_list_item"
+    tools:background="@color/block_background">
+
+    <ImageView
+        android:id="@+id/itemAssetImage"
+        style="@style/Widget.Nova.AssetIcon.Primary"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/itemAssetToken"
+        tools:src="@drawable/ic_token_dot_colored" />
+
+    <TextView
+        android:id="@+id/itemAssetToken"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetImage"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="DOT" />
+
+    <TextView
+        android:id="@+id/itemAssetRate"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/itemAssetToken"
+        app:layout_constraintTop_toBottomOf="@+id/itemAssetToken"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="$10.25" />
+
+    <TextView
+        android:id="@+id/itemAssetRateChange"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:textColor="@color/text_positive"
+        app:layout_constraintBottom_toBottomOf="@+id/itemAssetRate"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetRate"
+        app:layout_constraintTop_toTopOf="@+id/itemAssetRate"
+        tools:text="+25%" />
+
+    <TextView
+        android:id="@+id/itemAssetPriceAmount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemAssetRateChange"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetRateChange"
+        tools:text="$1,000.05" />
+
+    <TextView
+        android:id="@+id/itemAssetBalance"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBaseline_toBaselineOf="@id/itemAssetToken"
+        app:layout_constraintEnd_toEndOf="@+id/itemAssetPriceAmount"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/itemAssetToken"
+        tools:text="120.0849" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

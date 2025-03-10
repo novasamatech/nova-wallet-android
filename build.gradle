@@ -1,16 +1,16 @@
 buildscript {
     ext {
         // App version
-        versionName = '8.0.2'
-        versionCode = 140
+        versionName = '9.4.1'
+        versionCode = 186
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 33
+        compileSdkVersion = 34
         minSdkVersion = 24
-        targetSdkVersion = 33
+        targetSdkVersion = 34
 
         kotlinVersion = '1.7.21'
 
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.1.0'
+        substrateSdkVersion = '2.4.0'
 
         gifVersion = '1.2.19'
 
@@ -91,6 +91,8 @@ buildscript {
         playServicesAuthVersion = "20.0.0"
         googleApiClientVersion = "1.32.1"
         googleDriveVersion = "v3-rev20210919-1.32.1"
+
+        cardStackVersion = "2.3.4"
 
         withoutTransitiveAndroidX = {
             exclude group: "androidx.appcompat", module: "appcompat"
@@ -140,7 +142,7 @@ buildscript {
         // lifecycle scopes
         lifeCycleKtxDep = "androidx.lifecycle:lifecycle-runtime-ktx:$architectureComponentVersion"
 
-        permissionsDep = "com.github.florent37:runtime-permission-kotlin:$permissionsVersion"
+        permissionsDep = "com.github.florent37:RuntimePermission:$permissionsVersion"
 
         roomDep = "androidx.room:room-runtime:$roomVersion"
         roomKtxDep = "androidx.room:room-ktx:$roomVersion"
@@ -174,7 +176,6 @@ buildscript {
         jUnitDep = "junit:junit:$junitVersion"
         mockitoDep = "org.mockito:mockito-inline:$mockitoVersion"
         robolectricDep = "org.robolectric:robolectric:$robolectricVersion"
-        robolectricMultidexDep = "org.robolectric:shadows-multidex:$robolectricVersion"
         archCoreTestDep = "androidx.arch.core:core-testing:$architectureComponentVersion"
 
         progressButtonDep = "com.github.razir.progressbutton:progressbutton:$progressButtonsVersion"
@@ -213,6 +214,12 @@ buildscript {
         firebaseAppCheck = "com.google.firebase:firebase-appcheck-playintegrity"
 
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+        cardStackView = "com.github.yuyakaido:cardstackview:$cardStackVersion"
+
+        chartsDep = "com.github.PhilJay:MPAndroidChart:v3.1.0"
+
+        swipeRefershLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
     }
 
     repositories {
@@ -222,10 +229,10 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.7.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.14'
-        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.3'
+        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.6'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"
         classpath "com.github.triplet.gradle:play-publisher:$playPublisherVersion"
     }

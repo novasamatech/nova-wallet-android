@@ -21,6 +21,8 @@ interface SettingsRouter : ReturnableRouter {
 
     fun openLanguages()
 
+    fun openAppearance()
+
     fun openChangePinCode()
 
     fun openWalletDetails(metaId: Long)
@@ -44,4 +46,6 @@ interface SettingsRouter : ReturnableRouter {
     fun finishCreateNetworkFlow()
 
     fun openEditNetwork(payload: AddNetworkPayload.Mode.Edit)
+
+    fun returnToWallet()
 }

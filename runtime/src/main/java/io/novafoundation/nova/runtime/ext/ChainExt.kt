@@ -1,9 +1,13 @@
 package io.novafoundation.nova.runtime.ext
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.utils.emptyEthereumAccountId
 import io.novafoundation.nova.common.utils.emptySubstrateAccountId
 import io.novafoundation.nova.common.utils.findIsInstanceOrNull
@@ -13,6 +17,7 @@ import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
@@ -49,14 +54,11 @@ const val EVM_DEFAULT_TOKEN_DECIMALS = 18
 private const val EIP_155_PREFIX = "eip155"
 
 val Chain.autoBalanceEnabled: Boolean
-    get() = nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
+    get() = nodes.wssNodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.AutoBalance
 
-val Chain.autoBalanceDisabled: Boolean
-    get() = !autoBalanceEnabled
-
-val Chain.selectedNodeUrlOrNull: String?
-    get() = if (nodes.nodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
-        nodes.nodeSelectionStrategy.nodeUrl
+val Chain.selectedUnformattedWssNodeUrlOrNull: String?
+    get() = if (nodes.wssNodeSelectionStrategy is Chain.Nodes.NodeSelectionStrategy.SelectedNode) {
+        nodes.wssNodeSelectionStrategy.unformattedNodeUrl
     } else {
         null
     }
@@ -148,6 +150,10 @@ fun Chain.Additional?.isGenericLedgerAppSupported(): Boolean {
     return this?.supportLedgerGenericApp ?: false
 }
 
+fun Chain.Additional?.shouldDisableMetadataHashCheck(): Boolean {
+    return this?.disabledCheckMetadataHash ?: false
+}
+
 fun Chain.Additional?.isMigrationLedgerAppSupported(): Boolean {
     return isGenericLedgerAppSupported()
 }
@@ -160,7 +166,7 @@ fun ChainId.chainIdHexPrefix16(): String {
 
 enum class StakingTypeGroup {
 
-    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, UNSUPPORTED
+    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, UNSUPPORTED
 }
 
 fun Chain.Asset.StakingType.group(): StakingTypeGroup {
@@ -168,6 +174,7 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
         UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
         RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
         PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+        MYTHOS -> StakingTypeGroup.MYTHOS
         NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
     }
 }
@@ -195,10 +202,26 @@ val Chain.Asset.isUtilityAsset: Boolean
 inline val Chain.Asset.isCommissionAsset: Boolean
     get() = isUtilityAsset
 
+inline val FullChainAssetId.isUtility: Boolean
+    get() = assetId == UTILITY_ASSET_ID
+
+private const val XC_PREFIX = "xc"
+
+fun Chain.Asset.normalizeSymbol(): String {
+    return normalizeTokenSymbol(this.symbol.value)
+}
+
 private const val MOONBEAM_XC_PREFIX = "xc"
 
-fun Chain.Asset.unifiedSymbol(): String {
-    return symbol.value.removePrefix(MOONBEAM_XC_PREFIX)
+fun TokenSymbol.normalize(): TokenSymbol {
+    return normalizeTokenSymbol(value).asTokenSymbol()
+}
+
+fun normalizeTokenSymbol(symbol: String): String {
+    if (symbol.startsWith(XC_PREFIX)) {
+        return symbol.removePrefix(XC_PREFIX)
+    }
+    return symbol
 }
 
 val Chain.Node.isWss: Boolean
@@ -211,8 +234,12 @@ fun Chain.Nodes.wssNodes(): List<Chain.Node> {
     return nodes.filter { it.isWss }
 }
 
-fun Chain.Nodes.httpNodes(): Chain.Nodes {
-    return copy(nodes = nodes.filter { it.isHttps })
+fun Chain.Nodes.httpNodes(): List<Chain.Node> {
+    return nodes.filter { it.isHttps }
+}
+
+fun Chain.Nodes.hasHttpNodes(): Boolean {
+    return nodes.any { it.isHttps }
 }
 
 val Chain.Asset.disabled: Boolean
@@ -243,6 +270,20 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
+}
+
+fun Chain.accountIdKeyOf(address: String): AccountIdKey {
+    return accountIdOf(address).intoKey()
+}
+
+fun String.anyAddressToAccountId(): ByteArray {
+    return runCatching {
+        // Substrate
+        toAccountId()
+    }.recoverCatching {
+        // Evm
+        asEthereumAddress().toAccountId().value
+    }.getOrThrow()
 }
 
 fun Chain.accountIdOrNull(address: String): ByteArray? {
@@ -378,9 +419,11 @@ object ChainGeneses {
     const val HYDRA_DX = "afdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d"
 
     const val AVAIL_TURING_TESTNET = "d3d2f3a3495dc597434a99d7d449ebad6616db45e4e4f178f31cc6fa14378b70"
-    const val AVAIL = "128ea318539862c0a06b745981300d527c1041c6f3388a8c49565559e3ea3d10"
+    const val AVAIL = "b91746b45e0346cc2f815a520b9c6cb4d5c0902af848db0a80f85932d2e8276a"
 
     const val VARA = "fe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763"
+
+    const val POLKADOT_ASSET_HUB = "68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
 }
 
 object ChainIds {
@@ -498,3 +541,17 @@ fun Chain.Explorer.normalizedUrl(): String? {
     val url = listOfNotNull(extrinsic, account, event).firstOrNull()
     return url?.let { Urls.normalizeUrl(it) }
 }
+
+fun Chain.supportTinderGov(): Boolean {
+    return hasReferendaSummaryApi()
+}
+
+fun Chain.hasReferendaSummaryApi(): Boolean {
+    return externalApi<Chain.ExternalApi.ReferendumSummary>() != null
+}
+
+fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
+    return externalApi<Chain.ExternalApi.ReferendumSummary>()
+}
+
+fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

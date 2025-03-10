@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.ext.fullId
@@ -99,7 +100,7 @@ class RealGovernanceUnlockInteractor(
         extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
             if (claimable == null) error("Nothing to claim")
 
-            executeUnlock(accountIdToUnlock = origin.requestedOrigin, governanceSelectedOption, claimable)
+            executeUnlock(accountIdToUnlock = origin.executingAccount, governanceSelectedOption, claimable)
         }.awaitInBlock()
     }
 
@@ -134,9 +135,11 @@ class RealGovernanceUnlockInteractor(
 
             val governanceSource = governanceSourceRegistry.sourceFor(governanceSelectedOption)
 
+            val metaAccount = accountRepository.getSelectedMetaAccount()
+
             combine(
                 assetFlow,
-                balanceLocksRepository.observeBalanceLocks(chain, chainAsset),
+                balanceLocksRepository.observeBalanceLocks(metaAccount.id, chain, chainAsset),
                 locksOverviewFlow(scope)
             ) { assetFlow, balanceLocks, locksOverview ->
                 governanceSource.constructGovernanceUnlockAffects(assetFlow, balanceLocks, locksOverview)
@@ -244,7 +247,7 @@ class RealGovernanceUnlockInteractor(
         }
     }
 
-    private fun List<BalanceLock>.otherLocksPreventingLockBeingLessThan(amount: Balance, thisLockId: String): List<String> {
+    private fun List<BalanceLock>.otherLocksPreventingLockBeingLessThan(amount: Balance, thisLockId: BalanceLockId): List<BalanceLockId> {
         return filter { it.id != thisLockId }.mapNotNull { lock ->
             lock.id.takeIf { lock.amountInPlanks > amount }
         }

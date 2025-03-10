@@ -9,17 +9,20 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.BalanceDetailComponent
-import io.novafoundation.nova.feature_assets.presentation.balance.filters.di.AssetFiltersComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
-import io.novafoundation.nova.feature_assets.presentation.buy.flow.di.AssetBuyFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.di.AssetBuyFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.buy.flow.network.di.NetworkBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
-import io.novafoundation.nova.feature_assets.presentation.receive.flow.di.AssetReceiveFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.di.AssetReceiveFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.receive.flow.network.di.NetworkReceiveFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.send.amount.di.SelectSendComponent
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.di.ConfirmSendComponent
-import io.novafoundation.nova.feature_assets.presentation.send.flow.di.AssetSendFlowComponent
-import io.novafoundation.nova.feature_assets.presentation.swap.di.AssetSwapFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.send.flow.asset.di.AssetSendFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.send.flow.network.di.NetworkSendFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.di.AssetSwapFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.swap.network.di.NetworkSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
@@ -30,6 +33,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.TransactionDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.di.SwapDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.di.TransactionHistoryFilterComponent
+import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
@@ -74,8 +78,6 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun receiveComponentFactory(): ReceiveComponent.Factory
 
-    fun assetFiltersComponentFactory(): AssetFiltersComponent.Factory
-
     fun assetSearchComponentFactory(): AssetSearchComponent.Factory
 
     fun manageTokensComponentFactory(): ManageTokensComponent.Factory
@@ -93,6 +95,14 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun receiveFlowComponent(): AssetReceiveFlowComponent.Factory
 
     fun buyFlowComponent(): AssetBuyFlowComponent.Factory
+
+    fun networkBuyFlowComponent(): NetworkBuyFlowComponent.Factory
+
+    fun networkReceiveFlowComponent(): NetworkReceiveFlowComponent.Factory
+
+    fun networkSendFlowComponent(): NetworkSendFlowComponent.Factory
+
+    fun networkSwapFlowComponent(): NetworkSwapFlowComponent.Factory
 
     fun inject(view: GoToNftsView)
 
@@ -120,7 +130,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             Web3NamesApi::class,
             WalletConnectFeatureApi::class,
             SwapFeatureApi::class,
-            BuyFeatureApi::class
+            BuyFeatureApi::class,
+            BannersFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

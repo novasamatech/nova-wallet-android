@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapRemoveStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -112,7 +112,7 @@ class ConfirmRemoveStakingProxyViewModel(
             asset = assetFlow.first(),
             proxyAddress = payload.proxyAddress,
             proxiedAccountId = metaAccount.requireAccountIdIn(chain),
-            fee = feeMixin.awaitDecimalFee()
+            fee = feeMixin.awaitFee()
         )
 
         validationExecutor.requireValid(
@@ -133,7 +133,6 @@ class ConfirmRemoveStakingProxyViewModel(
 
             feeMixin.loadFee(
                 this,
-                chain.id,
                 feeConstructor = { removeStakingProxyInteractor.estimateFee(chain, proxiedAccountId) },
                 onRetryCancelled = ::backClicked
             )

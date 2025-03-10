@@ -10,14 +10,16 @@ fun BaseFragmentMixin<*>.observeRetries(
     retriable: Retriable,
     context: Context = fragment.requireContext(),
 ) {
-    retriable.retryEvent.observeEvent {
-        retryDialog(
-            context = context,
-            onRetry = it.onRetry,
-            onCancel = it.onCancel
-        ) {
-            setTitle(it.title)
-            setMessage(it.message)
+    with(retriable) {
+        retryEvent.observeEvent {
+            retryDialog(
+                context = context,
+                onRetry = it.onRetry,
+                onCancel = it.onCancel
+            ) {
+                setTitle(it.title)
+                setMessage(it.message)
+            }
         }
     }
 }

@@ -5,11 +5,11 @@ import java.io.File
 
 interface FileProvider {
 
-    suspend fun getFileInExternalCacheStorage(fileName: String): File
+    fun getFileInExternalCacheStorage(fileName: String): File
 
-    suspend fun getFileInInternalCacheStorage(fileName: String): File
+    fun getFileInInternalCacheStorage(fileName: String): File
 
-    suspend fun generateTempFile(fixedName: String? = null): File
+    fun generateTempFile(fixedName: String? = null): File
 
-    suspend fun uriOf(file: File): Uri
+    fun uriOf(file: File): Uri
 }

@@ -3,16 +3,15 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asFlow
 import io.novafoundation.nova.common.mixin.api.Retriable
-import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.GenericFeeModel
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -23,137 +22,73 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transform
 
-sealed class FeeStatus<out F : GenericFee> {
-    object Loading : FeeStatus<Nothing>()
+interface GenericFeeLoaderMixin<F> : Retriable {
 
-    class Loaded<F : GenericFee>(val feeModel: GenericFeeModel<F>) : FeeStatus<F>()
-
-    object NoFee : FeeStatus<Nothing>()
-
-    object Error : FeeStatus<Nothing>()
-}
-
-interface GenericFee {
-
-    val networkFee: Fee
-}
-
-@JvmInline
-value class SimpleFee(override val networkFee: Fee) : GenericFee
-
-class SimpleGenericFee<T : Fee>(override val networkFee: T) : GenericFee
-
-interface GenericFeeLoaderMixin<F : GenericFee> : Retriable {
-
-    class Configuration<F : GenericFee>(
+    class Configuration<F>(
         val showZeroFiat: Boolean = true,
-        val initialStatusValue: FeeStatus<F>? = null
-    )
+        val initialState: InitialState<F> = InitialState()
+    ) {
 
-    val feeLiveData: LiveData<FeeStatus<F>>
+        class InitialState<F>(
+            val feeStatus: FeeStatus<F, FeeDisplay>? = null
+        )
+    }
 
-    interface Presentation<F : GenericFee> : GenericFeeLoaderMixin<F> {
+    val feeLiveData: LiveData<FeeStatus<F, FeeDisplay>>
+
+    interface Presentation<F> : GenericFeeLoaderMixin<F>, SetFee<F> {
 
         suspend fun loadFeeSuspending(
             retryScope: CoroutineScope,
-            expectedChain: ChainId? = null,
             feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
         )
-
-        /**
-         * @param expectedChain - Specify to force `feeConstructor` to wait until Token corresponds to the given `expectedChain`
-         * Useful when `tokenFlow` that mixin was initialized with can switch chains
-         */
-        fun loadFeeV2Generic(
-            coroutineScope: CoroutineScope,
-            expectedChain: ChainId? = null,
-            feeConstructor: suspend (Token) -> F?,
-            onRetryCancelled: () -> Unit,
-        )
-
-        suspend fun setFee(fee: F?)
-
-        suspend fun setFeeStatus(feeStatus: FeeStatus<F>)
-
-        fun invalidateFee()
-    }
-
-    interface Factory {
-
-        fun <F : GenericFee> createGeneric(
-            tokenFlow: Flow<Token?>,
-            configuration: Configuration<F> = Configuration()
-        ): Presentation<F>
-    }
-}
-
-interface FeeLoaderMixin : GenericFeeLoaderMixin<SimpleFee> {
-
-    interface Presentation : GenericFeeLoaderMixin.Presentation<SimpleFee>, FeeLoaderMixin {
 
         fun loadFee(
             coroutineScope: CoroutineScope,
-            expectedChain: ChainId? = null,
-            feeConstructor: suspend (Token) -> Fee?,
+            feeConstructor: suspend (Token) -> F?,
             onRetryCancelled: () -> Unit,
-        ) = loadFeeV2Generic(
-            coroutineScope = coroutineScope,
-            expectedChain = expectedChain,
-            feeConstructor = { token -> feeConstructor(token)?.let(::SimpleFee) },
-            onRetryCancelled = onRetryCancelled
         )
-    }
 
-    interface Factory : GenericFeeLoaderMixin.Factory {
+        suspend fun setFeeOrHide(fee: F?)
+        suspend fun setFeeStatus(feeStatus: FeeStatus<F, FeeDisplay>)
+
+        suspend fun invalidateFee()
+    }
+}
+
+@Deprecated("Use FeeLoaderMixinV2 instead")
+interface FeeLoaderMixin : GenericFeeLoaderMixin<Fee> {
+
+    interface Presentation : GenericFeeLoaderMixin.Presentation<Fee>, FeeLoaderMixin
+
+    interface Factory {
 
         fun create(
             tokenFlow: Flow<Token?>,
-            configuration: Configuration<SimpleFee> = Configuration()
+            configuration: Configuration<Fee> = Configuration()
         ): Presentation
     }
 }
 
-suspend fun <F : GenericFee> GenericFeeLoaderMixin<F>.awaitDecimalFee(): GenericDecimalFee<F> = feeLiveData.asFlow()
-    .filterIsInstance<FeeStatus.Loaded<F>>()
-    .first().feeModel.decimalFee
+suspend fun <F : FeeBase> GenericFeeLoaderMixin<F>.awaitFee(): F = feeLiveData.asFlow()
+    .filterIsInstance<FeeStatus.Loaded<F, FeeDisplay>>()
+    .first()
+    .feeModel.fee
 
-suspend fun <F : GenericFee> GenericFeeLoaderMixin<F>.awaitOptionalDecimalFee(): GenericDecimalFee<F>? = feeLiveData.asFlow()
+suspend fun <F : FeeBase> GenericFeeLoaderMixin<F>.awaitOptionalFee(): F? = feeLiveData.asFlow()
     .transform { feeStatus ->
         when (feeStatus) {
-            is FeeStatus.Loaded -> emit(feeStatus.feeModel.decimalFee)
+            is FeeStatus.Loaded<F, FeeDisplay> -> emit(feeStatus.feeModel.fee)
             FeeStatus.NoFee -> emit(null)
             else -> {} // skip
         }
     }.first()
 
-fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeOrNullFlow(): Flow<F?> {
-    return feeLiveData.asFlow().map {
-        it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel?.decimalFee?.genericFee
-    }
-}
-
-fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedDecimalFeeOrNullFlow(): Flow<GenericDecimalFee<F>?> {
-    return feeLiveData.asFlow().map {
-        it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel?.decimalFee
-    }
-}
-
-fun <F : GenericFee> GenericFeeLoaderMixin<F>.loadedFeeModelOrNullFlow(): Flow<GenericFeeModel<F>?> {
-    return feeLiveData
-        .asFlow()
-        .map { it.castOrNull<FeeStatus.Loaded<F>>()?.feeModel }
-}
-
-fun <F : GenericFee> GenericFeeLoaderMixin<F>.getDecimalFeeOrNull(): GenericDecimalFee<F>? {
-    return feeLiveData.value
-        .castOrNull<FeeStatus.Loaded<F>>()
-        ?.feeModel
-        ?.decimalFee
-}
-
-fun <T : GenericFee> FeeLoaderMixin.Factory.createGeneric(assetFlow: Flow<Asset>) = createGeneric<T>(assetFlow.map { it.token })
+@Deprecated("Use createChangeableFee instead")
 fun FeeLoaderMixin.Factory.create(assetFlow: Flow<Asset>) = create(assetFlow.map { it.token })
+
+@Deprecated("Use createChangeableFee instead")
 fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseCase.currentTokenFlow())
 
 fun <I> FeeLoaderMixin.Presentation.connectWith(
@@ -165,7 +100,7 @@ fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource.onEach { input ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input) },
+            feeConstructor = { token -> token.feeConstructor(input) },
             onRetryCancelled = onRetryCancelled
         )
     }
@@ -186,7 +121,7 @@ fun <I1, I2> FeeLoaderMixin.Presentation.connectWith(
     ) { input1, input2 ->
         this.loadFee(
             coroutineScope = scope,
-            feeConstructor = { feeConstructor(it, input1, input2) },
+            feeConstructor = { token -> token.feeConstructor(input1, input2) },
             onRetryCancelled = onRetryCancelled
         )
     }

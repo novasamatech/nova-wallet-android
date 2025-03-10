@@ -23,7 +23,11 @@ sealed interface NetworkNodeFailure {
 
 fun NetworkNodeValidationSystemBuilder.validateNetworkNodeIsAlive(
     nodeHealthStateCheckRequest: suspend (NetworkNodePayload) -> Unit
-) = validateNetworkNodeIsAlive(nodeHealthStateCheckRequest, failure = { NetworkNodeFailure.NodeIsNotAlive })
+) = validateNetworkNodeIsAlive(
+    nodeHealthStateCheckRequest,
+    nodeUrl = { it.nodeUrl },
+    failure = { NetworkNodeFailure.NodeIsNotAlive }
+)
 
 fun NetworkNodeValidationSystemBuilder.validateNodeSupportedByNetwork(
     nodeChainIdRequester: suspend (NetworkNodePayload) -> String

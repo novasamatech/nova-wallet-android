@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claim
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_staking_impl.domain.common.validation.profitableAction
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
@@ -17,13 +18,24 @@ typealias NominationPoolsClaimRewardsValidationSystemBuilder =
     ValidationSystemBuilder<NominationPoolsClaimRewardsValidationPayload, NominationPoolsClaimRewardsValidationFailure>
 
 fun ValidationSystem.Companion.nominationPoolsClaimRewards(
-    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
+    enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+    stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
 ): NominationPoolsClaimRewardsValidationSystem = ValidationSystem {
+    noStakingTypesConflict(stakingTypesConflictValidationFactory)
+
     enoughToPayFees()
 
     sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
 
     profitableClaim()
+}
+
+private fun NominationPoolsClaimRewardsValidationSystemBuilder.noStakingTypesConflict(factory: StakingTypesConflictValidationFactory) {
+    factory.noStakingTypesConflict(
+        accountId = { it.poolMember.accountId },
+        chainId = { it.asset.token.configuration.chainId },
+        error = { NominationPoolsClaimRewardsValidationFailure.StakingTypesConflict }
+    )
 }
 
 private fun NominationPoolsClaimRewardsValidationSystemBuilder.sufficientCommissionBalanceToStayAboveED(

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.blockhain.mode
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.votedFor
+import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.referendum.OffChainReferendumVotingDetails
 import io.novafoundation.nova.feature_governance_api.data.repository.ConvictionVotingRepository
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.extrinsic.democracyRemoveVote
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.common.bin
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -40,7 +42,7 @@ class GovV1ConvictionVotingRepository(
     private val balanceLocksRepository: BalanceLocksRepository,
 ) : ConvictionVotingRepository {
 
-    override val voteLockId: String = DEMOCRACY_ID
+    override val voteLockId = DEMOCRACY_ID
 
     override suspend fun voteLockingPeriod(chainId: ChainId): BlockNumber {
         val runtime = chainRegistry.getRuntime(chainId)
@@ -94,6 +96,10 @@ class GovV1ConvictionVotingRepository(
             .filter { it.vote.votedFor(type) }
     }
 
+    override suspend fun abstainVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails? {
+        return null
+    }
+
     override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
         claimable.actions.forEach { claimAction ->
             when (claimAction) {
@@ -112,8 +118,20 @@ class GovV1ConvictionVotingRepository(
         democracyVote(referendumId, vote)
     }
 
+    override fun CallBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
+        democracyVote(referendumId, vote)
+    }
+
     override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
         democracyRemoveVote(referendumId)
+    }
+
+    override fun isAbstainVotingAvailable(): Boolean {
+        return false
+    }
+
+    override suspend fun fullVotingDetails(referendumId: ReferendumId, chain: Chain): OffChainReferendumVotingDetails? {
+        return null
     }
 
     private fun <T> T?.associatedWithTrack(): Map<TrackId, T> {

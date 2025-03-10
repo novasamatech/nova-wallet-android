@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs.PolkadotJsExtensionInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.PolkadotJsTransportRequest
-import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignerResult
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.mapPolkadotJsSignerPayloadToPolkadotPayload
 import io.novafoundation.nova.feature_dapp_impl.web3.session.Web3Session
 import io.novafoundation.nova.feature_dapp_impl.web3.states.BaseState
@@ -17,6 +16,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost.NotAuthorizedException
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignerResult
 import kotlinx.coroutines.flow.flowOf
 
 class DefaultPolkadotJsState(
@@ -75,7 +75,7 @@ class DefaultPolkadotJsState(
         when (val response = hostApi.confirmTx(signRequest)) {
             is ConfirmTxResponse.Rejected -> request.reject(NotAuthorizedException)
             is ConfirmTxResponse.Sent -> throw IllegalStateException("Unexpected 'Sent' response for PolkadotJs extension")
-            is ConfirmTxResponse.Signed -> request.accept(PolkadotSignerResult(response.requestId, response.signature))
+            is ConfirmTxResponse.Signed -> request.accept(PolkadotSignerResult(response.requestId, response.signature, response.modifiedTransaction))
             is ConfirmTxResponse.SigningFailed -> {
                 if (response.shouldPresent) hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
 

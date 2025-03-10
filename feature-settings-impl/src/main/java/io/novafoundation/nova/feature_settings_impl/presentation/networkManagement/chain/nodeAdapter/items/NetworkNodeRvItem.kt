@@ -7,7 +7,7 @@ data class NetworkNodeRvItem(
     val id: String,
     val name: String,
     @ColorRes val nameColorRes: Int,
-    val url: String,
+    val unformattedUrl: String,
     val isEditable: Boolean,
     val isDeletable: Boolean,
     val isSelected: Boolean,

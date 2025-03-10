@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/itemManageTokenMultichainNetworks"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/itemManageTokenMultichainSymbol"
-        tools:src="@drawable/ic_nova" />
+        tools:src="@drawable/ic_token_dot_colored" />
 
     <TextView
         android:id="@+id/itemManageTokenMultichainSymbol"

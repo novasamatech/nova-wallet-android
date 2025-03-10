@@ -236,6 +236,8 @@ class StakingInteractor(
 
     fun currentAssetFlow() = assetUseCase.currentAssetFlow()
 
+    fun chainFlow() = assetUseCase.currentAssetAndOptionFlow().map { it.option.assetWithChain.chain }
+
     fun assetFlow(accountAddress: String): Flow<Asset> {
         return flow {
             val (chain, chainAsset) = stakingSharedState.assetWithChain.first()

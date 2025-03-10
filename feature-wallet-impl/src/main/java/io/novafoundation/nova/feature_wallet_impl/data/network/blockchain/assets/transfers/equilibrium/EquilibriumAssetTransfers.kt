@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -31,19 +30,20 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import kotlinx.coroutines.CoroutineScope
 
 private const val TRANSFER_CALL = "transfer"
 
 class EquilibriumAssetTransfers(
     chainRegistry: ChainRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
-    extrinsicService: ExtrinsicService,
+    extrinsicServiceFactory: ExtrinsicService.Factory,
     phishingValidationFactory: PhishingValidationFactory,
     private val remoteStorageSource: StorageDataSource,
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
-    override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
+    override fun getValidationSystem(coroutineScope: CoroutineScope) = ValidationSystem {
         validAddress()
         recipientIsNotSystemAccount()
 

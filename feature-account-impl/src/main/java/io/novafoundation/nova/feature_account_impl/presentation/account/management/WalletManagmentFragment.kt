@@ -71,9 +71,9 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel>(), Accoun
         viewModel.confirmAccountDeletion.awaitableActionLiveData.observeEvent {
             warningDialog(
                 requireContext(),
-                onConfirm = { it.onSuccess(true) },
-                onCancel = { it.onSuccess(false) },
-                confirmTextRes = R.string.account_delete_confirm
+                onPositiveClick = { it.onSuccess(true) },
+                onNegativeClick = { it.onSuccess(false) },
+                positiveTextRes = R.string.account_delete_confirm
             ) {
                 setTitle(R.string.account_delete_confirmation_title)
                 setMessage(R.string.account_delete_confirmation_description)

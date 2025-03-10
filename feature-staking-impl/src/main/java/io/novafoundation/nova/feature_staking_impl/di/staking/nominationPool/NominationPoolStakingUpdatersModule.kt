@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ActiveEraUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.CurrentEraUpdater
@@ -16,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.EraStartSessionIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.GenesisSlotUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.CounterForPoolMembersUpdater
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.DelegatedStakeUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.LastPoolIdUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MaxPoolMembersPerPoolUpdater
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.MaxPoolMembersUpdater
@@ -46,6 +48,20 @@ class NominationPoolStakingUpdatersModule {
         storageCache = storageCache,
         stakingSharedState = stakingSharedState,
         chainRegistry = chainRegistry
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideDelegatedStakeUpdater(
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        scope: AccountUpdateScope
+    ) = DelegatedStakeUpdater(
+        storageCache = storageCache,
+        stakingSharedState = stakingSharedState,
+        chainRegistry = chainRegistry,
+        scope = scope
     )
 
     @Provides
@@ -144,6 +160,7 @@ class NominationPoolStakingUpdatersModule {
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
         parachainsUpdater: ParachainsUpdater,
+        delegatedStakeUpdater: DelegatedStakeUpdater,
     ) = StakingUpdaters.Group(
         lastPoolIdUpdater,
         minJoinBondUpdater,
@@ -160,6 +177,7 @@ class NominationPoolStakingUpdatersModule {
         genesisSlotUpdater,
         currentSessionIndexUpdater,
         eraStartSessionIndexUpdater,
-        parachainsUpdater
+        parachainsUpdater,
+        delegatedStakeUpdater
     )
 }

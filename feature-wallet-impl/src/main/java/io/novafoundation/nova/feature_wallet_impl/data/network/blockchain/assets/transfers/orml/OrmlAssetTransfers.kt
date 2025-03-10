@@ -1,11 +1,10 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.firstExistingModuleName
+import io.novafoundation.nova.common.utils.firstExistingCall
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -23,10 +22,10 @@ import java.math.BigInteger
 class OrmlAssetTransfers(
     chainRegistry: ChainRegistry,
     assetSourceRegistry: AssetSourceRegistry,
-    extrinsicService: ExtrinsicService,
+    extrinsicServiceFactory: ExtrinsicService.Factory,
     phishingValidationFactory: PhishingValidationFactory,
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
-) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicService, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
+) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         ormlTransfer(
@@ -46,17 +45,20 @@ class OrmlAssetTransfers(
         return chainAsset.requireOrml().transfersEnabled && super.areTransfersEnabled(chainAsset)
     }
 
-    override val validationSystem: AssetTransfersValidationSystem = defaultValidationSystem()
-
     private fun ExtrinsicBuilder.ormlTransfer(
         chainAsset: Chain.Asset,
         target: AccountId,
         amount: BigInteger
     ) {
+        val (moduleIndex, callIndex) = runtime.metadata.firstExistingCall(
+            Modules.TOKENS to "transfer",
+            Modules.CURRENCIES to "transfer"
+        ).index
+
         call(
-            moduleName = runtime.metadata.firstExistingModuleName(Modules.CURRENCIES, Modules.TOKENS),
-            callName = "transfer",
-            arguments = mapOf(
+            moduleIndex = moduleIndex,
+            callIndex = callIndex,
+            args = mapOf(
                 "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, target),
                 "currency_id" to chainAsset.ormlCurrencyId(runtime),
                 "amount" to amount

@@ -19,6 +19,8 @@ sealed class PolkadotSignPayload : Parcelable {
         val specVersion: String,
         val tip: String,
         val transactionVersion: String,
+        val metadataHash: String?,
+        val withSignedTransaction: Boolean?,
         val signedExtensions: List<String>,
         val version: Int
     ) : PolkadotSignPayload()

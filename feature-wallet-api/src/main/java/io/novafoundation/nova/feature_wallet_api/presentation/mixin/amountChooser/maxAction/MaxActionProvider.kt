@@ -1,41 +1,58 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction
 
-import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.Companion.share
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface MaxActionProvider {
 
-    class MaxAvailableForAction(val balance: Balance, val chainAsset: Chain.Asset)
+    companion object
 
-    val maxAvailableForDisplay: Flow<Balance?>
-
-    val maxAvailableForAction: Flow<MaxAvailableForAction?>
+    val maxAvailableBalance: Flow<MaxAvailableBalance>
 }
 
-object MaxActionProviderDsl {
+fun MaxActionProvider.Companion.create(
+    coroutineScope: CoroutineScope,
+    builder: MaxActionProviderDsl.() -> MaxActionProvider
+): MaxActionProvider {
+    return builder(MaxActionProviderDsl).share(coroutineScope)
+}
 
-    fun Flow<Asset?>.providingMaxOf(field: (Asset) -> Balance, allowMaxAction: Boolean = true): MaxActionProvider {
-        return AssetMaxActionProvider(this, field, allowMaxAction)
+interface MaxActionProviderDsl {
+
+    companion object : MaxActionProviderDsl
+
+    fun Flow<Asset>.providingMaxOf(field: (Asset) -> Balance): MaxActionProvider {
+        return AssetMaxActionProvider(this, field)
     }
 
-    fun <F : GenericFee> MaxActionProvider.deductFee(
-        feeLoaderMixin: GenericFeeLoaderMixin<F>,
-        extractTotalFee: (F) -> Balance
+    fun MaxActionProvider.deductEd(assetSourceRegistry: AssetSourceRegistry, deductEdFlow: Flow<Boolean>): MaxActionProvider {
+        return ExistentialDepositDeductionMaxActionProvider(assetSourceRegistry, this, deductEdFlow)
+    }
+
+    fun <F : MaxAvailableDeduction> MaxActionProvider.deductFee(
+        feeLoaderMixin: FeeLoaderMixinV2<F, *>,
     ): MaxActionProvider {
-        return FeeAwareMaxActionProvider(feeLoaderMixin, extractTotalFee, inner = this)
+        return ComplexFeeAwareMaxActionProvider(feeLoaderMixin, inner = this)
     }
-}
 
-infix operator fun MaxActionProvider.MaxAvailableForAction?.minus(other: BigInteger?): MaxActionProvider.MaxAvailableForAction? {
-    if (this == null || other == null) return null
+    fun MaxActionProvider.deductAmount(
+        amount: Flow<Balance>
+    ): MaxActionProvider {
+        return DeductAmountMaxActionProvider(amount, inner = this)
+    }
 
-    val difference = balance - other
+    fun Flow<Chain.Asset>.providingBalance(balanceFlow: Flow<Balance>): MaxActionProvider {
+        return BalanceMaxActionProvider(this, balanceFlow)
+    }
 
-    return MaxActionProvider.MaxAvailableForAction(difference.atLeastZero(), chainAsset)
+    fun MaxActionProvider.share(coroutineScope: CoroutineScope): MaxActionProvider {
+        return SharingMaxActionProvider(this, coroutineScope)
+    }
 }

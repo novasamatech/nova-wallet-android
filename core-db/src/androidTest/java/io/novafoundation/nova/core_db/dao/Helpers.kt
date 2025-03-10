@@ -6,9 +6,12 @@ import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
+import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
+import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 fun createTestChain(
@@ -28,8 +31,17 @@ fun createTestChain(
             assetOf(assetId = it, symbol = it.toString())
         }
     }
+    val explorers = emptyList<ChainExplorerLocal>()
+    val externalApis = emptyList<ChainExternalApiLocal>()
 
-    return JoinedChainInfo(chain, nodes, assets, explorers = emptyList(), externalApis = emptyList())
+    return JoinedChainInfo(
+        chain,
+        NodeSelectionPreferencesLocal(chain.id, autoBalanceEnabled = true, selectedNodeUrl = null),
+        nodes,
+        assets,
+        explorers,
+        externalApis
+    )
 }
 
 fun chainOf(
@@ -52,7 +64,9 @@ fun chainOf(
     supportProxy = false,
     swap = "",
     hasSubstrateRuntime = true,
-    nodeSelectionStrategy = ChainLocal.NodeSelectionStrategyLocal.ROUND_ROBIN
+    nodeSelectionStrategy = ChainLocal.AutoBalanceStrategyLocal.ROUND_ROBIN,
+    source = ChainLocal.Source.CUSTOM,
+    customFee = ""
 )
 
 fun ChainLocal.nodeOf(
@@ -61,7 +75,8 @@ fun ChainLocal.nodeOf(
     name = "Test",
     url = link,
     chainId = id,
-    orderId = 0
+    orderId = 0,
+    source = ChainNodeLocal.Source.CUSTOM,
 )
 
 fun ChainLocal.assetOf(
@@ -90,7 +105,7 @@ suspend fun ChainDao.addChains(chains: List<JoinedChainInfo>) {
         nodesDiff = addedDiff(chains.flatMap(JoinedChainInfo::nodes)),
         explorersDiff = addedDiff(chains.flatMap(JoinedChainInfo::explorers)),
         externalApisDiff = addedDiff(chains.flatMap(JoinedChainInfo::externalApis)),
-        nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
+        nodeSelectionPreferencesDiff = emptyDiff()
     )
 }
 
@@ -103,7 +118,7 @@ suspend fun ChainDao.removeChain(joinedChainInfo: JoinedChainInfo) {
         nodesDiff = removedDiff(joinedChainInfo.nodes),
         explorersDiff = removedDiff(joinedChainInfo.explorers),
         externalApisDiff = removedDiff(joinedChainInfo.externalApis),
-        nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
+        nodeSelectionPreferencesDiff = emptyDiff()
     )
 }
 
@@ -114,7 +129,7 @@ suspend fun ChainDao.updateChain(joinedChainInfo: JoinedChainInfo) {
         nodesDiff = updatedDiff(joinedChainInfo.nodes),
         explorersDiff = updatedDiff(joinedChainInfo.explorers),
         externalApisDiff = updatedDiff(joinedChainInfo.externalApis),
-        nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
+        nodeSelectionPreferencesDiff = emptyDiff()
     )
 }
 

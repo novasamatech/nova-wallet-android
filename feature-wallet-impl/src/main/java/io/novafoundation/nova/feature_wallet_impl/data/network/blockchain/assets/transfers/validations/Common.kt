@@ -8,28 +8,27 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure.WillRemoveAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.commissionChainAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeList
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.originFeeListInUsedAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.recipientOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.sendingAmountInCommissionAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.balanceCountedTowardsED
-import io.novafoundation.nova.feature_wallet_api.domain.model.networkFeePart
 import io.novafoundation.nova.feature_wallet_api.domain.validation.AmountProducer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
-import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDepositMultyFee
+import io.novafoundation.nova.feature_wallet_api.domain.validation.doNotCrossExistentialDepositMultiFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notPhishingAccount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
-import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceMultyFee
+import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalanceMultiFee
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validAddress
 import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SimpleGenericFee
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
+import kotlinx.coroutines.CoroutineScope
 import java.math.BigDecimal
 
 fun AssetTransfersValidationSystemBuilder.positiveAmount() = positiveAmount(
@@ -56,30 +55,30 @@ fun AssetTransfersValidationSystemBuilder.sufficientCommissionBalanceToStayAbove
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) {
     enoughTotalToStayAboveEDValidationFactory.validate(
-        fee = { it.originFee.networkFeePart() },
+        fee = { it.originFee.submissionFee },
         balance = { it.originCommissionAsset.balanceCountedTowardsED() },
-        chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.transfer.originChain.commissionAsset) },
-        error = { payload, error -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.transfer.originChain.commissionAsset, error) }
+        chainWithAsset = { ChainWithAsset(it.transfer.originChain, it.commissionChainAsset) },
+        error = { payload, error -> AssetTransferValidationFailure.NotEnoughFunds.ToStayAboveED(payload.commissionChainAsset, error) }
     )
 }
 
 fun AssetTransfersValidationSystemBuilder.checkForFeeChanges(
-    assetSourceRegistry: AssetSourceRegistry
+    assetSourceRegistry: AssetSourceRegistry,
+    coroutineScope: CoroutineScope
 ) = checkForFeeChanges(
     calculateFee = { payload ->
         val transfers = assetSourceRegistry.sourceFor(payload.transfer.originChainAsset).transfers
-        val fee = transfers.calculateFee(payload.transfer)
-        SimpleGenericFee(payload.originFee.genericFee.networkFee.copy(networkFee = fee))
+        transfers.calculateFee(payload.transfer, coroutineScope)
     },
-    currentFee = { it.originFee },
-    chainAsset = { it.transfer.commissionAssetToken.configuration },
+    currentFee = { it.originFee.submissionFee },
+    chainAsset = { it.commissionChainAsset },
     error = AssetTransferValidationFailure::FeeChangeDetected
 )
 
 fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDepositInUsedAsset(
     assetSourceRegistry: AssetSourceRegistry,
     extraAmount: AmountProducer<AssetTransferPayload>,
-) = doNotCrossExistentialDepositMultyFee(
+) = doNotCrossExistentialDepositMultiFee(
     countableTowardsEdBalance = { it.originUsedAsset.balanceCountedTowardsED() },
     fee = { it.originFeeListInUsedAsset },
     extraAmount = extraAmount,
@@ -87,13 +86,13 @@ fun AssetTransfersValidationSystemBuilder.doNotCrossExistentialDepositInUsedAsse
     error = { remainingAmount, payload -> payload.transfer.originChainAsset.existentialDepositError(remainingAmount) }
 )
 
-fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalanceMultyFee(
+fun AssetTransfersValidationSystemBuilder.sufficientTransferableBalanceToPayOriginFee() = sufficientBalanceMultiFee(
     available = { it.originCommissionAsset.transferable },
     amount = { it.sendingAmountInCommissionAsset },
     feeExtractor = { it.originFeeList },
     error = { context ->
         AssetTransferValidationFailure.NotEnoughFunds.InCommissionAsset(
-            chainAsset = context.payload.transfer.originChain.commissionAsset,
+            chainAsset = context.payload.commissionChainAsset,
             fee = context.fee,
             maxUsable = context.maxUsable
         )
@@ -113,7 +112,7 @@ fun AssetTransfersValidationSystemBuilder.recipientIsNotSystemAccount() = notSys
 )
 
 private suspend fun AssetSourceRegistry.existentialDepositForUsedAsset(transfer: AssetTransfer): BigDecimal {
-    return existentialDeposit(transfer.originChain, transfer.originChainAsset)
+    return existentialDeposit(transfer.originChainAsset)
 }
 
 private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveAccount = when (type) {

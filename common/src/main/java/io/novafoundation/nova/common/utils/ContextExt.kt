@@ -2,9 +2,17 @@ package io.novafoundation.nova.common.utils
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
+import android.os.CombinedVibration
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.util.Log
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -16,6 +24,7 @@ import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.shape.addRipple
+import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.common.view.shape.getRippleMask
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import kotlin.math.roundToInt
@@ -30,7 +39,7 @@ fun Context.shareText(text: String) {
         putExtra(Intent.EXTRA_TEXT, text)
     }
 
-    startActivity(intent)
+    startActivity(Intent.createChooser(intent, null))
 }
 
 inline fun postToUiThread(crossinline action: () -> Unit) {
@@ -108,6 +117,8 @@ interface WithContextExtensions {
     val Float.dpF: Float
         get() = dpF(providedContext)
 
+    fun getRippleDrawable(cornerSizeInDp: Int) = providedContext.getMaskedRipple(cornerSizeInDp)
+
     fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = providedContext.addRipple(to, mask)
 
     fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = addRipple(this, mask)
@@ -139,9 +150,41 @@ fun getRippleMask(
     cornerSizeDp: Int = 12,
 ) = context.getRippleMask(cornerSizeDp)
 
+fun Context.launchDeepLink(url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            .addFlags(FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "Error while running an activity", e)
+    }
+}
+
 context(View)
 fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRipple(this, mask)
 
 context(View)
 val Int.dp: Int
     get() = dp(this@View.context)
+
+context(View)
+val Int.dpF: Float
+    get() = dpF(this@View.context)
+
+fun Context.vibrate(duration: Long) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibrator = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        val vibrationEffect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator.vibrate(CombinedVibration.createParallel(vibrationEffect))
+    } else {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (vibrator.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(duration)
+            }
+        }
+    }
+}

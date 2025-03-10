@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.data.repository
 
-import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.PhishingSitesDao
 import io.novafoundation.nova.core_db.model.PhishingSiteLocal
 import io.novafoundation.nova.feature_dapp_impl.data.network.phishing.PhishingSitesApi
+import io.novafoundation.nova.feature_dapp_impl.data.phisning.PhishingDetectingService
 
 interface PhishingSitesRepository {
 
@@ -16,6 +16,7 @@ interface PhishingSitesRepository {
 class PhishingSitesRepositoryImpl(
     private val phishingSitesDao: PhishingSitesDao,
     private val phishingSitesApi: PhishingSitesApi,
+    private val phishingDetectingService: PhishingDetectingService
 ) : PhishingSitesRepository {
 
     override suspend fun syncPhishingSites() {
@@ -26,21 +27,6 @@ class PhishingSitesRepositoryImpl(
     }
 
     override suspend fun isPhishing(url: String): Boolean {
-        val host = Urls.hostOf(url)
-        val hostSuffixes = extractAllPossibleSubDomains(host)
-
-        return phishingSitesDao.isPhishing(hostSuffixes)
-    }
-
-    private fun extractAllPossibleSubDomains(host: String): List<String> {
-        val separator = "."
-
-        val segments = host.split(separator)
-
-        val suffixes = (2..segments.size).map { suffixLength ->
-            segments.takeLast(suffixLength).joinToString(separator = ".")
-        }
-
-        return suffixes
+        return phishingDetectingService.isPhishing(url)
     }
 }

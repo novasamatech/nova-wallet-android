@@ -29,7 +29,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Defa
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic.EncodingInstance.CallRepresentation
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
@@ -40,6 +39,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
+import io.novasama.substrate_sdk_android.runtime.metadata.method
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
@@ -48,7 +48,9 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunctio
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import io.novasama.substrate_sdk_android.scale.Schema
@@ -75,6 +77,9 @@ val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
 
 val SS58Encoder.DEFAULT_PREFIX: Short
     get() = 42.toShort()
+
+val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
+    get() = DEFAULT_PREFIX
 
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
@@ -110,6 +115,10 @@ fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
 
 fun BigInteger.toUnsignedLittleEndian(): ByteArray {
     return toUnsignedBytes().reversedArray()
+}
+
+fun BigInteger.takeUnlessZero(): BigInteger? {
+    return takeUnless { isZero }
 }
 
 fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
@@ -182,14 +191,18 @@ fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.DecodedInstance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
+fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
 fun Module.numberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(constant(name), runtimeSnapshot)
+
 fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) = constantOrNull(name)?.let {
     bindNumberConstant(it, runtimeSnapshot)
 }
+
+context(RuntimeContext)
+fun Module.numberConstant(name: String) = numberConstant(name, runtime)
 
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
@@ -264,6 +277,10 @@ fun RuntimeMetadata.preImage() = module(Modules.PREIMAGE)
 
 fun RuntimeMetadata.nominationPools() = module(Modules.NOMINATION_POOLS)
 
+fun RuntimeMetadata.delegatedStakingOrNull() = moduleOrNull(Modules.DELEGATED_STAKING)
+
+fun RuntimeMetadata.delegatedStaking() = module(Modules.DELEGATED_STAKING)
+
 fun RuntimeMetadata.nominationPoolsOrNull() = moduleOrNull(Modules.NOMINATION_POOLS)
 
 fun RuntimeMetadata.assetConversionOrNull() = moduleOrNull(Modules.ASSET_CONVERSION)
@@ -296,8 +313,18 @@ fun RuntimeMetadata.proxy() = module(Modules.PROXY)
 
 fun RuntimeMetadata.utility() = module(Modules.UTILITY)
 
+fun RuntimeMetadata.collatorStaking() = module(Modules.COLLATOR_STAKING)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
+}
+
+fun RuntimeMetadata.firstExistingCall(vararg options: Pair<String, String>): MetadataFunction {
+    val result = options.tryFindNonNull { (moduleName, functionName) ->
+        moduleOrNull(moduleName)?.callOrNull(functionName)
+    }
+
+    return requireNotNull(result)
 }
 
 fun RuntimeMetadata.firstExistingModuleOrNull(vararg options: String): Module? {
@@ -325,6 +352,21 @@ fun Module.hasCall(name: String) = callOrNull(name) != null
 
 fun Module.hasStorage(storage: String) = storageOrNull(storage) != null
 
+context(RuntimeContext)
+fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
+    return if (keyArguments.isEmpty()) {
+        storageKey()
+    } else {
+        storageKey(runtime, *keyArguments)
+    }
+}
+
+context(RuntimeContext)
+@JvmName("createStorageKeyArray")
+fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
+    return createStorageKey(*keyArguments)
+}
+
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
 fun SeedFactory.deriveSeed32(mnemonicWords: String, password: String?) = cropSeedTo32Bytes(deriveSeed(mnemonicWords, password))
@@ -346,6 +388,13 @@ fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
 
 fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == this.event.index
+
+fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
+    val runtimeApi = runtimeApiOrNull("AssetConversionApi") ?: return null
+
+    return runtimeApi.method("quote_price_tokens_for_exact_tokens")
+        .inputs.first().type
+}
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))
 
@@ -372,10 +421,6 @@ fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress
 val SignerPayloadExtrinsic.chainId: String
     get() = genesisHash.toHexString()
 
-fun CallRepresentation.toCallInstance(): CallRepresentation.Instance? {
-    return (this as? CallRepresentation.Instance)
-}
-
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
     ?: fallbacks.firstOrNull { modules[it] != null }
         ?.let { modules[it] } ?: throw NoSuchElementException()
@@ -386,6 +431,20 @@ fun Module.storageOrFallback(name: String, vararg fallbacks: String): StorageEnt
 
 suspend fun SocketService.awaitConnected() {
     networkStateFlow().first { it is SocketStateMachine.State.Connected }
+}
+
+fun String.hexBytesSize(): Int {
+    val contentLength = if (startsWith("0x")) {
+        length - 2
+    } else {
+        length
+    }
+
+    return contentLength / 2
+}
+
+fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
+    return apis != null
 }
 
 object Modules {
@@ -437,6 +496,8 @@ object Modules {
 
     const val NOMINATION_POOLS = "NominationPools"
 
+    const val DELEGATED_STAKING = "DelegatedStaking"
+
     const val ASSET_CONVERSION = "AssetConversion"
 
     const val TRANSACTION_PAYMENT = "TransactionPayment"
@@ -474,4 +535,6 @@ object Modules {
     const val XYK = "XYK"
 
     const val ASSET_REGISTRY = "AssetRegistry"
+
+    const val COLLATOR_STAKING = "CollatorStaking"
 }

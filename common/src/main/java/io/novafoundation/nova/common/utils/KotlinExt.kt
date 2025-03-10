@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils
 
 import android.net.Uri
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -17,17 +18,24 @@ import java.io.InputStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
+import java.math.RoundingMode
 import java.util.Calendar
 import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
 
@@ -39,6 +47,8 @@ fun BigDecimal.percentageToFraction() = this.divide(PERCENTAGE_MULTIPLIER, MathC
 infix fun Int.floorMod(divisor: Int) = Math.floorMod(this, divisor)
 
 fun Double.ceil(): Double = kotlin.math.ceil(this)
+
+fun BigInteger.toDuration() = toLong().milliseconds
 
 @Suppress("UNCHECKED_CAST")
 inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
@@ -62,6 +72,16 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
         null -> this
         else -> Result.failure(transform(exception))
     }
+}
+
+fun Result<*>.coerceToUnit(): Result<Unit> = map { }
+
+@OptIn(ExperimentalTime::class)
+inline fun <R> measureExecution(label: String, function: () -> R): R {
+    val (value, time) = measureTimedValue(function)
+    Log.d("Performance", "$label took $time")
+
+    return value
 }
 
 inline fun <T, reified E : Throwable> Result<T>.mapErrorNotInstance(transform: (throwable: Throwable) -> Throwable): Result<T> {
@@ -98,10 +118,24 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
     return destination
 }
 
+fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
+    return subList(fromIndex.coerceIn(0, size), toIndex.coerceIn(0, size))
+}
+
 suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
     return coroutineScope {
         map { async { operation(it) } }
     }.awaitAll()
+}
+
+suspend fun <T, R> Iterable<T>.flatMapAsync(operation: suspend (T) -> Collection<R>): List<R> {
+    return coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll().flatten()
+}
+
+suspend fun <T, R> Iterable<T>.forEachAsync(operation: suspend (T) -> R) {
+    mapAsync(operation)
 }
 
 fun ByteArray.startsWith(prefix: ByteArray): Boolean {
@@ -109,6 +143,18 @@ fun ByteArray.startsWith(prefix: ByteArray): Boolean {
 
     prefix.forEachIndexed { index, byte ->
         if (get(index) != byte) return false
+    }
+
+    return true
+}
+
+fun ByteArray.endsWith(suffix: ByteArray): Boolean {
+    if (suffix.size > size) return false
+
+    val offset = size - suffix.size
+
+    suffix.forEachIndexed { index, byte ->
+        if (get(offset + index) != byte) return false
     }
 
     return true
@@ -154,6 +200,9 @@ val BigDecimal.isZero: Boolean
 val BigDecimal.isPositive: Boolean
     get() = signum() > 0
 
+val BigDecimal.isNegative: Boolean
+    get() = signum() < 0
+
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
@@ -171,6 +220,8 @@ fun BigDecimal?.orZero(): BigDecimal = this ?: 0.toBigDecimal()
 
 fun Double?.orZero(): Double = this ?: 0.0
 
+fun Int?.orZero(): Int = this ?: 0
+
 fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = MathContext.DECIMAL64): BigDecimal {
     return toBigDecimal().divide(divisor.toBigDecimal(), mathContext)
 }
@@ -178,6 +229,35 @@ fun BigInteger.divideToDecimal(divisor: BigInteger, mathContext: MathContext = M
 fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
 fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
+
+fun BigDecimal.lessEpsilon(): BigDecimal = when {
+    this.isZero -> this
+    else -> this.subtract(BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision))
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal): BigDecimal? = try {
+    this.divide(value)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, mathContext: MathContext): BigDecimal? = try {
+    this.divide(value, mathContext)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.divideOrNull(value: BigDecimal, roundingMode: RoundingMode): BigDecimal? = try {
+    this.divide(value, roundingMode)
+} catch (e: ArithmeticException) {
+    null
+}
+
+fun BigDecimal.coerceInOrNull(from: BigDecimal, to: BigDecimal): BigDecimal? = if (this >= from && this <= to) {
+    this
+} else {
+    null
+}
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
@@ -217,6 +297,10 @@ fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all {
 fun <T> Result<T>.requireException() = exceptionOrNull()!!
 
 fun <T> Result<T>.requireValue() = getOrThrow()!!
+
+fun <T> Result<T?>.requireInnerNotNull(): Result<T> {
+    return mapCatching { requireNotNull(it) }
+}
 
 /**
  * Given a list finds a partition point in O(log2(N)) given that there is only a single partition point present.
@@ -283,6 +367,10 @@ inline fun <K, V, R> Map<K, V>.mapValuesNotNull(crossinline mapper: (Map.Entry<K
 @Suppress("UNCHECKED_CAST")
 inline fun <K, V> Map<K, V?>.filterNotNull(): Map<K, V> {
     return filterValues { it != null } as Map<K, V>
+}
+
+inline fun <K1, K2, V> Map<Pair<K1, K2>, V>.dropSecondKey(): Map<K1, V> {
+    return mapKeys { (keys, _) -> keys.first }
 }
 
 inline fun <T, R> Array<T>.tryFindNonNull(transform: (T) -> R?): R? {
@@ -417,6 +505,11 @@ fun <T> List<T>.added(toAdd: T): List<T> {
     return toMutableList().apply { add(toAdd) }
 }
 
+fun <T : Any> MutableList<T>.removeFirstOrNull(condition: (T) -> Boolean): T? {
+    val index = indexOfFirstOrNull(condition) ?: return null
+    return removeAt(index)
+}
+
 fun <T> List<T>.prepended(toPrepend: T): List<T> {
     return toMutableList().apply { add(0, toPrepend) }
 }
@@ -446,9 +539,9 @@ inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fo
 
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
-fun <T> List<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
+fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
 
-fun <T> List<T>.indexOfOrNull(value: T) = indexOf(value).takeIf { it >= 0 }
+fun <T> Collection<T>.indexOfOrNull(value: T) = indexOf(value).takeIf { it >= 0 }
 
 @Suppress("IfThenToElvis")
 fun ByteArray?.optionalContentEquals(other: ByteArray?): Boolean {
@@ -551,6 +644,12 @@ fun Date.atTheNextDay(): Date {
     return calendar.toDate()
 }
 
+fun Float.signum() = when {
+    this < 0f -> -1f
+    this > 0f -> 1f
+    else -> 0f
+}
+
 fun Calendar.toDate(): Date = Date(time.time)
 
 fun Calendar.resetDay() {
@@ -558,4 +657,19 @@ fun Calendar.resetDay() {
     set(Calendar.MINUTE, 0)
     set(Calendar.SECOND, 0)
     set(Calendar.MILLISECOND, 0)
+}
+
+inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
+    launch { block() }
+}
+
+fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
+
+suspend fun <T> scopeAsync(
+    context: CoroutineContext = Dispatchers.Default,
+    block: suspend CoroutineScope.() -> T
+): Deferred<T> {
+    return coroutineScope {
+        async(context, block = block)
+    }
 }

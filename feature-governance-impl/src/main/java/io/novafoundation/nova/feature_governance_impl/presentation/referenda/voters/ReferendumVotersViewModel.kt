@@ -167,10 +167,10 @@ class ReferendumVotersViewModel(
     }
 
     private fun mapTypeToString(voteType: VoteType): String {
-        return if (voteType == VoteType.AYE) {
-            resourceManager.getString(R.string.referendum_positive_voters_title)
-        } else {
-            resourceManager.getString(R.string.referendum_negative_voters_title)
+        return when (voteType) {
+            VoteType.AYE -> resourceManager.getString(R.string.referendum_positive_voters_title)
+            VoteType.NAY -> resourceManager.getString(R.string.referendum_negative_voters_title)
+            VoteType.ABSTAIN -> resourceManager.getString(R.string.referendum_abstain_voters_title)
         }
     }
 }

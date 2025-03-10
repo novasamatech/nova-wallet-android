@@ -9,10 +9,10 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.search.AssetSearchViewModel
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
 @Module(includes = [ViewModelModule::class])
 class AssetSearchModule {
@@ -27,15 +27,15 @@ class AssetSearchModule {
     @ViewModelKey(AssetSearchViewModel::class)
     fun provideViewModel(
         router: AssetsRouter,
-        interactor: AssetSearchInteractor,
-        currencyInteractor: CurrencyInteractor,
-        externalBalancesInteractor: ExternalBalancesInteractor
+        interactorFactory: AssetSearchInteractorFactory,
+        externalBalancesInteractor: ExternalBalancesInteractor,
+        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
     ): ViewModel {
         return AssetSearchViewModel(
             router = router,
-            interactor = interactor,
-            currencyInteractor = currencyInteractor,
-            externalBalancesInteractor = externalBalancesInteractor
+            interactorFactory = interactorFactory,
+            externalBalancesInteractor = externalBalancesInteractor,
+            expandableAssetsMixinFactory = expandableAssetsMixinFactory
         )
     }
 }

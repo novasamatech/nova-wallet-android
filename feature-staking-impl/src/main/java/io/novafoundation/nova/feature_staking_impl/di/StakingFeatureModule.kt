@@ -32,9 +32,12 @@ import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.d
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.config.api.StakingGlobalConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
+import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolDelegatedStakeRepository
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.RoundDurationEstimator
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
@@ -68,9 +71,9 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.StakingRewardsDataSourceRegistry
-import io.novafoundation.nova.feature_staking_impl.data.validators.KnownNovaValidators
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
-import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteKnownNovaValidators
+import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
+import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -78,6 +81,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteracto
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.RealStakingRewardPeriodInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.period.StakingRewardPeriodInteractor
@@ -139,11 +144,15 @@ class StakingFeatureModule {
     fun provideStakingEraInteractorFactory(
         roundDurationEstimator: RoundDurationEstimator,
         stakingSharedComputation: StakingSharedComputation,
-        stakingConstantsRepository: StakingConstantsRepository
+        stakingConstantsRepository: StakingConstantsRepository,
+        mythosSharedComputation: MythosSharedComputation,
+        mythosStakingRepository: MythosStakingRepository,
     ) = StakingEraInteractorFactory(
         roundDurationEstimator = roundDurationEstimator,
         stakingSharedComputation = stakingSharedComputation,
-        stakingConstantsRepository = stakingConstantsRepository
+        stakingConstantsRepository = stakingConstantsRepository,
+        mythosSharedComputation = mythosSharedComputation,
+        mythosStakingRepository = mythosStakingRepository
     )
 
     @Provides
@@ -174,7 +183,8 @@ class StakingFeatureModule {
         stakingStoriesDataSource: StakingStoriesDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
-        storageCache: StorageCache
+        storageCache: StorageCache,
+        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
     ): StakingRepository = StakingRepositoryImpl(
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
@@ -182,7 +192,8 @@ class StakingFeatureModule {
         stakingStoriesDataSource = stakingStoriesDataSource,
         walletConstants = walletConstants,
         chainRegistry = chainRegistry,
-        storageCache = storageCache
+        storageCache = storageCache,
+        multiChainRuntimeCallsApi = multiChainRuntimeCallsApi
     )
 
     @Provides
@@ -331,7 +342,7 @@ class StakingFeatureModule {
     fun provideKnownNovaValidators(
         novaValidatorsApi: NovaValidatorsApi,
         chainRegistry: ChainRegistry
-    ): KnownNovaValidators = RemoteKnownNovaValidators(novaValidatorsApi, chainRegistry)
+    ): ValidatorsPreferencesSource = RemoteValidatorsPreferencesSource(novaValidatorsApi, chainRegistry)
 
     @Provides
     @FeatureScope
@@ -339,8 +350,8 @@ class StakingFeatureModule {
         validatorProvider: ValidatorProvider,
         computationalCache: ComputationalCache,
         sharedState: StakingSharedState,
-        knownNovaValidators: KnownNovaValidators
-    ) = ValidatorRecommenderFactory(validatorProvider, sharedState, computationalCache, knownNovaValidators)
+        validatorsPreferencesSource: ValidatorsPreferencesSource
+    ) = ValidatorRecommenderFactory(validatorProvider, sharedState, computationalCache, validatorsPreferencesSource)
 
     @Provides
     @FeatureScope
@@ -350,14 +361,14 @@ class StakingFeatureModule {
         rewardCalculatorFactory: RewardCalculatorFactory,
         stakingConstantsRepository: StakingConstantsRepository,
         stakingSharedComputation: StakingSharedComputation,
-        knownNovaValidators: KnownNovaValidators
+        validatorsPreferencesSource: ValidatorsPreferencesSource
     ) = ValidatorProvider(
         stakingRepository = stakingRepository,
         identityRepository = identityRepository,
         rewardCalculatorFactory = rewardCalculatorFactory,
         stakingConstantsRepository = stakingConstantsRepository,
         stakingSharedComputation = stakingSharedComputation,
-        knownNovaValidators = knownNovaValidators
+        validatorsPreferencesSource = validatorsPreferencesSource
     )
 
     @Provides
@@ -691,5 +702,19 @@ class StakingFeatureModule {
         api: StakingGlobalConfigApi
     ): StakingGlobalConfigRepository {
         return RealStakingGlobalConfigRepository(api)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingConflictsValidationFactory(
+        stakingRepository: StakingRepository,
+        delegatedStakeRepository: NominationPoolDelegatedStakeRepository,
+        nominationPoolStakingRepository: NominationPoolMembersRepository
+    ): StakingTypesConflictValidationFactory {
+        return StakingTypesConflictValidationFactory(
+            stakingRepository = stakingRepository,
+            delegatedStakeRepository = delegatedStakeRepository,
+            nominationPoolStakingRepository = nominationPoolStakingRepository
+        )
     }
 }

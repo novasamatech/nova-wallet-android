@@ -4,23 +4,29 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.drawToBitmap
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
-import kotlinx.android.synthetic.main.fragment_receive.receiveFrom
 import kotlinx.android.synthetic.main.fragment_receive.receiveQrCode
 import kotlinx.android.synthetic.main.fragment_receive.receiveShare
-import kotlinx.android.synthetic.main.fragment_receive.receiveToolbar
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_receive.receiveAccount
+import kotlinx.android.synthetic.main.fragment_receive.receiveAddress
+import kotlinx.android.synthetic.main.fragment_receive.receiveBackButton
+import kotlinx.android.synthetic.main.fragment_receive.receiveChain
+import kotlinx.android.synthetic.main.fragment_receive.receiveCopyButton
+import kotlinx.android.synthetic.main.fragment_receive.receiveQrCodeContainer
+import kotlinx.android.synthetic.main.fragment_receive.receiveSubtitle
+import kotlinx.android.synthetic.main.fragment_receive.receiveTitle
+import kotlinx.android.synthetic.main.fragment_receive.receiveToolbar
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
@@ -43,16 +49,19 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
     ) = layoutInflater.inflate(R.layout.fragment_receive, container, false)
 
     override fun initViews() {
-        receiveFrom.setWholeClickListener { viewModel.recipientClicked() }
+        receiveToolbar.applyStatusBarInsets()
 
-        receiveToolbar.setHomeButtonListener { viewModel.backClicked() }
+        receiveCopyButton.setOnClickListener { viewModel.copyAddressClicked() }
 
-        receiveShare.setOnClickListener { viewModel.shareButtonClicked() }
+        receiveBackButton.setOnClickListener { viewModel.backClicked() }
 
-        receiveFrom.primaryIcon.setVisible(true)
+        receiveShare.setOnClickListener {
+            val qrBitmap = receiveQrCode.drawToBitmap()
+            viewModel.shareButtonClicked(qrBitmap)
+        }
 
-        receiveQrCode.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
-        receiveQrCode.clipToOutline = true // for round corners
+        receiveQrCodeContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
+        receiveQrCodeContainer.clipToOutline = true
     }
 
     override fun inject() {
@@ -66,18 +75,12 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
     }
 
     override fun subscribe(viewModel: ReceiveViewModel) {
-        setupExternalActions(viewModel)
-
-        viewModel.qrBitmapFlow.observe(receiveQrCode::setImageBitmap)
-
-        viewModel.receiver.observe {
-            receiveFrom.setTextIcon(it.addressModel.image)
-            receiveFrom.primaryIcon.loadTokenIcon(it.chainAssetIcon, imageLoader)
-            receiveFrom.setMessage(it.addressModel.address)
-            receiveFrom.setLabel(it.chain.name)
-        }
-
-        viewModel.toolbarTitle.observe(receiveToolbar::setTitle)
+        viewModel.chainFlow.observe(receiveChain::setChain)
+        viewModel.titleFlow.observe(receiveTitle::setText)
+        viewModel.subtitleFlow.observe(receiveSubtitle::setText)
+        viewModel.qrCodeFlow.observe(receiveQrCode::setQrModel)
+        viewModel.accountNameFlow.observe(receiveAccount::setText)
+        viewModel.addressFlow.observe(receiveAddress::setText)
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
     }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.common.utils.graph
 
-import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.MultiMapList
 import java.util.PriorityQueue
 
@@ -11,108 +10,96 @@ interface Edge<N> {
     val to: N
 }
 
+interface WeightedEdge<N> : Edge<N> {
+
+    // Smaller the better
+    val weight: Int
+}
+
 class Graph<N, E : Edge<N>>(
-    val adjacencyList: Map<N, List<E>>
+    val adjacencyList: MultiMapList<N, E>
 ) {
 
     companion object;
 }
 
-fun <N, E : Edge<N>> Graph.Companion.create(vararg multiMaps: MultiMapList<N, E>): Graph<N, E> {
-    return create(multiMaps.toList())
-}
-
-fun <N, E : Edge<N>> Graph.Companion.create(vararg adjacencyPairs: Pair<N, List<E>>): Graph<N, E> {
-    return create(adjacencyPairs.toMap())
-}
-
-fun <N, E : Edge<N>> Graph.Companion.create(multiMaps: List<MultiMapList<N, E>>): Graph<N, E> {
-    return GraphBuilder<N, E>().apply {
-        multiMaps.forEach(::addEdges)
-    }.build()
-}
-
-typealias ConnectedComponent<N> = List<N>
 typealias Path<E> = List<E>
 
+fun <N> Graph<N, *>.vertices(): Set<N> {
+    return adjacencyList.keys
+}
+
+fun Graph<*, *>.numberOfEdges(): Int {
+    return adjacencyList.values.sumOf { it.size }
+}
+
+fun interface EdgeVisitFilter<E : Edge<*>> {
+
+    suspend fun shouldVisit(edge: E, pathPredecessor: E?): Boolean
+}
+
 /**
- * Find all connected components of the graph.
- * Time Complexity is O(V+E)
- * Space Complexity is O(V)
+ * Finds all nodes reachable from [origin]
+ *
+ * Works for both directed and undirected graphs
+ *
+ * Complexity: O(V + E)
  */
-fun <N, E : Edge<N>> Graph<N, E>.findConnectedComponents(): List<ConnectedComponent<N>> {
-    val visited = mutableSetOf<N>()
-    val result = mutableListOf<ConnectedComponent<N>>()
+suspend fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(
+    origin: N,
+    nodeVisitFilter: EdgeVisitFilter<E>? = null
+): Set<N> {
+    val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 
-    for (vertex in adjacencyList.keys) {
-        if (vertex in visited) continue
+    val reachableNodes = reachabilityDfs(origin, adjacencyList, actualNodeListFilter, predecessor = null)
+    reachableNodes.removeAt(reachableNodes.indexOf(origin))
 
-        val nextConnectedComponent = connectedComponentsDfs(vertex, adjacencyList, visited)
-        result.add(nextConnectedComponent)
-    }
-
-    return result
+    return reachableNodes.toSet()
 }
 
-fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirections(): MultiMap<N, N> {
-    val connectedComponents = findConnectedComponents()
-    return connectedComponents.findAllPossibleDirections()
+fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
+    val vertices = adjacencyList[origin] ?: return false
+    return vertices.isNotEmpty()
 }
 
-fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
-    val connectedComponents = findConnectedComponents()
-    return connectedComponents.findAllPossibleDirectionsToList()
-}
+suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
+    from: N,
+    to: N,
+    limit: Int,
+    nodeVisitFilter: EdgeVisitFilter<E>? = null
+): List<Path<E>> {
+    val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 
-fun <N> List<ConnectedComponent<N>>.findAllPossibleDirections(): MultiMap<N, N> {
-    val result = mutableMapOf<N, Set<N>>()
+    data class QueueElement(val currentPath: Path<E>, val score: Int) : Comparable<QueueElement> {
 
-    forEach { connectedComponent ->
-        val asSet = connectedComponent.toSet()
-
-        asSet.forEach { node ->
-            // in the connected component every node is connected to every other except itself
-            result[node] = asSet - node
-        }
-    }
-
-    return result
-}
-
-fun <N> List<ConnectedComponent<N>>.findAllPossibleDirectionsToList(): MultiMapList<N, N> {
-    val result = mutableMapOf<N, List<N>>()
-
-    forEach { connectedComponent ->
-        connectedComponent.forEach { node ->
-            // in the connected component every node is connected to every other except itself
-            result[node] = connectedComponent - node
-        }
-    }
-
-    return result
-}
-
-fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit: Int): List<Path<E>> {
-    data class QueueElement(val currentPath: Path<E>, val nodeList: List<N>, val score: Int) : Comparable<QueueElement> {
         override fun compareTo(other: QueueElement): Int {
             return score - other.score
+        }
+
+        fun lastNode(): N {
+            return if (currentPath.isNotEmpty()) currentPath.last().to else from
+        }
+
+        operator fun contains(node: N): Boolean {
+            return currentPath.any { it.from == node || it.to == node }
         }
     }
 
     val paths = mutableListOf<Path<E>>()
 
     val count = mutableMapOf<N, Int>()
-    adjacencyList.keys.forEach { count[it] = 0 }
 
     val heap = PriorityQueue<QueueElement>()
-    heap.add(QueueElement(currentPath = emptyList(), nodeList = listOf(from), score = 0))
+    heap.add(QueueElement(currentPath = emptyList(), score = 0))
 
     while (heap.isNotEmpty() && paths.size < limit) {
         val minimumQueueElement = heap.poll()!!
-        val lastNode = minimumQueueElement.nodeList.last()
+        val lastNode = minimumQueueElement.lastNode()
 
-        val newCount = count.getValue(lastNode) + 1
+        val newCount = count.getOrElse(lastNode) { 0 } + 1
         count[lastNode] = newCount
+
+        val predecessor = minimumQueueElement.currentPath.lastOrNull()
 
         if (lastNode == to) {
             paths.add(minimumQueueElement.currentPath)
@@ -120,13 +107,13 @@ fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit:
         }
 
         if (newCount <= limit) {
-            adjacencyList.getValue(lastNode).forEach { edge ->
-                if (edge.to in minimumQueueElement.nodeList) return@forEach
+            val edges = adjacencyList[lastNode].orEmpty()
+            edges.forEach { edge ->
+                if (edge.to in minimumQueueElement || !actualNodeListFilter.shouldVisit(edge, predecessor)) return@forEach
 
                 val newElement = QueueElement(
                     currentPath = minimumQueueElement.currentPath + edge,
-                    nodeList = minimumQueueElement.nodeList + edge.to,
-                    score = minimumQueueElement.score + 1
+                    score = minimumQueueElement.score + edge.weight
                 )
 
                 heap.add(newElement)
@@ -137,18 +124,22 @@ fun <N, E : Edge<N>> Graph<N, E>.findDijkstraPathsBetween(from: N, to: N, limit:
     return paths
 }
 
-private fun <N, E : Edge<N>> connectedComponentsDfs(
+private suspend fun <N, E : Edge<N>> reachabilityDfs(
     node: N,
     adjacencyList: Map<N, List<E>>,
-    visited: MutableSet<N>,
+    nodeVisitFilter: EdgeVisitFilter<E>,
+    predecessor: E?,
+    visited: MutableSet<N> = mutableSetOf(),
     connectedComponentState: MutableList<N> = mutableListOf()
-): ConnectedComponent<N> {
+): MutableList<N> {
     visited.add(node)
     connectedComponentState.add(node)
 
-    for (edge in adjacencyList.getValue(node)) {
-        if (edge.to !in visited) {
-            connectedComponentsDfs(edge.to, adjacencyList, visited, connectedComponentState)
+    val edges = adjacencyList[node].orEmpty()
+
+    for (edge in edges) {
+        if (edge.to !in visited && nodeVisitFilter.shouldVisit(edge, predecessor)) {
+            reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, predecessor = edge, visited, connectedComponentState)
         }
     }
 

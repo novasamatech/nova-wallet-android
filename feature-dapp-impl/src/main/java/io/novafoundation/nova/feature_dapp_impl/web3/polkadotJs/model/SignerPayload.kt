@@ -18,6 +18,8 @@ sealed class SignerPayload {
         val specVersion: String,
         val tip: String,
         val transactionVersion: String,
+        val metadataHash: String?,
+        val withSignedTransaction: Boolean?,
         val signedExtensions: List<String>,
         val version: Int
     ) : SignerPayload()
@@ -60,12 +62,14 @@ fun mapPolkadotJsSignerPayloadToPolkadotPayload(signerPayload: SignerPayload): P
                 blockNumber = blockNumber,
                 era = era,
                 genesisHash = genesisHash,
+                metadataHash = metadataHash,
                 method = method,
                 nonce = nonce,
                 specVersion = specVersion,
                 tip = tip,
                 transactionVersion = transactionVersion,
                 signedExtensions = signedExtensions,
+                withSignedTransaction = withSignedTransaction,
                 version = version
             )
         }

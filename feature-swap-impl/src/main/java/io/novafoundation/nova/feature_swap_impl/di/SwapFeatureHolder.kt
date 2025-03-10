@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
+import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -22,6 +23,7 @@ class SwapFeatureHolder @Inject constructor(
             .commonApi(commonApi())
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
+            .swapCoreApi(getFeature(SwapCoreApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))

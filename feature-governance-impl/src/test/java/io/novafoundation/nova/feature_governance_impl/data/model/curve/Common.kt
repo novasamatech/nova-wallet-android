@@ -12,11 +12,16 @@ import java.math.MathContext
 val Int.percent
     get() = this.toBigDecimal().percentageToFraction()
 
-fun BigDecimal.lessEpsilon() = this - BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision)
-
-fun VotingCurve.runTests(tests: List<Pair<Perbill, Perbill>>) {
+fun VotingCurve.runThresholdTests(tests: List<Pair<Perbill, Perbill>>) {
     tests.forEach { (x, expectedY) ->
         val y = threshold(x)
         Assert.assertTrue("Expected: ${expectedY}, got: ${y}", expectedY hasTheSaveValueAs y)
+    }
+}
+
+fun VotingCurve.runDelayTests(tests: List<Pair<Perbill, Perbill>>) {
+    tests.forEach { (x, expectedY) ->
+        val y = delay(x)
+        Assert.assertTrue("Expected $expectedY for input $x but got: $y", expectedY hasTheSaveValueAs y)
     }
 }

@@ -6,13 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_dapp_impl.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
+import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchViewModel
@@ -40,15 +43,21 @@ class DAppSearchModule {
         router: DAppRouter,
         resourceManager: ResourceManager,
         interactor: SearchDappInteractor,
+        dappInteractor: DappInteractor,
         searchResponder: DAppSearchCommunicator,
-        payload: SearchPayload
+        payload: SearchPayload,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        appLinksProvider: AppLinksProvider
     ): ViewModel {
         return DAppSearchViewModel(
             router = router,
             resourceManager = resourceManager,
             interactor = interactor,
             dAppSearchResponder = searchResponder,
-            payload = payload
+            payload = payload,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            appLinksProvider = appLinksProvider,
+            dappInteractor = dappInteractor
         )
     }
 }

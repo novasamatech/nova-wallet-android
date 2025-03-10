@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwapRouteView">
+        <attr name="SwapRouteView_displayChainName" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="SwapRouteTableCellView">
+        <attr name="SwapRouteView_displayChainName" />
+    </declare-styleable>
+</resources>

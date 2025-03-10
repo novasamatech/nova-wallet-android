@@ -59,8 +59,16 @@ class PreferencesImpl(
         sharedPreferences.edit().putLong(field, value).apply()
     }
 
+    override fun putStringSet(field: String, value: Set<String>?) {
+        sharedPreferences.edit().putStringSet(field, value).apply()
+    }
+
     override fun getLong(field: String, defaultValue: Long): Long {
         return sharedPreferences.getLong(field, defaultValue)
+    }
+
+    override fun getStringSet(field: String): Set<String> {
+        return sharedPreferences.getStringSet(field, emptySet()) ?: emptySet()
     }
 
     override fun getCurrentLanguage(): Language? {
@@ -99,6 +107,18 @@ class PreferencesImpl(
         }
     }
 
+    override fun stringSetFlow(field: String, initialValueProducer: InitialValueProducer<Set<String>>?): Flow<Set<String>?> {
+        return keyFlow(field).map {
+            if (contains(field)) {
+                getStringSet(field)
+            } else {
+                val initialValue = initialValueProducer?.invoke()
+                putStringSet(field, initialValue)
+                initialValue
+            }
+        }
+    }
+
     override fun keyFlow(key: String): Flow<String> = keysFlow(key)
         .map { it.first() }
 
@@ -107,7 +127,7 @@ class PreferencesImpl(
 
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key in keys) {
-                trySend(listOf(key))
+                trySend(listOfNotNull(key))
             }
         }
 

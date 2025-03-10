@@ -15,6 +15,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config_dev.json\""
+        buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators_dev.json\""
     }
 
     buildTypes {
@@ -23,6 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config.json\""
+            buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators.json\""
         }
     }
 
@@ -35,6 +37,7 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+    namespace 'io.novafoundation.nova.feature_staking_impl'
 }
 
 dependencies {

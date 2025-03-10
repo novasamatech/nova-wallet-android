@@ -11,9 +11,9 @@ fun BaseFragmentMixin<*>.setupRemoveFavouritesConfirmation(awaitableMixin: Confi
     awaitableMixin.awaitableActionLiveData.observeEvent {
         warningDialog(
             context = providedContext,
-            onConfirm = { it.onSuccess(Unit) },
-            confirmTextRes = R.string.common_remove,
-            onCancel = it.onCancel
+            onPositiveClick = { it.onSuccess(Unit) },
+            positiveTextRes = R.string.common_remove,
+            onNegativeClick = it.onCancel
         ) {
             setTitle(R.string.dapp_favourites_remove_title)
 

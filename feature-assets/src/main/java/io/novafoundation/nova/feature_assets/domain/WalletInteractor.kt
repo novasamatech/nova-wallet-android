@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_assets.domain
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_assets.domain.common.AssetGroup
+import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
+import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_nft_api.data.repository.NftSyncTrigger
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
@@ -32,6 +34,8 @@ interface WalletInteractor {
 
     suspend fun syncChainNfts(metaAccount: MetaAccount, chain: Chain)
 
+    fun chainFlow(chainId: ChainId): Flow<Chain>
+
     fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset>
 
     fun assetFlow(chainAsset: Chain.Asset): Flow<Asset>
@@ -57,8 +61,13 @@ interface WalletInteractor {
         filters: Set<TransactionFilter>
     ): Result<DataPage<Operation>>
 
-    suspend fun groupAssets(
+    suspend fun groupAssetsByNetwork(
         assets: List<Asset>,
         externalBalances: List<ExternalBalance>
-    ): Map<AssetGroup, List<AssetWithOffChainBalance>>
+    ): Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>
+
+    suspend fun groupAssetsByToken(
+        assets: List<Asset>,
+        externalBalances: List<ExternalBalance>
+    ): Map<TokenAssetGroup, List<AssetWithNetwork>>
 }

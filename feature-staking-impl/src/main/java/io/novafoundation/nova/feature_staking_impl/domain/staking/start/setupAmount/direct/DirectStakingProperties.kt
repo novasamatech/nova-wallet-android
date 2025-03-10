@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.direct
 
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.asset
@@ -9,6 +11,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConsta
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.minStake
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidation.ConflictingStakingType
+import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.ValidatorRecommenderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure
@@ -33,6 +37,8 @@ class DirectStakingPropertiesFactory(
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingRepository: StakingRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
+    private val stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : SingleStakingPropertiesFactory {
 
     override fun createProperties(scope: CoroutineScope, stakingOption: StakingOption): SingleStakingProperties {
@@ -43,7 +49,9 @@ class DirectStakingPropertiesFactory(
             scope = scope,
             stakingSharedComputation = stakingSharedComputation,
             stakingRepository = stakingRepository,
-            stakingConstantsRepository = stakingConstantsRepository
+            stakingConstantsRepository = stakingConstantsRepository,
+            stakingTypesConflictValidationFactory = stakingTypesConflictValidationFactory,
+            selectedAccountUseCase = selectedAccountUseCase
         )
     }
 }
@@ -56,6 +64,8 @@ private class DirectStakingProperties(
     private val stakingSharedComputation: StakingSharedComputation,
     private val stakingRepository: StakingRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
+    private val stakingTypesConflictValidationFactory: StakingTypesConflictValidationFactory,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : SingleStakingProperties {
 
     override val stakingType: Chain.Asset.StakingType = stakingOption.stakingType
@@ -64,8 +74,8 @@ private class DirectStakingProperties(
         return asset.freeInPlanks
     }
 
-    override suspend fun maximumToStake(asset: Asset, fee: Balance): Balance {
-        return availableBalance(asset) - fee
+    override suspend fun maximumToStake(asset: Asset): Balance {
+        return availableBalance(asset)
     }
 
     override val recommendation: SingleStakingRecommendation = DirectStakingRecommendation(
@@ -77,6 +87,8 @@ private class DirectStakingProperties(
     )
 
     override val validationSystem: StartMultiStakingValidationSystem = ValidationSystem {
+        noConflictingStaking()
+
         maximumNominatorsReached()
 
         positiveBond()
@@ -88,6 +100,15 @@ private class DirectStakingProperties(
 
     override suspend fun minStake(): Balance {
         return stakingSharedComputation.minStake(stakingOption.chain.id, scope)
+    }
+
+    private fun StartMultiStakingValidationSystemBuilder.noConflictingStaking() {
+        stakingTypesConflictValidationFactory.noStakingTypesConflict(
+            accountId = { selectedAccountUseCase.getSelectedMetaAccount().requireAccountIdIn(it.recommendableSelection.selection.stakingOption.chain) },
+            chainId = { it.asset.token.configuration.chainId },
+            error = { StartMultiStakingValidationFailure.HasConflictingStakingType },
+            checkStakingTypeNotPresent = ConflictingStakingType.POOLS
+        )
     }
 
     private fun StartMultiStakingValidationSystemBuilder.enoughForMinimumStake() {

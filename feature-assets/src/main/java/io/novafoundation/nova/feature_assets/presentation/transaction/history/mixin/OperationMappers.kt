@@ -5,12 +5,15 @@ import android.text.TextUtils
 import android.text.style.ImageSpan
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.data.model.AssetIconMode
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.model.AmountParcelModel
 import io.novafoundation.nova.feature_assets.presentation.model.ChainAssetWithAmountParcelModel
@@ -80,7 +83,7 @@ private fun mapStatusToStatusAppearance(status: Operation.Status): OperationStat
 
 @DrawableRes
 private fun transferDirectionIcon(isIncome: Boolean): Int {
-    return if (isIncome) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
+    return if (isIncome) R.drawable.ic_receive_history else R.drawable.ic_send_history
 }
 
 @ColorRes
@@ -212,6 +215,7 @@ fun mapOperationToOperationModel(
     operation: Operation,
     nameIdentifier: AddressDisplayUseCase.Identifier,
     resourceManager: ResourceManager,
+    assetIconProvider: AssetIconProvider
 ): OperationModel {
     val statusAppearance = mapStatusToStatusAppearance(operation.status)
     val formattedTime = resourceManager.formatTime(operation.time)
@@ -230,7 +234,7 @@ fun mapOperationToOperationModel(
                     subHeader = resourceManager.getString(subtitleRes),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
                     statusAppearance = statusAppearance,
-                    operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_filled).asIcon(),
+                    operationIcon = resourceManager.getDrawable(R.drawable.ic_staking_history).asIcon(),
                 )
             }
 
@@ -273,7 +277,7 @@ fun mapOperationToOperationModel(
                     subHeader = subHeader.value,
                     subHeaderEllipsize = subHeader.elipsize,
                     statusAppearance = statusAppearance,
-                    operationIcon = operation.chainAsset.iconUrl?.asIcon() ?: R.drawable.ic_nova.asIcon()
+                    operationIcon = assetIconProvider.getAssetIconOrFallback(operation.chainAsset, AssetIconMode.WHITE)
                 )
             }
 
@@ -290,7 +294,7 @@ fun mapOperationToOperationModel(
                     statusAppearance = statusAppearance,
                     subHeader = operationType.formatSubHeader(resourceManager),
                     subHeaderEllipsize = TextUtils.TruncateAt.END,
-                    operationIcon = R.drawable.ic_flip_swap.asIcon()
+                    operationIcon = R.drawable.ic_swap_history.asIcon()
                 )
             }
         }
@@ -359,7 +363,7 @@ suspend fun mapOperationToParcel(
                         time = time,
                         amount = amount,
                         type = resourceManager.getString(typeRes),
-                        era = resourceManager.getString(R.string.staking_era_index_no_prefix, rewardKind.era),
+                        era = rewardKind.era?.let { resourceManager.getString(R.string.staking_era_index_no_prefix, it) },
                         validator = rewardKind.validator,
                         statusAppearance = OperationStatusAppearance.COMPLETED
                     )

@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork
 import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
@@ -134,17 +135,24 @@ class ChainRegistry(
         chainDao.setConnectionState(chainId, connectionState)
     }
 
-    suspend fun setAutoBalanceEnabled(chainId: ChainId, enabled: Boolean) {
-        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, enabled, null))
+    suspend fun setWssNodeSelectionStrategy(chainId: String, strategy: Chain.Nodes.NodeSelectionStrategy) {
+        return when (strategy) {
+            Chain.Nodes.NodeSelectionStrategy.AutoBalance -> enableAutoBalance(chainId)
+            is Chain.Nodes.NodeSelectionStrategy.SelectedNode -> setSelectedNode(chainId, strategy.unformattedNodeUrl)
+        }
     }
 
-    suspend fun setDefaultNode(chainId: ChainId, nodeUrl: String) {
+    private suspend fun enableAutoBalance(chainId: ChainId) {
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, autoBalanceEnabled = false, null))
+    }
+
+    private suspend fun setSelectedNode(chainId: ChainId, unformattedNodeUrl: String) {
         val chain = getChain(chainId)
 
-        val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == nodeUrl }
-        require(chainSupportsNode) { "Node with url $nodeUrl is not found for chain $chainId" }
+        val chainSupportsNode = chain.nodes.nodes.any { it.unformattedUrl == unformattedNodeUrl }
+        require(chainSupportsNode) { "Node with url $unformattedNodeUrl is not found for chain $chainId" }
 
-        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, false, nodeUrl))
+        chainDao.setNodePreferences(NodeSelectionPreferencesLocal(chainId, false, unformattedNodeUrl))
     }
 
     private suspend fun requireConnectionStateAtLeast(chainId: ChainId, state: ConnectionState) {
@@ -298,6 +306,12 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
     }
 }
 
+suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeContext.() -> R): R {
+    return with(RuntimeContext(getRuntime(chainId))) {
+        action()
+    }
+}
+
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List<Chain> = currentChains.first().filter(predicate)
 
@@ -357,6 +371,11 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
     val addressPrefix = evmChainIdHex.removeHexPrefix().toIntOrNull(radix = 16) ?: return null
 
     return findEvmChain(addressPrefix)
+}
+
+suspend fun ChainRegistry.findRelayChainOrThrow(chainId: ChainId): ChainId {
+    val chain = getChain(chainId)
+    return chain.parentId ?: chainId
 }
 
 fun ChainRegistry.enabledChainsFlow() = currentChains

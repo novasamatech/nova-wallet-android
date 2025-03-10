@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_assets.presentation.transaction.detail.ex
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.model.AssetIconMode
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
@@ -28,6 +31,7 @@ class ExtrinsicDetailViewModel(
     val operation: OperationParcelizeModel.Extrinsic,
     private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel(),
     ExternalActions by externalActions {
 
@@ -52,7 +56,7 @@ class ExtrinsicDetailViewModel(
         .share()
 
     val operationIcon = flowOf {
-        chainAsset().iconUrl
+        assetIconProvider.getAssetIconOrFallback(chainAsset().icon, AssetIconMode.WHITE)
     }.shareInBackground()
 
     val content = flowOf {
@@ -91,10 +95,12 @@ class ExtrinsicDetailViewModel(
                 label = blockEntry.label,
                 addressModel = getIcon(blockEntry.address),
             )
+
             is ExtrinsicContentParcel.BlockEntry.LabeledValue -> ExtrinsicContentModel.BlockEntry.LabeledValue(
                 label = blockEntry.label,
                 value = blockEntry.value
             )
+
             is ExtrinsicContentParcel.BlockEntry.TransactionId -> ExtrinsicContentModel.BlockEntry.TransactionId(
                 label = resourceManager.getString(R.string.common_transaction_id),
                 hash = blockEntry.hash

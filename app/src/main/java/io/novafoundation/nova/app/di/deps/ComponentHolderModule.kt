@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
+import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
+import io.novafoundation.nova.feature_banners_impl.di.BannersFeatureHolder
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_buy_impl.di.BuyFeatureHolder
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
@@ -28,6 +30,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureHolder
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
@@ -51,6 +55,8 @@ import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureHolder
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureHolder
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_core.di.SwapCoreHolder
+import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureHolder
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureHolder
@@ -244,7 +250,25 @@ interface ComponentHolderModule {
 
     @ApplicationScope
     @Binds
+    @ClassKey(DeepLinkBuildingFeatureApi::class)
+    @IntoMap
+    fun provideDeepLinkBuildingFeatureHolder(holder: DeepLinkBuildingFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
     @ClassKey(CloudBackupFeatureApi::class)
     @IntoMap
     fun provideCloudBackupFeatureHolder(holder: CloudBackupFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(SwapCoreApi::class)
+    @IntoMap
+    fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(BannersFeatureApi::class)
+    @IntoMap
+    fun provideBannersFeatureApi(holder: BannersFeatureHolder): FeatureApiHolder
 }

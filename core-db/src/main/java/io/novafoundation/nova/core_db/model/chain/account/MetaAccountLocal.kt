@@ -7,6 +7,11 @@ import androidx.room.PrimaryKey
 import io.novafoundation.nova.core.model.CryptoType
 import java.util.UUID
 
+/*
+    TODO: on next migration please add following changes:
+     - Foreign key for parentMetaId to remove proxy meta account automatically when proxied is deleted
+     - Foreign key to ProxyAccountLocal to remove proxies meta accounts automatically when chain is deleted
+ */
 @Entity(
     tableName = MetaAccountLocal.TABLE_NAME,
     indices = [

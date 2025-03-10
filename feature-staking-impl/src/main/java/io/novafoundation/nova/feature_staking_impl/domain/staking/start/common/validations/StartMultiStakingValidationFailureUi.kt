@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations
 
+import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
@@ -10,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.copyWith
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.AmountLessThanMinimum
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.AvailableBalanceGap
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.HasConflictingStakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.InactivePool
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.MaxNominatorsReached
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.StartMultiStakingValidationFailure.NonPositiveAmount
@@ -49,7 +51,7 @@ fun handleStartMultiStakingValidationFailure(
         NonPositiveAmount -> resourceManager.zeroAmount().asDefault()
 
         is AvailableBalanceGap -> {
-            val lockDisplay = mapBalanceIdToUi(resourceManager, reason.biggestLockId)
+            val lockDisplay = mapBalanceIdToUi(resourceManager, reason.biggestLockId.value)
             val currentMaxAvailable = reason.currentMaxAvailable.formatPlanks(reason.chainAsset)
             val alternativeMinStake = reason.alternativeMinStake.formatPlanks(reason.chainAsset)
 
@@ -81,5 +83,14 @@ fun handleStartMultiStakingValidationFailure(
             },
             updateAmountInUi = updateAmountInUi
         )
+
+        is HasConflictingStakingType -> handleStartStakingConflictingTypesFailure(resourceManager).asDefault()
     }
+}
+
+private fun handleStartStakingConflictingTypesFailure(
+    resourceManager: ResourceManager
+): TitleAndMessage {
+    return resourceManager.getString(R.string.setup_staking_conflict_title) to
+        resourceManager.getString(R.string.setup_staking_conflict_message)
 }

@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.model.mapBalanceLockFromLocal
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -14,15 +15,20 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class RealBalanceLocksRepository(
+    // TODO refactoring - repository should not depend on other repository. MetaId should be passed to repository arguments
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val lockDao: LockDao
 ) : BalanceLocksRepository {
 
-    override suspend fun observeBalanceLocks(chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        return lockDao.observeBalanceLocks(metaAccount.id, chain.id, chainAsset.id)
+    override fun observeBalanceLocks(metaId: Long, chain: Chain, chainAsset: Chain.Asset): Flow<List<BalanceLock>> {
+        return lockDao.observeBalanceLocks(metaId, chain.id, chainAsset.id)
             .mapList { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
+    }
+
+    override suspend fun getBalanceLocks(metaId: Long, chainAsset: Chain.Asset): List<BalanceLock> {
+        return lockDao.getBalanceLocks(metaId, chainAsset.chainId, chainAsset.id)
+            .map { lock -> mapBalanceLockFromLocal(chainAsset, lock) }
     }
 
     override suspend fun getBiggestLock(chain: Chain, chainAsset: Chain.Asset): BalanceLock? {
@@ -32,10 +38,10 @@ class RealBalanceLocksRepository(
             mapBalanceLockFromLocal(chainAsset, it)
         }
     }
-    override suspend fun observeBalanceLock(chainAsset: Chain.Asset, lockId: String): Flow<BalanceLock?> {
+    override suspend fun observeBalanceLock(chainAsset: Chain.Asset, lockId: BalanceLockId): Flow<BalanceLock?> {
         val metaAccount = accountRepository.getSelectedMetaAccount()
 
-        return lockDao.observeBalanceLock(metaAccount.id, chainAsset.chainId, chainAsset.id, lockId).map { lockLocal ->
+        return lockDao.observeBalanceLock(metaAccount.id, chainAsset.chainId, chainAsset.id, lockId.value).map { lockLocal ->
             lockLocal?.let { mapBalanceLockFromLocal(chainAsset, it) }
         }
     }

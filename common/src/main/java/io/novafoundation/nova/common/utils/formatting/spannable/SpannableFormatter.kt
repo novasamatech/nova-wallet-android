@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.utils.formatting.spannable
 
 import android.text.SpannedString
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter.fill
 import java.util.regex.Pattern
 
 /**

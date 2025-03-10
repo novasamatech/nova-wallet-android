@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Đường dẫn dẫn xuất của bạn chứa các ký hiệu không được hỗ trợ hoặc có cấu trúc không chính xác</string>
     <string name="account_invalid_derivation_path_title">Đường dẫn dẫn xuất không hợp lệ</string>
     <string name="account_json_file">Tệp JSON</string>
-    <string name="account_ledger_generic_import_start_step_1">Đảm bảo <font color="#FFFFFF">ứng dụng Generic được cài đặt</font> vào thiết bị Ledger của bạn bằng cách sử dụng ứng dụng Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Mở ứng dụng Generic</font> trên thiết bị Ledger của bạn</string>
+    <string name="account_ledger_generic_import_start_step_1">Đảm bảo %s vào thiết bị Ledger của bạn bằng cách sử dụng ứng dụng Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Ứng dụng Polkadot đã được cài đặt</string>
+    <string name="account_ledger_generic_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Mở ứng dụng Polkadot</string>
     <string name="account_ledger_import_fill_description">Đảm bảo ứng dụng mạng được cài đặt vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live. Mở ứng dụng mạng trên thiết bị Ledger của bạn.</string>
     <string name="account_ledger_import_fill_disabled_hint">Thêm ít nhất một tài khoản</string>
     <string name="account_ledger_import_fill_title">Thêm tài khoản vào ví của bạn</string>
     <string name="account_ledger_import_start_guide">Hướng dẫn kết nối Bluetooth chính thức của Ledger</string>
-    <string name="account_ledger_import_start_step_1">Đảm bảo <font color="#FFFFFF">ứng dụng mạng được cài đặt</font> vào thiết bị Ledger của bạn bằng cách sử dụng ứng dụng Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Mở ứng dụng</font> trên thiết bị Ledger của bạn</string>
-    <string name="account_ledger_import_start_step_3">Cho phép Nova Wallet <font color="#FFFFFF">truy cập Bluetooth và Vị trí</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Chọn tài khoản</font> để thêm vào ví</string>
+    <string name="account_ledger_import_start_step_1">Đảm bảo %s vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">Ứng dụng mạng đã được cài đặt</string>
+    <string name="account_ledger_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Mở ứng dụng mạng</string>
+    <string name="account_ledger_import_start_step_3">Cho phép Nova Wallet %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth và Vị trí</string>
+    <string name="account_ledger_import_start_step_4">%s để thêm vào ví</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Chọn tài khoản</string>
     <string name="account_ledger_import_start_title">Kết nối Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Để ký kết các hoạt động và di chuyển các tài khoản của bạn sang ứng dụng Generic Ledger mới, cài đặt và mở ứng dụng Migration. Ứng dụng Ledger (Legacy) và Migration Ledger sẽ không còn được hỗ trợ trong tương lai.</string>
     <string name="account_ledger_legacy_warning_title">Ứng dụng Ledger mới đã được phát hành</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Ứng dụng Migration sẽ không còn khả dụng trong tương lai gần. Sử dụng nó để di chuyển các tài khoản của bạn sang ứng dụng Ledger mới để tránh mất tiền của bạn.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Ứng dụng Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Hãy bật Bluetooth trong cài đặt điện thoại của bạn và thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_ledger_select_device_title">Chọn thiết bị Ledger của bạn</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Đây là các tài khoản của bạn</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Mã QR không hợp lệ, hãy chắc chắn rằng bạn đang quét mã QR từ %s</string>
     <string name="account_parity_signer_import_start_select_top">Hãy chắc chắn rằng bạn đã chọn cái đầu tiên</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer sẽ cung cấp cho bạn <font color="#FFFFFF">mã QR để quét</font></string>
+    <string name="account_parity_signer_import_start_step_1">ứng dụng %s trên điện thoại thông minh của bạn</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">mở Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s bạn muốn thêm vào Ví Nova</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Đi tới tab \'Keys\'. Chọn seed, sau đó tài khoản</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer sẽ cung cấp cho bạn %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">quét mã QR</string>
     <string name="account_parity_signer_import_start_title">Thêm ví từ %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s không hỗ trợ ký các thông báo tùy ý — chỉ hỗ trợ giao dịch</string>
     <string name="account_parity_signer_not_supported_title">Không hỗ trợ ký</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Ký với %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Hãy chú ý, tên đường dẫn dẫn xuất nên để trống</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Mở ứng dụng Polkadot Vault</font> trên điện thoại thông minh của bạn</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Chuyển đến tab \"Key Sets\".</font> Chọn bộ khóa, Mạng và sau đó chọn tài khoản bạn muốn thêm vào Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault sẽ cung cấp cho bạn <font color="#FFFFFF">mã QR để quét</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">ứng dụng %s trên điện thoại thông minh của bạn</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Mở Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Chọn bộ khóa, Mạng và sau đó chọn tài khoản bạn muốn thêm vào Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Đi tới tab \'Key Sets\'.</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault sẽ cung cấp cho bạn %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">quét mã QR</string>
     <string name="account_private_key">Khoá riêng tư</string>
     <string name="account_proxieds">Được ủy quyền cho bạn (Proxieds)</string>
     <string name="account_proxy_type_any">Bất kỳ</string>
@@ -150,7 +162,9 @@
     <string name="accounts_change_chain_account">Thay đổi tài khoản %s</string>
     <string name="accounts_change_chain_secrets">Thay đổi tài khoản</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">Thêm node tùy chỉnh</string>
     <string name="add_delegation_missing_account_message">Bạn cần thêm tài khoản %s vào ví để ủy quyền</string>
+    <string name="add_network_title">Nhập chi tiết mạng</string>
     <string name="add_proxy_confirmation_delegate_to">Ủy quyền cho</string>
     <string name="add_proxy_confirmation_delegating_account">Tài khoản ủy quyền</string>
     <string name="add_proxy_confirmation_delegating_wallet">Ví ủy quyền</string>
@@ -158,6 +172,11 @@
     <string name="add_proxy_deposit_description_message">Số tiền ký gửi sẽ được giữ nguyên trên tài khoản của bạn cho đến khi proxy bị xóa.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Bạn đã đạt đến giới hạn %s proxy được thêm vào %s. Xóa proxy để thêm proxy mới.</string>
     <string name="add_proxy_maximum_reached_error_title">Đã đạt đến số lượng proxy tối đa</string>
+    <string name="added_networks_empty_placeholder">Các mạng tùy chỉnh đã thêm\nsẽ xuất hiện ở đây</string>
+    <string name="appearance_colored_icon_title">Đã tô màu</string>
+    <string name="appearance_title">Giao diện</string>
+    <string name="appearance_token_assets_title">biểu tượng token</string>
+    <string name="appearance_white_icon_title">Trắng</string>
     <string name="asset_add_evm_token_already_exist_message">Địa chỉ hợp đồng đã nhập có sẵn trong Nova là token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">Địa chỉ hợp đồng đã nhập có sẵn trong Nova là token %s. Bạn có chắc chắn muốn thay đổi không?</string>
     <string name="asset_add_evm_token_already_exist_title">Token này đã tồn tại</string>
@@ -170,10 +189,11 @@
     <string name="asset_add_token_enter_contract_address">Nhập địa chỉ hợp đồng</string>
     <string name="asset_add_token_enter_decimals">Nhập số thập phân</string>
     <string name="asset_add_token_enter_symbol">Nhập ký hiệu</string>
+    <string name="asset_view_networks">Mạng</string>
+    <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Thêm token</string>
     <string name="assets_add_token_enter_info_address_label">Địa chỉ hợp đồng</string>
     <string name="assets_add_token_enter_info_decimals_label">Số thập phân</string>
-    <string name="assets_add_token_enter_info_price_label">Liên kết Coingecko cho thông tin giá (Tùy chọn)</string>
     <string name="assets_add_token_enter_info_symbol_label">Ký hiệu</string>
     <string name="assets_add_token_enter_info_title">Nhập chi tiết token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Chọn mạng để thêm token ERC-20</string>
@@ -193,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger không hỗ trợ token này</string>
     <string name="assets_search_hint">Tìm kiếm theo mạng hoặc token</string>
     <string name="assets_search_placeholder">Không tìm thấy mạng hoặc token nào với\ntên đã nhập</string>
+    <string name="assets_search_token_hint">Tìm kiếm theo token</string>
     <string name="assets_select_send_your_wallets">Ví của bạn</string>
     <string name="assets_send_flow_placeholder">Bạn không có token để gửi.\nMua hoặc Nhận token vào\ntài khoản của bạn.</string>
     <string name="assets_swap_flow_pay_title">Token để thanh toán</string>
@@ -220,9 +241,13 @@
     <string name="backup_settings_toolbar_title">Sao lưu</string>
     <string name="backup_title">Sao lưu</string>
     <string name="biometric_auth_title">Xác thực sinh trắc học</string>
+    <string name="browser_tabs_close_all">Đóng tất cả</string>
     <string name="buy_completed">Mua hàng đã được khởi tạo! Vui lòng đợi tối đa 60 phút. Bạn có thể theo dõi trạng thái trong email.</string>
+    <string name="buy_network_flow_title">Chọn mạng để mua %s</string>
     <string name="buy_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
     <string name="buy_provider_open_confirmation_title">Tiếp tục trong trình duyệt?</string>
+    <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
+    <string name="chain_network_management_enabling">Kích hoạt kết nối</string>
     <string name="change_cloud_backup_password_subtitle">Vui lòng nhập mật khẩu sẽ được sử dụng để khôi phục ví của bạn từ sao lưu đám mây. Mật khẩu này không thể khôi phục trong tương lai, vì vậy hãy đảm bảo ghi nhớ nó!</string>
     <string name="change_cloud_backup_password_title">Cập nhật mật khẩu sao lưu</string>
     <string name="choose_amount_asset">Tài sản</string>
@@ -233,6 +258,8 @@
     <string name="choose_amount_fee">Phí chuyển khoản</string>
     <string name="choose_amount_network_error">Mạng không phản hồi</string>
     <string name="choose_amount_to">Đến</string>
+    <string name="close_dapp_tabs_message">Tất cả các tab mở trong trình duyệt DApp sẽ bị đóng.</string>
+    <string name="close_dapp_tabs_title">Đóng tất cả DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s và nhớ luôn giữ chúng ngoại tuyến để khôi phục bất cứ lúc nào. Bạn có thể thực hiện việc này trong Cài đặt Sao lưu.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Vui lòng viết ra tất cả Passphrases của ví trước khi tiếp tục</string>
     <string name="cloud_backup_delete_action_title">Sao lưu sẽ bị xóa khỏi Google Drive</string>
@@ -280,6 +307,7 @@
     <string name="common_active">Hoạt động</string>
     <string name="common_add">Thêm</string>
     <string name="common_add_delegation">Thêm ủy quyền</string>
+    <string name="common_add_network">Thêm mạng</string>
     <string name="common_address">Địa chỉ</string>
     <string name="common_advanced">Nâng cao</string>
     <string name="common_all">Tất cả</string>
@@ -316,6 +344,8 @@
     <string name="common_confirm_title">Xác nhận</string>
     <string name="common_confirmation_title">Bạn có chắc chắn?</string>
     <string name="common_confirmed">Đã xác nhận</string>
+    <string name="common_connected_ms">%d ms</string>
+    <string name="common_connecting">đang kết nối...</string>
     <string name="common_connection_error_message">Vui lòng kiểm tra kết nối của bạn hoặc thử lại sau</string>
     <string name="common_connection_error_title">Kết nối thất bại</string>
     <string name="common_continue">Tiếp tục</string>
@@ -325,9 +355,11 @@
     <string name="common_crypto_type">Loại khóa cặp</string>
     <string name="common_date">Ngày</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s và %s</string>
+    <string name="common_delete">Xóa</string>
     <string name="common_details">Chi tiết</string>
     <string name="common_disabled">Đã tắt</string>
     <string name="common_disconnect">Ngắt kết nối</string>
+    <string name="common_do_not_close_app">Không đóng ứng dụng!</string>
     <string name="common_done">Hoàn thành</string>
     <string name="common_dont_show_again">Không hiển thị lại điều này</string>
     <string name="common_edit">Chỉnh sửa</string>
@@ -336,17 +368,21 @@
     <string name="common_enable">Kích hoạt</string>
     <string name="common_enter_address">Nhập địa chỉ...</string>
     <string name="common_enter_amount">Nhập số lượng...</string>
+    <string name="common_enter_details">Nhập chi tiết</string>
     <string name="common_enter_password">Nhập mật khẩu</string>
     <string name="common_error_general_title">Lỗi</string>
     <string name="common_error_not_enough_tokens">Không đủ token</string>
     <string name="common_event">Sự kiện</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">Địa chỉ EVM</string>
     <string name="common_existential_warning_message_v2_2_0">Tài khoản của bạn sẽ bị xóa khỏi blockchain sau thao tác này do nó làm tổng số dư thấp hơn mức tối thiểu</string>
     <string name="common_existential_warning_title">Thao tác sẽ xóa tài khoản</string>
     <string name="common_expired">Hết hạn</string>
     <string name="common_explore">Khám phá</string>
+    <string name="common_failed">Thất bại</string>
     <string name="common_fee_changed_message" formatted="false">Phí mạng ước tính %s cao hơn nhiều so với phí mạng mặc định (%s). Điều này có thể do tắc nghẽn mạng tạm thời. Bạn có thể làm mới để đợi phí mạng thấp hơn.</string>
     <string name="common_fee_changed_title">Phí mạng quá cao</string>
+    <string name="common_fee_with_label">Phí: %s</string>
     <string name="common_filter_sort_header">Sắp xếp theo:</string>
     <string name="common_filters">Bộ lọc</string>
     <string name="common_find_out_more">Tìm hiểu thêm</string>
@@ -377,6 +413,7 @@
         <item quantity="other">%d phút</item>
     </plurals>
     <string name="common_missing_account_title">tài khoản %s đang thiếu</string>
+    <string name="common_modify">Chỉnh sửa</string>
     <string name="common_module">Mô đun</string>
     <string name="common_network">Mạng</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -396,6 +433,7 @@
     <string name="common_not_available">Không khả dụng</string>
     <string name="common_not_enough_funds_message">Xin lỗi, bạn không có đủ tiền để trả phí mạng.</string>
     <string name="common_not_enough_funds_title">Số dư không đủ</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">Bạn không có đủ số dư để trả phí mạng %s. Số dư hiện tại là %s</string>
     <string name="common_not_now">Không phải bây giờ</string>
     <string name="common_off">Tắt</string>
     <string name="common_ok">OK</string>
@@ -435,7 +473,12 @@
     <string name="common_search">Tìm kiếm</string>
     <string name="common_search_placeholder_default">Kết quả tìm kiếm sẽ hiển thị ở đây</string>
     <string name="common_search_results_number">Kết quả tìm kiếm: %d</string>
+    <string name="common_sec">giây</string>
+    <plurals name="common_seconds_format">
+        <item quantity="other">%d giây</item>
+    </plurals>
     <string name="common_secret_derivation_path">Đường dẫn dẫn xuất bí mật</string>
+    <string name="common_see_all">Xem tất cả</string>
     <string name="common_settings">Cài đặt</string>
     <string name="common_share">Chia sẻ</string>
     <string name="common_sign_in">Đăng nhập</string>
@@ -448,14 +491,17 @@
     <string name="common_something_went_wrong_title">Có sự cố</string>
     <string name="common_sort_by">Sắp xếp theo</string>
     <string name="common_status">Trạng thái</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Địa chỉ Substrate</string>
     <string name="common_tap_to_reveal_title">Nhấn để hiển thị</string>
     <string name="common_terms_and_conditions_formatting">Điều khoản và Điều kiện</string>
+    <string name="common_testnet">Testnet</string>
     <string name="common_time_left">Thời gian còn lại</string>
     <string name="common_title">Tiêu đề</string>
     <string name="common_to_settings">Mở Cài đặt</string>
     <string name="common_too_small_balance_title">Số dư của bạn quá nhỏ</string>
     <string name="common_total">Tổng cộng</string>
+    <string name="common_total_fee">Tổng phí</string>
     <string name="common_transaction_id">ID Giao dịch</string>
     <string name="common_transaction_submitted">Giao dịch đã được gửi</string>
     <string name="common_try_again">Thử lại</string>
@@ -468,6 +514,7 @@
     <string name="common_unlimited">Không giới hạn</string>
     <string name="common_update">Cập nhật</string>
     <string name="common_use">Sử dụng</string>
+    <string name="common_use_max">Sử dụng tối đa</string>
     <string name="common_validation_invalid_address_message">Người nhận phải là địa chỉ %s hợp lệ</string>
     <string name="common_validation_invalid_address_title">Người nhận không hợp lệ</string>
     <string name="common_waiting">Đang chờ</string>
@@ -485,7 +532,6 @@
     <string name="connection_add_already_exists_error">Nút đã được thêm trước đó. Vui lòng thử nút khác.</string>
     <string name="connection_add_invalid_error">Không thể thiết lập kết nối với nút. Vui lòng thử nút khác.</string>
     <string name="connection_add_unsupported_error">Rất tiếc, mạng không được hỗ trợ. Vui lòng thử một trong những mạng sau: %s.</string>
-    <string name="connection_delete_confirm">Xóa</string>
     <string name="connection_delete_description">Xác nhận xóa %s.</string>
     <string name="connection_delete_title">Xóa mạng?</string>
     <string name="connection_error_message_v2_2_0">Vui lòng kiểm tra kết nối của bạn hoặc thử lại sau</string>
@@ -508,6 +554,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">Mật khẩu khớp</string>
     <string name="create_cloud_backup_password_subtitle">Vui lòng nhập mật khẩu để truy cập sao lưu bất kỳ lúc nào. Mật khẩu không thể khôi phục, hãy chắc chắn nhớ nó!</string>
     <string name="create_cloud_backup_password_title">Tạo mật khẩu sao lưu của bạn</string>
+    <string name="create_network_invalid_chain_id_message">Chain ID đã nhập không khớp với mạng trong URL RPC.</string>
+    <string name="create_network_invalid_chain_id_title">Chain ID không hợp lệ</string>
     <string name="crodloan_private_crowdloan_message">Crowdloan riêng tư chưa được hỗ trợ.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan riêng tư</string>
     <string name="crowdloan_about">Về crowdloans</string>
@@ -564,6 +612,24 @@
     <string name="crowdloan_unlock_hint">Các token %s của bạn sẽ được hoàn trả sau kỳ hạn cho thuê.</string>
     <string name="crowdloan_your_contributions">Các khoản đóng góp của bạn</string>
     <string name="crownloans_raised_format" formatted="false">Đã gây quỹ: %s trong %s</string>
+    <string name="custom_network_already_exist_failure_message">URL RPC đã nhập có mặt trong Nova như một mạng tùy chỉnh %s. Bạn có chắc chắn muốn chỉnh sửa nó không?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">URL Trình khám phá khối (Tùy chọn)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">Chain ID</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Biểu tượng tiền tệ</string>
+    <string name="custom_network_name_title">Tên mạng</string>
+    <string name="custom_node_add_button_state">Thêm node</string>
+    <string name="custom_node_add_title">Thêm node tùy chỉnh cho</string>
+    <string name="custom_node_disabled_button_state">Nhập chi tiết</string>
+    <string name="custom_node_edit_button_state">Lưu</string>
+    <string name="custom_node_edit_title">Chỉnh sửa node tùy chỉnh cho</string>
+    <string name="custom_node_name_hint">Tên</string>
+    <string name="custom_node_name_title">Tên node</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">URL node</string>
+    <string name="custom_rpc_node_url_title">URL RPC</string>
     <string name="dapp_authorized_description">DApps mà bạn đã cho phép truy cập để xem địa chỉ của bạn khi bạn sử dụng chúng</string>
     <string name="dapp_authorized_remove_description">DApp “%s” sẽ bị xóa khỏi Ủy quyền</string>
     <string name="dapp_authorized_remove_title">Xóa khỏi Ủy quyền?</string>
@@ -574,6 +640,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Phê duyệt yêu cầu này nếu bạn tin tưởng ứng dụng.\nKiểm tra chi tiết giao dịch.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Yêu thích</string>
     <string name="dapp_favourites">Yêu thích</string>
     <string name="dapp_favourites_add">Thêm vào yêu thích</string>
     <string name="dapp_favourites_remove_description">DApp “%s” sẽ bị xóa khỏi Yêu thích</string>
@@ -592,6 +660,9 @@
     <string name="dapp_sign_error_unsupported_chain">Chuỗi không được hỗ trợ với mã băm genesis %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Hãy chắc chắn rằng thao tác là chính xác</string>
     <string name="dapp_sign_extrinsic_failed">Không thể ký thao tác yêu cầu</string>
+    <string name="dapp_url_warning_open_anyway">Mở dù sao đi nữa</string>
+    <string name="dapp_url_warning_subtitle">Các DApp độc hại có thể rút hết các khoản tiền của bạn. Luôn luôn tự nghiên cứu trước khi sử dụng một DApp, cấp quyền hoặc gửi tiền.\n\nNếu ai đó thúc giục bạn truy cập DApp này, rất có thể đó là một trò lừa đảo. Khi nghi ngờ, vui lòng liên hệ với bộ phận hỗ trợ của Nova Wallet: %s.</string>
+    <string name="dapp_url_warning_title">Cảnh báo! DApp chưa biết</string>
     <string name="deep_linking_chain_id_is_not_found">Không tìm thấy chuỗi</string>
     <string name="deep_linking_domain_is_not_matched">Miền từ liên kết %s không được phép</string>
     <string name="deep_linking_governance_type_is_not_specified">Loại quản lý không được chỉ định</string>
@@ -600,6 +671,7 @@
     <string name="deep_linking_invalid_derivation_path">Đường dẫn dẫn xuất không hợp lệ</string>
     <string name="deep_linking_invalid_mnemonic">Mnemonics không hợp lệ</string>
     <string name="deep_linking_url_is_invalid">URL không hợp lệ</string>
+    <string name="default_network_already_exist_failure_message">URL RPC đã nhập có mặt trong Nova như một mạng %s.</string>
     <string name="default_notification_channel_name">Kênh thông báo mặc định</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Tìm kiếm theo địa chỉ hoặc tên</string>
@@ -650,6 +722,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">Mật khẩu sao lưu của bạn đã được cập nhật trước đó. Để tiếp tục sử dụng Cloud Backup, %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">vui lòng nhập mật khẩu sao lưu mới.</string>
     <string name="deprecated_cloud_backup_password_title">Mật khẩu sao lưu đã thay đổi</string>
+    <string name="disabled_chain_error_message">Bạn không thể ký các giao dịch của các mạng bị vô hiệu hóa. Kích hoạt %s trong cài đặt và thử lại</string>
+    <string name="disabled_chain_error_title">%s bị vô hiệu hóa</string>
     <string name="duplicate_proxy_type_message">Bạn đã ủy quyền cho tài khoản này: %s</string>
     <string name="duplicate_proxy_type_title">Ủy quyền đã tồn tại</string>
     <string name="ecdsa_selection_subtitle">(BTC/ETH tương thích)</string>
@@ -684,6 +758,8 @@
         <item quantity="other">Bạn cần chọn ít nhất %d track</item>
     </plurals>
     <string name="governance_unlock">Mở khóa</string>
+    <string name="high_price_impact_detacted_message">Thực hiện giao dịch này sẽ dẫn đến trượt giá đáng kể và thiệt hại tài chính. Xem xét giảm kích thước giao dịch của bạn hoặc chia giao dịch thành nhiều lần thực hiện.</string>
+    <string name="high_price_impact_detacted_title">Phát hiện tác động giá cao (%s)</string>
     <string name="history_v1.9.0">Lịch sử</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Tên pháp lý</string>
@@ -708,8 +784,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">Sử dụng cụm từ 12, 15, 18, 21 hoặc 24 từ của bạn</string>
     <string name="import_wallet_options_title">Chọn cách bạn muốn nhập ví của mình</string>
     <string name="import_wallet_options_watch_only_title">Chỉ quan sát</string>
+    <string name="integrate_networks_banner_description">Tích hợp tất cả các tính năng của mạng bạn đang xây dựng vào Nova Wallet, làm cho nó trở nên dễ tiếp cận với mọi người.</string>
+    <string name="integrate_networks_banner_link">Tích hợp mạng của bạn</string>
+    <string name="integrate_networks_banner_title">Xây dựng cho Polkadot?</string>
     <string name="invalid_proxy_address_message">Địa chỉ proxy phải là địa chỉ %s hợp lệ</string>
     <string name="invalid_proxy_address_title">Địa chỉ proxy không hợp lệ</string>
+    <string name="invalid_token_symbol_message">Biểu tượng tiền tệ đã nhập (%1$s) không khớp với mạng (%2$s). Bạn có muốn sử dụng biểu tượng tiền tệ đúng không?</string>
+    <string name="invalid_token_symbol_title">Biểu tượng tiền tệ không hợp lệ</string>
     <string name="invoice_scan_error_no_info">Không thể giải mã QR</string>
     <string name="invoice_scan_qr_code_title">Mã QR</string>
     <string name="invoice_scan_upload">Tải lên từ thư viện</string>
@@ -737,10 +818,21 @@
     <string name="ledger_verify_address_subtitle">Nhấn cả hai nút trên %s của bạn để phê duyệt địa chỉ</string>
     <string name="ledger_wallet_details_description">Ví này đã được ghép đôi với Ledger. Nova sẽ giúp bạn thực hiện bất kỳ thao tác nào bạn muốn, và bạn sẽ được yêu cầu ký chúng bằng Ledger</string>
     <string name="ledher_import_select_address_title">Chọn tài khoản để thêm vào ví</string>
+    <string name="loading_network_info">Đang tải thông tin mạng...</string>
     <string name="loocking_backup_progress">Đang tìm kiếm bản sao lưu của bạn...</string>
     <string name="make_payout_transaction_sent">Giao dịch thanh toán đã được gửi</string>
     <string name="manage_assets_add_token">Thêm token</string>
     <string name="manage_cloud_backup">Quản lý sao lưu</string>
+    <string name="manage_network_action_delete">Xóa mạng</string>
+    <string name="manage_network_action_edit">Chỉnh sửa mạng</string>
+    <string name="manage_network_actions_title">Quản lý mạng đã thêm</string>
+    <string name="manage_network_delete_message">Bạn sẽ không thể thấy số dư token của bạn trên mạng đó trên màn hình Tài sản</string>
+    <string name="manage_network_delete_title">Xóa mạng?</string>
+    <string name="manage_node_action_delete">Xóa node</string>
+    <string name="manage_node_action_edit">Chỉnh sửa node</string>
+    <string name="manage_node_actions_title">Quản lý các node đã thêm</string>
+    <string name="manage_node_delete_message">Node \"%s\" sẽ bị xóa</string>
+    <string name="manage_node_delete_title">Xóa node?</string>
     <string name="manual_backup_secrets_custom_key_title">Khóa tùy chỉnh</string>
     <string name="manual_backup_secrets_default_key_title">Khóa mặc định</string>
     <string name="manual_backup_secrets_subtitle">Không chia sẻ bất kỳ thông tin nào này với bất kỳ ai - Nếu bạn làm vậy, bạn sẽ mất tất cả tài sản của mình vĩnh viễn và không thể khôi phục.</string>
@@ -761,9 +853,14 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">Chọn ít nhất %d ví</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Node này đã tồn tại</string>
     <string name="network_fee">Phí mạng</string>
     <string name="network_info_address">Địa chỉ nút</string>
     <string name="network_info_title">Thông tin nút</string>
+    <string name="network_management_added_page_title">Đã thêm</string>
+    <string name="network_management_custom_nodes">nodes tuỳ chỉnh</string>
+    <string name="network_management_default_nodes">nodes mặc định</string>
+    <string name="network_management_default_page_title">Mặc định</string>
     <string name="network_status_connecting">Đang kết nối…</string>
     <string name="nft_collection">Bộ sưu tập</string>
     <string name="nft_created_by">Được tạo bởi</string>
@@ -774,6 +871,12 @@
     <string name="nft_owned_by">Sở hữu bởi</string>
     <string name="nft_price_not_listed">Chưa niêm yết</string>
     <string name="nft_your_nfts">NFT của bạn</string>
+    <string name="node_already_exist_failure_message">URL bạn nhập đã tồn tại dưới dạng Node \"%s\".</string>
+    <string name="node_already_exist_failure_title">Node này đã tồn tại</string>
+    <string name="node_not_alive_message">URL Node bạn nhập không phản hồi hoặc chứa định dạng không chính xác. Định dạng URL phải bắt đầu với \"wss://\".</string>
+    <string name="node_not_alive_title">Lỗi Node</string>
+    <string name="node_not_supported_by_network_message">URL bạn nhập không tương ứng với Node cho %1$s. Hãy nhập URL của node %1$s hợp lệ.</string>
+    <string name="node_not_supported_by_network_title">Sai mạng</string>
     <string name="nomination_pool_claim_rewards">Yêu cầu phần thưởng</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Token của bạn sẽ được thêm lại vào stake</string>
     <string name="nomination_pools_direct">Trực tiếp</string>
@@ -818,6 +921,13 @@
     <string name="pool_full_failure_title">Bể đã đầy</string>
     <string name="pool_inactive_failure_message">Bạn không thể tham gia bể chưa mở. Vui lòng liên hệ với chủ bể.</string>
     <string name="pool_inactive_failure_title">Bể chưa mở</string>
+    <string name="pool_staking_conflict_message">Bạn không thể sử dụng cả Staking trực tiếp và Pool Staking từ cùng một tài khoản. Để quản lý Pool Staking bạn trước tiên cần unstake token của mình từ Staking trực tiếp.</string>
+    <string name="pool_staking_conflict_title">Các thao tác trong Pool không khả dụng</string>
+    <string name="popular_dapps_title">Phổ biến</string>
+    <string name="pre_configured_networks_add_custom_button">Thêm mạng thủ công</string>
+    <string name="pre_configured_networks_progress_text">Đang tải danh sách mạng...</string>
+    <string name="pre_configured_networks_search_hint">Tìm kiếm theo tên mạng</string>
+    <string name="pre_configured_networks_title">Thêm mạng</string>
     <string name="profile_accounts_title">Tài khoản</string>
     <string name="profile_accounts_title_2_0">Ví tiền</string>
     <string name="profile_language_title">Ngôn ngữ</string>
@@ -877,6 +987,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Bằng việc bật thông báo đẩy, bạn đồng ý với %s và %s của chúng tôi</string>
     <string name="push_welcome_timeout_error_message">Vui lòng thử lại sau bằng cách truy cập cài đặt thông báo từ tab Cài đặt</string>
     <string name="push_welcome_title">Đừng bỏ lỡ điều gì!</string>
+    <string name="receive_network_flow_title">Chọn mạng để nhận %s</string>
+    <string name="receive_screen_copy_address">Sao chép Địa chỉ</string>
     <string name="recover_json_hint">Dán mã JSON hoặc tải lên tệp...</string>
     <string name="recover_json_upload">Tải lên tệp</string>
     <string name="recovery_json">Khôi phục JSON</string>
@@ -891,8 +1003,13 @@
     <string name="referenda_list_placeholder">Thông tin về các cuộc trưng cầu dân ý sẽ xuất hiện ở đây khi chúng bắt đầu</string>
     <string name="referenda_search_placeholder">Không tìm thấy cuộc trưng cầu dân ý với tiêu đề hoặc ID đã nhập\n</string>
     <string name="referenda_search_toolbar_hint">Tìm kiếm theo tiêu đề hoặc ID cuộc trưng cầu dân ý</string>
+    <string name="referenda_swipe_gov_banner_chip">%d cuộc trưng cầu</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Vuốt để bình chọn cho cuộc trưng cầu với tóm tắt AI. Nhanh và dễ dàng!</string>
     <string name="referenda_title">Cuộc trưng cầu dân ý</string>
     <string name="referendim_details_not_found_title">Không tìm thấy cuộc trưng cầu dân ý</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Bỏ phiếu Abstain chỉ có thể thực hiện với độ xác tín 0.1x. Bỏ phiếu với độ xác tín 0.1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Cập nhật độ xác tín</string>
+    <string name="referendum_abstain_voters_title">Bỏ phiếu Abstain</string>
     <string name="referendum_aye_format">Đồng ý: %s</string>
     <string name="referendum_dapp_list_title">Sử dụng trình duyệt Nova DApp</string>
     <string name="referendum_description_fallback">Chỉ người đề xuất mới có thể chỉnh sửa mô tả và tiêu đề này. Nếu bạn sở hữu tài khoản của người đề xuất, hãy truy cập Polkassembly và điền thông tin về đề xuất của bạn.</string>
@@ -1025,16 +1142,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Track không có sẵn</string>
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
+    <string name="select_network_title">Chọn mạng</string>
     <string name="select_tracks_for">Chọn track cho</string>
     <string name="selected_tracks_quantity" formatted="false">%d trong %d</string>
     <string name="send_address_hint">Địa chỉ hoặc w3n</string>
+    <string name="send_network_flow_title">Chọn mạng để gửi %s</string>
     <string name="send_recipient_system_account_message">Người nhận là một tài khoản hệ thống. Nó không được kiểm soát bởi bất kỳ công ty hoặc cá nhân nào.\nBạn có chắc chắn vẫn muốn thực hiện chuyển khoản này không?</string>
     <string name="send_recipient_system_account_title">Token sẽ bị mất</string>
     <string name="set_staking_proxy_address_description">Cấp quyền cho</string>
     <string name="settings_biometric_not_ready_message">Vui lòng, đảm bảo sinh trắc học đã được bật trong Cài đặt</string>
     <string name="settings_biometric_not_ready_title">Sinh trắc học đã bị vô hiệu hóa trong Cài đặt</string>
     <string name="settings_community">Cộng đồng</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Nhận hỗ trợ qua Email</string>
     <string name="settings_general">Chung</string>
     <string name="settings_pin_code_verification_confirmation_message">Mỗi hoạt động ký trên ví với cặp khóa (tạo trong ví nova hoặc nhập) cần yêu cầu xác minh PIN trước khi tạo chữ ký</string>
     <string name="settings_pin_code_verification_confirmation_title">Yêu cầu xác thực cho các hoạt động ký</string>
@@ -1046,8 +1165,11 @@
     <string name="settings_security">Bảo mật</string>
     <string name="settings_support">Hỗ trợ &amp;  Phản hồi</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki &amp; Trung tâm trợ giúp</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">Độ xác tín sẽ được đặt là 0.1x khi bỏ phiếu Abstain</string>
+    <string name="setup_staking_conflict_message">Bạn không thể Stake với Direct Staking và Nomination Pools cùng một lúc</string>
+    <string name="setup_staking_conflict_title">Đã staking</string>
     <string name="setup_staking_type_advanced_options_condition">Quản lý Stake nâng cao</string>
     <string name="setup_staking_type_already_used_title">Loại Stake không thể thay đổi</string>
     <string name="setup_staking_type_direct_already_used_message">Bạn đã có Stake trực tiếp</string>
@@ -1405,6 +1527,16 @@
     <string name="swap_custom_fee_selector_description">Token để trả phí mạng</string>
     <string name="swap_custom_fee_selector_footer">Phí mạng được thêm vào trên số tiền đã nhập</string>
     <string name="swap_error_pair_not_supported">Cặp này không được hỗ trợ</string>
+    <string name="swap_execution_failure" formatted="false">Thất bại trên hoạt động #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">%s sang %s hoán đổi trên %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Chuyển %s từ %s sang %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="other">%s hoạt động</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s của %s hoạt động</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Đang hoán đổi %s sang %s trên %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Đang chuyển %s sang %s</string>
+    <string name="swap_execution_time">Thời gian thực hiện</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Bạn cần giữ ít nhất %s sau khi trả phí mạng %s vì bạn giữ các token không đủ</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Bạn cần giữ ít nhất %s để nhận được token %s</string>
     <string name="swap_failure_insufficient_balance_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả %2$s cho phí mạng.</string>
@@ -1424,6 +1556,7 @@
     <string name="swap_get_token_cross_chain_description">Chuyển %s từ mạng khác</string>
     <string name="swap_get_token_receive_description">Nhận %s bằng QR hoặc địa chỉ của bạn</string>
     <string name="swap_get_token_using">Nhận %s bằng cách sử dụng</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Trong khi hoán đổi thực hiện, số tiền nhận trung gian là %s, thấp hơn số dư tối thiểu %s. Hãy thử chỉ định số tiền hoán đổi lớn hơn.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">Độ trượt giá phải được chỉ định trong khoảng %s đến %s</string>
     <string name="swap_invalid_slippage_failure_title">Độ trượt giá không hợp lệ</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Chọn một token để thanh toán</string>
@@ -1432,6 +1565,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Nhập số tiền khác</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Để thanh toán phí mạng bằng %s, Nova sẽ tự động hoán đổi %s thành %s để duy trì số dư tối thiểu %s trong tài khoản của bạn.</string>
     <string name="swap_network_fee_description">Một khoản phí mạng được tính bởi blockchain để xử lý và xác nhận bất kỳ giao dịch nào. Có thể thay đổi tùy thuộc vào điều kiện mạng hoặc tốc độ giao dịch.</string>
+    <string name="swap_network_flow_title">Chọn mạng để hoán đổi %s</string>
     <string name="swap_not_enought_liquidity_failure">Pool không có đủ thanh khoản để thực hiện hoán đổi</string>
     <string name="swap_price_difference_description">Sự khác biệt về giá đề cập đến sự chênh lệch giá giữa hai tài sản khác nhau. Khi thực hiện hoán đổi trong tiền điện tử, sự khác biệt về giá thường là sự chênh lệch giữa giá của tài sản mà bạn đang hoán đổi và giá của tài sản mà bạn đang hoán đổi.</string>
     <string name="swap_price_difference_title">Sự khác biệt về giá</string>
@@ -1441,6 +1575,10 @@
     <string name="swap_rate_was_updated_failure_message">Tỷ giá cũ: %1$s 	 %2$s.\nTỷ giá mới: %1$s 	 %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Tỷ giá hoán đổi đã được cập nhật</string>
     <string name="swap_repeat_operation">Lặp lại thao tác</string>
+    <string name="swap_route">Lộ trình</string>
+    <string name="swap_route_description">Cách mà token của bạn sẽ đi qua các mạng lưới khác nhau để có được token mong muốn.</string>
+    <string name="swap_route_segment_swap_title">Hoán đổi</string>
+    <string name="swap_route_segment_transfer_title">Chuyển</string>
     <string name="swap_settings_title">Cài đặt hoán đổi</string>
     <string name="swap_slippage">Trượt giá</string>
     <string name="swap_slippage_description">Trượt giá hoán đổi là một hiện tượng phổ biến trong giao dịch phi tập trung nơi giá cuối cùng của một giao dịch hoán đổi có thể hơi khác so với giá dự kiến do điều kiện thị trường thay đổi.</string>
@@ -1451,9 +1589,35 @@
     <string name="swap_slippage_warning_too_small">Giao dịch có thể bị hoàn lại do mức chấp nhận độ trượt giá thấp.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">Số lượng %s ít hơn số dư tối thiểu %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Bạn đang cố gắng hoán đổi số tiền quá nhỏ</string>
+    <string name="swipe_gov_abstain_format">Kiềm chế: %s</string>
+    <string name="swipe_gov_aye_format">Đồng ý: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Bạn luôn có thể bỏ phiếu cho cuộc trưng cầu này sau</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Xóa cuộc trưng cầu %s khỏi danh sách bỏ phiếu?</string>
+    <string name="swipe_gov_basket_removed_items_message">Một số cuộc trưng cầu không còn khả dụng để bỏ phiếu hoặc bạn có thể không có đủ token để bỏ phiếu. Khả dụng để bỏ phiếu: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Một số cuộc trưng cầu bị loại khỏi danh sách bỏ phiếu</string>
+    <string name="swipe_gov_card_data_loading_error_message">Không thể tải dữ liệu cuộc trưng cầu</string>
+    <string name="swipe_gov_card_data_loading_error_title">Không có dữ liệu</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Bạn đã bỏ phiếu cho tất cả các cuộc trưng cầu khả dụng hoặc hiện không có cuộc trưng cầu nào để bỏ phiếu. Quay lại sau.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Bạn đã bỏ phiếu cho tất cả các cuộc trưng cầu khả dụng</string>
+    <string name="swipe_gov_card_requested_title">Yêu cầu:</string>
+    <string name="swipe_gov_cards_basket_title">Danh sách bỏ phiếu</string>
+    <string name="swipe_gov_cards_counter">%d còn lại</string>
+    <string name="swipe_gov_cards_full_list">Xác nhận phiếu</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">Không có cuộc trưng cầu để bỏ phiếu</string>
+    <string name="swipe_gov_cards_placeholder_button">Xác nhận phiếu của bạn</string>
+    <string name="swipe_gov_cards_voting_list_empty">Không có phiếu</string>
+    <string name="swipe_gov_convirm_votes_success_message">Bạn đã thành công bỏ phiếu cho %d cuộc trưng cầu</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">Bạn không có đủ số dư để bỏ phiếu với sức mạnh hiện tại %s (%sx). Vui lòng thay đổi sức mạnh bỏ phiếu hoặc thêm thêm tiền vào ví của bạn.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Số dư không đủ để bỏ phiếu</string>
+    <string name="swipe_gov_nay_format">Không đồng ý: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Bỏ phiếu cho %d cuộc trưng cầu</string>
+    <string name="swipe_gov_vote_subtitle">Việc bỏ phiếu sẽ được đặt cho các cuộc bỏ phiếu trong tương lai trong SwipeGov</string>
+    <string name="swipe_gov_vote_title">Sức mạnh bỏ phiếu</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Ví</string>
     <string name="today">Hôm nay</string>
+    <string name="token_price_info_provider_label">Liên kết Coingecko cho thông tin giá (Tùy chọn)</string>
     <string name="transaction_details_copy_hash">Sao chép hash</string>
     <string name="transaction_details_extrinsic_fee">Phí</string>
     <string name="transaction_details_from">Từ</string>
@@ -1498,6 +1662,7 @@
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>
     <string name="wallet_asset_receive_token">Nhận %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Chỉ gửi token %1$s và các token trong mạng %2$s tới địa chỉ này, nếu không bạn có thể mất tiền</string>
     <string name="wallet_asset_send">Gửi</string>
     <string name="wallet_asset_swap">Hoán đổi</string>
     <string name="wallet_assets">Tài sản</string>

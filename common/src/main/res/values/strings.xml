@@ -1,17 +1,208 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="price_charts_period_today">Today</string>
+    <string name="price_charts_period_week">Last Week</string>
+    <string name="price_charts_period_month">Last Month</string>
+    <string name="price_charts_period_year">Last Year</string>
+    <string name="price_charts_period_all">All Time</string>
+
+    <string name="price_chart_date_format">%s at %s</string>
+    <string name="price_chart_price_change">%s (%s)</string>
+
+    <string name="price_chart_title">%s price</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_chart_max">All</string>
+
+    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
+
+    <!--<string name="dapp_main_welcome_title">Welcome to Nova Browser</string>-->
+    <!--<string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>-->
+
+    <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
+
+    <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
+
+    <string name="popular_dapps_title">Popular</string>
+
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message">During swap execution intermediate receive amount is %s which is less than minimum balance of %s. Try specifying larger swap amount.</string>
+
+    <string name="common_not_enough_to_pay_fee_message">You don\'t have enough balance to pay network fee of %s. Current balance is %s</string>
+
+    <string name="common_sec">sec</string>
+
+    <string name="common_do_not_close_app">Do not close the app!</string>
+
+    <string name="common_failed">Failed</string>
+
+    <string name="swap_execution_operations_progress">%s of %s operations</string>
+
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operation</item>
+        <item quantity="other">%s operations</item>
+    </plurals>
+
+    <string name="swap_execution_progress_swap_label">Swapping %s to %s on %s</string>
+    <string name="swap_execution_progress_transfer_label">Transferring %s to %s</string>
+
+    <string name="swap_execution_failure">Failed on operation #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label">%s to %s swap on %s</string>
+    <string name="swap_execution_failure_transfer_label">%s transfer from %s to %s</string>
+
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <string name="swap_execution_time">Execution time</string>
+
+    <string name="common_total_fee">Total fee</string>
+
+    <string name="common_fee_with_label">Fee: %s</string>
+
+    <string name="swap_route_segment_transfer_title">Transfer</string>
+    <string name="swap_route_segment_swap_title">Swap</string>
+    <string name="swap_route_description">The way that your token will take through different networks to get the desired token.</string>
+    <string name="swap_route">Route</string>
+
+    <string name="common_see_all">See All</string>
+    <string name="dapp_favorites">Favorites</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+
+    <string name="close_dapp_tabs_title">Close All DApps?</string>
+    <string name="close_dapp_tabs_message">All opened tabs in DApp browser will be closed.</string>
+
+    <string name="browser_tabs_close_all">Close All</string>
+
+    <string name="select_network_title">Select network</string>
+
+    <string name="assets_search_token_hint">Search by token</string>
+
+    <string name="receive_screen_copy_address">Copy Address</string>
+    <string name="wallet_asset_receive_token_subtitle">Send only %1$s token and tokens in %2$s network to this address, or you might lose your funds</string>
+
+    <string name="appearance_token_assets_title">token icons</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_white_icon_title">White</string>
+    <string name="appearance_colored_icon_title">Colored</string>
+
+    <string name="buy_network_flow_title">Select network for buying %s</string>
+    <string name="receive_network_flow_title">Select network for receiving %s</string>
+    <string name="send_network_flow_title">Select network for sending %s</string>
+    <string name="swap_network_flow_title">Select network for swapping %s</string>
+
+    <string name="asset_view_tokens">Tokens</string>
+    <string name="asset_view_networks">Networks</string>
+
+    <string name="settings_wiki">Wiki &amp; Help Center</string>
+
+    <string name="settings_email">Get support via Email</string>
+
+    <string name="swipe_gov_card_placeholder_basket_full_text">You have already voted for all available referenda</string>
+    <string name="swipe_gov_cards_placeholder_button">Confirm your votes</string>
+    <string name="swipe_gov_cards_basket_title">Vote list</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">No referenda to vote</string>
+    <string name="swipe_gov_cards_counter">%d left</string>
+
+    <string name="common_use_max">Use max</string>
+
+    <string name="swipe_gov_insufficient_balance_dialog_title">Insufficient balance for voting</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message">You don\'t have enough balance to vote with the current voting power %s (%sx). Please change voting power or add more funds to your wallet.</string>
+    <string name="swipe_gov_convirm_votes_success_message">You have successfully voted for %d referenda</string>
+
+    <string name="swipe_gov_vote_setup_title">Vote for %d referenda</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">Remove referendum %s from vote list?</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">You always can vote for this referendum later </string>
+
+    <string name="swipe_gov_basket_removed_items_title">Some of the referenda excluded from vote list</string>
+    <string name="swipe_gov_basket_removed_items_message">Some of the referenda are no longer available for voting or you may not have enough tokens available to vote. Available to vote: %s.</string>
+
+    <string name="swipe_gov_aye_format">Aye: %s</string>
+    <string name="swipe_gov_nay_format">Nay: %s</string>
+    <string name="swipe_gov_abstain_format">Abstain: %s</string>
+
+    <string name="swipe_gov_vote_title">Voting power</string>
+    <string name="swipe_gov_vote_subtitle">Voting will be set for future votes in SwipeGov</string>
+    <string name="swipe_gov_cards_full_list">Confirm votes</string>
+    <string name="swipe_gov_cards_voting_list_empty">No votes</string>
+    <string name="swipe_gov_card_data_loading_error_title">No data retrived</string>
+    <string name="swipe_gov_card_data_loading_error_message">The data of the referendum could not be loaded</string>
+    <string name="swipe_gov_card_requested_title">Requested:</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">You have already voted for all available referenda or there are no referenda to vote right now. Come back later.</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Swipe to vote on referenda with AI summaries. Fast &amp; easy!</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referenda</string>
+
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>
+
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot app is installed</string>
+
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Open the Polkadot app</string>
+
+    <string name="account_ledger_generic_import_start_step_1">Make sure %s to your Ledger device using Ledger Live app</string>
+
+    <string name="account_ledger_generic_import_start_step_2">%s on your Ledger device</string>
+
+    <string name="account_ledger_import_start_step_3">Allow Nova Wallet to %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth and Location</string>
+
+    <string name="account_ledger_import_start_step_4">%s to add to wallet</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Select account</string>
+
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault will provide you %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">QR code to scan</string>
+
+    <string name="account_polkadot_vault_import_start_step_2">%s Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Go to “Key Sets” tab.</string>
+
+    <string name="account_polkadot_vault_import_start_step_1">%s application on your smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Open Polkadot Vault</string>
+
+    <string name="account_ledger_import_start_step_2">%s on your Ledger device</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Open the network app</string>
+
+    <string name="account_ledger_import_start_step_1">Make sure %s to your Ledger device using Ledger Live app</string>
+    <string name="account_ledger_import_start_step_1_highlighted">Network app is installed</string>
+
+    <string name="account_parity_signer_import_start_step_3">Parity Signer will provide you %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">QR code to scan</string>
+
+    <string name="account_parity_signer_import_start_step_2">%s you would like to add to Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Go to “Keys” tab. Select seed, then account</string>
+
+    <string name="account_parity_signer_import_start_step_1">%s application on your smartphone</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Open Parity Signer</string>
+
+    <string name="setup_referendum_vote_conviction_info">Conviction will be set to 0.1x when you vote Abstain</string>
+
+    <string name="referendum_abstain_voters_title">Abstain votes</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Conviction update</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Abstain votes can only be done with 0.1x conviction. Vote with 0.1x conviction?</string>
+
+    <string name="dapp_url_warning_title">Warning! DApp is unknown</string>
+    <string name="dapp_url_warning_subtitle">Malicious DApps can withdraw all your funds. Always do your own research before using a DApp, granting permission, or sending funds out.\n\nIf someone is urging you to visit this DApp, it is likely a scam. When in doubt, please contact Nova Wallet support: %s.</string>
+    <string name="dapp_url_warning_open_anyway">Open anyway</string>
+
+    <string name="setup_staking_conflict_title">Already staking</string>
+    <string name="setup_staking_conflict_message">You cannot stake with Direct Staking and Nomination Pools at the same time</string>
+
+    <string name="pool_staking_conflict_title">Pool operations are not available</string>
+    <string name="pool_staking_conflict_message">You can no longer use both Direct Staking and Pool Staking from the same account. To manage your Pool  Staking you first need to unstake your tokens from Direct Staking.</string>
+
+    <string name="chain_network_management_auto_balance">Auto-balance nodes</string>
+    <string name="chain_network_management_enabling">Enable connection</string>
+
     <string name="account_ledger_migration_deprecation_message">The Migration app will be unavailable in the near future. Use it to migrate your accounts to the new Ledger app to avoid losing your funds.</string>
 
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
 
-    <string name="account_ledger_generic_import_start_step_1">Make sure <font color='#FFFFFF'>Generic app is installed</font> to your Ledger device using Ledger Live app</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color='#FFFFFF'>Open the Generic app</font> on your Ledger device</string>
-
     <string name="account_ledger_legacy_warning_title">New Ledger app has been released</string>
     <string name="account_ledger_legacy_warning_message">To sign operations and migrate your accounts to the new Generic Ledger app install and open Migration app. Legacy Old and Migration Ledger apps will not be supported in the future.</string>
 
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
 
     <string name="account_ledger_nano_x">Ledger Nano X</string>
@@ -49,7 +240,6 @@
     <string name="manage_network_action_delete">Delete network</string>
     <string name="manage_network_actions_title">Manage added network</string>
 
-    <!--<string name="connection_delete_confirm">Delete</string>-->
     <string name="common_delete">Delete</string>
 
     <string name="add_network_title">Enter network details</string>
@@ -70,10 +260,8 @@
     <string name="common_substrate">Substrate</string>
     <string name="common_evm">EVM</string>
 
-    <!--<string name="assets_add_token_enter_info_price_label">Coingecko link for price info (Optional) </string>-->
     <string name="token_price_info_provider_label">Coingecko link for price info (Optional) </string>
 
-    <!--<string name="assets_add_token_enter_info_price_hint" translatable="false">www.coingecko.com/en/coins/tether</string>-->
     <string name="token_price_info_provider_placeholder" translatable="false">www.coingecko.com/en/coins/tether</string>
 
     <string name="custom_network_block_explorer_title">Block explorer URL (Optional) </string>
@@ -536,8 +724,6 @@
 
     <string name="referendim_details_not_found_title">Referendum not found</string>
 
-    <string name="settings_wiki">Wiki</string>
-
     <string name="operations_swap_title">Swap</string>
 
     <string name="swap_repeat_operation">Repeat the operation</string>
@@ -794,10 +980,6 @@
     <string name="account_parity_signer_chain_not_supported">%s doesn’t support %s</string>
 
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Pay attention, the derivation path name should be empty</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault will provide you <font color='#FFFFFF'>QR code to scan</font></string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color='#FFFFFF'>Go to “Key Sets” tab.</font> Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color='#FFFFFF'>Open Polkadot Vault</font> application on your smartphone</string>
-
 
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
@@ -944,8 +1126,6 @@
     <string name="web3names_identifiers_sheet_title">%s addresses for %s</string>
 
     <string name="common_no_app_to_handle_intent">No suitable app found on device to handle this intent</string>
-
-    <string name="account_ledger_import_start_step_3">Allow Nova Wallet to <font color='#FFFFFF'>access Bluetooth and Location</font></string>
 
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
@@ -1118,10 +1298,6 @@
     <string name="asset_add_evm_token_invalid_contract_address_message">The entered contract address is not a %s ERC-20 contract.</string>
 
     <string name="assets_filter_title">Filter tokens</string>
-
-    <string name="dapp_main_welcome_title">Welcome to Nova Browser</string>
-
-    <string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>
 
     <string name="manage_assets_add_token">Add token</string>
 
@@ -1386,10 +1562,6 @@
     <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>
     <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
-    <string name="account_ledger_import_start_step_4"><font color='#FFFFFF'>Select account</font> to add to wallet</string>
-    <string name="account_ledger_import_start_step_2"><font color='#FFFFFF'>Open the network app</font> on your Ledger device</string>
-    <string name="account_ledger_import_start_step_1">Make sure <font color='#FFFFFF'>Network app is installed</font> to your Ledger device using Ledger Live app</string>
-
     <string name="common_total">Total</string>
 
     <string name="wallet_currency_title">Currency</string>
@@ -1425,10 +1597,6 @@
     <string name="common_to_settings">Open Settings</string>
 
     <string name="account_parity_signer_import_start_select_top">Make sure to select top one</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer will provide you <font color='#FFFFFF'>QR code to scan</font></string>
-    <string name="account_parity_signer_import_start_step_2"><font color='#FFFFFF'>Go to “Keys” tab. Select seed, then account</font> you would like to add to Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_1"><font color='#FFFFFF'>Open Parity Signer</font> application on your smartphone</string>
-
     <string name="account_delete_confirmation_description">Make sure you have exported your wallet before proceeding.</string>
     <string name="account_delete_confirmation_title">Forget wallet?</string>
 
@@ -1962,7 +2130,6 @@
     <string name="search_recipient_welcome_v2_2_0">Search results will be displayed here</string>
     <string name="search_result_header">Search results</string>
     <string name="settings_community">Community</string>
-    <string name="settings_email">Email</string>
     <string name="settings_general">General</string>
     <string name="settings_preferences">Preferences</string>
     <string name="settings_security">Security</string>

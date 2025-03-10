@@ -66,16 +66,22 @@
     <string name="account_invalid_derivation_path_message_v2_2_0">Tu ruta de derivación contiene símbolos no compatibles o tiene una estructura incorrecta</string>
     <string name="account_invalid_derivation_path_title">Ruta de derivación inválida</string>
     <string name="account_json_file">Archivo JSON</string>
-    <string name="account_ledger_generic_import_start_step_1">Asegúrate de que <font color="#FFFFFF">Generic app esté instalada</font> en tu dispositivo Ledger usando la aplicación Ledger Live</string>
-    <string name="account_ledger_generic_import_start_step_2"><font color="#FFFFFF">Abre la aplicación Generic</font> en tu dispositivo Ledger</string>
+    <string name="account_ledger_generic_import_start_step_1">Asegúrate de que %s en tu dispositivo Ledger usando la aplicación Ledger Live</string>
+    <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot app esté instalada</string>
+    <string name="account_ledger_generic_import_start_step_2">%s en tu dispositivo Ledger</string>
+    <string name="account_ledger_generic_import_start_step_2_highlighted">Abre la aplicación Polkadot</string>
     <string name="account_ledger_import_fill_description">Asegúrate de que la aplicación de Red está instalada en tu dispositivo Ledger usando la aplicación Ledger Live. Abre la aplicación de red en tu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Agrega al menos una cuenta</string>
     <string name="account_ledger_import_fill_title">Añade cuentas a tu cartera</string>
     <string name="account_ledger_import_start_guide">Guía Oficial de Conexión Bluetooth de Ledger</string>
-    <string name="account_ledger_import_start_step_1">Asegúrate de que <font color="#FFFFFF">la aplicación de Red está instalada</font> en tu dispositivo Ledger usando la aplicación Ledger Live</string>
-    <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Abra la aplicación de red</font> en su dispositivo Ledger</string>
-    <string name="account_ledger_import_start_step_3">Permite a Nova Wallet el <font color="#FFFFFF">acceso a Bluetooth y Ubicación</font></string>
-    <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Seleccione cuenta</font> para agregarla a la billetera</string>
+    <string name="account_ledger_import_start_step_1">Asegúrate de que %s en tu dispositivo Ledger usando la aplicación Ledger Live</string>
+    <string name="account_ledger_import_start_step_1_highlighted">la aplicación de la Network está instalada</string>
+    <string name="account_ledger_import_start_step_2">%s en su dispositivo Ledger</string>
+    <string name="account_ledger_import_start_step_2_highlighted">Abra la aplicación de la Red</string>
+    <string name="account_ledger_import_start_step_3">Permite a Nova Wallet el %s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">acceso a Bluetooth y Ubicación</string>
+    <string name="account_ledger_import_start_step_4">%s para agregarla a la billetera</string>
+    <string name="account_ledger_import_start_step_4_highlighted">Seleccionar cuenta</string>
     <string name="account_ledger_import_start_title">Conecta Ledger Nano X</string>
     <string name="account_ledger_legacy_warning_message">Para firmar operaciones y migrar tus cuentas a la nueva aplicación Generic Ledger, instala y abre la aplicación Migration. Las aplicaciones Legacy Old y Migration Ledger no serán compatibles en el futuro.</string>
     <string name="account_ledger_legacy_warning_title">Se ha lanzado una nueva aplicación Ledger</string>
@@ -83,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">La aplicación Migration no estará disponible en un futuro cercano. Úsala para migrar tus cuentas a la nueva aplicación Ledger para evitar la pérdida de tus fondos.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic App)</string>
+    <string name="account_ledger_nano_x_generic">Ledger Nano X (aplicación Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Por favor, activa el Bluetooth en la configuración de tu teléfono y en el dispositivo Ledger. Desbloquea tu dispositivo Ledger y abre la aplicación %s.</string>
     <string name="account_ledger_select_device_title">Selecciona tu dispositivo Ledger</string>
@@ -97,9 +103,12 @@
     <string name="account_parity_signer_import_preview_title">Aquí están tus cuentas</string>
     <string name="account_parity_signer_import_scan_invalid_qr">Código QR inválido, por favor asegúrate de que estás escaneando el código QR de %s</string>
     <string name="account_parity_signer_import_start_select_top">Asegúrate de seleccionar el primero de la lista</string>
-    <string name="account_parity_signer_import_start_step_1"><font color="#FFFFFF">Open Parity Signer</font> application on your smartphone</string>
-    <string name="account_parity_signer_import_start_step_2"><font color="#FFFFFF">Vaya a la pestaña \"Claves\". Seleccione semilla, luego cuenta</font> que desea agregar a Nova Wallet</string>
-    <string name="account_parity_signer_import_start_step_3">Parity Signer te proporcionará <font color="#FFFFFF">un código QR para escanear</font></string>
+    <string name="account_parity_signer_import_start_step_1">%s en tu smartphone</string>
+    <string name="account_parity_signer_import_start_step_1_highlighted">Abrir Parity Signer</string>
+    <string name="account_parity_signer_import_start_step_2">%s que te gustaría agregar a Nova Wallet</string>
+    <string name="account_parity_signer_import_start_step_2_highlighted">Ve a la pestaña “Claves”. Selecciona semilla, luego la cuenta</string>
+    <string name="account_parity_signer_import_start_step_3">Parity Signer te proporcionará un %s</string>
+    <string name="account_parity_signer_import_start_step_3_highlighted">código QR para escanear</string>
     <string name="account_parity_signer_import_start_title">Agrega una billetera desde %s</string>
     <string name="account_parity_signer_not_supported_subtitle">%s no soporta la firma de mensajes arbitrarios — solo transacciones</string>
     <string name="account_parity_signer_not_supported_title">La firma no es compatible</string>
@@ -113,9 +122,12 @@
     <string name="account_parity_signer_sign_title">Firmar con %s</string>
     <string name="account_polkadot_vault">Polkadot Vault</string>
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Preste atención, el nombre de la ruta de derivación debe estar vacío</string>
-    <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Abre la aplicación Polkadot Vault</font> en tu teléfono inteligente</string>
-    <string name="account_polkadot_vault_import_start_step_2"><font color="#FFFFFF">Vaya a la pestaña \"Conjuntos de claves\".</font> Seleccione su conjunto de claves, Red y luego la cuenta que desea agregar a Nova Wallet.</string>
-    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault le proporcionará un <font color="#FFFFFF">código QR para escanear</font></string>
+    <string name="account_polkadot_vault_import_start_step_1">%s en tu smartphone</string>
+    <string name="account_polkadot_vault_import_start_step_1_highlighted">Abrir Polkadot Vault</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s Seleccione su conjunto de claves, Red y luego la cuenta que desea agregar a Nova Wallet.</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Ve a la pestaña “Conjuntos de Claves”.</string>
+    <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault le proporcionará un %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_highlighted">código QR para escanear</string>
     <string name="account_private_key">Clave privada</string>
     <string name="account_proxieds">Delegado a usted (Proxieds)</string>
     <string name="account_proxy_type_any">Cualquier acción</string>
@@ -150,7 +162,9 @@
     <string name="accounts_change_chain_account">Cambiar cuenta %s</string>
     <string name="accounts_change_chain_secrets">Cambiar cuenta</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="add_custom_node">Agregar nodo personalizado</string>
     <string name="add_delegation_missing_account_message">Necesitas agregar una cuenta %s al monedero para poder delegar</string>
+    <string name="add_network_title">Ingrese detalles de la red</string>
     <string name="add_proxy_confirmation_delegate_to">Delegar a</string>
     <string name="add_proxy_confirmation_delegating_account">Cuenta de delegación</string>
     <string name="add_proxy_confirmation_delegating_wallet">Monedero de delegación</string>
@@ -158,6 +172,11 @@
     <string name="add_proxy_deposit_description_message">El depósito permanece reservado en tu cuenta hasta que se remueva el proxy.</string>
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Has alcanzado el límite de %s proxies añadidos en %s. Elimina proxies para añadir nuevos.</string>
     <string name="add_proxy_maximum_reached_error_title">Se ha alcanzado el número máximo de proxies</string>
+    <string name="added_networks_empty_placeholder">Las redes personalizadas agregadas\naquí aparecerán</string>
+    <string name="appearance_colored_icon_title">Coloreado</string>
+    <string name="appearance_title">Apariencia</string>
+    <string name="appearance_token_assets_title">iconos de token</string>
+    <string name="appearance_white_icon_title">Blanco</string>
     <string name="asset_add_evm_token_already_exist_message">La dirección de contrato ingresada ya está presente en Nova como un token %s.</string>
     <string name="asset_add_evm_token_already_exist_modifiable_message">La dirección de contrato ingresada ya está presente en Nova como un token %s. ¿Estás seguro de que quieres modificarlo?</string>
     <string name="asset_add_evm_token_already_exist_title">Este token ya existe</string>
@@ -170,10 +189,11 @@
     <string name="asset_add_token_enter_contract_address">Ingrese la dirección del contrato</string>
     <string name="asset_add_token_enter_decimals">Ingrese los decimales</string>
     <string name="asset_add_token_enter_symbol">Ingrese el símbolo</string>
+    <string name="asset_view_networks">Redes</string>
+    <string name="asset_view_tokens">Tokens</string>
     <string name="assets_add_token">Agregar token</string>
     <string name="assets_add_token_enter_info_address_label">Dirección del contrato</string>
     <string name="assets_add_token_enter_info_decimals_label">Decimales</string>
-    <string name="token_price_info_provider_label">Enlace de Coingecko para información de precio (Opcional)</string>
     <string name="assets_add_token_enter_info_symbol_label">Símbolo</string>
     <string name="assets_add_token_enter_info_title">Ingrese los detalles del token ERC-20</string>
     <string name="assets_add_token_select_chain_title">Seleccione la red para agregar el token ERC-20</string>
@@ -193,6 +213,7 @@
     <string name="assets_receive_ledger_not_supported_title">Ledger no admite este token</string>
     <string name="assets_search_hint">Buscar por red o token</string>
     <string name="assets_search_placeholder">No se encontraron redes o tokens con\n el nombre ingresado</string>
+    <string name="assets_search_token_hint">Buscar por token</string>
     <string name="assets_select_send_your_wallets">Sus carteras</string>
     <string name="assets_send_flow_placeholder">No tiene tokens para enviar.\nCompre o reciba tokens en su\ncuenta.</string>
     <string name="assets_swap_flow_pay_title">Token para pagar</string>
@@ -220,9 +241,13 @@
     <string name="backup_settings_toolbar_title">Respaldar</string>
     <string name="backup_title">Respaldar</string>
     <string name="biometric_auth_title">Autenticación biométrica</string>
+    <string name="browser_tabs_close_all">Cerrar todo</string>
     <string name="buy_completed">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
+    <string name="buy_network_flow_title">Seleccionar red para comprar %s</string>
     <string name="buy_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
     <string name="buy_provider_open_confirmation_title">¿Continuar en el navegador?</string>
+    <string name="chain_network_management_auto_balance">Equilibrar nodos automáticamente</string>
+    <string name="chain_network_management_enabling">Habilitar conexión</string>
     <string name="change_cloud_backup_password_subtitle">Por favor, ingresa una contraseña que se usará para recuperar tus billeteras desde el respaldo en la nube. Esta contraseña no podrá ser recuperada en el futuro, ¡así que asegúrate de recordarla!</string>
     <string name="change_cloud_backup_password_title">Actualizar contraseña de respaldo</string>
     <string name="choose_amount_asset">Token</string>
@@ -233,6 +258,8 @@
     <string name="choose_amount_fee">Tasa de transferencia</string>
     <string name="choose_amount_network_error">La red no responde</string>
     <string name="choose_amount_to">A</string>
+    <string name="close_dapp_tabs_message">Todas las pestañas abiertas en el navegador DApp se cerrarán.</string>
+    <string name="close_dapp_tabs_title">¿Cerrar todas las DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s y recuerda siempre mantenerlos fuera de línea para restaurarlos en cualquier momento. Puedes hacer esto en la Configuración de Respaldo.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Por favor, escribe todas las Frases de Contraseña de tu billetera antes de continuar</string>
     <string name="cloud_backup_delete_action_title">El respaldo será eliminado de Google Drive</string>
@@ -280,6 +307,7 @@
     <string name="common_active">Activo</string>
     <string name="common_add">Agregar</string>
     <string name="common_add_delegation">Agregar delegación</string>
+    <string name="common_add_network">Agregar red</string>
     <string name="common_address">Dirección</string>
     <string name="common_advanced">Avanzado</string>
     <string name="common_all">Todo</string>
@@ -316,6 +344,8 @@
     <string name="common_confirm_title">Confirmación</string>
     <string name="common_confirmation_title">¿Estás seguro?</string>
     <string name="common_confirmed">Confirmado</string>
+    <string name="common_connected_ms">%d ms</string>
+    <string name="common_connecting">conectando...</string>
     <string name="common_connection_error_message">Por favor, revisa tu conexión o intenta nuevamente más tarde</string>
     <string name="common_connection_error_title">Fallo de conexión</string>
     <string name="common_continue">Continuar</string>
@@ -325,9 +355,11 @@
     <string name="common_crypto_type">Tipo de cripto de par de llaves</string>
     <string name="common_date">Fecha</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s y %s</string>
+    <string name="common_delete">Eliminar</string>
     <string name="common_details">Detalles</string>
     <string name="common_disabled">Deshabilitado</string>
     <string name="common_disconnect">Desconectar</string>
+    <string name="common_do_not_close_app">¡No cierres la aplicación!</string>
     <string name="common_done">Hecho</string>
     <string name="common_dont_show_again">No mostrar esto de nuevo</string>
     <string name="common_edit">Editar</string>
@@ -336,17 +368,21 @@
     <string name="common_enable">Habilitar</string>
     <string name="common_enter_address">Introducir dirección…</string>
     <string name="common_enter_amount">Introducir cantidad...</string>
+    <string name="common_enter_details">Ingrese detalles</string>
     <string name="common_enter_password">Ingresar contraseña</string>
     <string name="common_error_general_title">Error</string>
     <string name="common_error_not_enough_tokens">Tokens insuficientes</string>
     <string name="common_event">Evento</string>
+    <string name="common_evm">EVM</string>
     <string name="common_evm_address">Dirección EVM</string>
     <string name="common_existential_warning_message_v2_2_0">Tu cuenta será eliminada de la cadena de bloques después de esta operación ya que hace que el saldo total sea menor que el mínimo</string>
     <string name="common_existential_warning_title">La operación eliminará la cuenta</string>
     <string name="common_expired">Expirado</string>
     <string name="common_explore">Explorar</string>
+    <string name="common_failed">Fallido</string>
     <string name="common_fee_changed_message" formatted="false">La tarifa de red estimada %s es mucho mayor que la tarifa de red predeterminada (%s). Esto podría deberse a la congestión temporal de la red. Puedes actualizar para esperar una tarifa de red más baja.</string>
     <string name="common_fee_changed_title">La tarifa de red es demasiado alta</string>
+    <string name="common_fee_with_label">Tarifa: %s</string>
     <string name="common_filter_sort_header">Ordenar por:</string>
     <string name="common_filters">Filtros</string>
     <string name="common_find_out_more">Descubrir más</string>
@@ -380,6 +416,7 @@
         <item quantity="other">%d minutos</item>
     </plurals>
     <string name="common_missing_account_title">Falta la cuenta %s</string>
+    <string name="common_modify">Modificar</string>
     <string name="common_module">Módulo</string>
     <string name="common_network">Red</string>
     <string name="common_network_ethereum">Ethereum</string>
@@ -400,6 +437,7 @@
     <string name="common_not_available">No disponible</string>
     <string name="common_not_enough_funds_message">Lo sentimos, no tiene fondos suficientes para pagar la tarifa de red.</string>
     <string name="common_not_enough_funds_title">Saldo insuficiente</string>
+    <string name="common_not_enough_to_pay_fee_message" formatted="false">No tienes suficiente saldo para pagar la tarifa de red de %s. El saldo actual es %s</string>
     <string name="common_not_now">No ahora</string>
     <string name="common_off">Apagado</string>
     <string name="common_ok">Aceptar</string>
@@ -439,7 +477,13 @@
     <string name="common_search">Buscar</string>
     <string name="common_search_placeholder_default">Los resultados de la búsqueda se mostrarán aquí</string>
     <string name="common_search_results_number">Resultados de la búsqueda: %d</string>
+    <string name="common_sec">seg</string>
+    <plurals name="common_seconds_format">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
     <string name="common_secret_derivation_path">Ruta de derivación secreta</string>
+    <string name="common_see_all">Ver todo</string>
     <string name="common_settings">Configuraciones</string>
     <string name="common_share">Compartir</string>
     <string name="common_sign_in">Iniciar sesión</string>
@@ -452,14 +496,17 @@
     <string name="common_something_went_wrong_title">Algo salió mal</string>
     <string name="common_sort_by">Ordenar por</string>
     <string name="common_status">Estado</string>
+    <string name="common_substrate">Substrate</string>
     <string name="common_substrate_address">Dirección Substrate</string>
     <string name="common_tap_to_reveal_title">Toca para revelar</string>
     <string name="common_terms_and_conditions_formatting">Términos y Condiciones</string>
+    <string name="common_testnet">Red de prueba</string>
     <string name="common_time_left">Tiempo restante</string>
     <string name="common_title">Título</string>
     <string name="common_to_settings">Abrir configuración</string>
     <string name="common_too_small_balance_title">Tu saldo es demasiado pequeño</string>
     <string name="common_total">Total</string>
+    <string name="common_total_fee">Tarifa total</string>
     <string name="common_transaction_id">ID de transacción</string>
     <string name="common_transaction_submitted">Transacción enviada</string>
     <string name="common_try_again">Intentar de nuevo</string>
@@ -473,6 +520,7 @@
     <string name="common_unlimited">Ilimitado</string>
     <string name="common_update">Actualizar</string>
     <string name="common_use">Usar</string>
+    <string name="common_use_max">Usar máximo</string>
     <string name="common_validation_invalid_address_message">El destinatario debe ser una dirección %s válida</string>
     <string name="common_validation_invalid_address_title">Destinatario inválido</string>
     <string name="common_waiting">Esperando</string>
@@ -490,7 +538,6 @@
     <string name="connection_add_already_exists_error">El nodo ya ha sido agregado previamente. Por favor, prueba con otro nodo.</string>
     <string name="connection_add_invalid_error">No se puede establecer conexión con el nodo. Por favor, intenta con otro.</string>
     <string name="connection_add_unsupported_error">Desafortunadamente, la red no es compatible. Por favor, intenta con una de las siguientes: %s.</string>
-    <string name="common_delete">Eliminar</string>
     <string name="connection_delete_description">Confirma la eliminación de %s.</string>
     <string name="connection_delete_title">¿Eliminar red?</string>
     <string name="connection_error_message_v2_2_0">Por favor, verifica tu conexión o intenta de nuevo más tarde</string>
@@ -513,6 +560,8 @@
     <string name="create_cloud_backup_password_requirement_passwords_match">Las contraseñas coinciden</string>
     <string name="create_cloud_backup_password_subtitle">Por favor, introduce una contraseña para acceder a tu respaldo en cualquier momento. La contraseña no se puede recuperar, ¡asegúrate de recordarla!</string>
     <string name="create_cloud_backup_password_title">Crea tu contraseña de respaldo</string>
+    <string name="create_network_invalid_chain_id_message">El ID de cadena ingresado no coincide con la red en la URL de RPC.</string>
+    <string name="create_network_invalid_chain_id_title">ID de cadena inválido</string>
     <string name="crodloan_private_crowdloan_message">Los crowdloans privados aún no están soportados.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan privado</string>
     <string name="crowdloan_about">Acerca de los crowdloans</string>
@@ -569,6 +618,24 @@
     <string name="crowdloan_unlock_hint">Sus tokens %s serán devueltos después del periodo de leasing.</string>
     <string name="crowdloan_your_contributions">Sus contribuciones</string>
     <string name="crownloans_raised_format" formatted="false">Recaudado: %s de %s</string>
+    <string name="custom_network_already_exist_failure_message">La URL de RPC ingresada está presente en Nova como una red personalizada de %s. ¿Está seguro de que desea modificarla?</string>
+    <string name="custom_network_block_explorer_placeholder">https://networkscan.io</string>
+    <string name="custom_network_block_explorer_title">URL del explorador de bloques (Opcional)</string>
+    <string name="custom_network_chain_id_placeholder">012345</string>
+    <string name="custom_network_chain_id_title">ID de cadena</string>
+    <string name="custom_network_currency_placeholder">TOKEN</string>
+    <string name="custom_network_currency_title">Símbolo de moneda</string>
+    <string name="custom_network_name_title">Nombre de la red</string>
+    <string name="custom_node_add_button_state">Agregar nodo</string>
+    <string name="custom_node_add_title">Agregar nodo personalizado para</string>
+    <string name="custom_node_disabled_button_state">Ingrese detalles</string>
+    <string name="custom_node_edit_button_state">Guardar</string>
+    <string name="custom_node_edit_title">Editar nodo personalizado para</string>
+    <string name="custom_node_name_hint">Nombre</string>
+    <string name="custom_node_name_title">Nombre del nodo</string>
+    <string name="custom_node_url_hint">wss://</string>
+    <string name="custom_node_url_title">URL del nodo</string>
+    <string name="custom_rpc_node_url_title">URL de RPC</string>
     <string name="dapp_authorized_description">DApps a los que permitió acceder para ver su dirección cuando los utiliza</string>
     <string name="dapp_authorized_remove_description">La DApp “%s” será eliminada de Autorizados</string>
     <string name="dapp_authorized_remove_title">¿Eliminar de Autorizados?</string>
@@ -579,6 +646,8 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Apruebe esta solicitud si confía en la aplicación.\nVerifique los detalles de la transacción.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Favoritos</string>
     <string name="dapp_favourites">Favoritos</string>
     <string name="dapp_favourites_add">Agregar a favoritos</string>
     <string name="dapp_favourites_remove_description">La DApp “%s” será eliminada de Favoritos</string>
@@ -597,6 +666,9 @@
     <string name="dapp_sign_error_unsupported_chain">Cadena no soportada con hash de génesis %s</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Asegúrese de que la operación sea correcta</string>
     <string name="dapp_sign_extrinsic_failed">No se pudo firmar la operación solicitada</string>
+    <string name="dapp_url_warning_open_anyway">Abrir de todos modos</string>
+    <string name="dapp_url_warning_subtitle">Las DApps maliciosas pueden retirar todos tus fondos. Siempre realiza tu propia investigación antes de usar una DApp, otorgar permiso o enviar fondos.\n\nSi alguien te está presionando para que visites esta DApp, es probable que sea una estafa. En caso de duda, por favor contacta con el soporte de Nova Wallet: %s.</string>
+    <string name="dapp_url_warning_title">¡Advertencia! La DApp es desconocida</string>
     <string name="deep_linking_chain_id_is_not_found">Cadena no encontrada</string>
     <string name="deep_linking_domain_is_not_matched">El dominio del enlace %s no está permitido</string>
     <string name="deep_linking_governance_type_is_not_specified">Tipo de gobernanza no especificado</string>
@@ -605,6 +677,7 @@
     <string name="deep_linking_invalid_derivation_path">Ruta de derivación inválida</string>
     <string name="deep_linking_invalid_mnemonic">Mnemónico no válido</string>
     <string name="deep_linking_url_is_invalid">URL inválida</string>
+    <string name="default_network_already_exist_failure_message">La URL de RPC ingresada está presente en Nova como una red de %s.</string>
     <string name="default_notification_channel_name">Canal de Notificación Predeterminado</string>
     <string name="delegate_more_tracks">+%d</string>
     <string name="delegate_search_hint">Buscar por dirección o nombre</string>
@@ -655,6 +728,8 @@
     <string name="deprecated_cloud_backup_password_subtitle">Tu contraseña de respaldo fue actualizada anteriormente. Para continuar usando la Copia de Seguridad en la Nube, %s</string>
     <string name="deprecated_cloud_backup_password_subtitle_highlight">por favor, introduce la nueva contraseña de respaldo.</string>
     <string name="deprecated_cloud_backup_password_title">La contraseña de respaldo fue cambiada</string>
+    <string name="disabled_chain_error_message">No puede firmar transacciones de redes deshabilitadas. Habilite %s en la configuración y vuelva a intentarlo</string>
+    <string name="disabled_chain_error_title">%s está deshabilitado</string>
     <string name="duplicate_proxy_type_message">Ya está delegando a esta cuenta: %s</string>
     <string name="duplicate_proxy_type_title">La delegación ya existe</string>
     <string name="ecdsa_selection_subtitle">(Compatible con BTC/ETH)</string>
@@ -690,6 +765,8 @@
         <item quantity="other">Necesitas seleccionar al menos %d pistas</item>
     </plurals>
     <string name="governance_unlock">Desbloquear</string>
+    <string name="high_price_impact_detacted_message">Ejecutar este intercambio resultará en un deslizamiento significativo y pérdidas financieras. Considere reducir el tamaño de su transacción o dividir su operación en múltiples transacciones.</string>
+    <string name="high_price_impact_detacted_title">Impacto de precio alto detectado (%s)</string>
     <string name="history_v1.9.0">Historia</string>
     <string name="identity_email_title">Correo electrónico</string>
     <string name="identity_legal_name_title">Nombre legal</string>
@@ -714,8 +791,13 @@
     <string name="import_wallet_options_mnemonic_subtitle">Usa tu frase de 12, 15, 18, 21 o 24 palabras</string>
     <string name="import_wallet_options_title">Elige cómo te gustaría importar tu cartera</string>
     <string name="import_wallet_options_watch_only_title">Watch-only</string>
+    <string name="integrate_networks_banner_description">Integre todas las funciones de la red que está construyendo en Nova Wallet, haciéndola accesible para todos.</string>
+    <string name="integrate_networks_banner_link">Integre su red</string>
+    <string name="integrate_networks_banner_title">¿Construyendo para Polkadot?</string>
     <string name="invalid_proxy_address_message">La dirección proxy debe ser una dirección %s válida</string>
     <string name="invalid_proxy_address_title">Dirección proxy inválida</string>
+    <string name="invalid_token_symbol_message">El símbolo de moneda ingresado (%1$s) no coincide con la red (%2$s). ¿Desea usar el símbolo de moneda correcto?</string>
+    <string name="invalid_token_symbol_title">Símbolo de moneda inválido</string>
     <string name="invoice_scan_error_no_info">No se puede decodificar el QR</string>
     <string name="invoice_scan_qr_code_title">Código QR</string>
     <string name="invoice_scan_upload">Subir desde la galería</string>
@@ -743,10 +825,21 @@
     <string name="ledger_verify_address_subtitle">Presione ambos botones en su %s para aprobar la dirección</string>
     <string name="ledger_wallet_details_description">Esta cartera está emparejada con Ledger. Nova te ayudará a formar cualquier operación que desees, y se te solicitará firmarlas usando un dispositivo Ledger</string>
     <string name="ledher_import_select_address_title">Selecciona una cuenta para agregar a la cartera</string>
+    <string name="loading_network_info">Cargando información de la red...</string>
     <string name="loocking_backup_progress">Buscando tu copia de seguridad...</string>
     <string name="make_payout_transaction_sent">Transacción de pago enviada</string>
     <string name="manage_assets_add_token">Agregar token</string>
     <string name="manage_cloud_backup">Gestionar copia de seguridad</string>
+    <string name="manage_network_action_delete">Eliminar red</string>
+    <string name="manage_network_action_edit">Editar red</string>
+    <string name="manage_network_actions_title">Gestionar red agregada</string>
+    <string name="manage_network_delete_message">No podrá ver los saldos de sus tokens en esa red en la pantalla de Activos</string>
+    <string name="manage_network_delete_title">¿Eliminar red?</string>
+    <string name="manage_node_action_delete">Eliminar nodo</string>
+    <string name="manage_node_action_edit">Editar nodo</string>
+    <string name="manage_node_actions_title">Gestionar nodo agregado</string>
+    <string name="manage_node_delete_message">Nodo \"%s\" será eliminado</string>
+    <string name="manage_node_delete_title">¿Eliminar nodo?</string>
     <string name="manual_backup_secrets_custom_key_title">Clave personalizada</string>
     <string name="manual_backup_secrets_default_key_title">Clave por defecto</string>
     <string name="manual_backup_secrets_subtitle">No compartas esta información con nadie. Si lo haces, perderás todos tus activos de manera permanente e irrecuperable.</string>
@@ -768,9 +861,14 @@
         <item quantity="one">Selecciona al menos %d cartera</item>
         <item quantity="other">Selecciona al menos %d carteras</item>
     </plurals>
+    <string name="network_already_exist_failure_title">Este Nodo ya existe</string>
     <string name="network_fee">Comisión de red</string>
     <string name="network_info_address">Dirección del nodo</string>
     <string name="network_info_title">Información del Nodo</string>
+    <string name="network_management_added_page_title">Agregado</string>
+    <string name="network_management_custom_nodes">nodos personalizados</string>
+    <string name="network_management_default_nodes">nodos predeterminados</string>
+    <string name="network_management_default_page_title">Predeterminado</string>
     <string name="network_status_connecting">Conectando…</string>
     <string name="nft_collection">Colección</string>
     <string name="nft_created_by">Creado por</string>
@@ -781,6 +879,12 @@
     <string name="nft_owned_by">Propiedad de</string>
     <string name="nft_price_not_listed">Sin precio</string>
     <string name="nft_your_nfts">Tus NFTs</string>
+    <string name="node_already_exist_failure_message">La URL que ingresaste ya existe como el Nodo \"%s\".</string>
+    <string name="node_already_exist_failure_title">Este Nodo ya existe</string>
+    <string name="node_not_alive_message">La URL del Nodo que ingresaste no está respondiendo o contiene un formato incorrecto. El formato de la URL debe comenzar con \"wss://\".</string>
+    <string name="node_not_alive_title">Error de Nodo</string>
+    <string name="node_not_supported_by_network_message">La URL que ingresaste no corresponde al Nodo para %1$s.\nPor favor ingresa la URL del nodo %1$s válido.</string>
+    <string name="node_not_supported_by_network_title">Red incorrecta</string>
     <string name="nomination_pool_claim_rewards">Reclamar recompensas</string>
     <string name="nomination_pools_claim_rewards_restake_subtitle">Tus tokens se agregarán de nuevo al stake</string>
     <string name="nomination_pools_direct">Directo</string>
@@ -825,6 +929,13 @@
     <string name="pool_full_failure_title">El pool está lleno</string>
     <string name="pool_inactive_failure_message">No puedes unirte a un pool que no está abierto. Por favor, contacta al propietario del pool.</string>
     <string name="pool_inactive_failure_title">El pool no está abierto</string>
+    <string name="pool_staking_conflict_message">Ya no puedes usar tanto Staking Directo como Pool Staking desde la misma cuenta. Para gestionar tu Pool Staking, primero necesitas unstakear tus tokens del Staking Directo.</string>
+    <string name="pool_staking_conflict_title">Las operaciones de Pool no están disponibles</string>
+    <string name="popular_dapps_title">Populares</string>
+    <string name="pre_configured_networks_add_custom_button">Agregar red manualmente</string>
+    <string name="pre_configured_networks_progress_text">Cargando lista de redes...</string>
+    <string name="pre_configured_networks_search_hint">Buscar por nombre de la red</string>
+    <string name="pre_configured_networks_title">Agregar red</string>
     <string name="profile_accounts_title">Cuentas</string>
     <string name="profile_accounts_title_2_0">Carteras</string>
     <string name="profile_language_title">Idioma</string>
@@ -884,6 +995,8 @@
     <string name="push_welcome_terms_and_conditions" formatted="false">Al habilitar las notificaciones push, acepta nuestros %s y %s</string>
     <string name="push_welcome_timeout_error_message">Intente de nuevo más tarde accediendo a los ajustes de notificación desde la pestaña de Configuración</string>
     <string name="push_welcome_title">¡No te pierdas de nada!</string>
+    <string name="receive_network_flow_title">Seleccionar red para recibir %s</string>
+    <string name="receive_screen_copy_address">Copiar dirección</string>
     <string name="recover_json_hint">Pega el json o sube un archivo…</string>
     <string name="recover_json_upload">Subir archivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -898,8 +1011,13 @@
     <string name="referenda_list_placeholder">La información de los referendos aparecerá aquí cuando comiencen</string>
     <string name="referenda_search_placeholder">No se encontraron referendos con el título o ID entrado</string>
     <string name="referenda_search_toolbar_hint">Buscar por título de referendo o ID</string>
+    <string name="referenda_swipe_gov_banner_chip">%d referendos</string>
+    <string name="referenda_swipe_gov_banner_subtitle">Desliza para votar en referendos con resúmenes por IA. ¡Rápido y fácil!</string>
     <string name="referenda_title">Referendos</string>
     <string name="referendim_details_not_found_title">Referendo no encontrado</string>
+    <string name="referendum_abstain_vote_invalid_conviction_subtitle">Los votos de Abstención solo se pueden realizar con una convicción de 0.1x. ¿Votar con una convicción de 0.1x?</string>
+    <string name="referendum_abstain_vote_invalid_conviction_title">Actualización de la convicción</string>
+    <string name="referendum_abstain_voters_title">Votos de Abstención</string>
     <string name="referendum_aye_format">A favor: %s</string>
     <string name="referendum_dapp_list_title">Usar el navegador Nova DApp</string>
     <string name="referendum_description_fallback">Solo el proponente puede editar esta descripción y el título. Si posees la cuenta del proponente, visita Polkassembly y completa la información sobre tu propuesta</string>
@@ -1033,16 +1151,18 @@
     <string name="select_delegation_tracks_unavailable_tracks">Pistas no disponibles</string>
     <string name="select_ledger_location_enable_request_message">Nova necesita que la ubicación esté habilitada para poder realizar el escaneo bluetooth y encontrar tu dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Por favor, habilita la geolocalización en las configuraciones del dispositivo</string>
+    <string name="select_network_title">Seleccionar red</string>
     <string name="select_tracks_for">Seleccione pistas para</string>
     <string name="selected_tracks_quantity" formatted="false">%d de %d</string>
     <string name="send_address_hint">Dirección o w3n</string>
+    <string name="send_network_flow_title">Seleccionar red para enviar %s</string>
     <string name="send_recipient_system_account_message">El destinatario es una cuenta del sistema. No está controlado por ninguna empresa o individuo.\n¿Estás seguro de que aún quieres realizar esta transferencia?</string>
     <string name="send_recipient_system_account_title">Los tokens se perderán</string>
     <string name="set_staking_proxy_address_description">Otorgar autoridad a</string>
     <string name="settings_biometric_not_ready_message">Por favor, asegúrate de que la biometría está activada en los Ajustes</string>
     <string name="settings_biometric_not_ready_title">Biometría desactivada en los Ajustes</string>
     <string name="settings_community">Comunidad</string>
-    <string name="settings_email">Email</string>
+    <string name="settings_email">Obtenga ayuda por Email</string>
     <string name="settings_general">General</string>
     <string name="settings_pin_code_verification_confirmation_message">Cada operación de firma en monederos con par de claves (creados en nova wallet o importados) debería requerir verificación PIN antes de construir la firma</string>
     <string name="settings_pin_code_verification_confirmation_title">Solicitar autenticación para firmar operaciones</string>
@@ -1054,8 +1174,11 @@
     <string name="settings_security">Seguridad</string>
     <string name="settings_support">Soporte &amp; Retroalimentación</string>
     <string name="settings_twitter">Twitter</string>
-    <string name="settings_wiki">Wiki</string>
+    <string name="settings_wiki">Wiki y centro de ayuda</string>
     <string name="settings_youtube">Youtube</string>
+    <string name="setup_referendum_vote_conviction_info">La convicción se establecerá en 0.1x cuando se Abstenga</string>
+    <string name="setup_staking_conflict_message">No puedes hacer stake con Staking Directo y Pools de Nominación al mismo tiempo</string>
+    <string name="setup_staking_conflict_title">Ya estás en staking</string>
     <string name="setup_staking_type_advanced_options_condition">Gestión avanzada de staking</string>
     <string name="setup_staking_type_already_used_title">El tipo de staking no puede ser cambiado</string>
     <string name="setup_staking_type_direct_already_used_message">Ya tienes Staking directo</string>
@@ -1415,6 +1538,17 @@
     <string name="swap_custom_fee_selector_description">Token para pagar la tasa de red</string>
     <string name="swap_custom_fee_selector_footer">La tasa de red se agrega al monto ingresado</string>
     <string name="swap_error_pair_not_supported">Este par no es compatible</string>
+    <string name="swap_execution_failure" formatted="false">Fallido en la operación #%s (%s)</string>
+    <string name="swap_execution_failure_swap_label" formatted="false">Intercambio %s a %s en %s</string>
+    <string name="swap_execution_failure_transfer_label" formatted="false">Transferencia de %s de %s a %s</string>
+    <plurals name="swap_execution_operations_completed">
+        <item quantity="one">%s operación</item>
+        <item quantity="other">%s operaciones</item>
+    </plurals>
+    <string name="swap_execution_operations_progress" formatted="false">%s de %s operaciones</string>
+    <string name="swap_execution_progress_swap_label" formatted="false">Intercambiando %s a %s en %s</string>
+    <string name="swap_execution_progress_transfer_label" formatted="false">Transfiriendo %s a %s</string>
+    <string name="swap_execution_time">Tiempo de ejecución</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Deberías mantener al menos %s después de pagar %s de tasa de red ya que estás sosteniendo tokens insuficientes</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Debes mantener al menos %s para recibir el token %s</string>
     <string name="swap_failure_insufficient_balance_message">Puedes intercambiar hasta %1$s ya que necesitas pagar %2$s por la tasa de red.</string>
@@ -1434,6 +1568,7 @@
     <string name="swap_get_token_cross_chain_description">Transferir %s desde otra red</string>
     <string name="swap_get_token_receive_description">Recibir %s con QR o tu dirección</string>
     <string name="swap_get_token_using">Obtener %s usando</string>
+    <string name="swap_intermediate_too_low_amount_to_stay_abow_ed_message" formatted="false">Durante la ejecución del intercambio, la cantidad intermedia recibida es %s, lo cual es menos que el saldo mínimo de %s. Intenta especificar una cantidad de intercambio mayor.</string>
     <string name="swap_invalid_slippage_failure_message" formatted="false">El deslizamiento debe estar especificado entre %s y %s</string>
     <string name="swap_invalid_slippage_failure_title">Deslizamiento inválido</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Selecciona un token para pagar</string>
@@ -1442,6 +1577,7 @@
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Ingresa otro monto</string>
     <string name="swap_minimum_balance_buy_in_alert" formatted="false">Para pagar la comisión de red con %s, Nova intercambiará automáticamente %s por %s para mantener el balance mínimo de %s en tu cuenta.</string>
     <string name="swap_network_fee_description">Una comisión de red cobrada por la cadena de bloques para procesar y validar cualquier transacción. Puede variar dependiendo de las condiciones de la red o la velocidad de la transacción.</string>
+    <string name="swap_network_flow_title">Seleccionar red para intercambiar %s</string>
     <string name="swap_not_enought_liquidity_failure">El fondo no tiene suficiente liquidez para intercambiar</string>
     <string name="swap_price_difference_description">La diferencia de precio se refiere a la diferencia en el precio entre dos activos diferentes. Al realizar un intercambio en cripto, la diferencia de precio es generalmente la diferencia entre el precio del activo por el que estás intercambiando y el precio del activo con el que estás intercambiando.</string>
     <string name="swap_price_difference_title">Diferencia de precio</string>
@@ -1451,6 +1587,10 @@
     <string name="swap_rate_was_updated_failure_message">Tasa antigua: %1$s ≈ %2$s.\nNueva tasa: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">La tasa de intercambio fue actualizada</string>
     <string name="swap_repeat_operation">Repetir la operación</string>
+    <string name="swap_route">Ruta</string>
+    <string name="swap_route_description">La manera en que tu token pasará a través de diferentes redes para obtener el token deseado.</string>
+    <string name="swap_route_segment_swap_title">Intercambio</string>
+    <string name="swap_route_segment_transfer_title">Transferencia</string>
     <string name="swap_settings_title">Configuraciones de intercambio</string>
     <string name="swap_slippage">Deslizamiento</string>
     <string name="swap_slippage_description">El deslizamiento de intercambio es una ocurrencia común en el comercio descentralizado donde el precio final de una transacción de intercambio podría diferir ligeramente del precio esperado, debido a las cambiantes condiciones del mercado.</string>
@@ -1461,9 +1601,35 @@
     <string name="swap_slippage_warning_too_small">La transacción podría ser revertida debido a la baja tolerancia al deslizamiento.</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_message" formatted="false">La cantidad de %s es menor que el balance mínimo de %s</string>
     <string name="swap_too_low_amount_to_stay_abow_ed_title">Estás intentando intercambiar una cantidad demasiado pequeña</string>
+    <string name="swipe_gov_abstain_format">Abstenerse: %s</string>
+    <string name="swipe_gov_aye_format">A favor: %s</string>
+    <string name="swipe_gov_basket_remove_item_confirm_message">Siempre puedes votar por este referendo más tarde</string>
+    <string name="swipe_gov_basket_remove_item_confirm_title">¿Eliminar el referendo %s de la lista de votos?</string>
+    <string name="swipe_gov_basket_removed_items_message">Algunos de los referendos ya no están disponibles para votar o puede que no tengas suficientes tokens disponibles para votar. Disponible para votar: %s.</string>
+    <string name="swipe_gov_basket_removed_items_title">Algunos de los referendos fueron excluidos de la lista de votos</string>
+    <string name="swipe_gov_card_data_loading_error_message">No se pudieron cargar los datos del referendo</string>
+    <string name="swipe_gov_card_data_loading_error_title">No se recuperaron datos</string>
+    <string name="swipe_gov_card_placeholder_basket_empty_text">Ya has votado por todos los referendos disponibles o no hay referendos para votar en este momento. Vuelve más tarde.</string>
+    <string name="swipe_gov_card_placeholder_basket_full_text">Ya has votado por todos los referendos disponibles</string>
+    <string name="swipe_gov_card_requested_title">Solicitado:</string>
+    <string name="swipe_gov_cards_basket_title">Lista de votos</string>
+    <string name="swipe_gov_cards_counter">%d restantes</string>
+    <string name="swipe_gov_cards_full_list">Confirmar votos</string>
+    <string name="swipe_gov_cards_no_referenda_to_vote">No hay referendos para votar</string>
+    <string name="swipe_gov_cards_placeholder_button">Confirma tus votos</string>
+    <string name="swipe_gov_cards_voting_list_empty">Sin votos</string>
+    <string name="swipe_gov_convirm_votes_success_message">Has votado exitosamente por %d referendos</string>
+    <string name="swipe_gov_insufficient_balance_dialog_message" formatted="false">No tienes suficiente saldo para votar con el poder de voto actual %s (%sx). Por favor, cambia el poder de voto o añade más fondos a tu cartera.</string>
+    <string name="swipe_gov_insufficient_balance_dialog_title">Saldo insuficiente para votar</string>
+    <string name="swipe_gov_nay_format">En contra: %s</string>
+    <string name="swipe_gov_title">SwipeGov</string>
+    <string name="swipe_gov_vote_setup_title">Votar por %d referendos</string>
+    <string name="swipe_gov_vote_subtitle">La votación se establecerá para futuros votos en SwipeGov</string>
+    <string name="swipe_gov_vote_title">Poder de voto</string>
     <string name="tabbar_staking_title">Staking</string>
     <string name="tabbar_wallet_title">Cartera</string>
     <string name="today">Hoy</string>
+    <string name="token_price_info_provider_label">Enlace de Coingecko para información de precio (Opcional)</string>
     <string name="transaction_details_copy_hash">Copiar hash</string>
     <string name="transaction_details_extrinsic_fee">Comisión</string>
     <string name="transaction_details_from">Desde</string>
@@ -1508,6 +1674,7 @@
     <string name="wallet_asset_buy_with">Comprar con</string>
     <string name="wallet_asset_receive">Recibir</string>
     <string name="wallet_asset_receive_token">Recibir %s</string>
+    <string name="wallet_asset_receive_token_subtitle">Enviar solo el token %1$s y tokens en la red %2$s a esta dirección, o podrías perder tus fondos</string>
     <string name="wallet_asset_send">Enviar</string>
     <string name="wallet_asset_swap">Intercambiar</string>
     <string name="wallet_assets">Activos</string>

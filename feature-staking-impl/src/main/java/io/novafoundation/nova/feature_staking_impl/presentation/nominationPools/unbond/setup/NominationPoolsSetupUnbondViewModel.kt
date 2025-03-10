@@ -20,11 +20,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,8 @@ class NominationPoolsSetupUnbondViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: NominationPoolsUnbondValidationSystem,
     private val stakingSharedState: StakingSharedState,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -49,10 +51,19 @@ class NominationPoolsSetupUnbondViewModel(
 
     private val showNextProgress = MutableStateFlow(false)
 
-    private val assetFlow = assetUseCase.currentAssetFlow()
+    private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinFactory.create(assetFlow)
+    private val selectedAsset = assetWithOption.map { it.asset }
+        .shareInBackground()
+
+    private val selectedChainAsset = selectedAsset.map { it.token.configuration }
+        .shareInBackground()
+
+    val originFeeMixin = feeLoaderMixinFactory.createDefault(
+        this,
+        selectedChainAsset
+    )
 
     private val poolMemberStateFlow = interactor.poolMemberStateFlow(viewModelScope)
         .shareInBackground()
@@ -61,15 +72,18 @@ class NominationPoolsSetupUnbondViewModel(
 
     private val stakedBalance = poolMemberStateFlow.map { it.stakedBalance }
 
-    val transferableBalance = assetFlow.map {
+    val transferableBalance = selectedAsset.map {
         mapAmountToAmountModel(it.transferable, it)
     }.shareInBackground()
 
+    private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
+        selectedChainAsset.providingBalance(stakedBalance)
+    }
+
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
-        assetFlow = assetFlow,
-        availableBalanceFlow = stakedBalance,
-        balanceLabel = R.string.staking_main_stake_balance_staked
+        assetFlow = selectedAsset,
+        maxActionProvider = maxActionProvider
     )
 
     val hintsMixin = hintsFactory.create(coroutineScope = this)
@@ -97,10 +111,9 @@ class NominationPoolsSetupUnbondViewModel(
     private fun listenFee() {
         originFeeMixin.connectWith(
             inputSource1 = poolMemberFlow,
-            inputSource2 = amountChooserMixin.backPressuredAmount,
-            scope = this,
-            feeConstructor = { poolMember, amount ->
-                interactor.estimateFee(poolMember, amount.toPlanks())
+            inputSource2 = amountChooserMixin.backPressuredPlanks,
+            feeConstructor = { _, poolMember, amount ->
+                interactor.estimateFee(poolMember, amount)
             }
         )
     }
@@ -108,11 +121,11 @@ class NominationPoolsSetupUnbondViewModel(
     private fun maybeGoToNext() = launch {
         showNextProgress.value = true
 
-        val asset = assetFlow.first()
+        val asset = selectedAsset.first()
         val stakedBalance = asset.token.amountFromPlanks(stakedBalance.first())
 
         val payload = NominationPoolsUnbondValidationPayload(
-            fee = originFeeMixin.awaitDecimalFee(),
+            fee = originFeeMixin.awaitFee(),
             poolMember = poolMemberFlow.first(),
             stakedBalance = stakedBalance,
             asset = asset,

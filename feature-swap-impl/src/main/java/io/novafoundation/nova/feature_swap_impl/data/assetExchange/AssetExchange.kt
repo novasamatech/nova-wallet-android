@@ -1,76 +1,57 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange
 
-import io.novafoundation.nova.common.utils.MultiMap
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
-import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_swap_api.domain.model.MinimumBalanceBuyIn
-import io.novafoundation.nova.feature_swap_api.domain.model.QuotePath
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
-import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapDirection
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteException
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting.QuotingHost
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface AssetExchange {
 
-    interface Factory {
+    interface SingleChainFactory {
 
-        suspend fun create(chain: Chain, coroutineScope: CoroutineScope): AssetExchange?
+        suspend fun create(chain: Chain, swapHost: SwapHost): AssetExchange
     }
 
-    /**
-     * Implementations should expect `asset` to be non-utility asset,
-     * e.g. they don't need to additionally check whether asset is utility or not
-     * They can also expect this method is called only when asset is present in [AssetExchange.availableSwapDirections]
-     */
-    suspend fun canPayFeeInNonUtilityToken(asset: Chain.Asset): Boolean
+    interface MultiChainFactory {
 
-    suspend fun availableSwapDirections(): MultiMap<FullChainAssetId, FullChainAssetId>
+        suspend fun create(swapHost: SwapHost): AssetExchange
+    }
 
-    @Throws(SwapQuoteException::class)
-    suspend fun quote(args: AssetExchangeQuoteArgs): AssetExchangeQuote
+    interface SwapHost : QuotingHost {
 
-    suspend fun estimateFee(args: SwapExecuteArgs): AssetExchangeFee
+        val scope: CoroutineScope
 
-    suspend fun swap(args: SwapExecuteArgs): Result<ExtrinsicSubmission>
+        override val sharedSubscriptions: SharedSwapSubscriptions
 
-    suspend fun slippageConfig(): SlippageConfig
+        suspend fun quote(quoteArgs: ParentQuoterArgs): Balance
 
-    fun runSubscriptions(chain: Chain, metaAccount: MetaAccount): Flow<ReQuoteTrigger>
+        suspend fun extrinsicService(): ExtrinsicService
+    }
+
+    suspend fun sync()
+
+    suspend fun availableDirectSwapConnections(): List<SwapGraphEdge>
+
+    fun feePaymentOverrides(): List<FeePaymentProviderOverride>
+
+    fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 }
 
-data class AssetExchangeQuoteArgs(
+data class FeePaymentProviderOverride(
+    val provider: FeePaymentProvider,
+    val chain: Chain
+)
+
+data class ParentQuoterArgs(
     val chainAssetIn: Chain.Asset,
     val chainAssetOut: Chain.Asset,
     val amount: Balance,
     val swapDirection: SwapDirection,
-)
-
-class AssetExchangeQuote(
-    val direction: SwapDirection,
-
-    val quote: Balance,
-
-    val path: QuotePath
-) : Comparable<AssetExchangeQuote> {
-
-    override fun compareTo(other: AssetExchangeQuote): Int {
-        return when (direction) {
-            // When we want to sell a token, the bigger the quote - the better
-            SwapDirection.SPECIFIED_IN -> (quote - other.quote).signum()
-            // When we want to buy a token, the smaller the quote - the better
-            SwapDirection.SPECIFIED_OUT -> (other.quote - quote).signum()
-        }
-    }
-}
-
-class AssetExchangeFee(
-    val networkFee: Fee,
-    val minimumBalanceBuyIn: MinimumBalanceBuyIn
 )

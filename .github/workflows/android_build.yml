@@ -27,6 +27,10 @@ on:
         required: false
         type: string
         default: "apk"
+      build-debug-tests:
+        required: false
+        type: boolean
+        default: false
     secrets:
       ACALA_PROD_AUTH_TOKEN:
         required: true
@@ -118,6 +122,8 @@ env:
   CI_DEVELOP_GOOGLE_SERVICES_FILE: ${{ secrets.CI_DEVELOP_GOOGLE_SERVICES }}
   CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
+  POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
+
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}
   cancel-in-progress: true
@@ -125,7 +131,7 @@ concurrency:
 jobs:
   build-app:
     name: Build app and test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Checkout particualr branch
@@ -173,6 +179,10 @@ jobs:
       - name: 🏗 Build app
         if: ${{ !startsWith(inputs.gradlew-command, 'false') }}
         run: ./gradlew ${{ inputs.gradlew-command }}
+
+      - name: 🏗 Build debug tests
+        if: ${{ inputs.build-debug-tests }}
+        run: ./gradlew assembleDebugAndroidTest
 
       - name: 🧹 Delete key after building
         if: ${{ !startsWith(inputs.keystore-file-name, 'false') }}

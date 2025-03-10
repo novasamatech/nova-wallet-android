@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ExposureOverview
 import io.novafoundation.nova.feature_staking_api.domain.model.ExposurePage
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
+import io.novafoundation.nova.feature_staking_api.domain.model.InflationPredictionInfo
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -43,6 +44,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -75,6 +77,7 @@ class StakingRepositoryImpl(
     private val chainRegistry: ChainRegistry,
     private val stakingStoriesDataSource: StakingStoriesDataSource,
     private val storageCache: StorageCache,
+    private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
 ) : StakingRepository {
 
     override suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex {
@@ -266,6 +269,17 @@ class StakingRepositoryImpl(
         chainId = chainId
     )
 
+    override suspend fun getInflationPredictionInfo(chainId: ChainId): InflationPredictionInfo {
+        val callApi = multiChainRuntimeCallsApi.forChain(chainId)
+
+        return callApi.call(
+            section = "Inflation",
+            method = "experimental_inflation_prediction_info",
+            arguments = emptyMap(),
+            returnBinding = InflationPredictionInfo::fromDecoded
+        )
+    }
+
     private suspend fun <T> queryStorageIfExists(
         chainId: ChainId,
         storageName: String,
@@ -318,6 +332,7 @@ class StakingRepositoryImpl(
                     stashId,
                     prefs
                 )
+
                 nominations != null -> StakingState.Stash.Nominator(
                     chain,
                     chainAsset,

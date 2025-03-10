@@ -38,13 +38,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:switcherTextColor="@color/button_text"
-            app:title="Enable connection" />
+            app:title="@string/chain_network_management_enabling" />
 
         <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
             android:id="@+id/chainNetworkManagementAutoBalance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:title="Auto-balance nodes" />
+            app:title="@string/chain_network_management_auto_balance" />
 
     </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 

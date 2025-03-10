@@ -80,7 +80,7 @@ class RealNewDelegationChooseAmountInteractor(
                 amount = amount,
                 conviction = conviction,
                 delegate = delegate,
-                user = origin.requestedOrigin,
+                user = origin.executingAccount,
                 chain = chain,
                 tracks = tracks,
                 shouldRemoveOtherTracks = shouldRemoveOtherTracks
@@ -143,7 +143,9 @@ class RealNewDelegationChooseAmountInteractor(
 
         val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
 
-        val balanceLocksFlow = locksRepository.observeBalanceLocks(chain, chainAsset)
+        val metaId = accountRepository.getSelectedMetaAccount().id
+
+        val balanceLocksFlow = locksRepository.observeBalanceLocks(metaId, chain, chainAsset)
 
         return balanceLocksFlow.map { locks ->
             RealDelegateAssistant(

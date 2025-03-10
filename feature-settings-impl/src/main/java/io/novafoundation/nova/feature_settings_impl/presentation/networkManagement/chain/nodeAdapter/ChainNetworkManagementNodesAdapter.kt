@@ -100,7 +100,7 @@ class ChainNetworkManagementNodeViewHolder(
             chainNodeRadioButton.isEnabled = item.isSelectable
             chainNodeName.text = item.name
             chainNodeName.setTextColorRes(item.nameColorRes)
-            chainNodeSocketAddress.text = item.url
+            chainNodeSocketAddress.text = item.unformattedUrl
             chainNodeConnectionStatusShimmering.setShimmerShown(item.connectionState.showShimmering)
             chainNodeConnectionState.setText(item.connectionState.name)
             item.connectionState.chainStatusColor?.let { chainNodeConnectionState.setTextColor(it) }

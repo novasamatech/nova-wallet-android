@@ -18,9 +18,10 @@ class ReselectSwapFlowExecutor(
     override suspend fun openNextScreen(coroutineScope: CoroutineScope, chainAsset: Chain.Asset) {
         val state = swapSettingsStateProvider.getSwapSettingsState(coroutineScope)
         when (selectingDirection) {
-            SelectingDirection.IN -> state.setAssetInUpdatingFee(chainAsset)
+            SelectingDirection.IN -> state.setAssetIn(chainAsset)
             SelectingDirection.OUT -> state.setAssetOut(chainAsset)
         }
-        assetsRouter.back()
+
+        assetsRouter.returnToMainSwapScreen()
     }
 }

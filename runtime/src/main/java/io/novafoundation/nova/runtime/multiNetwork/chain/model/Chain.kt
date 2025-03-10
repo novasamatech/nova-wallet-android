@@ -15,7 +15,10 @@ typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 typealias BuyProviderId = String
 typealias BuyProviderArguments = Map<String, Any?>
 
-data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId)
+data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId) {
+
+    companion object
+}
 
 data class Chain(
     val id: ChainId,
@@ -36,6 +39,7 @@ data class Chain(
     val supportProxy: Boolean,
     val governance: List<Governance>,
     val swap: List<Swap>,
+    val customFee: List<CustomFee>,
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
@@ -54,7 +58,9 @@ data class Chain(
         val stakingMaxElectingVoters: Int?,
         val feeViaRuntimeCall: Boolean?,
         val supportLedgerGenericApp: Boolean?,
-        val identityChain: ChainId?
+        val identityChain: ChainId?,
+        val disabledCheckMetadataHash: Boolean?,
+        val sessionLength: Int?
     )
 
     data class Types(
@@ -63,7 +69,7 @@ data class Chain(
     )
 
     data class Asset(
-        val iconUrl: String?,
+        val icon: String?,
         val id: ChainAssetId,
         val priceId: String?,
         val chainId: ChainId,
@@ -75,7 +81,7 @@ data class Chain(
         val source: Source,
         val name: String,
         val enabled: Boolean,
-    ) : Identifiable {
+    ) : Identifiable, Serializable {
 
         enum class Source {
             DEFAULT, ERC20, MANUAL
@@ -86,7 +92,8 @@ data class Chain(
 
             data class Statemine(
                 val id: StatemineAssetId,
-                val palletName: String?
+                val palletName: String?,
+                val isSufficient: Boolean,
             ) : Type()
 
             data class Orml(
@@ -113,24 +120,28 @@ data class Chain(
             UNSUPPORTED,
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
             PARACHAIN, TURING, // parachain-staking like
-            NOMINATION_POOLS
+            NOMINATION_POOLS,
+            MYTHOS
         }
 
         override val identifier = "$chainId:$id"
     }
 
     data class Nodes(
-        val nodeSelectionStrategy: NodeSelectionStrategy,
+        val autoBalanceStrategy: AutoBalanceStrategy,
+        val wssNodeSelectionStrategy: NodeSelectionStrategy,
         val nodes: List<Node>,
     ) {
 
-        sealed interface NodeSelectionStrategy {
+        enum class AutoBalanceStrategy {
+            ROUND_ROBIN, UNIFORM
+        }
 
-            enum class AutoBalance : NodeSelectionStrategy {
-                ROUND_ROBIN, UNIFORM
-            }
+        sealed class NodeSelectionStrategy {
 
-            class SelectedNode(val nodeUrl: String?, val autoBalanceStrategy: AutoBalance) : NodeSelectionStrategy
+            object AutoBalance : NodeSelectionStrategy()
+
+            class SelectedNode(val unformattedNodeUrl: String) : NodeSelectionStrategy()
         }
     }
 
@@ -147,7 +158,7 @@ data class Chain(
         }
 
         val connectionType = when {
-            unformattedUrl.startsWith("wss://") -> ConnectionType.WSS
+            unformattedUrl.startsWith("wss://") || unformattedUrl.startsWith("ws://") -> ConnectionType.WSS
             unformattedUrl.startsWith("https://") -> ConnectionType.HTTPS
             else -> ConnectionType.UNKNOWN
         }
@@ -192,6 +203,8 @@ data class Chain(
         }
 
         data class GovernanceDelegations(override val url: String) : ExternalApi()
+
+        data class ReferendumSummary(override val url: String) : ExternalApi()
     }
 
     enum class Governance {
@@ -200,6 +213,10 @@ data class Chain(
 
     enum class Swap {
         ASSET_CONVERSION, HYDRA_DX
+    }
+
+    enum class CustomFee {
+        ASSET_HUB, HYDRA_DX
     }
 
     enum class ConnectionState {

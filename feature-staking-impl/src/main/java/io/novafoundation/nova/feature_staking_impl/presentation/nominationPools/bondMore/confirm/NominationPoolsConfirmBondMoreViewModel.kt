@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
@@ -52,7 +52,7 @@ class NominationPoolsConfirmBondMoreViewModel(
     ExternalActions by externalActions,
     Validatable by validationExecutor {
 
-    private val decimalFee = mapFeeFromParcel(payload.fee)
+    private val submissionFee = mapFeeFromParcel(payload.fee)
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
@@ -71,7 +71,7 @@ class NominationPoolsConfirmBondMoreViewModel(
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee.genericFee, asset.token)
+        val feeModel = mapFeeToFeeModel(submissionFee, asset.token)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -101,7 +101,7 @@ class NominationPoolsConfirmBondMoreViewModel(
 
     private fun maybeGoToNext() = launch {
         val payload = NominationPoolsBondMoreValidationPayload(
-            fee = decimalFee,
+            fee = submissionFee,
             amount = amountFlow.first(),
             poolMember = poolMember.first(),
             asset = assetFlow.first()

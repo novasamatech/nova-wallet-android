@@ -106,6 +106,12 @@
         <attr name="primaryValueIconTint" format="color" />
         <attr name="titleEllipsisable" format="boolean" />
         <attr name="primaryValue" format="string" />
+        <attr name="shouldDrawDivider" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="GenericTableCellView">
+        <attr name="title" />
+        <attr name="titleIcon" />
     </declare-styleable>
 
     <declare-styleable name="TableView">
@@ -252,8 +258,10 @@
     </declare-styleable>
 
     <declare-styleable name="ExpandableView">
+        <attr name="supportAnimation" format="boolean" />
         <attr name="chevronId" format="reference" />
         <attr name="expandableId" format="reference" />
+        <attr name="collapsedByDefault" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="PromoBannerView">

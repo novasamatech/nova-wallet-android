@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common
 
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
+import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumThreshold
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumTrack
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
+import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumDetails
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumPreview
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
@@ -18,7 +20,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 
 interface ReferendumFormatter {
 
-    fun formatVoting(voting: ReferendumVoting, token: Token): ReferendumVotingModel
+    fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel?
 
     fun formatReferendumTrack(track: ReferendumTrack, asset: Chain.Asset): ReferendumTrackModel
 
@@ -39,4 +41,8 @@ interface ReferendumFormatter {
         token: Token,
         chain: Chain
     ): ReferendumModel
+
+    fun formatReferendumName(referendum: ReferendumPreview): String
+
+    fun formatReferendumName(referendum: ReferendumDetails): String
 }

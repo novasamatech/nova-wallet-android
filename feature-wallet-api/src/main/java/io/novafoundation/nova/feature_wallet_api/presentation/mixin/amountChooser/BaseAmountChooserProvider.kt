@@ -6,19 +6,20 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.mapNullable
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
-import io.novafoundation.nova.common.validation.getReasonOrNull
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.AmountErrorState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider.MaxAvailableForAction
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxAvailableBalance
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -27,7 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -35,12 +36,13 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
 
-private const val DEBOUNCE_DURATION_MILLIS = 500
+private val DEBOUNCE_DURATION = 500.milliseconds
 
 @OptIn(FlowPreview::class)
 @Suppress("LeakingThis")
@@ -54,9 +56,6 @@ open class BaseAmountChooserProvider(
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
 
-    private val chainAssetFlow = tokenFlow.map { it?.configuration }
-        .distinctUntilChanged()
-
     final override val inputState = MutableStateFlow(defaultState())
 
     @Deprecated(
@@ -69,18 +68,9 @@ open class BaseAmountChooserProvider(
     final override val amountInput = inputState.map { it.value }
         .stateIn(this, SharingStarted.Eagerly, initialValue = "")
 
-    override val fieldError: Flow<AmountErrorState> = fieldValidator?.observe(amountInput)
-        ?.map { formatValidationResultToErrorState(it) }
-        ?: flowOf(AmountErrorState.Valid)
-
-    private fun formatValidationResultToErrorState(result: FieldValidationResult): AmountErrorState {
-        val reason = result.getReasonOrNull()
-        return if (reason != null) {
-            AmountErrorState.Invalid(reason)
-        } else {
-            AmountErrorState.Valid
-        }
-    }
+    @Suppress("DEPRECATION")
+    override val fieldError: Flow<FieldValidationResult> = fieldValidator?.observe(amountInput)
+        ?: flowOf(FieldValidationResult.Ok)
 
     final override val amountState: Flow<InputState<BigDecimal?>> = inputState
         .map { inputState ->
@@ -98,7 +88,17 @@ open class BaseAmountChooserProvider(
         .shareInBackground()
 
     override val backPressuredAmount: Flow<BigDecimal>
-        get() = _amount.debounce(DEBOUNCE_DURATION_MILLIS.milliseconds)
+        get() = _amount.debounce(DEBOUNCE_DURATION)
+
+    private val chainAssetFlow = tokenFlow.filterNotNull()
+        .map { it.configuration }
+        .distinctUntilChangedBy { it.fullId }
+        .shareInBackground()
+
+    override val backPressuredPlanks: Flow<Balance> = combine(chainAssetFlow, _amount) { chainAsset, amount ->
+        chainAsset.planksFromAmount(amount)
+    }
+        .debounce(DEBOUNCE_DURATION)
 
     override val maxAction: AmountChooserMixinBase.MaxAction = RealMaxAction()
 
@@ -120,25 +120,20 @@ open class BaseAmountChooserProvider(
 
         private var activeDelayedClick: Job? = null
 
-        private val maxAvailableForActionAmount = combine(chainAssetFlow, maxActionProvider.maxAvailableForAction()) { chainAsset, maxAvailableForAction ->
-            if (chainAsset == null || maxAvailableForAction == null) {
-                null
-            } else {
-                chainAsset.amountFromPlanks(maxAvailableForAction)
-            }
+        private val maxAvailableBalance = maxActionProvider.maxAvailableBalanceOrNull()
+            .shareInBackground()
+
+        private val maxAvailableForActionAmount = maxAvailableBalance.mapNullable { maxAvailableBalance ->
+            maxAvailableBalance.actualAmount
         }.shareInBackground()
 
-        override val display: Flow<String?> = combine(chainAssetFlow, maxActionProvider.maxAvailableForDisplay()) { chainAsset, maxAvailableForDisplay ->
-            if (chainAsset == null || maxAvailableForDisplay == null) {
-                null
-            } else {
-                maxAvailableForDisplay.formatPlanks(chainAsset)
-            }
+        override val display: Flow<String?> = maxAvailableBalance.mapNullable { maxAvailableBalance ->
+            maxAvailableBalance.displayedBalance.formatPlanks(maxAvailableBalance.chainAsset)
         }.inBackground()
 
-        override val maxClick: Flow<MaxClick?> = maxAvailableForActionAmount.map { maxAvailableForAction ->
+        override val maxClick: Flow<MaxClick> = maxAvailableForActionAmount.map { maxAvailableForAction ->
             getMaxClickAction(maxAvailableForAction)
-        }.inBackground()
+        }.shareInBackground()
 
         init {
             setupAutoUpdates()
@@ -199,11 +194,12 @@ open class BaseAmountChooserProvider(
             return InputState(amount.toStripTrailingZerosString(), initiatedByUser = true, inputKind = InputKind.MAX_ACTION)
         }
 
-        private fun MaxActionProvider?.maxAvailableForAction(): Flow<Balance?> = this?.maxAvailableForAction?.balance() ?: flowOf(null)
+        private fun MaxActionProvider?.maxAvailableBalanceOrNull(): Flow<MaxAvailableBalance?> {
+            if (this == null) return flowOf(null)
 
-        private fun MaxActionProvider?.maxAvailableForDisplay(): Flow<Balance?> = this?.maxAvailableForDisplay ?: flowOf(null)
-
-        private fun Flow<MaxAvailableForAction?>.balance(): Flow<Balance?> = map { it?.balance }
+            return maxAvailableBalance
+                .onStart<MaxAvailableBalance?> { emit(null) }
+        }
 
         private fun cancelActiveDelayedClick() {
             activeDelayedClick?.cancel()

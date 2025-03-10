@@ -2,25 +2,28 @@ package io.novafoundation.nova.feature_settings_impl.domain
 
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.runtime.ext.Geneses
-import io.novafoundation.nova.runtime.ext.autoBalanceDisabled
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.ext.isCustomNetwork
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.ext.isEnabled
-import io.novafoundation.nova.runtime.ext.selectedNodeUrlOrNull
+import io.novafoundation.nova.runtime.ext.selectedUnformattedWssNodeUrlOrNull
 import io.novafoundation.nova.runtime.ext.wssNodes
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
 import io.novafoundation.nova.runtime.repository.ChainRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 
 class ChainNetworkState(
     val chain: Chain,
@@ -50,19 +53,20 @@ interface NetworkManagementChainInteractor {
 
     suspend fun toggleAutoBalance(chainId: String)
 
-    suspend fun selectNode(chainId: String, nodeUrl: String)
+    suspend fun selectNode(chainId: String, unformattedNodeUrl: String)
 
     suspend fun toggleChainEnableState(chainId: String)
 
     suspend fun deleteNetwork(chainId: String)
 
-    suspend fun deleteNode(chainId: String, nodeUrl: String)
+    suspend fun deleteNode(chainId: String, unformattedNodeUrl: String)
 }
 
 class RealNetworkManagementChainInteractor(
     private val chainRegistry: ChainRegistry,
     private val nodeHealthStateTesterFactory: NodeHealthStateTesterFactory,
-    private val chainRepository: ChainRepository
+    private val chainRepository: ChainRepository,
+    private val accountInteractor: AccountInteractor
 ) : NetworkManagementChainInteractor {
 
     override fun chainStateFlow(chainId: String, coroutineScope: CoroutineScope): Flow<ChainNetworkState> {
@@ -77,11 +81,23 @@ class RealNetworkManagementChainInteractor(
 
     override suspend fun toggleAutoBalance(chainId: String) {
         val chain = chainRegistry.getChain(chainId)
-        chainRegistry.setAutoBalanceEnabled(chainId, chain.autoBalanceDisabled)
+        chainRegistry.setWssNodeSelectionStrategy(chainId, chain.nodes.strategyForToggledWssAutoBalance())
     }
 
-    override suspend fun selectNode(chainId: String, nodeUrl: String) {
-        chainRegistry.setDefaultNode(chainId, nodeUrl)
+    private fun Chain.Nodes.strategyForToggledWssAutoBalance(): NodeSelectionStrategy {
+        return when (wssNodeSelectionStrategy) {
+            NodeSelectionStrategy.AutoBalance -> {
+                val firstNode = wssNodes().first()
+                NodeSelectionStrategy.SelectedNode(firstNode.unformattedUrl)
+            }
+
+            is NodeSelectionStrategy.SelectedNode -> NodeSelectionStrategy.AutoBalance
+        }
+    }
+
+    override suspend fun selectNode(chainId: String, unformattedNodeUrl: String) {
+        val strategy = NodeSelectionStrategy.SelectedNode(unformattedNodeUrl)
+        chainRegistry.setWssNodeSelectionStrategy(chainId, strategy)
     }
 
     override suspend fun toggleChainEnableState(chainId: String) {
@@ -94,18 +110,20 @@ class RealNetworkManagementChainInteractor(
         val chain = chainRegistry.getChain(chainId)
 
         require(chain.isCustomNetwork)
+
+        withContext(Dispatchers.Default) { accountInteractor.deleteProxiedMetaAccountsByChain(chainId) } // Delete proxied meta accounts manually
         chainRepository.deleteNetwork(chainId)
     }
 
-    override suspend fun deleteNode(chainId: String, nodeUrl: String) {
+    override suspend fun deleteNode(chainId: String, unformattedNodeUrl: String) {
         val chain = chainRegistry.getChain(chainId)
 
         require(chain.nodes.nodes.size > 1)
 
-        chainRepository.deleteNode(chainId, nodeUrl)
+        chainRepository.deleteNode(chainId, unformattedNodeUrl)
 
-        if (chain.selectedNodeUrlOrNull == nodeUrl) {
-            chainRegistry.setAutoBalanceEnabled(chain.id, true)
+        if (chain.selectedUnformattedWssNodeUrlOrNull == unformattedNodeUrl) {
+            chainRegistry.setWssNodeSelectionStrategy(chainId, NodeSelectionStrategy.AutoBalance)
         }
     }
 

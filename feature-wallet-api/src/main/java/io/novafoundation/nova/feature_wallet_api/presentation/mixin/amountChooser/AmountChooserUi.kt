@@ -5,6 +5,7 @@ import android.widget.EditText
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
@@ -17,7 +18,9 @@ interface AmountInputView {
 
     fun setFiatAmount(fiat: CharSequence?)
 
-    fun setError(errorState: AmountChooserMixinBase.AmountErrorState)
+    fun setError(errorState: FieldValidationResult)
+
+    fun setEnabled(enabled: Boolean)
 }
 
 interface MaxAvailableView {
@@ -55,7 +58,7 @@ fun BaseFragment<*>.setupAmountChooserBase(
     amountInputView: AmountInputView,
     maxAvailableView: MaxAvailableView?
 ) {
-    amountInputView.amountInput.bindToAmountInput(mixin.inputState, lifecycleScope)
+    bindInputStateToField(amountInputView, mixin.inputState, lifecycleScope)
     mixin.fiatAmount.observe(amountInputView::setFiatAmount)
     mixin.fieldError.observe(amountInputView::setError)
 
@@ -80,6 +83,12 @@ fun BaseFragment<*>.setupAmountChooserBase(
     }
 }
 
-private fun EditText.bindToAmountInput(flow: MutableSharedFlow<InputState<String>>, scope: CoroutineScope) {
-    bindTo(flow, scope, toT = { InputState(it, initiatedByUser = true, InputState.InputKind.REGULAR) }, fromT = { it.value })
+private fun BaseFragment<*>.bindInputStateToField(
+    amountInputView: AmountInputView,
+    flow: MutableSharedFlow<InputState<String>>,
+    scope: CoroutineScope
+) {
+    amountInputView.amountInput.bindTo(flow, scope, toT = { InputState(it, initiatedByUser = true, InputState.InputKind.REGULAR) }, fromT = { it.value })
+
+    flow.observe { amountInputView.setEnabled(it.inputKind.isInputAllowed()) }
 }

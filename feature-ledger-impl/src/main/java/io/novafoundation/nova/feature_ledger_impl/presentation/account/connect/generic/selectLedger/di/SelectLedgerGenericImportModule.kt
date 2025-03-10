@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportViewModel
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
 
 @Module(includes = [ViewModelModule::class])
 class SelectLedgerGenericImportModule {
@@ -39,7 +38,6 @@ class SelectLedgerGenericImportModule {
     @IntoMap
     @ViewModelKey(SelectLedgerGenericImportViewModel::class)
     fun provideViewModel(
-        substrateApplication: GenericSubstrateLedgerApplication,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
@@ -49,7 +47,6 @@ class SelectLedgerGenericImportModule {
         messageFormatter: LedgerMessageFormatter
     ): ViewModel {
         return SelectLedgerGenericImportViewModel(
-            substrateApplication = substrateApplication,
             discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,

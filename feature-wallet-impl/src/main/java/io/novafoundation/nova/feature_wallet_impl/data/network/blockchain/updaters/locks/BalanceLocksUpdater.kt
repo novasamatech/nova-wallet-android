@@ -38,12 +38,22 @@ class BalanceLocksUpdater(
         storageSubscriptionBuilder: SharedRequestsBuilder,
         scopeValue: MetaAccount,
     ): Flow<Updater.SideEffect> {
-        return chain.enabledAssets().map { chainAsset ->
-            val metaAccount = scopeValue
-            val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
-            val assetSource = assetSourceRegistry.sourceFor(chainAsset)
-            assetSource.balance.startSyncingBalanceLocks(metaAccount, chain, chainAsset, accountId, storageSubscriptionBuilder)
+        val metaAccount = scopeValue
+        val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
+
+        val flows = buildList {
+            chain.enabledAssets().forEach { chainAsset ->
+                val assetSource = assetSourceRegistry.sourceFor(chainAsset)
+
+                val locksFlow = assetSource.balance.startSyncingBalanceLocks(metaAccount, chain, chainAsset, accountId, storageSubscriptionBuilder)
+                val holdsFlow = assetSource.balance.startSyncingBalanceHolds(metaAccount, chain, chainAsset, accountId, storageSubscriptionBuilder)
+
+                add(locksFlow)
+                add(holdsFlow)
+            }
         }
+
+        return flows
             .merge()
             .noSideAffects()
     }

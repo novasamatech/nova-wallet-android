@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -25,9 +26,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDes
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.RewardDestinationParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.DecimalFee
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
@@ -118,7 +118,7 @@ class SelectRewardDestinationViewModel(
 
         val payload = RewardDestinationValidationPayload(
             availableControllerBalance = controllerAssetFlow.first().transferable,
-            fee = feeLoaderMixin.awaitDecimalFee(),
+            fee = feeLoaderMixin.awaitFee(),
             stashState = stashStateFlow.first()
         )
 
@@ -136,7 +136,7 @@ class SelectRewardDestinationViewModel(
         }
     }
 
-    private fun goToNextStep(rewardDestination: RewardDestinationModel, fee: DecimalFee) {
+    private fun goToNextStep(rewardDestination: RewardDestinationModel, fee: Fee) {
         val payload = ConfirmRewardDestinationPayload(
             fee = mapFeeToParcel(fee),
             rewardDestination = mapRewardDestinationModelToRewardDestinationParcelModel(rewardDestination)

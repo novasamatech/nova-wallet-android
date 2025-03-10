@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemAssetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="4dp"
+    android:layout_weight="1"
+    android:background="@drawable/bg_primary_list_item_corner_12_solid">
+
+    <ImageView
+        android:id="@+id/itemNetworkImage"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_polkadot_24" />
+
+    <TextView
+        android:id="@+id/itemNetworkName"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemNetworkImage"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Polkadot" />
+
+    <TextView
+        android:id="@+id/itemNetworkBalance"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/itemNetworkPriceAmount"
+        app:layout_constraintEnd_toEndOf="@+id/itemNetworkPriceAmount"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/itemNetworkName"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="120.0849" />
+
+    <TextView
+        android:id="@+id/itemNetworkPriceAmount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemNetworkBalance"
+        tools:text="$1,000.05" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

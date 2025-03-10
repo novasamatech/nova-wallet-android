@@ -35,7 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.hints.ConfirmStakeHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.reset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -140,7 +140,7 @@ class ConfirmChangeValidatorsViewModel(
         _showNextProgress.value = true
 
         val payload = SetupStakingPayload(
-            maxFee = feeLoaderMixin.awaitDecimalFee(),
+            maxFee = feeLoaderMixin.awaitFee(),
             controllerAsset = controllerAssetFlow.first()
         )
 

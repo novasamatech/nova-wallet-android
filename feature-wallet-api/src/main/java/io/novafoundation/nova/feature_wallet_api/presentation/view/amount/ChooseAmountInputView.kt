@@ -7,9 +7,10 @@ import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadTokenIcon
+import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
 import kotlinx.android.synthetic.main.view_choose_amount_input.view.chooseAmountInputFiat
@@ -33,13 +34,38 @@ class ChooseAmountInputView @JvmOverloads constructor(
     init {
         View.inflate(context, R.layout.view_choose_amount_input, this)
 
-        setAddStatesFromChildren(true) // so view will be focused when `chooseAmountInput` is focused
-
         background = context.getInputBackground()
     }
 
-    fun loadAssetImage(imageUrl: String?) {
-        chooseAmountInputImage.loadTokenIcon(imageUrl, imageLoader)
+    // To propagate state_focused from chooseAmountInputField
+    override fun childDrawableStateChanged(child: View) {
+        refreshDrawableState()
+    }
+
+    // Allocate all the state chooseAmountInputField can have, e.g. state_focused and state_enabled
+    override fun onCreateDrawableState(extraSpace: Int): IntArray {
+        val fieldState: IntArray? = amountInput.drawableState
+
+        val need = fieldState?.size ?: 0
+
+        val selfState = super.onCreateDrawableState(extraSpace + need)
+
+        return mergeDrawableStates(selfState, fieldState)
+    }
+
+    // Propagate state_enabled to children
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+
+        chooseAmountInputImage.alpha = if (enabled) 1f else 0.48f
+
+        chooseAmountInputField.isEnabled = enabled
+        chooseAmountInputToken.isEnabled = enabled
+        chooseAmountInputFiat.isEnabled = enabled
+    }
+
+    fun loadAssetImage(icon: Icon) {
+        chooseAmountInputImage.setTokenIcon(icon, imageLoader)
     }
 
     fun setAssetName(name: String) {

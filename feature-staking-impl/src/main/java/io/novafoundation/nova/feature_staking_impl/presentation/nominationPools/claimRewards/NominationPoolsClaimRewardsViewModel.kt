@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimR
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitDecimalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NominationPoolsClaimRewardsViewModel(
@@ -57,7 +58,7 @@ class NominationPoolsClaimRewardsViewModel(
     private val pendingRewards = interactor.pendingRewardsFlow()
         .shareInBackground()
 
-    val pendingRewardsAmountModel = combine(pendingRewards, assetFlow, ::mapAmountToAmountModel)
+    val pendingRewardsAmountModel = combine(pendingRewards.map { it.amount }, assetFlow, ::mapAmountToAmountModel)
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
@@ -99,12 +100,14 @@ class NominationPoolsClaimRewardsViewModel(
         _showNextProgress.value = true
 
         val shouldRestake = shouldRestakeInput.first()
+        val pendingRewards = pendingRewards.first()
 
         val payload = NominationPoolsClaimRewardsValidationPayload(
-            fee = feeLoaderMixin.awaitDecimalFee(),
-            pendingRewardsPlanks = pendingRewards.first(),
+            fee = feeLoaderMixin.awaitFee(),
+            pendingRewardsPlanks = pendingRewards.amount,
             asset = assetFlow.first(),
-            chain = stakingSharedState.chain()
+            chain = stakingSharedState.chain(),
+            poolMember = pendingRewards.poolMember
         )
 
         validationExecutor.requireValid(

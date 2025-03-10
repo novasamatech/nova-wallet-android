@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -41,11 +42,11 @@ class EvmNativeAssetBalance(
         return emptyFlow<Nothing>()
     }
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+    override fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         // Evm native tokens do not have ED
         return BigInteger.ZERO
     }
@@ -65,8 +66,8 @@ class EvmNativeAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Balance> {
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
         TODO("Not yet implemented")
     }
 

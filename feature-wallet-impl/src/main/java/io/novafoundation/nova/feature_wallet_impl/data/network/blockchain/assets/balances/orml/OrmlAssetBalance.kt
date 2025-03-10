@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrmlAccountBalanceOrEmpty
+import io.novafoundation.nova.common.domain.balance.TransferableMode
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.tokens
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -12,9 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset.Companion.calculateTransferable
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
@@ -54,16 +54,16 @@ class OrmlAssetBalance(
 
         return subscriptionBuilder.subscribe(key)
             .map { change ->
-                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime)).orEmpty()
+                val balanceLocks = bindBalanceLocks(storage.decodeValue(change.value, runtime))
                 lockDao.updateLocks(balanceLocks, metaAccount.id, chain.id, chainAsset.id)
             }
     }
 
-    override suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
+    override fun isSelfSufficient(chainAsset: Chain.Asset): Boolean {
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         return chainAsset.requireOrml().existentialDeposit
     }
 
@@ -79,15 +79,18 @@ class OrmlAssetBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder
-    ): Flow<Balance> {
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
         return remoteStorageSource.subscribe(chain.id, sharedSubscriptionBuilder) {
-            metadata.tokens().storage("Accounts").observe(
+            metadata.tokens().storage("Accounts").observeWithRaw(
                 accountId,
                 chainAsset.ormlCurrencyId(runtime),
                 binding = ::bindOrmlAccountBalanceOrEmpty
             ).map {
-                Asset.TransferableMode.REGULAR.calculateTransferable(it)
+                TransferableBalanceUpdate(
+                    newBalance = TransferableMode.REGULAR.calculateTransferable(it.value),
+                    updatedAt = it.at
+                )
             }
         }
     }

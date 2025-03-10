@@ -4,11 +4,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import java.math.BigInteger
 
 sealed class BalanceSyncUpdate {
@@ -30,12 +31,17 @@ interface AssetBalance {
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<*>
 
-    suspend fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
-
-    suspend fun existentialDeposit(
+    suspend fun startSyncingBalanceHolds(
+        metaAccount: MetaAccount,
         chain: Chain,
-        chainAsset: Chain.Asset
-    ): BigInteger
+        chainAsset: Chain.Asset,
+        accountId: AccountId,
+        subscriptionBuilder: SharedRequestsBuilder
+    ): Flow<*> = emptyFlow<Nothing>()
+
+    fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
+
+    suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger
 
     suspend fun queryAccountBalance(
         chain: Chain,
@@ -47,8 +53,8 @@ interface AssetBalance {
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder,
-    ): Flow<Balance>
+        sharedSubscriptionBuilder: SharedRequestsBuilder?,
+    ): Flow<TransferableBalanceUpdate>
 
     suspend fun queryTotalBalance(
         chain: Chain,

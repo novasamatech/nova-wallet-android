@@ -1,30 +1,67 @@
 package io.novafoundation.nova.runtime.multiNetwork.connection.autobalance.strategy
 
-import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.runtime.ext.httpNodes
+import io.novafoundation.nova.runtime.ext.wssNodes
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import kotlinx.coroutines.flow.Flow
+import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
+import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrl
+import io.novafoundation.nova.runtime.multiNetwork.connection.saturateNodeUrls
 
-class NodeSelectionStrategyProvider {
+class NodeSelectionStrategyProvider(
+    private val connectionSecrets: ConnectionSecrets,
+) {
 
-    private val roundRobin = RoundRobinStrategy()
-    private val uniform = UniformStrategy()
-
-    fun strategyFlowFor(chainId: ChainId, default: NodeSelectionStrategy): Flow<NodeSelectionSequenceStrategy> {
-        return flowOf { strategyFor(default) }
+    fun createWss(config: Chain.Nodes): NodeSequenceGenerator {
+        return createNodeSequenceGenerator(
+            availableNodes = config.wssNodes(),
+            autobalanceStrategy = config.autoBalanceStrategy,
+            nodeSelectionStrategy = config.wssNodeSelectionStrategy
+        )
     }
 
-    fun strategyFor(config: NodeSelectionStrategy): NodeSelectionSequenceStrategy {
-        return when (config) {
-            is NodeSelectionStrategy.AutoBalance -> autobalanceStrategyFor(config)
-            is NodeSelectionStrategy.SelectedNode -> SelectedNodeStrategy(config.nodeUrl, autobalanceStrategyFor(config.autoBalanceStrategy))
+    fun createHttp(config: Chain.Nodes): NodeSequenceGenerator {
+        return createNodeSequenceGenerator(
+            availableNodes = config.httpNodes(),
+            autobalanceStrategy = config.autoBalanceStrategy,
+            // Http nodes disregard selected wss strategy and always use auto balance
+            nodeSelectionStrategy = NodeSelectionStrategy.AutoBalance
+        )
+    }
+
+    private fun createNodeSequenceGenerator(
+        availableNodes: List<Chain.Node>,
+        autobalanceStrategy: Chain.Nodes.AutoBalanceStrategy,
+        nodeSelectionStrategy: NodeSelectionStrategy,
+    ): NodeSequenceGenerator {
+        return when (nodeSelectionStrategy) {
+            NodeSelectionStrategy.AutoBalance -> createAutoBalanceGenerator(autobalanceStrategy, availableNodes)
+            is NodeSelectionStrategy.SelectedNode -> {
+                createSelectedNodeGenerator(nodeSelectionStrategy.unformattedNodeUrl, availableNodes)
+                    // Fallback to auto balance in case we failed to setup a selected node strategy
+                    ?: createAutoBalanceGenerator(autobalanceStrategy, availableNodes)
+            }
         }
     }
 
-    private fun autobalanceStrategyFor(config: NodeSelectionStrategy.AutoBalance): NodeSelectionSequenceStrategy {
-        return when (config) {
-            NodeSelectionStrategy.AutoBalance.ROUND_ROBIN -> roundRobin
-            NodeSelectionStrategy.AutoBalance.UNIFORM -> uniform
+    private fun createSelectedNodeGenerator(
+        selectedUnformattedNodeUrl: String,
+        availableNodes: List<Chain.Node>,
+    ): SelectedNodeGenerator? {
+        val node = availableNodes.find { it.unformattedUrl == selectedUnformattedNodeUrl } ?: return null
+        val saturatedNode = node.saturateNodeUrl(connectionSecrets) ?: return null
+        return SelectedNodeGenerator(saturatedNode)
+    }
+
+    private fun createAutoBalanceGenerator(
+        autoBalanceStrategy: Chain.Nodes.AutoBalanceStrategy,
+        availableNodes: List<Chain.Node>,
+    ): NodeSequenceGenerator {
+        val saturatedUrls = availableNodes.saturateNodeUrls(connectionSecrets)
+
+        return when (autoBalanceStrategy) {
+            Chain.Nodes.AutoBalanceStrategy.ROUND_ROBIN -> RoundRobinGenerator(saturatedUrls)
+            Chain.Nodes.AutoBalanceStrategy.UNIFORM -> UniformGenerator(saturatedUrls)
         }
     }
 }

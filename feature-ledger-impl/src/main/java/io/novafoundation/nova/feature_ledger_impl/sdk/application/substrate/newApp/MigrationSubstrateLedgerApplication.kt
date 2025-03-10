@@ -11,8 +11,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class MigrationSubstrateLedgerApplication(
     transport: LedgerTransport,
-    chainRegistry: ChainRegistry,
     metadataShortenerService: MetadataShortenerService,
+    private val chainRegistry: ChainRegistry,
     private val ledgerRepository: LedgerRepository,
     private val legacyApplicationConfigs: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all()
 ) : NewSubstrateLedgerApplication(transport, chainRegistry, metadataShortenerService) {
@@ -23,6 +23,12 @@ class MigrationSubstrateLedgerApplication(
         val applicationConfig = legacyApplicationConfigs.getConfig(chainId)
 
         return buildDerivationPath(applicationConfig.coin, accountIndex)
+    }
+
+    override suspend fun getAddressPrefix(chainId: ChainId): Short {
+        val chain = chainRegistry.getChain(chainId)
+
+        return chain.addressPrefix.toShort()
     }
 
     override suspend fun getDerivationPath(metaId: Long, chainId: ChainId): String {

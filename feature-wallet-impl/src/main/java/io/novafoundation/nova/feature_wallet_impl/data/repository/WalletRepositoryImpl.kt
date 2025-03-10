@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.model.PhishingAddressLocal
 import io.novafoundation.nova.core_db.model.TokenLocal
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
 import io.novafoundation.nova.core_db.model.operation.OperationLocal
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
@@ -19,7 +20,6 @@ import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteData
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 class WalletRepositoryImpl(
     private val substrateSource: SubstrateRemoteSource,
@@ -57,8 +56,8 @@ class WalletRepositoryImpl(
             chainRegistry.chainsById,
             assetCache.observeSyncedAssets(metaId)
         ) { chainsById, assetsLocal ->
-            assetsLocal.map { asset ->
-                mapAssetLocalToAsset(asset, chainsById.chainAsset(asset.assetAndChainId))
+            assetsLocal.mapNotNull { asset ->
+                chainsById.chainAsset(asset.assetAndChainId)?.let { mapAssetLocalToAsset(asset, it) }
             }
         }
     }
@@ -67,8 +66,8 @@ class WalletRepositoryImpl(
         val chainsById = chainRegistry.chainsById.first()
         val assetsLocal = assetCache.getSyncedAssets(metaId)
 
-        assetsLocal.map {
-            mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+        assetsLocal.mapNotNull { asset ->
+            chainsById.chainAsset(asset.assetAndChainId)?.let { mapAssetLocalToAsset(asset, it) }
         }
     }
 
@@ -76,8 +75,8 @@ class WalletRepositoryImpl(
         val chainsById = chainRegistry.chainsById.first()
         val assetsLocal = assetCache.getSupportedAssets(metaId)
 
-        assetsLocal.map {
-            mapAssetLocalToAsset(it, chainsById.chainAsset(it.assetAndChainId))
+        assetsLocal.mapNotNull { asset ->
+            chainsById.chainAsset(asset.assetAndChainId)?.let { mapAssetLocalToAsset(asset, it) }
         }
     }
 
@@ -171,7 +170,7 @@ class WalletRepositoryImpl(
     override suspend fun insertPendingTransfer(
         hash: String,
         assetTransfer: AssetTransfer,
-        fee: BigDecimal
+        fee: SubmissionFee
     ) {
         val operation = createAppOperation(
             hash = hash,
@@ -210,7 +209,7 @@ class WalletRepositoryImpl(
     private fun createAppOperation(
         hash: String,
         transfer: AssetTransfer,
-        fee: BigDecimal,
+        fee: SubmissionFee,
     ): OperationLocal {
         val senderAddress = transfer.sender.requireAddressIn(transfer.originChain)
 
@@ -222,7 +221,7 @@ class WalletRepositoryImpl(
             amount = transfer.amountInPlanks,
             senderAddress = senderAddress,
             receiverAddress = transfer.recipient,
-            fee = transfer.commissionAssetToken.planksFromAmount(fee),
+            fee = fee.amount,
             status = OperationBaseLocal.Status.PENDING,
             source = OperationBaseLocal.Source.APP
         )
@@ -242,7 +241,7 @@ class WalletRepositoryImpl(
         assetCache.getAssetWithToken(metaAccount.id, chainId, assetId)
     }
 
-    private fun Map<ChainId, Chain>.chainAsset(ids: AssetAndChainId): Chain.Asset {
-        return getValue(ids.chainId).assetsById.getValue(ids.assetId)
+    private fun Map<ChainId, Chain>.chainAsset(ids: AssetAndChainId): Chain.Asset? {
+        return get(ids.chainId)?.assetsById?.get(ids.assetId)
     }
 }

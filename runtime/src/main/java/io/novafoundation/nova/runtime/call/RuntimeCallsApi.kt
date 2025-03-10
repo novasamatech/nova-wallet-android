@@ -1,7 +1,7 @@
 package io.novafoundation.nova.runtime.call
 
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
-import io.novafoundation.nova.runtime.network.rpc.StateCallRequest
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -9,22 +9,29 @@ import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.registry.TypeRegistry
 import io.novasama.substrate_sdk_android.runtime.definitions.registry.getOrThrow
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
+import io.novasama.substrate_sdk_android.runtime.metadata.createRequest
+import io.novasama.substrate_sdk_android.runtime.metadata.decodeOutput
+import io.novasama.substrate_sdk_android.runtime.metadata.method
+import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApi
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.state.StateCallRequest
 
 typealias RuntimeTypeName = String
 typealias RuntimeTypeValue = Any?
 
 interface RuntimeCallsApi {
 
+    val chainId: ChainId
+
     val runtime: RuntimeSnapshot
 
-    // TODO we can do better than that - it is possible to auto-detect method signature's types
-    // However it requires a separate research
-    // We should revisit this when Metadata v15 will take place
     /**
      * @param arguments - list of pairs [runtimeTypeValue, runtimeTypeName],
      * where runtimeTypeValue is value to be encoded and runtimeTypeName is type name that can be found in [TypeRegistry]
      * It can also be null, in that case argument is considered as already encoded in hex form
+     *
+     * This should only be used if automatic decoding via metadata is not possible
+     * For the other cases use another [call] overload
      */
     suspend fun <R> call(
         section: String,
@@ -33,10 +40,27 @@ interface RuntimeCallsApi {
         returnType: RuntimeTypeName,
         returnBinding: (Any?) -> R
     ): R
+
+    suspend fun <R> call(
+        section: String,
+        method: String,
+        arguments: Map<String, Any?>,
+        returnBinding: (Any?) -> R
+    ): R
+}
+
+suspend fun <R> RuntimeCallsApi.callCatching(
+    section: String,
+    method: String,
+    arguments: Map<String, Any?>,
+    returnBinding: (Any?) -> R
+): Result<R> {
+    return runCatching { call(section, method, arguments, returnBinding) }
 }
 
 internal class RealRuntimeCallsApi(
     override val runtime: RuntimeSnapshot,
+    override val chainId: ChainId,
     private val socketService: SocketService,
 ) : RuntimeCallsApi {
 
@@ -54,6 +78,22 @@ internal class RealRuntimeCallsApi(
         val response = socketService.stateCall(request)
 
         val decoded = decodeResponse(response, returnType)
+
+        return returnBinding(decoded)
+    }
+
+    override suspend fun <R> call(
+        section: String,
+        method: String,
+        arguments: Map<String, Any?>,
+        returnBinding: (Any?) -> R
+    ): R {
+        val apiMethod = runtime.metadata.runtimeApi(section).method(method)
+        val request = apiMethod.createRequest(runtime, arguments)
+
+        val response = socketService.stateCall(request)
+
+        val decoded = response?.let { apiMethod.decodeOutput(runtime, it) }
 
         return returnBinding(decoded)
     }

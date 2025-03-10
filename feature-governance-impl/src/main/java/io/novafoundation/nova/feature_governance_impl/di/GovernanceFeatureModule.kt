@@ -6,11 +6,13 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_governance_impl.di.modules.screens.Referen
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumUnlockModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVoteModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumVotersModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.screens.TinderGovModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1
 import io.novafoundation.nova.feature_governance_impl.di.modules.v1.GovernanceV1Module
 import io.novafoundation.nova.feature_governance_impl.di.modules.v2.GovernanceV2
@@ -45,6 +48,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.convic
 import io.novafoundation.nova.feature_governance_impl.presentation.common.conviction.RealConvictionValuesProvider
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.LocksFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.RealLocksFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.RealShareReferendumMixin
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.RealVotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
@@ -73,7 +78,8 @@ import javax.inject.Named
         ReferendumVoteModule::class,
         ReferendumUnlockModule::class,
         DelegateModule::class,
-        GovernanceDAppsModule::class
+        GovernanceDAppsModule::class,
+        TinderGovModule::class
     ]
 )
 class GovernanceFeatureModule {
@@ -154,8 +160,9 @@ class GovernanceFeatureModule {
     @FeatureScope
     fun provideTracksFormatter(
         trackCategorizer: TrackCategorizer,
-        resourceManager: ResourceManager
-    ): TrackFormatter = RealTrackFormatter(trackCategorizer, resourceManager)
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
+    ): TrackFormatter = RealTrackFormatter(trackCategorizer, resourceManager, assetIconProvider)
 
     @Provides
     @FeatureScope
@@ -192,4 +199,10 @@ class GovernanceFeatureModule {
         governanceSharedState: GovernanceSharedState,
         governanceSourceRegistry: GovernanceSourceRegistry,
     ): TracksUseCase = RealTracksUseCase(governanceSharedState, governanceSourceRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideShareReferendumMixin(
+        referendumLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
+    ): ShareReferendumMixin = RealShareReferendumMixin(referendumLinkConfigurator)
 }

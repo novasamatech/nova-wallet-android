@@ -98,11 +98,12 @@ abstract class BaseStorageSource(
     override fun <R> subscribe(
         chainId: String,
         at: BlockHash?,
+        applyStorageDefault: Boolean,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R> {
         return flow {
             val runtime = chainRegistry.getRuntime(chainId)
-            val context = createQueryContext(chainId, at, runtime, applyStorageDefault = false, subscriptionBuilder = null)
+            val context = createQueryContext(chainId, at, runtime, applyStorageDefault, subscriptionBuilder = null)
 
             emitAll(context.subscribe())
         }
@@ -110,12 +111,13 @@ abstract class BaseStorageSource(
 
     override suspend fun <R> subscribe(
         chainId: String,
-        subscriptionBuilder: SubstrateSubscriptionBuilder,
+        subscriptionBuilder: SubstrateSubscriptionBuilder?,
         at: BlockHash?,
+        applyStorageDefault: Boolean,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R> {
         val runtime = chainRegistry.getRuntime(chainId)
-        val context = createQueryContext(chainId, at, runtime, applyStorageDefault = false, subscriptionBuilder)
+        val context = createQueryContext(chainId, at, runtime, applyStorageDefault, subscriptionBuilder)
 
         return subscribe(context)
     }
