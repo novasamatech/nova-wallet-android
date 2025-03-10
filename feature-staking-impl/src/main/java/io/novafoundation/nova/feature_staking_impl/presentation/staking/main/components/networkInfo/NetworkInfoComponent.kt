@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.UnsupportedComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.nominationPools.NominationPoolsNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.parachain.ParachainNetworkInfoComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.relaychain.RelaychainNetworkInfoComponentFactory
@@ -35,6 +36,8 @@ class NetworkInfoComponentFactory(
         relaychainComponentCreator = relaychainComponentFactory::create,
         parachainComponentCreator = parachainComponentFactory::create,
         nominationPoolsCreator = nominationPoolsComponentFactory::create,
+        // TODO network info
+        mythosCreator = UnsupportedComponent.creator(),
         hostContext = hostContext
     )
 }

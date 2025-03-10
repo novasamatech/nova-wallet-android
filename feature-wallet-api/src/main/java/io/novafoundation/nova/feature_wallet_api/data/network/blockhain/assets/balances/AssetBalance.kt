@@ -41,10 +41,7 @@ interface AssetBalance {
 
     fun isSelfSufficient(chainAsset: Chain.Asset): Boolean
 
-    suspend fun existentialDeposit(
-        chain: Chain,
-        chainAsset: Chain.Asset
-    ): BigInteger
+    suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger
 
     suspend fun queryAccountBalance(
         chain: Chain,

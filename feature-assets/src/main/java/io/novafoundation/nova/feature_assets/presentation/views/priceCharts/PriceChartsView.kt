@@ -105,7 +105,7 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean) {
-        priceTextInjector?.format(selectedEntry.y, priceChartCurrentPrice)
+        priceTextInjector?.format(selectedEntry.y, priceChartCurrentPrice, isEntrySelected)
         priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, priceChartPriceChange)
         dateTextInjector?.format(selectedEntry.x.roundToLong(), isEntrySelected, priceChartDate, charts[selectedChartIndex])
     }
@@ -165,8 +165,8 @@ class PriceChartsView @JvmOverloads constructor(
      * We should disallow intercept touch events by parents when we move horizontally to prevent scrolling in parent
      */
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        val isHorizontalScroll = horizontalScrollDetector.isHorizontalScroll(ev)
-        if (isHorizontalScroll) {
+        val isTouchIntercepted = controller.isTouchIntercepted()
+        if (isTouchIntercepted) {
             parent.requestDisallowInterceptTouchEvent(true)
         }
 

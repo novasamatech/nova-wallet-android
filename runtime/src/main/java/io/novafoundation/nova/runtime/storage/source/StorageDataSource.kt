@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import java.io.OutputStream
 
 typealias StorageKey = String
+typealias StorageValue = String?
+typealias StorageEntries = Map<StorageKey, StorageValue>
+
 typealias ChildKeyBuilder = suspend OutputStream.(RuntimeSnapshot) -> Unit
 
 interface StorageDataSource {
@@ -44,6 +47,7 @@ interface StorageDataSource {
     fun <R> subscribe(
         chainId: String,
         at: BlockHash? = null,
+        applyStorageDefault: Boolean = false,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>
 
@@ -51,6 +55,7 @@ interface StorageDataSource {
         chainId: String,
         subscriptionBuilder: SubstrateSubscriptionBuilder?,
         at: BlockHash? = null,
+        applyStorageDefault: Boolean = false,
         subscribe: suspend StorageQueryContext.() -> Flow<R>
     ): Flow<R>
 

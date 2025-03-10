@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.identity.Governance
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.common.info.ReferendumInfoViewModel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 
 @Module(includes = [ViewModelModule::class, MarkdownFullModule::class])
@@ -37,6 +38,7 @@ class ReferendumInfoModule {
         governanceIdentityProviderFactory: GovernanceIdentityProviderFactory,
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
+        shareReferendumMixin: ShareReferendumMixin,
         markwon: Markwon
     ): ViewModel {
         return ReferendumInfoViewModel(
@@ -49,6 +51,7 @@ class ReferendumInfoModule {
             governanceIdentityProviderFactory = governanceIdentityProviderFactory,
             addressIconGenerator = addressIconGenerator,
             externalActions = externalActions,
+            shareReferendumMixin = shareReferendumMixin,
             markwon = markwon
         )
     }

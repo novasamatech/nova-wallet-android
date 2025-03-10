@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
@@ -50,6 +51,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAss
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
@@ -89,6 +91,9 @@ class BalanceDetailViewModel(
     private val _showLockedDetailsEvent = MutableLiveData<Event<BalanceLocksModel>>()
     val showLockedDetailsEvent: LiveData<Event<BalanceLocksModel>> = _showLockedDetailsEvent
 
+    private val chainFlow = walletInteractor.chainFlow(assetPayload.chainId)
+        .shareInBackground()
+
     private val assetFlow = walletInteractor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
         .share()
@@ -112,11 +117,16 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
+    val supportExpandableBalanceDetails = assetFlow.map { it.totalInPlanks.isPositive() }
+        .shareInBackground()
+
     private val lockedBalanceModel = combine(balanceLocksFlow, balanceHoldsFlow, externalBalancesFlow, assetFlow) { locks, holds, externalBalances, asset ->
         mapBalanceLocksToUi(locks, holds, externalBalances, asset)
     }
         .inBackground()
         .share()
+
+    val chainUI = chainFlow.map { mapChainToUi(it) }
 
     val buyMixin = buyMixinFactory.create(scope = this)
 
@@ -142,11 +152,12 @@ class BalanceDetailViewModel(
         resourceManager.getString(R.string.price_chart_title, tokenName)
     }.shareInBackground()
 
-    val priceChartFormatters: Flow<PriceChartTextInjectors> = flowOf {
+    val priceChartFormatters: Flow<PriceChartTextInjectors> = assetFlow.map { asset ->
+        val lastCoinRate = asset.token.coinRate?.rate
         val currency = currencyInteractor.getSelectedCurrency()
 
         PriceChartTextInjectors(
-            RealPricePriceTextInjector(currency),
+            RealPricePriceTextInjector(currency, lastCoinRate),
             RealPriceChangeTextInjector(resourceManager, currency),
             RealDateChartTextInjector(resourceManager)
         )
@@ -257,7 +268,7 @@ class BalanceDetailViewModel(
     ): BalanceLocksModel {
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
-                mapBalanceIdToUi(resourceManager, it.id),
+                mapBalanceIdToUi(resourceManager, it.id.value),
                 mapAmountToAmountModel(it.amountInPlanks, asset)
             )
         }

@@ -6,14 +6,14 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.AssetDetailsDeepLinkHandler
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.ReferendumDeepLinkHandler
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.CompoundNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.SystemNotificationHandler
@@ -68,14 +68,14 @@ class NotificationHandlersModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         tokenRepository: TokenRepository,
-        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+        configurator: AssetDetailsDeepLinkConfigurator
     ): NotificationHandler {
         return TokenSentNotificationHandler(
             context,
             accountRepository,
             tokenRepository,
             chainRegistry,
-            assetDetailsDeepLinkHandler,
+            configurator,
             activityIntentProvider,
             notificationIdProvider,
             gson,
@@ -96,13 +96,13 @@ class NotificationHandlersModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         tokenRepository: TokenRepository,
-        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+        configurator: AssetDetailsDeepLinkConfigurator
     ): NotificationHandler {
         return TokenReceivedNotificationHandler(
             context,
             accountRepository,
             tokenRepository,
-            assetDetailsDeepLinkHandler,
+            configurator,
             chainRegistry,
             activityIntentProvider,
             notificationIdProvider,
@@ -124,13 +124,13 @@ class NotificationHandlersModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         tokenRepository: TokenRepository,
-        assetDetailsDeepLinkHandler: AssetDetailsDeepLinkHandler
+        configurator: AssetDetailsDeepLinkConfigurator
     ): NotificationHandler {
         return StakingRewardNotificationHandler(
             context,
             accountRepository,
             tokenRepository,
-            assetDetailsDeepLinkHandler,
+            configurator,
             chainRegistry,
             activityIntentProvider,
             notificationIdProvider,
@@ -151,11 +151,11 @@ class NotificationHandlersModule {
         referendaStatusFormatter: ReferendaStatusFormatter,
         gson: Gson,
         chainRegistry: ChainRegistry,
-        referendumDeepLinkHandler: ReferendumDeepLinkHandler
+        configurator: ReferendumDetailsDeepLinkConfigurator
     ): NotificationHandler {
         return ReferendumStateUpdateNotificationHandler(
             context,
-            referendumDeepLinkHandler,
+            configurator,
             referendaStatusFormatter,
             chainRegistry,
             activityIntentProvider,
@@ -198,11 +198,11 @@ class NotificationHandlersModule {
         resourceManager: ResourceManager,
         gson: Gson,
         chainRegistry: ChainRegistry,
-        referendumDeepLinkHandler: ReferendumDeepLinkHandler
+        configurator: ReferendumDetailsDeepLinkConfigurator
     ): NotificationHandler {
         return NewReferendumNotificationHandler(
             context,
-            referendumDeepLinkHandler,
+            configurator,
             chainRegistry,
             activityIntentProvider,
             notificationIdProvider,

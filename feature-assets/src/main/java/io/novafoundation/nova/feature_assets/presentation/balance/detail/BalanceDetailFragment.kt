@@ -25,12 +25,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailActions
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
 import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsChain
 import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
 private const val KEY_TOKEN = "KEY_TOKEN"
@@ -64,7 +65,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         hideKeyboard()
 
         balanceDetailBack.applyBarMargin()
-        balanceDetailTokenName.applyBarMargin()
 
         transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
 
@@ -128,6 +128,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailsBalances.locked.showAmount(asset.locked)
         }
 
+        viewModel.supportExpandableBalanceDetails.observe {
+            balanceDetailsBalances.showBalanceDetails(it)
+        }
+
         viewModel.priceChartFormatters.observe {
             priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
         }
@@ -161,6 +165,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
                 onSuccess = { it.onSuccess(Unit) },
                 message = it.payload
             ).show()
+        }
+
+        viewModel.chainUI.observe {
+            balanceDetailsChain.setChain(it)
         }
     }
 

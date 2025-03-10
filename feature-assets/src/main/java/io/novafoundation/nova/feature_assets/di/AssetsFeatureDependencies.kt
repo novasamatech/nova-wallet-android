@@ -49,6 +49,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
@@ -76,6 +77,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -181,6 +183,8 @@ interface AssetsFeatureDependencies {
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
+    val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory
+
     val bannerSourceFactory: BannersSourceFactory
 
     val bannersMixinFactory: PromotionBannersMixinFactory
@@ -276,4 +280,6 @@ interface AssetsFeatureDependencies {
     fun nftRepository(): NftRepository
 
     fun assetViewModeInteractor(): AssetViewModeInteractor
+
+    fun maxActionProviderFactory(): MaxActionProviderFactory
 }

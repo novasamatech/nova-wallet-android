@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -42,6 +43,7 @@ abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> : B
         currentValidatorsToolbar.setRightActionClickListener { viewModel.changeClicked() }
     }
 
+    @CallSuper
     override fun subscribe(viewModel: V) {
         viewModel.currentStakeTargetsFlow.observe { loadingState ->
             when (loadingState) {
