@@ -129,6 +129,10 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_select_wallet"
+        app:destination="@id/selectWalletFragment" />
+
     <fragment
         android:id="@+id/splashFragment"
         android:name="io.novafoundation.nova.splash.presentation.SplashFragment"
@@ -208,5 +212,10 @@
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
         android:label="WalletConnectApproveSessionFragment" />
+
+    <dialog
+        android:id="@+id/selectWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.SelectWalletFragment"
+        android:label="SelectWalletFragment" />
 
 </navigation>
