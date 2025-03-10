@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">\"%s\" DApp verrà rimosso dai Preferiti</string>
     <string name="dapp_favourites_remove_title">Rimuovi dai Preferiti?</string>
     <string name="dapp_list_placeholder">L\'elenco delle DApp apparirà qui</string>
-    <string name="dapp_main_welcome_subtitle">Esplora il web usando i tuoi account da Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Benvenuto in Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Aggiungi ai Preferiti</string>
     <string name="dapp_options_desktop_mode">Modalità Desktop</string>
     <string name="dapp_options_remove_from_favorite">Rimuovi dai Preferiti</string>
@@ -936,6 +934,19 @@
     <string name="pre_configured_networks_progress_text">Caricamento della lista delle reti...</string>
     <string name="pre_configured_networks_search_hint">Cerca per nome rete</string>
     <string name="pre_configured_networks_title">Aggiungi rete</string>
+    <string name="price_chart_date_format" formatted="false">%s alle %s</string>
+    <string name="price_chart_day">1G</string>
+    <string name="price_chart_max">Tutto</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">Prezzo di %s</string>
+    <string name="price_chart_week">1S</string>
+    <string name="price_chart_year">1A</string>
+    <string name="price_charts_period_all">Tutti i Tempi</string>
+    <string name="price_charts_period_month">Ultimo Mese</string>
+    <string name="price_charts_period_today">Oggi</string>
+    <string name="price_charts_period_week">Ultima Settimana</string>
+    <string name="price_charts_period_year">Ultimo Anno</string>
     <string name="profile_accounts_title">Account</string>
     <string name="profile_accounts_title_2_0">Portafogli</string>
     <string name="profile_language_title">Lingua</string>
