@@ -2,15 +2,19 @@ package io.novafoundation.nova.feature_dapp_impl.domain.browser.polkadotJs
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.model.substrateFrom
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novasama.substrate_sdk_android.encrypt.EncryptionType
+import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 class PolkadotJsExtensionInteractor(
@@ -27,7 +31,7 @@ class PolkadotJsExtensionInteractor(
                 address = address,
                 genesisHash = null,
                 name = metaAccount.name,
-                encryption = metaAccount.substrateCryptoType?.let { mapCryptoTypeToEncryption(it) }
+                encryption = metaAccount.substrateCryptoType?.let { MultiChainEncryption.substrateFrom(it) }
             )
         }
 
@@ -36,7 +40,7 @@ class PolkadotJsExtensionInteractor(
                 address = adddressBytes.toEthereumAddress(),
                 genesisHash = null,
                 name = metaAccount.name,
-                encryption = EncryptionType.ECDSA
+                encryption = MultiChainEncryption.Ethereum
             )
         }
 
@@ -47,7 +51,7 @@ class PolkadotJsExtensionInteractor(
                 address = chain.addressOf(chainAccount.accountId),
                 genesisHash = chain.requireGenesisHash().requireHexPrefix(),
                 name = "${metaAccount.name} (${chain.name})",
-                encryption = chainAccount.cryptoType?.let(::mapCryptoTypeToEncryption)
+                encryption = chainAccount.multiChainEncryption(chain)
             )
         }
 
@@ -64,6 +68,14 @@ class PolkadotJsExtensionInteractor(
                 genesisHash = it.chainId.requireHexPrefix(),
                 specVersion = it.specVersion
             )
+        }
+    }
+
+    private fun MetaAccount.ChainAccount.multiChainEncryption(chain: Chain): MultiChainEncryption? {
+        return if (chain.isEthereumBased) {
+            MultiChainEncryption.Ethereum
+        } else {
+            cryptoType?.let { MultiChainEncryption.substrateFrom(it) }
         }
     }
 }
