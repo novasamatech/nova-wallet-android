@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation.views.priceCharts
 
+import LongPressDetector
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.MotionEvent
+import android.view.View
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
@@ -11,10 +13,11 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.vibrate
 import io.novafoundation.nova.feature_assets.R
 import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 
-class ChartController(private val chart: LineChart, private val callback: Callback) {
+class ChartController(private val chart: LineChart, private val callback: Callback) : View.OnTouchListener {
 
     interface Callback {
         fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean)
@@ -23,6 +26,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private val context = chart.context
 
     private val chartUIParams = ChartUIParams.default(context)
+    private val longClickDetector = LongPressDetector(cancelDistance = 5.dpF(context), timeout = 200, ::onChartsLongClick)
 
     private var currentEntries: List<Entry> = emptyList()
     private var useNeutralColor = false
@@ -86,21 +90,39 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             setGridDashedLine(chartUIParams.gridLineDashEffect)
         }
 
-        chart.setOnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_DOWN -> {
-                    val entry = chart.getEntryByTouchPoint(event)
-                    if (entry != null) {
-                        updateChartWithSelectedEntry(entry)
-                    }
-                }
+        chart.setOnTouchListener(this)
+    }
 
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    updateChart()
-                }
+    override fun onTouch(v: View, event: MotionEvent): Boolean {
+        longClickDetector.onTouch(v, event)
+
+        when (event.action) {
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                updateChart()
             }
+        }
 
-            false
+        handleChartsTouch(event)
+
+        return true
+    }
+
+    fun onChartsLongClick(event: MotionEvent) {
+        handleChartsTouch(event)
+
+        context.vibrate(50) // Add very short vibration on long click
+    }
+
+    fun isTouchIntercepted(): Boolean {
+        return longClickDetector.isLongClickDetected
+    }
+
+    private fun handleChartsTouch(event: MotionEvent) {
+        if (longClickDetector.isLongClickDetected) {
+            val entry = chart.getEntryByTouchPoint(event)
+            if (entry != null) {
+                updateChartWithSelectedEntry(entry)
+            }
         }
     }
 

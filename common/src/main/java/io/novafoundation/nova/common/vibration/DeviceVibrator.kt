@@ -1,9 +1,10 @@
 package io.novafoundation.nova.common.vibration
 
-import android.os.Vibrator
+import android.content.Context
+import io.novafoundation.nova.common.utils.vibrate
 
 class DeviceVibrator(
-    private val vibrator: Vibrator
+    private val context: Context
 ) {
 
     companion object {
@@ -11,6 +12,6 @@ class DeviceVibrator(
     }
 
     fun makeShortVibration() {
-        vibrator.vibrate(SHORT_VIBRATION_DURATION)
+        context.vibrate(SHORT_VIBRATION_DURATION)
     }
 }
