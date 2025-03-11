@@ -46,7 +46,7 @@ class PolkadotJsExtensionInteractor(
         val customAccounts = metaAccount.chainAccounts.mapNotNull { (chainId, chainAccount) ->
             val chain = chainRegistry.getChain(chainId)
             // Ignore non-substrate chains since they don't have chainId=genesisHash
-            val genesisHash = chain.genesisHash ?: return@mapNotNull null
+            val genesisHash = chain.genesisHash?.requireHexPrefix() ?: return@mapNotNull null
 
             InjectedAccount(
                 address = chain.addressOf(chainAccount.accountId),
