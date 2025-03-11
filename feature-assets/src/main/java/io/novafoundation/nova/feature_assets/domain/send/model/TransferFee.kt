@@ -28,8 +28,11 @@ data class TransferFee(
     }
 
     override fun maxAmountDeductionFor(amountAsset: Chain.Asset): Balance {
-        val submission = originFee.submissionFee.getAmount(amountAsset)
+        // Delegate submission calculation to submission fee itself
+        val submission = originFee.submissionFee.maxAmountDeductionFor(amountAsset)
+        // Delivery is always paid from executing account
         val delivery = originFee.deliveryFee?.getAmount(amountAsset).orZero()
+        // Execution is paid from the sending amount itself, so we subtract it as well since we later add it on top of sending amount
         val execution = crossChainFee?.getAmount(amountAsset).orZero()
 
         return submission + delivery + execution
