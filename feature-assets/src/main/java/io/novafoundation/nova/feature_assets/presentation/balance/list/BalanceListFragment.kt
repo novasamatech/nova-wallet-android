@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
+import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -89,20 +90,19 @@ class BalanceListFragment :
 
         hideKeyboard()
 
-        balanceListAssets.setHasFixedSize(true)
-        balanceListAssets.adapter = adapter
-
-        val animationSettings = ExpandableAnimationSettings.createForAssets()
-        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
-
-        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
-        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
-
-        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        setupRecyclerView()
 
         walletContainer.setOnRefreshListener {
             viewModel.fullSync()
         }
+    }
+
+    private fun setupRecyclerView() {
+        balanceListAssets.setHasFixedSize(true)
+        balanceListAssets.adapter = adapter
+
+        setupAssetsDecorationForRecyclerView()
+        setupRecyclerViewSpacing()
     }
 
     override fun inject() {
@@ -116,7 +116,9 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
+        viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
+            balanceListAssets.invalidateItemDecorations()
+        }
 
         viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
@@ -220,6 +222,24 @@ class BalanceListFragment :
 
     override fun swapClicked() {
         viewModel.swapClicked()
+    }
+
+    private fun setupRecyclerViewSpacing() {
+        balanceListAssets.addSpaceItemDecoration {
+            addSpaceBetween(AssetsHeaderAdapter.getViewType(), PromotionBannerAdapter.getViewType(), spaceDp = 4)
+            addSpaceBetween(PromotionBannerAdapter.getViewType(), ManageAssetsAdapter.getViewType(), spaceDp = 4)
+            addSpaceBetween(AssetsHeaderAdapter.getViewType(), ManageAssetsAdapter.getViewType(), spaceDp = 24)
+        }
+    }
+
+    private fun setupAssetsDecorationForRecyclerView() {
+        val animationSettings = ExpandableAnimationSettings.createForAssets()
+        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
+
+        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+
+        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
     }
 
     private fun getAssetsPlaceholderModel() = PlaceholderModel(
