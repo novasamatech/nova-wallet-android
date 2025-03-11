@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.WithAccountId
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.hints.HintsMixin
 import io.novafoundation.nova.common.navigation.ReturnableRouter
@@ -33,12 +33,18 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -61,20 +67,19 @@ import java.math.BigInteger
 
 abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStakingLogic<T>>(
     logicFactory: StartSingleSelectStakingLogic.Factory<T, L>,
+    feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val rewardsComponentFactory: SingleSelectStakingRewardEstimationComponentFactory,
     private val assetUseCase: AssetUseCase,
     private val resourceManager: ResourceManager,
     protected val validationExecutor: ValidationExecutor,
-    protected val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val recommendatorFactory: SingleSelectRecommendator.Factory<T>,
     private val selectedAssetState: StakingSharedState,
     private val router: ReturnableRouter,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
-    Validatable by validationExecutor,
-    FeeLoaderMixin by feeLoaderMixin,
-    Retriable where T : Identifiable, T : WithAccountId {
+    Validatable by validationExecutor
+    where T : Identifiable, T : WithAccountId {
 
     @Suppress("LeakingThis")
     protected val logic: L = logicFactory.create(this)
@@ -90,13 +95,22 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
     protected val assetFlow = assetUseCase.currentAssetFlow()
         .share()
 
+    private val chainAssetFlow = selectedAssetState.selectedAssetFlow()
+
     private val stakeableAmount = logic.stakeableAmount(assetFlow)
+        .shareInBackground()
+
+    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)
+
+    private val maxAmountProvider = MaxActionProvider.create(viewModelScope) {
+        chainAssetFlow.providingBalance(stakeableAmount)
+            .deductFee(originFeeMixin)
+    }
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        availableBalanceFlow = stakeableAmount,
-        balanceLabel = R.string.wallet_balance_available
+        maxActionProvider = maxAmountProvider
     )
 
     private val isStakeMoreFlow = logic.isStakeMore()
@@ -178,17 +192,15 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
     }
 
     init {
-        feeLoaderMixin.connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
+        originFeeMixin.connectWith(
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
             inputSource2 = selectedTargetIdFlow,
-            scope = this,
-            feeConstructor = { amount, selectedTargetId ->
+            feeConstructor = { _, amount, selectedTargetId ->
                 val chain = selectedAssetState.chain()
                 val stakeTargetId = selectedTargetId ?: chain.emptyAccountId().intoKey()
 
-                logic.estimateFee(amount.toPlanks(), stakeTargetId)
+                logic.estimateFee(amount, stakeTargetId)
             },
-            onRetryCancelled = ::backClicked
         )
 
         listenSelectedTargetChanges()
@@ -230,7 +242,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
 
         val asset = assetFlow.first()
         val amount = amountChooserMixin.amount.first()
-        val fee = feeLoaderMixin.awaitFee()
+        val fee = originFeeMixin.awaitFee()
 
         goNext(selectedTarget, amount, fee, asset)
     }

@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.android.synthetic.main.view_balances.view.viewBalanceExpandableContainer
+import kotlinx.android.synthetic.main.view_balances.view.viewBalanceExpandableView
 import kotlinx.android.synthetic.main.view_balances.view.viewBalanceFiat
 import kotlinx.android.synthetic.main.view_balances.view.viewBalanceToken
 
@@ -24,6 +25,9 @@ abstract class BalancesView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
+
+    protected val expandableView
+        get() = viewBalanceExpandableView
 
     init {
         View.inflate(context, R.layout.view_balances, this)

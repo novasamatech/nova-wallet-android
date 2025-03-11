@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">‘%s’ DApp Favorilerden kaldırılacak</string>
     <string name="dapp_favourites_remove_title">Favorilerden Kaldırılsın mı?</string>
     <string name="dapp_list_placeholder">DApp\'lerin listesi burada görünecek</string>
-    <string name="dapp_main_welcome_subtitle">Hesaplarınızı Nova Wallet\'tan kullanarak web\'i gezin</string>
-    <string name="dapp_main_welcome_title">Nova Tarayıcısına Hoş Geldiniz</string>
     <string name="dapp_options_add_to_favorite">Favorilere Ekle</string>
     <string name="dapp_options_desktop_mode">Masaüstü modu</string>
     <string name="dapp_options_remove_from_favorite">Favorilerden Çıkar</string>
@@ -936,6 +934,19 @@
     <string name="pre_configured_networks_progress_text">Ağlar listesi yükleniyor...</string>
     <string name="pre_configured_networks_search_hint">Ağ adına göre ara</string>
     <string name="pre_configured_networks_title">Ağ ekle</string>
+    <string name="price_chart_date_format" formatted="false">%s tarihinde %s</string>
+    <string name="price_chart_day">1G</string>
+    <string name="price_chart_max">Hepsi</string>
+    <string name="price_chart_month">1A</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s fiyatı</string>
+    <string name="price_chart_week">1H</string>
+    <string name="price_chart_year">1Yıl</string>
+    <string name="price_charts_period_all">Tüm Zamanlar</string>
+    <string name="price_charts_period_month">Geçen Ay</string>
+    <string name="price_charts_period_today">Bugün</string>
+    <string name="price_charts_period_week">Geçen Hafta</string>
+    <string name="price_charts_period_year">Geçen Yıl</string>
     <string name="profile_accounts_title">Hesaplar</string>
     <string name="profile_accounts_title_2_0">Cüzdanlar</string>
     <string name="profile_language_title">Dil</string>

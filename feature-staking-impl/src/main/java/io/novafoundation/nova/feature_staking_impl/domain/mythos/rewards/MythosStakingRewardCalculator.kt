@@ -61,7 +61,7 @@ class RealMythosStakingRewardCalculator(
     }
 
     override fun calculateCollatorAnnualReturns(collatorId: AccountIdKey, amount: BigDecimal): PeriodReturns {
-        val collatorApr = collatorApr(collatorId) ?: error("Collator $collatorId not found")
+        val collatorApr = collatorApr(collatorId).orZero()
         val aprFraction = collatorApr.inFraction.toBigDecimal()
 
         return PeriodReturns(

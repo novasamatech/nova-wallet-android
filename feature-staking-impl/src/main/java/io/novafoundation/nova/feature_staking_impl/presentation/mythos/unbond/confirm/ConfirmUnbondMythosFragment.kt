@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
@@ -65,10 +64,9 @@ class ConfirmUnbondMythosFragment : BaseFragment<ConfirmUnbondMythosViewModel>()
     }
 
     override fun subscribe(viewModel: ConfirmUnbondMythosViewModel) {
-        observeRetries(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel, mythosUnbondConfirmExtrinsicInfo.fee)
+        setupFeeLoading(viewModel.feeLoaderMixin, mythosUnbondConfirmExtrinsicInfo.fee)
 
         viewModel.showNextProgress.observe(mythosUnbondConfirmConfirm::setProgressState)
 

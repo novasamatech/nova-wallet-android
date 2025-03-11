@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.va
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm.ConfirmUnbondMythosViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmUnbondMythosModule {
@@ -37,7 +37,7 @@ class ConfirmUnbondMythosModule {
         resourceManager: ResourceManager,
         validationSystem: UnbondMythosValidationSystem,
         interactor: UnbondMythosStakingInteractor,
-        feeLoaderMixin: FeeLoaderMixin.Presentation,
+        feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
         externalActions: ExternalActions.Presentation,
         selectedAssetState: StakingSharedState,
         validationExecutor: ValidationExecutor,
@@ -54,7 +54,7 @@ class ConfirmUnbondMythosModule {
             resourceManager = resourceManager,
             validationSystem = validationSystem,
             interactor = interactor,
-            feeLoaderMixin = feeLoaderMixin,
+            feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,
             externalActions = externalActions,
             selectedAssetState = selectedAssetState,
             validationExecutor = validationExecutor,

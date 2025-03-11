@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">“%s”DApp将从收藏夹中移除</string>
     <string name="dapp_favourites_remove_title">从收藏夹中移除?</string>
     <string name="dapp_list_placeholder">DApps列表将出现在这里</string>
-    <string name="dapp_main_welcome_subtitle">使用您从Nova钱包的账户浏览网页</string>
-    <string name="dapp_main_welcome_title">欢迎来到Nova浏览器</string>
     <string name="dapp_options_add_to_favorite">添加到收藏夹</string>
     <string name="dapp_options_desktop_mode">桌面模式</string>
     <string name="dapp_options_remove_from_favorite">从收藏夹中移除</string>
@@ -928,6 +926,19 @@
     <string name="pre_configured_networks_progress_text">正在加载网络列表...</string>
     <string name="pre_configured_networks_search_hint">按网络名称搜索</string>
     <string name="pre_configured_networks_title">添加网络</string>
+    <string name="price_chart_date_format" formatted="false">%s 于 %s</string>
+    <string name="price_chart_day">1天</string>
+    <string name="price_chart_max">所有</string>
+    <string name="price_chart_month">1月</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s 价格</string>
+    <string name="price_chart_week">1周</string>
+    <string name="price_chart_year">1年</string>
+    <string name="price_charts_period_all">所有时间</string>
+    <string name="price_charts_period_month">上个月</string>
+    <string name="price_charts_period_today">今天</string>
+    <string name="price_charts_period_week">上周</string>
+    <string name="price_charts_period_year">去年</string>
     <string name="profile_accounts_title">账户</string>
     <string name="profile_accounts_title_2_0">钱包</string>
     <string name="profile_language_title">语言</string>
