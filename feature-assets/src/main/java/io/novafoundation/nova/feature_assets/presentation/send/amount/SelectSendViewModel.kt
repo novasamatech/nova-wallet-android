@@ -103,6 +103,10 @@ class SelectSendViewModel(
     private val destinationAsset = destinationChainWithAsset.map { it.asset }
     private val destinationChain = destinationChainWithAsset.map { it.chain }
 
+    private val isCrossChainFlow = combine(originChain, destinationChain) { origin, destination ->
+        origin.id != destination.id
+    }.shareInBackground()
+
     private val selectAddressPayloadFlow = combine(
         originChain,
         destinationChain
@@ -166,6 +170,7 @@ class SelectSendViewModel(
         viewModelScope = viewModelScope,
         assetInFlow = originAssetFlow,
         feeLoaderMixin = feeMixin,
+        deductEd = isCrossChainFlow
     )
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
@@ -334,8 +339,7 @@ class SelectSendViewModel(
             sendInteractor.getFee(assetTransfer, viewModelScope)
         }
 
-        combine(originChain, destinationChain) { originChain, destinationChain ->
-            val isCrossChain = originChain.id != destinationChain.id
+        isCrossChainFlow.onEach { isCrossChain ->
             val mode = determineFeeSelectionMode(isCrossChain)
 
             feeFormatter.crossChainFeeShown = isCrossChain
