@@ -28,8 +28,10 @@ data class TransferFee(
     }
 
     override fun maxAmountDeductionFor(amountAsset: Chain.Asset): Balance {
-        return originFee.submissionFee.amount +
-            originFee.deliveryFee?.amount.orZero() +
-            crossChainFee?.getAmount(amountAsset).orZero()
+        val submission = originFee.submissionFee.getAmount(amountAsset)
+        val delivery = originFee.deliveryFee?.getAmount(amountAsset).orZero()
+        val execution = crossChainFee?.getAmount(amountAsset).orZero()
+
+        return submission + delivery + execution
     }
 }
