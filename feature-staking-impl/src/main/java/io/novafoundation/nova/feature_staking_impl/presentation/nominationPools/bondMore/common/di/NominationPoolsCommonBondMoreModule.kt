@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolAvailableBalanceValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.PoolStateValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.validations.StakingTypesConflictValidationFactory
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.RealNominationPoolsAvailableBalanceResolver
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.hints.NominationPoolsBondMoreHintsFactory
 
 @Module
@@ -29,15 +31,13 @@ class NominationPoolsCommonBondMoreModule {
         extrinsicService: ExtrinsicService,
         stakingSharedState: StakingSharedState,
         migrationUseCase: DelegatedStakeMigrationUseCase,
-        nominationPoolSharedComputation: NominationPoolSharedComputation,
-        poolAccountDerivation: PoolAccountDerivation,
+        poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     ): NominationPoolsBondMoreInteractor {
         return RealNominationPoolsBondMoreInteractor(
             extrinsicService,
             stakingSharedState,
             migrationUseCase,
-            nominationPoolSharedComputation,
-            poolAccountDerivation
+            poolsAvailableBalanceResolver,
         )
     }
 
