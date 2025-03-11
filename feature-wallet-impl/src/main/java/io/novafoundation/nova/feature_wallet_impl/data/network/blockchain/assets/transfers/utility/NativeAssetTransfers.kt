@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.TransferMode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
@@ -67,17 +68,26 @@ class NativeAssetTransfers(
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
         nativeTransfer(
             accountId = transfer.originChain.accountIdOrDefault(transfer.recipient),
-            amount = transfer.originChainAsset.planksFromAmount(transfer.amount)
+            amount = transfer.originChainAsset.planksFromAmount(transfer.amount),
+            mode = transfer.transferMode
         )
     }
 
     override suspend fun transferFunctions(chainAsset: Chain.Asset) = listOf(
         Modules.BALANCES to "transfer",
         Modules.BALANCES to "transfer_allow_death",
+        Modules.BALANCES to "transfer_all"
     )
 
     private fun getAccountInfoStorageKey(metaAccount: MetaAccount, chain: Chain, runtime: RuntimeSnapshot): String {
         val accountId = metaAccount.requireAccountIdIn(chain)
         return runtime.metadata.module(Modules.SYSTEM).storage("Account").storageKey(runtime, accountId)
     }
+
+    private val AssetTransfer.transferMode: TransferMode
+        get() = if (transferringMaxAmount) {
+            TransferMode.ALL
+        } else {
+            TransferMode.ALLOW_DEATH
+        }
 }

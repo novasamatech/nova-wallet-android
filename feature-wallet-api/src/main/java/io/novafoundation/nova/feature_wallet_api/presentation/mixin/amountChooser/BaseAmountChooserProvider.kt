@@ -77,8 +77,12 @@ open class BaseAmountChooserProvider(
             inputState.map { input -> input.parseBigDecimalOrNull() }
         }.share()
 
-    private val _amount: Flow<BigDecimal> = amountState
-        .map { it.value.orZero() }
+    private val _amountStateOrZero: Flow<InputState<BigDecimal>> = amountState.map { inputState ->
+        inputState.map { it.orZero() }
+    }.share()
+
+    private val _amount: Flow<BigDecimal> = _amountStateOrZero
+        .map { it.value }
         .share()
 
     @Deprecated("Use amountState instead")
@@ -87,8 +91,8 @@ open class BaseAmountChooserProvider(
     override val fiatAmount: Flow<CharSequence> = fiatFormatter.formatFlow(tokenFlow.filterNotNull(), _amount)
         .shareInBackground()
 
-    override val backPressuredAmount: Flow<BigDecimal>
-        get() = _amount.debounce(DEBOUNCE_DURATION)
+    override val backPressuredAmountState: Flow<InputState<BigDecimal>>
+        get() = _amountStateOrZero.debounce(DEBOUNCE_DURATION)
 
     private val chainAssetFlow = tokenFlow.filterNotNull()
         .map { it.configuration }
