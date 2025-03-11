@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.substrateFrom
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedAccount
 import io.novafoundation.nova.feature_dapp_impl.web3.polkadotJs.model.InjectedMetadataKnown
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.requireGenesisHash
+import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.ext.toEthereumAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -44,10 +44,12 @@ class PolkadotJsExtensionInteractor(
 
         val customAccounts = metaAccount.chainAccounts.mapNotNull { (chainId, chainAccount) ->
             val chain = chainRegistry.getChain(chainId)
+            // Ignore non-substrate chains since they don't have chainId=genesisHash
+            val genesisHash = chain.genesisHash?.requireHexPrefix() ?: return@mapNotNull null
 
             InjectedAccount(
                 address = chain.addressOf(chainAccount.accountId),
-                genesisHash = chain.requireGenesisHash().requireHexPrefix(),
+                genesisHash = genesisHash,
                 name = "${metaAccount.name} (${chain.name})",
                 encryption = chainAccount.multiChainEncryption(chain)
             )
