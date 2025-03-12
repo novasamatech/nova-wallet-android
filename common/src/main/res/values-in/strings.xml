@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">DApp \"%s\" akan dihapus dari Favorit</string>
     <string name="dapp_favourites_remove_title">Hapus dari Favorit?</string>
     <string name="dapp_list_placeholder">Daftar DApps akan muncul di sini</string>
-    <string name="dapp_main_welcome_subtitle">Jelajahi web menggunakan akun Anda dari Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Selamat datang di Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Tambahkan ke Favorit</string>
     <string name="dapp_options_desktop_mode">Mode Desktop</string>
     <string name="dapp_options_remove_from_favorite">Hapus dari Favorit</string>
@@ -747,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Jaringan: %s\nMnemonic: %s</string>
     <string name="fee_not_yet_loaded_message">Harap tunggu hingga biaya dihitung</string>
     <string name="fee_not_yet_loaded_title">Perhitungan biaya sedang berlangsung</string>
+    <string name="fragment_assets_nova_card">Kelola Kartu Debit</string>
     <string name="fragment_set_staking_proxy_title">Tambahkan delegasi untuk staking %s</string>
     <string name="fragment_swap_main_settings_details_title">Detail Swap</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
     <string name="fragment_swap_main_settings_pay_title">Anda membayar</string>
     <string name="fragment_swap_main_settings_receive_title">Anda menerima</string>
     <string name="fragment_swap_main_settings_select_token">Pilih token</string>
+    <string name="fragment_top_up_card_title">Isi ulang kartu dengan %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Silakan hubungi support@novawallet.io. Sertakan alamat email yang Anda gunakan untuk menerbitkan kartu.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Hubungi dukungan</string>
     <string name="governance_notification_channel_name">Saluran Pemberitahuan Pemerintahan</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">Anda perlu memilih setidaknya %d trek</item>
@@ -928,6 +930,19 @@
     <string name="pre_configured_networks_progress_text">Memuat daftar jaringan...</string>
     <string name="pre_configured_networks_search_hint">Cari berdasarkan nama jaringan</string>
     <string name="pre_configured_networks_title">Tambahkan jaringan</string>
+    <string name="price_chart_date_format" formatted="false">%s pada %s</string>
+    <string name="price_chart_day">1H</string>
+    <string name="price_chart_max">Semua</string>
+    <string name="price_chart_month">1B</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">harga %s</string>
+    <string name="price_chart_week">1M</string>
+    <string name="price_chart_year">1T</string>
+    <string name="price_charts_period_all">Sepanjang Masa</string>
+    <string name="price_charts_period_month">Bulan Lalu</string>
+    <string name="price_charts_period_today">Hari ini</string>
+    <string name="price_charts_period_week">Minggu Lalu</string>
+    <string name="price_charts_period_year">Tahun Lalu</string>
     <string name="profile_accounts_title">Akun</string>
     <string name="profile_accounts_title_2_0">Dompet</string>
     <string name="profile_language_title">Bahasa</string>
@@ -1658,6 +1673,9 @@
     <string name="vote_revote">Perbarui suara</string>
     <string name="vote_vote">Beri suara</string>
     <string name="voting_status">Status pemungutan suara</string>
+    <string name="waiting_top_up_card_description">Ini dapat memakan waktu hingga 5 menit.\nJendela ini akan ditutup secara otomatis.</string>
+    <string name="waiting_top_up_card_timer">Perkiraan %s</string>
+    <string name="waiting_top_up_card_title">Kartu Anda sedang diterbitkan!</string>
     <string name="wallet_asset_buy">Beli</string>
     <string name="wallet_asset_buy_with">Beli dengan</string>
     <string name="wallet_asset_receive">Terima</string>

@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">DApp “%s” sẽ bị xóa khỏi Yêu thích</string>
     <string name="dapp_favourites_remove_title">Xóa khỏi Yêu thích?</string>
     <string name="dapp_list_placeholder">Danh sách DApps sẽ xuất hiện ở đây</string>
-    <string name="dapp_main_welcome_subtitle">Lướt web sử dụng tài khoản từ Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Chào mừng đến với Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Thêm vào Yêu thích</string>
     <string name="dapp_options_desktop_mode">Chế độ máy tính</string>
     <string name="dapp_options_remove_from_favorite">Xóa khỏi Yêu thích</string>
@@ -747,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Mạng: %s\nMnemonic: %s</string>
     <string name="fee_not_yet_loaded_message">Vui lòng chờ cho đến khi phí được tính toán</string>
     <string name="fee_not_yet_loaded_title">Đang tính toán phí</string>
+    <string name="fragment_assets_nova_card">Quản lý Thẻ Ghi Nợ</string>
     <string name="fragment_set_staking_proxy_title">Thêm ủy quyền cho %s staking</string>
     <string name="fragment_swap_main_settings_details_title">Chi tiết đổi</string>
     <string name="fragment_swap_main_settings_max_button">Tối đa:</string>
     <string name="fragment_swap_main_settings_pay_title">Bạn trả</string>
     <string name="fragment_swap_main_settings_receive_title">Bạn nhận</string>
     <string name="fragment_swap_main_settings_select_token">Chọn một token</string>
+    <string name="fragment_top_up_card_title">Nạp thẻ với %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Vui lòng liên hệ support@novawallet.io. Bao gồm địa chỉ email mà bạn đã sử dụng để phát hành thẻ.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Liên hệ hỗ trợ</string>
     <string name="governance_notification_channel_name">Kênh thông báo quản trị</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">Bạn cần chọn ít nhất %d track</item>
@@ -928,6 +930,19 @@
     <string name="pre_configured_networks_progress_text">Đang tải danh sách mạng...</string>
     <string name="pre_configured_networks_search_hint">Tìm kiếm theo tên mạng</string>
     <string name="pre_configured_networks_title">Thêm mạng</string>
+    <string name="price_chart_date_format" formatted="false">%s lúc %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">Tất cả</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">giá của %s</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">Tất cả thời gian</string>
+    <string name="price_charts_period_month">Tháng trước</string>
+    <string name="price_charts_period_today">Hôm nay</string>
+    <string name="price_charts_period_week">Tuần trước</string>
+    <string name="price_charts_period_year">Năm trước</string>
     <string name="profile_accounts_title">Tài khoản</string>
     <string name="profile_accounts_title_2_0">Ví tiền</string>
     <string name="profile_language_title">Ngôn ngữ</string>
@@ -1658,6 +1673,9 @@
     <string name="vote_revote">Bỏ phiếu lại</string>
     <string name="vote_vote">Bỏ phiếu</string>
     <string name="voting_status">Trạng thái bỏ phiếu</string>
+    <string name="waiting_top_up_card_description">Có thể mất đến 5 phút.\nCửa sổ này sẽ tự động đóng.</string>
+    <string name="waiting_top_up_card_timer">Dự đoán %s</string>
+    <string name="waiting_top_up_card_title">Thẻ của bạn đang được phát hành!</string>
     <string name="wallet_asset_buy">Mua</string>
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>

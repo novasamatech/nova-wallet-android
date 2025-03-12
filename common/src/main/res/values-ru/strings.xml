@@ -665,8 +665,6 @@
     <string name="dapp_favourites_remove_description">”%s” DApp будет удален из Избранного</string>
     <string name="dapp_favourites_remove_title">Удалить из Избранного?</string>
     <string name="dapp_list_placeholder">Список DApps появится здесь</string>
-    <string name="dapp_main_welcome_subtitle">Просматривайте веб-страницы, используя ваши аккаунты из Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Добро пожаловать в Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Добавить в избранное</string>
     <string name="dapp_options_desktop_mode">Версия для ПК</string>
     <string name="dapp_options_remove_from_favorite">Убрать из Избранного</string>
@@ -765,12 +763,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Сеть: %s\nМнемоника: %s</string>
     <string name="fee_not_yet_loaded_message">Подождите, пока будет рассчитана комиссия</string>
     <string name="fee_not_yet_loaded_title">Расчет комиссии в процессе</string>
+    <string name="fragment_assets_nova_card">Управление картой</string>
     <string name="fragment_set_staking_proxy_title">Добавить делегацию для %s стекинга</string>
     <string name="fragment_swap_main_settings_details_title">Детали обмена</string>
     <string name="fragment_swap_main_settings_max_button">Макс:</string>
     <string name="fragment_swap_main_settings_pay_title">Вы платите</string>
     <string name="fragment_swap_main_settings_receive_title">Вы получаете</string>
     <string name="fragment_swap_main_settings_select_token">Выберите токен</string>
+    <string name="fragment_top_up_card_title">Пополнить карту с помощью %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Пожалуйста, обратитесь в support@novawallet.io. Укажите адрес электронной почты, который вы использовали для выпуска карты.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Связаться с поддержкой</string>
     <string name="governance_notification_channel_name">Канал уведомлений демократии</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Необходимо выбрать хотя бы %d трек</item>
@@ -952,6 +954,19 @@
     <string name="pre_configured_networks_progress_text">Загрузка списка сетей...</string>
     <string name="pre_configured_networks_search_hint">Поиск по имени сети</string>
     <string name="pre_configured_networks_title">Добавить сеть</string>
+    <string name="price_chart_date_format" formatted="false">%s в %s</string>
+    <string name="price_chart_day">1Д</string>
+    <string name="price_chart_max">Все</string>
+    <string name="price_chart_month">1М</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">Цена %s</string>
+    <string name="price_chart_week">1Н</string>
+    <string name="price_chart_year">1Г</string>
+    <string name="price_charts_period_all">Все время</string>
+    <string name="price_charts_period_month">Прошлый месяц</string>
+    <string name="price_charts_period_today">Сегодня</string>
+    <string name="price_charts_period_week">Прошлая неделя</string>
+    <string name="price_charts_period_year">Прошлый год</string>
     <string name="profile_accounts_title">Аккаунты</string>
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
@@ -1694,6 +1709,9 @@
     <string name="vote_revote">Переголосовать</string>
     <string name="vote_vote">Голосовать</string>
     <string name="voting_status">Статус голосования</string>
+    <string name="waiting_top_up_card_description">Это может занять до 5 минут.\nЭто окно закроется автоматически.</string>
+    <string name="waiting_top_up_card_timer">Примерно %s</string>
+    <string name="waiting_top_up_card_title">Ваша карта выпускается!</string>
     <string name="wallet_asset_buy">Купить</string>
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>
