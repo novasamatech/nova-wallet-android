@@ -12,7 +12,7 @@ import java.math.BigInteger
 // TODO rename FeeBase -> Fee and use SubmissionFee everywhere Fee is currently used
 typealias Fee = SubmissionFee
 
-interface SubmissionFee : FeeBase {
+interface SubmissionFee : FeeBase, MaxAvailableDeduction {
 
     companion object
 
@@ -20,6 +20,14 @@ interface SubmissionFee : FeeBase {
      * Information about origin that is supposed to send the transaction fee was calculated against
      */
     val submissionOrigin: SubmissionOrigin
+
+    /**
+     * Submission fee deducts fee amount from max balance only when executing account pays fees
+     * When signing account is different from executing one, executing account balance remains unaffected by submission fee payment
+     */
+    override fun maxAmountDeductionFor(amountAsset: Chain.Asset): BigInteger {
+        return getAmountByExecutingAccount(amountAsset)
+    }
 }
 
 val SubmissionFee.submissionFeesPayer: AccountId
@@ -29,15 +37,11 @@ val SubmissionFee.submissionFeesPayer: AccountId
  * Fee that doesn't have a particular origin
  * For example, fees paid during cross chain transfers do not have a specific account that pays them
  */
-interface FeeBase : MaxAvailableDeduction {
+interface FeeBase {
 
     val amount: BigInteger
 
     val asset: Chain.Asset
-
-    override fun maxAmountDeductionFor(amountAsset: Chain.Asset): BigInteger {
-        return if (amountAsset.fullId == asset.fullId) amount else BigInteger.ZERO
-    }
 }
 
 val FeeBase.decimalAmount: BigDecimal
