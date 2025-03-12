@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.utils.permissions
 import androidx.fragment.app.Fragment
 import com.github.florent37.runtimepermission.kotlin.PermissionException
 import com.github.florent37.runtimepermission.kotlin.coroutines.experimental.askPermission
+import com.github.florent37.runtimepermission.kotlin.askPermission
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker.PermissionDeniedAction

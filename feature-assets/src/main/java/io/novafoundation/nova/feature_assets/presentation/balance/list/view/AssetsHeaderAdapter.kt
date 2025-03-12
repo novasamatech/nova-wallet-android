@@ -131,7 +131,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT,NOVA_CARD_TEXT
+    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, NOVA_CARD_TEXT
 }
 
 class HeaderHolder(

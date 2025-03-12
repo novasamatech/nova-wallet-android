@@ -23,6 +23,8 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -193,6 +195,10 @@ interface AssetsFeatureDependencies {
     val bannerSourceFactory: BannersSourceFactory
 
     val bannersMixinFactory: PromotionBannersMixinFactory
+
+    val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
+
+    val webViewFileChooserFactory: WebViewFileChooserFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

@@ -10,14 +10,17 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebChromeClientFactory
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewClientFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptorFactory
@@ -26,6 +29,12 @@ import okhttp3.OkHttpClient
 
 @Module(includes = [ViewModelModule::class])
 class NovaCardModule {
+
+    @Provides
+    fun providePermissionAsker(fragment: Fragment, factory: WebViewPermissionAskerFactory) = factory.create(fragment)
+
+    @Provides
+    fun provideFileChooser(fragment: Fragment, factory: WebViewFileChooserFactory) = factory.create(fragment)
 
     @Provides
     fun provideCardCreationInterceptorFactory(
@@ -46,16 +55,23 @@ class NovaCardModule {
     )
 
     @Provides
+    fun provideNovaCardWebViewClientFactory() = NovaCardWebViewClientFactory()
+
+    @Provides
+    fun provideNovaCardWebChromeClientFactory(
+        permissionsAsker: WebViewPermissionAsker,
+        webViewFileChooser: WebViewFileChooser
+    ) = NovaCardWebChromeClientFactory(permissionsAsker, webViewFileChooser)
+
+    @Provides
     fun provideNovaCardWebViewControllerFactory(
-        systemCallExecutor: SystemCallExecutor,
-        fileProvider: FileProvider,
-        permissionsAskerFactory: PermissionsAskerFactory,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        novaCardWebViewClientFactory: NovaCardWebViewClientFactory,
+        novaCardWebChromeClientFactory: NovaCardWebChromeClientFactory,
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
-            systemCallExecutor,
-            fileProvider,
-            permissionsAskerFactory,
+            novaCardWebViewClientFactory,
+            novaCardWebChromeClientFactory,
             appLinksProvider,
             BuildConfig.NOVA_CARD_WIDGET_ID
         )
@@ -68,13 +84,19 @@ class NovaCardModule {
         chainRegistry: ChainRegistry,
         accountInteractor: AccountInteractor,
         assetsRouter: AssetsRouter,
-        novaCardInteractor: NovaCardInteractor
+        novaCardInteractor: NovaCardInteractor,
+        cardCreationInterceptorFactory: CardCreationInterceptorFactory,
+        topUpRequestInterceptorFactory: TopUpRequestInterceptorFactory,
+        novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory
     ): ViewModel {
         return NovaCardViewModel(
             chainRegistry = chainRegistry,
             accountInteractor = accountInteractor,
             assetsRouter = assetsRouter,
-            novaCardInteractor = novaCardInteractor
+            novaCardInteractor = novaCardInteractor,
+            cardCreationInterceptorFactory = cardCreationInterceptorFactory,
+            topUpRequestInterceptorFactory = topUpRequestInterceptorFactory,
+            novaCardWebViewControllerFactory = novaCardWebViewControllerFactory
         )
     }
 
