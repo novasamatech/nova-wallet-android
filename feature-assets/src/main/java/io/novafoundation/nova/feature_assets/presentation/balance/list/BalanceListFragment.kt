@@ -160,10 +160,6 @@ class BalanceListFragment :
 
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
 
-        viewModel.novaCardText.observe {
-            headerAdapter.setNovaCardText(it)
-        }
-
         viewModel.assetViewModeModelFlow.observe { manageAssetsAdapter.setAssetViewModeModel(it) }
     }
 

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
-    android:paddingHorizontal="16dp">
+    android:paddingHorizontal="16dp"
+    tools:layout_height="match_parent">
 
     <io.novafoundation.nova.feature_account_api.view.WalletConnectCounterView
         android:id="@+id/balanceListWalletConnect"
@@ -49,7 +50,8 @@
         android:elevation="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle" />
+        app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle"
+        tools:layout_height="200dp" />
 
     <androidx.legacy.widget.Space
         android:id="@+id/balanceListNovaCardNegativeMargin"
@@ -71,5 +73,5 @@
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
+        app:layout_constraintTop_toBottomOf="@id/balanceListNovaCard" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,13 +45,11 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     }
 
     private var filterIconRes: Int? = null
-    private var shouldShowPlaceholder: Boolean = false
     private var walletConnectModel: WalletConnectSessionsModel? = null
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: String? = null
     private var nftPreviews: List<NftPreviewUi>? = null
-    private var novaCardText: CharSequence? = null
 
     fun setFilterIconRes(filterIconRes: Int) {
         this.filterIconRes = filterIconRes
@@ -87,12 +85,6 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         notifyItemChanged(0, Payload.WALLET_CONNECT)
     }
 
-    fun setNovaCardText(text: CharSequence) {
-        this.novaCardText = text
-
-        notifyItemChanged(0, Payload.NOVA_CARD_TEXT)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(parent.inflateChild(R.layout.item_asset_header), handler)
     }
@@ -108,7 +100,6 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
                     Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
-                    Payload.NOVA_CARD_TEXT -> holder.bindNovaCardText(novaCardText)
                 }
             }
         }
@@ -120,8 +111,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
             selectedWalletModel,
             nftCountLabel,
             nftPreviews,
-            walletConnectModel,
-            novaCardText
+            walletConnectModel
         )
     }
 
@@ -131,7 +121,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, NOVA_CARD_TEXT
+    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT
 }
 
 class HeaderHolder(
@@ -159,15 +149,13 @@ class HeaderHolder(
         addressModel: SelectedWalletModel?,
         nftCount: String?,
         nftPreviews: List<NftPreviewUi>?,
-        walletConnect: WalletConnectSessionsModel?,
-        novaCardText: CharSequence?,
+        walletConnect: WalletConnectSessionsModel?
     ) {
         bindTotalBalance(totalBalance)
         bindAddress(addressModel)
         bindNftPreviews(nftPreviews)
         bindNftCount(nftCount)
         bindWalletConnect(walletConnect)
-        bindNovaCardText(novaCardText)
     }
 
     fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(containerView) {
