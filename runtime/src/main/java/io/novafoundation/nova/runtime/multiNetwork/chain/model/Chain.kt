@@ -29,6 +29,7 @@ data class Chain(
     val externalApis: List<ExternalApi>,
     val icon: String?,
     val addressPrefix: Int,
+    val legacyAddressPrefix: Int?,
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,

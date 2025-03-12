@@ -82,6 +82,7 @@ fun mapRemoteChainToLocal(
             types = types,
             icon = icon ?: EMPTY_CHAIN_ICON,
             prefix = addressPrefix,
+            legacyPrefix = legacyAddressPrefix,
             isEthereumBased = ETHEREUM_OPTION in optionsOrEmpty,
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,

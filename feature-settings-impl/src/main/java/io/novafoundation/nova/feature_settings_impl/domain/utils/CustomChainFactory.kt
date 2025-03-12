@@ -120,6 +120,7 @@ class CustomChainFactory(
             externalApis = prefilledChain?.externalApis.orEmpty(),
             icon = prefilledChain?.icon,
             addressPrefix = addressPrefix,
+            legacyAddressPrefix = null,
             types = prefilledChain?.types,
             isEthereumBased = isEthereumBased,
             isTestNet = prefilledChain?.isTestNet.orFalse(),

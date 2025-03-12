@@ -19,6 +19,7 @@ data class ChainLocal(
     @Embedded
     val types: TypesConfig?,
     val prefix: Int,
+    val legacyPrefix: Int?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
     @ColumnInfo(defaultValue = "1")

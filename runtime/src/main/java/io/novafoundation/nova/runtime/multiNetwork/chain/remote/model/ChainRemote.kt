@@ -10,6 +10,7 @@ data class ChainRemote(
     val externalApi: ChainExternalApisRemote?,
     val icon: String?,
     val addressPrefix: Int,
+    val legacyAddressPrefix: Int?,
     val types: ChainTypesInfo?,
     val options: Set<String>?,
     val parentId: String?,

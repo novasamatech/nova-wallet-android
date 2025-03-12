@@ -70,6 +70,7 @@ import io.novafoundation.nova.core_db.migrations.AddGovernanceDapps_25_26
 import io.novafoundation.nova.core_db.migrations.AddGovernanceExternalApiToChain_27_28
 import io.novafoundation.nova.core_db.migrations.AddGovernanceFlagToChains_24_25
 import io.novafoundation.nova.core_db.migrations.AddGovernanceNetworkToExternalApi_33_34
+import io.novafoundation.nova.core_db.migrations.AddLegacyAddressPrefix_66_67
 import io.novafoundation.nova.core_db.migrations.AddLocalMigratorVersionToChainRuntimes_57_58
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
@@ -155,7 +156,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 66,
+    version = 67,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -255,7 +256,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
-                    .addMigrations(AddFavoriteDAppsOrdering_65_66)
+                    .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67)
                     .build()
             }
             return instance!!

@@ -259,6 +259,7 @@ fun mapChainLocalToChain(
             icon = icon.takeIf { it.isNotBlank() },
             externalApis = externalApis,
             addressPrefix = prefix,
+            legacyAddressPrefix = legacyPrefix,
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,
