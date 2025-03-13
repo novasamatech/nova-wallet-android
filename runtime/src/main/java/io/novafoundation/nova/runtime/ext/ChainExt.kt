@@ -260,6 +260,14 @@ fun Chain.addressOf(accountId: ByteArray): String {
     }
 }
 
+fun Chain.legacyAddressOfOrNull(accountId: ByteArray): String? {
+    return if (isEthereumBased) {
+        null
+    } else {
+        legacyAddressPrefix?.let { accountId.toAddress(it.toShort()) }
+    }
+}
+
 fun ByteArray.toEthereumAddress(): String {
     return asEthereumAccountId().toAddress(withChecksum = true).value
 }
@@ -327,7 +335,8 @@ fun Chain.isValidAddress(address: String): Boolean {
         } else {
             address.toAccountId() // verify supplied address can be converted to account id
 
-            address.addressPrefix() == addressPrefix.toShort()
+            addressPrefix.toShort() == address.addressPrefix()
+                || legacyAddressPrefix?.toShort() == address.addressPrefix()
         }
     }.getOrDefault(false)
 }
