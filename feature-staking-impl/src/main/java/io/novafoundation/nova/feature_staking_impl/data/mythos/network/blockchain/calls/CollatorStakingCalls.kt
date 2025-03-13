@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -76,6 +77,17 @@ fun CollatorStakingCalls.claimRewards() {
         callName = "claim_rewards",
         arguments = emptyMap()
     )
+}
+
+fun CollatorStakingCalls.setAutoCompoundPercentage(percent: Fraction) {
+    builder.call(
+        moduleName = Modules.COLLATOR_STAKING,
+        callName = "set_autocompound_percentage",
+        arguments = mapOf(
+            "percent" to percent.inWholePercents
+        )
+    )
+
 }
 
 private fun StakingIntent.toEncodableInstance(): Any {

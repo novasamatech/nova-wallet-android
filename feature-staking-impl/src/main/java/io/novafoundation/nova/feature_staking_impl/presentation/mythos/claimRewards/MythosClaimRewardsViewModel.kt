@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -14,21 +15,28 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.MythosClaimRewardsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.model.MythosAutoCompoundState
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.model.isConfigurable
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.MythosClaimRewardsValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.MythosClaimRewardsValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewards.model.MythosRestakeSwitchModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
+import io.novafoundation.nova.runtime.state.chainAsset
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MythosClaimRewardsViewModel(
@@ -57,6 +65,14 @@ class MythosClaimRewardsViewModel(
     private val pendingRewards = interactor.pendingRewardsFlow()
         .shareInBackground()
 
+    private val autoCompoundState = interactor.currentAutoCompoundState()
+        .shareInBackground()
+
+    val shouldRestake = MutableStateFlow(true)
+
+    val restakeSwitchState = autoCompoundState.map { it.toSwitchState() }
+        .shareInBackground()
+
     val pendingRewardsAmountModel = combine(pendingRewards, assetFlow, ::mapAmountToAmountModel)
         .shareInBackground()
 
@@ -73,6 +89,13 @@ class MythosClaimRewardsViewModel(
 
     init {
         loadFee()
+
+        setRestakeFromRemoteState()
+    }
+
+    private fun setRestakeFromRemoteState() {
+        autoCompoundState.filterIsInstance<MythosAutoCompoundState.Configurable>()
+            .map {  }
     }
 
     fun confirmClicked() {
@@ -89,6 +112,25 @@ class MythosClaimRewardsViewModel(
 
         externalActions.showAddressActions(address, chain)
     }
+
+    private suspend fun MythosAutoCompoundState.toSwitchState(): MythosRestakeSwitchModel {
+        return if (isConfigurable()) {
+            MythosRestakeSwitchModel(
+                enabled = true,
+                subtitle = resourceManager.getString(R.string.nomination_pools_claim_rewards_restake_subtitle)
+            )
+        } else {
+            val chainAsset = stakingSharedState.chainAsset()
+            val formattedThreshold = "${threshold.format()}+ ${chainAsset.symbol.value}"
+
+            MythosRestakeSwitchModel(
+                enabled = false,
+                subtitle = formattedThreshold
+            )
+        }
+    }
+
+    private suspend fun MythosAutoCompoundState.
 
     private fun loadFee() = launchUnit {
         feeLoaderMixin.loadFee {
