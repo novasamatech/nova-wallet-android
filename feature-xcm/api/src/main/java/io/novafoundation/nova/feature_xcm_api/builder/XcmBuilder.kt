@@ -37,12 +37,13 @@ interface XcmBuilder : XcmContext {
     // but we keep the support limited to simplify implementation
     fun depositAsset(assets: MultiAssetFilter, beneficiary: AccountIdKey)
 
-    // Context-change
+    // Performs context change
     fun transferReserveAsset(assets: MultiAssets, dest: AbsoluteMultiLocation)
 
-    // Context change
+    // Performs context change
     fun initiateReserveWithdraw(assets: MultiAssetFilter, reserve: AbsoluteMultiLocation)
 
+    // Performs context change
     fun depositReserveAsset(assets: MultiAssetFilter, dest: AbsoluteMultiLocation)
 
     suspend fun build(): VersionedXcmMessage
