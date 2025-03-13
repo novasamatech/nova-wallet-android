@@ -85,6 +85,8 @@ fun List<Junction>.toInterior() = when (size) {
     else -> MultiLocation.Interior.Junctions(this)
 }
 
+fun Junction.toInterior() = MultiLocation.Interior.Junctions(listOf(this))
+
 fun MultiLocation.Interior.isHere() = this is MultiLocation.Interior.Here
 
 fun MultiLocation.accountId(): AccountIdKey? {
@@ -101,7 +103,11 @@ fun MultiLocation.Interior.asLocation(): AbsoluteMultiLocation {
     return AbsoluteMultiLocation(this)
 }
 
-fun List<Junction>.toAbsoluteLocation(): AbsoluteMultiLocation {
+fun List<Junction>.asLocation(): AbsoluteMultiLocation {
+    return toInterior().asLocation()
+}
+
+fun Junction.asLocation(): AbsoluteMultiLocation {
     return toInterior().asLocation()
 }
 

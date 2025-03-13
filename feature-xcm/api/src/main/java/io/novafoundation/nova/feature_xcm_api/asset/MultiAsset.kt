@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
 
-class MultiAsset private constructor(
+data class MultiAsset private constructor(
     val id: MultiAssetId,
     val fungibility: Fungibility,
 ) : VersionedToDynamicScaleInstance {
@@ -59,7 +59,7 @@ class MultiAsset private constructor(
             }
         }
 
-        class Fungible(val amount: BalanceOf) : Fungibility() {
+        data class Fungible(val amount: BalanceOf) : Fungibility() {
 
             override fun toEncodableInstance(): Any {
                 return DictEnum.Entry(name = "Fungible", value = amount)
@@ -95,6 +95,14 @@ value class MultiAssets(val value: List<MultiAsset>) : VersionedToDynamicScaleIn
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
         return value.map { it.toEncodableInstance(xcmVersion) }
     }
+}
+
+fun List<MultiAsset>.intoMultiAssets(): MultiAssets {
+    return MultiAssets(this)
+}
+
+fun MultiAsset.intoMultiAssets(): MultiAssets {
+    return MultiAssets(listOf(this))
 }
 
 typealias VersionedMultiAsset = VersionedXcm<MultiAsset>
