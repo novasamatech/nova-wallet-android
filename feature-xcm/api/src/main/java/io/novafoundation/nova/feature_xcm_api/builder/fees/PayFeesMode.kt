@@ -12,10 +12,10 @@ sealed class PayFeesMode {
     /**
      * Fees should be measured when building the xcm by calling provided [MeasureXcmFees] implementation
      */
-    class Measured(val feeAssetId: MultiAssetId): PayFeesMode()
+    class Measured(val feeAssetId: MultiAssetId) : PayFeesMode()
 
     /**
      * Should use exactly [fee] when specifying fees
      */
-    class Exact(val fee: MultiAsset): PayFeesMode()
+    class Exact(val fee: MultiAsset) : PayFeesMode()
 }

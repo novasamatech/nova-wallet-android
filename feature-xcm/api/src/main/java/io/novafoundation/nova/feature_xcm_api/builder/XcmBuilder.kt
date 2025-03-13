@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_xcm_api.builder
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
@@ -13,15 +12,9 @@ import io.novafoundation.nova.feature_xcm_api.asset.withAmount
 import io.novafoundation.nova.feature_xcm_api.builder.fees.MeasureXcmFees
 import io.novafoundation.nova.feature_xcm_api.builder.fees.PayFeesMode
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
-import io.novafoundation.nova.feature_xcm_api.message.XcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior.Here
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
-
 
 interface XcmBuilder : XcmContext {
 
@@ -82,6 +75,3 @@ fun XcmBuilder.payFeesIn(assetLocation: AbsoluteMultiLocation) {
 fun XcmBuilder.payFees(assetId: MultiAssetId, exactFees: BalanceOf) {
     payFees(PayFeesMode.Exact(assetId.withAmount(exactFees)))
 }
-
-
-

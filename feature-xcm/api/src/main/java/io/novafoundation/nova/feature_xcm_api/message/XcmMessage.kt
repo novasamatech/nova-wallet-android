@@ -16,7 +16,7 @@ import java.math.BigInteger
 @JvmInline
 value class XcmMessage(val instructions: List<XcmInstruction>) : VersionedToDynamicScaleInstance {
 
-    constructor(vararg instructions: XcmInstruction): this(instructions.toList())
+    constructor(vararg instructions: XcmInstruction) : this(instructions.toList())
 
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
         return instructions.map { it.toEncodableInstance(xcmVersion) }
