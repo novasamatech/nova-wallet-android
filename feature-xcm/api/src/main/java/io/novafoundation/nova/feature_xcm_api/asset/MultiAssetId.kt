@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_xcm_api.asset
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
@@ -19,4 +20,8 @@ value class MultiAssetId(val multiLocation: RelativeMultiLocation) : VersionedTo
             )
         }
     }
+}
+
+fun MultiAssetId.withAmount(amount: BalanceOf): MultiAsset {
+    return MultiAsset.from(multiLocation, amount)
 }
