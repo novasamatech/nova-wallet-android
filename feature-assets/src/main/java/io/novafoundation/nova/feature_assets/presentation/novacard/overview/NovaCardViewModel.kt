@@ -78,8 +78,12 @@ class NovaCardViewModel(
     }
 
     override fun onTopUpCompleted(orderId: String) {
-        openedOrderIds.remove(orderId)
-        markCardAsCardCreated()
+        launch {
+            openedOrderIds.remove(orderId)
+
+            novaCardInteractor.setTopUpFinishedEvent()
+            markCardAsCardCreated()
+        }
     }
 
     override fun onCardCreated() {

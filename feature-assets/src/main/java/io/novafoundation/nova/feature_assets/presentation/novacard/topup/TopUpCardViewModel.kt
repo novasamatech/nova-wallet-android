@@ -157,14 +157,8 @@ class TopUpCardViewModel(
     private fun transferTokensAndFinishFlow(payload: AssetTransferPayload) = launch {
         sendInteractor.performTransfer(payload.transfer, payload.originFee, null, viewModelScope)
 
-        if (novaCardInteractor.isNovaCardCreated()) {
-            router.back()
-        } else {
-            novaCardInteractor.setTimeCardBeingIssued(System.currentTimeMillis())
-
-            // If nova card is not active it means user create card first time and we need to show waiting dialog
-            router.finishTopUpFlowAndAwaitCardCreation()
-        }
+        novaCardInteractor.setLastTopUpTime(System.currentTimeMillis())
+        router.finishAndAwaitTopUp()
     }
 
     private fun setupFees() {

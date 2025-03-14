@@ -441,7 +441,7 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun finishTopUpFlowAndAwaitCardCreation() {
+    override fun finishAndAwaitTopUp() {
         navigationBuilder().action(R.id.action_finish_top_up_flow)
             .navigateInFirstAttachedContext()
     }

@@ -2,7 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
     <string name="waiting_top_up_card_timer">Estimated %s</string>
-    <string name="waiting_top_up_card_title">Your card is being issued!</string>
+    <string name="waiting_initial_top_up_card_title">Your card is being issued!</string>
+    <string name="waiting_existing_card_top_up_card_title">Your card is being funded!</string>
     <string name="waiting_top_up_card_description">It can take up to 5 minutes.\nThis window will be closed automatically.</string>
 
     <string name="fragment_waiting_top_up_time_out_error_title">Contact support</string>

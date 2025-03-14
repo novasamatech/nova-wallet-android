@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import kotlinx.android.synthetic.main.fragment_waiting_nova_card_top_up.topUpWaitingTitle
 import kotlinx.android.synthetic.main.fragment_waiting_nova_card_top_up.waitingTopUpCardTimer
 
 class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopUpViewModel>() {
@@ -36,6 +37,10 @@ class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopU
     }
 
     override fun subscribe(viewModel: WaitingNovaCardTopUpViewModel) {
+        viewModel.titleFlow.observe {
+            topUpWaitingTitle.text = it
+        }
+
         waitingTopUpCardTimer.startTimer(
             viewModel.getTimerValue(),
             customMessageFormat = R.string.waiting_top_up_card_timer,
