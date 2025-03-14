@@ -1685,9 +1685,10 @@
     <string name="vote_revote">Yeniden Oy Ver</string>
     <string name="vote_vote">Oy Ver</string>
     <string name="voting_status">Oylama Durumu</string>
+    <string name="waiting_existing_card_top_up_card_title">Kartınız finanse ediliyor!</string>
+    <string name="waiting_initial_top_up_card_title">Kartınız veriliyor!</string>
     <string name="waiting_top_up_card_description">Bu işlem 5 dakika kadar sürebilir.\nBu pencere otomatik olarak kapatılacaktır.</string>
     <string name="waiting_top_up_card_timer">Tahmini %s</string>
-    <string name="waiting_top_up_card_title">Kartınız veriliyor!</string>
     <string name="wallet_asset_buy">Satın al</string>
     <string name="wallet_asset_buy_with">ile Satın al</string>
     <string name="wallet_asset_receive">Al</string>

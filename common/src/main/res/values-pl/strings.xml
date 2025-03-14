@@ -1709,9 +1709,10 @@
     <string name="vote_revote">Oddaj ponownie głos</string>
     <string name="vote_vote">Głosuj</string>
     <string name="voting_status">Status głosowania</string>
+    <string name="waiting_existing_card_top_up_card_title">Twoja karta jest doładowywana!</string>
+    <string name="waiting_initial_top_up_card_title">Twoja karta jest w trakcie wydawania!</string>
     <string name="waiting_top_up_card_description">Może to potrwać do 5 minut.\nTo okno zostanie zamknięte automatycznie.</string>
     <string name="waiting_top_up_card_timer">Szacowany czas %s</string>
-    <string name="waiting_top_up_card_title">Twoja karta jest w trakcie wydawania!</string>
     <string name="wallet_asset_buy">Kup</string>
     <string name="wallet_asset_buy_with">Kup za</string>
     <string name="wallet_asset_receive">Otrzymaj</string>

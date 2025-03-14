@@ -1673,9 +1673,10 @@
     <string name="vote_revote">재투표</string>
     <string name="vote_vote">투표</string>
     <string name="voting_status">투표 상태</string>
+    <string name="waiting_existing_card_top_up_card_title">카드가 충전 중입니다!</string>
+    <string name="waiting_initial_top_up_card_title">카드가 발급되고 있습니다!</string>
     <string name="waiting_top_up_card_description">최대 5분이 소요될 수 있습니다.\n이 창은 자동으로 닫힙니다.</string>
     <string name="waiting_top_up_card_timer">예상 %s</string>
-    <string name="waiting_top_up_card_title">카드가 발급되고 있습니다!</string>
     <string name="wallet_asset_buy">구매</string>
     <string name="wallet_asset_buy_with">구매 방법</string>
     <string name="wallet_asset_receive">받기</string>

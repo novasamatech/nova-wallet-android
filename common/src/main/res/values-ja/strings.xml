@@ -1673,9 +1673,10 @@
     <string name="vote_revote">再投票</string>
     <string name="vote_vote">投票</string>
     <string name="voting_status">投票状況</string>
+    <string name="waiting_existing_card_top_up_card_title">あなたのカードに資金が追加されています！</string>
+    <string name="waiting_initial_top_up_card_title">カードが発行されています！</string>
     <string name="waiting_top_up_card_description">最大で5分かかる場合があります。\nこのウィンドウは自動的に閉じられます。</string>
     <string name="waiting_top_up_card_timer">推定%s</string>
-    <string name="waiting_top_up_card_title">カードが発行されています！</string>
     <string name="wallet_asset_buy">購入</string>
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>

@@ -1673,9 +1673,10 @@
     <string name="vote_revote">Perbarui suara</string>
     <string name="vote_vote">Beri suara</string>
     <string name="voting_status">Status pemungutan suara</string>
+    <string name="waiting_existing_card_top_up_card_title">Kartu Anda sedang dibiayai!</string>
+    <string name="waiting_initial_top_up_card_title">Kartu Anda sedang diterbitkan!</string>
     <string name="waiting_top_up_card_description">Ini dapat memakan waktu hingga 5 menit.\nJendela ini akan ditutup secara otomatis.</string>
     <string name="waiting_top_up_card_timer">Perkiraan %s</string>
-    <string name="waiting_top_up_card_title">Kartu Anda sedang diterbitkan!</string>
     <string name="wallet_asset_buy">Beli</string>
     <string name="wallet_asset_buy_with">Beli dengan</string>
     <string name="wallet_asset_receive">Terima</string>

@@ -1685,9 +1685,10 @@
     <string name="vote_revote">Volver a votar</string>
     <string name="vote_vote">Votar</string>
     <string name="voting_status">Estado de la votación</string>
+    <string name="waiting_existing_card_top_up_card_title">¡Tu tarjeta está siendo financiada!</string>
+    <string name="waiting_initial_top_up_card_title">¡Tu tarjeta está siendo emitida!</string>
     <string name="waiting_top_up_card_description">Puede tardar hasta 5 minutos.\nEsta ventana se cerrará automáticamente.</string>
     <string name="waiting_top_up_card_timer">Estimado %s</string>
-    <string name="waiting_top_up_card_title">¡Tu tarjeta está siendo emitida!</string>
     <string name="wallet_asset_buy">Comprar</string>
     <string name="wallet_asset_buy_with">Comprar con</string>
     <string name="wallet_asset_receive">Recibir</string>

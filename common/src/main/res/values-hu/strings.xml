@@ -1685,9 +1685,10 @@
     <string name="vote_revote">Újraszavaz</string>
     <string name="vote_vote">Szavazás</string>
     <string name="voting_status">Szavazás állapota</string>
+    <string name="waiting_existing_card_top_up_card_title">A kártyád feltöltése folyamatban van!</string>
+    <string name="waiting_initial_top_up_card_title"><font>A kártyád kiállítása folyamatban van!</font></string>
     <string name="waiting_top_up_card_description">Eltarthat akár 5 percig.\nEz az ablak automatikusan bezáródik.</string>
     <string name="waiting_top_up_card_timer">Becsült %s</string>
-    <string name="waiting_top_up_card_title"><font>A kártyád kiállítása folyamatban van!</font></string>
     <string name="wallet_asset_buy">Vétel</string>
     <string name="wallet_asset_buy_with">Vásárlás a következővel</string>
     <string name="wallet_asset_receive">Fogadás</string>

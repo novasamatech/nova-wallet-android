@@ -1709,9 +1709,10 @@
     <string name="vote_revote">Переголосовать</string>
     <string name="vote_vote">Голосовать</string>
     <string name="voting_status">Статус голосования</string>
+    <string name="waiting_existing_card_top_up_card_title">Ваша карта пополняется!</string>
+    <string name="waiting_initial_top_up_card_title">Ваша карта выпускается!</string>
     <string name="waiting_top_up_card_description">Это может занять до 5 минут.\nЭто окно закроется автоматически.</string>
     <string name="waiting_top_up_card_timer">Примерно %s</string>
-    <string name="waiting_top_up_card_title">Ваша карта выпускается!</string>
     <string name="wallet_asset_buy">Купить</string>
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>

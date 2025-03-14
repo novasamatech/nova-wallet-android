@@ -1673,9 +1673,10 @@
     <string name="vote_revote">Bỏ phiếu lại</string>
     <string name="vote_vote">Bỏ phiếu</string>
     <string name="voting_status">Trạng thái bỏ phiếu</string>
+    <string name="waiting_existing_card_top_up_card_title">Thẻ của bạn đang được nạp tiền!</string>
+    <string name="waiting_initial_top_up_card_title">Thẻ của bạn đang được phát hành!</string>
     <string name="waiting_top_up_card_description">Có thể mất đến 5 phút.\nCửa sổ này sẽ tự động đóng.</string>
     <string name="waiting_top_up_card_timer">Dự đoán %s</string>
-    <string name="waiting_top_up_card_title">Thẻ của bạn đang được phát hành!</string>
     <string name="wallet_asset_buy">Mua</string>
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>
