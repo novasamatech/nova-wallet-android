@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculator
 import io.novafoundation.nova.feature_staking_impl.data.mythos.duration.MythosSessionDurationCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.Invulnerables
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythCandidateInfos
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythReleaseRequest
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosCandidatesRepository
@@ -63,6 +64,13 @@ class MythosSharedComputation @Inject constructor(
     fun sessionValidatorsFlow(chainId: ChainId): Flow<SessionValidators> {
         return cachedFlow("MythosSharedComputation.sessionValidatorsFlow", chainId) {
             sessionRepository.sessionValidatorsFlow(chainId)
+        }
+    }
+
+    context(ComputationalScope)
+    suspend fun getInvulnerableCollators(chainId: ChainId): Invulnerables {
+        return cachedValue("MythosSharedComputation.invulnerables", chainId) {
+            mythosStakingRepository.getInvulnerableCollators(chainId)
         }
     }
 

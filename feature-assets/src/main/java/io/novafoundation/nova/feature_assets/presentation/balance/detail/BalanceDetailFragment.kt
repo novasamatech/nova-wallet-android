@@ -30,6 +30,8 @@ import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailToken
 import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
 import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
+import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsChain
 import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
 private const val KEY_TOKEN = "KEY_TOKEN"
@@ -64,7 +66,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         balanceDetailBack.applyBarMargin()
 
-        transfersContainer.initializeBehavior(anchorView = balanceDetailContainer)
+        transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
 
         transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
 
@@ -126,6 +128,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
             balanceDetailsBalances.locked.showAmount(asset.locked)
         }
 
+        viewModel.supportExpandableBalanceDetails.observe {
+            balanceDetailsBalances.showBalanceDetails(it)
+        }
+
         viewModel.priceChartFormatters.observe {
             priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
         }
@@ -159,6 +165,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
                 onSuccess = { it.onSuccess(Unit) },
                 message = it.payload
             ).show()
+        }
+
+        viewModel.chainUI.observe {
+            balanceDetailsChain.setChain(it)
         }
     }
 

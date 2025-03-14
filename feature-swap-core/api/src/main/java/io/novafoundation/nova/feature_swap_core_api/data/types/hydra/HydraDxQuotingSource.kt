@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_core_api.data.types.hydra
 
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -20,6 +21,6 @@ interface HydraDxQuotingSource<E : QuotableEdge> : Identifiable {
 
     interface Factory<S : HydraDxQuotingSource<*>> {
 
-        fun create(chain: Chain): S
+        fun create(chain: Chain, host: SwapQuoting.QuotingHost): S
     }
 }

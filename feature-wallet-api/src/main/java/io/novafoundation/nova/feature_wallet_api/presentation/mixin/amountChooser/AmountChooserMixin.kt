@@ -47,7 +47,7 @@ interface AmountChooserMixinBase : CoroutineScope {
 
         val amountState: Flow<InputState<BigDecimal?>>
 
-        val backPressuredAmount: Flow<BigDecimal>
+        val backPressuredAmountState: Flow<InputState<BigDecimal>>
 
         val backPressuredPlanks: Flow<Balance>
     }
@@ -121,4 +121,16 @@ fun InputKind.isInputBlocked(): Boolean {
 
 fun InputKind.isInputAllowed(): Boolean {
     return !isInputBlocked()
+}
+
+fun InputKind.isMaxAction(): Boolean {
+    return this == InputKind.MAX_ACTION
+}
+
+fun <T, R> InputState<T>.map(transform: (T) -> R): InputState<R> {
+    return InputState(
+        value = transform(value),
+        inputKind = inputKind,
+        initiatedByUser = initiatedByUser
+    )
 }

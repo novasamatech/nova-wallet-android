@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">“%s” DApp이(가) 즐겨찾기에서 제거됩니다.</string>
     <string name="dapp_favourites_remove_title">즐겨찾기에서 제거하시겠습니까?</string>
     <string name="dapp_list_placeholder">여기에 DApps 목록이 표시됩니다.</string>
-    <string name="dapp_main_welcome_subtitle">Nova Wallet 계정을 사용하여 웹을 탐색하세요</string>
-    <string name="dapp_main_welcome_title">Nova 브라우저에 오신 것을 환영합니다</string>
     <string name="dapp_options_add_to_favorite">즐겨찾기에 추가</string>
     <string name="dapp_options_desktop_mode">데스크탑 모드</string>
     <string name="dapp_options_remove_from_favorite">즐겨찾기에서 제거</string>
@@ -928,6 +926,19 @@
     <string name="pre_configured_networks_progress_text">네트워크 목록을 로드 중...</string>
     <string name="pre_configured_networks_search_hint">네트워크 이름으로 검색</string>
     <string name="pre_configured_networks_title">네트워크 추가</string>
+    <string name="price_chart_date_format" formatted="false">%s 에 %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">모두</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s 가격</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">전체 기간</string>
+    <string name="price_charts_period_month">지난달</string>
+    <string name="price_charts_period_today">오늘</string>
+    <string name="price_charts_period_week">지난주</string>
+    <string name="price_charts_period_year">지난해</string>
     <string name="profile_accounts_title">계정</string>
     <string name="profile_accounts_title_2_0">지갑</string>
     <string name="profile_language_title">언어</string>

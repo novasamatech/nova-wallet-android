@@ -5,8 +5,13 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
+import android.os.CombinedVibration
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -165,3 +170,21 @@ val Int.dp: Int
 context(View)
 val Int.dpF: Float
     get() = dpF(this@View.context)
+
+fun Context.vibrate(duration: Long) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibrator = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        val vibrationEffect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator.vibrate(CombinedVibration.createParallel(vibrationEffect))
+    } else {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (vibrator.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(duration)
+            }
+        }
+    }
+}

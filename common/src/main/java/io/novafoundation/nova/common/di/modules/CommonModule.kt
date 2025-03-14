@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Vibrator
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import dagger.Module
@@ -184,8 +183,7 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideDeviceVibrator(context: Context): DeviceVibrator {
-        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        return DeviceVibrator(vibrator)
+        return DeviceVibrator(context)
     }
 
     @Provides
