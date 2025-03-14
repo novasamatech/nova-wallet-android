@@ -20,7 +20,9 @@ class TopUpExistingCardCase(
 
     override fun init(viewModel: BaseViewModel) {
         novaCardInteractor.observeTopUpFinishedEvent()
-            .onEach { assetsRouter.back() }
+            .onEach {
+                assetsRouter.back()
+            }
             .launchIn(viewModel)
     }
 

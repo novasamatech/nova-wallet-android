@@ -31,10 +31,9 @@ fun TextView.startTimer(
     durationFormatter: DurationFormatter? = null,
     @StringRes customMessageFormat: Int? = null,
     lifecycle: Lifecycle? = null,
-    timerDurationFormatter: DurationFormatter? = null,
     onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
-) = startTimer(value.millis, value.millisCalculatedAt, durationFormatter, lifecycle, customMessageFormat, timerDurationFormatter, onTick, onFinish)
+) = startTimer(value.millis, value.millisCalculatedAt, durationFormatter, lifecycle, customMessageFormat, onTick, onFinish)
 
 fun TextView.startTimer(
     millis: Long,
@@ -42,7 +41,6 @@ fun TextView.startTimer(
     durationFormatter: DurationFormatter? = null,
     lifecycle: Lifecycle? = null,
     @StringRes customMessageFormat: Int? = null,
-    timerDurationFormatter: DurationFormatter? = null,
     onTick: ((view: TextView, millisUntilFinished: Long) -> Unit)? = null,
     onFinish: ((view: TextView) -> Unit)? = null
 ) {

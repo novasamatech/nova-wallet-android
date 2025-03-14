@@ -42,9 +42,9 @@ class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopU
         }
 
         waitingTopUpCardTimer.startTimer(
-            viewModel.getTimerValue(),
+            value = viewModel.getTimerValue(),
             customMessageFormat = R.string.waiting_top_up_card_timer,
-            timerDurationFormatter = viewModel.getTimerFormatter(),
+            durationFormatter = viewModel.getTimerFormatter(),
             lifecycle = lifecycle,
             onFinish = { viewModel.timerFinished() }
         )
