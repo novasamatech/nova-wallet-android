@@ -429,7 +429,6 @@ object ChainGeneses {
 object ChainIds {
 
     const val ETHEREUM = "$EIP_155_PREFIX:1"
-    const val ETHEREUM_SEPOLIA = "$EIP_155_PREFIX:11155111"
 
     const val MOONBEAM = ChainGeneses.MOONBEAM
     const val MOONRIVER = ChainGeneses.MOONRIVER

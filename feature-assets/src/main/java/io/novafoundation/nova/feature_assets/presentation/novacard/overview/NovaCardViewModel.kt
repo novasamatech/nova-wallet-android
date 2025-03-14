@@ -82,12 +82,12 @@ class NovaCardViewModel(
             openedOrderIds.remove(orderId)
 
             novaCardInteractor.setTopUpFinishedEvent()
-            markCardAsCardCreated()
+            setCardStateCreated()
         }
     }
 
     override fun onCardCreated() {
-        markCardAsCardCreated()
+        setCardStateCreated()
     }
 
     private suspend fun getTopUpChain(): Chain {
@@ -104,7 +104,7 @@ class NovaCardViewModel(
         }
     }
 
-    private fun markCardAsCardCreated() {
+    private fun setCardStateCreated() {
         if (novaCardInteractor.isNovaCardCreated()) return
 
         novaCardInteractor.setNovaCardState(NovaCardState.CREATED)
