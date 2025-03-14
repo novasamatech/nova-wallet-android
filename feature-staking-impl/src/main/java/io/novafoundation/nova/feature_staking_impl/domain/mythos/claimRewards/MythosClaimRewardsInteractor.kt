@@ -131,12 +131,13 @@ class RealMythosClaimRewardsInteractor @Inject constructor(
     }
 
     private suspend fun determineNewCollatorStakes(claimedRewards: Balance): List<StakingIntent> {
-        val delegations = delegatorStateUseCase.getUserDelegations()
+        val delegations = delegatorStateUseCase.getUserDelegations().toList()
         val splitWeights = delegations.map { (_, delegation) -> delegation.stake }
+        val collatorIds = delegations.map { (collatorId, _) -> collatorId }
 
         val rewardAllocations = claimedRewards.splitByWeights(splitWeights)
 
-        return delegations.keys.zip(rewardAllocations).map { (collatorId, stakeMoreAmount) ->
+        return collatorIds.zip(rewardAllocations).map { (collatorId, stakeMoreAmount) ->
             StakingIntent(collatorId, stakeMoreAmount)
         }
     }
