@@ -65,6 +65,9 @@ enum class FractionUnit {
 
 fun Fraction?.orZero(): Fraction = this ?: Fraction.ZERO
 
+val Fraction.isZero: Boolean
+    get() = this == Fraction.ZERO
+
 private fun FractionUnit.convertToFraction(value: Double): Double {
     return when (this) {
         FractionUnit.FRACTION -> value

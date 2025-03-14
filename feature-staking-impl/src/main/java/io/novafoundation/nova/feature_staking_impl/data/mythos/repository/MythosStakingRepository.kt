@@ -50,6 +50,8 @@ interface MythosStakingRepository {
     suspend fun getMainStakingPot(chainId: ChainId): Result<AccountIdKey>
 
     suspend fun getInvulnerableCollators(chainId: ChainId): Invulnerables
+
+    suspend fun autoCompoundThreshold(chainId: ChainId): Balance
 }
 
 @FeatureScope
@@ -114,6 +116,12 @@ class RealMythosStakingRepository @Inject constructor(
     override suspend fun getInvulnerableCollators(chainId: ChainId): Invulnerables {
         return localStorageDataSource.query(chainId) {
             metadata.collatorStaking.invulnerables.query().orEmpty()
+        }
+    }
+
+    override suspend fun autoCompoundThreshold(chainId: ChainId): Balance {
+        return chainRegistry.withRuntime(chainId) {
+            metadata.collatorStaking().numberConstant("AutoCompoundingThreshold")
         }
     }
 
