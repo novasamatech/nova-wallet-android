@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -118,7 +119,8 @@ class TopUpCardViewModel(
         val fee = feeMixin.awaitFee()
         val originFee = OriginFee(fee, null)
 
-        val transfer = buildTransfer(feeMixin.feePaymentCurrency())
+        val amountState = amountChooserMixin.amountState.first()
+        val transfer = buildTransfer(feeMixin.feePaymentCurrency(), amountState.inputKind.isMaxAction())
 
         val payload = AssetTransferPayload(
             transfer = WeightedAssetTransfer(
@@ -163,9 +165,10 @@ class TopUpCardViewModel(
 
     private fun setupFees() {
         feeMixin.connectWith(
-            feeMixin.feeChainAssetFlow
-        ) { feePaymentCurrency, commissionAsset ->
-            val assetTransfer = buildTransfer(feePaymentCurrency)
+            feeMixin.feeChainAssetFlow,
+            amountChooserMixin.amountState
+        ) { feePaymentCurrency, commissionAsset, amountState ->
+            val assetTransfer = buildTransfer(feePaymentCurrency, amountState.inputKind.isMaxAction())
 
             val originFee = sendInteractor.getOriginFee(assetTransfer, viewModelScope)
             originFee.submissionFee
@@ -173,7 +176,8 @@ class TopUpCardViewModel(
     }
 
     private suspend fun buildTransfer(
-        feePaymentCurrency: FeePaymentCurrency
+        feePaymentCurrency: FeePaymentCurrency,
+        transferringMaxAmount: Boolean
     ): AssetTransfer {
         val chainWithAsset = chainWithAssetFlow.first()
         val amount = amountChooserMixin.amount.first()
@@ -184,7 +188,8 @@ class TopUpCardViewModel(
             origin = chainWithAsset,
             destination = chainWithAsset,
             amount = amount,
-            address = address
+            address = address,
+            transferringMaxAmount = transferringMaxAmount
         )
     }
 }
