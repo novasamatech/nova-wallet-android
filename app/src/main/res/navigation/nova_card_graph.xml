@@ -37,6 +37,15 @@
         tools:layout="@layout/fragment_top_up_card">
 
         <action
+            android:id="@+id/action_close_top_up_with_browser"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/novaCardFragment"
+            app:popUpToInclusive="true" />
+
+        <action
             android:id="@+id/action_finish_top_up_flow"
             app:destination="@id/waitingForTopUpCardFragment"
             app:enterAnim="@anim/fragment_open_enter"

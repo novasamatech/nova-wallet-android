@@ -46,7 +46,7 @@ class DirectRewardTypeJoin(
     val isReward: Boolean,
     val amount: BigInteger,
     val eventId: String,
-    val era: Int,
+    val era: Int?,
     val validator: String?,
 )
 

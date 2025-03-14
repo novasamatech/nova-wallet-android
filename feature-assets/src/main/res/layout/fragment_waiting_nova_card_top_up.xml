@@ -21,13 +21,14 @@
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:id="@+id/topUpWaitingTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
         android:textColor="@color/text_primary"
-        android:text="@string/waiting_top_up_card_title" />
+        tools:text="@string/waiting_initial_top_up_card_title" />
 
     <TextView
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"

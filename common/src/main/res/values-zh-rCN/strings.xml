@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">备份</string>
     <string name="backup_title">备份</string>
     <string name="biometric_auth_title">生物认证</string>
+    <string name="browser_tabs_close_all">关闭所有</string>
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
     <string name="buy_network_flow_title">选择购买%s的网络</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">转账费</string>
     <string name="choose_amount_network_error">网络无响应</string>
     <string name="choose_amount_to">至</string>
+    <string name="close_dapp_tabs_message">DApp浏览器中所有打开的标签页将被关闭。</string>
+    <string name="close_dapp_tabs_title">关闭所有DApps？</string>
     <string name="cloud_backup_delete_action_subtitle">%s 并且记住始终将它们离线保存，以便随时恢复它们。您可以在备份设置中执行此操作。</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">请在继续之前记下您钱包的所有助记词</string>
     <string name="cloud_backup_delete_action_title">备份将从Google Drive中删除</string>
@@ -475,6 +478,7 @@
         <item quantity="other">%d 秒</item>
     </plurals>
     <string name="common_secret_derivation_path">密钥派生路径</string>
+    <string name="common_see_all">查看全部</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
     <string name="common_sign_in">登录</string>
@@ -636,13 +640,13 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">如果您信任此应用，请批准此请求。\n检查交易详情。</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">收藏夹</string>
     <string name="dapp_favourites">收藏夹</string>
     <string name="dapp_favourites_add">添加到收藏夹</string>
     <string name="dapp_favourites_remove_description">“%s”DApp将从收藏夹中移除</string>
     <string name="dapp_favourites_remove_title">从收藏夹中移除?</string>
     <string name="dapp_list_placeholder">DApps列表将出现在这里</string>
-    <string name="dapp_main_welcome_subtitle">使用您从Nova钱包的账户浏览网页</string>
-    <string name="dapp_main_welcome_title">欢迎来到Nova浏览器</string>
     <string name="dapp_options_add_to_favorite">添加到收藏夹</string>
     <string name="dapp_options_desktop_mode">桌面模式</string>
     <string name="dapp_options_remove_from_favorite">从收藏夹中移除</string>
@@ -752,6 +756,8 @@
         <item quantity="other">您至少需要选择%d轨道</item>
     </plurals>
     <string name="governance_unlock">解锁</string>
+    <string name="high_price_impact_detacted_message">执行此交换将导致显著的滑点和经济损失。建议减小交易规模或将交易分拆为多笔交易。</string>
+    <string name="high_price_impact_detacted_title">检测到高价格影响 (%s)</string>
     <string name="history_v1.9.0">历史</string>
     <string name="identity_email_title">电子邮件</string>
     <string name="identity_legal_name_title">法定名字</string>
@@ -915,10 +921,24 @@
     <string name="pool_inactive_failure_title">池未开放</string>
     <string name="pool_staking_conflict_message">你不能再同时使用同一个账号进行直接质押和池质押。要管理你的池质押，首先需要从直接质押中取消质押你的代币。</string>
     <string name="pool_staking_conflict_title">池操作不可用</string>
+    <string name="popular_dapps_title">流行</string>
     <string name="pre_configured_networks_add_custom_button">手动添加网络</string>
     <string name="pre_configured_networks_progress_text">正在加载网络列表...</string>
     <string name="pre_configured_networks_search_hint">按网络名称搜索</string>
     <string name="pre_configured_networks_title">添加网络</string>
+    <string name="price_chart_date_format" formatted="false">%s 于 %s</string>
+    <string name="price_chart_day">1天</string>
+    <string name="price_chart_max">所有</string>
+    <string name="price_chart_month">1月</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s 价格</string>
+    <string name="price_chart_week">1周</string>
+    <string name="price_chart_year">1年</string>
+    <string name="price_charts_period_all">所有时间</string>
+    <string name="price_charts_period_month">上个月</string>
+    <string name="price_charts_period_today">今天</string>
+    <string name="price_charts_period_week">上周</string>
+    <string name="price_charts_period_year">去年</string>
     <string name="profile_accounts_title">账户</string>
     <string name="profile_accounts_title_2_0">钱包</string>
     <string name="profile_language_title">语言</string>

@@ -43,6 +43,8 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
@@ -96,6 +98,10 @@ interface CommonApi {
     val googleApiAvailabilityProvider: GoogleApiAvailabilityProvider
 
     val coinGeckoLinkParser: CoinGeckoLinkParser
+
+    val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
+
+    val webViewFileChooserFactory: WebViewFileChooserFactory
 
     fun computationalCache(): ComputationalCache
 

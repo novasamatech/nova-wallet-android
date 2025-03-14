@@ -44,10 +44,13 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.isEnabled
@@ -81,6 +84,7 @@ class SelectSendViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val accountRepository: AccountRepository,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -99,6 +103,10 @@ class SelectSendViewModel(
 
     private val destinationAsset = destinationChainWithAsset.map { it.asset }
     private val destinationChain = destinationChainWithAsset.map { it.chain }
+
+    private val isCrossChainFlow = combine(originChain, destinationChain) { origin, destination ->
+        origin.id != destination.id
+    }.shareInBackground()
 
     private val selectAddressPayloadFlow = combine(
         originChain,
@@ -159,11 +167,17 @@ class SelectSendViewModel(
     private val feeFormatter = TransferFeeDisplayFormatter()
     val feeMixin = feeLoaderMixinFactory.createForTransfer(originChainAsset, feeFormatter)
 
+    private val maxActionProvider = maxActionProviderFactory.create(
+        viewModelScope = viewModelScope,
+        assetInFlow = originAssetFlow,
+        feeLoaderMixin = feeMixin,
+        deductEd = isCrossChainFlow
+    )
+
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = originAssetFlow,
-        balanceLabel = R.string.wallet_balance_transferable,
-        balanceField = Asset::transferable,
+        maxActionProvider = maxActionProvider
     )
 
     val continueButtonStateLiveData = combine(
@@ -189,11 +203,13 @@ class SelectSendViewModel(
         sendInProgressFlow.value = true
 
         val fee = feeMixin.awaitFee()
+        val amountState = amountChooserMixin.amountState.first()
 
         val transfer = buildTransfer(
             origin = originChainWithAsset.first(),
             destination = destinationChainWithAsset.first(),
-            amount = amountChooserMixin.amountState.first().value ?: return@launch,
+            amount = amountState.value ?: return@launch,
+            transferringMaxAmount = amountState.inputKind.isMaxAction(),
             feePaymentCurrency = feeMixin.feePaymentCurrency(),
             address = addressInputMixin.getAddress(),
         )
@@ -313,21 +329,21 @@ class SelectSendViewModel(
             originChainWithAsset,
             destinationChainWithAsset,
             addressInputMixin.inputFlow,
-            amountChooserMixin.backPressuredAmount,
-        ) { paymentCurrency, originAsset, destinationAsset, address, amount ->
+            amountChooserMixin.backPressuredAmountState,
+        ) { paymentCurrency, originAsset, destinationAsset, address, amountState ->
             val assetTransfer = buildTransfer(
                 origin = originAsset,
                 destination = destinationAsset,
-                amount = amount,
+                amount = amountState.value,
                 feePaymentCurrency = paymentCurrency,
-                address = address
+                address = address,
+                transferringMaxAmount = amountState.inputKind.isMaxAction()
             )
 
             sendInteractor.getFee(assetTransfer, viewModelScope)
         }
 
-        combine(originChain, destinationChain) { originChain, destinationChain ->
-            val isCrossChain = originChain.id != destinationChain.id
+        isCrossChainFlow.onEach { isCrossChain ->
             val mode = determineFeeSelectionMode(isCrossChain)
 
             feeFormatter.crossChainFeeShown = isCrossChain
@@ -347,6 +363,7 @@ class SelectSendViewModel(
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
+            transferringMaxAmount = validPayload.transfer.transferringMaxAmount,
             origin = AssetPayload(
                 chainId = validPayload.transfer.originChain.id,
                 chainAssetId = validPayload.transfer.originChainAsset.id
@@ -368,6 +385,7 @@ class SelectSendViewModel(
         feePaymentCurrency: FeePaymentCurrency,
         destination: ChainWithAsset,
         amount: BigDecimal,
+        transferringMaxAmount: Boolean,
         address: String,
     ): AssetTransfer {
         return buildAssetTransfer(
@@ -376,6 +394,7 @@ class SelectSendViewModel(
             origin = origin,
             destination = destination,
             amount = amount,
+            transferringMaxAmount = transferringMaxAmount,
             address = address
         )
     }

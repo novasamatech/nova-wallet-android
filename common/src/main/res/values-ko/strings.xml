@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">백업</string>
     <string name="backup_title">백업</string>
     <string name="biometric_auth_title">생체 인증</string>
+    <string name="browser_tabs_close_all">모두 닫기</string>
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
     <string name="buy_network_flow_title">%s 구매를 위한 네트워크 선택</string>
     <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">전송 수수료</string>
     <string name="choose_amount_network_error">네트워크가 응답하지 않습니다</string>
     <string name="choose_amount_to">받는 사람</string>
+    <string name="close_dapp_tabs_message">DApp 브라우저의 모든 열린 탭이 닫힙니다.</string>
+    <string name="close_dapp_tabs_title">모든 DApp 닫기?</string>
     <string name="cloud_backup_delete_action_subtitle">%s 및 언제든지 복원할 수 있도록 항상 오프라인으로 보관하십시오. 백업 설정에서 이 작업을 수행할 수 있습니다.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">진행하기 전에 모든 지갑의 암호 구문을 적어 두십시오</string>
     <string name="cloud_backup_delete_action_title">Google 드라이브에서 백업이 삭제됩니다</string>
@@ -475,6 +478,7 @@
         <item quantity="other">%d초</item>
     </plurals>
     <string name="common_secret_derivation_path">비밀 경로 도출</string>
+    <string name="common_see_all">모두 보기</string>
     <string name="common_settings">설정</string>
     <string name="common_share">공유</string>
     <string name="common_sign_in">로그인</string>
@@ -636,13 +640,13 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">애플리케이션을 신뢰하는 경우 이 요청을 승인하십시오.\n거래 세부 정보를 확인하십시오.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">즐겨찾기</string>
     <string name="dapp_favourites">즐겨찾기</string>
     <string name="dapp_favourites_add">즐겨찾기에 추가</string>
     <string name="dapp_favourites_remove_description">“%s” DApp이(가) 즐겨찾기에서 제거됩니다.</string>
     <string name="dapp_favourites_remove_title">즐겨찾기에서 제거하시겠습니까?</string>
     <string name="dapp_list_placeholder">여기에 DApps 목록이 표시됩니다.</string>
-    <string name="dapp_main_welcome_subtitle">Nova Wallet 계정을 사용하여 웹을 탐색하세요</string>
-    <string name="dapp_main_welcome_title">Nova 브라우저에 오신 것을 환영합니다</string>
     <string name="dapp_options_add_to_favorite">즐겨찾기에 추가</string>
     <string name="dapp_options_desktop_mode">데스크탑 모드</string>
     <string name="dapp_options_remove_from_favorite">즐겨찾기에서 제거</string>
@@ -752,6 +756,8 @@
         <item quantity="other">최소한 %d개의 트랙을 선택해야 합니다</item>
     </plurals>
     <string name="governance_unlock">잠금 해제</string>
+    <string name="high_price_impact_detacted_message">이 스왑을 실행하면 상당한 슬리패지와 재정적 손실이 발생할 것입니다. 거래 크기를 줄이거나 거래를 여러 개로 나누는 것을 고려하세요.</string>
+    <string name="high_price_impact_detacted_title">높은 가격 영향이 감지됨 (%s)</string>
     <string name="history_v1.9.0">역사</string>
     <string name="identity_email_title">이메일</string>
     <string name="identity_legal_name_title">법적 이름</string>
@@ -915,10 +921,24 @@
     <string name="pool_inactive_failure_title">풀은 열려 있지 않습니다</string>
     <string name="pool_staking_conflict_message">더 이상 동일한 계정에서 직접 Staking과 Pool Staking을 동시에 사용할 수 없습니다. Pool Staking을 관리하려면 먼저 직접 Staking에서 토큰을 Unstake해야 합니다.</string>
     <string name="pool_staking_conflict_title">Pool 작업을 사용할 수 없습니다</string>
+    <string name="popular_dapps_title">인기 있는</string>
     <string name="pre_configured_networks_add_custom_button">네트워크 수동 추가</string>
     <string name="pre_configured_networks_progress_text">네트워크 목록을 로드 중...</string>
     <string name="pre_configured_networks_search_hint">네트워크 이름으로 검색</string>
     <string name="pre_configured_networks_title">네트워크 추가</string>
+    <string name="price_chart_date_format" formatted="false">%s 에 %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">모두</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s 가격</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">전체 기간</string>
+    <string name="price_charts_period_month">지난달</string>
+    <string name="price_charts_period_today">오늘</string>
+    <string name="price_charts_period_week">지난주</string>
+    <string name="price_charts_period_year">지난해</string>
     <string name="profile_accounts_title">계정</string>
     <string name="profile_accounts_title_2_0">지갑</string>
     <string name="profile_language_title">언어</string>

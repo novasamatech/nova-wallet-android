@@ -5,8 +5,5 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class DAppOptionsPayload(
-    val currentPageTitle: String,
-    val isFavorite: Boolean,
-    val isDesktopModeEnabled: Boolean,
-    val url: String
+    val isDesktopModeEnabled: Boolean
 ) : Parcelable

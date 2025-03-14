@@ -1,21 +1,34 @@
 package io.novafoundation.nova.feature_staking_impl.data.validators
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.mapNotNullToSet
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+// TODO migrate this to use AccountIdKey instead of hex-encoded account id
 interface ValidatorsPreferencesSource {
 
     suspend fun getRecommendedValidatorIds(chainId: ChainId): Set<String>
 
     suspend fun getExcludedValidatorIds(chainId: ChainId): Set<String>
+}
+
+suspend fun ValidatorsPreferencesSource.getRecommendedValidatorIdKeys(chainId: ChainId): Set<AccountIdKey> {
+    return getRecommendedValidatorIds(chainId).mapToSet { it.fromHex().intoKey() }
+}
+
+suspend fun ValidatorsPreferencesSource.getExcludedValidatorIdKeys(chainId: ChainId): Set<AccountIdKey> {
+    return getExcludedValidatorIds(chainId).mapToSet { it.fromHex().intoKey() }
 }
 
 class RemoteValidatorsPreferencesSource(

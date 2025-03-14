@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.showToast
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 interface BaseFragmentMixin<T : BaseViewModel> : BaseScreenMixin<T> {
 
@@ -43,6 +44,12 @@ interface BaseFragmentMixin<T : BaseViewModel> : BaseScreenMixin<T> {
     fun <V> Flow<V>.observeWhenCreated(collector: suspend (V) -> Unit) {
         fragment.lifecycleScope.launchWhenCreated {
             collect(collector)
+        }
+    }
+
+    fun <V> Flow<V>.observeFirst(collector: suspend (V) -> Unit) {
+        fragment.lifecycleScope.launchWhenCreated {
+            collector(first())
         }
     }
 

@@ -18,11 +18,15 @@ interface NovaCardInteractor {
 
     fun setNovaCardState(state: NovaCardState)
 
+    suspend fun setTopUpFinishedEvent()
+
+    fun observeTopUpFinishedEvent(): Flow<Unit>
+
     fun observeNovaCardState(): Flow<NovaCardState>
 
-    fun setTimeCardBeingIssued(time: Long)
+    fun setLastTopUpTime(time: Long)
 
-    fun getTimeToCardCreation(): Long
+    fun getLastTopUpTime(): Long
 }
 
 const val TIMER_MINUTES = 5
@@ -43,16 +47,24 @@ class RealNovaCardInteractor(
         return novaCardStateRepository.setNovaCardCreationState(state)
     }
 
+    override suspend fun setTopUpFinishedEvent() {
+        novaCardStateRepository.setTopUpFinishedEvent()
+    }
+
+    override fun observeTopUpFinishedEvent(): Flow<Unit> {
+        return novaCardStateRepository.observeTopUpFinishedEvent()
+    }
+
     override fun observeNovaCardState(): Flow<NovaCardState> {
         return novaCardStateRepository.observeNovaCardCreationState()
     }
 
-    override fun setTimeCardBeingIssued(time: Long) {
-        novaCardStateRepository.setTimeCardBeingIssued(time)
+    override fun setLastTopUpTime(time: Long) {
+        novaCardStateRepository.setLastTopUpTime(time)
     }
 
-    override fun getTimeToCardCreation(): Long {
-        val cardBeingIssuedTime = novaCardStateRepository.getTimeCardBeingIssued()
+    override fun getLastTopUpTime(): Long {
+        val cardBeingIssuedTime = novaCardStateRepository.getLastTopUpTime()
         val cardCreationTime = cardBeingIssuedTime + TIMER_MINUTES.minutes.inWholeMilliseconds
         val currentTime = System.currentTimeMillis()
         val millisecondsToCardCreation = cardCreationTime - currentTime

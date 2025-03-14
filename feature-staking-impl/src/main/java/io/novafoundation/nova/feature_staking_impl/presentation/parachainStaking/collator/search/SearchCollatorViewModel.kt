@@ -1,8 +1,5 @@
-@file:OptIn(ExperimentalTime::class)
-
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search
 
-import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.invoke
@@ -31,7 +28,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.ExperimentalTime
 
 class SearchCollatorViewModel(
     private val router: ParachainStakingRouter,
@@ -51,7 +47,7 @@ class SearchCollatorViewModel(
     private val electedCollators by lazyAsync {
         val stakingOption = singleAssetSharedState.selectedOption()
 
-        collatorRecommendatorFactory.create(stakingOption, scope = viewModelScope)
+        collatorRecommendatorFactory.create(stakingOption, computationalScope = this)
             .recommendations(CollatorRecommendationConfig.DEFAULT)
     }
 

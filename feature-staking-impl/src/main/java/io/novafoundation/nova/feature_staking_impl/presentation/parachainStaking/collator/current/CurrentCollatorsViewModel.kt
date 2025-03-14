@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.CurrentStakeTargetsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.actions.ManageCurrentStakeTargetsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Active
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Elected
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Inactive
@@ -29,7 +30,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.currentSt
 import io.novafoundation.nova.feature_staking_impl.presentation.common.currentStakeTargets.model.Waiting
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.formatStakeTargetRewardsOrNull
 import io.novafoundation.nova.feature_staking_impl.presentation.openStartStaking
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.model.ManageCollatorsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.mappers.mapCollatorToDetailsParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
@@ -101,7 +101,7 @@ class CurrentCollatorsViewModel(
         resourceManager.getString(R.string.staking_parachain_your_collators)
     }
 
-    val selectManageCollatorsAction = actionAwaitableMixinFactory.create<Unit, ManageCollatorsAction>()
+    val selectManageCollatorsAction = actionAwaitableMixinFactory.create<Unit, ManageCurrentStakeTargetsAction>()
 
     override fun stakeTargetInfoClicked(address: String) {
         launch {
@@ -125,8 +125,8 @@ class CurrentCollatorsViewModel(
     override fun changeClicked() {
         launch {
             when (selectManageCollatorsAction.awaitAction()) {
-                ManageCollatorsAction.BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
-                ManageCollatorsAction.UNBOND -> router.openUnbond()
+                ManageCurrentStakeTargetsAction.BOND_MORE -> router.openStartStaking(StartParachainStakingMode.BOND_MORE)
+                ManageCurrentStakeTargetsAction.UNBOND -> router.openUnbond()
             }
         }
     }

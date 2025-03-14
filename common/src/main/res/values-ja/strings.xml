@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">バックアップ</string>
     <string name="backup_title">バックアップ</string>
     <string name="biometric_auth_title">生体認証</string>
+    <string name="browser_tabs_close_all">すべて閉じる</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
     <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">転送手数料</string>
     <string name="choose_amount_network_error">ネットワークが応答していません</string>
     <string name="choose_amount_to">宛先</string>
+    <string name="close_dapp_tabs_message">DAppブラウザーで開いているすべてのタブが閉じられます。</string>
+    <string name="close_dapp_tabs_title">すべてのDAppを閉じますか？</string>
     <string name="cloud_backup_delete_action_subtitle">%s と、いつでも復元できるように必ずオフラインで保持してください。バックアップ設定でこれを行うことができます。</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">進む前にすべてのウォレットのパスフレーズを書き留めてください</string>
     <string name="cloud_backup_delete_action_title">Googleドライブからバックアップが削除されます</string>
@@ -475,6 +478,7 @@
         <item quantity="other">%d秒</item>
     </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
+    <string name="common_see_all">すべて見る</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
     <string name="common_sign_in">サインイン</string>
@@ -636,13 +640,13 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">アプリケーションを信頼する場合はこのリクエストを承認してください。\nトランザクションの詳細を確認してください。</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">お気に入り</string>
     <string name="dapp_favourites">お気に入り</string>
     <string name="dapp_favourites_add">お気に入りに追加</string>
     <string name="dapp_favourites_remove_description">「%s」DAppはお気に入りから削除されます</string>
     <string name="dapp_favourites_remove_title">お気に入りから削除しますか？</string>
     <string name="dapp_list_placeholder">ここにDAppsのリストが表示されます</string>
-    <string name="dapp_main_welcome_subtitle">Nova Walletのアカウントを使用してウェブを閲覧</string>
-    <string name="dapp_main_welcome_title">Nova Browserへようこそ</string>
     <string name="dapp_options_add_to_favorite">お気に入りに追加</string>
     <string name="dapp_options_desktop_mode">デスクトップモード</string>
     <string name="dapp_options_remove_from_favorite">お気に入りから削除</string>
@@ -752,6 +756,8 @@
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
     </plurals>
     <string name="governance_unlock">ロック解除</string>
+    <string name="high_price_impact_detacted_message">この交換を実行すると、大幅なスリッページと財務上の損失が発生します。取引サイズを減らすか、取引を複数のトランザクションに分けることを検討してください。</string>
+    <string name="high_price_impact_detacted_title">高価格インパクト検出 (%s)</string>
     <string name="history_v1.9.0">履歴</string>
     <string name="identity_email_title">メール</string>
     <string name="identity_legal_name_title">法的氏名</string>
@@ -915,10 +921,24 @@
     <string name="pool_inactive_failure_title">プールが開いていません</string>
     <string name="pool_staking_conflict_message">同じアカウントでDirect StakingとPool Stakingの両方を使用することはできなくなりました。Pool Stakingを管理するには、まずDirect Stakingからトークンをアンステークする必要があります。</string>
     <string name="pool_staking_conflict_title">プール操作は利用できません</string>
+    <string name="popular_dapps_title">人気のある</string>
     <string name="pre_configured_networks_add_custom_button">手動でネットワークを追加</string>
     <string name="pre_configured_networks_progress_text">ネットワークリストを読み込み中...</string>
     <string name="pre_configured_networks_search_hint">ネットワーク名で検索</string>
     <string name="pre_configured_networks_title">ネットワークを追加</string>
+    <string name="price_chart_date_format" formatted="false">%sの%s</string>
+    <string name="price_chart_day">1日</string>
+    <string name="price_chart_max">全て</string>
+    <string name="price_chart_month">1ヶ月</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s価格</string>
+    <string name="price_chart_week">1週間</string>
+    <string name="price_chart_year">1年</string>
+    <string name="price_charts_period_all">全期間</string>
+    <string name="price_charts_period_month">先月</string>
+    <string name="price_charts_period_today">今日</string>
+    <string name="price_charts_period_week">先週</string>
+    <string name="price_charts_period_year">昨年</string>
     <string name="profile_accounts_title">アカウント</string>
     <string name="profile_accounts_title_2_0">ウォレット</string>
     <string name="profile_language_title">言語</string>

@@ -12,9 +12,21 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.WaitingNovaCardTopUpViewModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.flows.TopUpCaseFactory
 
 @Module(includes = [ViewModelModule::class])
 class WaitingNovaCardTopUpModule {
+
+    @Provides
+    fun provideTopUpCaseFactory(
+        assetsRouter: AssetsRouter,
+        resourceManager: ResourceManager,
+        novaCardInteractor: NovaCardInteractor
+    ) = TopUpCaseFactory(
+        assetsRouter,
+        resourceManager,
+        novaCardInteractor
+    )
 
     @Provides
     @IntoMap
@@ -22,9 +34,9 @@ class WaitingNovaCardTopUpModule {
     fun provideViewModel(
         assetsRouter: AssetsRouter,
         novaCardInteractor: NovaCardInteractor,
-        resourceManager: ResourceManager
+        topUpCaseFactory: TopUpCaseFactory
     ): ViewModel {
-        return WaitingNovaCardTopUpViewModel(assetsRouter, resourceManager, novaCardInteractor)
+        return WaitingNovaCardTopUpViewModel(assetsRouter, novaCardInteractor, topUpCaseFactory)
     }
 
     @Provides

@@ -22,7 +22,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,7 @@ class SetupTinderGovVoteViewModel(
     private val tinderGovInteractor: TinderGovInteractor,
     private val tinderGovVoteResponder: TinderGovVoteResponder,
     private val accountRepository: AccountRepository,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     interactor: VoteReferendumInteractor,
@@ -44,9 +45,9 @@ class SetupTinderGovVoteViewModel(
     validationExecutor: ValidationExecutor,
     locksChangeFormatter: LocksChangeFormatter,
     convictionValuesProvider: ConvictionValuesProvider,
+    maxActionProviderFactory: MaxActionProviderFactory,
     locksFormatter: LocksFormatter,
 ) : SetupVoteViewModel(
-    feeLoaderMixinFactory,
     assetUseCase,
     amountChooserMixinFactory,
     interactor,
@@ -57,7 +58,9 @@ class SetupTinderGovVoteViewModel(
     validationExecutor,
     locksChangeFormatter,
     convictionValuesProvider,
-    locksFormatter
+    locksFormatter,
+    maxActionProviderFactory,
+    feeLoaderMixinFactory
 ) {
     override val title: Flow<String> = flowOf {
         resourceManager.getString(R.string.swipe_gov_vote_title)

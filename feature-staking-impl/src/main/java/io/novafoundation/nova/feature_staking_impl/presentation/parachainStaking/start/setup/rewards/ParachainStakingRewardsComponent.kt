@@ -1,50 +1,62 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards
 
-import io.novafoundation.nova.common.utils.firstNotNull
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.Action
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponent.State
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
-import io.novasama.substrate_sdk_android.runtime.AccountId
-import kotlinx.coroutines.CoroutineScope
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.data.memory.ComputationalScope
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.rewards.PeriodReturns
+import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.rewards.SingleSelectStakingRewardEstimationComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.rewards.SingleSelectStakingRewardEstimationComponentFactory
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import java.math.BigDecimal
 
-interface ParachainStakingRewardsComponent : StatefullComponent<State, Nothing, Action>, CoroutineScope {
+class ParachainStakingRewardsComponentFactory(
+    private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+    private val singleAssetSharedState: StakingSharedState,
+    private val resourceManager: ResourceManager,
+) : SingleSelectStakingRewardEstimationComponentFactory {
 
-    class State(
-        val rewardsConfiguration: RewardsConfiguration,
-        val rewardEstimation: RewardEstimation
+    override fun create(
+        computationalScope: ComputationalScope,
+        assetFlow: Flow<Asset>,
+        selectedAmount: Flow<BigDecimal>,
+        selectedTarget: Flow<AccountIdKey?>
+    ): SingleSelectStakingRewardEstimationComponent = ParachainStakingRewardsComponent(
+        rewardCalculatorFactory = rewardCalculatorFactory,
+        singleAssetSharedState = singleAssetSharedState,
+        resourceManager = resourceManager,
+        computationalScope = computationalScope,
+        assetFlow = assetFlow,
+        selectedAmountFlow = selectedAmount,
+        selectedTargetFlow = selectedTarget
     )
+}
 
-    data class RewardsConfiguration(
-        val collator: AccountId?,
-        val amount: BigDecimal
-    )
+private class ParachainStakingRewardsComponent(
+    private val rewardCalculatorFactory: ParachainStakingRewardCalculatorFactory,
+    private val singleAssetSharedState: StakingSharedState,
+    resourceManager: ResourceManager,
 
-    sealed class Action {
+    computationalScope: ComputationalScope,
+    assetFlow: Flow<Asset>,
+    selectedAmountFlow: Flow<BigDecimal>,
+    selectedTargetFlow: Flow<AccountIdKey?>
+) : SingleSelectStakingRewardEstimationComponent(resourceManager, computationalScope, assetFlow, selectedAmountFlow, selectedTargetFlow) {
 
-        class ConfigurationUpdated(val newConfiguration: RewardsConfiguration) : Action()
+    private val rewardCalculator by lazyAsync {
+        rewardCalculatorFactory.create(singleAssetSharedState.selectedOption())
     }
-}
 
-@JvmName("connectWithAmount")
-infix fun ParachainStakingRewardsComponent.connectWith(amountFlow: Flow<BigDecimal>) {
-    amountFlow.onEach { newAmount ->
-        val rewardsConfiguration = state.firstNotNull().rewardsConfiguration
-        val newConfiguration = rewardsConfiguration.copy(amount = newAmount)
-
-        onAction(Action.ConfigurationUpdated(newConfiguration))
-    }.launchIn(this)
-}
-
-infix fun ParachainStakingRewardsComponent.connectWith(selectedCollatorIdFlow: Flow<AccountId?>) {
-    selectedCollatorIdFlow.onEach { newCollatorId ->
-        val rewardsConfiguration = state.firstNotNull().rewardsConfiguration
-        val newConfiguration = rewardsConfiguration.copy(collator = newCollatorId)
-
-        onAction(Action.ConfigurationUpdated(newConfiguration))
-    }.launchIn(this)
+    override suspend fun calculatePeriodReturns(selectedTarget: AccountIdKey?, selectedAmount: BigDecimal): PeriodReturns {
+        return if (selectedTarget != null) {
+            rewardCalculator().calculateCollatorAnnualReturns(selectedTarget.value, selectedAmount)
+        } else {
+            rewardCalculator().calculateMaxAnnualReturns(selectedAmount)
+        }
+    }
 }

@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Backup</string>
     <string name="backup_title">Backup</string>
     <string name="biometric_auth_title">Autenticação biométrica</string>
+    <string name="browser_tabs_close_all">Fechar Tudo</string>
     <string name="buy_completed">Compra iniciada! Por favor, aguarde até 60 minutos. Você pode rastrear o status pelo email.</string>
     <string name="buy_network_flow_title">Selecione a rede para comprar %s</string>
     <string name="buy_provider_open_confirmation_message">Para continuar a compra você será redirecionado do aplicativo Nova Wallet para %s</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Taxa de transferência</string>
     <string name="choose_amount_network_error">Rede não está respondendo</string>
     <string name="choose_amount_to">Para</string>
+    <string name="close_dapp_tabs_message">Todas as abas abertas no navegador DApp serão fechadas.</string>
+    <string name="close_dapp_tabs_title">Fechar Todos os DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s e lembre-se de sempre mantê-los offline para restaurá-los a qualquer momento. Você pode fazer isso nas Configurações de Backup.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Por favor, anote todas as Frases de Segurança da sua carteira antes de prosseguir</string>
     <string name="cloud_backup_delete_action_title">O backup será excluído do Google Drive</string>
@@ -480,6 +483,7 @@
         <item quantity="other">%d segundos</item>
     </plurals>
     <string name="common_secret_derivation_path">Sequência de derivação secreta</string>
+    <string name="common_see_all">Ver Tudo</string>
     <string name="common_settings">Configurações</string>
     <string name="common_share">Compartilhar</string>
     <string name="common_sign_in">Entrar</string>
@@ -642,13 +646,13 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Aprove esta solicitação se você confia no aplicativo.\nVerifique os detalhes da transação.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApps</string>
+    <string name="dapp_entry_point_title">%d DApps</string>
+    <string name="dapp_favorites">Favoritos</string>
     <string name="dapp_favourites">Favoritos</string>
     <string name="dapp_favourites_add">Adicionar aos favoritos</string>
     <string name="dapp_favourites_remove_description">O DApp “%s” será removido dos Favoritos</string>
     <string name="dapp_favourites_remove_title">Remover dos Favoritos?</string>
     <string name="dapp_list_placeholder">A lista de DApps aparecerá aqui</string>
-    <string name="dapp_main_welcome_subtitle">Navegue na web usando suas contas do Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Bem-vindo ao Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Adicionar aos Favoritos</string>
     <string name="dapp_options_desktop_mode">Modo Desktop</string>
     <string name="dapp_options_remove_from_favorite">Remover dos Favoritos</string>
@@ -759,6 +763,8 @@
         <item quantity="other">Você precisa selecionar pelo menos %d trilhas</item>
     </plurals>
     <string name="governance_unlock">Desbloquear</string>
+    <string name="high_price_impact_detacted_message">Executar esta troca resultará em deslizamento significativo e perdas financeiras. Considere reduzir o tamanho da sua negociação ou divida-a em várias transações.</string>
+    <string name="high_price_impact_detacted_title">Alto impacto de preço detectado (%s)</string>
     <string name="history_v1.9.0">Histórico</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Nome Legal</string>
@@ -923,10 +929,24 @@
     <string name="pool_inactive_failure_title">Pool não está aberto</string>
     <string name="pool_staking_conflict_message">Você não pode mais usar Staking Direto e Staking em Pool a partir da mesma conta. Para gerenciar seu Staking em Pool, você primeiro precisa retirar seus tokens do Staking Direto.</string>
     <string name="pool_staking_conflict_title">Operações de Pool não disponíveis</string>
+    <string name="popular_dapps_title">Populares</string>
     <string name="pre_configured_networks_add_custom_button">Adicionar rede manualmente</string>
     <string name="pre_configured_networks_progress_text">Carregando lista de redes...</string>
     <string name="pre_configured_networks_search_hint">Pesquisar pelo nome da rede</string>
     <string name="pre_configured_networks_title">Adicionar rede</string>
+    <string name="price_chart_date_format" formatted="false">%s às %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">Tudo</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">Preço de %s</string>
+    <string name="price_chart_week">1S</string>
+    <string name="price_chart_year">1A</string>
+    <string name="price_charts_period_all">Todo o Tempo</string>
+    <string name="price_charts_period_month">Último Mês</string>
+    <string name="price_charts_period_today">Hoje</string>
+    <string name="price_charts_period_week">Última Semana</string>
+    <string name="price_charts_period_year">Último Ano</string>
     <string name="profile_accounts_title">Contas</string>
     <string name="profile_accounts_title_2_0">Carteiras</string>
     <string name="profile_language_title">Idioma</string>

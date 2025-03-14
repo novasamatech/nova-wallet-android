@@ -241,6 +241,7 @@
     <string name="backup_settings_toolbar_title">Yedekleme</string>
     <string name="backup_title">Yedekleme</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
+    <string name="browser_tabs_close_all">Hepsini Kapat</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
@@ -257,6 +258,8 @@
     <string name="choose_amount_fee">Transfer ücreti</string>
     <string name="choose_amount_network_error">Ağ yanıt vermiyor</string>
     <string name="choose_amount_to">Kime</string>
+    <string name="close_dapp_tabs_message">DApp tarayıcısındaki tüm açık sekmeler kapatılacak.</string>
+    <string name="close_dapp_tabs_title">Tüm DApp\'leri Kapat?</string>
     <string name="cloud_backup_delete_action_subtitle">%s ve her zaman çevrimdışı tutup istediğiniz zaman geri yükleyebilmek için hatırlayın. Bunu Yedekleme Ayarlarında yapabilirsiniz.</string>
     <string name="cloud_backup_delete_action_subtitle_highlighted">Lütfen devam etmeden önce tüm cüzdan şifre kelimelerinizi not edin.</string>
     <string name="cloud_backup_delete_action_title">Yedek Google Drive\'dan silinecek</string>
@@ -480,6 +483,7 @@
         <item quantity="other">%d saniye</item>
     </plurals>
     <string name="common_secret_derivation_path">Gizli türetme yolu</string>
+    <string name="common_see_all">Hepsini Gör</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
     <string name="common_sign_in">Giriş Yap</string>
@@ -642,13 +646,13 @@
     <string name="dapp_confirm_sign_extrinsic_subtitle">Uygulamaya güveniyorsanız bu isteği onaylayın.\\nİşlem detaylarını kontrol edin.</string>
     <string name="dapp_dapp">DApp</string>
     <string name="dapp_dapps">DApp\'ler</string>
+    <string name="dapp_entry_point_title">%d DApp</string>
+    <string name="dapp_favorites">Favoriler</string>
     <string name="dapp_favourites">Favoriler</string>
     <string name="dapp_favourites_add">Favorilere Ekle</string>
     <string name="dapp_favourites_remove_description">‘%s’ DApp Favorilerden kaldırılacak</string>
     <string name="dapp_favourites_remove_title">Favorilerden Kaldırılsın mı?</string>
     <string name="dapp_list_placeholder">DApp\'lerin listesi burada görünecek</string>
-    <string name="dapp_main_welcome_subtitle">Hesaplarınızı Nova Wallet\'tan kullanarak web\'i gezin</string>
-    <string name="dapp_main_welcome_title">Nova Tarayıcısına Hoş Geldiniz</string>
     <string name="dapp_options_add_to_favorite">Favorilere Ekle</string>
     <string name="dapp_options_desktop_mode">Masaüstü modu</string>
     <string name="dapp_options_remove_from_favorite">Favorilerden Çıkar</string>
@@ -759,6 +763,8 @@
         <item quantity="other">En az %d parça seçmelisiniz</item>
     </plurals>
     <string name="governance_unlock">Kilit Aç</string>
+    <string name="high_price_impact_detacted_message">Bu takası gerçekleştirmek, önemli kaymalar ve finansal kayıplarla sonuçlanacaktır. İşlem boyutunuzu küçültmeyi veya işleminizi birden fazla işleme bölmeyi düşünün.</string>
+    <string name="high_price_impact_detacted_title">Yüksek fiyat etkisi tespit edildi (%s)</string>
     <string name="history_v1.9.0">Geçmiş</string>
     <string name="identity_email_title">E-posta</string>
     <string name="identity_legal_name_title">Resmi Ad</string>
@@ -923,10 +929,24 @@
     <string name="pool_inactive_failure_title">Havuz açık değil</string>
     <string name="pool_staking_conflict_message">Artık aynı hesaptan hem Doğrudan Stake hem de Havuz Stake kullanamazsınız. Havuz Stake\'inizi yönetmek için öncelikle token\'larınızı Doğrudan Stake\'ten çözmeniz gerekmektedir.</string>
     <string name="pool_staking_conflict_title">Havuz işlemleri kullanılamıyor</string>
+    <string name="popular_dapps_title">Popüler</string>
     <string name="pre_configured_networks_add_custom_button">Ağı elle ekle</string>
     <string name="pre_configured_networks_progress_text">Ağlar listesi yükleniyor...</string>
     <string name="pre_configured_networks_search_hint">Ağ adına göre ara</string>
     <string name="pre_configured_networks_title">Ağ ekle</string>
+    <string name="price_chart_date_format" formatted="false">%s tarihinde %s</string>
+    <string name="price_chart_day">1G</string>
+    <string name="price_chart_max">Hepsi</string>
+    <string name="price_chart_month">1A</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s fiyatı</string>
+    <string name="price_chart_week">1H</string>
+    <string name="price_chart_year">1Yıl</string>
+    <string name="price_charts_period_all">Tüm Zamanlar</string>
+    <string name="price_charts_period_month">Geçen Ay</string>
+    <string name="price_charts_period_today">Bugün</string>
+    <string name="price_charts_period_week">Geçen Hafta</string>
+    <string name="price_charts_period_year">Geçen Yıl</string>
     <string name="profile_accounts_title">Hesaplar</string>
     <string name="profile_accounts_title_2_0">Cüzdanlar</string>
     <string name="profile_language_title">Dil</string>

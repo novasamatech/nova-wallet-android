@@ -2,13 +2,14 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.oneOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher.Factory.Source
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.asSource
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.SubstrateAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
@@ -20,6 +21,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
@@ -67,12 +69,13 @@ class NativeAssetHistory(
             val call = extrinsicVisit.call
             if (!call.isTransfer(runtime)) return null
 
-            val amount = bindNumber(call.arguments["value"])
+            val transferEvent = extrinsicVisit.events.findEvent(Modules.BALANCES, "Transfer") ?: return null
+            val (_, toRaw, amountRaw) = transferEvent.arguments
 
             return RealtimeHistoryUpdate.Type.Transfer(
                 senderId = extrinsicVisit.origin,
-                recipientId = bindAccountIdentifier(call.arguments["dest"]),
-                amountInPlanks = amount,
+                recipientId = bindAccountIdentifier(toRaw),
+                amountInPlanks = bindNumber(amountRaw),
                 chainAsset = chainAsset,
             )
         }
@@ -83,7 +86,8 @@ class NativeAssetHistory(
             return oneOf(
                 balances.callOrNull("transfer"),
                 balances.callOrNull("transfer_keep_alive"),
-                balances.callOrNull("transfer_allow_death")
+                balances.callOrNull("transfer_allow_death"),
+                balances.callOrNull("transfer_all")
             )
         }
     }

@@ -50,6 +50,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.splitKey
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import io.novasama.substrate_sdk_android.scale.Schema
@@ -114,6 +115,10 @@ fun ByteArray.toBigEndianU16(): UShort = toBigEndianShort().toUShort()
 
 fun BigInteger.toUnsignedLittleEndian(): ByteArray {
     return toUnsignedBytes().reversedArray()
+}
+
+fun BigInteger.takeUnlessZero(): BigInteger? {
+    return takeUnless { isZero }
 }
 
 fun ByteArray.toBigEndianU32(): UInt = ByteBuffer.wrap(this).order(ByteOrder.BIG_ENDIAN).int.toUInt()
@@ -191,9 +196,13 @@ fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(Default
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
 fun Module.numberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(constant(name), runtimeSnapshot)
+
 fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) = constantOrNull(name)?.let {
     bindNumberConstant(it, runtimeSnapshot)
 }
+
+context(RuntimeContext)
+fun Module.numberConstant(name: String) = numberConstant(name, runtime)
 
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
@@ -304,8 +313,18 @@ fun RuntimeMetadata.proxy() = module(Modules.PROXY)
 
 fun RuntimeMetadata.utility() = module(Modules.UTILITY)
 
+fun RuntimeMetadata.collatorStaking() = module(Modules.COLLATOR_STAKING)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
+}
+
+fun RuntimeMetadata.firstExistingCall(vararg options: Pair<String, String>): MetadataFunction {
+    val result = options.tryFindNonNull { (moduleName, functionName) ->
+        moduleOrNull(moduleName)?.callOrNull(functionName)
+    }
+
+    return requireNotNull(result)
 }
 
 fun RuntimeMetadata.firstExistingModuleOrNull(vararg options: String): Module? {
@@ -332,6 +351,21 @@ fun RuntimeMetadata.hasConstant(module: String, constant: String) = moduleOrNull
 fun Module.hasCall(name: String) = callOrNull(name) != null
 
 fun Module.hasStorage(storage: String) = storageOrNull(storage) != null
+
+context(RuntimeContext)
+fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
+    return if (keyArguments.isEmpty()) {
+        storageKey()
+    } else {
+        storageKey(runtime, *keyArguments)
+    }
+}
+
+context(RuntimeContext)
+@JvmName("createStorageKeyArray")
+fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
+    return createStorageKey(*keyArguments)
+}
 
 fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
@@ -501,4 +535,6 @@ object Modules {
     const val XYK = "XYK"
 
     const val ASSET_REGISTRY = "AssetRegistry"
+
+    const val COLLATOR_STAKING = "CollatorStaking"
 }

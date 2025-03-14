@@ -26,7 +26,8 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:lines="1"
-        android:textColor="@color/text_secondary" />
+        android:text="@string/fragment_assets_nova_card"
+        android:textColor="@color/text_primary" />
 
     <ImageView
         android:layout_width="wrap_content"

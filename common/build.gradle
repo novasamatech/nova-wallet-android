@@ -57,6 +57,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        releaseGithub {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+            buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android/releases\""
+        }
     }
 
     compileOptions {
@@ -68,6 +74,7 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+    namespace 'io.novafoundation.nova.common'
 }
 
 dependencies {

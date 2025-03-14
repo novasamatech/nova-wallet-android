@@ -25,9 +25,9 @@ class MoreStakingOptionsViewModel(
     private val interactor: StakingDashboardInteractor,
     private val startStakingRouter: StartMultiStakingRouter,
     private val dashboardRouter: StakingDashboardRouter,
-    private val router: StakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
+    private val stakingRouter: StakingRouter,
 ) : BaseViewModel() {
 
     init {
@@ -53,7 +53,7 @@ class MoreStakingOptionsViewModel(
     }
 
     fun onBrowserStakingItemClicked(item: StakingDAppModel) = launch {
-        router.openDAppBrowser(item.url)
+        stakingRouter.openDAppBrowser(item.url)
     }
 
     private fun syncDApps() = launch {

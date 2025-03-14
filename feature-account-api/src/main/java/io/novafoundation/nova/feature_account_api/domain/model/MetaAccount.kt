@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
@@ -86,6 +87,9 @@ interface MetaAccount : LightMetaAccount {
     // TODO we can now subclass MetaAccount and have this field only in subclass
     val proxy: ProxyAccount?
 
+    // TODO this should not be exposed as its a implementation detail
+    // We should rather use something like
+    // fun iterateAccounts(): Iterable<(AccountId, ChainId?, MultiChainEncryption?)>
     val chainAccounts: Map<ChainId, ChainAccount>
 
     class ChainAccount(
@@ -93,6 +97,7 @@ interface MetaAccount : LightMetaAccount {
         val chainId: ChainId,
         val publicKey: ByteArray?,
         val accountId: ByteArray,
+        // TODO this should be MultiChainEncryption
         val cryptoType: CryptoType?,
     )
 
@@ -111,6 +116,10 @@ fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
 fun MetaAccount.addressIn(chain: Chain): String? {
     return accountIdIn(chain)?.let(chain::addressOf)
+}
+
+fun MetaAccount.accountIdKeyIn(chain: Chain): AccountIdKey? {
+    return accountIdIn(chain)?.let(::AccountIdKey)
 }
 
 fun MetaAccount.mainEthereumAddress() = ethereumAddress?.toEthereumAddress()

@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary
 
 import androidx.annotation.StringRes
-import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.mythos.MythosStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.nominationPools.NominationPoolsStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
@@ -20,33 +20,26 @@ class StakeSummaryModel(
     val status: StakeStatusModel,
 )
 
-sealed class StakeStatusModel(val details: TitleAndMessage?) {
+sealed class StakeStatusModel {
 
-    class Active(details: TitleAndMessage? = null) : StakeStatusModel(details)
+    object Active : StakeStatusModel()
 
     class Waiting(
         val timeLeft: Long,
         @StringRes val messageFormat: Int,
-        details: TitleAndMessage? = null
-    ) : StakeStatusModel(details)
+    ) : StakeStatusModel()
 
-    class Inactive(details: TitleAndMessage? = null) : StakeStatusModel(details)
+    object Inactive : StakeStatusModel()
 }
 
-sealed class StakeSummaryEvent {
-
-    class ShowStatusDialog(val titleAndMessage: TitleAndMessage) : StakeSummaryEvent()
-}
-
-sealed class StakeSummaryAction {
-
-    object StatusClicked : StakeSummaryAction()
-}
+typealias StakeSummaryEvent = Unit
+typealias StakeSummaryAction = Unit
 
 class StakeSummaryComponentFactory(
     private val relaychainComponentFactory: RelaychainStakeSummaryComponentFactory,
     private val parachainStakeSummaryComponentFactory: ParachainStakeSummaryComponentFactory,
     private val nominationPoolsStakeSummaryComponentFactory: NominationPoolsStakeSummaryComponentFactory,
+    private val mythos: MythosStakeSummaryComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
 ) {
 
@@ -56,6 +49,7 @@ class StakeSummaryComponentFactory(
         relaychainComponentCreator = relaychainComponentFactory::create,
         parachainComponentCreator = parachainStakeSummaryComponentFactory::create,
         nominationPoolsCreator = nominationPoolsStakeSummaryComponentFactory::create,
+        mythosCreator = mythos::create,
         hostContext = hostContext
     )
 }

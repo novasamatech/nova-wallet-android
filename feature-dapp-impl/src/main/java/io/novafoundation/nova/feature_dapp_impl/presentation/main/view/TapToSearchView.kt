@@ -20,13 +20,15 @@ class TapToSearchView @JvmOverloads constructor(
         get() = context
 
     init {
-        setPaddingRelative(12.dp, 16.dp, 12.dp, 16.dp)
+        setPaddingRelative(12.dp, 0.dp, 12.dp, 0.dp)
+
+        gravity = android.view.Gravity.CENTER_VERTICAL
 
         setDrawableStart(
             drawableRes = R.drawable.ic_search,
-            widthInDp = 20,
-            heightInDp = 20,
-            paddingInDp = 8,
+            widthInDp = 16,
+            heightInDp = 16,
+            paddingInDp = 6,
             tint = R.color.icon_secondary
         )
 

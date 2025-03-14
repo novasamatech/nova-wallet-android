@@ -1,36 +1,31 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.waiting
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.common.utils.formatting.duration.CompoundDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.EstimatedDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.TimeDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.ZeroDurationFormatter
-import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.flows.TopUpCaseFactory
 
 class WaitingNovaCardTopUpViewModel(
     private val assetsRouter: AssetsRouter,
-    private val resourceManager: ResourceManager,
-    private val novaCardInteractor: NovaCardInteractor
+    private val novaCardInteractor: NovaCardInteractor,
+    private val topUpCaseFactory: TopUpCaseFactory
 ) : BaseViewModel() {
 
+    private val topUpCase = topUpCaseFactory.create(novaCardInteractor.getNovaCardState())
+
+    val titleFlow = topUpCase.titleFlow
+
     init {
-        novaCardInteractor.observeNovaCardState()
-            .onEach { novaCardState ->
-                if (novaCardState == NovaCardState.CREATED) {
-                    assetsRouter.back()
-                }
-            }.launchIn(this)
+        topUpCase.init(this)
     }
 
     fun getTimerValue(): TimerValue {
-        val timeToCardCreation = novaCardInteractor.getTimeToCardCreation()
+        val timeToCardCreation = novaCardInteractor.getLastTopUpTime()
         return TimerValue(timeToCardCreation, System.currentTimeMillis())
     }
 
@@ -45,12 +40,7 @@ class WaitingNovaCardTopUpViewModel(
     }
 
     fun timerFinished() {
-        novaCardInteractor.setNovaCardState(NovaCardState.NONE)
-
-        showError(
-            resourceManager.getString(R.string.fragment_waiting_top_up_time_out_error_title),
-            resourceManager.getString(R.string.fragment_waiting_top_up_time_out_error_message)
-        )
+        topUpCase.onTimeFinished(this)
 
         assetsRouter.back()
     }

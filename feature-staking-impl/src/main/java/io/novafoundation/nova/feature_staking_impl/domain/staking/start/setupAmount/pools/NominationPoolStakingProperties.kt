@@ -72,8 +72,8 @@ private class NominationPoolStakingProperties(
         return poolsAvailableBalanceResolver.availableBalanceToStartStaking(asset)
     }
 
-    override suspend fun maximumToStake(asset: Asset, fee: Balance): Balance {
-        return poolsAvailableBalanceResolver.maximumBalanceToStake(asset, fee).maxToStake
+    override suspend fun maximumToStake(asset: Asset): Balance {
+        return poolsAvailableBalanceResolver.maximumBalanceToStake(asset)
     }
 
     override val recommendation: SingleStakingRecommendation = NominationPoolRecommendation(

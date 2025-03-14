@@ -63,9 +63,8 @@ class SetupStakingTypeSelectionMixin(
     }
 
     private suspend fun setSelectionAndApply(selection: StartMultiStakingSelection, stakingOption: StakingOption) {
-        val recommendedSelection = singleStakingPropertiesFactory.createProperties(scope, stakingOption)
-            .recommendation
-            .recommendedSelection(selection.stake)
+        val properties = singleStakingPropertiesFactory.createProperties(scope, stakingOption)
+        val recommendedSelection = properties.recommendation.recommendedSelection(selection.stake)
 
         // Content is not recommended if recommendation does not exist
         val contentRecommended = recommendedSelection?.isSettingsEquals(selection) ?: false
@@ -74,19 +73,22 @@ class SetupStakingTypeSelectionMixin(
             .updateSelection(
                 RecommendableMultiStakingSelection(
                     SelectionTypeSource.Manual(contentRecommended = contentRecommended),
-                    selection
+                    selection,
+                    properties
                 )
             )
     }
 
     suspend fun selectRecommended(viewModelScope: CoroutineScope, stakingOption: StakingOption, amount: BigInteger) {
+        val properties = singleStakingPropertiesFactory.createProperties(scope, stakingOption)
         val recommendedSelection = singleStakingPropertiesFactory.createProperties(scope, stakingOption)
             .recommendation
             .recommendedSelection(amount) ?: return
 
         val recommendableMultiStakingSelection = RecommendableMultiStakingSelection(
             source = SelectionTypeSource.Manual(contentRecommended = true),
-            selection = recommendedSelection
+            selection = recommendedSelection,
+            properties = properties
         )
 
         editableSelectionStoreProvider.getSelectionStore(viewModelScope)

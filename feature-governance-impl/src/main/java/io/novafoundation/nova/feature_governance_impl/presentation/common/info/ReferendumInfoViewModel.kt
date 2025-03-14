@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
@@ -38,6 +39,7 @@ class ReferendumInfoViewModel(
     private val governanceIdentityProviderFactory: GovernanceIdentityProviderFactory,
     private val addressIconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
+    val shareReferendumMixin: ShareReferendumMixin,
     val markwon: Markwon,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
@@ -92,6 +94,17 @@ class ReferendumInfoViewModel(
 
     fun backClicked() {
         router.back()
+    }
+
+    fun shareButtonClicked() {
+        launch {
+            val selectedOption = selectedAssetSharedState.selectedOption()
+            shareReferendumMixin.shareReferendum(
+                payload.referendumId,
+                selectedOption.assetWithChain.chain,
+                selectedOption.additional.governanceType
+            )
+        }
     }
 
     fun proposerClicked() = launch {

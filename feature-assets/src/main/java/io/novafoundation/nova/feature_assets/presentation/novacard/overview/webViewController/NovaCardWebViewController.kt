@@ -1,143 +1,65 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController
 
-import android.Manifest
 import android.net.Uri
-import android.webkit.PermissionRequest
-import android.webkit.ValueCallback
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebViewClient
-import androidx.fragment.app.Fragment
-import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.AppLinksProvider
-import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.systemCall.FilePickerSystemCall
-import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.NovaCardInterceptor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class NovaCardWebViewControllerFactory(
-    private val systemCallExecutor: SystemCallExecutor,
-    private val fileProvider: FileProvider,
-    private val permissionsAskerFactory: PermissionsAskerFactory,
+    private val novaCardWebViewClientFactory: NovaCardWebViewClientFactory,
+    private val novaCardWebChromeClientFactory: NovaCardWebChromeClientFactory,
     private val appLinksProvider: AppLinksProvider,
-    private val gson: Gson,
-    private val widgetId: String,
-    private val webViewCardCreationInterceptorFactory: WebViewCardCreationInterceptorFactory
+    private val widgetId: String
 ) {
 
     fun create(
-        fragment: Fragment,
-        webView: WebView,
-        eventHandler: NovaCardEventHandler,
-        cardCreatedListener: OnCardCreatedListener,
+        interceptors: List<NovaCardInterceptor>,
         setupConfig: CardSetupConfig,
         scope: CoroutineScope,
     ): NovaCardWebViewController {
-        val jsCallback = NovaCardJsCallback(gson, eventHandler)
-        val pageProvider = NovaCardWebPageProvider(widgetId = widgetId, setupConfig)
         return NovaCardWebViewController(
-            fragment = fragment,
-            webView = webView,
-            fileProvider = fileProvider,
+            novaCardWebViewClient = novaCardWebViewClientFactory.create(interceptors),
+            novaCardWebChromeClient = novaCardWebChromeClientFactory.create(scope),
             appLinksProvider = appLinksProvider,
-            permissionsAskerFactory = permissionsAskerFactory,
-            systemCallExecutor = systemCallExecutor,
-            pageProvider = pageProvider,
-            novaCardJsCallback = jsCallback,
-            coroutineScope = scope,
-            cardCreationInterceptor = webViewCardCreationInterceptorFactory.create(cardCreatedListener)
+            setupConfig = setupConfig,
+            widgetId = widgetId
         )
     }
 }
 
 class NovaCardWebViewController(
-    private val fragment: Fragment,
-    private val webView: WebView,
-    private val fileProvider: FileProvider,
+    private val novaCardWebViewClient: NovaCardWebViewClient,
+    private val novaCardWebChromeClient: NovaCardWebChromeClient,
     private val appLinksProvider: AppLinksProvider,
-    private val permissionsAskerFactory: PermissionsAskerFactory,
-    private val systemCallExecutor: SystemCallExecutor,
-    private val pageProvider: NovaCardWebPageProvider,
-    private val novaCardJsCallback: NovaCardJsCallback,
-    private val coroutineScope: CoroutineScope,
-    private val cardCreationInterceptor: WebViewCardCreationInterceptor
+    private val setupConfig: CardSetupConfig,
+    private val widgetId: String
 ) {
 
-    private val permissionsAsker = permissionsAskerFactory.create(fragment)
-
-    private val webViewClient = object : WebViewClient() {
-
-        private var jsScriptWasCalled = false
-
-        init {
-            cardCreationInterceptor.runPolling(coroutineScope)
+    fun setup(webView: WebView) {
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            allowFileAccess = true
+            allowContentAccess = true
+            useWideViewPort = true
+            displayZoomControls = false
         }
 
-        override fun onPageFinished(view: WebView, url: String) {
-            super.onPageFinished(view, url)
+        webView.webViewClient = novaCardWebViewClient
+        webView.webChromeClient = novaCardWebChromeClient
 
-            if (!jsScriptWasCalled) {
-                jsScriptWasCalled = true
-                webView.evaluateJavascript(pageProvider.getJsScript(), null)
-            }
-        }
+        val uri = Uri.parse(appLinksProvider.novaCardWidgetUrl).buildUpon()
+            .appendQueryParameter("widget_id", widgetId)
+            .appendQueryParameter("type", "sell")
+            .appendQueryParameter("currencies", setupConfig.spendToken.symbol.value)
+            .appendQueryParameter("theme", "nova")
+            .appendQueryParameter("show_spend_card_details", "true")
+            .appendQueryParameter("hide_refund_address", "true")
+            .appendQueryParameter("refund_address", setupConfig.refundAddress)
+            .build()
 
-        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            cardCreationInterceptor.intercept(request)
-
-            return super.shouldInterceptRequest(view, request)
-        }
-    }
-
-    private val webChromeClient = object : android.webkit.WebChromeClient() {
-
-        override fun onPermissionRequest(request: PermissionRequest) {
-            coroutineScope.launch {
-                val result = permissionsAsker.requirePermissionsOrExit(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
-
-                if (result) {
-                    request.grant(request.resources)
-                } else {
-                    request.deny()
-                }
-            }
-        }
-
-        override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
-            coroutineScope.launch {
-                val result = systemCallExecutor.executeSystemCall(FilePickerSystemCall(fileProvider))
-                result.onSuccess { filePathCallback.onReceiveValue(arrayOf(it)) }
-                    .onFailure { filePathCallback.onReceiveValue(null) }
-            }
-
-            return true
-        }
-    }
-
-    fun setup() {
-        val webSettings = webView.settings
-        webSettings.javaScriptEnabled = true
-        webSettings.domStorageEnabled = true
-        webSettings.allowFileAccess = true
-        webSettings.allowContentAccess = true
-        webSettings.useWideViewPort = true
-        webSettings.displayZoomControls = false
-        webView.addJavascriptInterface(novaCardJsCallback, pageProvider.getCallbackName())
-
-        webView.webViewClient = webViewClient
-
-        webView.webChromeClient = webChromeClient
-
-        webView.loadDataWithBaseURL(
-            appLinksProvider.novaCardWidgetUrl,
-            pageProvider.getPage(),
-            "text/html",
-            "UTF-8",
-            null
-        )
+        webView.loadUrl(uri.toString())
     }
 }
