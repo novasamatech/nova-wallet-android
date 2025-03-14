@@ -751,12 +751,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Réseau : %s\nMnémonique : %s</string>
     <string name="fee_not_yet_loaded_message">Veuillez patienter jusqu\'à ce que les frais soient calculés</string>
     <string name="fee_not_yet_loaded_title">Le calcul des frais est en cours</string>
+    <string name="fragment_assets_nova_card">Gérer la carte de débit</string>
     <string name="fragment_set_staking_proxy_title">Ajouter une délégation pour le staking %s</string>
     <string name="fragment_swap_main_settings_details_title">Détails de l\'échange</string>
     <string name="fragment_swap_main_settings_max_button">Max :</string>
     <string name="fragment_swap_main_settings_pay_title">Vous payez</string>
     <string name="fragment_swap_main_settings_receive_title">Vous recevez</string>
     <string name="fragment_swap_main_settings_select_token">Sélectionnez un token</string>
+    <string name="fragment_top_up_card_title">Recharger la carte avec %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Veuillez contacter support@novawallet.io. Incluez l\'adresse email que vous avez utilisée pour émettre la carte.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Contacter le support</string>
     <string name="governance_notification_channel_name">Canal de notification de gouvernance</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Vous devez sélectionner au moins %d piste</item>
@@ -1681,6 +1685,10 @@
     <string name="vote_revote">Revoter</string>
     <string name="vote_vote">Voter</string>
     <string name="voting_status">Statut du scrutin</string>
+    <string name="waiting_existing_card_top_up_card_title">Votre carte est en cours de financement !</string>
+    <string name="waiting_initial_top_up_card_title">Votre carte est en cours d\'émission !</string>
+    <string name="waiting_top_up_card_description">Cela peut prendre jusqu\'à 5 minutes.\nCette fenêtre se fermera automatiquement.</string>
+    <string name="waiting_top_up_card_timer">Estimé %s</string>
     <string name="wallet_asset_buy">Acheter</string>
     <string name="wallet_asset_buy_with">Acheter avec</string>
     <string name="wallet_asset_receive">Recevoir</string>
