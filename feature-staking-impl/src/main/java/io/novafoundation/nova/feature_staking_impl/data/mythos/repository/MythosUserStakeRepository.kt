@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.metadata
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.autoCompound
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.candidateStake
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
@@ -34,11 +33,19 @@ interface MythosUserStakeRepository {
 
     fun userStakeOrDefaultFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo>
 
+    suspend fun userStakeOrDefault(chainId: ChainId, accountId: AccountId): UserStakeInfo
+
     fun userDelegationsFlow(
         chainId: ChainId,
         userId: AccountIdKey,
         delegationIds: List<AccountIdKey>
     ): Flow<Map<AccountIdKey, MythDelegation>>
+
+    suspend fun userDelegations(
+        chainId: ChainId,
+        userId: AccountIdKey,
+        delegationIds: List<AccountIdKey>
+    ): Map<AccountIdKey, MythDelegation>
 
     suspend fun shouldClaimRewards(
         chainId: ChainId,
@@ -63,14 +70,14 @@ interface MythosUserStakeRepository {
     suspend fun getAutoCompoundPercentage(
         chainId: ChainId,
         accountId: AccountIdKey
-    ): Flow<Fraction>
+    ): Fraction
 
-    suspend fun userModifiedCompoundPercentageViaNova(): Boolean
+    suspend fun lastShouldRestakeSelection(): Boolean?
 
-    suspend fun markUserModifiedCompoundPercentageViaNova()
+    suspend fun setLastShouldRestakeSelection(shouldRestake: Boolean)
 }
 
-private const val COMPOUND_MODIFIED_KEY = "RealMythosUserStakeRepository.COMPOUND_MODIFIED_KEY"
+private const val SHOULD_RESTAKE_KEY = "RealMythosUserStakeRepository.COMPOUND_MODIFIED_KEY"
 
 @FeatureScope
 class RealMythosUserStakeRepository @Inject constructor(
@@ -86,6 +93,12 @@ class RealMythosUserStakeRepository @Inject constructor(
         }
     }
 
+    override suspend fun userStakeOrDefault(chainId: ChainId, accountId: AccountId): UserStakeInfo {
+        return localStorageDataSource.query(chainId, applyStorageDefault = true) {
+            metadata.collatorStaking.userStake.queryNonNull(accountId)
+        }
+    }
+
     override fun userDelegationsFlow(
         chainId: ChainId,
         userId: AccountIdKey,
@@ -97,6 +110,19 @@ class RealMythosUserStakeRepository @Inject constructor(
             metadata.collatorStaking.candidateStake.observe(allKeys).map { resultMap ->
                 resultMap.mapKeys { (keys, _) -> keys.first }
             }
+        }
+    }
+
+    override suspend fun userDelegations(
+        chainId: ChainId,
+        userId: AccountIdKey,
+        delegationIds: List<AccountIdKey>
+    ): Map<AccountIdKey, MythDelegation> {
+        return localStorageDataSource.query(chainId) {
+            val allKeys = delegationIds.map { it to userId }
+
+            metadata.collatorStaking.candidateStake.entries(allKeys)
+                .mapKeys { (keys, _) -> keys.first }
         }
     }
 
@@ -121,18 +147,22 @@ class RealMythosUserStakeRepository @Inject constructor(
         }
     }
 
-    override suspend fun getAutoCompoundPercentage(chainId: ChainId, accountId: AccountIdKey): Flow<Fraction> {
-        return localStorageDataSource.subscribe(chainId, applyStorageDefault = true) {
-            metadata.collatorStaking.autoCompound.observeNonNull(accountId.value)
+    override suspend fun getAutoCompoundPercentage(chainId: ChainId, accountId: AccountIdKey): Fraction {
+        return localStorageDataSource.query(chainId, applyStorageDefault = true) {
+            metadata.collatorStaking.autoCompound.queryNonNull(accountId.value)
         }
     }
 
-    override suspend fun userModifiedCompoundPercentageViaNova(): Boolean {
-        return preferences.contains(COMPOUND_MODIFIED_KEY)
+    override suspend fun lastShouldRestakeSelection(): Boolean? {
+        if (preferences.contains(SHOULD_RESTAKE_KEY)) {
+            return preferences.getBoolean(SHOULD_RESTAKE_KEY, true)
+        }
+
+        return null
     }
 
-    override suspend fun markUserModifiedCompoundPercentageViaNova() {
-        preferences.putBoolean(COMPOUND_MODIFIED_KEY, true)
+    override suspend fun setLastShouldRestakeSelection(shouldRestake: Boolean) {
+        preferences.putBoolean(SHOULD_RESTAKE_KEY, shouldRestake)
     }
 
     private suspend fun RuntimeCallsApi.shouldClaimPendingRewards(accountId: AccountIdKey): Boolean {

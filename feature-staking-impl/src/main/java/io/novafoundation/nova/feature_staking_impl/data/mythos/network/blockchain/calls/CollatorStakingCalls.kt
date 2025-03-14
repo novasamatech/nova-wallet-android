@@ -87,7 +87,6 @@ fun CollatorStakingCalls.setAutoCompoundPercentage(percent: Fraction) {
             "percent" to percent.inWholePercents
         )
     )
-
 }
 
 private fun StakingIntent.toEncodableInstance(): Any {
