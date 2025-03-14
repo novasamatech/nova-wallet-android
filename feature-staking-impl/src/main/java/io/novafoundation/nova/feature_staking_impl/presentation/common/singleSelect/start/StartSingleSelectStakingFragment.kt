@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import io.novafoundation.nova.common.address.WithAccountId
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -38,6 +39,7 @@ abstract class StartSingleSelectStakingFragment<T, V : StartSingleSelectStakingV
         return inflater.inflate(R.layout.fragment_parachain_staking_start, container, false)
     }
 
+    @CallSuper
     override fun initViews() {
         startParachainStakingContainer.applyStatusBarInsets()
 

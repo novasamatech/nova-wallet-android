@@ -80,3 +80,7 @@ val CollatorStakingRuntimeApi.candidateStake: QueryableStorageEntry2<AccountIdKe
 context(RuntimeContext)
 val CollatorStakingRuntimeApi.releaseQueues: QueryableStorageEntry1<AccountId, List<MythReleaseRequest>>
     get() = storage1("ReleaseQueues", binding = { decoded, _ -> bindMythReleaseQueues(decoded) })
+
+context(RuntimeContext)
+val CollatorStakingRuntimeApi.autoCompound: QueryableStorageEntry1<AccountId, Fraction>
+    get() = storage1("AutoCompound", binding = { decoded, _ -> bindPercentFraction(decoded) })
