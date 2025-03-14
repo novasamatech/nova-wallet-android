@@ -25,5 +25,4 @@
         android:text="@string/network_status_connecting"
         android:textColor="@color/text_primary"
         android:visibility="gone" />
-
 </FrameLayout>

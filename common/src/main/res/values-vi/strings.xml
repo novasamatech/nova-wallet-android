@@ -745,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Mạng: %s\nMnemonic: %s</string>
     <string name="fee_not_yet_loaded_message">Vui lòng chờ cho đến khi phí được tính toán</string>
     <string name="fee_not_yet_loaded_title">Đang tính toán phí</string>
+    <string name="fragment_assets_nova_card">Quản lý Thẻ Ghi Nợ</string>
     <string name="fragment_set_staking_proxy_title">Thêm ủy quyền cho %s staking</string>
     <string name="fragment_swap_main_settings_details_title">Chi tiết đổi</string>
     <string name="fragment_swap_main_settings_max_button">Tối đa:</string>
     <string name="fragment_swap_main_settings_pay_title">Bạn trả</string>
     <string name="fragment_swap_main_settings_receive_title">Bạn nhận</string>
     <string name="fragment_swap_main_settings_select_token">Chọn một token</string>
+    <string name="fragment_top_up_card_title">Nạp thẻ với %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Vui lòng liên hệ support@novawallet.io. Bao gồm địa chỉ email mà bạn đã sử dụng để phát hành thẻ.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Liên hệ hỗ trợ</string>
     <string name="governance_notification_channel_name">Kênh thông báo quản trị</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">Bạn cần chọn ít nhất %d track</item>
@@ -1669,6 +1673,10 @@
     <string name="vote_revote">Bỏ phiếu lại</string>
     <string name="vote_vote">Bỏ phiếu</string>
     <string name="voting_status">Trạng thái bỏ phiếu</string>
+    <string name="waiting_existing_card_top_up_card_title">Thẻ của bạn đang được nạp tiền!</string>
+    <string name="waiting_initial_top_up_card_title">Thẻ của bạn đang được phát hành!</string>
+    <string name="waiting_top_up_card_description">Có thể mất đến 5 phút.\nCửa sổ này sẽ tự động đóng.</string>
+    <string name="waiting_top_up_card_timer">Dự đoán %s</string>
     <string name="wallet_asset_buy">Mua</string>
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>

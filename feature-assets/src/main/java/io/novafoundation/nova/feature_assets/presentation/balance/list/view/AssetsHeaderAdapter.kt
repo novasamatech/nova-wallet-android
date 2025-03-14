@@ -12,9 +12,11 @@ import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConn
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNovaCard
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
+import kotlinx.android.synthetic.main.view_asset_nova_card.view.assetNovaCardText
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
 
@@ -38,10 +40,11 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         fun buyClicked()
 
         fun swapClicked()
+
+        fun novaCardClick()
     }
 
     private var filterIconRes: Int? = null
-    private var shouldShowPlaceholder: Boolean = false
     private var walletConnectModel: WalletConnectSessionsModel? = null
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
@@ -135,6 +138,8 @@ class HeaderHolder(
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buyClicked() }
+            balanceListNovaCard.setOnClickListener { handler.novaCardClick() }
+
             balanceListTotalBalance.onSwapClick { handler.swapClicked() }
         }
     }
@@ -175,5 +180,9 @@ class HeaderHolder(
 
     fun bindWalletConnect(walletConnectModel: WalletConnectSessionsModel?) = walletConnectModel?.let {
         containerView.balanceListWalletConnect.setConnectionCount(it.connections)
+    }
+
+    fun bindNovaCardText(text: CharSequence?) = with(containerView) {
+        assetNovaCardText.setText(text)
     }
 }

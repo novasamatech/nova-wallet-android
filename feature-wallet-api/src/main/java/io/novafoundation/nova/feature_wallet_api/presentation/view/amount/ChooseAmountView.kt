@@ -71,6 +71,8 @@ class ChooseAmountView @JvmOverloads constructor(
     }
 
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ChooseAmountView) {
+        isEnabled = it.getBoolean(R.styleable.ChooseAmountView_android_enabled, true)
+
         val title = it.getString(R.styleable.ChooseAmountView_title) ?: context.getString(R.string.common_amount)
         setTitle(title)
     }

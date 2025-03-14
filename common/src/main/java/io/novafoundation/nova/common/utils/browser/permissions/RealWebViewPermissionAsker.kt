@@ -1,16 +1,25 @@
-package io.novafoundation.nova.feature_dapp_impl.web3.webview
+package io.novafoundation.nova.common.utils.browser.permissions
 
 import android.Manifest
 import android.webkit.PermissionRequest
+import androidx.fragment.app.Fragment
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class WebViewPermissionAsker(
-    private val permissionsAsker: PermissionsAsker.Presentation
-) {
+class WebViewPermissionAskerFactory(private val permissionsAskerFactory: PermissionsAskerFactory) {
 
-    fun requestPermission(coroutineScope: CoroutineScope, request: PermissionRequest) {
+    fun create(fragment: Fragment): WebViewPermissionAsker {
+        return RealWebViewPermissionAsker(permissionsAskerFactory.create(fragment))
+    }
+}
+
+class RealWebViewPermissionAsker(
+    private val permissionsAsker: PermissionsAsker.Presentation
+) : WebViewPermissionAsker {
+
+    override fun requestPermission(coroutineScope: CoroutineScope, request: PermissionRequest) {
         coroutineScope.launch {
             val permissions = mapPermissionRequest(request)
 
@@ -31,7 +40,6 @@ class WebViewPermissionAsker(
     private fun mapPermissionRequest(request: PermissionRequest) = request.resources.flatMap { resource ->
         when (resource) {
             PermissionRequest.RESOURCE_VIDEO_CAPTURE -> listOf(Manifest.permission.CAMERA)
-            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> listOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
             else -> emptyList()
         }
     }.toTypedArray()

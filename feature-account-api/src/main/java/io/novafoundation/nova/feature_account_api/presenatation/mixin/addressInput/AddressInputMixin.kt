@@ -27,3 +27,7 @@ interface AddressInputMixin : ExternalAccountResolver {
 }
 
 suspend fun AddressInputMixin.isAddressValid(input: String) = getInputSpec().isValidAddress(input)
+
+fun AddressInputMixin.setAddress(input: String) {
+    inputFlow.value = input
+}

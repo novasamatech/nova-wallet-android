@@ -319,6 +319,10 @@ class BalanceListViewModel(
         assetsListInteractor.hideCrowdloanBanner()
     }
 
+    fun novaCardClicked() {
+        router.openNovaCard()
+    }
+
     fun switchViewMode() {
         launch { assetListMixin.switchViewMode() }
     }

@@ -32,7 +32,7 @@ class ScanSignParitySignerModule {
         permissionsAskerFactory: PermissionsAskerFactory,
         fragment: Fragment,
         router: AccountRouter
-    ) = permissionsAskerFactory.create(fragment, router)
+    ) = permissionsAskerFactory.createReturnable(fragment, router)
 
     @Provides
     @IntoMap

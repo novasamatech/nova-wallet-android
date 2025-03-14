@@ -14,5 +14,7 @@
 
     <declare-styleable name="ChooseAmountView">
         <attr name="title" />
+
+        <attr name="android:enabled" />
     </declare-styleable>
 </resources>

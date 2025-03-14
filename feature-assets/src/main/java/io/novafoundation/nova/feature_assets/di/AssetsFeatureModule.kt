@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
+import io.novafoundation.nova.feature_assets.data.repository.NovaCardStateRepository
+import io.novafoundation.nova.feature_assets.data.repository.RealNovaCardStateRepository
 import io.novafoundation.nova.feature_assets.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
@@ -25,6 +27,8 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
@@ -174,6 +178,18 @@ class AssetsFeatureModule {
         poolAccountDerivation = poolAccountDerivation,
         mythosMainPotMatcherFactory = mythosMainPotMatcherFactory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideNovaCardRepository(preferences: Preferences): NovaCardStateRepository {
+        return RealNovaCardStateRepository(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNovaCardInteractor(repository: NovaCardStateRepository): NovaCardInteractor {
+        return RealNovaCardInteractor(repository)
+    }
 
     @Provides
     @FeatureScope

@@ -43,12 +43,16 @@ class SendInteractor(
 
             TransferFee(originFee, fees.executionFee)
         } else {
-            val submissionFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
             TransferFee(
-                originFee = OriginFee(submissionFee, null),
+                originFee = getOriginFee(transfer, coroutineScope),
                 crossChainFee = null
             )
         }
+    }
+
+    suspend fun getOriginFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): OriginFee = withContext(Dispatchers.Default) {
+        val networkFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
+        OriginFee(networkFee, null)
     }
 
     suspend fun performTransfer(

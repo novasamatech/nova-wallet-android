@@ -6,6 +6,8 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.ProgressBar
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
 import kotlinx.coroutines.CoroutineScope
 

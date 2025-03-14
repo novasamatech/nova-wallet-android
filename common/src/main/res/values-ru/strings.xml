@@ -763,12 +763,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Сеть: %s\nМнемоника: %s</string>
     <string name="fee_not_yet_loaded_message">Подождите, пока будет рассчитана комиссия</string>
     <string name="fee_not_yet_loaded_title">Расчет комиссии в процессе</string>
+    <string name="fragment_assets_nova_card">Управление картой</string>
     <string name="fragment_set_staking_proxy_title">Добавить делегацию для %s стекинга</string>
     <string name="fragment_swap_main_settings_details_title">Детали обмена</string>
     <string name="fragment_swap_main_settings_max_button">Макс:</string>
     <string name="fragment_swap_main_settings_pay_title">Вы платите</string>
     <string name="fragment_swap_main_settings_receive_title">Вы получаете</string>
     <string name="fragment_swap_main_settings_select_token">Выберите токен</string>
+    <string name="fragment_top_up_card_title">Пополнить карту с помощью %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Пожалуйста, обратитесь в support@novawallet.io. Укажите адрес электронной почты, который вы использовали для выпуска карты.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Связаться с поддержкой</string>
     <string name="governance_notification_channel_name">Канал уведомлений демократии</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Необходимо выбрать хотя бы %d трек</item>
@@ -1705,6 +1709,10 @@
     <string name="vote_revote">Переголосовать</string>
     <string name="vote_vote">Голосовать</string>
     <string name="voting_status">Статус голосования</string>
+    <string name="waiting_existing_card_top_up_card_title">Ваша карта пополняется!</string>
+    <string name="waiting_initial_top_up_card_title">Ваша карта выпускается!</string>
+    <string name="waiting_top_up_card_description">Это может занять до 5 минут.\nЭто окно закроется автоматически.</string>
+    <string name="waiting_top_up_card_timer">Примерно %s</string>
     <string name="wallet_asset_buy">Купить</string>
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>

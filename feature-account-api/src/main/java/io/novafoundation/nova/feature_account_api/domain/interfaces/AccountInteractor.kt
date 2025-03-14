@@ -30,6 +30,8 @@ interface AccountInteractor {
 
     suspend fun selectMetaAccount(metaId: Long)
 
+    suspend fun selectedMetaAccount(): MetaAccount
+
     suspend fun deleteAccount(metaId: Long): Boolean
 
     suspend fun updateMetaAccountPositions(idsInNewOrder: List<Long>)

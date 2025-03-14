@@ -745,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">网络：%s\n助记词：%s</string>
     <string name="fee_not_yet_loaded_message">请等待费用计算</string>
     <string name="fee_not_yet_loaded_title">费用计算正在进行中</string>
+    <string name="fragment_assets_nova_card">管理借记卡</string>
     <string name="fragment_set_staking_proxy_title">为%s质押添加委托</string>
     <string name="fragment_swap_main_settings_details_title">兑换详情</string>
     <string name="fragment_swap_main_settings_max_button">最大：</string>
     <string name="fragment_swap_main_settings_pay_title">您支付</string>
     <string name="fragment_swap_main_settings_receive_title">您收到</string>
     <string name="fragment_swap_main_settings_select_token">选择一个代币</string>
+    <string name="fragment_top_up_card_title">使用%s充值卡</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">请联系support@novawallet.io。包括您用于发卡的电子邮件地址。</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">联系支持</string>
     <string name="governance_notification_channel_name">治理通知渠道</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">您至少需要选择%d轨道</item>
@@ -1669,6 +1673,10 @@
     <string name="vote_revote">重新投票</string>
     <string name="vote_vote">投票</string>
     <string name="voting_status">投票状态</string>
+    <string name="waiting_existing_card_top_up_card_title">您的卡正在充值中！</string>
+    <string name="waiting_initial_top_up_card_title">您的卡正在发行！</string>
+    <string name="waiting_top_up_card_description">最多可能需要 5 分钟。\n此窗口将自动关闭。</string>
+    <string name="waiting_top_up_card_timer">预计 %s</string>
     <string name="wallet_asset_buy">购买</string>
     <string name="wallet_asset_buy_with">用...购买</string>
     <string name="wallet_asset_receive">接收</string>

@@ -91,7 +91,7 @@ private fun getTimerDurationFormatter(context: Context): DurationFormatter {
             dayFormatter = DayDurationFormatter(context),
             hoursFormatter = HoursDurationFormatter(context)
         ),
-        TimeDurationFormatter(),
+        timeDurationFormatter,
         ZeroDurationFormatter(timeDurationFormatter)
     )
 
