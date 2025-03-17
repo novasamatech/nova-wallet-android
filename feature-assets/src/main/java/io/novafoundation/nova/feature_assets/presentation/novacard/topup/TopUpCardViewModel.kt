@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
@@ -159,8 +160,20 @@ class TopUpCardViewModel(
     private fun transferTokensAndFinishFlow(payload: AssetTransferPayload) = launch {
         sendInteractor.performTransfer(payload.transfer, payload.originFee, null, viewModelScope)
 
-        novaCardInteractor.setLastTopUpTime(System.currentTimeMillis())
+        updateCardState()
+        updateLastTopUpTime()
+
         router.finishAndAwaitTopUp()
+    }
+
+    private fun updateCardState() {
+        if (!novaCardInteractor.isNovaCardCreated()) {
+            novaCardInteractor.setNovaCardState(NovaCardState.CREATION)
+        }
+    }
+
+    private fun updateLastTopUpTime() {
+        novaCardInteractor.setLastTopUpTime(System.currentTimeMillis())
     }
 
     private fun setupFees() {
