@@ -25,13 +25,12 @@ class CardCreationInterceptor(
         fun onCardCreated()
     }
 
-    /**
-     * @return true if the request was intercepted otherwise false
-     */
+    private val interceptionPattern = Regex("https://api\\.mercuryo\\.io/[a-zA-Z0-9.]+/cards")
+
     override fun intercept(request: WebResourceRequest): Boolean {
         val url = request.url.toString()
 
-        if (url.contains("https://api.mercuryo.io/v1.6/cards")) { // Specify your condition here
+        if (url.contains(interceptionPattern)) {
             return performOkHttpRequest(request)
         }
 
@@ -42,7 +41,7 @@ class CardCreationInterceptor(
         val requestBuilder = request.toOkHttpRequestBuilder()
 
         return try {
-            val response = makeRequest(okHttpClient, requestBuilder)
+            val response = okHttpClient.makeRequestBlocking(requestBuilder)
             val cardsResponse = gson.fromJson(response.body!!.string(), CardsResponse::class.java)
 
             if (cardsResponse.isCardCreated()) {

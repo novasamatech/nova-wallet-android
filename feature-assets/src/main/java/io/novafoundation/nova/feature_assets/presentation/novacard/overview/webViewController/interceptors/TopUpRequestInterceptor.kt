@@ -27,12 +27,12 @@ class TopUpRequestInterceptor(
         fun onTopUpStart(orderId: String, amount: BigDecimal, address: String)
     }
 
+    private val interceptionPattern = Regex("https://api\\.mercuryo\\.io/[a-zA-Z0-9.]+/widget/sell-request/([a-zA-Z0-9]+)/status.*")
+
     override fun intercept(request: WebResourceRequest): Boolean {
         val url = request.url.toString()
 
-        val pattern = Regex("https://api\\.mercuryo\\.io/[a-zA-Z0-9.]+/widget/sell-request/([a-zA-Z0-9]+)/status.*")
-
-        val matches = pattern.find(url)
+        val matches = interceptionPattern.find(url)
 
         if (matches != null) {
             val orderId = matches.groupValues[1]
@@ -46,7 +46,7 @@ class TopUpRequestInterceptor(
         val requestBuilder = request.toOkHttpRequestBuilder()
 
         return try {
-            val response = makeRequest(okHttpClient, requestBuilder)
+            val response = okHttpClient.makeRequestBlocking(requestBuilder)
             val topUpResponse = gson.fromJson(response.body!!.string(), TopUpResponse::class.java)
 
             when {

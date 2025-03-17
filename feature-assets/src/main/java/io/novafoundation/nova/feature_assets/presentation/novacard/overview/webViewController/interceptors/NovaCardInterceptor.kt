@@ -15,8 +15,8 @@ interface NovaCardInterceptor {
     fun intercept(request: WebResourceRequest): Boolean
 }
 
-fun makeRequest(okHttpClient: OkHttpClient, requestBuilder: Request.Builder): Response {
-    val okHttpResponse = okHttpClient.newCall(requestBuilder.build()).execute()
+fun OkHttpClient.makeRequestBlocking(requestBuilder: Request.Builder): Response {
+    val okHttpResponse = this.newCall(requestBuilder.build()).execute()
 
     if (okHttpResponse.isSuccessful) {
         return okHttpResponse

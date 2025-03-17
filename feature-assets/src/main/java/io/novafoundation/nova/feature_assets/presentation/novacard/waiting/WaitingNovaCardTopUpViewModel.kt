@@ -25,8 +25,8 @@ class WaitingNovaCardTopUpViewModel(
     }
 
     fun getTimerValue(): TimerValue {
-        val timeToCardCreation = novaCardInteractor.getLastTopUpTime()
-        return TimerValue(timeToCardCreation, System.currentTimeMillis())
+        val estimatedTopUpDuration = novaCardInteractor.getEstimatedTopUpDuration()
+        return TimerValue(estimatedTopUpDuration, System.currentTimeMillis())
     }
 
     fun getTimerFormatter(): EstimatedDurationFormatter {

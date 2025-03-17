@@ -59,7 +59,7 @@ class NovaCardViewModel(
     }
 
     init {
-        checkCardCreationState()
+        ensureCardCreationIsBlocking()
     }
 
     override fun onTopUpStart(orderId: String, amount: BigDecimal, address: String) {
@@ -94,7 +94,7 @@ class NovaCardViewModel(
         return chainRegistry.getChain(ChainGeneses.POLKADOT)
     }
 
-    private fun checkCardCreationState() {
+    private fun ensureCardCreationIsBlocking() {
         launch {
             val novaCardState = novaCardInteractor.getNovaCardState()
 

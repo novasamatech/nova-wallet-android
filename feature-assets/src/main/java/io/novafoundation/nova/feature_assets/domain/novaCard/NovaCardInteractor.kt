@@ -4,12 +4,6 @@ import io.novafoundation.nova.feature_assets.data.repository.NovaCardStateReposi
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration.Companion.minutes
 
-enum class NovaCardState {
-    NONE,
-    CREATION,
-    CREATED
-}
-
 interface NovaCardInteractor {
 
     fun isNovaCardCreated(): Boolean
@@ -26,7 +20,7 @@ interface NovaCardInteractor {
 
     fun setLastTopUpTime(time: Long)
 
-    fun getLastTopUpTime(): Long
+    fun getEstimatedTopUpDuration(): Long
 }
 
 const val TIMER_MINUTES = 5
@@ -63,12 +57,12 @@ class RealNovaCardInteractor(
         novaCardStateRepository.setLastTopUpTime(time)
     }
 
-    override fun getLastTopUpTime(): Long {
-        val cardBeingIssuedTime = novaCardStateRepository.getLastTopUpTime()
-        val cardCreationTime = cardBeingIssuedTime + TIMER_MINUTES.minutes.inWholeMilliseconds
+    override fun getEstimatedTopUpDuration(): Long {
+        val lastTopUpTime = novaCardStateRepository.getLastTopUpTime()
+        val onTopUpFinishTime = lastTopUpTime + TIMER_MINUTES.minutes.inWholeMilliseconds
         val currentTime = System.currentTimeMillis()
-        val millisecondsToCardCreation = cardCreationTime - currentTime
+        val estimatedDurationToFinishTopUp = onTopUpFinishTime - currentTime
 
-        return millisecondsToCardCreation.coerceAtLeast(0)
+        return estimatedDurationToFinishTopUp.coerceAtLeast(0)
     }
 }

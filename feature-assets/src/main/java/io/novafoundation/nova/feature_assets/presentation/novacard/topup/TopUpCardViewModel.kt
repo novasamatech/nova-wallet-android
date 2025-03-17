@@ -183,8 +183,7 @@ class TopUpCardViewModel(
         ) { feePaymentCurrency, commissionAsset, amountState ->
             val assetTransfer = buildTransfer(feePaymentCurrency, amountState.inputKind.isMaxAction())
 
-            val originFee = sendInteractor.getOriginFee(assetTransfer, viewModelScope)
-            originFee.submissionFee
+            sendInteractor.getSubmissionFee(assetTransfer, viewModelScope)
         }
     }
 

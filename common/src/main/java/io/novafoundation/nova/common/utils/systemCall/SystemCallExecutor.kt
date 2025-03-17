@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.utils.systemCall
 import android.content.Intent
 import io.novafoundation.nova.common.resources.ContextManager
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -12,29 +11,10 @@ class SystemCallExecutor(
     private val contextManager: ContextManager
 ) {
 
-    private sealed interface PendingRequest<T> {
+    private class PendingRequest<T>(
+        val callback: (Result<T>) -> Unit,
         val systemCall: SystemCall<T>
-
-        fun onResult(result: Result<T>)
-
-        class Suspendable<T>(
-            private val continuation: Continuation<Result<T>>,
-            override val systemCall: SystemCall<T>
-        ) : PendingRequest<T> {
-            override fun onResult(result: Result<T>) {
-                continuation.resume(result)
-            }
-        }
-
-        class Normal<T>(
-            private val onResult: (Result<T>) -> Unit,
-            override val systemCall: SystemCall<T>
-        ) : PendingRequest<T> {
-            override fun onResult(result: Result<T>) {
-                onResult.invoke(result)
-            }
-        }
-    }
+    )
 
     private val ongoingRequests = ConcurrentHashMap<Int, PendingRequest<Any?>>()
 
@@ -43,8 +23,8 @@ class SystemCallExecutor(
         try {
             val request = handleRequest(systemCall)
 
-            ongoingRequests[request.requestCode] = PendingRequest.Suspendable(
-                continuation = continuation as Continuation<Result<Any?>>,
+            ongoingRequests[request.requestCode] = PendingRequest(
+                callback = { continuation.resume(it as Result<T>) },
                 systemCall = systemCall as SystemCall<Any?>
             )
         } catch (e: Exception) {
@@ -57,8 +37,8 @@ class SystemCallExecutor(
         try {
             val request = handleRequest(systemCall)
 
-            ongoingRequests[request.requestCode] = PendingRequest.Normal(
-                onResult = onResult as (Result<Any?>) -> Unit,
+            ongoingRequests[request.requestCode] = PendingRequest(
+                callback = onResult as (Result<Any?>) -> Unit,
                 systemCall = systemCall as SystemCall<Any?>
             )
             return true
@@ -71,7 +51,7 @@ class SystemCallExecutor(
         val removed = ongoingRequests.remove(requestCode)?.let { systemCallRequest ->
             val parsedResult = systemCallRequest.systemCall.parseResult(requestCode, resultCode, data)
 
-            systemCallRequest.onResult(parsedResult)
+            systemCallRequest.callback(parsedResult)
         }
 
         return removed != null
