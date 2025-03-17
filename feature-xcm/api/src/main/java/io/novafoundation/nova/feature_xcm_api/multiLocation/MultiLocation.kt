@@ -103,6 +103,10 @@ fun MultiLocation.Interior.asLocation(): AbsoluteMultiLocation {
     return AbsoluteMultiLocation(this)
 }
 
+fun MultiLocation.Interior.asRelativeLocation(): RelativeMultiLocation {
+    return asLocation().toRelative()
+}
+
 fun List<Junction>.asLocation(): AbsoluteMultiLocation {
     return toInterior().asLocation()
 }

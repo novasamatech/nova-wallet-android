@@ -141,6 +141,7 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
         val dest: RelativeMultiLocation,
         val xcm: XcmMessage
     ) : XcmInstruction() {
+
         override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
             return DictEnum.Entry(
                 name = "DepositReserveAsset",
