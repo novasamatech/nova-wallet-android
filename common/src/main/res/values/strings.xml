@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="waiting_top_up_card_timer">Estimated %s</string>
+    <string name="waiting_initial_top_up_card_title">Your card is being issued!</string>
+    <string name="waiting_existing_card_top_up_card_title">Your card is being funded!</string>
+    <string name="waiting_top_up_card_description">It can take up to 5 minutes.\nThis window will be closed automatically.</string>
+
+    <string name="fragment_waiting_top_up_time_out_error_title">Contact support</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Please contact support@novawallet.io. Include email address that you have used for issuing the card.</string>
+
+    <string name="fragment_assets_nova_card">Manage Debit Card</string>
+
+    <string name="fragment_top_up_card_title">Top up card with %s</string>
+
     <string name="price_charts_period_today">Today</string>
     <string name="price_charts_period_week">Last Week</string>
     <string name="price_charts_period_month">Last Month</string>

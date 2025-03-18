@@ -745,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">ネットワーク: %s\nニーモニック: %s</string>
     <string name="fee_not_yet_loaded_message">手数料が計算されるまでお待ちください</string>
     <string name="fee_not_yet_loaded_title">手数料の計算中</string>
+    <string name="fragment_assets_nova_card">デビットカードを管理</string>
     <string name="fragment_set_staking_proxy_title">%s Stakingのデリゲーションを追加</string>
     <string name="fragment_swap_main_settings_details_title">スワップの詳細</string>
     <string name="fragment_swap_main_settings_max_button">最大:</string>
     <string name="fragment_swap_main_settings_pay_title">あなたが支払う</string>
     <string name="fragment_swap_main_settings_receive_title">あなたが受け取る</string>
     <string name="fragment_swap_main_settings_select_token">トークンを選択</string>
+    <string name="fragment_top_up_card_title">カードに%sをチャージ</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">support@novawallet.ioに連絡してください。カードを発行するために使用したメールアドレスを添えてください。</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">サポートに連絡</string>
     <string name="governance_notification_channel_name">ガバナンス通知チャンネル</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
@@ -1669,6 +1673,10 @@
     <string name="vote_revote">再投票</string>
     <string name="vote_vote">投票</string>
     <string name="voting_status">投票状況</string>
+    <string name="waiting_existing_card_top_up_card_title">あなたのカードに資金が追加されています！</string>
+    <string name="waiting_initial_top_up_card_title">カードが発行されています！</string>
+    <string name="waiting_top_up_card_description">最大で5分かかる場合があります。\nこのウィンドウは自動的に閉じられます。</string>
+    <string name="waiting_top_up_card_timer">推定%s</string>
     <string name="wallet_asset_buy">購入</string>
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>

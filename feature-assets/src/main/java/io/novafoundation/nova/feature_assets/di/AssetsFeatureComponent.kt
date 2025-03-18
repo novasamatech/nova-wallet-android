@@ -12,6 +12,9 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.Bala
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.di.NovaCardComponent
+import io.novafoundation.nova.feature_assets.presentation.novacard.topup.di.TopUpCardComponent
+import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.di.WaitingNovaCardTopUpComponent
 import io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.di.AssetBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.buy.flow.network.di.NetworkBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.receive.di.ReceiveComponent
@@ -103,6 +106,12 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun networkSendFlowComponent(): NetworkSendFlowComponent.Factory
 
     fun networkSwapFlowComponent(): NetworkSwapFlowComponent.Factory
+
+    fun topUpCardComponentFactory(): TopUpCardComponent.Factory
+
+    fun novaCardComponentFactory(): NovaCardComponent.Factory
+
+    fun waitingNovaCardTopUpComponentFactory(): WaitingNovaCardTopUpComponent.Factory
 
     fun inject(view: GoToNftsView)
 
