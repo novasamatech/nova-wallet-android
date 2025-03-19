@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
+import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -36,7 +37,7 @@ class ProxiedSignerFactory(
     private val proxyCallFilterFactory: ProxyCallFilterFactory
 ) {
 
-    fun create(metaAccount: MetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
+    fun create(metaAccount: ProxiedMetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
         return ProxiedSigner(
             proxiedMetaAccount = metaAccount,
             chainRegistry = chainRegistry,
@@ -53,7 +54,7 @@ class ProxiedSignerFactory(
 }
 
 class ProxiedSigner(
-    private val proxiedMetaAccount: MetaAccount,
+    private val proxiedMetaAccount: ProxiedMetaAccount,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
@@ -129,12 +130,16 @@ class ProxiedSigner(
         }
     }
 
-    private suspend fun checkPermissionAndWrap(proxyMetaAccount: MetaAccount, payload: SignerPayloadExtrinsic, chain: Chain): SignerPayloadExtrinsic {
+    private suspend fun checkPermissionAndWrap(
+        proxyMetaAccount: MetaAccount,
+        payload: SignerPayloadExtrinsic,
+        chain: Chain
+    ): SignerPayloadExtrinsic {
         val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 
         val availableProxyTypes = getProxyRepository.getDelegatedProxyTypesRemote(
-            chainId = payload.chainId,
+            chainId = proxiedMetaAccount.getMainProxyChainId(),
             proxiedAccountId = proxiedAccountId,
             proxyAccountId = proxyAccountId
         )
@@ -142,13 +147,51 @@ class ProxiedSigner(
         val proxyType = proxyCallFilterFactory.getFirstMatchedTypeOrNull(payload.call, availableProxyTypes)
             ?: notEnoughPermission(proxyMetaAccount, availableProxyTypes)
 
+        return if (proxiedMetaAccount.isRemoteProxyChain(chain.id)) {
+            wrapInRemoteProxy(proxyMetaAccount, payload, chain)
+        } else {
+            wrapInProxy(proxyMetaAccount, payload, chain, proxyType)
+        }
+    }
+
+    private suspend fun wrapInRemoteProxy(
+        proxyMetaAccount: MetaAccount,
+        payload: SignerPayloadExtrinsic,
+        remoteProxyChain: Chain
+    ): SignerPayloadExtrinsic {
+        // TODO we are currently assuming proxy address exist in the proxy meta account
+        // However, we currently do not guarantee this as remote proxies are added regardless of existence of proxy account (it should also match on both chains)
+        val proxyAddress = proxyMetaAccount.requireAddressIn(remoteProxyChain)
+        val proxyAccountId = proxyMetaAccount.requireAccountIdIn(remoteProxyChain)
+
+        val mainProxyChainId = proxiedMetaAccount.getMainProxyChainId()
+        val mainProxyChain = chainRegistry.getChain(mainProxyChainId)
+        val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(mainProxyChain)
+
+        val nonce = rpcCalls.getNonce(payload.chainId, proxyAddress)
+        val readProof = getProxyRepository.getRelaychainProxyProof(mainProxyChainId, remoteProxyChain.id, proxiedAccountId)
+
+        return payload.wrapIntoRemoteProxyPayload(
+            proxyAccountId = proxyAccountId,
+            currentProxyNonce = nonce,
+            proof = readProof
+        )
+    }
+
+    private suspend fun wrapInProxy(
+        proxyMetaAccount: MetaAccount,
+        payload: SignerPayloadExtrinsic,
+        chain: Chain,
+        proxyType: ProxyType,
+    ): SignerPayloadExtrinsic {
+        val proxyAccountId = proxyMetaAccount.requireAccountIdIn(chain)
         val proxyAddress = proxyMetaAccount.requireAddressIn(chain)
+
         val nonce = rpcCalls.getNonce(payload.chainId, proxyAddress)
 
         return payload.wrapIntoProxyPayload(
             proxyAccountId = proxyAccountId,
             proxyType = proxyType,
-            call = payload.call,
             currentProxyNonce = nonce
         )
     }
@@ -162,7 +205,7 @@ class ProxiedSigner(
 
     private suspend fun getProxyMetaAccount(): MetaAccount {
         val proxyAccount = proxiedMetaAccount.proxy ?: throw IllegalStateException("Proxy account is not found")
-        return accountRepository.getMetaAccount(proxyAccount.metaId)
+        return accountRepository.getMetaAccount(proxyAccount.proxyMetaId)
     }
 
     private suspend fun notEnoughPermission(proxyMetaAccount: MetaAccount, availableProxyTypes: List<ProxyType>): Nothing {

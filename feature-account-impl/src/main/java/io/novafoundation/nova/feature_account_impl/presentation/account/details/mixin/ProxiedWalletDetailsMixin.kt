@@ -36,7 +36,7 @@ class ProxiedWalletDetailsMixin(
 
     override val typeAlert: Flow<AlertModel?> = flowOf {
         val proxyAccount = metaAccount.proxy ?: return@flowOf null
-        val proxyMetaAccount = interactor.getMetaAccount(proxyAccount.metaId)
+        val proxyMetaAccount = interactor.getMetaAccount(proxyAccount.proxyMetaId)
 
         val proxyAccountWithIcon = proxyFormatter.mapProxyMetaAccount(proxyMetaAccount.name, proxyFormatter.makeAccountDrawable(proxyMetaAccount))
         AlertModel(

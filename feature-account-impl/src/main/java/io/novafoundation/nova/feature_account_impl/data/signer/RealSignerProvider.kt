@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedFeeS
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySignerFactory
+import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
 import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -52,7 +53,7 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.POLKADOT_VAULT -> polkadotVaultSignerFactory.createPolkadotVault(metaAccount)
             LightMetaAccount.Type.LEDGER -> ledgerSignerFactory.create(metaAccount, LedgerVariant.GENERIC)
             LightMetaAccount.Type.LEDGER_LEGACY -> ledgerSignerFactory.create(metaAccount, LedgerVariant.LEGACY)
-            LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount, this, isRoot)
+            LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount as ProxiedMetaAccount, this, isRoot)
         }
     }
 }

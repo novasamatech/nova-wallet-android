@@ -21,7 +21,7 @@ class NftProvidersRegistry(
 
     fun get(chain: Chain): List<NftProvider> {
         return when (chain.id) {
-            Chain.Geneses.STATEMINE -> statemineProviders
+            Chain.Geneses.KUSAMA_ASSET_HUB -> statemineProviders
             Chain.Geneses.KUSAMA -> kusamaProviders
             Chain.Geneses.POLKADOT -> polkadotProviders
             else -> emptyList()

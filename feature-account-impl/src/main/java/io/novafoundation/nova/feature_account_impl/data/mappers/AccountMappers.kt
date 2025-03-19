@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultM
 import io.novafoundation.nova.feature_account_impl.domain.account.model.GenericLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.LegacyLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.PolkadotVaultMetaAccount
-import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedLedgerMetaAccount
+import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -116,11 +116,11 @@ class AccountMappers(
                     status = mapMetaAccountStateFromLocal(status)
                 )
 
-                LightMetaAccount.Type.PROXIED -> ProxiedLedgerMetaAccount(
+                LightMetaAccount.Type.PROXIED -> ProxiedMetaAccount(
                     id = id,
                     globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
-                    proxy = proxyAccount,
+                    proxy = proxyAccount!!,
                     substratePublicKey = substratePublicKey,
                     substrateCryptoType = substrateCryptoType,
                     substrateAccountId = substrateAccountId,
