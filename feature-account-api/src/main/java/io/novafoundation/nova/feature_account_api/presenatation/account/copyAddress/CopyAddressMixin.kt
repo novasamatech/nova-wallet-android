@@ -9,7 +9,7 @@ interface CopyAddressMixin {
 
     fun copyLegacyAddress(chainWithAccountId: ChainWithAccountId)
 
-    fun getBaseAddress(chainWithAccountId: ChainWithAccountId): String
+    fun getPrimaryAddress(chainWithAccountId: ChainWithAccountId): String
 
     fun getLegacyAddress(chainWithAccountId: ChainWithAccountId): String?
 

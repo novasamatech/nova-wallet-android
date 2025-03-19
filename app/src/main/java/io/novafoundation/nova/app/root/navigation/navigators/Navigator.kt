@@ -477,7 +477,7 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openLegacyAddressScreen(chainId: String, accountId: ByteArray) {
+    override fun openChainAddressSelector(chainId: String, accountId: ByteArray) {
         val payload = ChainAddressSelectorPayload(chainId, accountId)
 
         navigationBuilder().action(R.id.action_openUnifiedAddressDialog)

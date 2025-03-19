@@ -23,7 +23,7 @@ class ChainAddressSelectorViewModel(
         .map { ChainWithAccountId(it, payload.accountId) }
         .shareInBackground()
 
-    val newAddressFlow = chainWithAccountIdFlow.map { copyAddressMixin.getBaseAddress(it) }
+    val newAddressFlow = chainWithAccountIdFlow.map { copyAddressMixin.getPrimaryAddress(it) }
 
     val legacyAddressFlow = chainWithAccountIdFlow.map { copyAddressMixin.getLegacyAddress(it) }
 

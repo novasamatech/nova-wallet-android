@@ -29,14 +29,14 @@ class RealCopyAddressMixin(
     }
 
     override fun copyPrimaryAddress(chainWithAccountId: ChainWithAccountId) {
-        copyAddress(getBaseAddress(chainWithAccountId))
+        copyAddress(getPrimaryAddress(chainWithAccountId))
     }
 
     override fun copyLegacyAddress(chainWithAccountId: ChainWithAccountId) {
         copyAddress(getLegacyAddress(chainWithAccountId))
     }
 
-    override fun getBaseAddress(chainWithAccountId: ChainWithAccountId): String {
+    override fun getPrimaryAddress(chainWithAccountId: ChainWithAccountId): String {
         return chainWithAccountId.chain.addressOf(chainWithAccountId.accountId)
     }
 
@@ -55,7 +55,7 @@ class RealCopyAddressMixin(
     }
 
     override fun openAddressSelector(chainId: String, accountId: ByteArray) {
-        router.openLegacyAddressScreen(chainId, accountId)
+        router.openChainAddressSelector(chainId, accountId)
     }
 
     private fun copyAddress(address: String?) {
