@@ -28,7 +28,6 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDA
 import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionAllow
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionReject

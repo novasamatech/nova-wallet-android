@@ -14,7 +14,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Str
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import java.math.BigInteger
@@ -40,7 +39,8 @@ fun RuntimeSnapshot.decodeCustomTxPaymentId(assetIdHex: String): Any? {
     val type = chargeAssetTxPaymentType.includedInExtrinsic!!
     val assetIdType = type.cast<Struct>().get<Type<*>>("assetId")!!
 
-    return assetIdType.fromHex(this, assetIdHex)}
+    return assetIdType.fromHex(this, assetIdHex)
+}
 
 class ChargeAssetTxPaymentValue(
     val tip: BalanceOf,

@@ -7,12 +7,10 @@ import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.endsWith
 import io.novafoundation.nova.common.utils.intFromHex
-import io.novafoundation.nova.common.utils.signedExtensionOrNull
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.startsWith
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.CHARGE_ASSET_TX_PAYMENT_ID
 import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.chargeAssetTxPayment
 import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.decodeCustomTxPaymentId
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -29,8 +27,6 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkad
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.anyAddressToAccountId
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -58,7 +54,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromHex
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -326,7 +321,6 @@ class PolkadotExternalSignInteractor(
         constructor(modifiedOriginal: Boolean, hash: ByteArray?) : this(modifiedOriginal, CheckMetadataHash(hash))
 
         constructor(modifiedOriginal: Boolean, hexHash: String?) : this(modifiedOriginal, hexHash?.fromHex())
-
     }
 
     private data class ActualExtrinsic(

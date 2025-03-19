@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSig
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.evm.EvmSignInteractorFactory
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot.PolkadotSignInteractorFactory
 import io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic.ExternaSignViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
