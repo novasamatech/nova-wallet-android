@@ -64,7 +64,7 @@ class ExternaSignViewModel(
             scope = viewModelScope,
             selectedChainAssetFlow = it,
             configuration = FeeLoaderMixinV2.Configuration(
-                showZeroFiat = true,
+                showZeroFiat = false,
                 initialState = FeeLoaderMixinV2.Configuration.InitialState(
                     paymentCurrencySelectionMode = PaymentCurrencySelectionMode.DETECT_FROM_FEE
                 )
