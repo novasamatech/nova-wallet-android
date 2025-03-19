@@ -8,7 +8,7 @@ interface CopyValueMixin {
     fun copyValue(value: String)
 }
 
-class RealCopyValueMixin(
+internal class RealCopyValueMixin(
     private val clipboardManager: ClipboardManager,
     private val toastMessageManager: ToastMessageManager,
     private val resourceManager: ResourceManager

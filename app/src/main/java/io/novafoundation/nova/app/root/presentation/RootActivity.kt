@@ -116,6 +116,8 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
                 showToast(it)
             }
         )
+
+        viewModel.toastMessagesEvents.observeEvent { showToast(it) }
     }
 
     override fun removeSplashBackground() {

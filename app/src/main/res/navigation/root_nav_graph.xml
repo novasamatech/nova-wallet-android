@@ -133,6 +133,10 @@
         android:id="@+id/action_open_select_wallet"
         app:destination="@id/selectWalletFragment" />
 
+    <action
+        android:id="@+id/action_openUnifiedAddressDialog"
+        app:destination="@id/chainAddressesFragment" />
+
     <fragment
         android:id="@+id/splashFragment"
         android:name="io.novafoundation.nova.splash.presentation.SplashFragment"
@@ -217,5 +221,11 @@
         android:id="@+id/selectWalletFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.SelectWalletFragment"
         android:label="SelectWalletFragment" />
+
+    <dialog
+        android:id="@+id/chainAddressesFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorFragment"
+        android:label="fragment_chain_addresses"
+        tools:layout="@layout/fragment_chain_address_selector" />
 
 </navigation>

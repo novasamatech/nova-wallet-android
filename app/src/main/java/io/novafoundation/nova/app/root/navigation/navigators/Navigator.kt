@@ -482,7 +482,7 @@ class Navigator(
 
         navigationBuilder().action(R.id.action_openUnifiedAddressDialog)
             .setArgs(ChainAddressSelectorFragment.getBundle(payload))
-            .navigateInFirstAttachedContext()
+            .navigateInRoot()
     }
 
     override fun returnToMainSwapScreen() {

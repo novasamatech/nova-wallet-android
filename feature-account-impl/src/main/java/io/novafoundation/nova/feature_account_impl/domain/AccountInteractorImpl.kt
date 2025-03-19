@@ -16,11 +16,10 @@ import io.novafoundation.nova.feature_account_impl.domain.errors.UnsupportedNetw
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.enabledChainByIdFlow
+import io.novafoundation.nova.runtime.multiNetwork.chainFlow
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 
 class AccountInteractorImpl(
@@ -99,8 +98,7 @@ class AccountInteractorImpl(
     }
 
     override fun chainFlow(chainId: ChainId): Flow<Chain> {
-        return chainRegistry.enabledChainByIdFlow()
-            .mapNotNull { it[chainId] }
+        return chainRegistry.chainFlow(chainId)
     }
 
     override fun nodesFlow(): Flow<List<Node>> {

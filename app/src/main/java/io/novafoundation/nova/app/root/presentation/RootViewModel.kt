@@ -56,6 +56,8 @@ class RootViewModel(
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
+    val toastMessagesEvents = toastMessageManager.toastMessagesEvents
+
     private var willBeClearedForLanguageChange = false
 
     init {
@@ -91,8 +93,6 @@ class RootViewModel(
         syncPushSettingsIfNeeded()
 
         externalServiceInitializer.initialize()
-
-        toastMessageManager.toastMessagesEvents.observeForever { showToast(it.peekContent()) }
     }
 
     private fun observeBusEvents() {

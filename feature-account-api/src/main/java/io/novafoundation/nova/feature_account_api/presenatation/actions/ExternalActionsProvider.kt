@@ -7,8 +7,10 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.account.common.ChainWithAccountId
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createOptionalAccountAddressIcon
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountUrlOf
 import io.novafoundation.nova.runtime.ext.eventUrlOf
 import io.novafoundation.nova.runtime.ext.extrinsicUrlOf
@@ -76,9 +78,14 @@ class ExternalActionsProvider(
         showExternalActionsEvent.value = Event(payload)
     }
 
-    override fun copyValue(type: ExternalActions.Type) {
-        when (type) {
-            is ExternalActions.Type.Address -> copyAddressMixin.copyAddressOrOpenSelector(type.chainWithAccountId)
+    override fun copyValue(payload: ExternalActions.Payload) {
+        when (val type = payload.type) {
+            is ExternalActions.Type.Address -> {
+                val accountId = payload.chain.accountIdOf(type.address)
+                val chainWithAccountId = ChainWithAccountId(payload.chain, accountId)
+                copyAddressMixin.copyAddressOrOpenSelector(chainWithAccountId)
+            }
+
             is ExternalActions.Type.Event -> copyValueMixin.copyValue(type.id)
             is ExternalActions.Type.Extrinsic -> copyValueMixin.copyValue(type.hash)
 
