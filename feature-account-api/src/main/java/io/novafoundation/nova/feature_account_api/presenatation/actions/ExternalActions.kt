@@ -5,7 +5,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.feature_account_api.domain.account.common.ChainWithAccountId
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
@@ -18,7 +20,7 @@ interface ExternalActions : Browserable {
         val chain: Chain,
         val chainUi: ChainUi?,
         val icon: Drawable?,
-        @StringRes val copyLabelRes: Int,
+        @StringRes val copyLabelRes: Int?,
     )
 
     sealed class Type(
@@ -26,7 +28,9 @@ interface ExternalActions : Browserable {
         val explorerTemplateExtractor: ExplorerTemplateExtractor,
     ) {
 
-        class Address(val address: String?) : Type(address, explorerTemplateExtractor = Chain.Explorer::account)
+        object EmptyAccount : Type(null, explorerTemplateExtractor = Chain.Explorer::account)
+
+        class Address(val address: String, val chainWithAccountId: ChainWithAccountId) : Type(address, explorerTemplateExtractor = Chain.Explorer::account)
 
         class Extrinsic(val hash: String) : Type(hash, explorerTemplateExtractor = Chain.Explorer::extrinsic)
 
@@ -37,7 +41,7 @@ interface ExternalActions : Browserable {
 
     fun viewExternalClicked(explorer: Chain.Explorer, type: Type)
 
-    fun copyAddress(address: String, messageShower: (message: String) -> Unit)
+    fun copyValue(type: Type)
 
     interface Presentation : ExternalActions, Browserable.Presentation {
 
@@ -45,12 +49,15 @@ interface ExternalActions : Browserable {
     }
 }
 
-suspend fun ExternalActions.Presentation.showAddressActions(accountId: AccountId, chain: Chain) = showExternalActions(
-    type = ExternalActions.Type.Address(chain.addressOf(accountId)),
-    chain = chain
-)
+suspend fun ExternalActions.Presentation.showAddressActions(address: String?, chain: Chain) {
+    if (address == null) {
+        showExternalActions(ExternalActions.Type.EmptyAccount, chain)
+    } else {
+        showAddressActions(chain.accountIdOf(address), chain)
+    }
+}
 
-suspend fun ExternalActions.Presentation.showAddressActions(address: String, chain: Chain) = showExternalActions(
-    type = ExternalActions.Type.Address(address),
+suspend fun ExternalActions.Presentation.showAddressActions(accountId: AccountId, chain: Chain) = showExternalActions(
+    type = ExternalActions.Type.Address(chain.addressOf(accountId), ChainWithAccountId(chain, accountId)),
     chain = chain
 )

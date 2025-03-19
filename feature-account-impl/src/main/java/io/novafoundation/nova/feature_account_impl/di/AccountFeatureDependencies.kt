@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
+import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -68,6 +69,54 @@ import java.util.Random
 import javax.inject.Named
 
 interface AccountFeatureDependencies {
+
+    val hydraDxAssetConversionFactory: HydraDxQuoting.Factory
+
+    val pathQuoterFactory: PathQuoter.Factory
+
+    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
+
+    val systemCallExecutor: SystemCallExecutor
+
+    val multiChainQrSharingFactory: MultiChainQrSharingFactory
+
+    val contextManager: ContextManager
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val permissionsAskerFactory: PermissionsAskerFactory
+
+    val qrCodeGenerator: QrCodeGenerator
+
+    val mortalityConstructor: MortalityConstructor
+
+    val currencyRepository: CurrencyRepository
+
+    val extrinsicValidityUseCase: ExtrinsicValidityUseCase
+
+    val extrinsicSplitter: ExtrinsicSplitter
+
+    val gasPriceProviderFactory: GasPriceProviderFactory
+
+    val rootScope: RootScope
+
+    val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
+
+    val listSelectorMixinFactory: ListSelectorMixin.Factory
+
+    val ledgerMigrationTracker: LedgerMigrationTracker
+
+    val multiLocationConverterFactory: MultiLocationConverterFactory
+
+    val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
+
+    val storageCache: StorageCache
+
+    val eventsRepository: EventsRepository
+
+    val xcmVersionDetector: XcmVersionDetector
+
+    val chainStateRepository: ChainStateRepository
 
     fun appLinksProvider(): AppLinksProvider
 
@@ -148,54 +197,8 @@ interface AccountFeatureDependencies {
 
     fun multiChainRuntimeCallsApi(): MultiChainRuntimeCallsApi
 
-    val hydraDxAssetConversionFactory: HydraDxQuoting.Factory
-
-    val pathQuoterFactory: PathQuoter.Factory
+    fun copyValueMixin(): CopyValueMixin
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
-
-    val hydraDxAssetIdConverter: HydraDxAssetIdConverter
-
-    val systemCallExecutor: SystemCallExecutor
-
-    val multiChainQrSharingFactory: MultiChainQrSharingFactory
-
-    val contextManager: ContextManager
-
-    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
-
-    val permissionsAskerFactory: PermissionsAskerFactory
-
-    val qrCodeGenerator: QrCodeGenerator
-
-    val mortalityConstructor: MortalityConstructor
-
-    val currencyRepository: CurrencyRepository
-
-    val extrinsicValidityUseCase: ExtrinsicValidityUseCase
-
-    val extrinsicSplitter: ExtrinsicSplitter
-
-    val gasPriceProviderFactory: GasPriceProviderFactory
-
-    val rootScope: RootScope
-
-    val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
-
-    val listSelectorMixinFactory: ListSelectorMixin.Factory
-
-    val ledgerMigrationTracker: LedgerMigrationTracker
-
-    val multiLocationConverterFactory: MultiLocationConverterFactory
-
-    val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
-
-    val storageCache: StorageCache
-
-    val eventsRepository: EventsRepository
-
-    val xcmVersionDetector: XcmVersionDetector
-
-    val chainStateRepository: ChainStateRepository
 }

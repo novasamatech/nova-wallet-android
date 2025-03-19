@@ -250,6 +250,10 @@ val Chain.genesisHash: String?
         runCatching { it.fromHex() }.isSuccess
     }
 
+fun Chain.hasOnlyOneAddressFormat() = legacyAddressPrefix == null
+
+fun Chain.supportsLegacyAddressFormat() = legacyAddressPrefix != null
+
 fun Chain.requireGenesisHash() = requireNotNull(genesisHash)
 
 fun Chain.addressOf(accountId: ByteArray): String {
@@ -335,8 +339,8 @@ fun Chain.isValidAddress(address: String): Boolean {
         } else {
             address.toAccountId() // verify supplied address can be converted to account id
 
-            addressPrefix.toShort() == address.addressPrefix()
-                || legacyAddressPrefix?.toShort() == address.addressPrefix()
+            addressPrefix.toShort() == address.addressPrefix() ||
+                legacyAddressPrefix?.toShort() == address.addressPrefix()
         }
     }.getOrDefault(false)
 }

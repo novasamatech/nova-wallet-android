@@ -62,7 +62,11 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
+import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.RealCopyValueMixin
+import io.novafoundation.nova.common.utils.RealToastMessageManager
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -378,4 +382,22 @@ class CommonModule {
             BuildConfig.ASSET_WHITE_ICON_URL,
         )
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideToastMessageManager(): ToastMessageManager {
+        return RealToastMessageManager()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideCopyValueMixin(
+        clipboardManager: ClipboardManager,
+        toastMessageManager: ToastMessageManager,
+        resourceManager: ResourceManager
+    ): CopyValueMixin = RealCopyValueMixin(
+        clipboardManager,
+        toastMessageManager,
+        resourceManager
+    )
 }

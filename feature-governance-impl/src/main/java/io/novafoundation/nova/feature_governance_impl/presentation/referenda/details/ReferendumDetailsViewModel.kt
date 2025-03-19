@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -222,9 +223,8 @@ class ReferendumDetailsViewModel(
 
     fun proposerClicked() = launch {
         val proposer = proposerAddressModel.first()?.address ?: return@launch
-        val payload = ExternalActions.Type.Address(proposer)
 
-        externalActions.showExternalActions(payload, selectedChainFlow.first())
+        externalActions.showAddressActions(proposer, selectedChainFlow.first())
     }
 
     fun readMoreClicked() = launch {

@@ -354,7 +354,11 @@
         android:id="@+id/action_onboarding"
         app:destination="@id/onboarding_nav_graph"
         app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit"/>
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_openUnifiedAddressDialog"
+        app:destination="@id/chainAddressesFragment" />
 
     <fragment
         android:id="@+id/mainFragment"
@@ -1065,6 +1069,12 @@
         android:id="@+id/dappFavorites"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DappFavoritesFragment"
         android:label="fragment_favorites"
-        tools:layout="@layout/fragment_favorites_dapp"/>
+        tools:layout="@layout/fragment_favorites_dapp" />
+
+    <dialog
+        android:id="@+id/chainAddressesFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorFragment"
+        android:label="fragment_chain_addresses"
+        tools:layout="@layout/fragment_chain_address_selector" />
 
 </navigation>

@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.fee.toDomain
 import io.novafoundation.nova.feature_assets.R
@@ -171,7 +172,7 @@ class ConfirmSendViewModel(
         address: String,
         chain: Deferred<Chain>,
     ) {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain())
+        externalActions.showAddressActions(address, chain())
     }
 
     fun submitClicked() = launch {

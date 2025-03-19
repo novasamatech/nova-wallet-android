@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_external_actions.externalActi
 import kotlinx.android.synthetic.main.bottom_sheet_external_actions.externalActionsValue
 
 typealias ExternalViewCallback = (Chain.Explorer, ExternalActions.Type) -> Unit
-typealias CopyCallback = (String) -> Unit
+typealias CopyCallback = (ExternalActions.Type) -> Unit
 
 open class ExternalActionsSheet(
     context: Context,
@@ -48,13 +48,11 @@ open class ExternalActionsSheet(
             externalActionsIcon.makeGone()
         }
 
-        val primaryValue = payload.type.primaryValue
+        setTitle(payload.type.primaryValue)
 
-        setTitle(primaryValue)
-
-        primaryValue?.let {
+        payload.copyLabelRes?.let {
             textItem(R.drawable.ic_copy_outline, payload.copyLabelRes) {
-                onCopy(primaryValue)
+                onCopy(payload.type)
             }
 
             showExplorers()

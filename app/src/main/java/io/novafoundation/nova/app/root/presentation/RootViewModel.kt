@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -49,7 +50,8 @@ class RootViewModel(
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    private val toastMessageManager: ToastMessageManager
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -89,6 +91,8 @@ class RootViewModel(
         syncPushSettingsIfNeeded()
 
         externalServiceInitializer.initialize()
+
+        toastMessageManager.toastMessagesEvents.observeForever { showToast(it.peekContent()) }
     }
 
     private fun observeBusEvents() {

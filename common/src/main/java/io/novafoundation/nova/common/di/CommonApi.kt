@@ -41,7 +41,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
+import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.location.LocationManager
@@ -195,4 +197,8 @@ interface CommonApi {
     fun assetIconProvider(): AssetIconProvider
 
     fun assetViewModeInteractor(): AssetViewModeInteractor
+
+    fun toastMessageManager(): ToastMessageManager
+
+    fun copyValueMixin(): CopyValueMixin
 }

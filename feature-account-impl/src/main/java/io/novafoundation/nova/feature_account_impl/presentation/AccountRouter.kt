@@ -98,5 +98,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openManualBackupAdvancedSecrets(payload: ManualBackupCommonPayload)
 
+    fun openLegacyAddressScreen(chainId: String, accountId: ByteArray)
+
     fun finishApp()
 }
