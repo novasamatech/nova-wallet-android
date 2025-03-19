@@ -137,6 +137,12 @@ class WalletRepositoryImpl(
         }
     }
 
+    override fun assetFlowOrNull(metaId: Long, chainAsset: Chain.Asset): Flow<Asset?> {
+        return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.id)
+            .map { mapAssetLocalToAsset(it, chainAsset) }
+            .distinctUntilChanged()
+    }
+
     override fun assetFlow(metaId: Long, chainAsset: Chain.Asset): Flow<Asset> {
         return assetCache.observeAsset(metaId, chainAsset.chainId, chainAsset.id)
             .map { mapAssetLocalToAsset(it, chainAsset) }

@@ -7,10 +7,14 @@ import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
 import io.novafoundation.nova.common.utils.endsWith
 import io.novafoundation.nova.common.utils.intFromHex
+import io.novafoundation.nova.common.utils.signedExtensionOrNull
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.startsWith
 import io.novafoundation.nova.common.validation.EmptyValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.CHARGE_ASSET_TX_PAYMENT_ID
+import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.chargeAssetTxPayment
+import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.decodeCustomTxPaymentId
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
@@ -63,7 +67,6 @@ class PolkadotSignInteractorFactory(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val metadataShortenerService: MetadataShortenerService,
@@ -74,7 +77,6 @@ class PolkadotSignInteractorFactory(
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
         accountRepository = accountRepository,
-        tokenRepository = tokenRepository,
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
         request = request,
@@ -87,7 +89,6 @@ class PolkadotSignInteractorFactory(
 class PolkadotExternalSignInteractor(
     private val extrinsicService: ExtrinsicService,
     private val chainRegistry: ChainRegistry,
-    private val tokenRepository: TokenRepository,
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val request: ExternalSignRequest.Polkadot,
@@ -121,13 +122,12 @@ class PolkadotExternalSignInteractor(
         }
     }
 
-    override fun commissionTokenFlow(): Flow<Token>? {
+    override fun utilityAssetFlow(): Flow<Chain.Asset>? {
         val chainId = signPayload.maybeSignExtrinsic()?.genesisHash ?: return null
 
         return flow {
             val chain = chainRegistry.getChainOrNull(chainId) ?: return@flow
-
-            emitAll(tokenRepository.observeToken(chain.utilityAsset))
+            emit(chain.utilityAsset)
         }
     }
 
@@ -228,7 +228,10 @@ class PolkadotExternalSignInteractor(
             )
         }
 
-        val extrinsic = builder.call(parsedExtrinsic.call).buildExtrinsic()
+        val extrinsic = builder
+            .call(parsedExtrinsic.call)
+            .applyCustomSignedExtensions(parsedExtrinsic)
+            .buildExtrinsic()
 
         val actualParsedExtrinsic = parsedExtrinsic.copy(
             metadataHash = actualMetadataHash.checkMetadataHash.metadataHash
@@ -301,7 +304,8 @@ class PolkadotExternalSignInteractor(
                 era = EraType.fromHex(runtime, era),
                 tip = tip.bigIntegerFromHex(),
                 call = decodedCall(runtime),
-                metadataHash = metadataHash?.fromHex()
+                metadataHash = metadataHash?.fromHex(),
+                assetId = payloadJSON.tryDecodeAssetId(runtime)
             )
         }
     }
@@ -319,10 +323,10 @@ class PolkadotExternalSignInteractor(
     }
 
     private class ActualMetadataHash(val modifiedOriginal: Boolean, val checkMetadataHash: CheckMetadataHash) {
-
         constructor(modifiedOriginal: Boolean, hash: ByteArray?) : this(modifiedOriginal, CheckMetadataHash(hash))
 
         constructor(modifiedOriginal: Boolean, hexHash: String?) : this(modifiedOriginal, hexHash?.fromHex())
+
     }
 
     private data class ActualExtrinsic(
@@ -332,6 +336,16 @@ class PolkadotExternalSignInteractor(
     )
 
     private data class SignedResult(val signature: String, val modifiedTransaction: String?)
+
+    private fun ExtrinsicBuilder.applyCustomSignedExtensions(parsedExtrinsic: DAppParsedExtrinsic): ExtrinsicBuilder {
+        parsedExtrinsic.assetId?.let { chargeAssetTxPayment(it) }
+
+        return this
+    }
+
+    private fun PolkadotSignPayload.Json.tryDecodeAssetId(runtime: RuntimeSnapshot): Any? {
+        return assetId?.let(runtime::decodeCustomTxPaymentId)
+    }
 }
 
 private fun CheckMetadataHash(hash: ByteArray?): CheckMetadataHash {

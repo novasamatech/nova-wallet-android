@@ -13,7 +13,6 @@ sealed class ConfirmDAppOperationValidationFailure {
 }
 
 data class ConfirmDAppOperationValidationPayload(
-    val token: Token?,
     val fee: Fee?
 )
 

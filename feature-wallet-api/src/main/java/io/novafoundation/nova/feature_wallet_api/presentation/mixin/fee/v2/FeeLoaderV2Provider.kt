@@ -25,7 +25,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.Pa
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.automaticChangeEnabled
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.onLoaded
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.onlyNativeFeeEnabled
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.shouldDetectFeeAssetFromFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.userCanChangeFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.FeeContext
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -40,6 +42,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -60,7 +63,7 @@ internal class FeeLoaderV2Provider<F, D>(
     private val feeFormatter: FeeFormatter<F, D>,
     private val configuration: FeeLoaderMixinV2.Configuration<F, D>,
     private val feeInspector: FeeInspector<F>,
-    private val selectedChainAssetFlow: Flow<Chain.Asset>,
+    private val feeContextFlow: Flow<FeeContext>,
     coroutineScope: CoroutineScope
 ) : FeeLoaderMixinV2.Presentation<F, D>,
     CoroutineScope by coroutineScope,
@@ -68,8 +71,8 @@ internal class FeeLoaderV2Provider<F, D>(
 
     private val feeFormatterConfiguration = configuration.toFeeFormatterConfiguration()
 
-    private val selectedTokenInfo = selectedChainAssetFlow
-        .distinctUntilChangedBy { it.fullId }
+    private val selectedTokenInfo = feeContextFlow
+        .distinctUntilChangedBy { it.operationAsset.fullId }
         .map(::constructSelectedTokenInfo)
         .shareInBackground()
 
@@ -77,7 +80,7 @@ internal class FeeLoaderV2Provider<F, D>(
 
     override val feeChainAssetFlow = singleReplaySharedFlow<Chain.Asset>()
 
-    private val feeAsset: Flow<Asset> = feeChainAssetFlow
+    private val feeAsset: Flow<Asset?> = feeChainAssetFlow
         .distinctUntilChangedBy { it.fullId }
         .flatMapLatest { interactor.assetFlow(it) }
         .shareInBackground()
@@ -87,7 +90,7 @@ internal class FeeLoaderV2Provider<F, D>(
     private val feeSwitchCapabilityFlow = combine(selectedTokenInfo, feeChainAssetFlow) { selectedTokenInfo, feeAsset ->
         val selectedSupported = selectedTokenInfo.feePaymentSupported
 
-        val feeInNative = feeAsset.fullId == selectedTokenInfo.chain.utilityAsset.fullId
+        val feeInNative = feeAsset.fullId == selectedTokenInfo.chainUtilityAsset.fullId
         val feeInSelected = feeAsset.fullId == selectedTokenInfo.chainAsset.fullId
 
         FeeSwitchCapability(
@@ -158,16 +161,7 @@ internal class FeeLoaderV2Provider<F, D>(
         feeConstructor: FeeConstructor<F>
     ) {
         if (newFee != null) {
-            val actualPaymentCurrency = feeInspector.getSubmissionFeeAsset(newFee).toFeePaymentCurrency()
-            require(requestedFeePaymentCurrency == actualPaymentCurrency) {
-                """
-                    Fee with loaded with different fee payment currency that was requested.
-                    Requested: $requestedFeePaymentCurrency. Actual: $actualPaymentCurrency.
-                    Please check you are using the passed FeePaymentCurrency to load the fee.
-                """.trimIndent()
-            }
-
-            setFeeWithAutomaticChange(newFee, feeConstructor)
+            setLoadedFee(newFee, requestedFeePaymentCurrency, feeConstructor)
         } else {
             fee.emit(FeeStatus.NoFee)
         }
@@ -189,7 +183,7 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     override suspend fun feeAsset(): Asset {
-        return feeAsset.first()
+        return feeAsset.filterNotNull().first()
     }
 
     override suspend fun token(chainAsset: Chain.Asset): Token {
@@ -211,7 +205,7 @@ internal class FeeLoaderV2Provider<F, D>(
         val isCustomFee = !feeChainAssetFlow.first().isUtilityAsset
 
         if (isCustomFee && mode.onlyNativeFeeEnabled()) {
-            val utilityAsset = selectedTokenInfo.first().chain.utilityAsset
+            val utilityAsset = selectedTokenInfo.first().chainUtilityAsset
             feeChainAssetFlow.emit(utilityAsset)
 
             reloadFeeWithLatestConstructor()
@@ -240,6 +234,32 @@ internal class FeeLoaderV2Provider<F, D>(
         setFeeStatus(feeStatus)
     }
 
+    private suspend fun setLoadedFee(
+        newFee: F,
+        requestedFeePaymentCurrency: FeePaymentCurrency,
+        feeConstructor: FeeConstructor<F>
+    ) {
+        val selectionMode = paymentCurrencySelectionModeFlow.first()
+        val actualFeePaymentAsset = feeInspector.getSubmissionFeeAsset(newFee)
+
+        if (selectionMode.shouldDetectFeeAssetFromFee()) {
+            feeChainAssetFlow.emit(actualFeePaymentAsset)
+            fee.value = feeFormatter.formatFeeStatus(newFee, feeFormatterConfiguration)
+        } else {
+            val actualPaymentCurrency = actualFeePaymentAsset.toFeePaymentCurrency()
+
+            require(requestedFeePaymentCurrency == actualPaymentCurrency) {
+                """
+                    Fee with loaded with different fee payment currency that was requested.
+                    Requested: $requestedFeePaymentCurrency. Actual: $actualPaymentCurrency.
+                    Please check you are using the passed FeePaymentCurrency to load the fee.
+                """.trimIndent()
+            }
+
+            setFeeWithAutomaticChange(newFee, feeConstructor)
+        }
+    }
+
     private suspend fun setFeeWithAutomaticChange(
         newFee: F,
         feeConstructor: suspend (FeePaymentCurrency) -> F?
@@ -253,10 +273,10 @@ internal class FeeLoaderV2Provider<F, D>(
         }
 
         val feeAsset = feeAsset.first()
-        if (feeAsset.canPayFee(newFee)) {
+        if (feeAsset == null || feeAsset.canPayFee(newFee)) {
             fee.value = feeStatus
         } else {
-            val selectedChainAsset = selectedChainAssetFlow.first()
+            val selectedChainAsset = feeContextFlow.first().operationAsset
             feeChainAssetFlow.emit(selectedChainAsset)
 
             loadFee(feeConstructor)
@@ -271,11 +291,11 @@ internal class FeeLoaderV2Provider<F, D>(
 
                 if (index == 0) {
                     // First emission - we have loaded initial chain
-                    val initialFeeAsset = configuration.initialState.feePaymentCurrency.toChainAsset(tokenInfo.chain)
+                    val initialFeeAsset = configuration.initialState.feePaymentCurrency.toChainAsset(tokenInfo.chainUtilityAsset)
                     feeChainAssetFlow.emit(initialFeeAsset)
                 } else {
                     // Subsequent emissions - chain changed, set the utility asset
-                    feeChainAssetFlow.emit(tokenInfo.chain.utilityAsset)
+                    feeChainAssetFlow.emit(tokenInfo.chainUtilityAsset)
 
                     reloadFeeWithLatestConstructor()
                 }
@@ -305,7 +325,7 @@ internal class FeeLoaderV2Provider<F, D>(
         val selectedTokenInfo = selectedTokenInfo.first()
         val feeChainAsset = feeChainAssetFlow.first()
 
-        val availableFeeTokens = listOf(selectedTokenInfo.chain.utilityAsset, selectedTokenInfo.chainAsset)
+        val availableFeeTokens = listOf(selectedTokenInfo.chainUtilityAsset, selectedTokenInfo.chainAsset)
         return ChooseFeeCurrencyPayload(
             selectedCommissionAsset = feeChainAsset,
             availableAssets = availableFeeTokens
@@ -318,11 +338,10 @@ internal class FeeLoaderV2Provider<F, D>(
         return interactor.hasEnoughBalanceToPayFee(this, inspectedFeeAmount)
     }
 
-    private suspend fun constructSelectedTokenInfo(chainAsset: Chain.Asset): SelectedAssetInfo {
-        val chain = chainRegistry.getChain(chainAsset.chainId)
-        val canPayFee = canPayFeeIn(chainAsset)
+    private suspend fun constructSelectedTokenInfo(feeContext: FeeContext): SelectedAssetInfo {
+        val canPayFee = canPayFeeIn(feeContext.operationAsset)
 
-        return SelectedAssetInfo(chainAsset, chain, canPayFee)
+        return SelectedAssetInfo(feeContext.operationAsset, feeContext.operationChainUtilityAsset, canPayFee)
     }
 
     private suspend fun canPayFeeIn(chainAsset: Chain.Asset): Boolean {
@@ -335,7 +354,7 @@ internal class FeeLoaderV2Provider<F, D>(
 
     private class SelectedAssetInfo(
         val chainAsset: Chain.Asset,
-        val chain: Chain,
+        val chainUtilityAsset: Chain.Asset,
         val feePaymentSupported: Boolean
     )
 

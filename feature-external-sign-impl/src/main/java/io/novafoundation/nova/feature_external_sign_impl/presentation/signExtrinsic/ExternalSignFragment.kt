@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -27,6 +28,8 @@ import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDA
 import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionAllow
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmDAppActionReject
 import kotlinx.android.synthetic.main.fragment_confirm_sign_extrinsic.confirmSignExtinsicAccount
@@ -124,5 +127,12 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel>() {
                 setMessage(it.payload)
             }
         }
+    }
+
+    private fun setupFeeLoading(viewModel: ExternaSignViewModel, feeView: FeeView) {
+        val mixin = viewModel.originFeeMixin
+        feeView.setVisible(mixin != null)
+
+        mixin?.let { setupFeeLoading(it, feeView) }
     }
 }

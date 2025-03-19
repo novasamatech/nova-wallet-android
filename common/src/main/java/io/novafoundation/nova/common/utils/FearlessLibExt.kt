@@ -37,6 +37,8 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadE
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
@@ -394,6 +396,10 @@ fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
 
     return runtimeApi.method("quote_price_tokens_for_exact_tokens")
         .inputs.first().type
+}
+
+fun ExtrinsicMetadata.signedExtensionOrNull(id: SignedExtensionId): SignedExtensionMetadata? {
+    return signedExtensions.find { it.id == id }
 }
 
 fun structOf(vararg pairs: Pair<String, Any?>) = Struct.Instance(mapOf(*pairs))

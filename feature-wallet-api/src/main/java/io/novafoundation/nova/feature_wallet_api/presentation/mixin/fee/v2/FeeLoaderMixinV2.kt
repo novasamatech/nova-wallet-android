@@ -17,10 +17,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.Fe
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Factory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.FeeContext
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 
 interface FeeLoaderMixinV2<F, D> : Retriable {
 
@@ -36,6 +38,19 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
             val feeStatus: FeeStatus<F, D> = FeeStatus.NoFee
         )
     }
+
+    class FeeContext(
+        /**
+         *  Logical asset of the operation. For example, when sending USDT and paying fee in DOT,
+         *  operationAsset will be USDT
+         */
+        val operationAsset: Chain.Asset,
+        /**
+         *  Logical asset of the operation. For example, when sending USDT on Hydration,
+         *  operationChainUtilityAsset will be HDX
+         */
+        val operationChainUtilityAsset: Chain.Asset,
+    )
 
     val fee: StateFlow<FeeStatus<F, D>>
 
@@ -68,7 +83,7 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
 
         fun <F, D> create(
             scope: CoroutineScope,
-            selectedChainAssetFlow: Flow<Chain.Asset>,
+            feeContextFlow: Flow<FeeContext>,
             feeFormatter: FeeFormatter<F, D>,
             feeInspector: FeeInspector<F>,
             configuration: Configuration<F, D> = Configuration()
@@ -91,9 +106,13 @@ fun <F : SubmissionFee> Factory.createDefaultBy(
 ): FeeLoaderMixinV2.Presentation<F, FeeDisplay> {
     return create(
         scope = scope,
-        selectedChainAssetFlow = selectedChainAssetFlow,
+        feeContextFlow = selectedChainAssetFlow.asUtilityAssetFeeContext(),
         feeFormatter = DefaultFeeFormatter(),
         feeInspector = DefaultFeeInspector(),
         configuration = configuration
     )
+}
+
+fun Flow<Chain.Asset>.asUtilityAssetFeeContext(): Flow<FeeContext> {
+    return map { FeeContext(operationAsset = it, operationChainUtilityAsset = it) }
 }

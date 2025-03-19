@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic
 
+import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -25,9 +26,14 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDApp
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asUtilityAssetFeeContext
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,22 +55,26 @@ class ExternaSignViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     walletUiUseCase: WalletUiUseCase,
-    feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) : BaseViewModel(),
-    WithFeeLoaderMixin,
     Validatable by validationExecutor {
 
     val confirmUnrecoverableError = actionAwaitableMixinFactory.confirmingAction<SigningError>()
 
-    private val commissionTokenFlow = interactor.commissionTokenFlow()
-        ?.filterNotNull()
+    private val commissionTokenFlow = interactor.utilityAssetFlow()
         ?.shareInBackground()
 
-    override val originFeeMixin: FeeLoaderMixin.Presentation? = commissionTokenFlow?.let { it ->
-        feeLoaderMixinFactory.create(
-            tokenFlow = it,
-            configuration = GenericFeeLoaderMixin.Configuration(showZeroFiat = false)
+    val originFeeMixin = commissionTokenFlow?.let {
+        feeLoaderMixinV2Factory.createDefault(
+            scope = viewModelScope,
+            selectedChainAssetFlow = it,
+            configuration = FeeLoaderMixinV2.Configuration(
+                showZeroFiat = true,
+                initialState = FeeLoaderMixinV2.Configuration.InitialState(
+                    paymentCurrencySelectionMode = PaymentCurrencySelectionMode.DETECT_FROM_FEE
+                )
+            )
         )
     }
 
@@ -101,7 +111,6 @@ class ExternaSignViewModel(
         _performingOperationInProgress.value = true
 
         val validationPayload = ConfirmDAppOperationValidationPayload(
-            token = commissionTokenFlow?.first(),
             fee = originFeeMixin?.awaitOptionalFee()
         )
 
@@ -127,11 +136,7 @@ class ExternaSignViewModel(
     }
 
     private fun maybeLoadFee() {
-        originFeeMixin?.loadFee(
-            coroutineScope = this,
-            feeConstructor = { interactor.calculateFee() },
-            onRetryCancelled = {}
-        )
+        originFeeMixin?.loadFee { interactor.calculateFee() }
     }
 
     private suspend fun respondError(errorMessage: String?) = withContext(Dispatchers.Main) {
