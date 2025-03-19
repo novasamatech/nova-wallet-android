@@ -763,12 +763,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Sieć: %s\nMnemonika: %s</string>
     <string name="fee_not_yet_loaded_message">Proszę czekać, aż prowizja zostanie obliczona</string>
     <string name="fee_not_yet_loaded_title">Trwa obliczanie prowizji</string>
+    <string name="fragment_assets_nova_card">Zarządzaj kartą debetową</string>
     <string name="fragment_set_staking_proxy_title">Dodaj delegację dla %s staking</string>
     <string name="fragment_swap_main_settings_details_title">Szczegóły zamiany</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
     <string name="fragment_swap_main_settings_pay_title">Płacisz</string>
     <string name="fragment_swap_main_settings_receive_title">Otrzymujesz</string>
     <string name="fragment_swap_main_settings_select_token">Wybierz token</string>
+    <string name="fragment_top_up_card_title">Doładuj kartę %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Proszę skontaktować się z support@novawallet.io. Dołącz adres e-mail, którego użyłeś do wydania karty.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Skontaktuj się z pomocą techniczną</string>
     <string name="governance_notification_channel_name">Kanał powiadomień o zarządzaniu</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Musisz wybrać przynajmniej %d ścieżkę</item>
@@ -1705,6 +1709,10 @@
     <string name="vote_revote">Oddaj ponownie głos</string>
     <string name="vote_vote">Głosuj</string>
     <string name="voting_status">Status głosowania</string>
+    <string name="waiting_existing_card_top_up_card_title">Twoja karta jest doładowywana!</string>
+    <string name="waiting_initial_top_up_card_title">Twoja karta jest w trakcie wydawania!</string>
+    <string name="waiting_top_up_card_description">Może to potrwać do 5 minut.\nTo okno zostanie zamknięte automatycznie.</string>
+    <string name="waiting_top_up_card_timer">Szacowany czas %s</string>
     <string name="wallet_asset_buy">Kup</string>
     <string name="wallet_asset_buy_with">Kup za</string>
     <string name="wallet_asset_receive">Otrzymaj</string>

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.va
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
@@ -54,10 +55,12 @@ class MythosClaimRewardsViewModel(
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    private val pendingRewards = interactor.pendingRewardsFlow()
+    private val pendingRewardsFlow = interactor.pendingRewardsFlow()
         .shareInBackground()
 
-    val pendingRewardsAmountModel = combine(pendingRewards, assetFlow, ::mapAmountToAmountModel)
+    val shouldRestakeFlow = MutableStateFlow(true)
+
+    val pendingRewardsAmountModel = combine(pendingRewardsFlow, assetFlow, ::mapAmountToAmountModel)
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
@@ -72,7 +75,9 @@ class MythosClaimRewardsViewModel(
         .shareInBackground()
 
     init {
-        loadFee()
+        setupFee()
+
+        setDefaultRestakeSetting()
     }
 
     fun confirmClicked() {
@@ -90,9 +95,9 @@ class MythosClaimRewardsViewModel(
         externalActions.showAddressActions(address, chain)
     }
 
-    private fun loadFee() = launchUnit {
-        feeLoaderMixin.loadFee {
-            interactor.estimateFee()
+    private fun setupFee() {
+        feeLoaderMixin.connectWith(pendingRewardsFlow, shouldRestakeFlow) { _, pendingRewards, shouldRestake ->
+            interactor.estimateFee(pendingRewards, shouldRestake)
         }
     }
 
@@ -101,7 +106,7 @@ class MythosClaimRewardsViewModel(
 
         val payload = MythosClaimRewardsValidationPayload(
             fee = feeLoaderMixin.awaitFee(),
-            pendingRewardsPlanks = pendingRewards.first(),
+            pendingRewardsPlanks = pendingRewardsFlow.first(),
             asset = assetFlow.first(),
         )
 
@@ -115,7 +120,10 @@ class MythosClaimRewardsViewModel(
     }
 
     private fun sendTransaction() = launchUnit {
-        interactor.claimRewards()
+        val pendingRewards = pendingRewardsFlow.first()
+        val shouldRestake = shouldRestakeFlow.value
+
+        interactor.claimRewards(pendingRewards, shouldRestake)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
@@ -124,5 +132,9 @@ class MythosClaimRewardsViewModel(
             .onFailure(::showError)
 
         _showNextProgress.value = false
+    }
+
+    private fun setDefaultRestakeSetting() = launchUnit {
+        shouldRestakeFlow.value = interactor.initialShouldRestakeSetting()
     }
 }

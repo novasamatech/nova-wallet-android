@@ -57,6 +57,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment
+import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
@@ -436,6 +438,21 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openNovaCard() {
+        navigationBuilder().action(R.id.action_open_novaCard)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun finishAndAwaitTopUp() {
+        navigationBuilder().action(R.id.action_finish_top_up_flow)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openAwaitingCardCreation() {
+        navigationBuilder().action(R.id.action_open_awaiting_card_creation)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openSendNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_sendFlow_to_sendFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
@@ -483,6 +500,17 @@ class Navigator(
     override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navigationBuilder().action(R.id.action_open_swapSetupAmount)
             .setArgs(SwapMainSettingsFragment.getBundle(swapSettingsPayload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openTopUpCard(payload: TopUpCardPayload) {
+        navigationBuilder().action(R.id.action_open_topUpCard)
+            .setArgs(TopUpCardFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun closeTopUp() {
+        navigationBuilder().action(R.id.action_close_top_up_with_browser)
             .navigateInFirstAttachedContext()
     }
 

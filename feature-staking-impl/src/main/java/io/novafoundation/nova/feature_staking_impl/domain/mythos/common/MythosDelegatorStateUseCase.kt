@@ -9,7 +9,9 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdKeyOfSelectedMetaAccountIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.MythDelegation
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosLocks
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.mo
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.assetWithChain
+import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +42,8 @@ interface MythosDelegatorStateUseCase {
 
     context(ComputationalScope)
     fun currentDelegatorState(): Flow<MythosDelegatorState>
+
+    suspend fun getUserDelegations(): Map<AccountIdKey, MythDelegation>
 
     context(ComputationalScope)
     suspend fun getStakedCollators(state: MythosDelegatorState): List<MythosCollatorWithAmount>
@@ -67,6 +72,16 @@ class RealMythosDelegatorStateUseCase @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun getUserDelegations(): Map<AccountIdKey, MythDelegation> {
+        val chain = stakingSharedState.chain()
+        val accountId = accountRepository.requireIdKeyOfSelectedMetaAccountIn(chain)
+
+        val userStake = mythosUserStakeRepository.userStakeOrDefault(chain.id, accountId.value)
+        val delegations = mythosUserStakeRepository.userDelegations(chain.id, accountId, userStake.candidates)
+
+        return delegations
     }
 
     context(ComputationalScope)

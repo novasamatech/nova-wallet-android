@@ -70,6 +70,10 @@ class AccountInteractorImpl(
         accountRepository.selectMetaAccount(metaId)
     }
 
+    override suspend fun selectedMetaAccount(): MetaAccount {
+        return accountRepository.getSelectedMetaAccount()
+    }
+
     /**
      * return true if all accounts was deleted
      */

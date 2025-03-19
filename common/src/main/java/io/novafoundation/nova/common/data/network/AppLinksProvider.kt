@@ -26,6 +26,8 @@ class AppLinksProvider(
     val storeUrl: String,
 
     val ledgerMigrationArticle: String,
+
+    val novaCardWidgetUrl: String,
     val unifiedAddressArticle: String
 ) {
 
