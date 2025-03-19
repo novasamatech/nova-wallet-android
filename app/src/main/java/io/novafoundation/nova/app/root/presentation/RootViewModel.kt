@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.mapEvent
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core.updater.Updater
@@ -57,6 +58,9 @@ class RootViewModel(
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     val toastMessagesEvents = toastMessageManager.toastMessagesEvents
+
+    val walletConnectErrorsLiveData = walletConnectService.onPairErrorLiveData
+        .mapEvent { it.message }
 
     private var willBeClearedForLanguageChange = false
 
