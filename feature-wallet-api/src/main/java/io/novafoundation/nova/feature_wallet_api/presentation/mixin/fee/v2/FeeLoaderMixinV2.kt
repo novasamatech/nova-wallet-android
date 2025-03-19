@@ -46,7 +46,7 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
          */
         val operationAsset: Chain.Asset,
         /**
-         *  Logical asset of the operation. For example, when sending USDT on Hydration,
+         *  Utility asset of the logical of the operation. For example, when sending USDT on Hydration,
          *  operationChainUtilityAsset will be HDX
          */
         val operationChainUtilityAsset: Chain.Asset,
