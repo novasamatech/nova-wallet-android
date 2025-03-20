@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
@@ -61,16 +60,13 @@ class DynamicCrossChainWeigher @Inject constructor(
     ): CrossChainFeeModel {
         val safeTransfer = transfer.ensureSafeAmount()
 
-        val runtime = chainRegistry.getRuntime(config.originChainId)
-
-        val originResult = dryRunOnOrigin(config, safeTransfer, runtime)
-        val remoteReserveResult = dryRunOnRemoteReserve(config, originResult.forwardedXcm, runtime)
+        val originResult = dryRunOnOrigin(config, safeTransfer)
+        val remoteReserveResult = dryRunOnRemoteReserve(config, originResult.forwardedXcm)
         val destinationResult = dryRunOnDestination(config, safeTransfer, remoteReserveResult.forwardedXcm)
 
         return CrossChainFeeModel.fromDryRunResult(
             initialAmount = safeTransfer.amountPlanks,
             origin = originResult,
-            remoteReserve = remoteReserveResult,
             destination = destinationResult
         )
     }
@@ -85,8 +81,9 @@ class DynamicCrossChainWeigher @Inject constructor(
     private suspend fun dryRunOnOrigin(
         config: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-        runtime: RuntimeSnapshot
     ): IntermediateDryRunResult {
+        val runtime = chainRegistry.getRuntime(config.originChainId)
+
         val dryRunCall = constructDryRunCall(config, transfer, runtime)
         val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, config.originChainId)
             .getEffectsOrThrow(LOG_TAG)
@@ -106,11 +103,12 @@ class DynamicCrossChainWeigher @Inject constructor(
     private suspend fun dryRunOnRemoteReserve(
         config: DynamicCrossChainTransferConfiguration,
         forwardedFromOrigin: VersionedRawXcmMessage,
-        runtime: RuntimeSnapshot
     ): IntermediateDryRunResult {
         // No remote reserve - nothing to dry run, return unchanged value
         val remoteReserveLocation = config.remoteReserveChainLocation
             ?: return IntermediateDryRunResult(forwardedFromOrigin, Balance.ZERO)
+
+        val runtime = chainRegistry.getRuntime(remoteReserveLocation.chainId)
 
         val originLocation = config.originChainLocation.location
         val destinationLocation = config.destinationChainLocation.location
@@ -190,13 +188,14 @@ class DynamicCrossChainWeigher @Inject constructor(
     private fun CrossChainFeeModel.Companion.fromDryRunResult(
         initialAmount: Balance,
         origin: IntermediateDryRunResult,
-        remoteReserve: IntermediateDryRunResult,
         destination: FinalDryRunResult
     ): CrossChainFeeModel {
-        val deliveryFee = origin.deliveryFee + remoteReserve.deliveryFee
+        val deliveryFee = origin.deliveryFee
         val totalFee = initialAmount - destination.depositedAmount
         // We do not subtract `origin.deliveryFee` since it is paid directly from the origin account and not from the holding register
-        val executionFee = totalFee - remoteReserve.deliveryFee
+        // We do not subtract `remoteReserve.deliveryFee` since remote reserve delivery is paid in sending assets and thus better fit for "execution" fee
+        // since it is charged from the holding register
+        val executionFee = totalFee
 
         return CrossChainFeeModel(deliveryFee, executionFee)
     }
