@@ -6,18 +6,16 @@ import retrofit2.HttpException
 import kotlin.jvm.Throws
 import kotlin.time.Duration
 
-enum class PriceChartPeriod {
-    DAY, WEEK, MONTH, YEAR, MAX
-}
-
 interface CoinPriceRepository {
 
     @Throws(HttpException::class)
     suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Duration): HistoricalCoinRate?
 
     @Throws(HttpException::class)
-    suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate>
+    suspend fun getLastHistoryForPeriod(priceId: String, currency: Currency, range: PricePeriod): List<HistoricalCoinRate>
+}
 
-    @Throws(HttpException::class)
-    suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, range: PriceChartPeriod): List<HistoricalCoinRate>
+@Throws(HttpException::class)
+suspend fun CoinPriceRepository.getAllCoinPriceHistory(priceId: String, currency: Currency): List<HistoricalCoinRate> {
+    return getLastHistoryForPeriod(priceId, currency, PricePeriod.MAX)
 }

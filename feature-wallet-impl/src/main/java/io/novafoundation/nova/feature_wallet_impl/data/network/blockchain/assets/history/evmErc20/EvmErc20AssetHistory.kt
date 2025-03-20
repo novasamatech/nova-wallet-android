@@ -45,12 +45,10 @@ class EvmErc20AssetHistory(
             chainId = chain.id
         )
 
-        val earliestOperationTimestamp = response.result.minOfOrNull { it.timeStamp }
-        val latestOperationTimestamp = response.result.maxOfOrNull { it.timeStamp }
-        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+        val priceHistory = getPriceHistory(chainAsset, currency)
 
         return response.result.map {
-            val coinRate = coinPriceRange.findNearestCoinRate(it.timeStamp)
+            val coinRate = priceHistory.findNearestCoinRate(it.timeStamp)
             mapRemoteTransferToOperation(it, chainAsset, accountAddress, coinRate)
         }
     }

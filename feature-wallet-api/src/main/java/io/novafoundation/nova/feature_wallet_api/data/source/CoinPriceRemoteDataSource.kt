@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 
 interface CoinPriceRemoteDataSource {
 
-    suspend fun getCoinPriceRange(priceId: String, currency: Currency, fromTimestamp: Long, toTimestamp: Long): List<HistoricalCoinRate>
-
     suspend fun getLastCoinPriceRange(priceId: String, currency: Currency, days: String): List<HistoricalCoinRate>
 
     suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?>
