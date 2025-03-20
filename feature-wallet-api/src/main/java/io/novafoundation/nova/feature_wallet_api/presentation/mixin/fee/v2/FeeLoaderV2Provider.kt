@@ -344,7 +344,7 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     private suspend fun FeeContext.operationChainUtilityAsset(): Chain.Asset {
-        return when(val source = operationChainUtilityAssetSource) {
+        return when (val source = operationChainUtilityAssetSource) {
             OperationUtilityAssetSource.DetectFromOperationChain -> chainRegistry.getChain(operationAsset.chainId).utilityAsset
             is OperationUtilityAssetSource.Specified -> source.operationChainUtilityAsset
         }
