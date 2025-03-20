@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class TokenReserve(
@@ -10,4 +11,8 @@ class TokenReserve(
 
 fun TokenReserve.isRemote(origin: ChainId, destination: ChainId): Boolean {
     return origin != chainId && destination != chainId
+}
+
+fun TokenReserve.toChainLocation(): ChainLocation {
+    return ChainLocation(chainId, location)
 }

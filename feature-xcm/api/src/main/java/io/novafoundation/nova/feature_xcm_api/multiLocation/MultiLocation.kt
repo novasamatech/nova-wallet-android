@@ -14,7 +14,11 @@ abstract class MultiLocation(
 
     sealed class Interior {
 
-        object Here : Interior()
+        object Here : Interior() {
+            override fun toString(): String {
+                return "Here"
+            }
+        }
 
         class Junctions(junctions: List<Junction>) : Interior() {
             val junctions = junctions.sorted()

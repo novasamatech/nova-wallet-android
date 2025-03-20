@@ -19,6 +19,10 @@ sealed class MultiAssetFilter : ToDynamicScaleInstance {
          */
         object All : Wild() {
 
+            override fun toString(): String {
+                return "All"
+            }
+
             override fun toEncodableInstance(): Any {
                 return DictEnum.Entry(
                     name = "Wild",
@@ -33,7 +37,7 @@ sealed class MultiAssetFilter : ToDynamicScaleInstance {
         /**
          * Filter to use first [assetsCount] assets from the holding register
          */
-        class AllCounted(val assetsCount: Int) : Wild() {
+        data class AllCounted(val assetsCount: Int) : Wild() {
 
             override fun toEncodableInstance(): Any {
                 return DictEnum.Entry(

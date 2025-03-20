@@ -18,6 +18,10 @@ value class XcmMessage(val instructions: List<XcmInstruction>) : VersionedToDyna
 
     constructor(vararg instructions: XcmInstruction) : this(instructions.toList())
 
+    override fun toString(): String {
+        return instructions.toString()
+    }
+
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
         return instructions.map { it.toEncodableInstance(xcmVersion) }
     }
@@ -161,7 +165,25 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             return DictEnum.Entry(
                 name = "PayFees",
                 value = structOf(
-                    "fees" to fees.toEncodableInstance(xcmVersion)
+                    "asset" to fees.toEncodableInstance(xcmVersion)
+                )
+            )
+        }
+    }
+
+    data class InitiateTeleport(
+        val assets: MultiAssetFilter,
+        val dest: RelativeMultiLocation,
+        val xcm: XcmMessage
+    ) : XcmInstruction() {
+
+        override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
+            return DictEnum.Entry(
+                name = "InitiateTeleport",
+                value = structOf(
+                    "assets" to assets.toEncodableInstance(),
+                    "dest" to dest.toEncodableInstance(xcmVersion),
+                    "xcm" to xcm.toEncodableInstance(xcmVersion)
                 )
             )
         }
@@ -169,3 +191,40 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
 }
 
 typealias VersionedXcmMessage = VersionedXcm<XcmMessage>
+
+inline fun <reified T : XcmInstruction> VersionedXcmMessage.modifyInstruction(transform: (T) -> XcmInstruction): VersionedXcmMessage {
+    val newInstructions = xcm.instructions.map {
+        if (it is T) {
+            transform(it)
+        } else {
+            it
+        }
+    }
+
+    return copy(xcm = newInstructions.asXcmMessage())
+}
+
+inline fun <reified T : XcmInstruction> VersionedXcmMessage.modifyInstructionOrPrepend(lazyInstruction: (old: T?) -> XcmInstruction): VersionedXcmMessage {
+    var found = false
+
+    val newInstructions = xcm.instructions.mapTo(mutableListOf()) {
+        if (it is T) {
+            found = true
+
+            lazyInstruction(it)
+        } else {
+            it
+        }
+    }
+
+    if (!found) {
+        newInstructions.add(0, lazyInstruction(null))
+    }
+
+    return copy(xcm = newInstructions.asXcmMessage())
+}
+
+inline fun <reified T : XcmInstruction> VersionedXcmMessage.findInstruction(): T? {
+    return xcm.instructions.find { it is T } as T
+}
+

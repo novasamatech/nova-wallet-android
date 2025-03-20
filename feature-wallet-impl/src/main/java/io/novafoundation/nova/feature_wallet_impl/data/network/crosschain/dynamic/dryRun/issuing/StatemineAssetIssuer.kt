@@ -2,9 +2,10 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.composeCall
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.dryRun.AssetIssuer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeDispatchAs
+import io.novafoundation.nova.feature_xcm_api.extrinsic.composeDispatchAs
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain

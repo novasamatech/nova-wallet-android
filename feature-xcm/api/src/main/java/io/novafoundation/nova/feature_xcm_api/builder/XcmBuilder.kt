@@ -13,6 +13,9 @@ import io.novafoundation.nova.feature_xcm_api.builder.fees.MeasureXcmFees
 import io.novafoundation.nova.feature_xcm_api.builder.fees.PayFeesMode
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.AssetLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.XcmAssetIssuer
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 
@@ -21,10 +24,12 @@ interface XcmBuilder : XcmContext {
     interface Factory {
 
         fun create(
-            initial: AbsoluteMultiLocation,
+            initial: ChainLocation,
             xcmVersion: XcmVersion,
             measureXcmFees: MeasureXcmFees
         ): XcmBuilder
+
+        fun dryRunMeasureFees(assetIssuer: XcmAssetIssuer): MeasureXcmFees
     }
 
     fun payFees(payFeesMode: PayFeesMode)
@@ -38,13 +43,15 @@ interface XcmBuilder : XcmContext {
     fun depositAsset(assets: MultiAssetFilter, beneficiary: AccountIdKey)
 
     // Performs context change
-    fun transferReserveAsset(assets: MultiAssets, dest: AbsoluteMultiLocation)
+    fun transferReserveAsset(assets: MultiAssets, dest: ChainLocation)
 
     // Performs context change
-    fun initiateReserveWithdraw(assets: MultiAssetFilter, reserve: AbsoluteMultiLocation)
+    fun initiateReserveWithdraw(assets: MultiAssetFilter, reserve: ChainLocation)
 
     // Performs context change
-    fun depositReserveAsset(assets: MultiAssetFilter, dest: AbsoluteMultiLocation)
+    fun depositReserveAsset(assets: MultiAssetFilter, dest: ChainLocation)
+
+    fun initiateTeleport(assets: MultiAssetFilter, dest: ChainLocation)
 
     suspend fun build(): VersionedXcmMessage
 }
@@ -53,7 +60,7 @@ fun XcmBuilder.withdrawAsset(asset: AbsoluteMultiLocation, amount: BalanceOf) {
     withdrawAsset(MultiAsset.from(asset.relativeToLocal(), amount).intoMultiAssets())
 }
 
-fun XcmBuilder.transferReserveAsset(asset: AbsoluteMultiLocation, amount: BalanceOf, dest: AbsoluteMultiLocation) {
+fun XcmBuilder.transferReserveAsset(asset: AbsoluteMultiLocation, amount: BalanceOf, dest: ChainLocation) {
     transferReserveAsset(MultiAsset.from(asset.relativeToLocal(), amount).intoMultiAssets(), dest)
 }
 
@@ -65,12 +72,8 @@ fun XcmBuilder.depositAllAssetsTo(beneficiary: AccountIdKey) {
     depositAsset(All, beneficiary)
 }
 
-fun XcmBuilder.payFeesIn(assetId: MultiAssetId) {
+fun XcmBuilder.payFeesIn(assetId: AssetLocation) {
     payFees(PayFeesMode.Measured(assetId))
-}
-
-fun XcmBuilder.payFeesIn(assetLocation: AbsoluteMultiLocation) {
-    payFeesIn(MultiAssetId(assetLocation.relativeToLocal()))
 }
 
 fun XcmBuilder.payFees(assetId: MultiAssetId, exactFees: BalanceOf) {

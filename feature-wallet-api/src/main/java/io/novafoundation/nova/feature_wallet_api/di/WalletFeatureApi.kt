@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.di
 
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.dryRun.AssetIssuerRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
@@ -69,6 +70,8 @@ interface WalletFeatureApi {
     val assetsValidationContextFactory: AssetsValidationContext.Factory
 
     val statemineAssetsRepository: StatemineAssetsRepository
+
+    val assetIssuerRegistry: AssetIssuerRegistry
 
     fun provideWalletRepository(): WalletRepository
 

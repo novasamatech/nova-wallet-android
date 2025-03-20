@@ -176,6 +176,18 @@ fun composeCall(
     return runtime.composeCall(moduleName, callName, args)
 }
 
+fun RuntimeSnapshot.composeBatchAll(
+    calls: List<GenericCall.Instance>,
+): GenericCall.Instance {
+    return composeCall(
+        moduleName = Modules.UTILITY,
+        callName = "batch_all",
+        args = mapOf(
+            "calls" to calls
+        )
+    )
+}
+
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
 
 operator fun <S : Schema<S>> S.invoke(block: StructBuilderWithContext<S>? = null): EncodableStruct<S> {

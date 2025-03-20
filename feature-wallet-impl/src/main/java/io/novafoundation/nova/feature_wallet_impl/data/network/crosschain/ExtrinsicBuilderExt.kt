@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.utils.argument
 import io.novafoundation.nova.common.utils.requireActualType
 import io.novafoundation.nova.common.utils.structOf
@@ -45,7 +46,7 @@ private fun RuntimeSnapshot.prepareWeightForEncoding(weight: Weight): Any {
 }
 
 private fun Weight.encodeWeightV2(): Struct.Instance {
-    return structOf("refTime" to this, "proofSize" to Balance.ZERO)
+    return WeightV2.fromV1(this).toEncodableInstance()
 }
 
 private fun Type<*>.isWeightV1(): Boolean {

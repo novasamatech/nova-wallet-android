@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration.ChainLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemote
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.toChainLocation
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
-import io.novafoundation.nova.feature_xcm_api.chain.absoluteLocation
+import io.novafoundation.nova.feature_xcm_api.chain.chainLocation
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -58,19 +58,19 @@ fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
 
     val reserve = reserveRegistry.getReserve(originAsset)
 
-    val originChainLocation = originXcmChain.absoluteLocation()
-    val assetLocationOnOrigin = reserve.location.fromPointOfViewOf(originChainLocation)
+    val originChainLocation = originXcmChain.chainLocation()
+    val assetLocationOnOrigin = reserve.location.fromPointOfViewOf(originChainLocation.location)
 
     val remoteReserveChainLocation = if (reserve.isRemote(originChain.id, destinationChain.id)) {
-        ChainLocation(reserve.chainId, reserve.location)
+        reserve.toChainLocation()
     } else {
         null
     }
 
     return DynamicCrossChainTransferConfiguration(
         assetLocationOnOrigin = assetLocationOnOrigin,
-        originChainLocation = ChainLocation(originChain.id, originChainLocation),
-        destinationChainLocation = ChainLocation(destinationChain.id, destinationXcmChain.absoluteLocation()),
+        originChainLocation = originChainLocation,
+        destinationChainLocation = destinationXcmChain.chainLocation(),
         remoteReserveChainLocation = remoteReserveChainLocation,
     )
 }

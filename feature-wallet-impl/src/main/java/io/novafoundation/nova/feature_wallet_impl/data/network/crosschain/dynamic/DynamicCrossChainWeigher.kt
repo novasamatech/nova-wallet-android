@@ -3,20 +3,20 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.composeBatchAll
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.dryRun.AssetIssuerRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeDispatchAs
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.AssetIssuerRegistry
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.asset.requireFungible
+import io.novafoundation.nova.feature_xcm_api.extrinsic.composeDispatchAs
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.message.bindRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCall
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.getByLocation
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.usedXcmVersion
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.getInnerSuccessOrThrow
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -86,8 +87,9 @@ class DynamicCrossChainWeigher @Inject constructor(
         transfer: AssetTransferBase,
         runtime: RuntimeSnapshot
     ): IntermediateDryRunResult {
+        val xcmVersion = XcmVersion.V4
         val dryRunCall = constructDryRunCall(config, transfer, runtime)
-        val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, config.originChainId)
+        val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, xcmVersion, config.originChainId)
             .getInnerSuccessOrThrow(LOG_TAG)
 
         val nextHopLocation = (config.remoteReserveChainLocation ?: config.destinationChainLocation).location

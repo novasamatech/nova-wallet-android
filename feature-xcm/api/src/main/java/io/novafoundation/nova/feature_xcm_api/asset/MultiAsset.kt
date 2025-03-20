@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package io.novafoundation.nova.feature_xcm_api.asset
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
@@ -15,6 +17,8 @@ import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 data class MultiAsset private constructor(
     val id: MultiAssetId,
@@ -35,11 +39,18 @@ data class MultiAsset private constructor(
             multiLocation: RelativeMultiLocation,
             amount: BalanceOf
         ): MultiAsset {
+            return from(MultiAssetId(multiLocation), amount)
+        }
+
+        fun from(
+            multiAssetId: MultiAssetId,
+            amount: BalanceOf
+        ): MultiAsset {
             // Substrate doesn't allow zero balance starting from xcm v3
             val positiveAmount = amount.coerceAtLeast(BigInteger.ONE)
 
             return MultiAsset(
-                id = MultiAssetId(multiLocation),
+                id = multiAssetId,
                 fungibility = Fungibility.Fungible(positiveAmount)
             )
         }
@@ -76,7 +87,8 @@ data class MultiAsset private constructor(
 }
 
 fun MultiAsset.requireFungible(): MultiAsset.Fungibility.Fungible {
-    return fungibility.cast()
+    require(fungibility is MultiAsset.Fungibility.Fungible,)
+    return fungibility
 }
 
 @JvmInline
@@ -94,6 +106,10 @@ value class MultiAssets(val value: List<MultiAsset>) : VersionedToDynamicScaleIn
 
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
         return value.map { it.toEncodableInstance(xcmVersion) }
+    }
+
+    override fun toString(): String {
+        return value.toString()
     }
 }
 

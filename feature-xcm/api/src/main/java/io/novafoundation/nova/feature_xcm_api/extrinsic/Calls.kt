@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls
+package io.novafoundation.nova.feature_xcm_api.extrinsic
 
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.composeCall
@@ -16,18 +16,6 @@ fun RuntimeSnapshot.composeDispatchAs(
         args = mapOf(
             "as_origin" to origin.toEncodableInstance(),
             "call" to call
-        )
-    )
-}
-
-fun RuntimeSnapshot.composeBatchAll(
-    calls: List<GenericCall.Instance>,
-): GenericCall.Instance {
-    return composeCall(
-        moduleName = Modules.UTILITY,
-        callName = "batch_all",
-        args = mapOf(
-            "calls" to calls
         )
     )
 }

@@ -9,6 +9,10 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Dic
 @JvmInline
 value class MultiAssetId(val multiLocation: RelativeMultiLocation) : VersionedToDynamicScaleInstance {
 
+    override fun toString(): String {
+        return multiLocation.toString()
+    }
+
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
         // V4 removed variants of MultiAssetId, leaving only flattened value of Concrete
         return if (xcmVersion >= XcmVersion.V4) {

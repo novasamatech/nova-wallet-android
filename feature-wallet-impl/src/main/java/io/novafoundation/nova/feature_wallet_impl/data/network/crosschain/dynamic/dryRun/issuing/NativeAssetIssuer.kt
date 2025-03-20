@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.composeCall
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.dryRun.AssetIssuer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall

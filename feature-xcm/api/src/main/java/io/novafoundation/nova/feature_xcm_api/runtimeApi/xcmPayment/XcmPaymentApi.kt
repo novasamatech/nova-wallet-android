@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ScaleResultErr
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.data.network.runtime.binding.toResult
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.DryRunEffectsResultErr
-import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.XcmDryRunEffects
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.model.QueryXcmWeightErr
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
