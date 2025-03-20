@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.recyclerView.asViewType
+import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_dapp_impl.R
 import kotlinx.android.synthetic.main.item_dapp_group.view.dappRecyclerView
 import kotlinx.android.synthetic.main.item_dapp_group.view.itemDAppCategoryTitle
@@ -17,14 +17,8 @@ class DappCategoryListAdapter(
     private val handler: DAppClickHandler
 ) : BaseListAdapter<DappCategoryModel, DappCategoryViewHolder>(DappCategoryDiffCallback) {
 
-    companion object {
-        const val VIEW_TYPE = 301
-
-        fun getViewType() = VIEW_TYPE.asViewType()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DappCategoryViewHolder {
-        return DappCategoryViewHolder(parent.inflateChild(R.layout.item_dapp_group), handler)
+        return DappCategoryViewHolder(parent.inflateChild(viewType), handler)
     }
 
     override fun onBindViewHolder(holder: DappCategoryViewHolder, position: Int) {
@@ -32,7 +26,7 @@ class DappCategoryListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return VIEW_TYPE
+        return DappCategoryViewHolder.viewType
     }
 }
 
@@ -51,6 +45,10 @@ class DappCategoryViewHolder(
     view: View,
     itemHandler: DAppClickHandler,
 ) : BaseViewHolder(view) {
+
+    companion object : WithViewType {
+        override val viewType: Int = R.layout.item_dapp_group
+    }
 
     private val adapter = DappListAdapter(itemHandler)
 

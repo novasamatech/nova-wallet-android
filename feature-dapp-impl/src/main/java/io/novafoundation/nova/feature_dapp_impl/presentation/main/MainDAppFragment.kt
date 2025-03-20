@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
 import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
 import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DAppClickHandler
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappCategoryListAdapter
+import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappCategoryViewHolder
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_dapp_main.dappRecyclerViewCatalog
@@ -130,7 +132,7 @@ class MainDAppFragment :
     private fun setupRecyclerViewSpacing() {
         dappRecyclerViewCatalog.addSpaceItemDecoration {
             // Add extra space between items
-            addSpaceBetween(DappCategoryListAdapter.getViewType(), spaceDp = 8)
+            add(SpaceBetween(DappCategoryViewHolder, spaceDp = 8))
         }
     }
 }

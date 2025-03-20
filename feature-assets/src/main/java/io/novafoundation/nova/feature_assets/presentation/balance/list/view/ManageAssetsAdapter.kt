@@ -4,21 +4,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.common.utils.recyclerView.asViewType
+import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter.Companion.VIEW_TYPE
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_manage_assets.view.balanceListAssetTitle
 import kotlinx.android.synthetic.main.item_manage_assets.view.balanceListManage
 import kotlinx.android.synthetic.main.item_manage_assets.view.balanceListSearch
 
 class ManageAssetsAdapter(private val handler: Handler) : RecyclerView.Adapter<ManageAssetsHolder>() {
-
-    companion object {
-        const val VIEW_TYPE = 101
-
-        fun getViewType() = VIEW_TYPE.asViewType()
-    }
 
     interface Handler {
         fun searchClicked()
@@ -37,7 +30,7 @@ class ManageAssetsAdapter(private val handler: Handler) : RecyclerView.Adapter<M
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageAssetsHolder {
-        return ManageAssetsHolder(parent.inflateChild(R.layout.item_manage_assets), handler)
+        return ManageAssetsHolder(parent.inflateChild(viewType), handler)
     }
 
     override fun onBindViewHolder(holder: ManageAssetsHolder, position: Int) {
@@ -45,7 +38,7 @@ class ManageAssetsAdapter(private val handler: Handler) : RecyclerView.Adapter<M
     }
 
     override fun getItemViewType(position: Int): Int {
-        return VIEW_TYPE
+        return ManageAssetsHolder.viewType
     }
 
     override fun getItemCount(): Int {
@@ -57,6 +50,10 @@ class ManageAssetsHolder(
     override val containerView: View,
     handler: ManageAssetsAdapter.Handler,
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+
+    companion object : WithViewType {
+        override val viewType: Int = R.layout.item_manage_assets
+    }
 
     init {
         with(containerView) {

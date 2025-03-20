@@ -4,26 +4,14 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import io.novafoundation.nova.common.utils.recyclerView.ViewType
 
 class SpaceItemDecoration(private val spaces: List<RecyclerViewItemSpace>) : ItemDecoration() {
 
     class Builder {
         private val spaces = mutableListOf<RecyclerViewItemSpace>()
 
-        fun addSpaceBetween(
-            upperViewType: ViewType,
-            lowerViewType: ViewType,
-            spaceDp: Int
-        ) {
-            spaces.add(SpaceBetween(upperViewType, lowerViewType, spaceDp))
-        }
-
-        fun addSpaceBetween(
-            sameViewType: ViewType,
-            spaceDp: Int
-        ) {
-            spaces.add(SpaceBetween(sameViewType, sameViewType, spaceDp))
+        fun add(space: RecyclerViewItemSpace) {
+            spaces.add(space)
         }
 
         fun build(): SpaceItemDecoration {

@@ -4,13 +4,18 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.utils.recyclerView.ViewType
+import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 
 class SpaceBetween(
-    private val upperViewType: ViewType,
-    private val lowerViewType: ViewType,
+    upperViewTypeProvider: WithViewType,
+    lowerViewTypeProvider: WithViewType,
     private val spaceDp: Int
 ) : RecyclerViewItemSpace {
+
+    private val upperViewType = upperViewTypeProvider.viewType
+    private val lowerViewType = lowerViewTypeProvider.viewType
+
+    constructor(singleViewTypeProvider: WithViewType, spaceDp: Int) : this(singleViewTypeProvider, singleViewTypeProvider, spaceDp)
 
     override fun handleSpace(outRect: Rect, view: View, parent: RecyclerView): Boolean {
         if (shouldSetSpaceForItems(parent, view)) {
@@ -25,8 +30,8 @@ class SpaceBetween(
         parent: RecyclerView,
         view: View
     ): Boolean {
-        parent.getViewType(view).takeIf { it == upperViewType } ?: return false
-        parent.getNextViewType(view).takeIf { it == lowerViewType } ?: return false
+        if (parent.getViewType(view) != upperViewType) return false
+        if (parent.getNextViewType(view) != lowerViewType) return false
 
         return true
     }
