@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
@@ -17,7 +18,7 @@ fun FeeLoaderMixinV2.Factory.createForTransfer(
 ): TransferFeeLoaderMixin {
     return create(
         scope = viewModelScope,
-        selectedChainAssetFlow = originChainAsset,
+        feeContextFlow = originChainAsset.asFeeContextFromChain(),
         feeFormatter = formatter,
         feeInspector = TransferFeeInspector(),
         configuration = configuration
