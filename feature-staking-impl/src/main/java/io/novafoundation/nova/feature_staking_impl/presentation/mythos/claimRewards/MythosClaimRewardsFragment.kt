@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
+import kotlinx.android.synthetic.main.fragment_mythos_claim_rewards.mythosClaimRewardRestakeSwitch
 import kotlinx.android.synthetic.main.fragment_mythos_claim_rewards.mythosClaimRewardsAmount
 import kotlinx.android.synthetic.main.fragment_mythos_claim_rewards.mythosClaimRewardsConfirm
 import kotlinx.android.synthetic.main.fragment_mythos_claim_rewards.mythosClaimRewardsExtrinsicInformation
@@ -60,5 +63,7 @@ class MythosClaimRewardsFragment : BaseFragment<MythosClaimRewardsViewModel>() {
 
         viewModel.walletUiFlow.observe(mythosClaimRewardsExtrinsicInformation::setWallet)
         viewModel.originAddressModelFlow.observe(mythosClaimRewardsExtrinsicInformation::setAccount)
+
+        mythosClaimRewardRestakeSwitch.field.bindTo(viewModel.shouldRestakeFlow, viewLifecycleOwner.lifecycleScope)
     }
 }

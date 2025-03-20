@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Vibrator
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import dagger.Module
@@ -94,7 +93,7 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 @Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
-@Module(includes = [ParallaxCardModule::class])
+@Module(includes = [ParallaxCardModule::class, WebViewModule::class])
 class CommonModule {
 
     @Provides
@@ -184,8 +183,7 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideDeviceVibrator(context: Context): DeviceVibrator {
-        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        return DeviceVibrator(vibrator)
+        return DeviceVibrator(context)
     }
 
     @Provides

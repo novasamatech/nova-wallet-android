@@ -58,10 +58,10 @@ class AddressInputField @JvmOverloads constructor(
     fun setState(state: AddressInputState) {
         setIdenticonState(state.iconState)
 
-        addressInputScan.setVisible(state.scanShown)
-        addressInputPaste.setVisible(state.pasteShown)
-        addressInputClear.setVisible(state.clearShown)
-        addressInputMyself.setVisible(state.myselfShown)
+        addressInputScan.setVisible(state.scanShown && isEnabled)
+        addressInputPaste.setVisible(state.pasteShown && isEnabled)
+        addressInputClear.setVisible(state.clearShown && isEnabled)
+        addressInputMyself.setVisible(state.myselfShown && isEnabled)
     }
 
     fun setExternalAccount(externalAccountState: ExtendedLoadingState<ExternalAccount?>) {
@@ -108,12 +108,18 @@ class AddressInputField @JvmOverloads constructor(
         addressInputW3NAddress.setOnClickListener(listener)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        content.isEnabled = enabled
+        super.setEnabled(enabled)
+    }
+
     private fun setIdenticonState(state: AddressInputState.IdenticonState) {
         when (state) {
             is AddressInputState.IdenticonState.Address -> {
                 addressInputIdenticon.makeVisible()
                 addressInputIdenticon.setImageDrawable(state.drawable)
             }
+
             AddressInputState.IdenticonState.Placeholder -> {
                 addressInputIdenticon.makeVisible()
                 addressInputIdenticon.setImageResource(R.drawable.ic_identicon_placeholder)
@@ -132,6 +138,8 @@ class AddressInputField @JvmOverloads constructor(
     private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressInputField) {
+        isEnabled = it.getBoolean(R.styleable.AddressInputField_android_enabled, true)
+
         val hint = it.getString(R.styleable.AddressInputField_android_hint)
         hint?.let { content.hint = hint }
 

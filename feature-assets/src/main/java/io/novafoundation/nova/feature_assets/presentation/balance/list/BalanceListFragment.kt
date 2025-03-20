@@ -220,6 +220,10 @@ class BalanceListFragment :
         viewModel.buyClicked()
     }
 
+    override fun novaCardClick() {
+        viewModel.novaCardClicked()
+    }
+
     override fun assetViewModeClicked() {
         viewModel.switchViewMode()
     }

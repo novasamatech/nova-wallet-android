@@ -23,6 +23,10 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.HoldsDao
@@ -93,6 +97,7 @@ import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import okhttp3.OkHttpClient
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
@@ -183,11 +188,17 @@ interface AssetsFeatureDependencies {
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
+    val okHttpClient: OkHttpClient
+
     val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory
 
     val bannerSourceFactory: BannersSourceFactory
 
     val bannersMixinFactory: PromotionBannersMixinFactory
+
+    val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
+
+    val webViewFileChooserFactory: WebViewFileChooserFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 
@@ -278,6 +289,10 @@ interface AssetsFeatureDependencies {
     fun assetsIconModeRepository(): AssetsIconModeRepository
 
     fun nftRepository(): NftRepository
+
+    fun systemCallExecutor(): SystemCallExecutor
+
+    fun permissionsAskerFactory(): PermissionsAskerFactory
 
     fun assetViewModeInteractor(): AssetViewModeInteractor
 

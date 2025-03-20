@@ -13,9 +13,11 @@ import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConn
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
+import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNovaCard
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
+import kotlinx.android.synthetic.main.view_asset_nova_card.view.assetNovaCardText
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<AssetsHeaderHolder>() {
 
@@ -39,6 +41,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         fun buyClicked()
 
         fun swapClicked()
+
+        fun novaCardClick()
     }
 
     private var filterIconRes: Int? = null
@@ -143,6 +147,8 @@ class AssetsHeaderHolder(
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buyClicked() }
+            balanceListNovaCard.setOnClickListener { handler.novaCardClick() }
+
             balanceListTotalBalance.onSwapClick { handler.swapClicked() }
         }
     }
@@ -183,5 +189,9 @@ class AssetsHeaderHolder(
 
     fun bindWalletConnect(walletConnectModel: WalletConnectSessionsModel?) = walletConnectModel?.let {
         containerView.balanceListWalletConnect.setConnectionCount(it.connections)
+    }
+
+    fun bindNovaCardText(text: CharSequence?) = with(containerView) {
+        assetNovaCardText.setText(text)
     }
 }

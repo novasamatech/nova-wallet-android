@@ -312,6 +312,10 @@ class BalanceListViewModel(
         router.openSwapFlow()
     }
 
+    fun novaCardClicked() {
+        router.openNovaCard()
+    }
+
     fun switchViewMode() {
         launch { assetListMixin.switchViewMode() }
     }

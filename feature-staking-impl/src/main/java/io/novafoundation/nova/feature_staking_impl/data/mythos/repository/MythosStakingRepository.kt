@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorRewardPercentage
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.extraReward
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.invulnerables
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.minStake
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.Invulnerables
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
@@ -46,6 +48,10 @@ interface MythosStakingRepository {
     suspend fun collatorCommission(chainId: ChainId): Fraction
 
     suspend fun getMainStakingPot(chainId: ChainId): Result<AccountIdKey>
+
+    suspend fun getInvulnerableCollators(chainId: ChainId): Invulnerables
+
+    suspend fun autoCompoundThreshold(chainId: ChainId): Balance
 }
 
 @FeatureScope
@@ -92,7 +98,7 @@ class RealMythosStakingRepository @Inject constructor(
     }
 
     override suspend fun perBlockReward(chainId: ChainId): Balance {
-        return localStorageDataSource.query(chainId) {
+        return localStorageDataSource.query(chainId, applyStorageDefault = true) {
             metadata.collatorStaking.extraReward.queryNonNull()
         }
     }
@@ -105,6 +111,18 @@ class RealMythosStakingRepository @Inject constructor(
 
     override suspend fun getMainStakingPot(chainId: ChainId): Result<AccountIdKey> {
         return multiChainRuntimeCallsApi.forChain(chainId).mainStakingPot()
+    }
+
+    override suspend fun getInvulnerableCollators(chainId: ChainId): Invulnerables {
+        return localStorageDataSource.query(chainId) {
+            metadata.collatorStaking.invulnerables.query().orEmpty()
+        }
+    }
+
+    override suspend fun autoCompoundThreshold(chainId: ChainId): Balance {
+        return chainRegistry.withRuntime(chainId) {
+            metadata.collatorStaking().numberConstant("AutoCompoundingThreshold")
+        }
     }
 
     private suspend fun RuntimeCallsApi.mainStakingPot(): Result<AccountIdKey> {

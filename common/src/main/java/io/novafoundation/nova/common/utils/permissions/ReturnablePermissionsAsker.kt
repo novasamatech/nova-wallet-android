@@ -13,16 +13,19 @@ class PermissionsAskerFactory(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 ) {
 
-    fun create(
+    fun createReturnable(
         fragment: Fragment,
         router: ReturnableRouter
-    ): Presentation = RealPermissionsAsker(actionAwaitableMixinFactory, fragment, router)
+    ): Presentation = ReturnablePermissionsAsker(actionAwaitableMixinFactory, fragment, router)
+
+    fun create(
+        fragment: Fragment
+    ): Presentation = BasePermissionsAsker(actionAwaitableMixinFactory, fragment)
 }
 
-private class RealPermissionsAsker(
+private open class BasePermissionsAsker(
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val fragment: Fragment,
-    private val returnableRouter: ReturnableRouter
+    protected val fragment: Fragment
 ) : Presentation {
 
     override val showPermissionsDenied = actionAwaitableMixinFactory.create<PermissionDeniedLevel, PermissionDeniedAction>()
@@ -40,25 +43,41 @@ private class RealPermissionsAsker(
             }
 
             when (showPermissionsDenied.awaitAction(level)) {
-                PermissionDeniedAction.RETRY -> {
-                    if (e.hasDenied()) {
-                        return requirePermissionsOrExit(*permissions)
-                    }
+                PermissionDeniedAction.RETRY -> return onRetry(e, *permissions)
 
-                    if (e.hasForeverDenied()) {
-                        e.goToSettings()
-
-                        return false
-                    }
-
-                    return true
-                }
-                PermissionDeniedAction.BACK -> {
-                    returnableRouter.back()
-
-                    return false
-                }
+                PermissionDeniedAction.CANCEL -> return onCancel()
             }
         }
+    }
+
+    protected suspend fun onRetry(e: PermissionException, vararg permissions: Permission): Boolean {
+        if (e.hasDenied()) {
+            return requirePermissionsOrExit(*permissions)
+        }
+
+        if (e.hasForeverDenied()) {
+            e.goToSettings()
+
+            return false
+        }
+
+        return true
+    }
+
+    protected open suspend fun onCancel(): Boolean {
+        return false
+    }
+}
+
+private class ReturnablePermissionsAsker(
+    actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    fragment: Fragment,
+    private val returnableRouter: ReturnableRouter
+) : BasePermissionsAsker(actionAwaitableMixinFactory, fragment) {
+
+    override suspend fun onCancel(): Boolean {
+        returnableRouter.back()
+
+        return false
     }
 }

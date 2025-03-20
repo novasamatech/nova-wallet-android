@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">\"%s\" DApp verrà rimosso dai Preferiti</string>
     <string name="dapp_favourites_remove_title">Rimuovi dai Preferiti?</string>
     <string name="dapp_list_placeholder">L\'elenco delle DApp apparirà qui</string>
-    <string name="dapp_main_welcome_subtitle">Esplora il web usando i tuoi account da Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Benvenuto in Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Aggiungi ai Preferiti</string>
     <string name="dapp_options_desktop_mode">Modalità Desktop</string>
     <string name="dapp_options_remove_from_favorite">Rimuovi dai Preferiti</string>
@@ -753,12 +751,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Rete: %s\nMnemonica: %s</string>
     <string name="fee_not_yet_loaded_message">Attendere fino al calcolo della commissione</string>
     <string name="fee_not_yet_loaded_title">Il calcolo della commissione è in corso</string>
+    <string name="fragment_assets_nova_card">Gestisci Carta di Debito</string>
     <string name="fragment_set_staking_proxy_title">Aggiungi delega per lo staking di %s</string>
     <string name="fragment_swap_main_settings_details_title">Dettagli dello swap</string>
     <string name="fragment_swap_main_settings_max_button">Massimo:</string>
     <string name="fragment_swap_main_settings_pay_title">Tu paghi</string>
     <string name="fragment_swap_main_settings_receive_title">Tu ricevi</string>
     <string name="fragment_swap_main_settings_select_token">Seleziona un token</string>
+    <string name="fragment_top_up_card_title">Ricarica la carta con %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Si prega di contattare support@novawallet.io. Includere l\'indirizzo email che hai usato per emettere la carta.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Contatta il supporto</string>
     <string name="governance_notification_channel_name">Canale di notifica della governance</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">È necessario selezionare almeno %d traccia</item>
@@ -936,6 +938,19 @@
     <string name="pre_configured_networks_progress_text">Caricamento della lista delle reti...</string>
     <string name="pre_configured_networks_search_hint">Cerca per nome rete</string>
     <string name="pre_configured_networks_title">Aggiungi rete</string>
+    <string name="price_chart_date_format" formatted="false">%s alle %s</string>
+    <string name="price_chart_day">1G</string>
+    <string name="price_chart_max">Tutto</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">Prezzo di %s</string>
+    <string name="price_chart_week">1S</string>
+    <string name="price_chart_year">1A</string>
+    <string name="price_charts_period_all">Tutti i Tempi</string>
+    <string name="price_charts_period_month">Ultimo Mese</string>
+    <string name="price_charts_period_today">Oggi</string>
+    <string name="price_charts_period_week">Ultima Settimana</string>
+    <string name="price_charts_period_year">Ultimo Anno</string>
     <string name="profile_accounts_title">Account</string>
     <string name="profile_accounts_title_2_0">Portafogli</string>
     <string name="profile_language_title">Lingua</string>
@@ -1670,6 +1685,10 @@
     <string name="vote_revote">Rivotare</string>
     <string name="vote_vote">Votare</string>
     <string name="voting_status">Stato del voto</string>
+    <string name="waiting_existing_card_top_up_card_title">La tua carta sta ricevendo fondi!</string>
+    <string name="waiting_initial_top_up_card_title">La tua carta è in fase di emissione!</string>
+    <string name="waiting_top_up_card_description">Può richiedere fino a 5 minuti.\nQuesta finestra si chiuderà automaticamente.</string>
+    <string name="waiting_top_up_card_timer">Stimato %s</string>
     <string name="wallet_asset_buy">Acquista</string>
     <string name="wallet_asset_buy_with">Acquista con</string>
     <string name="wallet_asset_receive">Ricevi</string>

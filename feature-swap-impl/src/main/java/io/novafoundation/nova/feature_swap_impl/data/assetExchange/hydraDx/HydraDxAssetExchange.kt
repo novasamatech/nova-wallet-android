@@ -110,7 +110,7 @@ class HydraDxExchangeFactory(
             swapSourceFactories = swapSourceFactories,
             swapHost = swapHost,
             hydrationFeeInjector = hydrationFeeInjector,
-            delegate = quotingFactory.create(chain),
+            delegate = quotingFactory.create(chain, swapHost),
             chainStateRepository = chainStateRepository,
             swapDeductionUseCase = swapDeductionUseCase
         )
