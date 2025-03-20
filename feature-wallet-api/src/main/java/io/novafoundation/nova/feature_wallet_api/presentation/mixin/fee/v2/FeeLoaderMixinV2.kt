@@ -15,9 +15,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.Ch
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeContext.OperationUtilityAssetSource
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Factory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.FeeContext
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -38,19 +38,6 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
             val feeStatus: FeeStatus<F, D> = FeeStatus.NoFee
         )
     }
-
-    class FeeContext(
-        /**
-         *  Logical asset of the operation. For example, when sending USDT and paying fee in DOT,
-         *  operationAsset will be USDT
-         */
-        val operationAsset: Chain.Asset,
-        /**
-         *  Utility asset of the logical of the operation. For example, when sending USDT on Hydration,
-         *  operationChainUtilityAsset will be HDX
-         */
-        val operationChainUtilityAsset: Chain.Asset,
-    )
 
     val fee: StateFlow<FeeStatus<F, D>>
 
@@ -97,22 +84,36 @@ fun Factory.createDefault(
     scope: CoroutineScope,
     selectedChainAssetFlow: Flow<Chain.Asset>,
     configuration: Configuration<Fee, FeeDisplay> = Configuration()
-): FeeLoaderMixinV2.Presentation<Fee, FeeDisplay> = createDefaultBy(scope, selectedChainAssetFlow, configuration)
+): FeeLoaderMixinV2.Presentation<Fee, FeeDisplay> = createDefaultBy(scope, selectedChainAssetFlow.asFeeContextFromChain(), configuration)
 
 fun <F : SubmissionFee> Factory.createDefaultBy(
     scope: CoroutineScope,
-    selectedChainAssetFlow: Flow<Chain.Asset>,
+    feeContext: Flow<FeeContext>,
     configuration: Configuration<F, FeeDisplay> = Configuration()
 ): FeeLoaderMixinV2.Presentation<F, FeeDisplay> {
     return create(
         scope = scope,
-        feeContextFlow = selectedChainAssetFlow.asUtilityAssetFeeContext(),
+        feeContextFlow = feeContext,
         feeFormatter = DefaultFeeFormatter(),
         feeInspector = DefaultFeeInspector(),
         configuration = configuration
     )
 }
 
-fun Flow<Chain.Asset>.asUtilityAssetFeeContext(): Flow<FeeContext> {
-    return map { FeeContext(operationAsset = it, operationChainUtilityAsset = it) }
+fun Flow<Chain.Asset>.asFeeContextFromChain(): Flow<FeeContext> {
+    return map { operationAsset ->
+        FeeContext(
+            operationAsset = operationAsset,
+            operationChainUtilityAssetSource = OperationUtilityAssetSource.DetectFromOperationChain
+        )
+    }
+}
+
+fun Flow<Chain.Asset>.asFeeContextFromSelf(): Flow<FeeContext> {
+    return map { operationAsset ->
+        FeeContext(
+            operationAsset = operationAsset,
+            operationChainUtilityAssetSource = OperationUtilityAssetSource.Specified(operationAsset)
+        )
+    }
 }

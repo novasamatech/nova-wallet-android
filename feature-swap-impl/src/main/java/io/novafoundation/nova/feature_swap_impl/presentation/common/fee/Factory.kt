@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asUtilityAssetFeeContext
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromChain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
@@ -20,7 +20,7 @@ fun FeeLoaderMixinV2.Factory.createForSwap(
 ): SwapFeeLoaderMixin {
     return create(
         scope = viewModelScope,
-        feeContextFlow = chainAssetIn.asUtilityAssetFeeContext(),
+        feeContextFlow = chainAssetIn.asFeeContextFromChain(),
         feeFormatter = SwapFeeFormatter(interactor),
         feeInspector = SwapFeeInspector(),
         configuration = configuration

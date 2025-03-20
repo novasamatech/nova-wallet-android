@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
@@ -28,8 +29,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpik
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,9 +63,9 @@ class ExternaSignViewModel(
         ?.shareInBackground()
 
     val originFeeMixin = commissionTokenFlow?.let {
-        feeLoaderMixinV2Factory.createDefault(
+        feeLoaderMixinV2Factory.createDefaultBy(
             scope = viewModelScope,
-            selectedChainAssetFlow = it,
+            feeContext = it.asFeeContextFromSelf(),
             configuration = FeeLoaderMixinV2.Configuration(
                 showZeroFiat = false,
                 initialState = FeeLoaderMixinV2.Configuration.InitialState(

@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.FeeContext
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

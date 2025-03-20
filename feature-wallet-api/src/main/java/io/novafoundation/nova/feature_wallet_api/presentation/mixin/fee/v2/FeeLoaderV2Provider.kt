@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.on
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.onlyNativeFeeEnabled
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.shouldDetectFeeAssetFromFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.userCanChangeFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.FeeContext
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeContext.OperationUtilityAssetSource
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -340,8 +340,14 @@ internal class FeeLoaderV2Provider<F, D>(
 
     private suspend fun constructSelectedTokenInfo(feeContext: FeeContext): SelectedAssetInfo {
         val canPayFee = canPayFeeIn(feeContext.operationAsset)
+        return SelectedAssetInfo(feeContext.operationAsset, feeContext.operationChainUtilityAsset(), canPayFee)
+    }
 
-        return SelectedAssetInfo(feeContext.operationAsset, feeContext.operationChainUtilityAsset, canPayFee)
+    private suspend fun FeeContext.operationChainUtilityAsset(): Chain.Asset {
+        return when(val source = operationChainUtilityAssetSource) {
+            OperationUtilityAssetSource.DetectFromOperationChain -> chainRegistry.getChain(operationAsset.chainId).utilityAsset
+            is OperationUtilityAssetSource.Specified -> source.operationChainUtilityAsset
+        }
     }
 
     private suspend fun canPayFeeIn(chainAsset: Chain.Asset): Boolean {
