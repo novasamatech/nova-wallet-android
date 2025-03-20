@@ -100,6 +100,5 @@ interface ExtrinsicService {
         chain: Chain,
         extrinsic: String,
         usedSigner: FeeSigner,
-        submissionOptions: SubmissionOptions = SubmissionOptions()
     ): Fee
 }
