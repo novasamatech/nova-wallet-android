@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosCollatorRewardPercentageUpdater
+import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosCompoundPercentageUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosExtraRewardUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosMinStakeUpdater
 import io.novafoundation.nova.feature_staking_impl.data.mythos.updaters.MythosReleaseQueuesUpdater
@@ -117,6 +118,20 @@ class MythosStakingUpdatersModule {
 
     @Provides
     @FeatureScope
+    fun provideCompoundPercentageUpdater(
+        sharedState: StakingSharedState,
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        accountUpdateScope: AccountUpdateScope,
+    ) = MythosCompoundPercentageUpdater(
+        sharedState,
+        chainRegistry,
+        storageCache,
+        accountUpdateScope
+    )
+
+    @Provides
+    @FeatureScope
     @Mythos
     fun provideMythosStakingUpdaters(
         // UserStake in synced in-place in StakingDashboardMythosUpdater by dashboard
@@ -128,7 +143,8 @@ class MythosStakingUpdatersModule {
         selectedCandidatesUpdater: MythosSelectedCandidatesUpdater,
         releaseQueuesUpdater: MythosReleaseQueuesUpdater,
         extraRewardUpdater: MythosExtraRewardUpdater,
-        collatorRewardPercentageUpdater: MythosCollatorRewardPercentageUpdater
+        collatorRewardPercentageUpdater: MythosCollatorRewardPercentageUpdater,
+        compoundPercentageUpdater: MythosCompoundPercentageUpdater
     ): StakingUpdaters.Group {
         return StakingUpdaters.Group(
             sessionValidatorsUpdater,
@@ -138,7 +154,8 @@ class MythosStakingUpdatersModule {
             selectedCandidatesUpdater,
             releaseQueuesUpdater,
             extraRewardUpdater,
-            collatorRewardPercentageUpdater
+            collatorRewardPercentageUpdater,
+            compoundPercentageUpdater
         )
     }
 }

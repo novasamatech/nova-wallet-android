@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -44,12 +45,19 @@ class SendInteractor(
 
             TransferFee(originFee, fees.executionFee)
         } else {
-            val submissionFee = getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
             TransferFee(
-                originFee = OriginFee(submissionFee, null),
+                originFee = getOriginFee(transfer, coroutineScope),
                 crossChainFee = null
             )
         }
+    }
+
+    suspend fun getOriginFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): OriginFee = withContext(Dispatchers.Default) {
+        OriginFee(getSubmissionFee(transfer, coroutineScope), null)
+    }
+
+    suspend fun getSubmissionFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): SubmissionFee = withContext(Dispatchers.Default) {
+        getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
     }
 
     suspend fun performTransfer(

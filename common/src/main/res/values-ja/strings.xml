@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">「%s」DAppはお気に入りから削除されます</string>
     <string name="dapp_favourites_remove_title">お気に入りから削除しますか？</string>
     <string name="dapp_list_placeholder">ここにDAppsのリストが表示されます</string>
-    <string name="dapp_main_welcome_subtitle">Nova Walletのアカウントを使用してウェブを閲覧</string>
-    <string name="dapp_main_welcome_title">Nova Browserへようこそ</string>
     <string name="dapp_options_add_to_favorite">お気に入りに追加</string>
     <string name="dapp_options_desktop_mode">デスクトップモード</string>
     <string name="dapp_options_remove_from_favorite">お気に入りから削除</string>
@@ -747,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">ネットワーク: %s\nニーモニック: %s</string>
     <string name="fee_not_yet_loaded_message">手数料が計算されるまでお待ちください</string>
     <string name="fee_not_yet_loaded_title">手数料の計算中</string>
+    <string name="fragment_assets_nova_card">デビットカードを管理</string>
     <string name="fragment_set_staking_proxy_title">%s Stakingのデリゲーションを追加</string>
     <string name="fragment_swap_main_settings_details_title">スワップの詳細</string>
     <string name="fragment_swap_main_settings_max_button">最大:</string>
     <string name="fragment_swap_main_settings_pay_title">あなたが支払う</string>
     <string name="fragment_swap_main_settings_receive_title">あなたが受け取る</string>
     <string name="fragment_swap_main_settings_select_token">トークンを選択</string>
+    <string name="fragment_top_up_card_title">カードに%sをチャージ</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">support@novawallet.ioに連絡してください。カードを発行するために使用したメールアドレスを添えてください。</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">サポートに連絡</string>
     <string name="governance_notification_channel_name">ガバナンス通知チャンネル</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
@@ -928,6 +930,19 @@
     <string name="pre_configured_networks_progress_text">ネットワークリストを読み込み中...</string>
     <string name="pre_configured_networks_search_hint">ネットワーク名で検索</string>
     <string name="pre_configured_networks_title">ネットワークを追加</string>
+    <string name="price_chart_date_format" formatted="false">%sの%s</string>
+    <string name="price_chart_day">1日</string>
+    <string name="price_chart_max">全て</string>
+    <string name="price_chart_month">1ヶ月</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s価格</string>
+    <string name="price_chart_week">1週間</string>
+    <string name="price_chart_year">1年</string>
+    <string name="price_charts_period_all">全期間</string>
+    <string name="price_charts_period_month">先月</string>
+    <string name="price_charts_period_today">今日</string>
+    <string name="price_charts_period_week">先週</string>
+    <string name="price_charts_period_year">昨年</string>
     <string name="profile_accounts_title">アカウント</string>
     <string name="profile_accounts_title_2_0">ウォレット</string>
     <string name="profile_language_title">言語</string>
@@ -1658,6 +1673,10 @@
     <string name="vote_revote">再投票</string>
     <string name="vote_vote">投票</string>
     <string name="voting_status">投票状況</string>
+    <string name="waiting_existing_card_top_up_card_title">あなたのカードに資金が追加されています！</string>
+    <string name="waiting_initial_top_up_card_title">カードが発行されています！</string>
+    <string name="waiting_top_up_card_description">最大で5分かかる場合があります。\nこのウィンドウは自動的に閉じられます。</string>
+    <string name="waiting_top_up_card_timer">推定%s</string>
     <string name="wallet_asset_buy">購入</string>
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>

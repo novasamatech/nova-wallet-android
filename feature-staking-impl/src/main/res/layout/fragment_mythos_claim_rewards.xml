@@ -30,6 +30,22 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp" />
+
+    <io.novafoundation.nova.common.view.TableView
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_height="wrap_content">
+
+        <io.novafoundation.nova.common.view.Switch
+            android:layout_width="match_parent"
+            android:id="@+id/mythosClaimRewardRestakeSwitch"
+            app:title="@string/staking_setup_restake_v2_2_0"
+            app:subtitle="@string/nomination_pools_claim_rewards_restake_subtitle"
+            android:layout_height="wrap_content" />
+
+    </io.novafoundation.nova.common.view.TableView>
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -42,6 +58,4 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="@string/common_confirm" />
-
-
 </LinearLayout>

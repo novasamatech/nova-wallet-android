@@ -124,9 +124,10 @@ class RuntimeModule {
     @ApplicationScope
     fun provideChainStateRepository(
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         sampledBlockTimeStorage: SampledBlockTimeStorage,
         chainRegistry: ChainRegistry
-    ) = ChainStateRepository(localStorageSource, sampledBlockTimeStorage, chainRegistry)
+    ) = ChainStateRepository(localStorageSource, remoteStorageSource, sampledBlockTimeStorage, chainRegistry)
 
     @Provides
     @ApplicationScope

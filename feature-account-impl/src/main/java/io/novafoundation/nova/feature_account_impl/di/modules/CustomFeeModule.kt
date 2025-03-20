@@ -25,6 +25,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -50,14 +51,14 @@ class CustomFeeModule {
         quotingFactory: HydraDxQuoting.Factory,
         pathQuoterFactory: PathQuoter.Factory,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-        blockNumberUpdater: BlockNumberUpdater
+        chainStateRepository: ChainStateRepository
     ): HydraDxQuoteSharedComputation {
         return HydraDxQuoteSharedComputation(
             computationalCache = computationalCache,
             quotingFactory = quotingFactory,
             pathQuoterFactory = pathQuoterFactory,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
-            blockNumberUpdater = blockNumberUpdater
+            chainStateRepository = chainStateRepository
         )
     }
 

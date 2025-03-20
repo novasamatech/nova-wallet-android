@@ -3,8 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.data.mythos.repository
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.metadata
+import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.autoCompound
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.candidateStake
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.releaseQueues
@@ -19,6 +22,7 @@ import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,11 +33,19 @@ interface MythosUserStakeRepository {
 
     fun userStakeOrDefaultFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo>
 
+    suspend fun userStakeOrDefault(chainId: ChainId, accountId: AccountId): UserStakeInfo
+
     fun userDelegationsFlow(
         chainId: ChainId,
         userId: AccountIdKey,
         delegationIds: List<AccountIdKey>
     ): Flow<Map<AccountIdKey, MythDelegation>>
+
+    suspend fun userDelegations(
+        chainId: ChainId,
+        userId: AccountIdKey,
+        delegationIds: List<AccountIdKey>
+    ): Map<AccountIdKey, MythDelegation>
 
     suspend fun shouldClaimRewards(
         chainId: ChainId,
@@ -54,18 +66,36 @@ interface MythosUserStakeRepository {
         chainId: ChainId,
         accountId: AccountIdKey
     ): List<MythReleaseRequest>
+
+    suspend fun getAutoCompoundPercentage(
+        chainId: ChainId,
+        accountId: AccountIdKey
+    ): Fraction
+
+    suspend fun lastShouldRestakeSelection(): Boolean?
+
+    suspend fun setLastShouldRestakeSelection(shouldRestake: Boolean)
 }
+
+private const val SHOULD_RESTAKE_KEY = "RealMythosUserStakeRepository.COMPOUND_MODIFIED_KEY"
 
 @FeatureScope
 class RealMythosUserStakeRepository @Inject constructor(
     @Named(LOCAL_STORAGE_SOURCE)
     private val localStorageDataSource: StorageDataSource,
     private val callApi: MultiChainRuntimeCallsApi,
+    private val preferences: Preferences,
 ) : MythosUserStakeRepository {
 
     override fun userStakeOrDefaultFlow(chainId: ChainId, accountId: AccountId): Flow<UserStakeInfo> {
         return localStorageDataSource.subscribe(chainId, applyStorageDefault = true) {
             metadata.collatorStaking.userStake.observeNonNull(accountId)
+        }
+    }
+
+    override suspend fun userStakeOrDefault(chainId: ChainId, accountId: AccountId): UserStakeInfo {
+        return localStorageDataSource.query(chainId, applyStorageDefault = true) {
+            metadata.collatorStaking.userStake.queryNonNull(accountId)
         }
     }
 
@@ -80,6 +110,19 @@ class RealMythosUserStakeRepository @Inject constructor(
             metadata.collatorStaking.candidateStake.observe(allKeys).map { resultMap ->
                 resultMap.mapKeys { (keys, _) -> keys.first }
             }
+        }
+    }
+
+    override suspend fun userDelegations(
+        chainId: ChainId,
+        userId: AccountIdKey,
+        delegationIds: List<AccountIdKey>
+    ): Map<AccountIdKey, MythDelegation> {
+        return localStorageDataSource.query(chainId) {
+            val allKeys = delegationIds.map { it to userId }
+
+            metadata.collatorStaking.candidateStake.entries(allKeys)
+                .mapKeys { (keys, _) -> keys.first }
         }
     }
 
@@ -102,6 +145,24 @@ class RealMythosUserStakeRepository @Inject constructor(
         return localStorageDataSource.query(chainId) {
             metadata.collatorStaking.releaseQueues.query(accountId.value).orEmpty()
         }
+    }
+
+    override suspend fun getAutoCompoundPercentage(chainId: ChainId, accountId: AccountIdKey): Fraction {
+        return localStorageDataSource.query(chainId, applyStorageDefault = true) {
+            metadata.collatorStaking.autoCompound.queryNonNull(accountId.value)
+        }
+    }
+
+    override suspend fun lastShouldRestakeSelection(): Boolean? {
+        if (preferences.contains(SHOULD_RESTAKE_KEY)) {
+            return preferences.getBoolean(SHOULD_RESTAKE_KEY, true)
+        }
+
+        return null
+    }
+
+    override suspend fun setLastShouldRestakeSelection(shouldRestake: Boolean) {
+        preferences.putBoolean(SHOULD_RESTAKE_KEY, shouldRestake)
     }
 
     private suspend fun RuntimeCallsApi.shouldClaimPendingRewards(accountId: AccountIdKey): Boolean {

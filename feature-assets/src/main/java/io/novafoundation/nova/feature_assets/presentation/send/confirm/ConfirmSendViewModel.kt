@@ -221,7 +221,8 @@ class ConfirmSendViewModel(
             origin = originChainWithAsset,
             destination = destinationChainWithAsset,
             amount = amount,
-            address = address
+            address = address,
+            transferringMaxAmount = transferDraft.transferringMaxAmount
         )
     }
 
@@ -281,6 +282,7 @@ class ConfirmSendViewModel(
                 amount = transferDraft.amount,
                 feePaymentCurrency = transferDraft.feePaymentCurrency.toDomain(),
                 fee = fee.originFee,
+                transferringMaxAmount = transferDraft.transferringMaxAmount
             ),
             originFee = fee.originFee,
             originCommissionAsset = feeMixin.feeAsset(),

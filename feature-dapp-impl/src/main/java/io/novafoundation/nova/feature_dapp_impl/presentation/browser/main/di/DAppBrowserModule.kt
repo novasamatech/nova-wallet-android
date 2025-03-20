@@ -10,8 +10,6 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
-import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
@@ -26,8 +24,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBr
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewPermissionAsker
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -55,22 +53,16 @@ class DAppBrowserModule {
     @Provides
     @ScreenScope
     fun provideFileChooser(
-        fragment: Fragment
-    ) = WebViewFileChooser(fragment)
+        fragment: Fragment,
+        webViewFileChooserFactory: WebViewFileChooserFactory
+    ) = webViewFileChooserFactory.create(fragment)
 
     @Provides
     @ScreenScope
     fun providePermissionAsker(
-        permissionsAskerFactory: PermissionsAskerFactory,
         fragment: Fragment,
-        router: DAppRouter
-    ) = permissionsAskerFactory.create(fragment, router)
-
-    @Provides
-    @ScreenScope
-    fun provideWebViewPermissionAsker(permissionsAsker: PermissionsAsker.Presentation): WebViewPermissionAsker {
-        return WebViewPermissionAsker(permissionsAsker)
-    }
+        webViewPermissionAskerFactory: WebViewPermissionAskerFactory
+    ) = webViewPermissionAskerFactory.create(fragment)
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppBrowserViewModel {

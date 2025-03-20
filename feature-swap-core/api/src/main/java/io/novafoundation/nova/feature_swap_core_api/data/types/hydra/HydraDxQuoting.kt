@@ -7,7 +7,7 @@ interface HydraDxQuoting : SwapQuoting {
 
     interface Factory {
 
-        fun create(chain: Chain): HydraDxQuoting
+        fun create(chain: Chain, host: SwapQuoting.QuotingHost): HydraDxQuoting
     }
 
     fun getSource(id: String): HydraDxQuotingSource<*>

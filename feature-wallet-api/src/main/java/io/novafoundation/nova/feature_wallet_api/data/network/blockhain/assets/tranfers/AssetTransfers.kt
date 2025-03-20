@@ -56,6 +56,8 @@ interface AssetTransfer : AssetTransferBase {
 
     val amount: BigDecimal
 
+    val transferringMaxAmount: Boolean
+
     override val amountPlanks: Balance
         get() = originChainAsset.planksFromAmount(amount)
 }
@@ -103,6 +105,7 @@ class BaseAssetTransfer(
     override val destinationChainAsset: Chain.Asset,
     override val feePaymentCurrency: FeePaymentCurrency,
     override val amount: BigDecimal,
+    override val transferringMaxAmount: Boolean
 ) : AssetTransfer
 
 data class WeightedAssetTransfer(
@@ -114,6 +117,7 @@ data class WeightedAssetTransfer(
     override val destinationChainAsset: Chain.Asset,
     override val feePaymentCurrency: FeePaymentCurrency,
     override val amount: BigDecimal,
+    override val transferringMaxAmount: Boolean,
     val fee: OriginFee,
 ) : AssetTransfer {
 
@@ -126,6 +130,7 @@ data class WeightedAssetTransfer(
         destinationChainAsset = assetTransfer.destinationChainAsset,
         feePaymentCurrency = assetTransfer.feePaymentCurrency,
         amount = assetTransfer.amount,
+        transferringMaxAmount = assetTransfer.transferringMaxAmount,
         fee = fee
     )
 }
