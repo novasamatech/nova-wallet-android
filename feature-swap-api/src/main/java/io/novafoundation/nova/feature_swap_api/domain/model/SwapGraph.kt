@@ -9,14 +9,14 @@ interface SwapGraphEdge : QuotableEdge {
     /**
      * Begin a fully-constructed, ready to submit operation
      */
-    suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation
+    fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation
 
     /**
      * Append current swap edge execution to the existing transaction
      * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
      * [beginOperation]
      */
-    suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
+    fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
 
     /**
      * Begin a operation prototype that should reflect similar structure to [beginOperation] and [appendToOperation] but is limited to available functionality

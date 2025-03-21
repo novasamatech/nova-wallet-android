@@ -13,6 +13,11 @@ data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger): ToDynam
 
     companion object {
 
+        fun max(): WeightV2 {
+            val maxWeight = "184467440737090".toBigInteger()
+            return WeightV2(maxWeight, maxWeight)
+        }
+
         fun fromV1(refTime: BigInteger): WeightV2 {
             return WeightV2(refTime, proofSize = BigInteger.ZERO)
         }

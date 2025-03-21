@@ -297,7 +297,7 @@ internal class RealSwapService(
             }
 
             // Try to append segment to current swap tx
-            val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperation(currentSwapTx!!, operationArgs)
+            val maybeAppendedCurrentTx = currentSwapTx!!.appendSegment(quotedEdge.edge, operationArgs)
 
             currentSwapTx = if (maybeAppendedCurrentTx == null) {
                 finishedSwapTxs.add(currentSwapTx!!)

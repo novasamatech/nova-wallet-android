@@ -18,6 +18,11 @@ class TokenReserveRegistry(
         return reservesById.getValue(reserveId)
     }
 
+    fun isReserveKnown(chainAsset: Chain.Asset): Boolean {
+        val reserveId = getReserveId(chainAsset)
+        return reserveId in reservesById
+    }
+
     private fun getReserveId(chainAsset: Chain.Asset): TokenReserveId {
         return assetToReserveIdOverrides[chainAsset.fullId] ?: chainAsset.normalizeSymbol()
     }

@@ -18,6 +18,10 @@ interface AtomicSwapOperation {
 
     val assetOut: FullChainAssetId
 
+    suspend fun appendSegment(edge: SwapGraphEdge, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
+        return edge.appendToOperation(this, args)
+    }
+
     suspend fun constructDisplayData(): AtomicOperationDisplayData
 
     suspend fun estimateFee(): AtomicSwapOperationFee

@@ -491,6 +491,10 @@ fun Chain.enabledAssets(): List<Chain.Asset> = assets.filter { it.enabled }
 
 fun Chain.disabledAssets(): List<Chain.Asset> = assets.filterNot { it.enabled }
 
+fun Chain.getAsset(symbol: TokenSymbol): Chain.Asset {
+    return assets.first { it.symbol == symbol }
+}
+
 fun evmChainIdFrom(chainId: Int) = "$EIP_155_PREFIX:$chainId"
 
 fun evmChainIdFrom(chainId: BigInteger) = "$EIP_155_PREFIX:$chainId"

@@ -105,11 +105,11 @@ class CrossChainTransferAssetExchange(
         override val weight: Int
             get() = Weights.CrossChainTransfer.TRANSFER
 
-        override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
+        override fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return CrossChainTransferOperation(args, this)
         }
 
-        override suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
+        override fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
             return null
         }
 

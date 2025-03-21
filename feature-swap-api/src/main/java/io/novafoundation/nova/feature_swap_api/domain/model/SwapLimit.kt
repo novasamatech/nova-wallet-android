@@ -45,6 +45,12 @@ val SwapLimit.estimatedAmountIn: Balance
         is SwapLimit.SpecifiedOut -> amountInQuote
     }
 
+val SwapLimit.amountInMax: Balance
+    get() = when (this) {
+        is SwapLimit.SpecifiedIn -> amountIn
+        is SwapLimit.SpecifiedOut -> amountInMax
+    }
+
 val SwapLimit.amountOutMin: Balance
     get() = when (this) {
         is SwapLimit.SpecifiedIn -> amountOutMin

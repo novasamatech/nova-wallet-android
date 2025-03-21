@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.DryRunEffe
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.XcmDryRunEffects
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
+import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcmLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.enumerationKey
@@ -24,12 +25,20 @@ class RealDryRunApi @Inject constructor(
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
 ) : DryRunApi {
 
-    override suspend fun dryRunXcm(
+    override suspend fun dryRunRawXcm(
         originLocation: VersionedXcmLocation,
         xcm: VersionedRawXcmMessage,
         chainId: ChainId
     ): Result<ScaleResult<XcmDryRunEffects, DryRunEffectsResultErr>> {
-        return multiChainRuntimeCallsApi.forChain(chainId).dryRunXcm(xcm, originLocation)
+        return multiChainRuntimeCallsApi.forChain(chainId).dryRunXcm(xcm.toEncodableInstance(), originLocation)
+    }
+
+    override suspend fun dryRunXcm(
+        originLocation: VersionedXcmLocation,
+        xcm: VersionedXcmMessage,
+        chainId: ChainId
+    ): Result<ScaleResult<XcmDryRunEffects, DryRunEffectsResultErr>> {
+        return multiChainRuntimeCallsApi.forChain(chainId).dryRunXcm(xcm.toEncodableInstance(), originLocation)
     }
 
     override suspend fun dryRunCall(
@@ -42,7 +51,7 @@ class RealDryRunApi @Inject constructor(
     }
 
     private suspend fun RuntimeCallsApi.dryRunXcm(
-        xcm: VersionedRawXcmMessage,
+        xcmEncodable: Any?,
         origin: VersionedXcmLocation,
     ): Result<ScaleResult<XcmDryRunEffects, DryRunEffectsResultErr>> {
         return runCatching {
@@ -51,7 +60,7 @@ class RealDryRunApi @Inject constructor(
                 method = "dry_run_xcm",
                 arguments = mapOf(
                     "origin_location" to origin.toEncodableInstance(),
-                    "xcm" to xcm.toEncodableInstance(),
+                    "xcm" to xcmEncodable,
                 ),
                 returnBinding = {
                     runtime.provideContext {

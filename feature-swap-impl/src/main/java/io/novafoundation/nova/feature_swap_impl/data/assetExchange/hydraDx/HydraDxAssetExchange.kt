@@ -231,11 +231,11 @@ private class HydraDxAssetExchange(
         private val sourceQuotableEdge: HydraDxSourceEdge,
     ) : SwapGraphEdge, QuotableEdge by sourceQuotableEdge {
 
-        override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
+        override fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return HydraDxOperation(sourceQuotableEdge, args)
         }
 
-        override suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
+        override fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
             if (currentTransaction !is HydraDxOperation) return null
 
             return currentTransaction.appendSegment(sourceQuotableEdge, args)

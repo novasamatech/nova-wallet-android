@@ -47,9 +47,14 @@ abstract class MultiLocation(
 
         data class GeneralKey(val key: String) : Junction()
 
-        data class PalletInstance(val index: BigInteger) : Junction()
+        data class PalletInstance(val index: BigInteger) : Junction() {
 
-        data class GeneralIndex(val index: BigInteger) : Junction()
+            constructor(id: Int) : this(id.toBigInteger())
+        }
+
+        data class GeneralIndex(val index: BigInteger) : Junction() {
+            constructor(id: Int) : this(id.toBigInteger())
+        }
 
         data class AccountKey20(val accountId: AccountIdKey) : Junction()
 

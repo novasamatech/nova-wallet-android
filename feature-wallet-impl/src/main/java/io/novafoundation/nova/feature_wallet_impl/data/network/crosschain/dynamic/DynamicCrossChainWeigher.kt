@@ -119,7 +119,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val usedXcmVersion = forwardedFromOrigin.version
 
         val dryRunOrigin = originLocation.fromPointOfViewOf(remoteReserveLocation.location).versionedXcm(usedXcmVersion)
-        val dryRunResult = dryRunApi.dryRunXcm(dryRunOrigin, forwardedFromOrigin, remoteReserveLocation.chainId)
+        val dryRunResult = dryRunApi.dryRunRawXcm(dryRunOrigin, forwardedFromOrigin, remoteReserveLocation.chainId)
             .getInnerSuccessOrThrow(LOG_TAG)
 
         val destinationOnRemoteReserve = destinationLocation.fromPointOfViewOf(remoteReserveLocation.location)
@@ -145,7 +145,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val usedXcmVersion = forwardedFromPrevious.version
 
         val dryRunOrigin = previousLocation.fromPointOfViewOf(destinationLocation.location).versionedXcm(usedXcmVersion)
-        val dryRunResult = dryRunApi.dryRunXcm(dryRunOrigin, forwardedFromPrevious, destinationLocation.chainId)
+        val dryRunResult = dryRunApi.dryRunRawXcm(dryRunOrigin, forwardedFromPrevious, destinationLocation.chainId)
             .getInnerSuccessOrThrow(LOG_TAG)
 
         val depositedAmount = searchDepositAmount(dryRunResult, transfer.destinationChainAsset)

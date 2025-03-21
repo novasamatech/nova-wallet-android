@@ -188,6 +188,24 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             )
         }
     }
+
+    data class ExchangeAsset(
+        val give: MultiAssetFilter,
+        val want: MultiAssets,
+        val maximal: Boolean
+    ) : XcmInstruction() {
+
+        override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
+            return DictEnum.Entry(
+                name = "ExchangeAsset",
+                value = structOf(
+                    "give" to give.toEncodableInstance(),
+                    "want" to want.toEncodableInstance(xcmVersion),
+                    "maximal" to maximal
+                )
+            )
+        }
+    }
 }
 
 typealias VersionedXcmMessage = VersionedXcm<XcmMessage>

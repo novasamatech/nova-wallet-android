@@ -51,6 +51,10 @@ internal class RealXcmBuilder(
         addRegularInstruction(XcmInstruction.DepositAsset(assets, beneficiary.toMultiLocation()))
     }
 
+    override fun exchangeAsset(give: MultiAssetFilter, want: MultiAssets, maximal: Boolean) {
+        addRegularInstruction(XcmInstruction.ExchangeAsset(give, want, maximal))
+    }
+
     override fun transferReserveAsset(assets: MultiAssets, dest: ChainLocation) {
         performContextSwitch(dest) { forwardedMessage, forwardingFrom ->
             XcmInstruction.TransferReserveAsset(assets, dest.location.fromPointOfViewOf(forwardingFrom), forwardedMessage)

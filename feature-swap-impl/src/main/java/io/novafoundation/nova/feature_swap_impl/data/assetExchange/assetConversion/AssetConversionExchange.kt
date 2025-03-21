@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
+import io.novafoundation.nova.feature_swap_api.domain.model.amountInMax
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
@@ -32,6 +33,9 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.xcm.SwapXcmBuilder
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.xcm.XcmAppendableOperation
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.xcm.exchangeAllAssets
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -173,11 +177,11 @@ private class AssetConversionExchange(
 
     private inner class AssetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset) : BaseSwapGraphEdge(fromAsset, toAsset) {
 
-        override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
+        override fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return AssetConversionOperation(args, fromAsset, toAsset)
         }
 
-        override suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
+        override fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
             return null
         }
 
@@ -239,7 +243,7 @@ private class AssetConversionExchange(
         private val transactionArgs: AtomicSwapOperationArgs,
         private val fromAsset: Chain.Asset,
         private val toAsset: Chain.Asset
-    ) : AtomicSwapOperation {
+    ) : XcmAppendableOperation {
 
         override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
 
@@ -300,6 +304,18 @@ private class AssetConversionExchange(
                     actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
                 )
             }
+        }
+
+        override fun withdrawAmount(): Balance {
+            return estimatedSwapLimit.amountInMax
+        }
+
+        override suspend fun appendSegment(edge: SwapGraphEdge, args: AtomicSwapOperationArgs): XcmAppendableOperation? {
+            return null
+        }
+
+        override suspend fun appendTo(xcmBuilder: SwapXcmBuilder, actualSwapLimit: SwapLimit) {
+            xcmBuilder.exchangeAllAssets(actualSwapLimit, assetOut)
         }
 
         private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {

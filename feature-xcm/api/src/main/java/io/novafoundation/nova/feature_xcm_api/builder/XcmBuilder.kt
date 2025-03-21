@@ -42,6 +42,8 @@ interface XcmBuilder : XcmContext {
     // but we keep the support limited to simplify implementation
     fun depositAsset(assets: MultiAssetFilter, beneficiary: AccountIdKey)
 
+    fun exchangeAsset(give: MultiAssetFilter, want: MultiAssets, maximal: Boolean)
+
     // Performs context change
     fun transferReserveAsset(assets: MultiAssets, dest: ChainLocation)
 

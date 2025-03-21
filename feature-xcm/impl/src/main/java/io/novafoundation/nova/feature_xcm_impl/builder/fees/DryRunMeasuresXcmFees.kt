@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_xcm_api.asset.requireFungible
 import io.novafoundation.nova.feature_xcm_api.builder.fees.MeasureXcmFees
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.XcmAssetIssuer
 import io.novafoundation.nova.feature_xcm_api.extrinsic.composeDispatchAs
+import io.novafoundation.nova.feature_xcm_api.extrinsic.composeXcmExecute
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction
 import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction.WithdrawAsset
@@ -142,20 +143,6 @@ class DryRunMeasuresXcmFees(
         val fundAmount = minimumFundAmount.coerceAtLeast(withdrawAmount * 2.toBigInteger())
 
         return assetIssuer.issueAssetsCall(feeChainAsset, fundAmount, dryRunAccountId)
-    }
-
-    private fun RuntimeSnapshot.composeXcmExecute(
-        message: VersionedXcmMessage,
-        maxWeight: WeightV2
-    ): GenericCall.Instance {
-        return composeCall(
-            moduleName = metadata.xcmPalletName(),
-            callName = "execute",
-            args = mapOf(
-                "message" to message.toEncodableInstance(),
-                "max_weight" to maxWeight.toEncodableInstance()
-            )
-        )
     }
 
     @Suppress("IfThenToElvis")
