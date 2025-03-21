@@ -1655,6 +1655,11 @@
     <string name="unavailable_tracks_delegated_group">您已经代理投票的轨道</string>
     <string name="unavailable_tracks_title">不可用轨道</string>
     <string name="unavailable_tracks_voted_group">您已投票的轨道</string>
+    <string name="unified_address_format_checkbox_warning">不要再显示。\n您可以在接收中找到传统地址。</string>
+    <string name="unified_address_format_legacy_badge">传统格式</string>
+    <string name="unified_address_format_new_badge">新格式</string>
+    <string name="unified_address_subtitle">一些交易所可能仍然需要传统格式\n在他们更新期间进行操作。</string>
+    <string name="unified_address_title">新统一地址</string>
     <string name="update_notification_install_btn">安装</string>
     <string name="update_notification_item_version">版本 %s</string>
     <string name="update_notification_title">更新可用</string>

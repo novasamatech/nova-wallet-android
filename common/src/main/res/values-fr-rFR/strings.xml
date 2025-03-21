@@ -1667,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Chemins auxquels vous avez déjà délégué des votes</string>
     <string name="unavailable_tracks_title">Chemins indisponibles</string>
     <string name="unavailable_tracks_voted_group">Chemins dans lesquels vous avez des votes en cours</string>
+    <string name="unified_address_format_checkbox_warning">Ne plus afficher cela.\nVous pouvez trouver l\'adresse legacy dans Recevoir.</string>
+    <string name="unified_address_format_legacy_badge">Format legacy</string>
+    <string name="unified_address_format_new_badge">Nouveau format</string>
+    <string name="unified_address_subtitle">Certaines plateformes peuvent encore nécessiter le format legacy\npour des opérations pendant qu\'elles mettent à jour.</string>
+    <string name="unified_address_title">Nouvelle adresse unifiée</string>
     <string name="update_notification_install_btn">Installer</string>
     <string name="update_notification_item_version">Version %s</string>
     <string name="update_notification_title">Mise à jour disponible</string>

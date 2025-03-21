@@ -1691,6 +1691,11 @@
     <string name="unavailable_tracks_delegated_group">Ścieżki, do których już oddelegowałeś głosy</string>
     <string name="unavailable_tracks_title">Niedostępne ścieżki</string>
     <string name="unavailable_tracks_voted_group">Ścieżki, na których już oddałeś głosy</string>
+    <string name="unified_address_format_checkbox_warning">Nie pokazuj tego ponownie.\nStarszy adres możesz znaleźć w Odbiorze.</string>
+    <string name="unified_address_format_legacy_badge">Format starszy</string>
+    <string name="unified_address_format_new_badge">Nowy format</string>
+    <string name="unified_address_subtitle">Niektóre giełdy mogą wciąż wymagać starszego formatu\ndo operacji, podczas gdy dokonują aktualizacji.</string>
+    <string name="unified_address_title">Nowy Zunifikowany Adres</string>
     <string name="update_notification_install_btn">Zainstaluj</string>
     <string name="update_notification_item_version">Wersja %s</string>
     <string name="update_notification_title">Aktualizacja dostępna</string>

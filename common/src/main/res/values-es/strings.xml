@@ -1667,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Pistas a las que ya has delegado votos</string>
     <string name="unavailable_tracks_title">Pistas no disponibles</string>
     <string name="unavailable_tracks_voted_group">Pistas en las que tienes votos existentes</string>
+    <string name="unified_address_format_checkbox_warning">No mostrar esto nuevamente.\nPuedes encontrar la dirección legacy en Recibir.</string>
+    <string name="unified_address_format_legacy_badge">Formato legacy</string>
+    <string name="unified_address_format_new_badge">Nuevo formato</string>
+    <string name="unified_address_subtitle">Algunos intercambios aún pueden requerir el formato legacy\npara operaciones mientras actualizan.</string>
+    <string name="unified_address_title">Nueva Dirección Unificada</string>
     <string name="update_notification_install_btn">Instalar</string>
     <string name="update_notification_item_version">Versión %s</string>
     <string name="update_notification_title">Actualización disponible</string>

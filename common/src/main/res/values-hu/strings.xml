@@ -1667,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Kategóriák melyekben már delegáltál szavazatokat</string>
     <string name="unavailable_tracks_title">Nem elérhető kategóriák</string>
     <string name="unavailable_tracks_voted_group">Kategóriák melyekben már szavaztál</string>
+    <string name="unified_address_format_checkbox_warning">Ne mutassa újra.\nAz örökölt címet a Befogadásnál találhatja meg.</string>
+    <string name="unified_address_format_legacy_badge">Örökölt formátum</string>
+    <string name="unified_address_format_new_badge">Új formátum</string>
+    <string name="unified_address_subtitle">Egyes cseréknek még szükségük lehet az örökölt formátumra,\namíg frissítik a rendszert.</string>
+    <string name="unified_address_title">Új egységes cím</string>
     <string name="update_notification_install_btn">Telepítés</string>
     <string name="update_notification_item_version">Verzió %s</string>
     <string name="update_notification_title">Frissítés érhető el</string>
