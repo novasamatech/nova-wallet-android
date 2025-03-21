@@ -18,6 +18,9 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
@@ -49,6 +52,13 @@ class AddLedgerChainAccountSelectAddressModule {
     ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(AddLedgerChainAccountSelectAddressViewModel::class)
     fun provideViewModel(
@@ -60,7 +70,7 @@ class AddLedgerChainAccountSelectAddressModule {
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         selectLedgerAddressPayload: SelectLedgerAddressPayload,
-        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return AddLedgerChainAccountSelectAddressViewModel(
             router = router,
@@ -71,7 +81,7 @@ class AddLedgerChainAccountSelectAddressModule {
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
             selectLedgerAddressPayload = selectLedgerAddressPayload,
-            messageFormatter = messageFormatter
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 

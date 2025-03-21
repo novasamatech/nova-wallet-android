@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrati
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
@@ -19,12 +21,14 @@ class SelectLedgerLegacyImportViewModel(
     private val migrationUseCase: LedgerMigrationUseCase,
     private val selectLedgerPayload: SelectLedgerLegacyPayload,
     private val router: LedgerRouter,
+    private val messageCommandFormatter: MessageCommandFormatter,
     discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
     locationManager: LocationManager,
     resourceManager: ResourceManager,
-    messageFormatter: LedgerMessageFormatter
+    messageFormatter: LedgerMessageFormatter,
+    ledgerDeviceMapper: LedgerDeviceMapper
 ) : SelectLedgerViewModel(
     discoveryServiceFactory = discoveryServiceFactory,
     permissionsAsker = permissionsAsker,
@@ -33,11 +37,13 @@ class SelectLedgerLegacyImportViewModel(
     router = router,
     resourceManager = resourceManager,
     messageFormatter = messageFormatter,
+    ledgerDeviceMapper = ledgerDeviceMapper,
+    messageCommandFormatter = messageCommandFormatter,
     payload = selectLedgerPayload
 ) {
 
     override suspend fun verifyConnection(device: LedgerDevice) {
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
 
         val app = migrationUseCase.determineAppForLegacyAccount(selectLedgerPayload.chainId)
 

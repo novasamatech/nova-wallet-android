@@ -10,7 +10,7 @@ class SelectDiscoveryModeState : SelectLedgerState() {
     override suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.performTransition(event: SelectLedgerEvent) {
         if (event is SelectLedgerEvent.DiscoveryMethodSelected) {
             when (event.discoveryMethod) {
-                DiscoveryMethod.BLE, DiscoveryMethod.ALL -> WaitingForPermissionsState(event.discoveryMethod)
+                DiscoveryMethod.BLE, DiscoveryMethod.ALL -> emitState(WaitingForPermissionsState(event.discoveryMethod))
                 DiscoveryMethod.USB -> startDiscovery(event.discoveryMethod)
             }
         }

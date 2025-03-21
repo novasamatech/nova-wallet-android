@@ -17,9 +17,14 @@ import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.preview.PreviewImportGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.preview.RealPreviewImportGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -37,6 +42,19 @@ class PreviewImportGenericLedgerModule {
     }
 
     @Provides
+    @ScreenScope
+    fun provideMessageFormatter(
+        factory: LedgerMessageFormatterFactory,
+    ): LedgerMessageFormatter = factory.createGeneric()
+
+    @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(PreviewImportGenericLedgerViewModel::class)
     fun provideViewModel(
@@ -47,7 +65,8 @@ class PreviewImportGenericLedgerModule {
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        ledgerMessageFormatterFactory: LedgerMessageFormatterFactory
+        deviceMapperFactory: LedgerDeviceMapper,
+        messageCommandFormatter: MessageCommandFormatter,
     ): ViewModel {
         return PreviewImportGenericLedgerViewModel(
             interactor = interactor,
@@ -57,7 +76,8 @@ class PreviewImportGenericLedgerModule {
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             resourceManager = resourceManager,
-            messageFormatter = ledgerMessageFormatterFactory.createGeneric()
+            deviceMapperFactory = deviceMapperFactory,
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 

@@ -16,6 +16,9 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportViewModel
@@ -36,6 +39,13 @@ class SelectLedgerGenericImportModule {
     fun provideMessageFormatter(factory: LedgerMessageFormatterFactory): LedgerMessageFormatter = factory.createGeneric()
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SelectLedgerGenericImportViewModel::class)
     fun provideViewModel(
@@ -46,7 +56,9 @@ class SelectLedgerGenericImportModule {
         router: LedgerRouter,
         resourceManager: ResourceManager,
         messageFormatter: LedgerMessageFormatter,
-        payload: SelectLedgerGenericPayload
+        payload: SelectLedgerGenericPayload,
+        deviceMapperFactory: LedgerDeviceMapper,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectLedgerGenericImportViewModel(
             discoveryServiceFactory = discoveryServiceFactory,
@@ -56,6 +68,8 @@ class SelectLedgerGenericImportModule {
             router = router,
             resourceManager = resourceManager,
             messageFormatter = messageFormatter,
+            deviceMapperFactory = deviceMapperFactory,
+            messageCommandFormatter = messageCommandFormatter,
             payload = payload
         )
     }

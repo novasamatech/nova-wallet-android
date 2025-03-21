@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
@@ -54,6 +56,8 @@ abstract class SelectLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val messageFormatter: LedgerMessageFormatter,
     private val payload: SelectLedgerPayload,
+    private val ledgerDeviceMapper: LedgerDeviceMapper,
+    private val messageCommandFormatter: MessageCommandFormatter,
 ) : BaseViewModel(),
     PermissionsAsker by permissionsAsker,
     LedgerMessageCommands,
@@ -100,9 +104,9 @@ abstract class SelectLedgerViewModel(
     open suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
         handleLedgerError(
             reason = reason,
-            messageFormatter = messageFormatter,
-            resourceManager = resourceManager,
-            retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
+            device = device,
+            commandFormatter = messageCommandFormatter,
+            onRetry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
         )
     }
 
@@ -241,7 +245,7 @@ abstract class SelectLedgerViewModel(
         return devices.map {
             SelectLedgerModel(
                 id = it.id,
-                name = it.name,
+                name = ledgerDeviceMapper.mapName(it),
                 isConnecting = it.id == connectingTo?.id
             )
         }

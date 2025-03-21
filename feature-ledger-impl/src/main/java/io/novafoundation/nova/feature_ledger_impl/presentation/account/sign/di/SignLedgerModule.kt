@@ -24,8 +24,12 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.RealSignLe
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerViewModel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -70,6 +74,13 @@ class SignLedgerModule {
     }
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SignLedgerViewModel::class)
     fun provideViewModel(
@@ -84,7 +95,9 @@ class SignLedgerModule {
         payload: SignLedgerPayload,
         interactor: SignLedgerInteractor,
         responder: LedgerSignCommunicator,
-        messageFormatter: LedgerMessageFormatter
+        messageFormatter: LedgerMessageFormatter,
+        deviceMapperFactory: LedgerDeviceMapper,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SignLedgerViewModel(
             discoveryServiceFactory = discoveryServiceFactory,
@@ -98,7 +111,9 @@ class SignLedgerModule {
             extrinsicValidityUseCase = extrinsicValidityUseCase,
             payload = payload,
             responder = responder,
-            interactor = interactor
+            interactor = interactor,
+            ledgerDeviceMapper = deviceMapperFactory,
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 

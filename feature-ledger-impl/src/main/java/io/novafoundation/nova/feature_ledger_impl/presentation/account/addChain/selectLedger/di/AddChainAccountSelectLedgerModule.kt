@@ -19,6 +19,9 @@ import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrati
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 
@@ -27,9 +30,7 @@ class AddChainAccountSelectLedgerModule {
 
     @Provides
     fun providePermissionAsker(
-        permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment,
-        router: LedgerRouter
+        permissionsAskerFactory: PermissionsAskerFactory, fragment: Fragment, router: LedgerRouter
     ) = permissionsAskerFactory.create(fragment, router)
 
     @Provides
@@ -38,6 +39,13 @@ class AddChainAccountSelectLedgerModule {
         payload: AddChainAccountSelectLedgerPayload,
         factory: LedgerMessageFormatterFactory,
     ): LedgerMessageFormatter = factory.createLegacy(payload.addAccountPayload.chainId, showAlerts = false)
+
+    @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
 
     @Provides
     @IntoMap
@@ -51,7 +59,9 @@ class AddChainAccountSelectLedgerModule {
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        messageFormatter: LedgerMessageFormatter
+        messageFormatter: LedgerMessageFormatter,
+        ledgerDeviceMapper: LedgerDeviceMapper,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return AddChainAccountSelectLedgerViewModel(
             migrationUseCase = migrationUseCase,
@@ -62,7 +72,9 @@ class AddChainAccountSelectLedgerModule {
             router = router,
             resourceManager = resourceManager,
             payload = payload,
-            messageFormatter = messageFormatter
+            messageFormatter = messageFormatter,
+            ledgerDeviceMapper = ledgerDeviceMapper,
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 
