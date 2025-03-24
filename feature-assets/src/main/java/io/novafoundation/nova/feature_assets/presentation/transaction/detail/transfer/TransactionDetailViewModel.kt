@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createOptionalAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -91,12 +92,12 @@ class TransactionDetailViewModel(
         showExternalActions(ExternalActions.Type.Extrinsic(it))
     }
 
-    fun fromAddressClicked() {
-        showExternalActions(ExternalActions.Type.Address(operation.sender))
+    fun fromAddressClicked() = launch {
+        externalActions.showAddressActions(operation.sender, chain())
     }
 
-    fun toAddressClicked() {
-        showExternalActions(ExternalActions.Type.Address(operation.receiver))
+    fun toAddressClicked() = launch {
+        externalActions.showAddressActions(operation.receiver, chain())
     }
 
     private fun showExternalActions(type: ExternalActions.Type) = launch {

@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.legacyAddressOfOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
@@ -132,6 +133,7 @@ abstract class SubstrateAssetHistory(
 
         val request = SubqueryHistoryRequest(
             accountAddress = chain.addressOf(accountId),
+            legacyAccountAddress = chain.legacyAddressOfOrNull(accountId),
             pageSize = pageSize,
             cursor = cursor,
             filters = filters,

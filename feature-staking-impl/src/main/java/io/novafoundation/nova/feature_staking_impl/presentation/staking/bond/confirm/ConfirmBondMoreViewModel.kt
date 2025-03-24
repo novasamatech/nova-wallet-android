@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
@@ -91,7 +92,7 @@ class ConfirmBondMoreViewModel(
     }
 
     fun originAccountClicked() = launch {
-        externalActions.showExternalActions(ExternalActions.Type.Address(payload.stashAddress), selectedAssetState.chain())
+        externalActions.showAddressActions(payload.stashAddress, selectedAssetState.chain())
     }
 
     private fun maybeGoToNext() = launch {

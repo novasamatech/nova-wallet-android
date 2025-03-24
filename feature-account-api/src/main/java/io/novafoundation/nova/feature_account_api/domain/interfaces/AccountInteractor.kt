@@ -6,6 +6,7 @@ import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.feature_account_api.domain.model.Account
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoType
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,8 @@ interface AccountInteractor {
     suspend fun deleteAccount(metaId: Long): Boolean
 
     suspend fun updateMetaAccountPositions(idsInNewOrder: List<Long>)
+
+    fun chainFlow(chainId: ChainId): Flow<Chain>
 
     fun nodesFlow(): Flow<List<Node>>
 

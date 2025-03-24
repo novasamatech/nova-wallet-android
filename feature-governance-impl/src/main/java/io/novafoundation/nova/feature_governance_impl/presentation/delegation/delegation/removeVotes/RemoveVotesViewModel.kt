@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -98,9 +99,8 @@ class RemoveVotesViewModel(
 
     fun accountClicked() = launch {
         val addressModel = selectedAccount.first()
-        val type = ExternalActions.Type.Address(addressModel.address)
 
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+        externalActions.showAddressActions(addressModel.address, governanceSharedState.chain())
     }
 
     private fun removeVotesIfValid() = launch {

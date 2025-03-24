@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -116,6 +117,6 @@ class ShowSignParitySignerViewModel(
         val address = addressModel.first().address
         val chain = chain.first()
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+        externalActions.showAddressActions(address, chain)
     }
 }

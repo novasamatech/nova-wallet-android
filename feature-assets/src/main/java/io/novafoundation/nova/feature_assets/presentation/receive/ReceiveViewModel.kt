@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.QrCodeGenerator
@@ -16,14 +15,18 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.view.QrCodeModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.domain.account.common.ChainWithAccountId
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.supportsLegacyAddressFormat
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -42,8 +45,8 @@ class ReceiveViewModel(
     private val chainRegistry: ChainRegistry,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val router: AssetsRouter,
-    private val clipboardManager: ClipboardManager,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    private val copyAddressMixin: CopyAddressMixin
 ) : BaseViewModel() {
 
     private val selectedMetaAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
@@ -54,6 +57,9 @@ class ReceiveViewModel(
     }
 
     val chainFlow = flowOf { mapChainToUi(chainWithAssetAsync().chain) }
+        .shareInBackground()
+
+    val chainSupportsLegacyAddressFlow = flowOf { chainWithAssetAsync().chain.supportsLegacyAddressFormat() }
 
     val titleFlow = flowOf {
         val (_, chainAsset) = chainWithAssetAsync()
@@ -90,10 +96,9 @@ class ReceiveViewModel(
     val shareEvent: LiveData<Event<QrSharingPayload>> = _shareEvent
 
     fun copyAddressClicked() = launch {
-        val accountAddress = addressFlow.first()
-        clipboardManager.addToClipboard(accountAddress)
-
-        showToast(resourceManager.getString(io.novafoundation.nova.common.R.string.common_copied))
+        val chain = chainWithAssetAsync().chain
+        val address = addressFlow.first()
+        copyAddressMixin.copyAddressOrOpenSelector(ChainWithAccountId(chain, chain.accountIdOf(address)))
     }
 
     fun backClicked() {
@@ -120,5 +125,13 @@ class ReceiveViewModel(
             chain.name,
             tokenType.symbol
         ) + " " + address
+    }
+
+    fun chainAddressesClicked() {
+        launch {
+            val chain = chainWithAssetAsync().chain
+            val address = addressFlow.first()
+            copyAddressMixin.openAddressSelector(chain.id, chain.accountIdOf(address))
+        }
     }
 }

@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
@@ -58,7 +59,8 @@ class RootActivityModule {
         compoundRequestBusHandler: CompoundRequestBusHandler,
         pushNotificationsInteractor: PushNotificationsInteractor,
         externalServiceInitializer: ExternalServiceInitializer,
-        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher
+        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        toastMessageManager: ToastMessageManager
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -78,7 +80,8 @@ class RootActivityModule {
             compoundRequestBusHandler,
             pushNotificationsInteractor,
             externalServiceInitializer,
-            actionBottomSheetLauncher
+            actionBottomSheetLauncher,
+            toastMessageManager
         )
     }
 
