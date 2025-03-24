@@ -485,6 +485,11 @@ class Navigator(
             .navigateInRoot()
     }
 
+    override fun closeChainAddressesSelector() {
+        navigationBuilder().action(R.id.action_closeChainAddressesFragment)
+            .navigateInRoot()
+    }
+
     override fun returnToMainSwapScreen() {
         navigationBuilder().action(R.id.action_return_to_swap_settings)
             .navigateInFirstAttachedContext()

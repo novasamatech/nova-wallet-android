@@ -226,6 +226,12 @@
         android:id="@+id/chainAddressesFragment"
         android:name="io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorFragment"
         android:label="fragment_chain_addresses"
-        tools:layout="@layout/fragment_chain_address_selector" />
+        tools:layout="@layout/fragment_chain_address_selector">
+
+        <action android:id="@+id/action_closeChainAddressesFragment"
+            app:popUpTo="@+id/chainAddressesFragment"
+            app:popUpToInclusive="true" />
+
+    </dialog>
 
 </navigation>

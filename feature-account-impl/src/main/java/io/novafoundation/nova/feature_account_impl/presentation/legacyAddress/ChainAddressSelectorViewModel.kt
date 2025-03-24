@@ -28,7 +28,7 @@ class ChainAddressSelectorViewModel(
     val legacyAddressFlow = chainWithAccountIdFlow.map { copyAddressMixin.getLegacyAddress(it) }
 
     fun back() {
-        router.back()
+        router.closeChainAddressesSelector()
     }
 
     fun copyNewAddress() {
