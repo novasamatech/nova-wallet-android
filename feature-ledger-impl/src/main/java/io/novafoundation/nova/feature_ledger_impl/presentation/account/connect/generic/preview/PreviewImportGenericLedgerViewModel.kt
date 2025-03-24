@@ -69,7 +69,6 @@ class PreviewImportGenericLedgerViewModel(
 
     private suspend fun verifyAccount() {
         val device = device.first()
-        val mapper = deviceMapperFactory.createDelegate(device)
 
         ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
             address = payload.account.address,
