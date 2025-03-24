@@ -30,7 +30,9 @@ class AddChainAccountSelectLedgerModule {
 
     @Provides
     fun providePermissionAsker(
-        permissionsAskerFactory: PermissionsAskerFactory, fragment: Fragment, router: LedgerRouter
+        permissionsAskerFactory: PermissionsAskerFactory,
+        fragment: Fragment,
+        router: LedgerRouter
     ) = permissionsAskerFactory.create(fragment, router)
 
     @Provides

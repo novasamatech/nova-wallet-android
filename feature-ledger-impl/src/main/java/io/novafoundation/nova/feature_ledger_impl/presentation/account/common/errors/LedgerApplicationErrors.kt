@@ -2,19 +2,12 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.e
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.common.view.AlertModel
-import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter.MessageKind
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 

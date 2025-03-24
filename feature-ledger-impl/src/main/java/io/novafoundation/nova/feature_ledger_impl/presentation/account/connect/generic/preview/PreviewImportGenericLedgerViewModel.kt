@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers

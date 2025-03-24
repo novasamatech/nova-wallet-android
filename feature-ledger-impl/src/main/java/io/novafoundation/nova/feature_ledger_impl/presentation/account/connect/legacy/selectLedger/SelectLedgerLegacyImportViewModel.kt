@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter

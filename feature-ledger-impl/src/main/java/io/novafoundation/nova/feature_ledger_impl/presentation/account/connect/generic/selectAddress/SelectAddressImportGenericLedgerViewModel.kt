@@ -7,8 +7,6 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toGenericParcel

@@ -163,7 +163,6 @@ class MessageCommandFormatter(
         )
     }
 
-
     fun hideCommand(): LedgerMessageCommand {
         return LedgerMessageCommand.Hide
     }
