@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookup
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 
 interface FeePayment : CustomFeeCapability {
@@ -17,6 +18,8 @@ interface FeePayment : CustomFeeCapability {
 interface FeePaymentProvider {
 
     suspend fun feePaymentFor(feePaymentCurrency: FeePaymentCurrency, coroutineScope: CoroutineScope?): FeePayment
+
+    suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment
 
     suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?>
 }

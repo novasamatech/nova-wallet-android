@@ -22,6 +22,7 @@ sealed class PolkadotSignPayload : Parcelable {
         val metadataHash: String?,
         val withSignedTransaction: Boolean?,
         val signedExtensions: List<String>,
+        val assetId: String?,
         val version: Int
     ) : PolkadotSignPayload()
 

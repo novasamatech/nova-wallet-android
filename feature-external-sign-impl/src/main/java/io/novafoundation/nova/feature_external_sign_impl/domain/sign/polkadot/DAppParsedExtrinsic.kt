@@ -14,5 +14,6 @@ data class DAppParsedExtrinsic(
     val blockHash: ByteArray,
     val tip: BigInteger,
     val metadataHash: ByteArray?,
-    val call: GenericCall.Instance
+    val call: GenericCall.Instance,
+    val assetId: Any?,
 )
