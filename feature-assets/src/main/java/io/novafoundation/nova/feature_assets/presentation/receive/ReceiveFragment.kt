@@ -66,7 +66,7 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
         receiveQrCodeContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
         receiveQrCodeContainer.clipToOutline = true
 
-        receiveAddressesButton.setOnClickListener { viewModel.openLegacyAddressScreen() }
+        receiveAddressesButton.setOnClickListener { viewModel.chainAddressesClicked() }
     }
 
     override fun inject() {
