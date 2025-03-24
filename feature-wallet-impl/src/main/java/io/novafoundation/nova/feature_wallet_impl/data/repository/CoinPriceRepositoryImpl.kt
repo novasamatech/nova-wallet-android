@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.repository
 
-import io.novafoundation.nova.common.utils.KeyMutex
 import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
@@ -14,8 +13,6 @@ class CoinPriceRepositoryImpl(
     private val cacheCoinPriceDataSource: CoinPriceLocalDataSource,
     private val remoteCoinPriceDataSource: CoinPriceRemoteDataSource
 ) : CoinPriceRepository {
-
-    private val mutex = KeyMutex()
 
     override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Duration): HistoricalCoinRate? {
         val timestampInSeconds = timestamp.inWholeSeconds
@@ -37,17 +34,6 @@ class CoinPriceRepositoryImpl(
     }
 
     override suspend fun getLastHistoryForPeriod(priceId: String, currency: Currency, range: PricePeriod): List<HistoricalCoinRate> {
-        val key = "${priceId}_${currency.id}_$range"
-        return mutex.withKeyLock(key) {
-            val days = when (range) {
-                PricePeriod.DAY -> "1"
-                PricePeriod.WEEK -> "7"
-                PricePeriod.MONTH -> "30"
-                PricePeriod.YEAR -> "365"
-                PricePeriod.MAX -> "max"
-            }
-
-            remoteCoinPriceDataSource.getLastCoinPriceRange(priceId, currency, days)
-        }
+        return remoteCoinPriceDataSource.getLastCoinPriceRange(priceId, currency, range)
     }
 }
