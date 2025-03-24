@@ -56,13 +56,11 @@ class EvmNativeAssetHistory(
             chainId = chain.id
         )
 
-        val earliestOperationTimestamp = response.result.minOfOrNull { it.timeStamp } ?: 0L
-        val latestOperationTimestamp = response.result.maxOfOrNull { it.timeStamp } ?: 0L
-        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+        val priceHistory = getPriceHistory(chainAsset, currency)
 
         return response.result
             .map {
-                val coinRate = coinPriceRange.findNearestCoinRate(it.timeStamp)
+                val coinRate = priceHistory.findNearestCoinRate(it.timeStamp)
                 mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate)
             }
     }
