@@ -26,7 +26,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
  *   In this case, we need to add an action only to the root_navigation_graph
  *   To attach the the fragment to the RootNavigationHolder, call [navigateInRoot]
  **/
-abstract class NavigationBuilder (
+abstract class NavigationBuilder(
     private val navigationHoldersRegistry: NavigationHoldersRegistry
 ) {
 
