@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -34,8 +33,7 @@ class PreviewImportGenericLedgerViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
-    private val messageCommandFormatter: MessageCommandFormatter,
-    private val deviceMapperFactory: LedgerDeviceMapper
+    private val messageCommandFormatter: MessageCommandFormatter
 ) : BaseChainAccountsPreviewViewModel(
     iconGenerator = iconGenerator,
     externalActions = externalActions,
