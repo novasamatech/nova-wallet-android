@@ -125,15 +125,14 @@ class WalletInteractorImpl(
     }
 
     override fun operationsFirstPageFlow(chainId: ChainId, chainAssetId: Int): Flow<OperationsPageChange> {
-        return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { metaAccount ->
-                val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
-                val accountId = metaAccount.accountIdIn(chain)!!
-                val currency = currencyRepository.getSelectedCurrency()
-                transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset, currency).withIndex().map { (index, cursorPage) ->
-                    OperationsPageChange(cursorPage, accountChanged = index == 0)
-                }
-            }
+        return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+            val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
+            val accountId = metaAccount.accountIdIn(chain)!!
+            val currency = currencyRepository.getSelectedCurrency()
+            transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset, currency)
+                .withIndex()
+                .map { (index, cursorPage) -> OperationsPageChange(cursorPage, accountChanged = index == 0) }
+        }
     }
 
     override suspend fun syncOperationsFirstPage(

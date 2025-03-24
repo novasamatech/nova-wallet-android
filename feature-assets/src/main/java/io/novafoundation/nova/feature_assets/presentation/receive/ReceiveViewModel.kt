@@ -127,7 +127,7 @@ class ReceiveViewModel(
         ) + " " + address
     }
 
-    fun openLegacyAddressScreen() {
+    fun chainAddressesClicked() {
         launch {
             val chain = chainWithAssetAsync().chain
             val address = addressFlow.first()

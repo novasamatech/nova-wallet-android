@@ -100,5 +100,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openChainAddressSelector(chainId: String, accountId: ByteArray)
 
+    fun closeChainAddressesSelector()
+
     fun finishApp()
 }

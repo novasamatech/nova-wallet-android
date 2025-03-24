@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +18,7 @@ class FeeLoaderV2Factory(
 
     override fun <F, D> create(
         scope: CoroutineScope,
-        selectedChainAssetFlow: Flow<Chain.Asset>,
+        feeContextFlow: Flow<FeeContext>,
         feeFormatter: FeeFormatter<F, D>,
         feeInspector: FeeInspector<F>,
         configuration: FeeLoaderMixinV2.Configuration<F, D>
@@ -32,7 +31,7 @@ class FeeLoaderV2Factory(
             feeFormatter = feeFormatter,
             configuration = configuration,
             feeInspector = feeInspector,
-            selectedChainAssetFlow = selectedChainAssetFlow,
+            feeContextFlow = feeContextFlow,
             coroutineScope = scope,
         )
     }

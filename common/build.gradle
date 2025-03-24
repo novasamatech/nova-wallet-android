@@ -48,7 +48,7 @@ android {
         buildConfigField "String", "ASSET_COLORED_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/colored\""
         buildConfigField "String", "ASSET_WHITE_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/white/v1\""
 
-        buildConfigField "String", "UNIFIED_ADDRESS_ARTICLE", "\"https://wiki.polkadot.network/docs/learn-accounts#unified-address-format\""
+        buildConfigField "String", "UNIFIED_ADDRESS_ARTICLE", "\"https://docs.novawallet.io/nova-wallet-wiki/asset-management/how-to-receive-tokens#unified-and-legacy-addresses\""
     }
 
     buildTypes {

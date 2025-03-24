@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.data.network.coingecko
+package io.novafoundation.nova.feature_wallet_api.data.network.priceApi
 
 import java.math.BigDecimal
 
