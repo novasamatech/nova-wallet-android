@@ -1667,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Faixas que você já delegou votos</string>
     <string name="unavailable_tracks_title">Faixas indisponíveis</string>
     <string name="unavailable_tracks_voted_group">Faixas em que você tem votos existentes</string>
+    <string name="unified_address_format_checkbox_warning">Não mostrar isso novamente.\nVocê pode encontrar o endereço legado em Receber.</string>
+    <string name="unified_address_format_legacy_badge">Formato legado</string>
+    <string name="unified_address_format_new_badge">Novo formato</string>
+    <string name="unified_address_subtitle">Algumas trocas ainda podem exigir o formato legado\npara operações enquanto atualizam.</string>
+    <string name="unified_address_title">Novo Endereço Unificado</string>
     <string name="update_notification_install_btn">Instalar</string>
     <string name="update_notification_item_version">Versão %s</string>
     <string name="update_notification_title">Atualização disponível</string>

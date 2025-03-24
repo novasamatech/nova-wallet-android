@@ -1691,6 +1691,11 @@
     <string name="unavailable_tracks_delegated_group">Треки, в которых вы уже делегировали голоса</string>
     <string name="unavailable_tracks_title">Недоступные треки</string>
     <string name="unavailable_tracks_voted_group">Треки, в которых вы голосовали</string>
+    <string name="unified_address_format_checkbox_warning">Больше не показывать.\nВы можете найти старый адрес в разделе Получение.</string>
+    <string name="unified_address_format_legacy_badge">Старый формат</string>
+    <string name="unified_address_format_new_badge">Новый формат</string>
+    <string name="unified_address_subtitle">Некоторые обменники могут по-прежнему требовать старый формат для операций, пока они обновляются.</string>
+    <string name="unified_address_title">Новый Унифицированный Адрес</string>
     <string name="update_notification_install_btn">Установить</string>
     <string name="update_notification_item_version">Версия %s</string>
     <string name="update_notification_title">Доступно обновление</string>

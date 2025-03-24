@@ -1655,6 +1655,11 @@
     <string name="unavailable_tracks_delegated_group">Các track mà bạn đã ủy quyền bỏ phiếu</string>
     <string name="unavailable_tracks_title">Các track không khả dụng</string>
     <string name="unavailable_tracks_voted_group">Các track mà bạn đã có bỏ phiếu sẵn</string>
+    <string name="unified_address_format_checkbox_warning">Không hiển thị lại điều này.\nBạn có thể tìm thấy địa chỉ cũ trong Nhận.</string>
+    <string name="unified_address_format_legacy_badge">Định dạng cũ</string>
+    <string name="unified_address_format_new_badge">Định dạng mới</string>
+    <string name="unified_address_subtitle">Một số sàn giao dịch có thể vẫn yêu cầu định dạng cũ\ncho các hoạt động trong khi họ cập nhật.</string>
+    <string name="unified_address_title">Địa Chỉ Thống Nhất Mới</string>
     <string name="update_notification_install_btn">Cài đặt</string>
     <string name="update_notification_item_version">Phiên bản %s</string>
     <string name="update_notification_title">Có cập nhật mới</string>

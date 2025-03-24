@@ -1655,6 +1655,11 @@
     <string name="unavailable_tracks_delegated_group">이미 투표를 위임한 트랙</string>
     <string name="unavailable_tracks_title">사용할 수 없는 트랙</string>
     <string name="unavailable_tracks_voted_group">기존에 투표한 트랙</string>
+    <string name="unified_address_format_checkbox_warning">다시 표시하지 않습니다.\n레거시 주소는 수신에서 찾을 수 있습니다.</string>
+    <string name="unified_address_format_legacy_badge">레거시 형식</string>
+    <string name="unified_address_format_new_badge">새 형식</string>
+    <string name="unified_address_subtitle">일부 거래소는 업데이트하는 동안\n작업을 위해 아직 레거시 형식을 요구할 수 있습니다.</string>
+    <string name="unified_address_title">새로운 통합 주소</string>
     <string name="update_notification_install_btn">설치</string>
     <string name="update_notification_item_version">버전 %s</string>
     <string name="update_notification_title">사용 가능한 업데이트</string>

@@ -1667,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Zaten oylarınızı delegasyon yaptığınız izler</string>
     <string name="unavailable_tracks_title">Ulaşılamayan izler</string>
     <string name="unavailable_tracks_voted_group">Mevcut oyların olduğu izler</string>
+    <string name="unified_address_format_checkbox_warning">Bunu tekrar gösterme.\nEski adresi Al bölümünde bulabilirsiniz.</string>
+    <string name="unified_address_format_legacy_badge">Eski format</string>
+    <string name="unified_address_format_new_badge">Yeni format</string>
+    <string name="unified_address_subtitle">Bazı borsalar işlemler için hala eski formatı\ngüncelleme yaparken kullanmanızı isteyebilir.</string>
+    <string name="unified_address_title">Yeni Birleştirilmiş Adres</string>
     <string name="update_notification_install_btn">Yükle</string>
     <string name="update_notification_item_version">Versiyon %s</string>
     <string name="update_notification_title">Güncelleme mevcut</string>
