@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
+import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
+import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -26,7 +28,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDec
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.ManageAssetsAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.ManageAssetsHolder
+import io.novafoundation.nova.feature_banners_api.presentation.BannerHolder
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
 import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -89,20 +94,19 @@ class BalanceListFragment :
 
         hideKeyboard()
 
-        balanceListAssets.setHasFixedSize(true)
-        balanceListAssets.adapter = adapter
-
-        val animationSettings = ExpandableAnimationSettings.createForAssets()
-        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
-
-        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
-        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
-
-        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        setupRecyclerView()
 
         walletContainer.setOnRefreshListener {
             viewModel.fullSync()
         }
+    }
+
+    private fun setupRecyclerView() {
+        balanceListAssets.setHasFixedSize(true)
+        balanceListAssets.adapter = adapter
+
+        setupAssetsDecorationForRecyclerView()
+        setupRecyclerViewSpacing()
     }
 
     override fun inject() {
@@ -116,7 +120,9 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        viewModel.bannersMixin.bindWithAdapter(bannerAdapter)
+        viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
+            balanceListAssets.invalidateItemDecorations()
+        }
 
         viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
@@ -224,6 +230,24 @@ class BalanceListFragment :
 
     override fun swapClicked() {
         viewModel.swapClicked()
+    }
+
+    private fun setupRecyclerViewSpacing() {
+        balanceListAssets.addSpaceItemDecoration {
+            add(SpaceBetween(AssetsHeaderHolder, BannerHolder, spaceDp = 4))
+            add(SpaceBetween(BannerHolder, ManageAssetsHolder, spaceDp = 4))
+            add(SpaceBetween(AssetsHeaderHolder, ManageAssetsHolder, spaceDp = 24))
+        }
+    }
+
+    private fun setupAssetsDecorationForRecyclerView() {
+        val animationSettings = ExpandableAnimationSettings.createForAssets()
+        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
+
+        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+
+        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
     }
 
     private fun getAssetsPlaceholderModel() = PlaceholderModel(
