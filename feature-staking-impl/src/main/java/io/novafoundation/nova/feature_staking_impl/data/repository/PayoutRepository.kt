@@ -41,7 +41,7 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.query.DynamicInstanceBinder
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.runtime.storage.source.query.multi
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import io.novasama.substrate_sdk_android.hash.isPositive

@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.runtime.storage.typed.events
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull

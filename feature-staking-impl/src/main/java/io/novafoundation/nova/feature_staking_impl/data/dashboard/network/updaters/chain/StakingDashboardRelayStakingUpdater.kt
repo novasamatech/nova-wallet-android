@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

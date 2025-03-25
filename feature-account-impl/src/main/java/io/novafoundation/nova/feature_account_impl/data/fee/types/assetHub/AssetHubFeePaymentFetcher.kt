@@ -10,7 +10,7 @@ import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
 import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 
 interface AssetHubFeePaymentAssetsFetcher {
 

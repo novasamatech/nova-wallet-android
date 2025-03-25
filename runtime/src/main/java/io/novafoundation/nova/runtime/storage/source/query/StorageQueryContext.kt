@@ -124,7 +124,3 @@ suspend fun StorageQueryContext.multi(
 }
 
 fun Iterable<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
-
-@Deprecated("Use RuntimeContext.metadata")
-val StorageQueryContext.metadata: RuntimeMetadata
-    get() = runtime.metadata

@@ -35,7 +35,7 @@ import io.novafoundation.nova.runtime.storage.cache.StorageCachingContext
 import io.novafoundation.nova.runtime.storage.cache.cacheValues
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
