@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.signedExtensionOrNull
 import io.novafoundation.nova.common.utils.structOf
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.bindMultiLocation
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
