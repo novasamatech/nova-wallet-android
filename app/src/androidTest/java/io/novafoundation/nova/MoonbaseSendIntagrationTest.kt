@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.default
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.TransferMode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -88,7 +89,7 @@ class MoonbaseSendIntagrationTest {
         val signer = TestSigner {_ ->}
 
         val extrinsic = extrinsicBuilderFactory.create(chain, signer, accountId)
-            .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), keepAlive = true)
+            .nativeTransfer(accountId, chain.utilityAsset.planksFromAmount(BigDecimal.ONE), TransferMode.KEEP_ALIVE)
             .buildExtrinsic()
 
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)

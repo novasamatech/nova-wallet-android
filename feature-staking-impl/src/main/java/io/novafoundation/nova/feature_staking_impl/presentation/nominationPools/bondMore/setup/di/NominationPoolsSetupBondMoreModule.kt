@@ -19,7 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.bondMore.setup.NominationPoolsSetupBondMoreViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonBondMoreModule::class])
 class NominationPoolsSetupBondMoreModule {
@@ -33,11 +34,12 @@ class NominationPoolsSetupBondMoreModule {
         resourceManager: ResourceManager,
         validationExecutor: ValidationExecutor,
         validationSystem: NominationPoolsBondMoreValidationSystem,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         poolMemberUseCase: NominationPoolMemberUseCase,
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsBondMoreHintsFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
+        maxActionProviderFactory: MaxActionProviderFactory,
     ): ViewModel {
         return NominationPoolsSetupBondMoreViewModel(
             router = router,
@@ -49,6 +51,7 @@ class NominationPoolsSetupBondMoreModule {
             poolMemberUseCase = poolMemberUseCase,
             assetUseCase = assetUseCase,
             hintsFactory = hintsFactory,
+            maxActionProviderFactory = maxActionProviderFactory,
             amountChooserMixinFactory = amountChooserMixinFactory
         )
     }

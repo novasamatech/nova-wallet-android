@@ -214,11 +214,7 @@ abstract class SelectLedgerViewModel(
             listOf(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
-        val granted = if (discoveryMethod.isBluetoothRequired()) {
-            permissionsAsker.requirePermissionsOrExit(*permissions.toTypedArray())
-        } else {
-            permissionsAsker.requirePermissionsOrIgnore(*permissions.toTypedArray())
-        }
+        val granted = permissionsAsker.requirePermissions(*permissions.toTypedArray())
 
         if (granted) {
             stateMachine.onEvent(SelectLedgerEvent.PermissionsGranted)

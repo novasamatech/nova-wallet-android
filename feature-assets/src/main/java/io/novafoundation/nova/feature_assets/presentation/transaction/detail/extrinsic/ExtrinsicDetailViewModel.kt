@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.ExtrinsicContentParcel
@@ -70,7 +71,7 @@ class ExtrinsicDetailViewModel(
     fun fromAddressClicked() = addressClicked(operation.originAddress)
 
     fun addressClicked(address: String) = launch {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain())
+        externalActions.showAddressActions(address, chain())
     }
 
     fun backClicked() {

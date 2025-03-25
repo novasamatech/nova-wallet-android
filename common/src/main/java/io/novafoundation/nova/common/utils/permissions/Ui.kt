@@ -13,7 +13,7 @@ fun BaseFragment<*>.setupPermissionAsker(component: PermissionsAsker) {
         warningDialog(
             context = requireContext(),
             onPositiveClick = { it.onSuccess(PermissionDeniedAction.RETRY) },
-            onNegativeClick = { it.onSuccess(PermissionDeniedAction.REJECT) },
+            onNegativeClick = { it.onSuccess(PermissionDeniedAction.CANCEL) },
             positiveTextRes = if (level == CAN_ASK_AGAIN) R.string.common_ask_again else R.string.common_to_settings
         ) {
             if (level == CAN_ASK_AGAIN) {

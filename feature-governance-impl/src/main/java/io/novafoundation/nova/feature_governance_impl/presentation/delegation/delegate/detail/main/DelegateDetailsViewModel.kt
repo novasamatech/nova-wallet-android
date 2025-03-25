@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.DelegatorVote
@@ -135,7 +136,7 @@ class DelegateDetailsViewModel(
         val address = delegateDetailsLoadingState.firstLoaded().addressModel.address
         val chain = governanceSharedState.chain()
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+        externalActions.showAddressActions(address, chain)
     }
 
     fun delegationsClicked() {

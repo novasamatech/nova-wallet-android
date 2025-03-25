@@ -23,6 +23,10 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
+import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.HoldsDao
@@ -35,6 +39,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -49,6 +54,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
@@ -60,22 +66,24 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -91,6 +99,7 @@ import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import okhttp3.OkHttpClient
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
@@ -181,9 +190,17 @@ interface AssetsFeatureDependencies {
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
 
+    val okHttpClient: OkHttpClient
+
+    val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory
+
     val bannerSourceFactory: BannersSourceFactory
 
     val bannersMixinFactory: PromotionBannersMixinFactory
+
+    val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
+
+    val webViewFileChooserFactory: WebViewFileChooserFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 
@@ -265,6 +282,8 @@ interface AssetsFeatureDependencies {
 
     fun ethereumAddressFormat(): EthereumAddressFormat
 
+    fun proxyPriceApi(): ProxyPriceApi
+
     fun coingeckoApi(): CoingeckoApi
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
@@ -275,5 +294,13 @@ interface AssetsFeatureDependencies {
 
     fun nftRepository(): NftRepository
 
+    fun systemCallExecutor(): SystemCallExecutor
+
+    fun permissionsAskerFactory(): PermissionsAskerFactory
+
     fun assetViewModeInteractor(): AssetViewModeInteractor
+
+    fun maxActionProviderFactory(): MaxActionProviderFactory
+
+    fun copyAddressMixin(): CopyAddressMixin
 }

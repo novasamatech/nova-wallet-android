@@ -12,8 +12,10 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.mapEvent
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core.updater.Updater
@@ -49,10 +51,16 @@ class RootViewModel(
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
-    private val actionBottomSheetLauncher: ActionBottomSheetLauncher
+    private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
+    private val toastMessageManager: ToastMessageManager
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
+
+    val toastMessagesEvents = toastMessageManager.toastMessagesEvents
+
+    val walletConnectErrorsLiveData = walletConnectService.onPairErrorLiveData
+        .mapEvent { it.message }
 
     private var willBeClearedForLanguageChange = false
 

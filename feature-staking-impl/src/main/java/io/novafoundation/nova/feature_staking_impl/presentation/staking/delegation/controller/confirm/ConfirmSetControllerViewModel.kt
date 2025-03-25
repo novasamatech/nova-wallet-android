@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
@@ -86,7 +87,7 @@ class ConfirmSetControllerViewModel(
     }
 
     private fun showExternalActions(address: String) = launch {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        externalActions.showAddressActions(address, selectedAssetState.chain())
     }
 
     private fun maybeConfirm() = launch {

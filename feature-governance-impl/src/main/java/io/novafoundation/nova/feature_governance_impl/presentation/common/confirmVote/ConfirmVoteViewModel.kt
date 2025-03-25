@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
@@ -72,9 +73,8 @@ abstract class ConfirmVoteViewModel(
 
     fun accountClicked() = launch {
         val addressModel = currentAddressModelFlow.first()
-        val type = ExternalActions.Type.Address(addressModel.address)
 
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+        externalActions.showAddressActions(addressModel.address, governanceSharedState.chain())
     }
 
     abstract fun confirmClicked()

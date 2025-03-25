@@ -30,6 +30,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_MythosBondMoreGraph"
+        app:destination="@id/staking_mythos_start_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_addStakingProxyFragment"
         app:destination="@id/addStakingProxyFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -82,6 +90,23 @@
         android:id="@+id/confirmAddStakingProxyFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyFragment"
         android:label="ConfirmAddStakingProxyFragment" />
+
+    <action
+        android:id="@+id/action_open_mythos_claim_rewards"
+        app:destination="@+id/mythosClaimRewardsFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_stakingMythosUnbondGraph"
+        app:destination="@id/staking_mythos_unbond_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
 
     <fragment
         android:id="@+id/stakingFragment"
@@ -211,6 +236,22 @@
         <action
             android:id="@+id/action_stakingFragment_to_PoolsClaimRewardsFragment"
             app:destination="@+id/nominationPoolsClaimRewardsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_mythosRedeemFragment"
+            app:destination="@id/mythosRedeemFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_stakingFragment_to_mythosCurrentCollatorsFragment"
+            app:destination="@id/mythosCurrentCollatorsFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -511,4 +552,23 @@
         android:id="@+id/nominationPoolsClaimRewardsFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards.NominationPoolsClaimRewardsFragment"
         android:label="NominationPoolsClaimRewardsFragment" />
+
+    <include app:graph="@navigation/staking_mythos_start_graph" />
+
+    <include app:graph="@navigation/staking_mythos_unbond_graph" />
+
+    <fragment
+        android:id="@+id/mythosRedeemFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.MythosRedeemFragment"
+        android:label="MythosRedeemFragment" />
+
+    <fragment
+        android:id="@+id/mythosClaimRewardsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewards.MythosClaimRewardsFragment"
+        android:label="MythosClaimRewardsFragment" />
+
+    <fragment
+        android:id="@+id/mythosCurrentCollatorsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.mythos.currentCollators.MythosCurrentCollatorsFragment"
+        android:label="MythosCurrentCollatorsFragment" />
 </navigation>

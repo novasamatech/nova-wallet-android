@@ -8,11 +8,14 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
+import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -27,9 +30,12 @@ class StakingFeatureHolder @Inject constructor(
     private val nominationPoolsRouter: NominationPoolsRouter,
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingDashboardRouter: StakingDashboardRouter,
+    private val mythosStakingRouter: MythosStakingRouter,
     private val selectAddressCommunicator: SelectAddressCommunicator,
     private val selectCollatorInterScreenCommunicator: SelectCollatorInterScreenCommunicator,
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
+    private val selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
+    private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -47,12 +53,15 @@ class StakingFeatureHolder @Inject constructor(
             .create(
                 router = router,
                 parachainStaking = parachainStakingRouter,
+                mythosStakingRouter = mythosStakingRouter,
                 selectCollatorInterScreenCommunicator = selectCollatorInterScreenCommunicator,
                 selectCollatorSettingsInterScreenCommunicator = selectCollatorSettingsInterScreenCommunicator,
                 selectAddressCommunicator = selectAddressCommunicator,
                 nominationPoolsRouter = nominationPoolsRouter,
                 startMultiStakingRouter = startMultiStakingRouter,
                 stakingDashboardRouter = stakingDashboardRouter,
+                selectMythosCollatorInterScreenCommunicator = selectMythosCollatorInterScreenCommunicator,
+                selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
                 deps = dependencies
             )
     }

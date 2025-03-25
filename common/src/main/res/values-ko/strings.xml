@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">“%s” DApp이(가) 즐겨찾기에서 제거됩니다.</string>
     <string name="dapp_favourites_remove_title">즐겨찾기에서 제거하시겠습니까?</string>
     <string name="dapp_list_placeholder">여기에 DApps 목록이 표시됩니다.</string>
-    <string name="dapp_main_welcome_subtitle">Nova Wallet 계정을 사용하여 웹을 탐색하세요</string>
-    <string name="dapp_main_welcome_title">Nova 브라우저에 오신 것을 환영합니다</string>
     <string name="dapp_options_add_to_favorite">즐겨찾기에 추가</string>
     <string name="dapp_options_desktop_mode">데스크탑 모드</string>
     <string name="dapp_options_remove_from_favorite">즐겨찾기에서 제거</string>
@@ -747,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">네트워크: %s\nMnemonic: %s</string>
     <string name="fee_not_yet_loaded_message">수수료 계산이 완료될 때까지 기다려주세요</string>
     <string name="fee_not_yet_loaded_title">수수료 계산 진행 중</string>
+    <string name="fragment_assets_nova_card">직불카드 관리</string>
     <string name="fragment_set_staking_proxy_title">%s Staking을 위한 대리 추가</string>
     <string name="fragment_swap_main_settings_details_title">스왑 세부 정보</string>
     <string name="fragment_swap_main_settings_max_button">최대:</string>
     <string name="fragment_swap_main_settings_pay_title">지불 금액</string>
     <string name="fragment_swap_main_settings_receive_title">수령 금액</string>
     <string name="fragment_swap_main_settings_select_token">토큰 선택</string>
+    <string name="fragment_top_up_card_title">카드에 %s 충전</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">support@novawallet.io에 문의하세요. 카드 발급에 사용된 이메일 주소를 포함하세요.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">지원에 문의</string>
     <string name="governance_notification_channel_name">거버넌스 알림 채널</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">최소한 %d개의 트랙을 선택해야 합니다</item>
@@ -928,6 +930,19 @@
     <string name="pre_configured_networks_progress_text">네트워크 목록을 로드 중...</string>
     <string name="pre_configured_networks_search_hint">네트워크 이름으로 검색</string>
     <string name="pre_configured_networks_title">네트워크 추가</string>
+    <string name="price_chart_date_format" formatted="false">%s 에 %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">모두</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s 가격</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">전체 기간</string>
+    <string name="price_charts_period_month">지난달</string>
+    <string name="price_charts_period_today">오늘</string>
+    <string name="price_charts_period_week">지난주</string>
+    <string name="price_charts_period_year">지난해</string>
     <string name="profile_accounts_title">계정</string>
     <string name="profile_accounts_title_2_0">지갑</string>
     <string name="profile_language_title">언어</string>
@@ -1640,6 +1655,11 @@
     <string name="unavailable_tracks_delegated_group">이미 투표를 위임한 트랙</string>
     <string name="unavailable_tracks_title">사용할 수 없는 트랙</string>
     <string name="unavailable_tracks_voted_group">기존에 투표한 트랙</string>
+    <string name="unified_address_format_checkbox_warning">다시 표시하지 않습니다.\n레거시 주소는 수신에서 찾을 수 있습니다.</string>
+    <string name="unified_address_format_legacy_badge">레거시 형식</string>
+    <string name="unified_address_format_new_badge">새 형식</string>
+    <string name="unified_address_subtitle">일부 거래소는 업데이트하는 동안\n작업을 위해 아직 레거시 형식을 요구할 수 있습니다.</string>
+    <string name="unified_address_title">새로운 통합 주소</string>
     <string name="update_notification_install_btn">설치</string>
     <string name="update_notification_item_version">버전 %s</string>
     <string name="update_notification_title">사용 가능한 업데이트</string>
@@ -1658,6 +1678,10 @@
     <string name="vote_revote">재투표</string>
     <string name="vote_vote">투표</string>
     <string name="voting_status">투표 상태</string>
+    <string name="waiting_existing_card_top_up_card_title">카드가 충전 중입니다!</string>
+    <string name="waiting_initial_top_up_card_title">카드가 발급되고 있습니다!</string>
+    <string name="waiting_top_up_card_description">최대 5분이 소요될 수 있습니다.\n이 창은 자동으로 닫힙니다.</string>
+    <string name="waiting_top_up_card_timer">예상 %s</string>
     <string name="wallet_asset_buy">구매</string>
     <string name="wallet_asset_buy_with">구매 방법</string>
     <string name="wallet_asset_receive">받기</string>

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -110,8 +111,8 @@ class SwapDetailViewModel(
         showExternalActions(ExternalActions.Type.Extrinsic(it))
     }
 
-    fun originAddressClicked() {
-        showExternalActions(ExternalActions.Type.Address(operation.originAddress))
+    fun originAddressClicked() = launch {
+        externalActions.showAddressActions(operation.originAddress, originChain())
     }
 
     fun rateClicked() {

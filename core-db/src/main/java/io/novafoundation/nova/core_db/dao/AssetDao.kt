@@ -55,6 +55,8 @@ interface AssetReadOnlyCache {
 
     fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken>
 
+    fun observeAssetOrNull(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken?>
+
     fun observeAssets(metaId: Long, assetIds: Collection<AssetAndChainId>): Flow<List<AssetWithToken>>
 
     suspend fun getAssetWithToken(metaId: Long, chainId: String, assetId: Int): AssetWithToken?
@@ -81,6 +83,9 @@ abstract class AssetDao : AssetReadOnlyCache {
 
     @Query(RETRIEVE_ASSET_SQL_META_ID)
     abstract override fun observeAsset(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken>
+
+    @Query(RETRIEVE_ASSET_SQL_META_ID)
+    abstract override fun observeAssetOrNull(metaId: Long, chainId: String, assetId: Int): Flow<AssetWithToken?>
 
     @Query(RETRIEVE_ASSET_SQL_META_ID)
     abstract override suspend fun getAssetWithToken(metaId: Long, chainId: String, assetId: Int): AssetWithToken?

@@ -39,7 +39,7 @@ abstract class ChainUpdaterGroupUpdateSystem(
                     .map { updater ->
                         @Suppress("UNCHECKED_CAST")
                         (updater as Updater<Any?>).listenForUpdates(subscriptionBuilder, scopeValue)
-                            .catch { Log.e(logTag, "Failed to start $selfName for ${chain.name}: ${it.message}") }
+                            .catch { Log.e(logTag, "Failed to start $selfName for ${chain.name}", it) }
                             .flowOn(Dispatchers.Default)
                     }
 

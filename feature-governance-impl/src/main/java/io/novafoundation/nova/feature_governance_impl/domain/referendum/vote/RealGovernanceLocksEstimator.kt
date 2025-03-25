@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.Gove
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
@@ -33,7 +34,7 @@ internal class RealGovernanceLocksEstimator(
     private val votedReferenda: Map<ReferendumId, OnChainReferendum>,
     private val blockDurationEstimator: BlockDurationEstimator,
     private val tracks: Map<TrackId, TrackInfo>,
-    private val votingLockId: String,
+    private val votingLockId: BalanceLockId,
     undecidingTimeout: BlockNumber,
     voteLockingPeriod: BlockNumber,
     balanceLocks: List<BalanceLock>,

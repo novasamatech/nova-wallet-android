@@ -44,7 +44,7 @@ data class Operation(
 
             sealed class RewardKind {
 
-                class Direct(val era: Int, val validator: String?) : RewardKind()
+                class Direct(val era: Int?, val validator: String?) : RewardKind()
 
                 class Pool(val poolId: Int) : RewardKind()
             }

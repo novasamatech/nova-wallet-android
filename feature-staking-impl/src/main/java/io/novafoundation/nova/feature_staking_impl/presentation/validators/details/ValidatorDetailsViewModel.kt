@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mappers.mapStakeTargetDetailsToErrors
@@ -89,11 +90,11 @@ class ValidatorDetailsViewModel(
     private suspend fun calculatePayload(asset: Asset, stakeTargetStake: StakeTargetStakeParcelModel) = withContext(Dispatchers.Default) {
         require(stakeTargetStake is StakeTargetStakeParcelModel.Active)
 
-        val nominatorsStake = stakeTargetStake.stakers.sumByBigInteger(StakerParcelModel::value)
+        val nominatorsStake = stakeTargetStake.stakers?.sumByBigInteger(StakerParcelModel::value)
 
         ValidatorStakeBottomSheet.Payload(
-            own = mapAmountToAmountModel(stakeTargetStake.ownStake, asset),
-            stakers = mapAmountToAmountModel(nominatorsStake, asset),
+            own = stakeTargetStake.ownStake?.let { mapAmountToAmountModel(it, asset) },
+            stakers = nominatorsStake?.let { mapAmountToAmountModel(it, asset) },
             total = mapAmountToAmountModel(stakeTargetStake.totalStake, asset),
             stakersLabel = payload.displayConfig.stakersLabelRes
         )
@@ -103,6 +104,6 @@ class ValidatorDetailsViewModel(
         val address = stakeTargetDetails.first().addressModel.address
         val chain = selectedAssetState.chain()
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+        externalActions.showAddressActions(address, chain)
     }
 }

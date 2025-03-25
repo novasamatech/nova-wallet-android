@@ -33,10 +33,11 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
@@ -48,7 +49,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCas
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -63,6 +64,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
@@ -81,7 +83,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBa
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
-import io.novafoundation.nova.feature_wallet_impl.data.source.CoingeckoCoinPriceDataSource
+import io.novafoundation.nova.feature_wallet_impl.data.source.RealCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
@@ -116,17 +118,24 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideProxyPriceApi(networkApiCreator: NetworkApiCreator): ProxyPriceApi {
+        return networkApiCreator.create(ProxyPriceApi::class.java, ProxyPriceApi.BASE_URL)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): CoingeckoApi {
-        return networkApiCreator.create(CoingeckoApi::class.java)
+        return networkApiCreator.create(CoingeckoApi::class.java, CoingeckoApi.BASE_URL)
     }
 
     @Provides
     @FeatureScope
     fun provideCoinPriceRemoteDataSource(
+        priceApi: ProxyPriceApi,
         coingeckoApi: CoingeckoApi,
         httpExceptionHandler: HttpExceptionHandler
     ): CoinPriceRemoteDataSource {
-        return CoingeckoCoinPriceDataSource(coingeckoApi, httpExceptionHandler)
+        return RealCoinPriceDataSource(priceApi, coingeckoApi, httpExceptionHandler)
     }
 
     @Provides
@@ -220,9 +229,8 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideAmountChooserFactory(
-        resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider
-    ): AmountChooserMixin.Factory = AmountChooserProviderFactory(resourceManager, assetIconProvider)
+    ): AmountChooserMixin.Factory = AmountChooserProviderFactory(assetIconProvider)
 
     @Provides
     @FeatureScope
@@ -429,5 +437,11 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
     ): AssetsValidationContext.Factory {
         return AssetValidationContextFactory(arbitraryAssetUseCase, chainRegistry, assetSourceRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMaxActionProviderFactory(assetSourceRegistry: AssetSourceRegistry): MaxActionProviderFactory {
+        return MaxActionProviderFactory(assetSourceRegistry)
     }
 }
