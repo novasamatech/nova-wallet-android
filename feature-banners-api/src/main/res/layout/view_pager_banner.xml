@@ -12,28 +12,18 @@
         android:layout_height="0dp"
         android:layout_marginVertical="8dp"
         app:cardCornerRadius="12dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="@color/container_border"
         app:layout_constraintBottom_toBottomOf="@id/pagerBannerContent"
         app:layout_constraintEnd_toEndOf="@id/pagerBannerContent"
         app:layout_constraintStart_toStartOf="@id/pagerBannerContent"
-        app:layout_constraintTop_toTopOf="@id/pagerBannerContent">
+        app:layout_constraintTop_toTopOf="@id/pagerBannerContent"
+        app:strokeColor="@color/container_border"
+        app:strokeWidth="1dp">
 
         <FrameLayout
             android:id="@+id/pagerBannerBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@color/text_secondary" />
-
-        <io.novafoundation.nova.feature_banners_api.presentation.view.PageIndicatorView
-            android:id="@+id/pagerBannerIndicators"
-            android:layout_width="100dp"
-            android:layout_height="6dp"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -44,22 +34,31 @@
         android:layout_marginHorizontal="16dp"
         android:clipToPadding="false"
         android:elevation="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:minHeight="96dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_width="126dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/pagerBannerClose"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="4dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
         android:elevation="17dp"
+        android:padding="8dp"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_close_circle_translucent_contrast"
+        android:src="@drawable/ic_close"
         app:layout_constraintEnd_toEndOf="@id/pagerBannerContent"
-        app:layout_constraintTop_toTopOf="@id/pagerBannerContent" />
+        app:layout_constraintTop_toTopOf="@id/pagerBannerContent"
+        app:tint="@color/icon_secondary" />
+
+    <io.novafoundation.nova.feature_banners_api.presentation.view.PageIndicatorView
+        android:id="@+id/pagerBannerIndicators"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pagerBannerCardView" />
 
 </merge>

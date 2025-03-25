@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -71,9 +72,7 @@ class WalletDetailsViewModel(
 
         val chain = chainRegistry.getChain(item.chainUi.id)
 
-        val type = ExternalActions.Type.Address(item.address)
-
-        externalActions.showExternalActions(type, chain)
+        externalActions.showAddressActions(item.address, chain)
     }
 
     fun exportClicked(inChain: Chain) = launch {

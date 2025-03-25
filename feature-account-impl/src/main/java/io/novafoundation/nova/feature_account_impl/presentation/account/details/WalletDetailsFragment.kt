@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet
-import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.R
@@ -85,7 +84,7 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel>(), ChainAccou
             ChainAccountActionsSheet(
                 context,
                 payload,
-                onCopy = viewModel::copyAddressClicked,
+                onCopy = viewModel::copyValue,
                 onViewExternal = viewModel::viewExternalClicked,
                 onChange = viewModel::changeChainAccountClicked,
                 onExport = viewModel::exportClicked,

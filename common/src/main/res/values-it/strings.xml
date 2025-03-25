@@ -751,12 +751,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Rete: %s\nMnemonica: %s</string>
     <string name="fee_not_yet_loaded_message">Attendere fino al calcolo della commissione</string>
     <string name="fee_not_yet_loaded_title">Il calcolo della commissione è in corso</string>
+    <string name="fragment_assets_nova_card">Gestisci Carta di Debito</string>
     <string name="fragment_set_staking_proxy_title">Aggiungi delega per lo staking di %s</string>
     <string name="fragment_swap_main_settings_details_title">Dettagli dello swap</string>
     <string name="fragment_swap_main_settings_max_button">Massimo:</string>
     <string name="fragment_swap_main_settings_pay_title">Tu paghi</string>
     <string name="fragment_swap_main_settings_receive_title">Tu ricevi</string>
     <string name="fragment_swap_main_settings_select_token">Seleziona un token</string>
+    <string name="fragment_top_up_card_title">Ricarica la carta con %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Si prega di contattare support@novawallet.io. Includere l\'indirizzo email che hai usato per emettere la carta.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Contatta il supporto</string>
     <string name="governance_notification_channel_name">Canale di notifica della governance</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">È necessario selezionare almeno %d traccia</item>
@@ -1663,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Tracce a cui hai già delegato i voti</string>
     <string name="unavailable_tracks_title">Tracce non disponibili</string>
     <string name="unavailable_tracks_voted_group">Tracce in cui hai già dei voti</string>
+    <string name="unified_address_format_checkbox_warning">Non mostrare più.\nPuoi trovare l\'indirizzo legacy in Ricevi.</string>
+    <string name="unified_address_format_legacy_badge">Formato legacy</string>
+    <string name="unified_address_format_new_badge">Nuovo formato</string>
+    <string name="unified_address_subtitle">Alcuni exchange possono ancora richiedere il formato legacy\nper operazioni mentre sono in aggiornamento.</string>
+    <string name="unified_address_title">Nuovo Indirizzo Unificato</string>
     <string name="update_notification_install_btn">Installa</string>
     <string name="update_notification_item_version">Versione %s</string>
     <string name="update_notification_title">Aggiornamento disponibile</string>
@@ -1681,6 +1690,10 @@
     <string name="vote_revote">Rivotare</string>
     <string name="vote_vote">Votare</string>
     <string name="voting_status">Stato del voto</string>
+    <string name="waiting_existing_card_top_up_card_title">La tua carta sta ricevendo fondi!</string>
+    <string name="waiting_initial_top_up_card_title">La tua carta è in fase di emissione!</string>
+    <string name="waiting_top_up_card_description">Può richiedere fino a 5 minuti.\nQuesta finestra si chiuderà automaticamente.</string>
+    <string name="waiting_top_up_card_timer">Stimato %s</string>
     <string name="wallet_asset_buy">Acquista</string>
     <string name="wallet_asset_buy_with">Acquista con</string>
     <string name="wallet_asset_receive">Ricevi</string>

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
@@ -82,8 +83,8 @@ class SearchPoolViewModel(
 
     fun poolInfoClicked(poolItem: PoolRvItem) {
         launch {
-            externalActions.showExternalActions(
-                ExternalActions.Type.Address(poolItem.model.address),
+            externalActions.showAddressActions(
+                poolItem.model.address,
                 stakingOption().chain
             )
         }

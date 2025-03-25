@@ -37,7 +37,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_wallet_api.data.repository.PriceChartPeriod
+import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
@@ -317,34 +317,34 @@ class BalanceDetailViewModel(
         }
     }
 
-    private fun mapButtonText(priceChartPeriod: PriceChartPeriod): String {
-        val buttonTextRes = when (priceChartPeriod) {
-            PriceChartPeriod.DAY -> R.string.price_chart_day
-            PriceChartPeriod.WEEK -> R.string.price_chart_week
-            PriceChartPeriod.MONTH -> R.string.price_chart_month
-            PriceChartPeriod.YEAR -> R.string.price_chart_year
-            PriceChartPeriod.MAX -> R.string.price_chart_max
+    private fun mapButtonText(pricePeriod: PricePeriod): String {
+        val buttonTextRes = when (pricePeriod) {
+            PricePeriod.DAY -> R.string.price_chart_day
+            PricePeriod.WEEK -> R.string.price_chart_week
+            PricePeriod.MONTH -> R.string.price_chart_month
+            PricePeriod.YEAR -> R.string.price_chart_year
+            PricePeriod.MAX -> R.string.price_chart_max
         }
 
         return resourceManager.getString(buttonTextRes)
     }
 
-    private fun mapPeriodName(priceChartPeriod: PriceChartPeriod): String {
-        val periodNameRes = when (priceChartPeriod) {
-            PriceChartPeriod.DAY -> R.string.price_charts_period_today
-            PriceChartPeriod.WEEK -> R.string.price_charts_period_week
-            PriceChartPeriod.MONTH -> R.string.price_charts_period_month
-            PriceChartPeriod.YEAR -> R.string.price_charts_period_year
-            PriceChartPeriod.MAX -> R.string.price_charts_period_all
+    private fun mapPeriodName(pricePeriod: PricePeriod): String {
+        val periodNameRes = when (pricePeriod) {
+            PricePeriod.DAY -> R.string.price_charts_period_today
+            PricePeriod.WEEK -> R.string.price_charts_period_week
+            PricePeriod.MONTH -> R.string.price_charts_period_month
+            PricePeriod.YEAR -> R.string.price_charts_period_year
+            PricePeriod.MAX -> R.string.price_charts_period_all
         }
 
         return resourceManager.getString(periodNameRes)
     }
 
-    private fun supportTimeShowing(priceChartPeriod: PriceChartPeriod): Boolean {
-        return when (priceChartPeriod) {
-            PriceChartPeriod.DAY, PriceChartPeriod.WEEK, PriceChartPeriod.MONTH -> true
-            PriceChartPeriod.YEAR, PriceChartPeriod.MAX -> false
+    private fun supportTimeShowing(pricePeriod: PricePeriod): Boolean {
+        return when (pricePeriod) {
+            PricePeriod.DAY, PricePeriod.WEEK, PricePeriod.MONTH -> true
+            PricePeriod.YEAR, PricePeriod.MAX -> false
         }
     }
 }

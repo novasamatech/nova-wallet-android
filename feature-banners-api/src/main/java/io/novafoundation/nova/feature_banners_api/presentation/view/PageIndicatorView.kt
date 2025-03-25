@@ -24,13 +24,14 @@ class PageIndicatorView @JvmOverloads constructor(
     private var pagesCount = 0
     private val indicators = mutableListOf<Indicator>()
 
-    private val inactiveIndicatorColor = context.getColor(R.color.icon_inactive)
-    private val activeIndicatorColor = context.getColor(R.color.chip_icon)
+    private val indicatorColor = context.getColor(R.color.icon_inactive)
     private val goneIndicatorColor = Color.TRANSPARENT
     private val indicatorRadius = 3.dpF
     private val indicatorWidth = indicatorRadius * 2
     private val indicatorMargin = 12.dpF
     private val indicatorFullLength = 14.dpF
+
+    private var indicatorsBoxWidth = 0f
 
     private val argbEvaluator = ArgbEvaluator()
 
@@ -45,69 +46,83 @@ class PageIndicatorView @JvmOverloads constructor(
         pagesCount = size
         indicators.clear()
         if (size > 0) {
-            indicators.addAll(List(size) { Indicator(0f, indicatorMargin, inactiveIndicatorColor) })
-            indicators.first().apply {
-                this.size = indicatorFullLength
-                this.color = activeIndicatorColor
-            }
+            indicators.addAll(List(size) { Indicator(0f, indicatorMargin, indicatorColor) })
+            selectIndicatorInstantly(0)
         }
 
         invalidate()
     }
 
-    fun setCurrentPage(pageIndex: Int) {
+    fun selectIndicatorInstantly(pageIndex: Int) {
         setAnimationProgress(1f, fromPage = NO_PAGE, toPage = pageIndex)
     }
 
     fun setAnimationProgress(offset: Float, fromPage: Int, toPage: Int) {
-        setAnimation(offset.coerceIn(0f, 1f), fromPage, toPage, removeFrom = false)
+        setAnimationProgressInternal(offset.coerceIn(0f, 1f), fromPage, toPage, removeFrom = false)
     }
 
-    fun setCloseProgress(offset: Float, closingPage: Int, nextPage: Int) {
-        setAnimation(offset.coerceIn(0f, 1f), closingPage, nextPage, removeFrom = true)
+    fun setCloseAnimationProgress(offset: Float, closingPage: Int, nextPage: Int) {
+        setAnimationProgressInternal(offset.coerceIn(0f, 1f), closingPage, nextPage, removeFrom = true)
     }
 
-    private fun setAnimation(offset: Float, fromPage: Int, toPage: Int, removeFrom: Boolean) {
+    private fun setAnimationProgressInternal(offset: Float, fromIndex: Int, toIndex: Int, removeFrom: Boolean) {
         if (indicators.size <= 1) {
-            indicators.forEach { it.color = goneIndicatorColor }
+            hideIndicators()
             invalidate()
             return
         }
 
-        if (fromPage >= indicators.size || toPage >= indicators.size) return
+        clearIndicatorSizeParams()
+        increaseSizeForAnimationOffset(toIndex, offset)
+        decreaseSizeForAnimationOffset(fromIndex, offset, removeFrom)
 
-        indicators.forEachIndexed { index, indicator ->
-            when (index) {
-                fromPage -> {
-                    indicator.size = indicatorFullLength - offset * indicatorFullLength
-
-                    val marginToNext = if (removeFrom) indicatorMargin - offset * indicatorMargin else indicatorMargin
-                    val endColor = if (removeFrom) goneIndicatorColor else inactiveIndicatorColor
-
-                    indicator.marginToNext = marginToNext
-                    indicator.color = argbEvaluator.evaluate(offset, activeIndicatorColor, endColor) as Int
-                }
-
-                toPage -> {
-                    indicator.size = offset * indicatorFullLength
-                    indicator.marginToNext = indicatorMargin
-                    indicator.color = argbEvaluator.evaluate(offset, inactiveIndicatorColor, activeIndicatorColor) as Int
-                }
-
-                else -> {
-                    indicator.size = 0f
-                    indicator.marginToNext = indicatorMargin
-                    indicator.color = inactiveIndicatorColor
-                }
-            }
-        }
-
+        calculateIndicatorsBoxWidth()
         invalidate()
     }
 
+    private fun calculateIndicatorsBoxWidth() {
+        var newIndicatorBoxWidth = 0f
+        newIndicatorBoxWidth += indicatorRadius * 2 // Add start and end radius of indicator
+        indicators.forEach {
+            newIndicatorBoxWidth += it.size + it.marginToNext
+        }
+        indicatorsBoxWidth = newIndicatorBoxWidth
+    }
+
+    private fun increaseSizeForAnimationOffset(indicatorIndex: Int, offset: Float) {
+        val indicator = indicators.getOrNull(indicatorIndex) ?: return
+        indicator.size = offset * indicatorFullLength
+        indicator.marginToNext = indicatorMargin
+    }
+
+    private fun decreaseSizeForAnimationOffset(indicatorIndex: Int, offset: Float, isRemovingAnimation: Boolean) {
+        val indicator = indicators.getOrNull(indicatorIndex) ?: return
+
+        indicator.size = indicatorFullLength - offset * indicatorFullLength
+
+        val marginToNext = if (isRemovingAnimation) indicatorMargin - offset * indicatorMargin else indicatorMargin
+        val endColor = if (isRemovingAnimation) goneIndicatorColor else indicatorColor
+
+        indicator.marginToNext = marginToNext
+        indicator.color = argbEvaluator.evaluate(offset, indicatorColor, endColor) as Int
+    }
+
+    private fun clearIndicatorSizeParams() {
+        indicators.forEach {
+            it.size = 0f
+            it.marginToNext = indicatorMargin
+        }
+        indicators.lastOrNull()?.marginToNext = 0f
+    }
+
+    private fun hideIndicators() {
+        indicators.forEach { it.color = goneIndicatorColor }
+    }
+
     override fun onDraw(canvas: Canvas) {
-        val startMargin = indicatorRadius
-        var lastEnd = startMargin
+        val startSpace = (measuredWidth - indicatorsBoxWidth) / 2
+        val startMarginIndicator = indicatorRadius
+        var lastEnd = startSpace + startMarginIndicator
 
         indicators.forEachIndexed { index, indicator ->
             indicatorPaint.color = indicator.color

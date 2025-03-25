@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.fee.toParcel
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
@@ -273,7 +274,7 @@ class SelectSendViewModel(
     private fun showAccountDetails(address: String) {
         launch {
             val chain = destinationChainWithAsset.first().chain
-            externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+            externalActions.showAddressActions(address, chain)
         }
     }
 

@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
+import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.DEFAULT_DERIVATION_PATH
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -118,6 +119,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
+import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.RealSigningNotSupportedPresentable
@@ -376,11 +379,12 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideExternalAccountActions(
-        clipboardManager: ClipboardManager,
         resourceManager: ResourceManager,
-        addressIconGenerator: AddressIconGenerator
+        addressIconGenerator: AddressIconGenerator,
+        copyAddressMixin: CopyAddressMixin,
+        copyValueMixin: CopyValueMixin,
     ): ExternalActions.Presentation {
-        return ExternalActionsProvider(clipboardManager, resourceManager, addressIconGenerator)
+        return ExternalActionsProvider(resourceManager, addressIconGenerator, copyAddressMixin, copyValueMixin)
     }
 
     @Provides
@@ -728,4 +732,16 @@ class AccountFeatureModule {
     fun provideCustomFeeCapabilityFacade(
         accountRepository: AccountRepository
     ): CustomFeeCapabilityFacade = RealCustomCustomFeeCapabilityFacade(accountRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideCopyAddressMixin(
+        copyValueMixin: CopyValueMixin,
+        preferences: Preferences,
+        router: AccountRouter
+    ): CopyAddressMixin = RealCopyAddressMixin(
+        copyValueMixin,
+        preferences,
+        router
+    )
 }

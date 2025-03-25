@@ -51,6 +51,8 @@
 
     <include app:graph="@navigation/select_swap_token_nav_graph" />
 
+    <include app:graph="@navigation/nova_card_graph" />
+
     <action
         android:id="@+id/action_importWalletOptionsFragment"
         app:destination="@id/import_wallet_options_nav_graph"
@@ -233,7 +235,6 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
-
     <action
         android:id="@+id/action_open_scanWalletConnect"
         app:destination="@id/walletConnectScanFragment"
@@ -281,6 +282,14 @@
     <action
         android:id="@+id/action_open_swapSetupAmount"
         app:destination="@id/start_swap_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_novaCard"
+        app:destination="@id/nova_card_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -354,7 +363,7 @@
         android:id="@+id/action_onboarding"
         app:destination="@id/onboarding_nav_graph"
         app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit"/>
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/mainFragment"
@@ -1065,6 +1074,6 @@
         android:id="@+id/dappFavorites"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DappFavoritesFragment"
         android:label="fragment_favorites"
-        tools:layout="@layout/fragment_favorites_dapp"/>
+        tools:layout="@layout/fragment_favorites_dapp" />
 
 </navigation>

@@ -40,6 +40,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchro
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -376,6 +377,10 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 suspend fun ChainRegistry.findRelayChainOrThrow(chainId: ChainId): ChainId {
     val chain = getChain(chainId)
     return chain.parentId ?: chainId
+}
+
+fun ChainRegistry.chainFlow(chainId: ChainId): Flow<Chain> {
+    return chainsById.mapNotNull { it[chainId] }
 }
 
 fun ChainRegistry.enabledChainsFlow() = currentChains

@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.actions.CustomizableExternalActionsSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.actions.copyAddressClicked
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -61,7 +60,7 @@ class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel>(), Stak
             CustomizableExternalActionsSheet(
                 context,
                 payload,
-                onCopy = viewModel::copyAddressClicked,
+                onCopy = viewModel::copyValue,
                 onViewExternal = viewModel::viewExternalClicked,
                 additionalOptions = rewokeAccessExternalAction(payload)
             )

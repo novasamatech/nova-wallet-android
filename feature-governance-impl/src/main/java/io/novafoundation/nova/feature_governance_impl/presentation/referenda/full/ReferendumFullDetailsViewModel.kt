@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -133,7 +134,7 @@ class ReferendumFullDetailsViewModel(
     private fun openAddressInfo(accountId: ByteArray) = launch {
         val chain = getChain()
         val address = chain.addressOf(accountId)
-        val type = ExternalActions.Type.Address(address)
-        externalActions.showExternalActions(type, chain)
+
+        externalActions.showAddressActions(address, chain)
     }
 }
