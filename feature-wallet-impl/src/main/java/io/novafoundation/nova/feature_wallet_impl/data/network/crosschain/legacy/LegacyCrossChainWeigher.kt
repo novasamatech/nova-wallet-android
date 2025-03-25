@@ -254,7 +254,6 @@ class LegacyCrossChainWeigher @Inject constructor(
     private fun LegacyCrossChainTransferConfiguration.depositAsset(chain: Chain): XcmInstruction.DepositAsset {
         return XcmInstruction.DepositAsset(
             assets = MultiAssetFilter.Wild.All,
-            maxAssets = BigInteger.ONE,
             beneficiary = chain.emptyBeneficiaryMultiLocation()
         )
     }
@@ -270,7 +269,6 @@ class LegacyCrossChainWeigher @Inject constructor(
     private fun LegacyCrossChainTransferConfiguration.depositReserveAsset(): XcmInstruction {
         return XcmInstruction.DepositReserveAsset(
             assets = MultiAssetFilter.Wild.All,
-            maxAssets = BigInteger.ONE,
             dest = destinationChainLocation,
             xcm = XcmMessage(emptyList())
         )
