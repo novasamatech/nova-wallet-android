@@ -137,6 +137,7 @@ class TransactionHistoryProvider(
                     is OperationParcelizeModel.PoolReward -> {
                         router.openPoolRewardDetail(payload)
                     }
+
                     is OperationParcelizeModel.Swap -> {
                         router.openSwapDetail(payload)
                     }
@@ -177,6 +178,7 @@ class TransactionHistoryProvider(
                 is TransactionStateMachine.SideEffect.ErrorEvent -> {
                     // ignore errors here, they are bypassed to client of mixin
                 }
+
                 is TransactionStateMachine.SideEffect.LoadPage -> loadNewPage(sideEffect)
                 TransactionStateMachine.SideEffect.TriggerCache -> triggerCache()
             }

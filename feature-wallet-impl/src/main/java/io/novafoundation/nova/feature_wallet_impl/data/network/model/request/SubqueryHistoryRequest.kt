@@ -43,6 +43,7 @@ private fun ModuleRestriction.Companion.ignoreSpecialOperationTypesExtrinsics() 
 
 class SubqueryHistoryRequest(
     accountAddress: String,
+    legacyAccountAddress: String?,
     pageSize: Int = 1,
     cursor: String? = null,
     filters: Set<TransactionFilter>,
@@ -57,7 +58,7 @@ class SubqueryHistoryRequest(
                 first: $pageSize,
                 orderBy: TIMESTAMP_DESC,
                 filter: { 
-                    address:{ equalTo: "$accountAddress"},
+                    ${addressFilter(accountAddress, legacyAccountAddress)}
                     ${filters.toQueryFilter(asset, chain)}
                 }
             ) {
@@ -81,6 +82,14 @@ class SubqueryHistoryRequest(
     }
 
     """.trimIndent()
+
+    private fun addressFilter(accountAddress: String, legacyAccountAddress: String?): String {
+        return if (legacyAccountAddress != null) {
+            """address: { in: ["$accountAddress", "$legacyAccountAddress"] }"""
+        } else {
+            """address: { equalTo: "$accountAddress" }"""
+        }
+    }
 
     private fun Set<TransactionFilter>.toQueryFilter(asset: Asset, chain: Chain): String {
         val additionalFilters = not(isIgnoredExtrinsic())
@@ -128,6 +137,7 @@ class SubqueryHistoryRequest(
             StakingTypeGroup.RELAYCHAIN,
             StakingTypeGroup.PARACHAIN,
             StakingTypeGroup.MYTHOS -> "reward"
+
             StakingTypeGroup.NOMINATION_POOL -> "poolReward"
             StakingTypeGroup.UNSUPPORTED -> null
         }

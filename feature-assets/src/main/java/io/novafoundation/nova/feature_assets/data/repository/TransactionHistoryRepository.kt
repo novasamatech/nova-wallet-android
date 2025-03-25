@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.pool
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.getAllCoinPriceHistory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -64,9 +65,9 @@ interface TransactionHistoryRepository {
 class RealTransactionHistoryRepository(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val operationDao: OperationDao,
-    private val coinPriceRepository: CoinPriceRepository,
     private val poolAccountDerivation: PoolAccountDerivation,
     private val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory,
+    private val coinPriceRepository: CoinPriceRepository
 ) : TransactionHistoryRepository {
 
     override suspend fun syncOperationsFirstPage(
@@ -133,13 +134,10 @@ class RealTransactionHistoryRepository(
 
         return operationDao.observe(accountAddress, chain.id, chainAsset.id)
             .transform { operations ->
-                emit(mapOperations(operations, chainAsset, chain, coinPrices = emptyList()))
-                val coinPrices = runCatching {
-                    val fromTimestamp = operations.minOf { it.base.time }.milliseconds.inWholeSeconds
-                    val toTimestamp = operations.maxOf { it.base.time }.milliseconds.inWholeSeconds
-                    coinPriceRepository.getCoinPriceRange(chainAsset.priceId!!, currency, fromTimestamp, toTimestamp)
-                }.getOrElse { emptyList() }
-                emit(mapOperations(operations, chainAsset, chain, coinPrices))
+                emit(mapOperations(operations, chainAsset, chain, emptyList()))
+
+                runCatching { coinPriceRepository.getAllCoinPriceHistory(chainAsset.priceId!!, currency) }
+                    .onSuccess { emit(mapOperations(operations, chainAsset, chain, it)) }
             }
             .mapLatest { operations ->
                 val pageOffset = historySource.getSyncedPageOffset(accountId, chain, chainAsset)

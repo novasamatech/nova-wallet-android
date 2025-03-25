@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
@@ -18,7 +19,7 @@ import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTit
 import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
 import kotlinx.android.synthetic.main.view_asset_nova_card.view.assetNovaCardText
 
-class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<HeaderHolder>() {
+class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<AssetsHeaderHolder>() {
 
     interface Handler {
         fun totalBalanceClicked()
@@ -50,6 +51,10 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: String? = null
     private var nftPreviews: List<NftPreviewUi>? = null
+
+    override fun getItemViewType(position: Int): Int {
+        return AssetsHeaderHolder.viewType
+    }
 
     fun setFilterIconRes(filterIconRes: Int) {
         this.filterIconRes = filterIconRes
@@ -85,11 +90,11 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         notifyItemChanged(0, Payload.WALLET_CONNECT)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(parent.inflateChild(R.layout.item_asset_header), handler)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AssetsHeaderHolder {
+        return AssetsHeaderHolder(parent.inflateChild(viewType), handler)
     }
 
-    override fun onBindViewHolder(holder: HeaderHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: AssetsHeaderHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
         } else {
@@ -105,7 +110,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<H
         }
     }
 
-    override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
+    override fun onBindViewHolder(holder: AssetsHeaderHolder, position: Int) {
         holder.bind(
             totalBalance,
             selectedWalletModel,
@@ -124,10 +129,14 @@ private enum class Payload {
     TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT
 }
 
-class HeaderHolder(
+class AssetsHeaderHolder(
     override val containerView: View,
     handler: AssetsHeaderAdapter.Handler,
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+
+    companion object : WithViewType {
+        override val viewType: Int = R.layout.item_asset_header
+    }
 
     init {
         with(containerView) {

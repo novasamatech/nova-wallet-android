@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -137,7 +138,7 @@ class YieldBoostConfirmViewModel(
     fun originAccountClicked() = launch {
         val address = currentAccountModelFlow.first().address
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        externalActions.showAddressActions(address, selectedAssetState.chain())
     }
 
     private fun setInitialFee() = launch {

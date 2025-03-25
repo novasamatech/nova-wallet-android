@@ -33,10 +33,11 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
@@ -119,17 +120,24 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): PriceApi {
-        return networkApiCreator.create(PriceApi::class.java, PriceApi.BASE_URL)
+    fun provideProxyPriceApi(networkApiCreator: NetworkApiCreator): ProxyPriceApi {
+        return networkApiCreator.create(ProxyPriceApi::class.java, ProxyPriceApi.BASE_URL)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): CoingeckoApi {
+        return networkApiCreator.create(CoingeckoApi::class.java, CoingeckoApi.BASE_URL)
     }
 
     @Provides
     @FeatureScope
     fun provideCoinPriceRemoteDataSource(
-        priceApi: PriceApi,
+        priceApi: ProxyPriceApi,
+        coingeckoApi: CoingeckoApi,
         httpExceptionHandler: HttpExceptionHandler
     ): CoinPriceRemoteDataSource {
-        return RealCoinPriceDataSource(priceApi, httpExceptionHandler)
+        return RealCoinPriceDataSource(priceApi, coingeckoApi, httpExceptionHandler)
     }
 
     @Provides

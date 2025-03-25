@@ -54,6 +54,7 @@ fun chainOf(
     icon = "Test",
     types = null,
     prefix = 0,
+    legacyPrefix = null,
     isTestNet = false,
     isEthereumBased = false,
     hasCrowdloans = false,

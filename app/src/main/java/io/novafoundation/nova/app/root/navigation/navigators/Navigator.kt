@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.Export
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
+import io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorFragment
+import io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
@@ -473,6 +475,19 @@ class Navigator(
         navigationBuilder().action(R.id.action_buyFlow_to_buyFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
+    }
+
+    override fun openChainAddressSelector(chainId: String, accountId: ByteArray) {
+        val payload = ChainAddressSelectorPayload(chainId, accountId)
+
+        navigationBuilder().action(R.id.action_openUnifiedAddressDialog)
+            .setArgs(ChainAddressSelectorFragment.getBundle(payload))
+            .navigateInRoot()
+    }
+
+    override fun closeChainAddressesSelector() {
+        navigationBuilder().action(R.id.action_closeChainAddressesFragment)
+            .navigateInRoot()
     }
 
     override fun returnToMainSwapScreen() {

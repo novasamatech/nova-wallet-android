@@ -363,7 +363,7 @@
         android:id="@+id/action_onboarding"
         app:destination="@id/onboarding_nav_graph"
         app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit"/>
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/mainFragment"
@@ -1074,6 +1074,6 @@
         android:id="@+id/dappFavorites"
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DappFavoritesFragment"
         android:label="fragment_favorites"
-        tools:layout="@layout/fragment_favorites_dapp"/>
+        tools:layout="@layout/fragment_favorites_dapp" />
 
 </navigation>

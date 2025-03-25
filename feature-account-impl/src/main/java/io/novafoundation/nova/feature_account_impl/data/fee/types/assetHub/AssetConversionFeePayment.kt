@@ -6,8 +6,8 @@ import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.assetConversionAssetIdType
-import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
+import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.chargeAssetTxPayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
@@ -21,7 +21,6 @@ import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import java.math.BigInteger
 
 internal class AssetConversionFeePayment(
@@ -34,7 +33,7 @@ internal class AssetConversionFeePayment(
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
         val xcmVersion = detectAssetIdXcmVersion(extrinsicBuilder.runtime)
-        return extrinsicBuilder.assetTxPayment(encodableAssetId(xcmVersion))
+        return extrinsicBuilder.chargeAssetTxPayment(encodableAssetId(xcmVersion))
     }
 
     override suspend fun convertNativeFee(nativeFee: Fee): Fee {
@@ -62,22 +61,6 @@ internal class AssetConversionFeePayment(
             parents = 1,
             interior = Interior.Here
         ).toEncodableInstance(xcmVersion)
-    }
-
-    private fun ExtrinsicBuilder.assetTxPayment(assetId: Any?, tip: BigInteger = BigInteger.ZERO) {
-        val extensionValue = assetTxPaymentPayload(assetId, tip)
-
-        signedExtension(
-            id = "ChargeAssetTxPayment",
-            value = SignedExtensionValue(includedInExtrinsic = extensionValue)
-        )
-    }
-
-    private fun assetTxPaymentPayload(assetId: Any?, tip: BigInteger = BigInteger.ZERO): Any {
-        return structOf(
-            "tip" to tip,
-            "assetId" to assetId
-        )
     }
 
     private suspend fun RuntimeCallsApi.convertNativeFee(amount: BigInteger): BigInteger? {

@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.d
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.di.ChainAddressSelectorComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.di.ManualBackupSelectAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.di.ManualBackupAdvancedSecretsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.di.ManualBackupSecretsComponent
@@ -107,6 +108,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun selectWalletComponentFactory(): SelectWalletComponent.Factory
 
     fun selectAddressComponentFactory(): SelectAddressComponent.Factory
+
+    fun chainAddressSelectorComponent(): ChainAddressSelectorComponent.Factory
 
     fun selectMultipleWalletsComponentFactory(): SelectMultipleWalletsComponent.Factory
 

@@ -1655,6 +1655,11 @@
     <string name="unavailable_tracks_delegated_group">すでに投票を委任したトラック</string>
     <string name="unavailable_tracks_title">利用できないトラック</string>
     <string name="unavailable_tracks_voted_group">既に投票しているトラック</string>
+    <string name="unified_address_format_checkbox_warning">再び表示しない。\n受取で従来のアドレスを見つけることができます。</string>
+    <string name="unified_address_format_legacy_badge">従来の形式</string>
+    <string name="unified_address_format_new_badge">新しい形式</string>
+    <string name="unified_address_subtitle">いくつかの取引所では、更新中に操作用に従来の形式が必要な場合があります。</string>
+    <string name="unified_address_title">新しい統一アドレス</string>
     <string name="update_notification_install_btn">インストール</string>
     <string name="update_notification_item_version">バージョン %s</string>
     <string name="update_notification_title">更新が利用可能</string>

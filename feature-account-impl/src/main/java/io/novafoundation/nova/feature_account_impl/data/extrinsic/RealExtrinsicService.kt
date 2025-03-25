@@ -163,7 +163,6 @@ class RealExtrinsicService(
         chain: Chain,
         extrinsic: String,
         usedSigner: FeeSigner,
-        submissionOptions: SubmissionOptions
     ): Fee {
         val runtime = chainRegistry.getRuntime(chain.id)
         val sendableExtrinsic = SendableExtrinsic(runtime, Extrinsic.fromHex(runtime, extrinsic))
@@ -171,7 +170,7 @@ class RealExtrinsicService(
         val nativeFee = estimateNativeFee(chain, sendableExtrinsic, usedSigner.submissionOrigin(chain))
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
-        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
+        val feePayment = feePaymentProvider.detectFeePaymentFromExtrinsic(sendableExtrinsic)
 
         return feePayment.convertNativeFee(nativeFee)
     }

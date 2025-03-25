@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.RealAddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_wallet_api.data.network.coingecko.PriceApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
@@ -20,10 +20,10 @@ class AddTokenModule {
 
     @Provides
     fun coinGeckoLinkValidationFactory(
-        coinGeckoApi: PriceApi,
+        coingeckoApi: CoingeckoApi,
         coinGeckoLinkParser: CoinGeckoLinkParser
     ): CoinGeckoLinkValidationFactory {
-        return CoinGeckoLinkValidationFactory(coinGeckoApi, coinGeckoLinkParser)
+        return CoinGeckoLinkValidationFactory(coingeckoApi, coinGeckoLinkParser)
     }
 
     @Provides

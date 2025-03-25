@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="unified_address_title">New Unified Address</string>
+    <string name="unified_address_subtitle">Some exchanges may still require the legacy format\nfor operations while they update. %s</string>
+    <string name="unified_address_format_new_badge">new format</string>
+    <string name="unified_address_format_legacy_badge">legacy format</string>
+    <string name="unified_address_format_checkbox_warning">Do not show this again.\nYou can find legacy address in Receive.</string>
 
     <string name="waiting_top_up_card_timer">Estimated %s</string>
     <string name="waiting_initial_top_up_card_title">Your card is being issued!</string>

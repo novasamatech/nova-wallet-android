@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.model.Delegator
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -53,8 +54,7 @@ class DelegateDelegatorsViewModel(
 
     fun delegatorClicked(voter: VoterModel) = launch {
         val chain = chainFlow.first()
-        val type = ExternalActions.Type.Address(voter.addressModel.address)
-        externalActions.showExternalActions(type, chain)
+        externalActions.showAddressActions(voter.addressModel.address, chain)
     }
 
     private suspend fun mapDelegatorsToDelegatorModels(chain: Chain, chainAsset: Chain.Asset, voters: List<Delegator>): List<VoterModel> {
