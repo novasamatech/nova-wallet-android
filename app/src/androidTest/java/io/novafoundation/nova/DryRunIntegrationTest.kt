@@ -7,12 +7,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.toResult
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.xcmPalletName
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.xcm.legacy.accountIdToMultiLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
-import io.novafoundation.nova.feature_xcm_api.asset.from
-import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.feature_xcm_api.dryRun.model.OriginCaller
 import io.novafoundation.nova.feature_xcm_api.dryRun.model.getByLocation
@@ -20,7 +17,9 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.Junctions
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
 import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.toMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
+import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -54,7 +53,7 @@ class DryRunIntegrationTest : BaseIntegrationTest() {
         val assets = MultiAsset.from(dotLocation, amount)
 
         val origin = "16WWmr2Xqgy5fna35GsNHXMU7vDBM12gzHCFGibQjSmKpAN".toAccountId().intoKey()
-        val beneficiary = origin.value.accountIdToMultiLocation()
+        val beneficiary = origin.toMultiLocation()
 
         val xcmVersion = XcmVersion.V4
 
