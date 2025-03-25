@@ -139,7 +139,7 @@ fun mapChainAccountFromLocal(chainAccountLocal: ChainAccountLocal): MetaAccount.
 fun mapProxyAccountFromLocal(proxyAccountLocal: ProxyAccountLocal): ProxyAccount {
     return with(proxyAccountLocal) {
         ProxyAccount(
-            metaId = proxyMetaId,
+            proxyMetaId = proxyMetaId,
             chainId = chainId,
             proxiedAccountId = proxiedAccountId,
             proxyType = ProxyType.fromString(proxyType)
