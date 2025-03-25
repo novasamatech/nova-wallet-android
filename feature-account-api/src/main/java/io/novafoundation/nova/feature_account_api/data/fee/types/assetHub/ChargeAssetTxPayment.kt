@@ -6,8 +6,9 @@ import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.signedExtensionOrNull
 import io.novafoundation.nova.common.utils.structOf
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.bindMultiLocation
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
@@ -44,7 +45,7 @@ fun RuntimeSnapshot.decodeCustomTxPaymentId(assetIdHex: String): Any? {
 
 class ChargeAssetTxPaymentValue(
     val tip: BalanceOf,
-    val assetId: MultiLocation?
+    val assetId: RelativeMultiLocation?
 ) {
 
     companion object {

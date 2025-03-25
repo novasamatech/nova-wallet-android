@@ -19,7 +19,7 @@ android {
         buildConfigField "String", "EHTERSCAN_API_KEY_ETHEREUM", readStringSecret("EHTERSCAN_API_KEY_ETHEREUM")
 
         buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/dynamic_transfers_base/xcm/v7/transfers_dev.json\""
-        buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/dynamic_transfers_base/xcm/v7/transfers_dynamic_dev.json\""
+        buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/085ba3c609b1a960113ee3915b8103ce3f4e7edb/xcm/v7/transfers_dynamic_dev.json\""
     }
 
     buildTypes {
