@@ -28,6 +28,7 @@ interface StatefullComponent<STATE, EVENT, ACTION> {
 }
 
 class UnsupportedComponent<S, E, A> : StatefullComponent<S, E, A> {
+
     companion object {
 
         fun <S, E, A> creator(): ComponentCreator<S, E, A> = { _, _ -> UnsupportedComponent() }

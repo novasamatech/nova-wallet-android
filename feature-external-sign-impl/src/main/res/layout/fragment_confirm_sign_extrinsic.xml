@@ -92,7 +92,7 @@
                     android:id="@+id/confirmSignExtinsicFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/common_network" />
+                    app:title="@string/network_fee" />
 
             </io.novafoundation.nova.common.view.TableView>
 

@@ -6,7 +6,7 @@ typealias Permission = String
 
 interface PermissionsAsker {
     enum class PermissionDeniedAction {
-        RETRY, REJECT
+        RETRY, CANCEL
     }
 
     enum class PermissionDeniedLevel {

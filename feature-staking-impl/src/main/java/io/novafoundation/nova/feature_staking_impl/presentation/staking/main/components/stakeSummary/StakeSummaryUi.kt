@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary
 
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.view.dialog.infoDialog
 
 fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent, view: StakeSummaryView) {
     // state
@@ -26,25 +24,6 @@ fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent,
             }
             is LoadingState.Loading -> view.showLoading()
         }
-    }
-
-    // actions
-    view.setStatusClickListener {
-        component.onAction(StakeSummaryAction.StatusClicked)
-    }
-
-    // events
-    component.events.observeEvent {
-        when (it) {
-            is StakeSummaryEvent.ShowStatusDialog -> showStatusAlert(it.titleAndMessage)
-        }
-    }
-}
-
-private fun BaseFragment<*>.showStatusAlert(titleAndMessage: TitleAndMessage) {
-    infoDialog(requireContext()) {
-        setTitle(titleAndMessage.first)
-        setMessage(titleAndMessage.second)
     }
 }
 

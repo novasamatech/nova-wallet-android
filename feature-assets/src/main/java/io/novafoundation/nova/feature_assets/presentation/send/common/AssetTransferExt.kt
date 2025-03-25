@@ -13,6 +13,7 @@ fun buildAssetTransfer(
     origin: ChainWithAsset,
     destination: ChainWithAsset,
     amount: BigDecimal,
+    transferringMaxAmount: Boolean,
     address: String,
 ): AssetTransfer {
     return BaseAssetTransfer(
@@ -23,6 +24,7 @@ fun buildAssetTransfer(
         destinationChain = destination.chain,
         destinationChainAsset = destination.asset,
         amount = amount,
+        transferringMaxAmount = transferringMaxAmount,
         feePaymentCurrency = feePaymentCurrency
     )
 }

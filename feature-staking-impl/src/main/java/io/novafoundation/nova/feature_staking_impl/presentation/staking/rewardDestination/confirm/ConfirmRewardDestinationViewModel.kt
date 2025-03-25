@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
@@ -106,7 +107,7 @@ class ConfirmRewardDestinationViewModel(
     }
 
     private suspend fun showAddressExternalActions(address: String) {
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        externalActions.showAddressActions(address, selectedAssetState.chain())
     }
 
     private suspend fun mapRewardDestinationParcelModelToRewardDestinationModel(

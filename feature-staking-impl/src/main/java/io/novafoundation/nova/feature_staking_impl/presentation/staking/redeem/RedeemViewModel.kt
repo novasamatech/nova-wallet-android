@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
@@ -85,8 +86,8 @@ class RedeemViewModel(
 
     fun originAccountClicked() {
         launch {
-            val payload = ExternalActions.Type.Address(originAddressModelFlow.first().address)
-            externalActions.showExternalActions(payload, selectedAssetState.chain())
+            val address = originAddressModelFlow.first().address
+            externalActions.showAddressActions(address, selectedAssetState.chain())
         }
     }
 

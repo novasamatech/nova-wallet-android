@@ -20,6 +20,7 @@ sealed class SignerPayload {
         val transactionVersion: String,
         val metadataHash: String?,
         val withSignedTransaction: Boolean?,
+        val assetId: String,
         val signedExtensions: List<String>,
         val version: Int
     ) : SignerPayload()
@@ -70,7 +71,8 @@ fun mapPolkadotJsSignerPayloadToPolkadotPayload(signerPayload: SignerPayload): P
                 transactionVersion = transactionVersion,
                 signedExtensions = signedExtensions,
                 withSignedTransaction = withSignedTransaction,
-                version = version
+                version = version,
+                assetId = assetId
             )
         }
         is SignerPayload.Raw -> with(signerPayload) {

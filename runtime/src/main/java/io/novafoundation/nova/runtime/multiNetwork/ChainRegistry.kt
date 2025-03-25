@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork
 import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
@@ -36,10 +37,10 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
-import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -306,8 +307,8 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
     }
 }
 
-suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeSnapshot.() -> R): R {
-    return with(getRuntime(chainId)) {
+suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeContext.() -> R): R {
+    return with(RuntimeContext(getRuntime(chainId))) {
         action()
     }
 }
@@ -376,6 +377,10 @@ suspend fun ChainRegistry.findEvmChainFromHexId(evmChainIdHex: String): Chain? {
 suspend fun ChainRegistry.findRelayChainOrThrow(chainId: ChainId): ChainId {
     val chain = getChain(chainId)
     return chain.parentId ?: chainId
+}
+
+fun ChainRegistry.chainFlow(chainId: ChainId): Flow<Chain> {
+    return chainsById.mapNotNull { it[chainId] }
 }
 
 fun ChainRegistry.enabledChainsFlow() = currentChains

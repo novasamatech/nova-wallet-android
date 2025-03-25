@@ -18,9 +18,41 @@
     <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string> <!--Renamed and changed-->
 
     <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="unified_address_title">New Unified Address</string>
+    <string name="unified_address_subtitle">Some exchanges may still require the legacy format\nfor operations while they update. %s</string>
+    <string name="unified_address_format_new_badge">new format</string>
+    <string name="unified_address_format_legacy_badge">legacy format</string>
+    <string name="unified_address_format_checkbox_warning">Do not show this again.\nYou can find legacy address in Receive.</string>
 
-    <!--<string name="dapp_main_welcome_title">Welcome to Nova Browser</string>-->
-    <!--<string name="dapp_main_welcome_subtitle">Browse the web using your accounts from Nova Wallet</string>-->
+    <string name="waiting_top_up_card_timer">Estimated %s</string>
+    <string name="waiting_initial_top_up_card_title">Your card is being issued!</string>
+    <string name="waiting_existing_card_top_up_card_title">Your card is being funded!</string>
+    <string name="waiting_top_up_card_description">It can take up to 5 minutes.\nThis window will be closed automatically.</string>
+
+    <string name="fragment_waiting_top_up_time_out_error_title">Contact support</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Please contact support@novawallet.io. Include email address that you have used for issuing the card.</string>
+
+    <string name="fragment_assets_nova_card">Manage Debit Card</string>
+
+    <string name="fragment_top_up_card_title">Top up card with %s</string>
+
+    <string name="price_charts_period_today">Today</string>
+    <string name="price_charts_period_week">Last Week</string>
+    <string name="price_charts_period_month">Last Month</string>
+    <string name="price_charts_period_year">Last Year</string>
+    <string name="price_charts_period_all">All Time</string>
+
+    <string name="price_chart_date_format">%s at %s</string>
+    <string name="price_chart_price_change">%s (%s)</string>
+
+    <string name="price_chart_title">%s price</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_chart_max">All</string>
+
+    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 

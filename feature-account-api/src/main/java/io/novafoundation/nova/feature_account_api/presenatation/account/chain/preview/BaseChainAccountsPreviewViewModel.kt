@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.chain.mo
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview.model.ChainAccountPreview
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
@@ -37,9 +38,7 @@ abstract class BaseChainAccountsPreviewViewModel(
     fun chainAccountClicked(item: AccountInChainUi) = launch {
         val chain = chainRegistry.getChain(item.chainUi.id)
 
-        val type = ExternalActions.Type.Address(item.address)
-
-        externalActions.showExternalActions(type, chain)
+        externalActions.showAddressActions(item.address, chain)
     }
 
     protected fun Flow<List<ChainAccountPreview>>.defaultFormat(): Flow<List<AccountInChainUi>> {

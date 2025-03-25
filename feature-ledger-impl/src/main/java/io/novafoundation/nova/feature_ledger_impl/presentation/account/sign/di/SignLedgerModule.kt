@@ -52,7 +52,7 @@ class SignLedgerModule {
         permissionsAskerFactory: PermissionsAskerFactory,
         fragment: Fragment,
         router: LedgerRouter
-    ) = permissionsAskerFactory.create(fragment, router)
+    ) = permissionsAskerFactory.createReturnable(fragment, router)
 
     @Provides
     @ScreenScope

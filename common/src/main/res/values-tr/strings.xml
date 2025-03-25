@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">‘%s’ DApp Favorilerden kaldırılacak</string>
     <string name="dapp_favourites_remove_title">Favorilerden Kaldırılsın mı?</string>
     <string name="dapp_list_placeholder">DApp\'lerin listesi burada görünecek</string>
-    <string name="dapp_main_welcome_subtitle">Hesaplarınızı Nova Wallet\'tan kullanarak web\'i gezin</string>
-    <string name="dapp_main_welcome_title">Nova Tarayıcısına Hoş Geldiniz</string>
     <string name="dapp_options_add_to_favorite">Favorilere Ekle</string>
     <string name="dapp_options_desktop_mode">Masaüstü modu</string>
     <string name="dapp_options_remove_from_favorite">Favorilerden Çıkar</string>
@@ -753,12 +751,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Ağ: %s\nMnemonik: %s</string>
     <string name="fee_not_yet_loaded_message">Lütfen ücret hesaplanana kadar bekleyin</string>
     <string name="fee_not_yet_loaded_title">Ücret hesaplama işlemi sürüyor</string>
+    <string name="fragment_assets_nova_card">Banka Kartını Yönet</string>
     <string name="fragment_set_staking_proxy_title">Staking için %s delegasyonu ekle</string>
     <string name="fragment_swap_main_settings_details_title">Takas detayları</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
     <string name="fragment_swap_main_settings_pay_title">Ödediğiniz</string>
     <string name="fragment_swap_main_settings_receive_title">Aldığınız</string>
     <string name="fragment_swap_main_settings_select_token">Bir token seçin</string>
+    <string name="fragment_top_up_card_title">Kartı %s ile doldur</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Lütfen support@novawallet.io ile iletişime geçin. Kartınızı almak için kullandığınız e-posta adresini belirtin.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Destek ile iletişime geçin</string>
     <string name="governance_notification_channel_name">Yönetim Bildirim Kanalı</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">En az %d parça seçmelisiniz</item>
@@ -936,6 +938,19 @@
     <string name="pre_configured_networks_progress_text">Ağlar listesi yükleniyor...</string>
     <string name="pre_configured_networks_search_hint">Ağ adına göre ara</string>
     <string name="pre_configured_networks_title">Ağ ekle</string>
+    <string name="price_chart_date_format" formatted="false">%s tarihinde %s</string>
+    <string name="price_chart_day">1G</string>
+    <string name="price_chart_max">Hepsi</string>
+    <string name="price_chart_month">1A</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s fiyatı</string>
+    <string name="price_chart_week">1H</string>
+    <string name="price_chart_year">1Yıl</string>
+    <string name="price_charts_period_all">Tüm Zamanlar</string>
+    <string name="price_charts_period_month">Geçen Ay</string>
+    <string name="price_charts_period_today">Bugün</string>
+    <string name="price_charts_period_week">Geçen Hafta</string>
+    <string name="price_charts_period_year">Geçen Yıl</string>
     <string name="profile_accounts_title">Hesaplar</string>
     <string name="profile_accounts_title_2_0">Cüzdanlar</string>
     <string name="profile_language_title">Dil</string>
@@ -1652,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Zaten oylarınızı delegasyon yaptığınız izler</string>
     <string name="unavailable_tracks_title">Ulaşılamayan izler</string>
     <string name="unavailable_tracks_voted_group">Mevcut oyların olduğu izler</string>
+    <string name="unified_address_format_checkbox_warning">Bunu tekrar gösterme.\nEski adresi Al bölümünde bulabilirsiniz.</string>
+    <string name="unified_address_format_legacy_badge">Eski format</string>
+    <string name="unified_address_format_new_badge">Yeni format</string>
+    <string name="unified_address_subtitle">Bazı borsalar işlemler için hala eski formatı\ngüncelleme yaparken kullanmanızı isteyebilir.</string>
+    <string name="unified_address_title">Yeni Birleştirilmiş Adres</string>
     <string name="update_notification_install_btn">Yükle</string>
     <string name="update_notification_item_version">Versiyon %s</string>
     <string name="update_notification_title">Güncelleme mevcut</string>
@@ -1670,6 +1690,10 @@
     <string name="vote_revote">Yeniden Oy Ver</string>
     <string name="vote_vote">Oy Ver</string>
     <string name="voting_status">Oylama Durumu</string>
+    <string name="waiting_existing_card_top_up_card_title">Kartınız finanse ediliyor!</string>
+    <string name="waiting_initial_top_up_card_title">Kartınız veriliyor!</string>
+    <string name="waiting_top_up_card_description">Bu işlem 5 dakika kadar sürebilir.\nBu pencere otomatik olarak kapatılacaktır.</string>
+    <string name="waiting_top_up_card_timer">Tahmini %s</string>
     <string name="wallet_asset_buy">Satın al</string>
     <string name="wallet_asset_buy_with">ile Satın al</string>
     <string name="wallet_asset_receive">Al</string>

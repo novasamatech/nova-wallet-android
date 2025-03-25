@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_banners_api.presentation.view.switcher
 
 import android.graphics.Rect
+import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.feature_banners_api.presentation.ClipableImage
 import io.novafoundation.nova.feature_banners_api.presentation.view.PageView
 
@@ -21,6 +22,8 @@ class ContentSwitchingController(
             val view = viewFactory()
             view.title.text = payload.title
             view.subtitle.text = payload.subtitle
+
+            view.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
 
             val imageModel = payload.clipableImage
             if (view.image.drawable != imageModel.drawable) {

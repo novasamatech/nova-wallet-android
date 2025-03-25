@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.StatefullComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.mythos.MythosUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools.NominationPoolsUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain.ParachainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.rebond.RebondKind
@@ -57,6 +58,7 @@ class UnbondingComponentFactory(
     private val parachainComponentFactory: ParachainUnbondingComponentFactory,
     private val nominationPoolsUnbondingComponentFactory: NominationPoolsUnbondingComponentFactory,
     private val compoundStakingComponentFactory: CompoundStakingComponentFactory,
+    private val mythos: MythosUnbondingComponentFactory,
 ) {
 
     fun create(
@@ -65,6 +67,7 @@ class UnbondingComponentFactory(
         relaychainComponentCreator = relaychainUnbondingComponentFactory::create,
         parachainComponentCreator = parachainComponentFactory::create,
         nominationPoolsCreator = nominationPoolsUnbondingComponentFactory::create,
+        mythosCreator = mythos::create,
         hostContext = hostContext
     )
 }

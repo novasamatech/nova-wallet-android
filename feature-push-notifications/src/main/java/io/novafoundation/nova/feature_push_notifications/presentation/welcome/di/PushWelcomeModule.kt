@@ -25,7 +25,7 @@ class PushWelcomeModule {
         permissionsAskerFactory: PermissionsAskerFactory,
         fragment: Fragment,
         router: PushNotificationsRouter
-    ) = permissionsAskerFactory.create(fragment, router)
+    ) = permissionsAskerFactory.createReturnable(fragment, router)
 
     @Provides
     @IntoMap

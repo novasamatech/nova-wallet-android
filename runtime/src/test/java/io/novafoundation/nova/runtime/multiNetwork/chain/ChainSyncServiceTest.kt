@@ -66,6 +66,7 @@ class ChainSyncServiceTest {
         ),
         icon = "test",
         addressPrefix = 0,
+        legacyAddressPrefix = null,
         types = null,
         options = emptySet(),
         parentId = null,
