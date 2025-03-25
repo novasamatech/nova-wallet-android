@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabel
@@ -85,8 +86,8 @@ class ReferendumVotersViewModel(
         val voters = voterModels.firstOnLoad()
         val voterItem = voters[position]
         val chain = chainFlow.first()
-        val type = ExternalActions.Type.Address(voterItem.metadata.address)
-        externalActions.showExternalActions(type, chain)
+
+        externalActions.showAddressActions(voterItem.metadata.address, chain)
     }
 
     private suspend fun mapVotersToVoterModels(

@@ -57,7 +57,7 @@ private class RealAssetValidationContext(
         return edMutex.withLock {
             edCache.getOrPut(chainAssetId) {
                 val (chain, asset) = chainRegistry.chainWithAsset(chainAssetId)
-                assetSourceRegistry.existentialDepositInPlanks(chain, asset)
+                assetSourceRegistry.existentialDepositInPlanks(asset)
             }
         }
     }

@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.di.DescriptionComponent
@@ -131,6 +132,7 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
             AccountFeatureApi::class,
             DAppFeatureApi::class,
             DbApi::class,
+            DeepLinkBuildingFeatureApi::class
         ]
     )
     interface GovernanceFeatureDependenciesComponent : GovernanceFeatureDependencies

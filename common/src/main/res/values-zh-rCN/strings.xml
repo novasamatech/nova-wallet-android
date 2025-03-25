@@ -647,8 +647,6 @@
     <string name="dapp_favourites_remove_description">“%s”DApp将从收藏夹中移除</string>
     <string name="dapp_favourites_remove_title">从收藏夹中移除?</string>
     <string name="dapp_list_placeholder">DApps列表将出现在这里</string>
-    <string name="dapp_main_welcome_subtitle">使用您从Nova钱包的账户浏览网页</string>
-    <string name="dapp_main_welcome_title">欢迎来到Nova浏览器</string>
     <string name="dapp_options_add_to_favorite">添加到收藏夹</string>
     <string name="dapp_options_desktop_mode">桌面模式</string>
     <string name="dapp_options_remove_from_favorite">从收藏夹中移除</string>
@@ -747,12 +745,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">网络：%s\n助记词：%s</string>
     <string name="fee_not_yet_loaded_message">请等待费用计算</string>
     <string name="fee_not_yet_loaded_title">费用计算正在进行中</string>
+    <string name="fragment_assets_nova_card">管理借记卡</string>
     <string name="fragment_set_staking_proxy_title">为%s质押添加委托</string>
     <string name="fragment_swap_main_settings_details_title">兑换详情</string>
     <string name="fragment_swap_main_settings_max_button">最大：</string>
     <string name="fragment_swap_main_settings_pay_title">您支付</string>
     <string name="fragment_swap_main_settings_receive_title">您收到</string>
     <string name="fragment_swap_main_settings_select_token">选择一个代币</string>
+    <string name="fragment_top_up_card_title">使用%s充值卡</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">请联系support@novawallet.io。包括您用于发卡的电子邮件地址。</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">联系支持</string>
     <string name="governance_notification_channel_name">治理通知渠道</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">您至少需要选择%d轨道</item>
@@ -928,6 +930,19 @@
     <string name="pre_configured_networks_progress_text">正在加载网络列表...</string>
     <string name="pre_configured_networks_search_hint">按网络名称搜索</string>
     <string name="pre_configured_networks_title">添加网络</string>
+    <string name="price_chart_date_format" formatted="false">%s 于 %s</string>
+    <string name="price_chart_day">1天</string>
+    <string name="price_chart_max">所有</string>
+    <string name="price_chart_month">1月</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s 价格</string>
+    <string name="price_chart_week">1周</string>
+    <string name="price_chart_year">1年</string>
+    <string name="price_charts_period_all">所有时间</string>
+    <string name="price_charts_period_month">上个月</string>
+    <string name="price_charts_period_today">今天</string>
+    <string name="price_charts_period_week">上周</string>
+    <string name="price_charts_period_year">去年</string>
     <string name="profile_accounts_title">账户</string>
     <string name="profile_accounts_title_2_0">钱包</string>
     <string name="profile_language_title">语言</string>
@@ -1640,6 +1655,11 @@
     <string name="unavailable_tracks_delegated_group">您已经代理投票的轨道</string>
     <string name="unavailable_tracks_title">不可用轨道</string>
     <string name="unavailable_tracks_voted_group">您已投票的轨道</string>
+    <string name="unified_address_format_checkbox_warning">不要再显示。\n您可以在接收中找到传统地址。</string>
+    <string name="unified_address_format_legacy_badge">传统格式</string>
+    <string name="unified_address_format_new_badge">新格式</string>
+    <string name="unified_address_subtitle">一些交易所可能仍然需要传统格式\n在他们更新期间进行操作。</string>
+    <string name="unified_address_title">新统一地址</string>
     <string name="update_notification_install_btn">安装</string>
     <string name="update_notification_item_version">版本 %s</string>
     <string name="update_notification_title">更新可用</string>
@@ -1658,6 +1678,10 @@
     <string name="vote_revote">重新投票</string>
     <string name="vote_vote">投票</string>
     <string name="voting_status">投票状态</string>
+    <string name="waiting_existing_card_top_up_card_title">您的卡正在充值中！</string>
+    <string name="waiting_initial_top_up_card_title">您的卡正在发行！</string>
+    <string name="waiting_top_up_card_description">最多可能需要 5 分钟。\n此窗口将自动关闭。</string>
+    <string name="waiting_top_up_card_timer">预计 %s</string>
     <string name="wallet_asset_buy">购买</string>
     <string name="wallet_asset_buy_with">用...购买</string>
     <string name="wallet_asset_receive">接收</string>

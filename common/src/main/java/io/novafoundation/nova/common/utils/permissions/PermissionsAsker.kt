@@ -6,7 +6,7 @@ typealias Permission = String
 
 interface PermissionsAsker {
     enum class PermissionDeniedAction {
-        RETRY, REJECT
+        RETRY, CANCEL
     }
 
     enum class PermissionDeniedLevel {
@@ -16,8 +16,6 @@ interface PermissionsAsker {
     val showPermissionsDenied: ActionAwaitableMixin<PermissionDeniedLevel, PermissionDeniedAction>
 
     interface Presentation : PermissionsAsker {
-        suspend fun requirePermissionsOrExit(vararg permissions: Permission): Boolean
-
-        suspend fun requirePermissionsOrIgnore(vararg permissions: Permission): Boolean
+        suspend fun requirePermissions(vararg permissions: Permission): Boolean
     }
 }

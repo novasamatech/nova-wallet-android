@@ -79,11 +79,7 @@ class ValidatorExposureUpdater(
     private suspend fun checkValuesInCache(era: BigInteger, chainId: String, runtimeSnapshot: RuntimeSnapshot): Boolean {
         if (!isPagedExposuresFlagInCache(chainId)) return false
 
-        if (runtimeSnapshot.pagedExposuresEnabled()) {
-            return isPagedExposuresInCache(era, chainId, runtimeSnapshot) || isLegacyExposuresInCache(era, chainId, runtimeSnapshot)
-        }
-
-        return isLegacyExposuresInCache(era, chainId, runtimeSnapshot)
+        return isPagedExposuresInCache(era, chainId, runtimeSnapshot) || isLegacyExposuresInCache(era, chainId, runtimeSnapshot)
     }
 
     private suspend fun isPagedExposuresFlagInCache(chainId: String): Boolean {
@@ -91,30 +87,40 @@ class ValidatorExposureUpdater(
     }
 
     private suspend fun isPagedExposuresInCache(era: BigInteger, chainId: String, runtimeSnapshot: RuntimeSnapshot): Boolean {
+        if (!runtimeSnapshot.pagedExposuresEnabled()) return false
+
         val prefix = runtimeSnapshot.eraStakersOverviewPrefixFor(era)
 
         return storageCache.isPrefixInCache(prefix, chainId)
     }
 
     private suspend fun isLegacyExposuresInCache(era: BigInteger, chainId: String, runtimeSnapshot: RuntimeSnapshot): Boolean {
+        // We cannot construct storage key to remove legacy exposures
+        // There is a little chance they are still there given that removing of legacy exposures should
+        // happen at least when all legacy exposures are removed from the chain
+        if (runtimeSnapshot.legacyExposuresFullyRemoved()) {
+            return false
+        }
+
         val prefix = runtimeSnapshot.eraStakersPrefixFor(era)
 
         return storageCache.isPrefixInCache(prefix, chainId)
     }
 
     private suspend fun cleanupOutdatedEras(chainId: String, runtimeSnapshot: RuntimeSnapshot) {
-        if (runtimeSnapshot.pagedExposuresEnabled()) {
-            cleanupPagedExposures(runtimeSnapshot, chainId)
-        }
-
+        cleanupPagedExposures(runtimeSnapshot, chainId)
         cleanupLegacyExposures(runtimeSnapshot, chainId)
     }
 
     private suspend fun cleanupLegacyExposures(runtimeSnapshot: RuntimeSnapshot, chainId: String) {
+        if (runtimeSnapshot.legacyExposuresFullyRemoved()) return
+
         storageCache.removeByPrefix(runtimeSnapshot.eraStakersPrefix(), chainId)
     }
 
     private suspend fun cleanupPagedExposures(runtimeSnapshot: RuntimeSnapshot, chainId: String) {
+        if (!runtimeSnapshot.pagedExposuresEnabled()) return
+
         storageCache.removeByPrefix(runtimeSnapshot.eraStakersPagedPrefix(), chainId)
         storageCache.removeByPrefix(runtimeSnapshot.eraStakersOverviewPrefix(), chainId)
     }
@@ -175,6 +181,10 @@ class ValidatorExposureUpdater(
 
     private fun RuntimeSnapshot.pagedExposuresEnabled(): Boolean {
         return metadata.staking().hasStorage("ErasStakersPaged")
+    }
+
+    private fun RuntimeSnapshot.legacyExposuresFullyRemoved(): Boolean {
+        return !metadata.staking().hasStorage("ErasStakers")
     }
 
     private fun RuntimeSnapshot.eraStakersPrefixFor(era: BigInteger): String {

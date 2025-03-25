@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.drawToBitmap
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -20,6 +21,8 @@ import kotlinx.android.synthetic.main.fragment_receive.receiveShare
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.fragment_receive.receiveAccount
 import kotlinx.android.synthetic.main.fragment_receive.receiveAddress
+import kotlinx.android.synthetic.main.fragment_receive.receiveAddressesButton
+import kotlinx.android.synthetic.main.fragment_receive.receiveAddressesWarning
 import kotlinx.android.synthetic.main.fragment_receive.receiveBackButton
 import kotlinx.android.synthetic.main.fragment_receive.receiveChain
 import kotlinx.android.synthetic.main.fragment_receive.receiveCopyButton
@@ -62,6 +65,8 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
 
         receiveQrCodeContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
         receiveQrCodeContainer.clipToOutline = true
+
+        receiveAddressesButton.setOnClickListener { viewModel.chainAddressesClicked() }
     }
 
     override fun inject() {
@@ -81,6 +86,10 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel>() {
         viewModel.qrCodeFlow.observe(receiveQrCode::setQrModel)
         viewModel.accountNameFlow.observe(receiveAccount::setText)
         viewModel.addressFlow.observe(receiveAddress::setText)
+        viewModel.chainSupportsLegacyAddressFlow.observe {
+            receiveAddressesWarning.isVisible = it
+            receiveAddressesButton.isVisible = it
+        }
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
     }

@@ -11,7 +11,7 @@ fun <T> BaseFragment<T>.setupExternalActions(viewModel: T) where T : BaseViewMod
         ExternalActionsSheet(
             context,
             payload,
-            viewModel::copyAddressClicked,
+            viewModel::copyValue,
             viewModel::viewExternalClicked
         )
     }
@@ -28,8 +28,4 @@ inline fun <T> BaseFragment<T>.setupExternalActions(
             customSheetCreator(requireContext(), it).show()
         }
     }
-}
-
-fun <T> T.copyAddressClicked(address: String) where T : BaseViewModel, T : ExternalActions {
-    copyAddress(address, ::showMessage)
 }

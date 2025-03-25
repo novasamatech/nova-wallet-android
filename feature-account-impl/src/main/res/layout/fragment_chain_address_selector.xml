@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/walletListItemContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp">
+
+    <View
+        android:id="@+id/walletListPuller"
+        style="@style/Widget.Nova.Puller"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:id="@+id/selectLegacyAddressTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="22dp"
+        android:gravity="center"
+        android:text="@string/unified_address_title"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:id="@+id/selectLegacyAddressSubtitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        tools:text="@string/unified_address_subtitle" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addressNewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_block_16"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <io.novafoundation.nova.common.view.ChipLabelView
+            android:id="@+id/addressFormatChip"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unified_address_format_new_badge"
+            android:textColor="@color/text_positive"
+            app:layout_constraintBottom_toTopOf="@+id/addressFormatAddress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/addressFormatAddress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="middle"
+            android:lines="1"
+            android:textColor="@color/text_primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addressFormatChip"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="121eb2BdXbD2Ab...QtN6qCmG7N" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_copy_outline"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/icon_accent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addressLegacyContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_block_16"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <io.novafoundation.nova.common.view.ChipLabelView
+            android:id="@+id/addressFormatChipLegacy"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unified_address_format_legacy_badge"
+            app:layout_constraintBottom_toTopOf="@+id/addressFormatAddressLegacy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/addressFormatAddressLegacy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="middle"
+            android:lines="1"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addressFormatChipLegacy"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="7JcCsXJ2jvJp1Hw...6avrXyHvVmp9" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_copy_outline"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/icon_accent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/legacyAddressCheckbox"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingStart="8dp"
+        android:text="@string/unified_address_format_checkbox_warning"
+        android:textColor="@color/text_secondary" />
+
+    <io.novafoundation.nova.common.view.PrimaryButtonV2
+        android:id="@+id/legacyAddressButton"
+        style="@style/Widget.Nova.MaterialButton.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/common_ok" />
+
+</LinearLayout>

@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.satisfies

@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -45,18 +46,14 @@ class RewardDetailViewModel(
         router.back()
     }
 
-    fun eventIdClicked() {
-        shoExternalActions(ExternalActions.Type.Event(operation.eventId))
+    fun eventIdClicked() = launch {
+        externalActions.showExternalActions(ExternalActions.Type.Event(operation.eventId), chain())
     }
 
-    fun validatorAddressClicked() {
+    fun validatorAddressClicked() = launch {
         operation.validator?.let {
-            shoExternalActions(ExternalActions.Type.Address(it))
+            externalActions.showAddressActions(it, chain())
         }
-    }
-
-    private fun shoExternalActions(type: ExternalActions.Type) = launch {
-        externalActions.showExternalActions(type, chain())
     }
 
     private suspend fun getIcon(address: String) = addressIconGenerator.createAddressModel(

@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
@@ -39,8 +39,6 @@ interface ExternalSignFeatureDependencies {
 
     fun imageLoader(): ImageLoader
 
-    fun feeLoaderMixinFactory(): FeeLoaderMixin.Factory
-
     fun extrinsicService(): ExtrinsicService
 
     fun tokenRepository(): TokenRepository
@@ -49,6 +47,8 @@ interface ExternalSignFeatureDependencies {
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson
+
+    val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 

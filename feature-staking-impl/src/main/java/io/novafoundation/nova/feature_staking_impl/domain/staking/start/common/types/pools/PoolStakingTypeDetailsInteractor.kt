@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.pools
 
+import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.chain
@@ -11,7 +12,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.t
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.StakingTypeDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.StakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import java.math.BigInteger
 
@@ -22,13 +22,13 @@ class PoolStakingTypeDetailsInteractorFactory(
 
     override suspend fun create(
         stakingOption: StakingOption,
-        coroutineScope: CoroutineScope
+        computationalScope: ComputationalScope
     ): PoolStakingTypeDetailsInteractor {
         return PoolStakingTypeDetailsInteractor(
             nominationPoolSharedComputation,
             poolsAvailableBalanceResolver,
             stakingOption,
-            coroutineScope
+            computationalScope
         )
     }
 }
@@ -37,7 +37,7 @@ class PoolStakingTypeDetailsInteractor(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val poolsAvailableBalanceResolver: NominationPoolsAvailableBalanceResolver,
     private val stakingOption: StakingOption,
-    private val scope: CoroutineScope,
+    private val scope: ComputationalScope,
 ) : StakingTypeDetailsInteractor {
 
     override fun observeData(): Flow<StakingTypeDetails> {

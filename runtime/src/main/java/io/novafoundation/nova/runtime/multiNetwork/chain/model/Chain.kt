@@ -29,6 +29,7 @@ data class Chain(
     val externalApis: List<ExternalApi>,
     val icon: String?,
     val addressPrefix: Int,
+    val legacyAddressPrefix: Int?,
     val types: Types?,
     val isEthereumBased: Boolean,
     val isTestNet: Boolean,
@@ -59,7 +60,8 @@ data class Chain(
         val feeViaRuntimeCall: Boolean?,
         val supportLedgerGenericApp: Boolean?,
         val identityChain: ChainId?,
-        val disabledCheckMetadataHash: Boolean?
+        val disabledCheckMetadataHash: Boolean?,
+        val sessionLength: Int?
     )
 
     data class Types(
@@ -119,7 +121,8 @@ data class Chain(
             UNSUPPORTED,
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
             PARACHAIN, TURING, // parachain-staking like
-            NOMINATION_POOLS
+            NOMINATION_POOLS,
+            MYTHOS
         }
 
         override val identifier = "$chainId:$id"
