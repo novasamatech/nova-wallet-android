@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethod
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
@@ -136,7 +136,7 @@ class LedgerFeatureModule {
     @FeatureScope
     fun provideDeviceDiscoveryService(
         ledgerDeviceDiscoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory
-    ): LedgerDeviceDiscoveryService = ledgerDeviceDiscoveryServiceFactory.create(DiscoveryMethod.ALL)
+    ): LedgerDeviceDiscoveryService = ledgerDeviceDiscoveryServiceFactory.create(DiscoveryMethods.all())
 
     @Provides
     @FeatureScope

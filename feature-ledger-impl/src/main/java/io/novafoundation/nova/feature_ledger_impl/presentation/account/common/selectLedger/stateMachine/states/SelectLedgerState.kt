@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states
 
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethod
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothRequired
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryRequirement
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.hasRequirement
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isRequirementsNecessary
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothDisabled
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothEnabled
@@ -13,30 +15,31 @@ import java.io.InvalidObjectException
 
 sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffect, SelectLedgerEvent> {
 
-    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.bluetoothDisabled(discoveryMethod: DiscoveryMethod) {
-        missingDiscoveryState(setOf(DiscoveryRequirement.BLUETOOTH), discoveryMethod)
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.bluetoothDisabled(discoveryMethods: DiscoveryMethods) {
+        if (!discoveryMethods.isBluetoothIsNecessary()) return
+
+        missingDiscoveryState(setOf(DiscoveryRequirement.BLUETOOTH), discoveryMethods)
     }
 
-    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.locationDisabled(discoveryMethod: DiscoveryMethod) {
-        missingDiscoveryState(setOf(DiscoveryRequirement.LOCATION), discoveryMethod)
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.locationDisabled(discoveryMethods: DiscoveryMethods) {
+        if (!discoveryMethods.isLocationIsNecessary()) return
+
+        missingDiscoveryState(setOf(DiscoveryRequirement.LOCATION), discoveryMethods)
     }
 
-    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.startDiscovery(discoveryMethod: DiscoveryMethod) {
-        emitState(DiscoveringState(discoveryMethod))
+    protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.startDiscovery(discoveryMethods: DiscoveryMethods) {
+        emitState(DiscoveringState(discoveryMethods))
         emitSideEffect(SideEffect.StartDiscovery)
     }
 
     protected suspend fun StateMachine.Transition<SelectLedgerState, SideEffect>.missingDiscoveryState(
         missingRequirements: Set<DiscoveryRequirement>,
-        discoveryMethod: DiscoveryMethod
+        discoveryMethods: DiscoveryMethods
     ) {
-        if (discoveryMethod.isBluetoothRequired()) {
-            val sideEffect = getSideEffectFromRequirements(missingRequirements)
+        emitState(MissingDiscoveryRequirementState(missingRequirements, discoveryMethods))
 
-            emitState(MissingDiscoveryRequirementState(missingRequirements, discoveryMethod))
-
-            emitSideEffect(sideEffect)
-        }
+        val sideEffect = getSideEffectFromRequirements(missingRequirements)
+        emitSideEffect(sideEffect)
     }
 
     protected fun Set<DiscoveryRequirement>.updateByEvent(event: SelectLedgerEvent): Set<DiscoveryRequirement>? {
@@ -48,6 +51,10 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
             else -> null
         }
     }
+
+    protected fun DiscoveryMethods.isLocationIsNecessary() = isRequirementsNecessary() && hasRequirement(DiscoveryRequirement.LOCATION)
+
+    protected fun DiscoveryMethods.isBluetoothIsNecessary() = isRequirementsNecessary() && hasRequirement(DiscoveryRequirement.LOCATION)
 }
 
 private fun getSideEffectFromRequirements(requirements: Set<DiscoveryRequirement>) = when {
