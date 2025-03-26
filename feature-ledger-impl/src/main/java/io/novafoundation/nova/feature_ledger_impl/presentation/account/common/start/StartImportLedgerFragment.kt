@@ -74,7 +74,8 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> : Base
             guideItems = listOf(
                 LedgerGuideItem(1, networkAppIsInstalledStep()),
                 LedgerGuideItem(2, openingNetworkAppStep()),
-                LedgerGuideItem(3, selectAccountStep())
+                LedgerGuideItem(3, enableOTGSetting()),
+                LedgerGuideItem(4, selectAccountStep())
             )
         )
     }
@@ -92,6 +93,11 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> : Base
     private fun enableBluetoothStep() = requireContext().highlightedText(
         R.string.account_ledger_import_start_step_3,
         R.string.account_ledger_import_start_step_3_highlighted
+    )
+
+    private fun enableOTGSetting() = requireContext().highlightedText(
+        R.string.account_ledger_import_start_step_otg,
+        R.string.account_ledger_import_start_step_otg_highlighted
     )
 
     private fun selectAccountStep() = requireContext().highlightedText(

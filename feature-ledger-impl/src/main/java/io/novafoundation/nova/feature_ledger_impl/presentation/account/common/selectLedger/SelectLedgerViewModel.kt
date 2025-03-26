@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothUsing
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isPermissionsRequired
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -73,14 +72,22 @@ abstract class SelectLedgerViewModel(
         .shareInBackground()
 
     val hints = flowOf {
-        when (payload) {
-            SelectLedgerPayload.BLE -> resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
-            SelectLedgerPayload.USB -> resourceManager.getString(R.string.account_ledger_select_device_usb_description, messageFormatter.appName())
-            SelectLedgerPayload.ALL -> resourceManager.getString(R.string.account_ledger_select_device_all_description)
+        when (payload.connectionMode) {
+            SelectLedgerPayload.ConnectionMode.BLUETOOTH -> resourceManager.getString(
+                R.string.account_ledger_select_device_description,
+                messageFormatter.appName()
+            )
+
+            SelectLedgerPayload.ConnectionMode.USB -> resourceManager.getString(
+                R.string.account_ledger_select_device_usb_description,
+                messageFormatter.appName()
+            )
+
+            SelectLedgerPayload.ConnectionMode.ALL -> resourceManager.getString(R.string.account_ledger_select_device_all_description)
         }
     }.shareInBackground()
 
-    val showPermissionsButton = flowOf { discoveryMethod == DiscoveryMethod.ALL }
+    val showPermissionsButton = flowOf { payload.connectionMode == SelectLedgerPayload.ConnectionMode.ALL }
         .shareInBackground()
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()

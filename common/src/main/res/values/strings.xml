@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="account_ledger_import_start_step_otg">%s in your phone settings</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Enable OTG</string>
+
     <string name="select_ledger_grant_permissions">Enable Bluetooth &amp; Grant Permissions</string>
 
     <string name="ledger_verify_address_message_both_buttons">Press both buttons on your %s to approve the address</string>

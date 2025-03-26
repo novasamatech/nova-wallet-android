@@ -45,6 +45,8 @@ internal class RealBluetoothManager(
     }
 
     override fun enableBluetooth() {
+        if (isBluetoothEnabled()) return
+
         val activity = contextManager.getActivity()!!
 
         activity.lifecycle.whenStarted {
@@ -53,6 +55,8 @@ internal class RealBluetoothManager(
     }
 
     override suspend fun enableBluetoothAndAwait(): Boolean {
+        if (isBluetoothEnabled()) return true
+
         return systemCallExecutor.executeSystemCall(EnableBluetoothSystemCall()).getOrNull() ?: false
     }
 
