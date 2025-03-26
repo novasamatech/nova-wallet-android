@@ -6,8 +6,9 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
-import android.content.Intent
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.systemCall.EnableBluetoothSystemCall
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.whenStarted
 import android.bluetooth.BluetoothManager as NativeBluetoothManager
 
@@ -20,11 +21,14 @@ interface BluetoothManager {
     fun enableBluetooth()
 
     fun isBluetoothEnabled(): Boolean
+
+    suspend fun enableBluetoothAndAwait(): Boolean
 }
 
 @SuppressLint("MissingPermission")
 internal class RealBluetoothManager(
-    private val contextManager: ContextManager
+    private val contextManager: ContextManager,
+    private val systemCallExecutor: SystemCallExecutor
 ) : BluetoothManager {
 
     private val nativeBluetoothManager = contextManager.getApplicationContext().getSystemService(Activity.BLUETOOTH_SERVICE) as NativeBluetoothManager
@@ -42,11 +46,14 @@ internal class RealBluetoothManager(
 
     override fun enableBluetooth() {
         val activity = contextManager.getActivity()!!
-        val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
 
         activity.lifecycle.whenStarted {
-            activity.startActivityForResult(intent, 0)
+            systemCallExecutor.executeSystemCallNotBlocking(EnableBluetoothSystemCall())
         }
+    }
+
+    override suspend fun enableBluetoothAndAwait(): Boolean {
+        return systemCallExecutor.executeSystemCall(EnableBluetoothSystemCall()).getOrNull() ?: false
     }
 
     override fun isBluetoothEnabled(): Boolean {

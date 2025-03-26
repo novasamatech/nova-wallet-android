@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethod
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothRequired
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothUsing
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -73,12 +72,15 @@ abstract class SelectLedgerViewModel(
         .shareInBackground()
 
     val hints = flowOf {
-        if (discoveryMethod.isBluetoothUsing()) {
-            resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
-        } else {
-            resourceManager.getString(R.string.account_ledger_select_device_usb_description, messageFormatter.appName())
+        when (discoveryMethod) {
+            DiscoveryMethod.BLE -> resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
+            DiscoveryMethod.USB -> resourceManager.getString(R.string.account_ledger_select_device_usb_description, messageFormatter.appName())
+            DiscoveryMethod.ALL -> resourceManager.getString(R.string.account_ledger_select_device_all_description)
         }
     }.shareInBackground()
+
+    val showPermissionsButton = flowOf { discoveryMethod == DiscoveryMethod.ALL }
+        .shareInBackground()
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
 
@@ -191,6 +193,8 @@ abstract class SelectLedgerViewModel(
     }
 
     private fun requestLocation() {
+        if (locationManager.isLocationEnabled()) return
+
         _showRequestLocationDialog.value = true
     }
 
@@ -203,7 +207,17 @@ abstract class SelectLedgerViewModel(
         }.launchIn(this)
     }
 
+    fun requirePermissionsAndEnableBluetooth() = launch {
+        if (!requirePermissionsInternal()) return@launch
+        if (!bluetoothManager.enableBluetoothAndAwait()) return@launch
+        requestLocation()
+    }
+
     private fun requirePermissions() = launch {
+        requirePermissionsInternal()
+    }
+
+    private suspend fun requirePermissionsInternal(): Boolean {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             listOf(
                 Manifest.permission.BLUETOOTH_CONNECT,
@@ -219,6 +233,8 @@ abstract class SelectLedgerViewModel(
         if (granted) {
             stateMachine.onEvent(SelectLedgerEvent.PermissionsGranted)
         }
+
+        return granted
     }
 
     private fun discoveryError(error: Throwable) {

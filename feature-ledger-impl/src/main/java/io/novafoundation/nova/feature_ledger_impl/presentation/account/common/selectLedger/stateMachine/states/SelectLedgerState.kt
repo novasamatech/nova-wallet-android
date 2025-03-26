@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethod
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothRequired
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isBluetoothUsing
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothDisabled
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent.BluetoothEnabled
@@ -31,12 +30,10 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         missingRequirements: Set<DiscoveryRequirement>,
         discoveryMethod: DiscoveryMethod
     ) {
-        if (discoveryMethod.isBluetoothUsing()) {
+        if (discoveryMethod.isBluetoothRequired()) {
             val sideEffect = getSideEffectFromRequirements(missingRequirements)
 
-            if (discoveryMethod.isBluetoothRequired()) {
-                emitState(MissingDiscoveryRequirementState(missingRequirements, discoveryMethod))
-            }
+            emitState(MissingDiscoveryRequirementState(missingRequirements, discoveryMethod))
 
             emitSideEffect(sideEffect)
         }
