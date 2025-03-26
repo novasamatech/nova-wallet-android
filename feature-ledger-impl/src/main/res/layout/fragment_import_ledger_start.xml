@@ -14,51 +14,39 @@
         app:dividerVisible="false"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingBottom="96dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/startImportLedgerToolbar">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/startImportLedgerTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="16dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/account_ledger_import_start_title"
+            android:textColor="@color/text_primary" />
 
-            <TextView
-                android:id="@+id/startImportLedgerTitle"
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/account_ledger_import_start_title"
-                android:textColor="@color/text_primary" />
+        <io.novafoundation.nova.common.view.SegmentedTabLayout
+            android:id="@+id/startImportLedgerConnectionMode"
+            style="@style/SegmentedTab"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp" />
 
-            <io.novafoundation.nova.common.view.SegmentedTabLayout
-                android:id="@+id/startImportLedgerConnectionMode"
-                style="@style/SegmentedTab"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/startImportLedgerConnectionModePages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/startImportLedgerConnectionModePages"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never" />
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/startImportLedgerContinue"
