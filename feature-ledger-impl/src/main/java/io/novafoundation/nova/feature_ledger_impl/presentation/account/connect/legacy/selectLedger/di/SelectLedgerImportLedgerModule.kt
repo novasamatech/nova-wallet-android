@@ -28,9 +28,8 @@ class SelectLedgerImportLedgerModule {
     @Provides
     fun providePermissionAsker(
         permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment,
-        router: LedgerRouter
-    ) = permissionsAskerFactory.createReturnable(fragment, router)
+        fragment: Fragment
+    ) = permissionsAskerFactory.create(fragment)
 
     @Provides
     @ScreenScope
