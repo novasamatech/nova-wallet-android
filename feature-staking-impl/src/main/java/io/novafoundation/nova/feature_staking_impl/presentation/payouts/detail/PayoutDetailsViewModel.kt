@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -47,7 +48,7 @@ class PayoutDetailsViewModel(
     }
 
     fun validatorExternalActionClicked() = launch {
-        externalActions.showExternalActions(ExternalActions.Type.Address(payout.validatorInfo.address), selectedAssetState.chain())
+        externalActions.showAddressActions(payout.validatorInfo.address, selectedAssetState.chain())
     }
 
     private suspend fun mapPayoutParcelableToPayoutDetailsModel(asset: Asset): PayoutDetailsModel {

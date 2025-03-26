@@ -8,10 +8,12 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.main.ParachainNetworkInfoInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewards.ParachainStakingRewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.NominationPoolsAvailableBalanceResolver
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.MythosStakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.ParachainStakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.RelaychainStakingTypeDetailsInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.direct.StakingTypeDetailsInteractorFactory
@@ -66,6 +68,14 @@ class StakingTypeDetailsModule {
 
     @Provides
     @FeatureScope
+    fun provideMythosStakingTypeDetailsInteractorFactory(
+        mythosSharedComputation: MythosSharedComputation,
+    ): MythosStakingTypeDetailsInteractorFactory {
+        return MythosStakingTypeDetailsInteractorFactory(mythosSharedComputation)
+    }
+
+    @Provides
+    @FeatureScope
     @IntoMap
     @StakingTypeDetailsKey(StakingTypeGroup.NOMINATION_POOL)
     fun provideAbstractPoolStakingTypeDetailsInteractorFactory(
@@ -90,6 +100,16 @@ class StakingTypeDetailsModule {
     @StakingTypeDetailsKey(StakingTypeGroup.PARACHAIN)
     fun provideAbstractParachainStakingTypeDetailsInteractorFactory(
         stakingTypeDetailsInteractorFactory: ParachainStakingTypeDetailsInteractorFactory
+    ): StakingTypeDetailsInteractorFactory {
+        return stakingTypeDetailsInteractorFactory
+    }
+
+    @Provides
+    @FeatureScope
+    @IntoMap
+    @StakingTypeDetailsKey(StakingTypeGroup.MYTHOS)
+    fun provideAbstractMythosStakingTypeDetailsInteractorFactory(
+        stakingTypeDetailsInteractorFactory: MythosStakingTypeDetailsInteractorFactory
     ): StakingTypeDetailsInteractorFactory {
         return stakingTypeDetailsInteractorFactory
     }

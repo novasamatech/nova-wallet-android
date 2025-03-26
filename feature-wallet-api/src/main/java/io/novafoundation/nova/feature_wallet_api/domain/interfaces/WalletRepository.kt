@@ -33,6 +33,11 @@ interface WalletRepository {
         chainAsset: Chain.Asset
     ): Flow<Asset>
 
+    fun assetFlowOrNull(
+        metaId: Long,
+        chainAsset: Chain.Asset
+    ): Flow<Asset?>
+
     fun assetsFlow(
         metaId: Long,
         chainAssets: List<Chain.Asset>

@@ -65,7 +65,9 @@ class NetworkModule {
             email = BuildConfig.EMAIL,
             youtube = BuildConfig.YOUTUBE_URL,
             storeUrl = BuildConfig.APP_UPDATE_SOURCE_LINK,
-            ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE
+            ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE,
+            novaCardWidgetUrl = BuildConfig.NOVA_CARD_WIDGET_URL,
+            unifiedAddressArticle = BuildConfig.UNIFIED_ADDRESS_ARTICLE
         )
     }
 

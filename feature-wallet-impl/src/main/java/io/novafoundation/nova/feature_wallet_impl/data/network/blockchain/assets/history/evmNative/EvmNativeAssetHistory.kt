@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.ethereumAddressToAccountId
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
@@ -56,13 +56,11 @@ class EvmNativeAssetHistory(
             chainId = chain.id
         )
 
-        val earliestOperationTimestamp = response.result.minOfOrNull { it.timeStamp } ?: 0L
-        val latestOperationTimestamp = response.result.maxOfOrNull { it.timeStamp } ?: 0L
-        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+        val priceHistory = getPriceHistory(chainAsset, currency)
 
         return response.result
             .map {
-                val coinRate = coinPriceRange.findNearestCoinRate(it.timeStamp)
+                val coinRate = priceHistory.findNearestCoinRate(it.timeStamp)
                 mapRemoteNormalTxToOperation(it, chainAsset, accountAddress, coinRate)
             }
     }

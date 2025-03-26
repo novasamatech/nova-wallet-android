@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -117,4 +118,6 @@ interface RootDependencies {
     fun proxyHaveEnoughFeeValidationFactory(): ProxyHaveEnoughFeeValidationFactory
 
     fun context(): Context
+
+    fun toastMessageManager(): ToastMessageManager
 }

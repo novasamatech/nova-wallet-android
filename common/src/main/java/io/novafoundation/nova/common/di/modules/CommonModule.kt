@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.os.Vibrator
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import dagger.Module
@@ -63,7 +62,11 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
+import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.QrCodeGenerator
+import io.novafoundation.nova.common.utils.RealCopyValueMixin
+import io.novafoundation.nova.common.utils.RealToastMessageManager
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -94,7 +97,7 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 @Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
-@Module(includes = [ParallaxCardModule::class])
+@Module(includes = [ParallaxCardModule::class, WebViewModule::class])
 class CommonModule {
 
     @Provides
@@ -184,8 +187,7 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideDeviceVibrator(context: Context): DeviceVibrator {
-        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        return DeviceVibrator(vibrator)
+        return DeviceVibrator(context)
     }
 
     @Provides
@@ -380,4 +382,22 @@ class CommonModule {
             BuildConfig.ASSET_WHITE_ICON_URL,
         )
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideToastMessageManager(): ToastMessageManager {
+        return RealToastMessageManager()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideCopyValueMixin(
+        clipboardManager: ClipboardManager,
+        toastMessageManager: ToastMessageManager,
+        resourceManager: ResourceManager
+    ): CopyValueMixin = RealCopyValueMixin(
+        clipboardManager,
+        toastMessageManager,
+        resourceManager
+    )
 }

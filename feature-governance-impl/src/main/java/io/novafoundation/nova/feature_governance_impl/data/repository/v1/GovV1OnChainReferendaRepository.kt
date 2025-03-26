@@ -234,7 +234,7 @@ class GovV1OnChainReferendaRepository(
 
     // https:github.com/paritytech/substrate/blob/0d64ba4268106fffe430d41b541c1aeedd4f8da5/frame/democracy/src/lib.rs#L1476
     private fun ReferendumId.v3EnactmentSchedulerId(runtime: RuntimeSnapshot): ByteArray {
-        val encodedAssemblyId = DEMOCRACY_ID.encodeToByteArray() // 'const bytes' in rust
+        val encodedAssemblyId = DEMOCRACY_ID.value.encodeToByteArray() // 'const bytes' in rust
         val encodedIndex = u32.toByteArray(runtime, value)
 
         return encodedAssemblyId + encodedIndex

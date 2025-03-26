@@ -25,7 +25,10 @@ class AppLinksProvider(
     val integrateNetwork: String,
     val storeUrl: String,
 
-    val ledgerMigrationArticle: String
+    val ledgerMigrationArticle: String,
+
+    val novaCardWidgetUrl: String,
+    val unifiedAddressArticle: String
 ) {
 
     fun getTwitterAccountUrl(

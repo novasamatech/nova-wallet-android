@@ -1,14 +1,15 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
-import java.math.BigInteger
 
 typealias MaxClick = () -> Unit
 
@@ -47,7 +47,9 @@ interface AmountChooserMixinBase : CoroutineScope {
 
         val amountState: Flow<InputState<BigDecimal?>>
 
-        val backPressuredAmount: Flow<BigDecimal>
+        val backPressuredAmountState: Flow<InputState<BigDecimal>>
+
+        val backPressuredPlanks: Flow<Balance>
     }
 
     interface FiatFormatter {
@@ -55,10 +57,15 @@ interface AmountChooserMixinBase : CoroutineScope {
         fun formatFlow(tokenFlow: Flow<Token>, amountFlow: Flow<BigDecimal>): Flow<CharSequence>
     }
 
-    class InputState<T>(val value: T, val initiatedByUser: Boolean, val inputKind: InputKind) {
+    data class InputState<T>(
+        val value: T,
+        // TODO revisit this flag. Seems to only be used in SwapMainSettingsViewModel and its purpose and semantics looks unclear
+        val initiatedByUser: Boolean,
+        val inputKind: InputKind
+    ) {
 
         enum class InputKind {
-            REGULAR, MAX_ACTION
+            REGULAR, MAX_ACTION, BLOCKED
         }
     }
 
@@ -83,15 +90,7 @@ interface AmountChooserMixin : AmountChooserMixinBase {
         fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
-            availableBalanceFlow: Flow<BigInteger>,
-            @StringRes balanceLabel: Int?,
-        ): Presentation
-
-        fun create(
-            scope: CoroutineScope,
-            assetFlow: Flow<Asset>,
-            balanceField: (Asset) -> BigDecimal,
-            @StringRes balanceLabel: Int?
+            maxActionProvider: MaxActionProvider?,
         ): Presentation
     }
 }
@@ -104,6 +103,34 @@ fun AmountChooserMixinBase.Presentation.setAmountInput(amountInput: String, init
     inputState.value = InputState(value = amountInput, initiatedByUser, inputKind = InputKind.REGULAR)
 }
 
+fun AmountChooserMixinBase.Presentation.setInputBlocked() {
+    inputState.value = inputState.value.copy(inputKind = InputKind.BLOCKED)
+}
+
+fun AmountChooserMixinBase.Presentation.setBlockedAmount(amount: BigDecimal) {
+    inputState.value = InputState(value = amount.toStripTrailingZerosString(), initiatedByUser = false, inputKind = InputKind.BLOCKED)
+}
+
 suspend fun AmountChooserMixinBase.Presentation.invokeMaxClick() {
     maxAction.maxClick.first()?.invoke()
+}
+
+fun InputKind.isInputBlocked(): Boolean {
+    return this == InputKind.BLOCKED
+}
+
+fun InputKind.isInputAllowed(): Boolean {
+    return !isInputBlocked()
+}
+
+fun InputKind.isMaxAction(): Boolean {
+    return this == InputKind.MAX_ACTION
+}
+
+fun <T, R> InputState<T>.map(transform: (T) -> R): InputState<R> {
+    return InputState(
+        value = transform(value),
+        inputKind = inputKind,
+        initiatedByUser = initiatedByUser
+    )
 }

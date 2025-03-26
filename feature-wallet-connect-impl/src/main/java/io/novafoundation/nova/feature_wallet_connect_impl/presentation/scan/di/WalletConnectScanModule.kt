@@ -22,7 +22,7 @@ class WalletConnectScanModule {
         permissionsAskerFactory: PermissionsAskerFactory,
         fragment: Fragment,
         router: WalletConnectRouter
-    ) = permissionsAskerFactory.create(fragment, router)
+    ) = permissionsAskerFactory.createReturnable(fragment, router)
 
     @Provides
     @IntoMap

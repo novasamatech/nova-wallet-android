@@ -653,8 +653,6 @@
     <string name="dapp_favourites_remove_description">A „%s” DApp el lesz távolítva a Kedvencek közül</string>
     <string name="dapp_favourites_remove_title">Eltávolítod a kedvencek közül?</string>
     <string name="dapp_list_placeholder">Itt fog megjelenni a DApp-ok listája</string>
-    <string name="dapp_main_welcome_subtitle">Böngészd az internetet Nova Wallet fiókjaiddal</string>
-    <string name="dapp_main_welcome_title">Üdvözöl a Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Hozzáadás a kedvencekhez</string>
     <string name="dapp_options_desktop_mode">Asztali mód</string>
     <string name="dapp_options_remove_from_favorite">Eltávolítás a kedvencekből</string>
@@ -753,12 +751,16 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Hálózat: %s\nMnemonikus: %s</string>
     <string name="fee_not_yet_loaded_message">Kérlek, várj a díj kiszámításáig</string>
     <string name="fee_not_yet_loaded_title">A díjszámítás folyamatban van</string>
+    <string name="fragment_assets_nova_card">Bankkártya kezelése</string>
     <string name="fragment_set_staking_proxy_title">Delegálás megadása %s stake-eléshez</string>
     <string name="fragment_swap_main_settings_details_title">Váltás részletei</string>
     <string name="fragment_swap_main_settings_max_button">Max:</string>
     <string name="fragment_swap_main_settings_pay_title">Fizetendő</string>
     <string name="fragment_swap_main_settings_receive_title">Fogadandó</string>
     <string name="fragment_swap_main_settings_select_token">Token kiválasztása</string>
+    <string name="fragment_top_up_card_title">Töltsd fel a kártyát %s-val/vel</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Kérjük, vedd fel a kapcsolatot a support@novawallet.io címen. Add meg az e-mail címed, amelyet használtál a kártya kiállításához.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Lépj kapcsolatba a támogatással</string>
     <string name="governance_notification_channel_name">Kormányzási Értesítési Csatorna</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Válassz legalább %d kategóriát</item>
@@ -936,6 +938,19 @@
     <string name="pre_configured_networks_progress_text">Hálózatok listájának betöltése...</string>
     <string name="pre_configured_networks_search_hint">Keresés hálózati név alapján</string>
     <string name="pre_configured_networks_title">Hálózat hozzáadása</string>
+    <string name="price_chart_date_format" formatted="false">%s -kor %s</string>
+    <string name="price_chart_day">1N</string>
+    <string name="price_chart_max">Összes</string>
+    <string name="price_chart_month">1H</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">%s ár</string>
+    <string name="price_chart_week">1H</string>
+    <string name="price_chart_year">1É</string>
+    <string name="price_charts_period_all">Teljes idő</string>
+    <string name="price_charts_period_month">Elmúlt hónap</string>
+    <string name="price_charts_period_today">Ma</string>
+    <string name="price_charts_period_week">Elmúlt hét</string>
+    <string name="price_charts_period_year">Elmúlt év</string>
     <string name="profile_accounts_title">Fiókok</string>
     <string name="profile_accounts_title_2_0">Tárcák</string>
     <string name="profile_language_title">Nyelv</string>
@@ -1652,6 +1667,11 @@
     <string name="unavailable_tracks_delegated_group">Kategóriák melyekben már delegáltál szavazatokat</string>
     <string name="unavailable_tracks_title">Nem elérhető kategóriák</string>
     <string name="unavailable_tracks_voted_group">Kategóriák melyekben már szavaztál</string>
+    <string name="unified_address_format_checkbox_warning">Ne mutassa újra.\nAz örökölt címet a Befogadásnál találhatja meg.</string>
+    <string name="unified_address_format_legacy_badge">Örökölt formátum</string>
+    <string name="unified_address_format_new_badge">Új formátum</string>
+    <string name="unified_address_subtitle">Egyes cseréknek még szükségük lehet az örökölt formátumra,\namíg frissítik a rendszert.</string>
+    <string name="unified_address_title">Új egységes cím</string>
     <string name="update_notification_install_btn">Telepítés</string>
     <string name="update_notification_item_version">Verzió %s</string>
     <string name="update_notification_title">Frissítés érhető el</string>
@@ -1670,6 +1690,10 @@
     <string name="vote_revote">Újraszavaz</string>
     <string name="vote_vote">Szavazás</string>
     <string name="voting_status">Szavazás állapota</string>
+    <string name="waiting_existing_card_top_up_card_title">A kártyád feltöltése folyamatban van!</string>
+    <string name="waiting_initial_top_up_card_title"><font>A kártyád kiállítása folyamatban van!</font></string>
+    <string name="waiting_top_up_card_description">Eltarthat akár 5 percig.\nEz az ablak automatikusan bezáródik.</string>
+    <string name="waiting_top_up_card_timer">Becsült %s</string>
     <string name="wallet_asset_buy">Vétel</string>
     <string name="wallet_asset_buy_with">Vásárlás a következővel</string>
     <string name="wallet_asset_receive">Fogadás</string>

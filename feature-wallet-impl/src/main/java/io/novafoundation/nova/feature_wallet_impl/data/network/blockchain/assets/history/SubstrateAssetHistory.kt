@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRate
@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.legacyAddressOfOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlin.time.Duration.Companion.seconds
@@ -132,6 +133,7 @@ abstract class SubstrateAssetHistory(
 
         val request = SubqueryHistoryRequest(
             accountAddress = chain.addressOf(accountId),
+            legacyAccountAddress = chain.legacyAddressOfOrNull(accountId),
             pageSize = pageSize,
             cursor = cursor,
             filters = filters,
@@ -140,14 +142,13 @@ abstract class SubstrateAssetHistory(
         )
 
         val subqueryResponse = subqueryApi.getOperationsHistory(apiUrl, request).data.query
-        val earliestOperationTimestamp = getEarliestOperationTimestamp(subqueryResponse.historyElements)
-        val latestOperationTimestamp = getLatestOperationTimestamp(subqueryResponse.historyElements)
-        val coinPriceRange = getCoinPriceRange(chainAsset, currency, earliestOperationTimestamp, latestOperationTimestamp)
+
+        val priceHistory = getPriceHistory(chainAsset, currency)
 
         val assetsBySubQueryId = chain.assetsBySubQueryId()
 
         val operations = subqueryResponse.historyElements.nodes.mapNotNull { node ->
-            val coinRate = coinPriceRange.findNearestCoinRate(node.timestamp)
+            val coinRate = priceHistory.findNearestCoinRate(node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset, assetsBySubQueryId)
         }
 
@@ -155,14 +156,6 @@ abstract class SubstrateAssetHistory(
         val newPageOffset = PageOffset.CursorOrFull(pageInfo.endCursor)
 
         return DataPage(newPageOffset, operations)
-    }
-
-    private fun getEarliestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long? {
-        return operations.nodes.minOfOrNull { it.timestamp }
-    }
-
-    private fun getLatestOperationTimestamp(operations: SubqueryHistoryElementResponse.Query.HistoryElements): Long? {
-        return operations.nodes.maxOfOrNull { it.timestamp }
     }
 
     private fun Chain.substrateTransfersApi(): Chain.ExternalApi.Transfers.Substrate? {

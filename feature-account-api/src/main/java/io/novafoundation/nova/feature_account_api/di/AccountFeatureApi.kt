@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
@@ -73,6 +74,8 @@ interface AccountFeatureApi {
     fun cloudBackupFacade(): LocalAccountsCloudBackupFacade
 
     fun syncWalletsBackupPasswordCommunicator(): SyncWalletsBackupPasswordCommunicator
+
+    fun copyAddressMixin(): CopyAddressMixin
 
     val addressInputMixinFactory: AddressInputMixinFactory
 

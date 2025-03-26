@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
@@ -231,7 +232,7 @@ class AddStakingProxyViewModel(
     private fun showAccountDetails(address: String) {
         launch {
             val chain = selectedAssetState.chain()
-            externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+            externalActions.showAddressActions(address, chain)
         }
     }
 

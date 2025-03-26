@@ -3,12 +3,14 @@ package io.novafoundation.nova.feature_account_impl.data.fee.chains
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.chains.CustomOrNativeFeePaymentProvider
+import io.novafoundation.nova.feature_account_api.data.fee.types.NativeFeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydrationConversionFeePayment
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 
 class HydrationFeePaymentProvider(
@@ -27,6 +29,11 @@ class HydrationFeePaymentProvider(
             accountRepository = accountRepository,
             coroutineScope = coroutineScope!!
         )
+    }
+
+    override suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment {
+        // Todo Hydration fee support from extrinsic
+        return NativeFeePayment()
     }
 
     override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?> {

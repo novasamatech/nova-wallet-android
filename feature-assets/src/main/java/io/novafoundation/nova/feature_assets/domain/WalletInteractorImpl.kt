@@ -31,6 +31,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainByIdFlow
+import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -90,6 +91,11 @@ class WalletInteractorImpl(
         nftRepository.initialNftSync(metaAccount, chain)
     }
 
+    override fun chainFlow(chainId: ChainId): Flow<Chain> {
+        return chainRegistry.enabledChainByIdFlow()
+            .map { it.getValue(chainId) }
+    }
+
     override fun assetFlow(chainId: ChainId, chainAssetId: Int): Flow<Asset> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             val (_, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
@@ -119,15 +125,14 @@ class WalletInteractorImpl(
     }
 
     override fun operationsFirstPageFlow(chainId: ChainId, chainAssetId: Int): Flow<OperationsPageChange> {
-        return accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { metaAccount ->
-                val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
-                val accountId = metaAccount.accountIdIn(chain)!!
-                val currency = currencyRepository.getSelectedCurrency()
-                transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset, currency).withIndex().map { (index, cursorPage) ->
-                    OperationsPageChange(cursorPage, accountChanged = index == 0)
-                }
-            }
+        return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+            val (chain, chainAsset) = chainRegistry.chainWithAsset(chainId, chainAssetId)
+            val accountId = metaAccount.accountIdIn(chain)!!
+            val currency = currencyRepository.getSelectedCurrency()
+            transactionHistoryRepository.operationsFirstPageFlow(accountId, chain, chainAsset, currency)
+                .withIndex()
+                .map { (index, cursorPage) -> OperationsPageChange(cursorPage, accountChanged = index == 0) }
+        }
     }
 
     override suspend fun syncOperationsFirstPage(

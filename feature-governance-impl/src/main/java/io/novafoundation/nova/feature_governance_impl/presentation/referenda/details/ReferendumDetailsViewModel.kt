@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.validation.handleChainAccountNotFound
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.PreImage
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.VoteType
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumVoting
@@ -57,6 +58,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDApp
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.common.description.DescriptionPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumStatusModel
@@ -111,6 +113,7 @@ class ReferendumDetailsViewModel(
     private val validationExecutor: ValidationExecutor,
     private val updateSystem: UpdateSystem,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    val shareReferendumMixin: ShareReferendumMixin
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -220,9 +223,8 @@ class ReferendumDetailsViewModel(
 
     fun proposerClicked() = launch {
         val proposer = proposerAddressModel.first()?.address ?: return@launch
-        val payload = ExternalActions.Type.Address(proposer)
 
-        externalActions.showExternalActions(payload, selectedChainFlow.first())
+        externalActions.showAddressActions(proposer, selectedChainFlow.first())
     }
 
     fun readMoreClicked() = launch {
@@ -280,6 +282,17 @@ class ReferendumDetailsViewModel(
         ) {
             val votePayload = SetupVotePayload(payload.referendumId)
             router.openSetupReferendumVote(votePayload)
+        }
+    }
+
+    fun shareButtonClicked() {
+        launch {
+            val selectedOption = selectedAssetSharedState.selectedOption()
+            shareReferendumMixin.shareReferendum(
+                payload.referendumId,
+                selectedOption.assetWithChain.chain,
+                selectedOption.additional.governanceType
+            )
         }
     }
 
