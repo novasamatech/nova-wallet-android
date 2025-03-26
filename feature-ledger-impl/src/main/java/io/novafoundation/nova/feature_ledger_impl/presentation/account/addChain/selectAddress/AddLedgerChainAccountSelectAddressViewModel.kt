@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.AddLed
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -24,7 +24,7 @@ class AddLedgerChainAccountSelectAddressViewModel(
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
     selectLedgerAddressPayload: SelectLedgerAddressPayload,
-    messageFormatter: LedgerMessageFormatter
+    messageCommandFormatter: MessageCommandFormatter
 ) : SelectAddressLedgerViewModel(
     router = router,
     interactor = selectAddressLedgerInteractor,
@@ -32,7 +32,7 @@ class AddLedgerChainAccountSelectAddressViewModel(
     resourceManager = resourceManager,
     payload = selectLedgerAddressPayload,
     chainRegistry = chainRegistry,
-    messageFormatter = messageFormatter
+    messageCommandFormatter = messageCommandFormatter
 ) {
 
     override val ledgerVariant: LedgerVariant = LedgerVariant.LEGACY

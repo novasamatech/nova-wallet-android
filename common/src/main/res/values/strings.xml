@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="ledger_verify_address_message_both_buttons">Press both buttons on your %s to approve the address</string>
+    <string name="ledger_verify_address_message_confirm_button">Press confirm button on your %s to approve the address</string>
+    <string name="ledger_hold_to_sign">Hold confirm button on your %s to approve the transaction</string>
+
+    <!--<string name="ledger_verify_address_subtitle">Press both buttons on your %s to approve address</string>-->
+
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+
     <string name="account_ledger_select_device_usb_description">Please, enable Ledger device. Unlock your Ledger device and open the %s app.</string>
 
     <!--<string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>-->
@@ -1559,8 +1571,6 @@
     <string name="ledger_wallet_details_description">This wallet is paired with Ledger. Nova will help you to form any operations you want, and you will be requested to sign them using Ledger</string>
 
     <string name="common_ledger">Ledger</string>
-
-    <string name="ledger_verify_address_subtitle">Press both buttons on your %s to approve address</string>
 
     <string name="ledger_import_select_address_load_more">Load more accounts</string>
     <string name="ledher_import_select_address_title">Select account to add to wallet</string>
