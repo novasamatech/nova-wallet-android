@@ -6,8 +6,6 @@ import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovern
 import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.ReferendumTypeFilter
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

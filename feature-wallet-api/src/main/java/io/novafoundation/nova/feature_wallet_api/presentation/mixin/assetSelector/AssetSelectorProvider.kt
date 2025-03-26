@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBo
 import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.AssetAndOption
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class AssetSelectorFactory(
     private val assetIconProvider: AssetIconProvider,

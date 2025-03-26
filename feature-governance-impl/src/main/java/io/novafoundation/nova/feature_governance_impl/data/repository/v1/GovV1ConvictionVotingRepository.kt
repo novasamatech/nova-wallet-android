@@ -46,7 +46,7 @@ class GovV1ConvictionVotingRepository(
     override val voteLockId = DEMOCRACY_ID
 
     override suspend fun maxAvailableForVote(asset: Asset): Balance {
-       return asset.freeInPlanks
+        return asset.freeInPlanks
     }
 
     override suspend fun voteLockingPeriod(chainId: ChainId): BlockNumber {

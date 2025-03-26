@@ -9,9 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
-import java.math.BigDecimal
 
 fun mapAssetToAssetModel(
     assetIconProvider: AssetIconProvider,

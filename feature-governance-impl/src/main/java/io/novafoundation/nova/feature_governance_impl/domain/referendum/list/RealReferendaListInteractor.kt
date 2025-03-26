@@ -35,7 +35,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.rep
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.hash.isPositive

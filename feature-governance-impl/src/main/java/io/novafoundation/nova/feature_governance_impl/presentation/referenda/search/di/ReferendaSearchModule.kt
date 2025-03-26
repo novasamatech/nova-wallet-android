@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.search.ReferendaSearchViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 
 @Module(includes = [ViewModelModule::class])
 class ReferendaSearchModule {

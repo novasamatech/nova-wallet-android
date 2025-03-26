@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.isTrueOrError
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmountByExecutingAccount
 import io.novafoundation.nova.feature_wallet_api.R
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
