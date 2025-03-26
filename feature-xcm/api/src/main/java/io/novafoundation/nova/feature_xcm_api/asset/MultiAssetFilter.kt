@@ -1,14 +1,24 @@
 package io.novafoundation.nova.feature_xcm_api.asset
 
-import io.novafoundation.nova.common.utils.scale.ToDynamicScaleInstance
+import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 
-sealed class MultiAssetFilter : ToDynamicScaleInstance {
+sealed class MultiAssetFilter : VersionedToDynamicScaleInstance {
 
     companion object {
 
-        fun singleCounted(): MultiAssetFilter.Wild.AllCounted {
-            return MultiAssetFilter.Wild.AllCounted(assetsCount = 1)
+        fun singleCounted(): Wild.AllCounted {
+            return Wild.AllCounted(assetsCount = 1)
+        }
+    }
+
+    class Definite(val assets: MultiAssets) : MultiAssetFilter() {
+
+        constructor(asset: MultiAsset): this(asset.intoMultiAssets())
+
+        override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
+            return DictEnum.Entry("Definite", assets.toEncodableInstance(xcmVersion))
         }
     }
 
@@ -30,7 +40,7 @@ sealed class MultiAssetFilter : ToDynamicScaleInstance {
                 return "All"
             }
 
-            override fun toEncodableInstance(): Any {
+            override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
                 return DictEnum.Entry(
                     name = "Wild",
                     value = DictEnum.Entry(
@@ -46,7 +56,7 @@ sealed class MultiAssetFilter : ToDynamicScaleInstance {
          */
         data class AllCounted(val assetsCount: Int) : Wild() {
 
-            override fun toEncodableInstance(): Any {
+            override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
                 return DictEnum.Entry(
                     name = "Wild",
                     value = DictEnum.Entry(

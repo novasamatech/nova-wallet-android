@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.builder.buyExecution
 import io.novafoundation.nova.feature_xcm_api.builder.createWithoutFeesMeasurement
+import io.novafoundation.nova.feature_xcm_api.builder.relativeToLocal
 import io.novafoundation.nova.feature_xcm_api.builder.withdrawAsset
 import io.novafoundation.nova.feature_xcm_api.extrinsic.composeXcmExecute
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
@@ -26,6 +27,8 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocatio
 import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.toMultiLocation
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.getInnerSuccessOrThrow
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
@@ -43,7 +46,8 @@ private val USED_XCM_VERSION = XcmVersion.V4
 @FeatureScope
 class DynamicCrossChainTransactor @Inject constructor(
     private val chainRegistry: ChainRegistry,
-    private val xcmBuilderFactory: XcmBuilder.Factory
+    private val xcmBuilderFactory: XcmBuilder.Factory,
+    private val xcmPaymentApi: XcmPaymentApi
 ) {
 
     context(ExtrinsicBuilder)
@@ -99,9 +103,11 @@ class DynamicCrossChainTransactor @Inject constructor(
         crossChainFee: Balance
     ): GenericCall.Instance {
         val xcmProgram = buildXcmProgram(configuration, transfer, crossChainFee)
+        val weight = xcmPaymentApi.queryXcmWeight(configuration.originChainId, xcmProgram)
+            .getInnerSuccessOrThrow("DynamicCrossChainTransactor")
 
         return chainRegistry.withRuntime(configuration.originChainId) {
-            composeXcmExecute(xcmProgram, WeightV2.max())
+            composeXcmExecute(xcmProgram, weight)
         }
     }
 
@@ -164,15 +170,17 @@ class DynamicCrossChainTransactor @Inject constructor(
         destinationChainLocation: ChainLocation,
         beneficiary: AccountIdKey,
         amount: Balance,
+        fees: Balance? = null
     ) {
-        val feesAmount = amount / 2.toBigInteger()
+        val feesAmount = fees ?: (amount / 3.toBigInteger())
 
         // Origin
         withdrawAsset(assetLocation, amount)
         // Here and onward: we use buy execution for the very first segment to be able to pay delivery fees in sending asset
         // WeightLimit.zero() is used since it doesn't matter anyways as the message on origin is already weighted
         buyExecution(assetLocation, feesAmount, WeightLimit.zero())
-        initiateTeleport(MultiAssetFilter.singleCounted(), destinationChainLocation)
+        val feeAssetOnOrigin = MultiAsset.from(assetLocation.relativeToLocal(), feesAmount)
+        initiateTeleport(MultiAssetFilter.Definite(feeAssetOnOrigin), destinationChainLocation)
 
         // Destination
         buyExecution(assetLocation, feesAmount, WeightLimit.Unlimited)

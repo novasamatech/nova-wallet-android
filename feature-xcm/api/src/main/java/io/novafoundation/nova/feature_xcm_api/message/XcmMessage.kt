@@ -48,7 +48,7 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             return DictEnum.Entry(
                 name = "DepositAsset",
                 value = structOf(
-                    "assets" to assets.toEncodableInstance(),
+                    "assets" to assets.toEncodableInstance(xcmVersion),
                     "beneficiary" to beneficiary.toEncodableInstance(xcmVersion),
                     // Used in XCM V2 and below. We put 1 here since we only support cases for transferring a single asset
                     "max_assets" to BigInteger.ONE,
@@ -110,7 +110,7 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             return DictEnum.Entry(
                 name = "InitiateReserveWithdraw",
                 value = structOf(
-                    "assets" to assets.toEncodableInstance(),
+                    "assets" to assets.toEncodableInstance(xcmVersion),
                     "reserve" to reserve.toEncodableInstance(xcmVersion),
                     "xcm" to xcm.toEncodableInstance(xcmVersion)
                 )
@@ -145,7 +145,7 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             return DictEnum.Entry(
                 name = "DepositReserveAsset",
                 value = structOf(
-                    "assets" to assets.toEncodableInstance(),
+                    "assets" to assets.toEncodableInstance(xcmVersion),
                     // Used in XCM V2 and below. We put 1 here since we only support cases for transferring a single asset
                     "max_assets" to BigInteger.ONE,
                     "dest" to dest.toEncodableInstance(xcmVersion),
@@ -176,7 +176,7 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             return DictEnum.Entry(
                 name = "InitiateTeleport",
                 value = structOf(
-                    "assets" to assets.toEncodableInstance(),
+                    "assets" to assets.toEncodableInstance(xcmVersion),
                     "dest" to dest.toEncodableInstance(xcmVersion),
                     "xcm" to xcm.toEncodableInstance(xcmVersion)
                 )
