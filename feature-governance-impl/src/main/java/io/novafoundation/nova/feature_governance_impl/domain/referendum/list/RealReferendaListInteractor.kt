@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.search.CachedPhraseSearch
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Voting
+import io.novafoundation.nova.feature_governance_api.data.source.GovernanceAdditionalState
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.data.source.trackLocksFlowOrEmpty
@@ -32,6 +33,9 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.filters.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.filtering.ReferendaFilteringProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.repository.ReferendaCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -48,6 +52,15 @@ class RealReferendaListInteractor(
     private val referendaSortingProvider: ReferendaSortingProvider,
     private val referendaFilteringProvider: ReferendaFilteringProvider,
 ) : ReferendaListInteractor {
+
+    override suspend fun availableVoteAmount(option: SelectableAssetAndOption): Balance {
+        val additional = option.option.additional
+        require(additional is GovernanceAdditionalState) {
+            "Not a governance state: ${option.option}"
+        }
+        val governanceSource = governanceSourceRegistry.sourceFor(additional.governanceType)
+        return governanceSource.convictionVoting.maxAvailableForVote(option.asset)
+    }
 
     override fun searchReferendaListStateFlow(
         metaAccount: MetaAccount,

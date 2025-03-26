@@ -66,7 +66,7 @@ class CrowdloanViewModel(
 
     override val assetSelectorMixin = assetSelectorFactory.create(
         scope = this,
-        amountProvider = Asset::transferable,
+        amountProvider = { option -> option.asset.transferableInPlanks },
     )
 
     val mainDescription = assetSelectorMixin.selectedAssetFlow.map {

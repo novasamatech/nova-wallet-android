@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_wallet_api.domain.validation.hasEnoughBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.hasEnoughFreeBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
@@ -29,9 +30,9 @@ fun ValidationSystem.Companion.chooseDelegationAmount(
         }
     )
 
-    hasEnoughFreeBalance(
-        asset = { it.asset },
-        fee = { it.fee },
+    hasEnoughBalance(
+        availableBalance = { it.maxAvailableAmount },
+        chainAsset = { it.asset.token.configuration },
         requestedAmount = { it.amount },
         error = ChooseDelegationAmountValidationFailure::AmountIsTooBig
     )

@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.search.ReferendaSearchViewModel
+import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 
 @Module(includes = [ViewModelModule::class])
@@ -24,7 +25,7 @@ class ReferendaSearchModule {
     @IntoMap
     @ViewModelKey(ReferendaSearchViewModel::class)
     fun provideViewModel(
-        assetSelectorFactory: AssetSelectorFactory,
+        tokenUseCase: TokenUseCase,
         referendaListInteractor: ReferendaListInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
         selectedAssetSharedState: GovernanceSharedState,
@@ -33,7 +34,7 @@ class ReferendaSearchModule {
         resourceManager: ResourceManager
     ): ViewModel {
         return ReferendaSearchViewModel(
-            assetSelectorFactory = assetSelectorFactory,
+            tokenUseCase = tokenUseCase,
             referendaListInteractor = referendaListInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
             selectedAssetSharedState = selectedAssetSharedState,

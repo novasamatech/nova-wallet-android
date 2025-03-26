@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 import java.math.BigDecimal
@@ -15,11 +17,11 @@ fun mapAssetToAssetModel(
     assetIconProvider: AssetIconProvider,
     asset: Asset,
     resourceManager: ResourceManager,
+    balance: Balance,
     icon: Icon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration),
-    retrieveAmount: (Asset) -> BigDecimal = Asset::transferable,
     @StringRes patternId: Int? = R.string.common_available_format
 ): AssetModel {
-    val amount = retrieveAmount(asset).formatTokenAmount(asset.token.configuration)
+    val amount = balance.formatPlanks(asset.token.configuration)
     val formattedAmount = patternId?.let { resourceManager.getString(patternId, amount) } ?: amount
 
     return with(asset) {

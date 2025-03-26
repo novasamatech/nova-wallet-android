@@ -14,10 +14,11 @@ data class VoteTinderGovValidationPayload(
     override val asset: Asset,
     override val trackVoting: List<Voting>,
     override val fee: Fee,
+    override val maxAvailableAmount: BigDecimal,
     val basket: List<TinderGovBasketItem>
 ) : VoteValidationPayload {
 
-    override val maxAmount: BigDecimal
+    override val amount: BigDecimal
         get() {
             val amount = basket.maxOf { it.amount }
             return asset.token.amountFromPlanks(amount)
