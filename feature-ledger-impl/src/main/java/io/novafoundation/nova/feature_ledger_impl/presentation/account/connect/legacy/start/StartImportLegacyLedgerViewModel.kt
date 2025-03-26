@@ -12,7 +12,9 @@ import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.start.StartImportLedgerViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.FillWalletImportLedgerLegacyPayload
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
@@ -25,8 +27,12 @@ class StartImportLegacyLedgerViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
-    override fun continueClicked() {
-        router.openImportFillWallet()
+    override fun continueWithBluetooth() {
+        router.openImportFillWallet(FillWalletImportLedgerLegacyPayload(SelectLedgerPayload.ConnectionMode.BLUETOOTH))
+    }
+
+    override fun continueWithUsb() {
+        router.openImportFillWallet(FillWalletImportLedgerLegacyPayload(SelectLedgerPayload.ConnectionMode.USB))
     }
 
     val warningModel = flowOf { ledgerMigrationTracker.anyChainSupportsMigrationApp() }

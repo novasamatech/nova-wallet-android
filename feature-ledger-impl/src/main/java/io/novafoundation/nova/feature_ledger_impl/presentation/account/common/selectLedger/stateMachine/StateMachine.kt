@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine
 
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 
 sealed class SideEffect {
 
@@ -34,4 +35,6 @@ sealed class SelectLedgerEvent {
     object ConnectionVerified : SelectLedgerEvent()
 
     object PermissionsGranted : SelectLedgerEvent()
+
+    class DiscoveryMethodSelected(val discoveryMethods: DiscoveryMethods) : SelectLedgerEvent()
 }

@@ -36,7 +36,7 @@ abstract class ScanQrViewModel(
     }
 
     private fun requirePermissions() = launch {
-        val granted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.CAMERA)
+        val granted = permissionsAsker.requirePermissions(Manifest.permission.CAMERA)
 
         scanningAvailable.value = granted
     }
