@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.interfaces
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -33,7 +32,6 @@ internal class InternalFileSystemCache(
         notifyCallbacks(fileName, value)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeCachedValue(fileName: String): Flow<String> {
         return callbackFlow<String?> {
             val callback: OnCacheValueChanged = {

@@ -72,6 +72,10 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.update
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainWeigher
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainWeigher
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
@@ -91,8 +95,6 @@ import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.Asse
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -291,32 +293,30 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCrossChainWeigher(
-        @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
-        extrinsicService: ExtrinsicService,
-        chainRegistry: ChainRegistry,
-        xcmVersionDetector: XcmVersionDetector
-    ): CrossChainWeigher = RealCrossChainWeigher(storageDataSource, extrinsicService, chainRegistry, xcmVersionDetector)
+        dynamic: DynamicCrossChainWeigher,
+        legacy: LegacyCrossChainWeigher
+    ): CrossChainWeigher = RealCrossChainWeigher(dynamic, legacy)
 
     @Provides
     @FeatureScope
     fun provideCrossChainTransactor(
-        weigher: CrossChainWeigher,
         assetSourceRegistry: AssetSourceRegistry,
         phishingValidationFactory: PhishingValidationFactory,
-        xcmVersionDetector: XcmVersionDetector,
         enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
         eventsRepository: EventsRepository,
+        chainStateRepository: ChainStateRepository,
         chainRegistry: ChainRegistry,
-        chainStateRepository: ChainStateRepository
+        dynamic: DynamicCrossChainTransactor,
+        legacy: LegacyCrossChainTransactor
     ): CrossChainTransactor = RealCrossChainTransactor(
-        weigher = weigher,
         assetSourceRegistry = assetSourceRegistry,
         phishingValidationFactory = phishingValidationFactory,
-        xcmVersionDetector = xcmVersionDetector,
         enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
         eventsRepository = eventsRepository,
         chainStateRepository = chainStateRepository,
-        chainRegistry = chainRegistry
+        chainRegistry = chainRegistry,
+        dynamic = dynamic,
+        legacy = legacy
     )
 
     @Provides
@@ -404,7 +404,7 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideSubstrateRealtimeOperationFetcherFactory(
-        multiLocationConverterFactory: MultiLocationConverterFactory,
+        multiLocationConverterFactory: io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory,
         eventsRepository: EventsRepository,
         extrinsicWalk: ExtrinsicWalk,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter

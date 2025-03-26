@@ -30,10 +30,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainC
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ConnectionSecrets
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.RealXcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeVersionsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -222,21 +218,6 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideMultiLocationConverterFactory(
-        chainRegistry: ChainRegistry,
-        xcmVersionDetector: XcmVersionDetector,
-    ): MultiLocationConverterFactory {
-        return MultiLocationConverterFactory(chainRegistry, xcmVersionDetector)
-    }
-
-    @Provides
-    @ApplicationScope
-    fun provideChainMultiLocationConverterFactory(chainRegistry: ChainRegistry): ChainMultiLocationConverterFactory {
-        return ChainMultiLocationConverterFactory(chainRegistry)
-    }
-
-    @Provides
-    @ApplicationScope
     fun provideExtrinsicWalk(
         chainRegistry: ChainRegistry,
     ): ExtrinsicWalk = RealExtrinsicWalk(chainRegistry)
@@ -303,10 +284,4 @@ class RuntimeModule {
             gson
         )
     }
-
-    @Provides
-    @ApplicationScope
-    fun provideXcmPalletRepository(
-        chainRegistry: ChainRegistry
-    ): XcmVersionDetector = RealXcmVersionDetector(chainRegistry)
 }

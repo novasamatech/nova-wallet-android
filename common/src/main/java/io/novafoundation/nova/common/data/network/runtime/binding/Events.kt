@@ -20,6 +20,10 @@ fun bindEventRecords(decoded: Any?): List<EventRecord> {
     return bindList(decoded, ::bindEventRecord)
 }
 
+fun bindEvent(decoded: Any?): GenericEvent.Instance {
+    return decoded.cast()
+}
+
 private fun bindEventRecord(dynamicInstance: Any?): EventRecord {
     requireType<Struct.Instance>(dynamicInstance)
 

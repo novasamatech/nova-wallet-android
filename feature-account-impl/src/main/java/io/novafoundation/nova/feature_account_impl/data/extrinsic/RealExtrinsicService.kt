@@ -18,10 +18,11 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.DispatchError
+import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.bindDispatchError
+import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
+import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -255,7 +256,7 @@ class RealExtrinsicService(
     private fun parseErrorEvent(errorEvent: GenericEvent.Instance, runtimeSnapshot: RuntimeSnapshot): DispatchError {
         val dispatchError = errorEvent.arguments.first()
 
-        return bindDispatchError(dispatchError, runtimeSnapshot)
+        return runtimeSnapshot.provideContext { bindDispatchError(dispatchError) }
     }
 
     private suspend fun constructSplitExtrinsicsForSubmission(

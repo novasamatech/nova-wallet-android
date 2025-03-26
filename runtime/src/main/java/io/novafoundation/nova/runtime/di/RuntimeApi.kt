@@ -18,9 +18,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainC
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.connection.NodeConnectionFactory
 import io.novafoundation.nova.runtime.multiNetwork.connection.node.healthState.NodeHealthStateTesterFactory
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
@@ -95,10 +92,6 @@ interface RuntimeApi {
 
     val gasPriceProviderFactory: GasPriceProviderFactory
 
-    val multiLocationConverterFactory: MultiLocationConverterFactory
-
-    val chainMultiLocationConverterFactory: ChainMultiLocationConverterFactory
-
     val extrinsicWalk: ExtrinsicWalk
 
     val runtimeFilesCache: RuntimeFilesCache
@@ -120,6 +113,4 @@ interface RuntimeApi {
     val chainRepository: ChainRepository
 
     val remoteToDomainChainMapperFacade: RemoteToDomainChainMapperFacade
-
-    val xcmVersionDetector: XcmVersionDetector
 }

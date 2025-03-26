@@ -211,17 +211,12 @@ fun Chain.Asset.normalizeSymbol(): String {
     return normalizeTokenSymbol(this.symbol.value)
 }
 
-private const val MOONBEAM_XC_PREFIX = "xc"
-
 fun TokenSymbol.normalize(): TokenSymbol {
     return normalizeTokenSymbol(value).asTokenSymbol()
 }
 
 fun normalizeTokenSymbol(symbol: String): String {
-    if (symbol.startsWith(XC_PREFIX)) {
-        return symbol.removePrefix(XC_PREFIX)
-    }
-    return symbol
+    return symbol.removePrefix(XC_PREFIX)
 }
 
 val Chain.Node.isWss: Boolean
@@ -307,6 +302,8 @@ fun Chain.emptyAccountId() = if (isEthereumBased) {
 } else {
     emptySubstrateAccountId()
 }
+
+fun Chain.emptyAccountIdKey() = emptyAccountId().intoKey()
 
 fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
     return accountIdOrNull(maybeAddress) ?: emptyAccountId()
@@ -490,12 +487,14 @@ fun Chain.Asset.requireEquilibrium(): Type.Equilibrium {
 }
 
 fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
-    val ormlType = requireOrml()
+    return requireOrml().currencyId(runtime)
+}
 
-    val currencyIdType = runtime.typeRegistry[ormlType.currencyIdType]
-        ?: error("Cannot find type ${ormlType.currencyIdType}")
+fun Type.Orml.currencyId(runtime: RuntimeSnapshot): Any? {
+    val currencyIdType = runtime.typeRegistry[currencyIdType]
+        ?: error("Cannot find type $currencyIdType")
 
-    return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
+    return currencyIdType.fromHex(runtime, currencyIdScale)
 }
 
 val Chain.Asset.fullId: FullChainAssetId
