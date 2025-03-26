@@ -2,17 +2,19 @@ package io.novafoundation.nova.feature_xcm_impl.di.modules
 
 import dagger.Binds
 import dagger.Module
+import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainMultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.dryRun.DryRunApi
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.feature_xcm_impl.builder.RealXcmBuilderFactory
 import io.novafoundation.nova.feature_xcm_impl.converter.RealMultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_impl.converter.chain.RealChainMultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_impl.dryRun.RealDryRunApi
 import io.novafoundation.nova.feature_xcm_impl.versions.detector.RealXcmVersionDetector
 
 @Module
-interface BindsModule {
+internal interface BindsModule {
 
     @Binds
     fun bindXcmVersionDetector(real: RealXcmVersionDetector): XcmVersionDetector
@@ -25,4 +27,7 @@ interface BindsModule {
 
     @Binds
     fun bindDryRunApi(real: RealDryRunApi): DryRunApi
+
+    @Binds
+    fun bindXcmBuilderFactory(real: RealXcmBuilderFactory): XcmBuilder.Factory
 }

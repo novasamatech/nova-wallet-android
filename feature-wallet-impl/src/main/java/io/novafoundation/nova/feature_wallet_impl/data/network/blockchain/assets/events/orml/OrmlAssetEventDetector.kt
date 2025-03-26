@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
@@ -48,7 +49,7 @@ private class OrmlAssetEventDetector(
         if (currencyIdEncoded != targetCurrencyId) return null
 
         return DepositEvent(
-            destination = bindAccountId(who),
+            destination = bindAccountIdKey(who),
             amount = bindNumber(amount)
         )
     }

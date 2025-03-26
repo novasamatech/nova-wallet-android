@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
@@ -9,7 +11,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.runtime.ext.accountIdKeyOf
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -31,8 +35,8 @@ interface AssetTransferDirection {
 
 interface AssetTransferBase : AssetTransferDirection {
 
-    val recipientAccountId: AccountId
-        get() = destinationChain.accountIdOf(recipient)
+    val recipientAccountId: AccountIdKey
+        get() = destinationChain.accountIdOrDefault(recipient).intoKey()
 
     val recipient: String
 

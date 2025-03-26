@@ -102,7 +102,7 @@ class LegacyCrossChainWeigher @Inject constructor(
         val maxWeight = feeConfig.estimatedWeight()
 
         return when (val mode = feeConfig.to.xcmFeeType.mode) {
-            is Mode.Proportional -> CrossChainFeeModel(executionFees = mode.weightToFee(maxWeight))
+            is Mode.Proportional -> CrossChainFeeModel(paidFromHolding = mode.weightToFee(maxWeight))
 
             Mode.Standard -> {
                 val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain, amount)
@@ -114,7 +114,7 @@ class LegacyCrossChainWeigher @Inject constructor(
                     xcmExecute(xcmMessage, maxWeight)
                 }
 
-                CrossChainFeeModel(executionFees = paymentInfo.partialFee)
+                CrossChainFeeModel(paidFromHolding = paymentInfo.partialFee)
             }
 
             Mode.Unknown -> CrossChainFeeModel.zero()
@@ -141,9 +141,9 @@ class LegacyCrossChainWeigher @Inject constructor(
 
         val isSenderPaysOriginDelivery = !deliveryConfig.alwaysHoldingPays
         return if (isSenderPaysOriginDelivery && isSendingFromOrigin) {
-            CrossChainFeeModel(deliveryFees = deliveryFee)
+            CrossChainFeeModel(paidByAccount = deliveryFee)
         } else {
-            CrossChainFeeModel(executionFees = deliveryFee)
+            CrossChainFeeModel(paidFromHolding = deliveryFee)
         }
     }
 

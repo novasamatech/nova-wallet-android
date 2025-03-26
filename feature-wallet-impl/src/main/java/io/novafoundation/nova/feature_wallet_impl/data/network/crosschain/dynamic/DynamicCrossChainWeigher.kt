@@ -193,11 +193,10 @@ class DynamicCrossChainWeigher @Inject constructor(
         val deliveryFee = origin.deliveryFee
         val totalFee = initialAmount - destination.depositedAmount
         // We do not subtract `origin.deliveryFee` since it is paid directly from the origin account and not from the holding register
-        // We do not subtract `remoteReserve.deliveryFee` since remote reserve delivery is paid in sending assets and thus better fit for "execution" fee
-        // since it is charged from the holding register
+        // We do not subtract `remoteReserve.deliveryFee` since remote reserve delivery is paid from the holding register
         val executionFee = totalFee
 
-        return CrossChainFeeModel(deliveryFee, executionFee)
+        return CrossChainFeeModel(paidByAccount = deliveryFee, paidFromHolding = executionFee)
     }
 
     // Maximum between amount * 2 and MINIMUM_FUND_AMOUNT

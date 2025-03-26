@@ -130,21 +130,11 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
-            // Delivery fees cannot be paid in non-native assets
-            return !hasDeliveryFees()
+            return true
         }
 
         override suspend fun canTransferOutWholeAccountBalance(): Boolean {
-            // Precisely speaking just checking for delivery fees is not enough
-            // AssetTransactor on origin should also use Preserve transfers when executing TransferAssets instruction
-            // However it is much harder to check and there are no chains yet that have limitations on AssetTransactor level
-            // but don't have delivery fees, so we only check for delivery fees
-            return !hasDeliveryFees()
-        }
-
-        private fun hasDeliveryFees(): Boolean {
-            val config = crossChainConfig.value ?: return false
-            return config.hasDeliveryFee(delegate.from, delegate.to)
+            return true
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
@@ -277,21 +267,21 @@ class CrossChainTransferAssetExchange(
 
         override val postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
             paidByAccount = listOfNotNull(
-                SubmissionFeeWithLabel(crossChainFee.deliveryFee, debugLabel = "Delivery"),
+                SubmissionFeeWithLabel(crossChainFee.postSubmissionByAccount, debugLabel = "Delivery"),
             ),
             paidFromAmount = listOf(
-                FeeWithLabel(crossChainFee.executionFee, debugLabel = "Execution")
+                FeeWithLabel(crossChainFee.postSubmissionFromAmount, debugLabel = "Execution")
             )
         )
 
         override fun constructDisplayData(): AtomicOperationFeeDisplayData {
-            val deliveryFee = crossChainFee.deliveryFee
-            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != crossChainFee.executionFee.asset.fullId
+            val deliveryFee = crossChainFee.postSubmissionByAccount
+            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != crossChainFee.postSubmissionFromAmount.asset.fullId
 
             val crossChainFeeComponentDisplay = if (shouldSeparateDeliveryFromExecution) {
-                SwapFeeComponentDisplay.crossChain(crossChainFee.executionFee, deliveryFee!!)
+                SwapFeeComponentDisplay.crossChain(crossChainFee.postSubmissionFromAmount, deliveryFee!!)
             } else {
-                val totalCrossChain = crossChainFee.executionFee.addPlanks(deliveryFee?.amount.orZero())
+                val totalCrossChain = crossChainFee.postSubmissionFromAmount.addPlanks(deliveryFee?.amount.orZero())
                 SwapFeeComponentDisplay.crossChain(totalCrossChain)
             }
 

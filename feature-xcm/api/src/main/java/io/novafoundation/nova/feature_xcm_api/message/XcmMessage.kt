@@ -165,6 +165,24 @@ sealed class XcmInstruction : VersionedToDynamicScaleInstance {
             )
         }
     }
+
+    data class InitiateTeleport(
+        val assets: MultiAssetFilter,
+        val dest: RelativeMultiLocation,
+        val xcm: XcmMessage
+    ) : XcmInstruction() {
+
+        override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
+            return DictEnum.Entry(
+                name = "InitiateTeleport",
+                value = structOf(
+                    "assets" to assets.toEncodableInstance(),
+                    "dest" to dest.toEncodableInstance(xcmVersion),
+                    "xcm" to xcm.toEncodableInstance(xcmVersion)
+                )
+            )
+        }
+    }
 }
 
 typealias VersionedXcmMessage = VersionedXcm<XcmMessage>
