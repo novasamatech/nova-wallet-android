@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
@@ -102,7 +103,8 @@ class BalanceDetailModule {
         externalBalancesInteractor: ExternalBalancesInteractor,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
-        chartsInteractor: ChartsInteractor
+        chartsInteractor: ChartsInteractor,
+        buySellMixinFactory: BuySellMixinFactory
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -119,7 +121,8 @@ class BalanceDetailModule {
             externalBalancesInteractor = externalBalancesInteractor,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
-            chartsInteractor = chartsInteractor
+            chartsInteractor = chartsInteractor,
+            buySellMixinFactory = buySellMixinFactory
         )
     }
 

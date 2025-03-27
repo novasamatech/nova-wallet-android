@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="wallet_asset_sell_tokens">Sell tokens</string>
+    <string name="wallet_asset_buy_tokens">Buy tokens</string>
+
+    <string name="wallet_asset_buy_sell">Buy/Sell</string>
+
     <string name="unified_address_title">New Unified Address</string>
     <string name="unified_address_subtitle">Some exchanges may still require the legacy format\nfor operations while they update. %s</string>
     <string name="unified_address_format_new_badge">new format</string>

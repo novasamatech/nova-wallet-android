@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -79,7 +81,8 @@ class BalanceDetailViewModel(
     private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetIconProvider: AssetIconProvider,
-    private val chartsInteractor: ChartsInteractor
+    private val chartsInteractor: ChartsInteractor,
+    private val buySellMixinFactory: BuySellMixinFactory
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -126,6 +129,8 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
+    val buySellMixin = buySellMixinFactory.create()
+
     val chainUI = chainFlow.map { mapChainToUi(it) }
 
     val buyMixin = buyMixinFactory.create(scope = this)
@@ -136,7 +141,7 @@ class BalanceDetailViewModel(
         .onStart { emit(false) }
         .shareInBackground()
 
-    val buyEnabled: Flow<Boolean> = assetFlow
+    val buySellEnabled: Flow<Boolean> = assetFlow
         .flatMapLatest { buyMixin.buyEnabledFlow(it.token.configuration) }
         .inBackground()
         .share()
@@ -230,7 +235,8 @@ class BalanceDetailViewModel(
     fun buyClicked() = checkControllableAsset {
         launch {
             val chainAsset = assetFlow.first().token.configuration
-            buyMixin.buyClicked(chainAsset)
+            buySellMixin.openSelector(BuySellMixin.Selector.Asset(chainAsset.chainId, chainAsset.id))
+            //buyMixin.buyClicked(chainAsset)
         }
     }
 

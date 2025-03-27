@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBalanceBreakdownModel
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
@@ -75,7 +77,8 @@ class BalanceListViewModel(
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetListMixinFactory: AssetListMixinFactory,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val buySellMixinFactory: BuySellMixinFactory
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -94,6 +97,8 @@ class BalanceListViewModel(
         { walletInteractor.syncAssetsRates(selectedCurrency.first()) },
         walletInteractor::syncAllNfts
     )
+
+    val buySellMixin = buySellMixinFactory.create()
 
     val assetListMixin = assetListMixinFactory.create(viewModelScope)
 
@@ -304,8 +309,8 @@ class BalanceListViewModel(
         router.openReceiveFlow()
     }
 
-    fun buyClicked() {
-        router.openBuyFlow()
+    fun buySellClicked() {
+        buySellMixin.openSelector(BuySellMixin.Selector.AllAssets)
     }
 
     fun swapClicked() {
