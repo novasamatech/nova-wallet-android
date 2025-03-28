@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_xcm_api.asset
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindInt
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
+import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
@@ -11,11 +15,26 @@ sealed class MultiAssetFilter : VersionedToDynamicScaleInstance {
         fun singleCounted(): Wild.AllCounted {
             return Wild.AllCounted(assetsCount = 1)
         }
+
+        fun bind(value: Any?, xcmVersion: XcmVersion): MultiAssetFilter {
+            val enum = value.castToDictEnum()
+            return when (val name = enum.name) {
+                "Definite" -> Definite.bind(enum.value, xcmVersion)
+                "Wild" -> Wild.bind(enum.value)
+                else -> incompatible("Unknown MultiAssetFilter variant: $name")
+            }
+        }
     }
 
     class Definite(val assets: MultiAssets) : MultiAssetFilter() {
 
-        constructor(asset: MultiAsset): this(asset.intoMultiAssets())
+        companion object {
+            fun bind(value: Any?, xcmVersion: XcmVersion): Definite {
+                return Definite(MultiAssets.bind(value, xcmVersion))
+            }
+        }
+
+        constructor(asset: MultiAsset) : this(asset.intoMultiAssets())
 
         override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
             return DictEnum.Entry("Definite", assets.toEncodableInstance(xcmVersion))
@@ -23,6 +42,18 @@ sealed class MultiAssetFilter : VersionedToDynamicScaleInstance {
     }
 
     sealed class Wild : MultiAssetFilter() {
+
+        companion object {
+            fun bind(value: Any?): Wild {
+                val asEnum = value.castToDictEnum()
+                return when (val name = asEnum.name) {
+                    "All" -> All
+                    "AllCounted" -> AllCounted.bind(asEnum.value)
+                    else -> incompatible("Unknown Wild variant: $name")
+                }
+            }
+        }
+
 
         /**
          * Filter to use all assets from the holding register
@@ -55,6 +86,13 @@ sealed class MultiAssetFilter : VersionedToDynamicScaleInstance {
          * Filter to use first [assetsCount] assets from the holding register
          */
         data class AllCounted(val assetsCount: Int) : Wild() {
+
+            companion object {
+
+                fun bind(value: Any?): AllCounted {
+                    return AllCounted(bindInt(value))
+                }
+            }
 
             override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
                 return DictEnum.Entry(

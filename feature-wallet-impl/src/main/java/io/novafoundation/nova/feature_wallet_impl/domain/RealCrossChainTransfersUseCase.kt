@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
@@ -15,13 +14,14 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.paidByAccountOrNull
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.IncomingDirection
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.OutcomingDirection
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
@@ -133,23 +133,27 @@ internal class RealCrossChainTransfersUseCase(
 
         CrossChainTransferFee(
             submissionFee = originFee,
-            postSubmissionByAccount = crossChainFee.paidByAccountOrNull()?.let {
-                val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.signingAccount)
-                SubstrateFee(it, submissionOrigin, transfer.originChain.commissionAsset)
-            },
-            postSubmissionFromAmount = SubstrateFeeBase(
-                amount = crossChainFee.paidFromHolding,
-                asset = transfer.originChainAsset,
+            postSubmissionFee = PostSubmissionFee(
+                byAccount = crossChainFee.byAccount?.let {
+                    val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.signingAccount)
+                    SubstrateFee(it, submissionOrigin, transfer.originChain.commissionAsset)
+                },
+                fromAmount = PostSubmissionAmountFee(
+                    originAsset = transfer.originChainAsset,
+                    feesByChain = crossChainFee.fromAmountByChain,
+                    metadata = crossChainFee.metadata
+                )
             ),
         )
     }
 
     override suspend fun ExtrinsicService.performTransfer(
         transfer: AssetTransferBase,
+        crossChainTransferFee: PostSubmissionAmountFee,
         computationalScope: CoroutineScope
     ): Result<Balance> {
         val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
-        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
+        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer, crossChainTransferFee)
     }
 
     override suspend fun maximumExecutionTime(

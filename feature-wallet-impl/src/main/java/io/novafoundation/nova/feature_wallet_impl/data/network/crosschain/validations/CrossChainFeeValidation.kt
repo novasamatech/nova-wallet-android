@@ -18,7 +18,7 @@ class CrossChainFeeValidation : AssetTransfersValidation {
 
         val remainingBalanceAfterTransfer = value.originUsedAsset.transferable - value.transfer.amount - originFeeSum
 
-        val crossChainFee = value.crossChainFee?.decimalAmount.orZero()
+        val crossChainFee = value.crossChainFee?.totalFee?.decimalAmount.orZero()
         val remainsEnoughToPayCrossChainFees = remainingBalanceAfterTransfer >= crossChainFee
 
         return remainsEnoughToPayCrossChainFees isTrueOrError {

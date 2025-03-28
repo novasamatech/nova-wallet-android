@@ -39,6 +39,8 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
@@ -243,7 +245,7 @@ class ConfirmSendViewModel(
     private fun performTransfer(
         transfer: WeightedAssetTransfer,
         originFee: OriginFee,
-        crossChainFee: FeeBase?
+        crossChainFee: PostSubmissionAmountFee?
     ) = launch {
         sendInteractor.performTransfer(transfer, originFee, crossChainFee, viewModelScope)
             .onSuccess {
@@ -288,7 +290,7 @@ class ConfirmSendViewModel(
             originFee = fee.originFee,
             originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = assetFlow.first(),
-            crossChainFee = fee.crossChainFee
+            crossChainFee = fee.postSubmissionFee
         )
     }
 

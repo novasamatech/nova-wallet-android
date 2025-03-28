@@ -6,6 +6,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.Duration
@@ -24,7 +26,7 @@ interface CrossChainTransactor {
     suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-        crossChainFee: Balance
+        crossChainFee: PostSubmissionAmountFee
     ): Result<ExtrinsicSubmission>
 
     suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance
@@ -36,6 +38,7 @@ interface CrossChainTransactor {
     suspend fun performAndTrackTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
+        crossChainFee: PostSubmissionAmountFee
     ): Result<Balance>
 
     suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration

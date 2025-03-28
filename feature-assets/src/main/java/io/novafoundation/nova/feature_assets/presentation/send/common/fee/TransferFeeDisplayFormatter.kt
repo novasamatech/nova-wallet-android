@@ -20,7 +20,7 @@ class TransferFeeDisplayFormatter(
     ): TransferFeeDisplay {
         return TransferFeeDisplay(
             originFee = componentDelegate.formatFee(fee.originFee.totalInSubmissionAsset, configuration, context),
-            crossChainFee = fee.crossChainFee?.let { componentDelegate.formatFee(it, configuration, context) }
+            crossChainFee = fee.postSubmissionFee?.let { componentDelegate.formatFee(it.totalFee, configuration, context) }
         )
     }
 

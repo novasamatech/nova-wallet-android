@@ -227,7 +227,9 @@ class CrossChainTransferAssetExchange(
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
             val outcome = with(crossChainTransfersUseCase) {
-                swapHost.extrinsicService().performTransfer(transfer, swapHost.scope)
+                val fee = args.fee as CrossChainAtomicOperationFee
+                val postSubmissionAmountFee = fee.crossChainFee.postSubmissionFee.fromAmount
+                swapHost.extrinsicService().performTransfer(transfer, postSubmissionAmountFee, swapHost.scope)
             }
 
             return outcome.map { receivedAmount ->
@@ -260,28 +262,29 @@ class CrossChainTransferAssetExchange(
     }
 
     private class CrossChainAtomicOperationFee(
-        private val crossChainFee: CrossChainTransferFee
+        val crossChainFee: CrossChainTransferFee
     ) : AtomicSwapOperationFee {
 
         override val submissionFee = SubmissionFeeWithLabel(crossChainFee.submissionFee)
 
         override val postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
             paidByAccount = listOfNotNull(
-                SubmissionFeeWithLabel(crossChainFee.postSubmissionByAccount, debugLabel = "Delivery"),
+                SubmissionFeeWithLabel(crossChainFee.postSubmissionFee.byAccount, debugLabel = "From Account"),
             ),
             paidFromAmount = listOf(
-                FeeWithLabel(crossChainFee.postSubmissionFromAmount, debugLabel = "Execution")
+                FeeWithLabel(crossChainFee.postSubmissionFee.fromAmount.totalFee, debugLabel = "From Holding")
             )
         )
 
         override fun constructDisplayData(): AtomicOperationFeeDisplayData {
-            val deliveryFee = crossChainFee.postSubmissionByAccount
-            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != crossChainFee.postSubmissionFromAmount.asset.fullId
+            val fee = crossChainFee.postSubmissionFee
+            val deliveryFee = fee.byAccount
+            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != fee.fromAmount.originAsset.fullId
 
             val crossChainFeeComponentDisplay = if (shouldSeparateDeliveryFromExecution) {
-                SwapFeeComponentDisplay.crossChain(crossChainFee.postSubmissionFromAmount, deliveryFee!!)
+                SwapFeeComponentDisplay.crossChain(fee.fromAmount.totalFee, deliveryFee!!)
             } else {
-                val totalCrossChain = crossChainFee.postSubmissionFromAmount.addPlanks(deliveryFee?.amount.orZero())
+                val totalCrossChain = fee.fromAmount.totalFee.addPlanks(deliveryFee?.amount.orZero())
                 SwapFeeComponentDisplay.crossChain(totalCrossChain)
             }
 

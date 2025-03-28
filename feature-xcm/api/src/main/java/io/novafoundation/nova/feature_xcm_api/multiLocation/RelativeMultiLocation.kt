@@ -8,6 +8,13 @@ data class RelativeMultiLocation(
     override val interior: Interior
 ) : MultiLocation(interior), VersionedToDynamicScaleInstance {
 
+    companion object {
+
+        fun bind(value: Any?): RelativeMultiLocation {
+            return bindMultiLocation(value)
+        }
+    }
+
     override fun toEncodableInstance(xcmVersion: XcmVersion): Any {
         return toEncodableInstanceExt(xcmVersion)
     }

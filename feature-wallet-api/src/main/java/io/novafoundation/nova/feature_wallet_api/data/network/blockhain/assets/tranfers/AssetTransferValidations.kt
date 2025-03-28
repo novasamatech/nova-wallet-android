@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.intoFeeList
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -81,7 +83,7 @@ sealed class AssetTransferValidationFailure {
 data class AssetTransferPayload(
     val transfer: WeightedAssetTransfer,
     val originFee: OriginFee,
-    val crossChainFee: FeeBase?,
+    val crossChainFee: PostSubmissionAmountFee?,
     val originCommissionAsset: Asset,
     val originUsedAsset: Asset
 )

@@ -39,6 +39,7 @@ interface AtomicSwapOperation {
 
 class AtomicSwapOperationSubmissionArgs(
     val actualSwapLimit: SwapLimit,
+    val fee: AtomicSwapOperationFee
 )
 
 class AtomicSwapOperationArgs(

@@ -4,22 +4,22 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 
-data class CrossChainFeeModel(
+data class CrossChainFeeItem(
     val paidByAccount: Balance = BigInteger.ZERO,
     val paidFromHolding: Balance = BigInteger.ZERO
 ) {
     companion object
 }
 
-fun CrossChainFeeModel.paidByAccountOrNull(): Balance? {
+fun CrossChainFeeItem.paidByAccountOrNull(): Balance? {
     return paidByAccount.takeIf { paidByAccount.isPositive() }
 }
 
-fun CrossChainFeeModel.Companion.zero() = CrossChainFeeModel()
+fun CrossChainFeeItem.Companion.zero() = CrossChainFeeItem()
 
-operator fun CrossChainFeeModel.plus(other: CrossChainFeeModel) = CrossChainFeeModel(
+operator fun CrossChainFeeItem.plus(other: CrossChainFeeItem) = CrossChainFeeItem(
     paidByAccount = paidByAccount + other.paidByAccount,
     paidFromHolding = paidFromHolding + other.paidFromHolding
 )
 
-fun CrossChainFeeModel?.orZero() = this ?: CrossChainFeeModel.zero()
+fun CrossChainFeeItem?.orZero() = this ?: CrossChainFeeItem.zero()

@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -90,7 +92,7 @@ class RealCrossChainTransactor(
 
         doNotCrossExistentialDepositInUsedAsset(
             assetSourceRegistry = assetSourceRegistry,
-            extraAmount = { it.transfer.amount + it.crossChainFee?.decimalAmount.orZero() }
+            extraAmount = { it.transfer.amount + it.crossChainFee?.totalFee?.decimalAmount.orZero() }
         )
     }
 
@@ -106,7 +108,7 @@ class RealCrossChainTransactor(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
         ) {
-            crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
+            crossChainTransfer(configuration, transfer, AmountWithdrawMode.SPECIFIED_EXACT, crossChainFee = null)
         }
     }
 
@@ -114,7 +116,7 @@ class RealCrossChainTransactor(
     override suspend fun performTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-        crossChainFee: Balance
+        crossChainFee: PostSubmissionAmountFee
     ): Result<ExtrinsicSubmission> {
         return submitExtrinsic(
             chain = transfer.originChain,
@@ -123,7 +125,7 @@ class RealCrossChainTransactor(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
         ) {
-            crossChainTransfer(configuration, transfer, crossChainFee)
+            crossChainTransfer(configuration, transfer, AmountWithdrawMode.ADD_FEES_ON_TOP, crossChainFee)
         }
     }
 
@@ -135,6 +137,7 @@ class RealCrossChainTransactor(
     override suspend fun performAndTrackTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
+        crossChainFee: PostSubmissionAmountFee
     ): Result<Balance> {
         // Start balances updates eagerly to not to miss events in case tx has been included to block right after submission
         val balancesUpdates = observeTransferableBalance(transfer)
@@ -143,7 +146,7 @@ class RealCrossChainTransactor(
 
         Log.d("CrossChain", "Starting cross-chain transfer")
 
-        return performTransferOfExactAmount(configuration, transfer)
+        return performTransferOfExactAmount(configuration, transfer, crossChainFee)
             .requireOk()
             .flatMap {
                 Log.d("CrossChain", "Cross chain transfer for successfully executed on origin, waiting for destination")
@@ -239,6 +242,7 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicService.performTransferOfExactAmount(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
+        crossChainFee: PostSubmissionAmountFee
     ): Result<ExtrinsicExecutionResult> {
         return submitExtrinsicAndAwaitExecution(
             chain = transfer.originChain,
@@ -247,8 +251,7 @@ class RealCrossChainTransactor(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
         ) {
-            // We are transferring the exact amount, so we should add nothing on top of the transfer amount
-            crossChainTransfer(configuration, transfer, crossChainFee = Balance.ZERO)
+            crossChainTransfer(configuration, transfer, AmountWithdrawMode.SPECIFIED_EXACT, crossChainFee)
         }
     }
 
@@ -266,11 +269,12 @@ class RealCrossChainTransactor(
     private suspend fun ExtrinsicBuilder.crossChainTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-        crossChainFee: Balance
+        mode: AmountWithdrawMode,
+        crossChainFee: PostSubmissionAmountFee?
     ) {
         when (configuration) {
-            is CrossChainTransferConfiguration.Dynamic -> dynamic.crossChainTransfer(configuration.config, transfer, crossChainFee)
-            is CrossChainTransferConfiguration.Legacy -> legacy.crossChainTransfer(configuration.config, transfer, crossChainFee)
+            is CrossChainTransferConfiguration.Dynamic -> dynamic.crossChainTransfer(configuration.config, transfer, mode, crossChainFee)
+            is CrossChainTransferConfiguration.Legacy -> legacy.crossChainTransfer(configuration.config, transfer, mode, crossChainFee)
         }
     }
 }

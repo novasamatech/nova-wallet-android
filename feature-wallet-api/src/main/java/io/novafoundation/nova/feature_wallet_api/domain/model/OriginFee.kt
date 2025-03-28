@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.data.model.getAmount
 
 data class OriginFee(
     val submissionFee: SubmissionFee,
-    val deliveryFee: SubmissionFee?,
+    val postSubmissionFeeByAccount: SubmissionFee?,
 ) {
 
     val totalInSubmissionAsset: FeeBase = createTotalFeeInSubmissionAsset()
@@ -20,11 +20,11 @@ data class OriginFee(
 
     private fun createTotalFeeInSubmissionAsset(): FeeBase {
         val submissionAsset = submissionFee.asset
-        val totalAmount = submissionFee.amount + deliveryFee?.getAmount(submissionAsset).orZero()
+        val totalAmount = submissionFee.amount + postSubmissionFeeByAccount?.getAmount(submissionAsset).orZero()
         return SubstrateFeeBase(totalAmount, submissionAsset)
     }
 }
 
 fun OriginFee.intoFeeList(): List<Fee> {
-    return listOfNotNull(submissionFee, deliveryFee)
+    return listOfNotNull(submissionFee, postSubmissionFeeByAccount)
 }

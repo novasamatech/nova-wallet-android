@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
@@ -40,14 +42,14 @@ class SendInteractor(
 
             val originFee = OriginFee(
                 submissionFee = fees.submissionFee,
-                deliveryFee = fees.postSubmissionByAccount,
+                postSubmissionFeeByAccount = fees.postSubmissionFee.byAccount,
             )
 
-            TransferFee(originFee, fees.postSubmissionFromAmount)
+            TransferFee(originFee, fees.postSubmissionFee.fromAmount)
         } else {
             TransferFee(
                 originFee = getOriginFee(transfer, coroutineScope),
-                crossChainFee = null
+                postSubmissionFee = null
             )
         }
     }
@@ -63,14 +65,14 @@ class SendInteractor(
     suspend fun performTransfer(
         transfer: WeightedAssetTransfer,
         originFee: OriginFee,
-        crossChainFee: FeeBase?,
+        crossChainFee: PostSubmissionAmountFee?,
         coroutineScope: CoroutineScope
     ): Result<*> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
             with(extrinsicService) {
-                crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amount)
+                crossChainTransactor.performTransfer(config, transfer, crossChainFee!!)
             }
         } else {
             val submissionFee = originFee.submissionFee

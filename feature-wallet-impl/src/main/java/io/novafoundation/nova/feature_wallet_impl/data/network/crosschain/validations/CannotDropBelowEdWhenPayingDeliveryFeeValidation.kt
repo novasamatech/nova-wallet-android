@@ -26,11 +26,11 @@ class CannotDropBelowEdWhenPayingDeliveryFeeValidation(
 
         val existentialDeposit = assetSourceRegistry.existentialDepositInPlanks(value.transfer.originChainAsset)
 
-        val deliveryFeePart = value.originFee.deliveryFee?.amount.orZero()
+        val deliveryFeePart = value.originFee.postSubmissionFeeByAccount?.amount.orZero()
         val paysDeliveryFee = deliveryFeePart.isPositive()
 
         val networkFeePlanks = value.originFee.submissionFee.amountByExecutingAccount
-        val crossChainFeePlanks = value.crossChainFee?.amount.orZero()
+        val crossChainFeePlanks = value.crossChainFee?.totalFee?.amount.orZero()
 
         val sendingAmount = value.transfer.amountInPlanks + crossChainFeePlanks
         val requiredAmountWhenPayingDeliveryFee = sendingAmount + networkFeePlanks + deliveryFeePart + existentialDeposit

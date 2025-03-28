@@ -220,7 +220,7 @@ class SelectSendViewModel(
                 assetTransfer = transfer,
                 fee = fee.originFee,
             ),
-            crossChainFee = fee.crossChainFee,
+            crossChainFee = fee.postSubmissionFee,
             originFee = fee.originFee,
             originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = originAssetFlow.first()

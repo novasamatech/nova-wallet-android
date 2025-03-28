@@ -13,7 +13,8 @@ import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeItem
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.plus
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.zero
@@ -73,21 +74,31 @@ class LegacyCrossChainWeigher @Inject constructor(
         return destinationWeight.max(reserveWeight)
     }
 
-    suspend fun estimateFee(amount: Balance, config: LegacyCrossChainTransferConfiguration): CrossChainFeeModel = with(config) {
+    suspend fun estimateFee(amount: Balance, config: LegacyCrossChainTransferConfiguration): CrossChainFee = with(config) {
         // Reserve fee may be zero if xcm transfer doesn't reserve tokens
         val reserveFeeAmount = calculateFee(amount, reserveFee, reserveChainLocation)
         val destinationFeeAmount = calculateFee(amount, destinationFee, destinationChainLocation)
 
-        return reserveFeeAmount + destinationFeeAmount
+        CrossChainFee(
+            byAccount = reserveFeeAmount.paidByAccount + destinationFeeAmount.paidByAccount,
+            fromAmountByChain = buildMap {
+                reserveFee?.let {
+                    put(it.to.chainId, reserveFeeAmount.paidFromHolding)
+                }
+
+                put(destinationFee.to.chainId, destinationFeeAmount.paidFromHolding)
+            },
+            metadata = null
+        )
     }
 
     private suspend fun LegacyCrossChainTransferConfiguration.calculateFee(
         amount: Balance,
         feeConfig: CrossChainFeeConfiguration?,
         chainLocation: RelativeMultiLocation
-    ): CrossChainFeeModel {
+    ): CrossChainFeeItem {
         return when (feeConfig) {
-            null -> CrossChainFeeModel.zero()
+            null -> CrossChainFeeItem.zero()
             else -> {
                 val isSendingFromOrigin = originChainId == feeConfig.from.chainId
                 val feeAmount = feeFor(amount, feeConfig)
@@ -97,12 +108,12 @@ class LegacyCrossChainWeigher @Inject constructor(
         }
     }
 
-    private suspend fun LegacyCrossChainTransferConfiguration.feeFor(amount: Balance, feeConfig: CrossChainFeeConfiguration): CrossChainFeeModel {
+    private suspend fun LegacyCrossChainTransferConfiguration.feeFor(amount: Balance, feeConfig: CrossChainFeeConfiguration): CrossChainFeeItem {
         val chain = chainRegistry.getChain(feeConfig.to.chainId)
         val maxWeight = feeConfig.estimatedWeight()
 
         return when (val mode = feeConfig.to.xcmFeeType.mode) {
-            is Mode.Proportional -> CrossChainFeeModel(paidFromHolding = mode.weightToFee(maxWeight))
+            is Mode.Proportional -> CrossChainFeeItem(paidFromHolding = mode.weightToFee(maxWeight))
 
             Mode.Standard -> {
                 val xcmMessage = xcmMessage(feeConfig.to.xcmFeeType.instructions, chain, amount)
@@ -114,10 +125,10 @@ class LegacyCrossChainWeigher @Inject constructor(
                     xcmExecute(xcmMessage, maxWeight)
                 }
 
-                CrossChainFeeModel(paidFromHolding = paymentInfo.partialFee)
+                CrossChainFeeItem(paidFromHolding = paymentInfo.partialFee)
             }
 
-            Mode.Unknown -> CrossChainFeeModel.zero()
+            Mode.Unknown -> CrossChainFeeItem.zero()
         }
     }
 
@@ -126,8 +137,8 @@ class LegacyCrossChainWeigher @Inject constructor(
         config: CrossChainFeeConfiguration,
         destinationChainLocation: RelativeMultiLocation,
         isSendingFromOrigin: Boolean
-    ): CrossChainFeeModel {
-        val deliveryFeeConfiguration = config.from.deliveryFeeConfiguration ?: return CrossChainFeeModel.zero()
+    ): CrossChainFeeItem {
+        val deliveryFeeConfiguration = config.from.deliveryFeeConfiguration ?: return CrossChainFeeItem.zero()
 
         val deliveryConfig = deliveryFeeConfiguration.getDeliveryConfig(destinationChainLocation)
 
@@ -141,9 +152,9 @@ class LegacyCrossChainWeigher @Inject constructor(
 
         val isSenderPaysOriginDelivery = !deliveryConfig.alwaysHoldingPays
         return if (isSenderPaysOriginDelivery && isSendingFromOrigin) {
-            CrossChainFeeModel(paidByAccount = deliveryFee)
+            CrossChainFeeItem(paidByAccount = deliveryFee)
         } else {
-            CrossChainFeeModel(paidFromHolding = deliveryFee)
+            CrossChainFeeItem(paidFromHolding = deliveryFee)
         }
     }
 

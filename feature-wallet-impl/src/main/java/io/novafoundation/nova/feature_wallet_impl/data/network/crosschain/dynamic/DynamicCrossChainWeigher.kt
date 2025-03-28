@@ -3,21 +3,25 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.replaceAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeDispatchAs
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.AmountWithdrawMode
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.AssetIssuerRegistry
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.asset.requireFungible
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
+import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction
+import io.novafoundation.nova.feature_xcm_api.message.XcmMessage
 import io.novafoundation.nova.feature_xcm_api.message.bindRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
@@ -26,12 +30,14 @@ import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCall
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.getByLocation
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.usedXcmVersion
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.getInnerSuccessOrThrow
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
@@ -58,14 +64,15 @@ class DynamicCrossChainWeigher @Inject constructor(
     suspend fun estimateFee(
         config: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase
-    ): CrossChainFeeModel {
+    ): CrossChainFee {
         val safeTransfer = transfer.ensureSafeAmount()
 
         val originResult = dryRunOnOrigin(config, safeTransfer)
         val remoteReserveResult = dryRunOnRemoteReserve(config, originResult.forwardedXcm)
-        val destinationResult = dryRunOnDestination(config, safeTransfer, remoteReserveResult.forwardedXcm)
+        val toDestination = (remoteReserveResult ?: originResult).forwardedXcm
+        val destinationResult = dryRunOnDestination(config, safeTransfer, toDestination)
 
-        return CrossChainFeeModel.fromDryRunResult(
+        return CrossChainFee.fromDryRunResult(
             initialAmount = safeTransfer.amountPlanks,
             origin = originResult,
             remoteReserve = remoteReserveResult,
@@ -83,11 +90,12 @@ class DynamicCrossChainWeigher @Inject constructor(
     private suspend fun dryRunOnOrigin(
         config: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-    ): IntermediateDryRunResult {
+    ): OriginDryRunResult {
         val runtime = chainRegistry.getRuntime(config.originChainId)
 
-        val dryRunCall = constructDryRunCall(config, transfer, runtime)
-        val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, config.originChainId)
+        val xcmResultsVersion = XcmVersion.V4
+        val (dryRunCall, specifiedFees) = constructDryRunCall(config, transfer, runtime)
+        val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, xcmResultsVersion, config.originChainId)
             .getInnerSuccessOrThrow(LOG_TAG)
 
         val nextHopLocation = (config.remoteReserveChainLocation ?: config.destinationChainLocation).location
@@ -100,16 +108,14 @@ class DynamicCrossChainWeigher @Inject constructor(
         val deliveryFee = searchDeliveryFee(dryRunResult, runtime)
         val trappedAssets = searchTrappedAssets(dryRunResult, runtime)
 
-        return IntermediateDryRunResult(forwardedXcm, deliveryFee, trappedAssets)
+        return OriginDryRunResult(specifiedFees, forwardedXcm, deliveryFee, trappedAssets, config.originChainId)
     }
 
     private suspend fun dryRunOnRemoteReserve(
         config: DynamicCrossChainTransferConfiguration,
         forwardedFromOrigin: VersionedRawXcmMessage,
-    ): IntermediateDryRunResult {
-        // No remote reserve - nothing to dry run, return unchanged value
-        val remoteReserveLocation = config.remoteReserveChainLocation
-            ?: return IntermediateDryRunResult(forwardedFromOrigin, Balance.ZERO, Balance.ZERO)
+    ): IntermediateDryRunResult? {
+        val remoteReserveLocation = config.remoteReserveChainLocation ?: return null
 
         val runtime = chainRegistry.getRuntime(remoteReserveLocation.chainId)
 
@@ -132,7 +138,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val deliveryFee = searchDeliveryFee(dryRunResult, runtime)
         val trappedAssets = searchTrappedAssets(dryRunResult, runtime)
 
-        return IntermediateDryRunResult(forwardedXcm, deliveryFee, trappedAssets)
+        return IntermediateDryRunResult(forwardedXcm, deliveryFee, trappedAssets, remoteReserveLocation.chainId)
     }
 
     private suspend fun dryRunOnDestination(
@@ -151,35 +157,38 @@ class DynamicCrossChainWeigher @Inject constructor(
 
         val depositedAmount = searchDepositAmount(dryRunResult, transfer.destinationChainAsset)
 
-        return FinalDryRunResult(depositedAmount)
+        return FinalDryRunResult(depositedAmount, destinationLocation.chainId)
     }
 
     private suspend fun constructDryRunCall(
         config: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
         runtime: RuntimeSnapshot
-    ): GenericCall.Instance {
-        val callOnOrigin = dynamicCrossChainTransactor.composeCrossChainTransferCall(config, transfer, crossChainFee = Balance.ZERO)
+    ): DynamicXcmBuildResult<GenericCall.Instance> {
+        return dynamicCrossChainTransactor.composeCrossChainTransferCall(
+            configuration = config,
+            transfer = transfer,
+            mode = AmountWithdrawMode.SPECIFIED_EXACT,
+            fee = null
+        ).map { callOnOrigin ->
+            val dryRunAccount = transfer.originChain.emptyAccountIdKey()
+            val transferOrigin = OriginCaller.System.Signed(dryRunAccount)
 
-        val dryRunAccount = transfer.originChain.emptyAccountIdKey()
-        val transferOrigin = OriginCaller.System.Signed(dryRunAccount)
+            val calls = buildList {
+                addFundCalls(transfer, dryRunAccount)
 
-        val calls = buildList {
-            addFundCalls(transfer, dryRunAccount)
+                val transferCall = runtime.composeDispatchAs(callOnOrigin, transferOrigin)
+                add(transferCall)
+            }
 
-            val transferCall = runtime.composeDispatchAs(callOnOrigin, transferOrigin)
-            add(transferCall)
+            runtime.composeBatchAll(calls)
         }
-
-        return runtime.composeBatchAll(calls)
     }
 
     private suspend fun MutableList<GenericCall.Instance>.addFundCalls(transfer: AssetTransferBase, dryRunAccount: AccountIdKey) {
         val fundAmount = determineFundAmount(transfer)
 
-        val fundSendingAssetCall = assetIssuerRegistry.create(transfer.originChainAsset).composeIssueCall(fundAmount, dryRunAccount)
-        add(fundSendingAssetCall)
-
+        // Fund native first so we can later fund non-sufficient assets
         if (!transfer.originChainAsset.isUtilityAsset) {
             // Additionally fund native asset to pay delivery fees
             val nativeAsset = transfer.originChain.utilityAsset
@@ -187,22 +196,63 @@ class DynamicCrossChainWeigher @Inject constructor(
             val fundNativeAssetCall = assetIssuerRegistry.create(nativeAsset).composeIssueCall(planks, dryRunAccount)
             add(fundNativeAssetCall)
         }
+
+        val fundSendingAssetCall = assetIssuerRegistry.create(transfer.originChainAsset).composeIssueCall(fundAmount, dryRunAccount)
+        add(fundSendingAssetCall)
     }
 
-    private fun CrossChainFeeModel.Companion.fromDryRunResult(
+    private fun CrossChainFee.Companion.fromDryRunResult(
+        initialAmount: Balance,
+        origin: OriginDryRunResult,
+        remoteReserve: IntermediateDryRunResult?,
+        destination: FinalDryRunResult
+    ): CrossChainFee {
+        return CrossChainFee(
+            byAccount = origin.deliveryFee,
+            fromAmountByChain = buildFeeMap(initialAmount, origin, remoteReserve, destination),
+            metadata = buildDynamicXcmFeeMetadata(origin, remoteReserve)
+        )
+    }
+
+    private fun buildDynamicXcmFeeMetadata(
+        origin: OriginDryRunResult,
+        remoteReserve: IntermediateDryRunResult?,
+    ): DynamicXcmFeeMetadata {
+        val feeValuesInDryRunCallByChain = origin.feeValuesInDryRunCall
+
+        val xcmFeeSourceByChain = buildMap {
+            val originFeesSource = feeValuesInDryRunCallByChain.determineXcmFeeSource(origin.chainId, origin.trapped)
+            put(origin.chainId, originFeesSource)
+
+            if (remoteReserve != null) {
+                val reserveFeesSource = feeValuesInDryRunCallByChain.determineXcmFeeSource(remoteReserve.chainId, remoteReserve.trapped)
+                put(remoteReserve.chainId, reserveFeesSource)
+            }
+        }
+
+        return DynamicXcmFeeMetadata(xcmFeeSourceByChain)
+    }
+
+    private fun buildFeeMap(
         initialAmount: Balance,
         origin: IntermediateDryRunResult,
-        remoteReserve: IntermediateDryRunResult,
+        remoteReserve: IntermediateDryRunResult?,
         destination: FinalDryRunResult
-    ): CrossChainFeeModel {
-        val deliveryFee = origin.deliveryFee
-        val trapped = origin.trapped + remoteReserve.trapped
-        val totalFee = initialAmount - destination.depositedAmount - trapped
-        // We do not subtract `origin.deliveryFee` since it is paid directly from the origin account and not from the holding register
-        // We do not subtract `remoteReserve.deliveryFee` since remote reserve delivery is paid from the holding register
-        val executionFee = totalFee
+    ): Map<ChainId, Balance> {
+        return buildMap {
+            put(origin.chainId, origin.paidFees(initialAmount))
 
-        return CrossChainFeeModel(paidByAccount = deliveryFee, paidFromHolding = executionFee)
+            if (remoteReserve != null) {
+                val arrivedToReserve = origin.forwardedAmount()
+                put(remoteReserve.chainId, remoteReserve.paidFees(arrivedToReserve))
+
+                val arrivedToDestination = remoteReserve.forwardedAmount()
+                put(destination.chainId, destination.paidFees(arrivedToDestination))
+            } else {
+                val arrivedToDestination = origin.forwardedAmount()
+                put(destination.chainId, destination.paidFees(arrivedToDestination))
+            }
+        }
     }
 
     // Maximum between amount * 2 and MINIMUM_FUND_AMOUNT
@@ -258,14 +308,6 @@ class DynamicCrossChainWeigher @Inject constructor(
         return multiAssets.extractFirstAmount()
     }
 
-    private fun MultiAssets.extractFirstAmount(): Balance {
-        return if (value.isNotEmpty()) {
-            value.first().requireFungible().amount
-        } else {
-            Balance.ZERO
-        }
-    }
-
     private fun searchForwardedXcmInEvents(
         dryRunEffects: DryRunEffects,
         runtimeSnapshot: RuntimeSnapshot,
@@ -290,13 +332,58 @@ class DynamicCrossChainWeigher @Inject constructor(
         return forwardedXcmsToDestination.first()
     }
 
-    private class IntermediateDryRunResult(
+    private class OriginDryRunResult(
+        val feeValuesInDryRunCall: DynamicXcmSpecifiedFees,
+        forwardedXcm: VersionedRawXcmMessage,
+        deliveryFee: Balance,
+        trapped: Balance,
+        chainId: ChainId,
+    ) : IntermediateDryRunResult(forwardedXcm, deliveryFee, trapped, chainId)
+
+    private open class IntermediateDryRunResult(
         val forwardedXcm: VersionedRawXcmMessage,
         val deliveryFee: Balance,
         val trapped: Balance,
-    )
+        val chainId: ChainId,
+    ) {
+
+        fun forwardedAmount(): Balance {
+            val message = XcmMessage.bindKnown(forwardedXcm.xcm.toEncodableInstance(), forwardedXcm.version)
+            return message.instructions
+                .tryFindNonNull { it.forwardedAmount() }
+                .orZero()
+        }
+
+        fun paidFees(initialAmount: Balance): Balance {
+            return initialAmount - trapped - forwardedAmount()
+        }
+
+        private fun XcmInstruction.forwardedAmount(): Balance? {
+            return when (this) {
+                is XcmInstruction.WithdrawAsset -> assets.extractFirstAmount()
+                is XcmInstruction.ReserveAssetDeposited -> assets.extractFirstAmount()
+                is XcmInstruction.ReceiveTeleportedAsset -> assets.extractFirstAmount()
+                else -> null
+            }
+        }
+    }
 
     private class FinalDryRunResult(
-        val depositedAmount: Balance
-    )
+        val depositedAmount: Balance,
+        val chainId: ChainId
+    ) {
+
+        fun paidFees(initialAmount: Balance): Balance {
+            return initialAmount - depositedAmount
+        }
+    }
+}
+
+
+private fun MultiAssets.extractFirstAmount(): Balance {
+    return if (value.isNotEmpty()) {
+        value.first().requireFungible().amount
+    } else {
+        Balance.ZERO
+    }
 }

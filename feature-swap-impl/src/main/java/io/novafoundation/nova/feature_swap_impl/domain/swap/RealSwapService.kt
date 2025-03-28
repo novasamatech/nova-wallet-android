@@ -238,7 +238,7 @@ internal class RealSwapService(
                     // We cannot execute buy for segments after first one since we deal with actualReceivedAmount there
                     val shouldReplaceBuyWithSell = correction != null
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
-                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
+                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit, segmentFee)
 
                     Log.d("SwapSubmission", "$displayData with $actualSwapLimit")
 

@@ -3,12 +3,16 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legac
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee.PostSubmissionAmountFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.XcmTransferType
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.AmountWithdrawMode
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
@@ -34,13 +38,17 @@ class LegacyCrossChainTransactor @Inject constructor(
     suspend fun crossChainTransfer(
         configuration: LegacyCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-        crossChainFee: Balance
+        mode: AmountWithdrawMode,
+        crossChainFee: PostSubmissionAmountFee?
     ) {
+        val crossChainFeeTotal = crossChainFee?.totalFee?.amount.orZero()
+        val totalToWithdraw = mode.totalTransferAmount(transfer.amountPlanks, crossChainFeeTotal)
+
         when (configuration.transferType) {
-            XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, crossChainFee)
+            XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, totalToWithdraw)
+            XcmTransferType.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, totalToWithdraw)
+            XcmTransferType.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, totalToWithdraw)
+            XcmTransferType.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, totalToWithdraw)
             XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
         }
     }
@@ -48,9 +56,9 @@ class LegacyCrossChainTransactor @Inject constructor(
     private suspend fun ExtrinsicBuilder.xTokensTransfer(
         configuration: LegacyCrossChainTransferConfiguration,
         assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
+        totalToWithdraw: Balance,
     ) {
-        val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
+        val multiAsset = configuration.multiAssetFor(totalToWithdraw)
         val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
         val requiredDestWeight = weigher.estimateRequiredDestWeight(configuration)
 
@@ -76,12 +84,12 @@ class LegacyCrossChainTransactor @Inject constructor(
     private suspend fun ExtrinsicBuilder.xcmPalletTransferAssets(
         configuration: LegacyCrossChainTransferConfiguration,
         assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
+        totalToWithdraw: Balance,
     ) {
         xcmPalletTransfer(
             configuration = configuration,
             assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
+            totalToWithdraw = totalToWithdraw,
             callName = "transfer_assets"
         )
     }
@@ -89,12 +97,12 @@ class LegacyCrossChainTransactor @Inject constructor(
     private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(
         configuration: LegacyCrossChainTransferConfiguration,
         assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
+        totalToWithdraw: Balance,
     ) {
         xcmPalletTransfer(
             configuration = configuration,
             assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
+            totalToWithdraw = totalToWithdraw,
             callName = "limited_reserve_transfer_assets"
         )
     }
@@ -102,12 +110,12 @@ class LegacyCrossChainTransactor @Inject constructor(
     private suspend fun ExtrinsicBuilder.xcmPalletTeleport(
         configuration: LegacyCrossChainTransferConfiguration,
         assetTransfer: AssetTransferBase,
-        crossChainFee: Balance
+        totalToWithdraw: Balance,
     ) {
         xcmPalletTransfer(
             configuration = configuration,
             assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
+            totalToWithdraw = totalToWithdraw,
             callName = "limited_teleport_assets"
         )
     }
@@ -115,13 +123,13 @@ class LegacyCrossChainTransactor @Inject constructor(
     private suspend fun ExtrinsicBuilder.xcmPalletTransfer(
         configuration: LegacyCrossChainTransferConfiguration,
         assetTransfer: AssetTransferBase,
-        crossChainFee: Balance,
+        totalToWithdraw: Balance,
         callName: String
     ) {
         val lowestMultiLocationVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(assetTransfer.originChain.id).orDefault()
         val lowestMultiAssetsVersion = xcmVersionDetector.lowestPresentMultiAssetsVersion(assetTransfer.originChain.id).orDefault()
 
-        val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
+        val multiAsset = configuration.multiAssetFor(totalToWithdraw)
 
         call(
             moduleName = runtime.metadata.xcmPalletName(),
@@ -136,13 +144,8 @@ class LegacyCrossChainTransactor @Inject constructor(
         )
     }
 
-    private fun LegacyCrossChainTransferConfiguration.multiAssetFor(
-        transfer: AssetTransferBase,
-        crossChainFee: Balance
-    ): MultiAsset {
-        // we add cross chain fee top of entered amount so received amount will be no less than entered one
-        val planks = transfer.amountPlanks + crossChainFee
-        return MultiAsset.from(assetLocation, planks)
+    private fun LegacyCrossChainTransferConfiguration.multiAssetFor(totalToWithdraw: Balance): MultiAsset {
+        return MultiAsset.from(assetLocation, totalToWithdraw)
     }
 
     private fun AssetTransferBase.beneficiaryLocation(): RelativeMultiLocation {
