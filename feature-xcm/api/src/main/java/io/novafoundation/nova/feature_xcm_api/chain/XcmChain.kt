@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_xcm_api.chain
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.chainLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger

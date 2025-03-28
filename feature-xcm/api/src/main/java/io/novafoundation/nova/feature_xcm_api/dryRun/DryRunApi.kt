@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcmLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import java.sql.ResultSet
 
 interface DryRunApi {
 

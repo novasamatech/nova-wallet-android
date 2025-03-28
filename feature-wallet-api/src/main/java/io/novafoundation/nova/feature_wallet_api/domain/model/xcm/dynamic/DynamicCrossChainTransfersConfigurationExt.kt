@@ -84,9 +84,9 @@ private fun XcmChain.shouldUseReserveTransferTo(destination: XcmChain): Boolean 
 }
 
 private fun XcmChain.shouldUseTeleportTo(destination: XcmChain): Boolean {
-    return isRelay() && destination.isSystemChain()
-        || isSystemChain() && destination.isRelay()
-        || isSystemChain() && destination.isSystemChain()
+    return isRelay() && destination.isSystemChain() ||
+        isSystemChain() && destination.isRelay() ||
+        isSystemChain() && destination.isSystemChain()
 }
 
 /**

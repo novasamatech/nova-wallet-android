@@ -69,7 +69,7 @@ class RealDryRunApi @Inject constructor(
         originCaller: OriginCaller,
         call: GenericCall.Instance,
         xcmResultsVersion: XcmVersion,
-        ): Result<ScaleResult<CallDryRunEffects, DryRunEffectsResultErr>> {
+    ): Result<ScaleResult<CallDryRunEffects, DryRunEffectsResultErr>> {
         return runCatching {
             call(
                 section = "DryRunApi",
