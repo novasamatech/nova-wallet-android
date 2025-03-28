@@ -76,7 +76,8 @@ class DryRunIntegrationTest : BaseIntegrationTest() {
         val dryRunEffects = dryRunApi.dryRunCall(
             originCaller = OriginCaller.System.Signed(origin),
             call = call,
-            chainId = polkadot.id
+            chainId = polkadot.id,
+            xcmResultsVersion = XcmVersion.V4
         )
             .getOrThrow()
             .toResult().getOrThrow()

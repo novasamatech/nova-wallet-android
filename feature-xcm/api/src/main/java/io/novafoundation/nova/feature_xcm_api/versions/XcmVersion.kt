@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_xcm_api.versions
 
 enum class XcmVersion(val version: Int) {
-    V0(0), V1(1), V2(2), V3(3), V4(4);
+    V0(0), V1(1), V2(2), V3(3), V4(4), V5(5);
 
     companion object {
 

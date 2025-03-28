@@ -10,6 +10,8 @@ interface DryRunEffects {
     val forwardedXcms: ForwardedXcms
 }
 
-fun DryRunEffects.usedXcmVersion(): XcmVersion {
-    return forwardedXcms.first().first.version
+fun DryRunEffects.senderXcmVersion(): XcmVersion {
+    // For referencing destination, dry run uses sender's xcm version
+    val (destination) = forwardedXcms.first()
+    return destination.version
 }

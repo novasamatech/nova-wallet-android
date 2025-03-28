@@ -227,7 +227,7 @@ class RealCrossChainTransactor(
         val eventDetector = assetSourceRegistry.getEventDetector(transfer.destinationChainAsset)
 
         val depositEvent = events.mapNotNull { event -> eventDetector.tryDetectDeposit(event) }
-            .find { it.destination.contentEquals(transfer.recipientAccountId) }
+            .find { it.destination == transfer.recipientAccountId }
 
         return depositEvent?.amount
     }
@@ -258,7 +258,7 @@ class RealCrossChainTransactor(
         return destinationAssetBalances.balance.subscribeTransferableAccountBalance(
             chain = transfer.destinationChain,
             chainAsset = transfer.destinationChainAsset,
-            accountId = transfer.recipientAccountId,
+            accountId = transfer.recipientAccountId.value,
             sharedSubscriptionBuilder = null
         )
     }

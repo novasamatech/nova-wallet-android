@@ -22,10 +22,10 @@ import io.novafoundation.nova.feature_xcm_api.dryRun.getEffectsOrThrow
 import io.novafoundation.nova.feature_xcm_api.dryRun.model.DryRunEffects
 import io.novafoundation.nova.feature_xcm_api.dryRun.model.OriginCaller
 import io.novafoundation.nova.feature_xcm_api.dryRun.model.getByLocation
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.usedXcmVersion
+import io.novafoundation.nova.feature_xcm_api.dryRun.model.senderXcmVersion
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
-import io.novafoundation.nova.feature_xcm_api.message.bindRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -34,7 +34,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvent
-import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import javax.inject.Inject
@@ -83,9 +82,10 @@ class DynamicCrossChainWeigher @Inject constructor(
         transfer: AssetTransferBase,
     ): IntermediateDryRunResult {
         val runtime = chainRegistry.getRuntime(config.originChainId)
+        val xcmResultsVersion = XcmVersion.V4
 
         val dryRunCall = constructDryRunCall(config, transfer, runtime)
-        val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, config.originChainId)
+        val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, xcmResultsVersion, config.originChainId)
             .getEffectsOrThrow(LOG_TAG)
 
         val nextHopLocation = (config.remoteReserveChainLocation ?: config.destinationChainLocation).location
@@ -93,7 +93,6 @@ class DynamicCrossChainWeigher @Inject constructor(
         val forwardedXcm = searchForwardedXcm(
             dryRunEffects = dryRunResult,
             destination = nextHopLocation.fromPointOfViewOf(config.originChainLocation.location),
-            runtimeSnapshot = runtime
         )
         val deliveryFee = searchDeliveryFee(dryRunResult, runtime)
 
@@ -124,7 +123,6 @@ class DynamicCrossChainWeigher @Inject constructor(
         val forwardedXcm = searchForwardedXcm(
             dryRunEffects = dryRunResult,
             destination = destinationOnRemoteReserve,
-            runtimeSnapshot = runtime
         )
         val deliveryFee = searchDeliveryFee(dryRunResult, runtime)
 
@@ -145,7 +143,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val dryRunResult = dryRunApi.dryRunXcm(dryRunOrigin, forwardedFromPrevious, destinationLocation.chainId)
             .getEffectsOrThrow(LOG_TAG)
 
-        val depositedAmount = searchDepositAmount(dryRunResult, transfer.destinationChainAsset)
+        val depositedAmount = searchDepositAmount(dryRunResult, transfer.destinationChainAsset, transfer.recipientAccountId)
 
         return FinalDryRunResult(depositedAmount)
     }
@@ -173,9 +171,7 @@ class DynamicCrossChainWeigher @Inject constructor(
     private suspend fun MutableList<GenericCall.Instance>.addFundCalls(transfer: AssetTransferBase, dryRunAccount: AccountIdKey) {
         val fundAmount = determineFundAmount(transfer)
 
-        val fundSendingAssetCall = assetIssuerRegistry.create(transfer.originChainAsset).composeIssueCall(fundAmount, dryRunAccount)
-        add(fundSendingAssetCall)
-
+        // Fund native asset first so we can later fund potentially non-sufficient assets
         if (!transfer.originChainAsset.isUtilityAsset) {
             // Additionally fund native asset to pay delivery fees
             val nativeAsset = transfer.originChain.utilityAsset
@@ -183,6 +179,9 @@ class DynamicCrossChainWeigher @Inject constructor(
             val fundNativeAssetCall = assetIssuerRegistry.create(nativeAsset).composeIssueCall(planks, dryRunAccount)
             add(fundNativeAssetCall)
         }
+
+        val fundSendingAssetCall = assetIssuerRegistry.create(transfer.originChainAsset).composeIssueCall(fundAmount, dryRunAccount)
+        add(fundSendingAssetCall)
     }
 
     private fun CrossChainFeeModel.Companion.fromDryRunResult(
@@ -209,20 +208,23 @@ class DynamicCrossChainWeigher @Inject constructor(
     private fun searchForwardedXcm(
         dryRunEffects: DryRunEffects,
         destination: RelativeMultiLocation,
-        runtimeSnapshot: RuntimeSnapshot,
     ): VersionedRawXcmMessage {
-        return searchForwardedXcmInEvents(dryRunEffects, runtimeSnapshot)
-            ?: searchForwardedXcmInQueues(dryRunEffects, destination)
+        return searchForwardedXcmInQueues(dryRunEffects, destination)
     }
 
-    private suspend fun searchDepositAmount(dryRunEffects: DryRunEffects, chainAsset: Chain.Asset): Balance {
+    private suspend fun searchDepositAmount(
+        dryRunEffects: DryRunEffects,
+        chainAsset: Chain.Asset,
+        recipientAccountId: AccountIdKey,
+    ): Balance {
         val depositDetector = assetSourceRegistry.getEventDetector(chainAsset)
 
-        val deposit = dryRunEffects.emittedEvents.tryFindNonNull {
-            depositDetector.detectDeposit(it)
-        }
+        val deposits = dryRunEffects.emittedEvents.mapNotNull { depositDetector.detectDeposit(it) }
+            .filter { it.destination == recipientAccountId }
 
-        return deposit?.amount ?: error("No deposit detected")
+        if (deposits.isEmpty()) error("No deposits detected")
+
+        return deposits.sumOf { it.amount }
     }
 
     private fun searchDeliveryFee(
@@ -232,7 +234,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val xcmPalletName = runtimeSnapshot.metadata.xcmPalletName()
         val event = dryRunEffects.emittedEvents.findEvent(xcmPalletName, "FeesPaid") ?: return Balance.ZERO
 
-        val usedXcmVersion = dryRunEffects.usedXcmVersion()
+        val usedXcmVersion = dryRunEffects.senderXcmVersion()
 
         val feesDecoded = event.arguments[FEES_PAID_FEES_ARGUMENT_INDEX]
         val multiAssets = MultiAssets.bind(feesDecoded, usedXcmVersion).value
@@ -244,22 +246,11 @@ class DynamicCrossChainWeigher @Inject constructor(
         }
     }
 
-    private fun searchForwardedXcmInEvents(
-        dryRunEffects: DryRunEffects,
-        runtimeSnapshot: RuntimeSnapshot,
-    ): VersionedRawXcmMessage? {
-        val xcmPalletName = runtimeSnapshot.metadata.xcmPalletName()
-        val event = dryRunEffects.emittedEvents.findEvent(xcmPalletName, "Sent") ?: return null
-        val rawXcmMessage = bindRawXcmMessage(event.arguments[XCM_SENT_MESSAGE_ARGUMENT_INDEX])
-
-        return rawXcmMessage.versionedXcm(dryRunEffects.usedXcmVersion())
-    }
-
     private fun searchForwardedXcmInQueues(
         dryRunEffects: DryRunEffects,
         destination: RelativeMultiLocation
     ): VersionedRawXcmMessage {
-        val usedXcmVersion = dryRunEffects.usedXcmVersion()
+        val usedXcmVersion = dryRunEffects.senderXcmVersion()
         val versionedDestination = destination.versionedXcm(usedXcmVersion)
 
         val forwardedXcmsToDestination = dryRunEffects.forwardedXcms.getByLocation(versionedDestination)

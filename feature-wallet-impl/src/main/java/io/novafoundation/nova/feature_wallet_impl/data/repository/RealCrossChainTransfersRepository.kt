@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.mappers.crosschain.toDoma
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransfersConfigRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransfersConfigRemote
+import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,8 @@ private const val DYNAMIC_CACHE_NAME = "RealCrossChainTransfersRepository.Dynami
 class RealCrossChainTransfersRepository(
     private val api: CrossChainConfigApi,
     private val fileCache: FileCache,
-    private val gson: Gson
+    private val gson: Gson,
+    private val parachainInfoRepository: ParachainInfoRepository,
 ) : CrossChainTransfersRepository {
 
     override suspend fun syncConfiguration() = withContext(Dispatchers.IO) {
@@ -45,7 +47,7 @@ class RealCrossChainTransfersRepository(
 
         val dynamicFlow = fileCache.observeCachedValue(DYNAMIC_CACHE_NAME).map {
             val remote = gson.fromJson<DynamicCrossChainTransfersConfigRemote>(it)
-            remote.toDomain()
+            remote.toDomain(parachainInfoRepository)
         }
 
         return dynamicFlow.zip(legacyFlow, ::CrossChainTransfersConfiguration)

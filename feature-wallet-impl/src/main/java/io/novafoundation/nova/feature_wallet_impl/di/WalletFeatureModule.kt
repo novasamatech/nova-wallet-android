@@ -287,8 +287,9 @@ class WalletFeatureModule {
     fun provideCrossChainRepository(
         api: CrossChainConfigApi,
         fileCache: FileCache,
-        gson: Gson
-    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, fileCache, gson)
+        gson: Gson,
+        parachainInfoRepository: ParachainInfoRepository,
+    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, fileCache, gson, parachainInfoRepository)
 
     @Provides
     @FeatureScope
