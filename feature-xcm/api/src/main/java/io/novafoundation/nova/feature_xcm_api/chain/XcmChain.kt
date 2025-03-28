@@ -15,3 +15,11 @@ fun XcmChain.absoluteLocation(): AbsoluteMultiLocation {
     val junctions = listOfNotNull(parachainId?.let(MultiLocation.Junction::ParachainId))
     return junctions.asLocation()
 }
+
+fun XcmChain.isRelay(): Boolean {
+    return parachainId == null
+}
+
+fun XcmChain.isSystemChain(): Boolean {
+    return parachainId != null && parachainId.toInt() in 1000 until 2000
+}
