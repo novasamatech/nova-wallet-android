@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 
 class AssetMaxActionProvider(
     private val assetFlow: Flow<Asset>,
-    private val assetField: (Asset) -> Balance,
+    private val assetField: suspend (Asset) -> Balance,
 ) : MaxActionProvider {
 
     override val maxAvailableBalance: Flow<MaxAvailableBalance> = assetFlow.map { asset ->

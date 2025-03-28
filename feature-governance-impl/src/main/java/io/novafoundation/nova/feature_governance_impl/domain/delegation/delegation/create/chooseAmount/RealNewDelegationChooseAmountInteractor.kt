@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -41,6 +42,11 @@ class RealNewDelegationChooseAmountInteractor(
     private val computationalCache: ComputationalCache,
     private val accountRepository: AccountRepository,
 ) : NewDelegationChooseAmountInteractor {
+
+    override suspend fun maxAvailableBalanceToDelegate(asset: Asset): Balance {
+        val (_, source) = useSelectedGovernance()
+        return source.convictionVoting.maxAvailableForVote(asset)
+    }
 
     override fun delegateAssistantFlow(coroutineScope: CoroutineScope): Flow<DelegateAssistant> {
         return computationalCache.useSharedFlow(DELEGATION_ASSISTANT_CACHE_KEY, coroutineScope) {

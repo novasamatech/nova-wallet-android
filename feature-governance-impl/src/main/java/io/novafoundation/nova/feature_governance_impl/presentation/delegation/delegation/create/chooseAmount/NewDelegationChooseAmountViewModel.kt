@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -34,8 +35,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -82,7 +81,7 @@ class NewDelegationChooseAmountViewModel(
         viewModelScope = viewModelScope,
         assetInFlow = selectedAsset,
         feeLoaderMixin = originFeeMixin,
-        maxBalanceType = MaxBalanceType.FREE
+        balance = interactor::maxAvailableBalanceToDelegate
     )
 
     val amountChooserMixin = amountChooserMixinFactory.create(
@@ -175,7 +174,8 @@ class NewDelegationChooseAmountViewModel(
             asset = selectedAsset.first(),
             fee = originFeeMixin.awaitFee(),
             amount = amountChooserMixin.amount.first(),
-            delegate = payload.delegate
+            delegate = payload.delegate,
+            maxAvailableAmount = maxActionProvider.maxAvailableBalance.first().actualAmount
         )
 
         validationExecutor.requireValid(

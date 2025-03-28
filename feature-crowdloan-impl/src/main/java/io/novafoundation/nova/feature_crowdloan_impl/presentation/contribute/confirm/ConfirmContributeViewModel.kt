@@ -75,7 +75,7 @@ class ConfirmContributeViewModel(
         .share()
 
     val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager) }
+        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager, it.transferableInPlanks) }
         .inBackground()
         .share()
 
