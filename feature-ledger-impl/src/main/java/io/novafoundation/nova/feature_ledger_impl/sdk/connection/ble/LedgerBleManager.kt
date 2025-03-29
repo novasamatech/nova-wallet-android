@@ -13,7 +13,7 @@ import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.ktx.suspend
 import java.util.UUID
 
-private const val DEFAULT_MTU = 23
+private const val DEFAULT_MTU = 512
 private const val MTU_RESERVED_BYTES = 3
 
 class SupportedBleDevice(
