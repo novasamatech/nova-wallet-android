@@ -28,7 +28,7 @@ interface MetadataShortenerService {
 
     suspend fun isCheckMetadataHashAvailable(chainId: ChainId): Boolean
 
-    suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray
+    suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ExtrinsicProof
 
     suspend fun generateMetadataProof(chainId: ChainId): MetadataProof
 
@@ -50,7 +50,7 @@ internal class RealMetadataShortenerService(
         return shouldCalculateMetadataHash(runtime.metadata, chain)
     }
 
-    override suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ByteArray {
+    override suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ExtrinsicProof {
         val chainId = payloadExtrinsic.genesisHash.toHexString(withPrefix = false)
 
         val chain = chainRegistry.getChain(chainId)
@@ -64,7 +64,7 @@ internal class RealMetadataShortenerService(
 
         val metadata = chainRegistry.getRawMetadata(chainId)
 
-        return MetadataShortener.generate_extrinsic_proof(
+        val proof = MetadataShortener.generate_extrinsic_proof(
             call,
             signedExtras,
             additionalSigned,
@@ -75,6 +75,8 @@ internal class RealMetadataShortenerService(
             mainAsset.precision.value,
             mainAsset.symbol.value
         )
+
+        return ExtrinsicProof(proof)
     }
 
     override suspend fun generateMetadataProof(chainId: ChainId): MetadataProof {

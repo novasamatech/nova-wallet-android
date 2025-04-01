@@ -56,6 +56,7 @@ import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
@@ -117,6 +118,8 @@ interface AccountFeatureDependencies {
     val xcmVersionDetector: XcmVersionDetector
 
     val chainStateRepository: ChainStateRepository
+
+    val metadataShortenerService: MetadataShortenerService
 
     fun appLinksProvider(): AppLinksProvider
 
