@@ -365,6 +365,12 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_tradeProvidersFragment"
+        app:destination="@id/tradeProvidersFragment"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -542,6 +548,14 @@
         <action
             android:id="@+id/action_mainFragment_to_buyFlow"
             app:destination="@id/buyFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_sellFlow"
+            app:destination="@id/sellFlowFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -992,7 +1006,7 @@
 
     <fragment
         android:id="@+id/buyFlowFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.asset.AssetBuyFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.asset.AssetBuyFlowFragment"
         android:label="AssetBuyFlowFragment">
 
         <action
@@ -1005,6 +1019,25 @@
 
     </fragment>
 
+    <fragment
+        android:id="@+id/sellFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.asset.AssetSellFlowFragment"
+        android:label="AssetSellFlowFragment">
+
+        <action
+            android:id="@+id/action_sellFlow_to_sellFlowNetwork"
+            app:destination="@id/sellFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/tradeProvidersFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListFragment"
+        android:label="TradeProviderListFragment" />
 
     <fragment
         android:id="@+id/sendFlowNetworkFragment"
@@ -1018,7 +1051,12 @@
 
     <fragment
         android:id="@+id/buyFlowNetworkFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.buy.flow.network.NetworkBuyFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.network.NetworkBuyFlowFragment"
+        android:label="NetworkBuyFlowFragment" />
+
+    <fragment
+        android:id="@+id/sellFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.NetworkSellFlowFragment"
         android:label="NetworkBuyFlowFragment" />
 
     <fragment

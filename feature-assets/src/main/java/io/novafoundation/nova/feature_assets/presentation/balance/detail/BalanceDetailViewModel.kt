@@ -35,7 +35,7 @@ import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.Pric
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPriceChangeTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPricePriceTextInjector
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -72,7 +72,7 @@ class BalanceDetailViewModel(
     private val sendInteractor: SendInteractor,
     private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
-    buyMixinFactory: BuyMixin.Factory,
+    tradeMixinFactory: TradeMixin.Factory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
@@ -133,7 +133,7 @@ class BalanceDetailViewModel(
 
     val chainUI = chainFlow.map { mapChainToUi(it) }
 
-    val buyMixin = buyMixinFactory.create(scope = this)
+    val buyMixin = tradeMixinFactory.create(scope = this)
 
     val swapButtonEnabled = assetFlow.flatMapLatest {
         swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
@@ -142,7 +142,7 @@ class BalanceDetailViewModel(
         .shareInBackground()
 
     val buySellEnabled: Flow<Boolean> = assetFlow
-        .flatMapLatest { buyMixin.buyEnabledFlow(it.token.configuration) }
+        .flatMapLatest { buyMixin.tradeEnabledFlow(it.token.configuration) }
         .inBackground()
         .share()
 

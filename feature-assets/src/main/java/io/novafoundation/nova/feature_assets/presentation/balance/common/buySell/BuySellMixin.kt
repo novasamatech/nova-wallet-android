@@ -34,12 +34,12 @@ class RealBuySellMixin(
         val payload = when (selector) {
             Selector.AllAssets -> BuySellMixin.SelectorPayload(
                 buyItem { router.openBuyFlow() },
-                sellItem { router.openBuyFlow() }
+                sellItem { router.openSellFlow() }
             )
 
             is Selector.Asset -> BuySellMixin.SelectorPayload(
                 buyItem { router.openBuyFlow() },
-                sellItem { router.openBuyFlow() }
+                sellItem { router.openSellFlow() }
             )
         }
 

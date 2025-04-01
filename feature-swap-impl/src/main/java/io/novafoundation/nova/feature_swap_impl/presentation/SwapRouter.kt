@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_swap_impl.presentation
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface SwapRouter : ReturnableRouter {
 
@@ -27,4 +29,6 @@ interface SwapRouter : ReturnableRouter {
     fun openReceive(assetPayload: AssetPayload)
 
     fun openBalanceDetails(assetPayload: AssetPayload)
+
+    fun openBuyToken(chainId: String, assetId: Int)
 }

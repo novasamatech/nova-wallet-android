@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="sell_network_flow_title">Select network for selling %s</string>
+
+    <string name="mercurio_provider_description">Best price with fees up to 3.95%</string>
+    <string name="transak_provider_description">Buy crypto starting from just $5</string>
+    <string name="banxa_provider_description">Straightforward and efficient KYC process</string>
+
+    <string name="wallet_asset_sell">Sell</string>
+
+    <string name="additional_payment_methods">+%d</string>
+
+    <string name="trade_provider_list_buy_title">Select a provider to buy %s token</string>
+
+    <string name="trade_provider_list_sell_title">Select a provider to sell %s token</string>
+
+    <string name="trade_provider_list_footer">Payment methods, fees and limits differ by provider.\nCompare their quotes to find the best option for you.</string>
+
     <string name="wallet_asset_sell_tokens">Sell tokens</string>
     <string name="wallet_asset_buy_tokens">Buy tokens</string>
 
