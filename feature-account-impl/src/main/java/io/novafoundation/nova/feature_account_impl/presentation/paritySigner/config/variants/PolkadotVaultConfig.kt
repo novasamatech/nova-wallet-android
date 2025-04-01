@@ -11,6 +11,7 @@ internal fun PolkadotVaultConfig(resourceManager: ResourceManager, appLinksProvi
     return BuildPolkadotVaultVariantConfig(resourceManager) {
         sign {
             troubleShootingLink = appLinksProvider.polkadotVaultTroubleShooting
+            supportsProofSigning = true
         }
 
         connect {

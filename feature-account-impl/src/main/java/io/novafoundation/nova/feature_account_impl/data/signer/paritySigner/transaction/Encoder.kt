@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.transaction
 
 import io.novafoundation.nova.runtime.extrinsic.metadata.ExtrinsicProof
-import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataProof
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedCallData
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedExtensions
