@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_buy_impl.domain.providers
 
 import android.content.Context
 import android.net.Uri
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry

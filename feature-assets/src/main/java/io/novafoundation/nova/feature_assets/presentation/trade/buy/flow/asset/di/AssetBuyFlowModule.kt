@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInt
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.asset.AssetBuyFlowViewModel
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 

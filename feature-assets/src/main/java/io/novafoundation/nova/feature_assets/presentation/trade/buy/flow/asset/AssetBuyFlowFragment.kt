@@ -5,8 +5,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowFragment
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
-import javax.inject.Inject
 
 class AssetBuyFlowFragment : AssetFlowFragment<AssetBuyFlowViewModel>() {
 

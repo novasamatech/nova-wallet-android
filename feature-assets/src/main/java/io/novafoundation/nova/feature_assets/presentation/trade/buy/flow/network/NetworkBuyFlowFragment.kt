@@ -5,8 +5,6 @@ import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
-import javax.inject.Inject
 
 class NetworkBuyFlowFragment : NetworkFlowFragment<NetworkBuyFlowViewModel>() {
 

@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.network.NetworkBuyFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.NetworkSellFlowFragment
 
