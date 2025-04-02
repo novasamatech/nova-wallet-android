@@ -5,33 +5,16 @@ import android.view.View
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.view.dialog.infoDialog
 import io.novafoundation.nova.feature_buy_api.domain.TradeProvider
+import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_buy_impl.R
-import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
 import kotlinx.coroutines.flow.Flow
 
 class RealBuyMixinUi : BuyMixinUi {
 
     override fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: TradeMixin) = with(fragment) {
-        mixin.integrateWithBuyProviderEvent.observeEvent {
-            with(it) {
-                when (val integrator = integrator) {
-                    is ExternalProvider.Integrator -> showBuyDisclaimer(requireContext(), tradeProvider) {
-                        integrator.openFlow(requireContext())
-                    }
-                }
-            }
-        }
 
-        mixin.awaitProviderChoosing.awaitableActionLiveData.observeEvent { action ->
-            BuyProviderChooserBottomSheet(
-                context = requireContext(),
-                payload = action.payload,
-                onSelect = { _, item -> action.onSuccess(item) },
-                onCancel = action.onCancel
-            ).show()
-        }
     }
 
     override fun setupBuyButton(

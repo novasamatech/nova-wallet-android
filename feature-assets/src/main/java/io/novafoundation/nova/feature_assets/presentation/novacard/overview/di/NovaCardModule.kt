@@ -19,11 +19,11 @@ import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebChromeClientFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewClientFactory
+import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
+import io.novafoundation.nova.common.utils.webView.NovaCardWebViewClientFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -49,7 +49,7 @@ class NovaCardModule {
     fun provideTopUpRequestInterceptorFactory(
         gson: Gson,
         okHttpClient: OkHttpClient
-    ): TopUpRequestInterceptorFactory = TopUpRequestInterceptorFactory(
+    ): MercuryoSellRequestInterceptorFactory = MercuryoSellRequestInterceptorFactory(
         gson = gson,
         okHttpClient = okHttpClient
     )
@@ -58,16 +58,16 @@ class NovaCardModule {
     fun provideNovaCardWebViewClientFactory() = NovaCardWebViewClientFactory()
 
     @Provides
-    fun provideNovaCardWebChromeClientFactory(
+    fun provideBaseWebChromeClientFactory(
         permissionsAsker: WebViewPermissionAsker,
         webViewFileChooser: WebViewFileChooser
-    ) = NovaCardWebChromeClientFactory(permissionsAsker, webViewFileChooser)
+    ) = BaseWebChromeClientFactory(permissionsAsker, webViewFileChooser)
 
     @Provides
     fun provideNovaCardWebViewControllerFactory(
         appLinksProvider: AppLinksProvider,
         novaCardWebViewClientFactory: NovaCardWebViewClientFactory,
-        novaCardWebChromeClientFactory: NovaCardWebChromeClientFactory,
+        novaCardWebChromeClientFactory: BaseWebChromeClientFactory,
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
             novaCardWebViewClientFactory,
@@ -86,7 +86,7 @@ class NovaCardModule {
         assetsRouter: AssetsRouter,
         novaCardInteractor: NovaCardInteractor,
         cardCreationInterceptorFactory: CardCreationInterceptorFactory,
-        topUpRequestInterceptorFactory: TopUpRequestInterceptorFactory,
+        mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory,
         novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory
     ): ViewModel {
         return NovaCardViewModel(
@@ -95,7 +95,7 @@ class NovaCardModule {
             assetsRouter = assetsRouter,
             novaCardInteractor = novaCardInteractor,
             cardCreationInterceptorFactory = cardCreationInterceptorFactory,
-            topUpRequestInterceptorFactory = topUpRequestInterceptorFactory,
+            mercuryoSellRequestInterceptorFactory = mercuryoSellRequestInterceptorFactory,
             novaCardWebViewControllerFactory = novaCardWebViewControllerFactory
         )
     }

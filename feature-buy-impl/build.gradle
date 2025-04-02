@@ -26,9 +26,9 @@ android {
         buildConfigField "String", "MOONPAY_HOST", "\"buy-staging.moonpay.com\""
         buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_test_DMRuyL6Nf1qc9OzjPBmCFBeCGkFwiZs0\""
 
-        buildConfigField "String", "MERCURYO_WIDGET_ID", "\"fde83da2-2a4c-4af9-a2ca-30aead5d65a0\""
-        buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_TEST_SECRET")
-        buildConfigField "String", "MERCURYO_HOST", "\"sandbox-exchange.mrcr.io\""
+        buildConfigField "String", "MERCURYO_WIDGET_ID", "\"07c3ca04-f4a8-4d68-a192-83a1794ba705\""
+        buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_PRODUCTION_SECRET")
+        buildConfigField "String", "MERCURYO_HOST", "\"exchange.mercuryo.io\""
 
         buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa-sandbox.com\""
     }
@@ -47,10 +47,6 @@ android {
             buildConfigField "String", "MOONPAY_PRIVATE_KEY", readStringSecret("MOONPAY_PRODUCTION_SECRET")
             buildConfigField "String", "MOONPAY_PUBLIC_KEY", "\"pk_live_Boi6Rl107p7XuJWBL8GJRzGWlmUSoxbz\""
             buildConfigField "String", "MOONPAY_HOST", "\"buy.moonpay.com\""
-
-            buildConfigField "String", "MERCURYO_WIDGET_ID", "\"07c3ca04-f4a8-4d68-a192-83a1794ba705\""
-            buildConfigField "String", "MERCURYO_SECRET", readStringSecret("MERCURYO_PRODUCTION_SECRET")
-            buildConfigField "String", "MERCURYO_HOST", "\"exchange.mercuryo.io\""
 
             buildConfigField "String", "BANXA_HOST", "\"novawallet.banxa.com\""
         }

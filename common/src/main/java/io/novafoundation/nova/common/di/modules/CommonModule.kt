@@ -67,6 +67,8 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -75,6 +77,7 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory

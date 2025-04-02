@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_assets.presentation.tradeProvider
+package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
 import androidx.annotation.DrawableRes
 
 data class TradeProviderRvItem(
-    val id: String,
+    val providerId: String,
     val providerLogoRes: Int,
     val paymentMethods: List<PaymentMethod>,
     val description: String

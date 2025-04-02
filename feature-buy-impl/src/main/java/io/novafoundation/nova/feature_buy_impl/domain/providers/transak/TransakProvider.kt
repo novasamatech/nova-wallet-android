@@ -1,13 +1,15 @@
-package io.novafoundation.nova.feature_buy_impl.domain.providers
+package io.novafoundation.nova.feature_buy_impl.domain.providers.transak
 
-import android.content.Context
 import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
-import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
+import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CoroutineScope
 
 private const val NETWORK_KEY = "network"
 
@@ -15,7 +17,7 @@ class TransakProvider(
     private val host: String,
     private val apiKey: String,
     private val environment: String
-) : ExternalProvider {
+) : InternalProvider {
 
     override val id = "transak"
     override val name = "Transak"
@@ -45,7 +47,7 @@ class TransakProvider(
         }
     }
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeTokenRegistry.TradeFlow): ExternalProvider.Integrator {
+    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeTokenRegistry.TradeFlow): InternalProvider.Integrator {
         val network = chainAsset.buyProviders.getValue(id)[NETWORK_KEY] as? String
 
         return Integrator(
@@ -67,16 +69,18 @@ class TransakProvider(
         private val chainAsset: Chain.Asset,
         private val address: String,
         private val tradeFlow: TradeTokenRegistry.TradeFlow
-    ) : ExternalProvider.Integrator {
+    ) : InternalProvider.Integrator {
 
-        override fun openFlow(using: Context) {
-            using.showBrowser(buildPurchaseUrl())
+        override fun run(using: WebView) {
+            using.webViewClient = TransakWebViewClient()
+            using.loadUrl(createLink())
         }
 
-        private fun buildPurchaseUrl(): String {
+        private fun createLink(): String {
             return Uri.Builder()
                 .scheme("https")
                 .authority(host)
+                .appendQueryParameter("uctsAvailed", tradeFlow.getType())
                 .appendQueryParameter("apiKey", apiKey)
                 .appendQueryParameter("environment", environment)
                 .appendQueryParameter("cryptoCurrencyCode", chainAsset.symbol.value)
@@ -86,5 +90,19 @@ class TransakProvider(
                 .build()
                 .toString()
         }
+
+        private fun TradeTokenRegistry.TradeFlow.getType(): String {
+            return when (this) {
+                TradeTokenRegistry.TradeFlow.BUY -> "BUY"
+                TradeTokenRegistry.TradeFlow.SELL -> "SELL"
+            }
+        }
+    }
+}
+
+private class TransakWebViewClient : WebViewClient() {
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        view.loadUrl(request.url.toString())
+        return true;
     }
 }

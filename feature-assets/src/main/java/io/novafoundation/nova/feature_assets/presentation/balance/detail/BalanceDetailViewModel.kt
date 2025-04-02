@@ -236,7 +236,6 @@ class BalanceDetailViewModel(
         launch {
             val chainAsset = assetFlow.first().token.configuration
             buySellMixin.openSelector(BuySellMixin.Selector.Asset(chainAsset.chainId, chainAsset.id))
-            // buyMixin.buyClicked(chainAsset)
         }
     }
 

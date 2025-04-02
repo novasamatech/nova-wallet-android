@@ -12,7 +12,7 @@ interface TradeTokenRegistry {
 
     fun hasProvider(chainAsset: Chain.Asset, tradeFlow: TradeFlow): Boolean
 
-    fun availableProvidersFor(chainAsset: Chain.Asset, tradeFlow: TradeFlow): List<Provider<*>>
+    fun availableProvidersFor(chainAsset: Chain.Asset, tradeFlow: TradeFlow): List<TradeProvider>
 
     interface Provider<I : Integrator<*>> {
         val id: String
@@ -36,7 +36,7 @@ interface TradeTokenRegistry {
 
     interface Integrator<T> {
 
-        fun openFlow(using: T)
+        fun run(using: T)
     }
 
     enum class TradeFlow {

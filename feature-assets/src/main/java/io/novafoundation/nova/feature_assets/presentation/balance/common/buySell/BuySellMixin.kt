@@ -38,8 +38,8 @@ class RealBuySellMixin(
             )
 
             is Selector.Asset -> BuySellMixin.SelectorPayload(
-                buyItem { router.openBuyFlow() },
-                sellItem { router.openSellFlow() }
+                buyItem { router.openBuyProviders(selector.chaiId, selector.assetId) },
+                sellItem { router.openSellProviders(selector.chaiId, selector.assetId) }
             )
         }
 

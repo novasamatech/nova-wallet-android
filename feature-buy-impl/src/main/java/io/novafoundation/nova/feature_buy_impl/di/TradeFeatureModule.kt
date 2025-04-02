@@ -10,9 +10,10 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_buy_impl.BuildConfig
 import io.novafoundation.nova.feature_buy_impl.domain.RealTradeTokenRegistry
-import io.novafoundation.nova.feature_buy_impl.domain.providers.BanxaProvider
-import io.novafoundation.nova.feature_buy_impl.domain.providers.MercuryoProvider
-import io.novafoundation.nova.feature_buy_impl.domain.providers.TransakProvider
+import io.novafoundation.nova.feature_buy_impl.domain.providers.banxa.BanxaProvider
+import io.novafoundation.nova.feature_buy_impl.domain.providers.mercurio.MercuryoIntegratorFactory
+import io.novafoundation.nova.feature_buy_impl.domain.providers.mercurio.MercuryoProvider
+import io.novafoundation.nova.feature_buy_impl.domain.providers.transak.TransakProvider
 import io.novafoundation.nova.feature_buy_impl.presentation.mixin.TradeMixinFactory
 import io.novafoundation.nova.feature_buy_impl.presentation.mixin.RealBuyMixinUi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -22,17 +23,24 @@ class BuyFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideMercuryoIntegratorFactory(): MercuryoIntegratorFactory {
+        return MercuryoIntegratorFactory()
+    }
+
+    @Provides
+    @FeatureScope
     fun provideBanxaProvider(): BanxaProvider {
         return BanxaProvider(BuildConfig.BANXA_HOST)
     }
 
     @Provides
     @FeatureScope
-    fun provideMercuryoProvider(): MercuryoProvider {
+    fun provideMercuryoProvider(integratorFactory: MercuryoIntegratorFactory): MercuryoProvider {
         return MercuryoProvider(
             host = BuildConfig.MERCURYO_HOST,
             widgetId = BuildConfig.MERCURYO_WIDGET_ID,
-            secret = BuildConfig.MERCURYO_SECRET
+            secret = BuildConfig.MERCURYO_SECRET,
+            integratorFactory = integratorFactory
         )
     }
 
@@ -67,15 +75,9 @@ class BuyFeatureModule {
     @Provides
     @FeatureScope
     fun provideBuyMixinFactory(
-        buyTokenRegistry: TradeTokenRegistry,
-        chainRegistry: ChainRegistry,
-        accountUseCase: SelectedAccountUseCase,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        buyTokenRegistry: TradeTokenRegistry
     ): TradeMixin.Factory = TradeMixinFactory(
-        buyTokenRegistry = buyTokenRegistry,
-        chainRegistry = chainRegistry,
-        accountUseCase = accountUseCase,
-        awaitableMixinFactory = actionAwaitableMixinFactory
+        buyTokenRegistry = buyTokenRegistry
     )
 
     @Provides

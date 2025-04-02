@@ -1,31 +1,28 @@
-package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors
+package io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo
 
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
+import io.novafoundation.nova.common.utils.webView.makeRequestBlocking
+import io.novafoundation.nova.common.utils.webView.toOkHttpRequestBuilder
+import io.novafoundation.nova.feature_assets.presentation.common.trade.callback.TradeSellCallback
 import java.math.BigDecimal
 import okhttp3.OkHttpClient
 
-class TopUpRequestInterceptorFactory(
+class MercuryoSellRequestInterceptorFactory(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson
 ) {
-    fun create(callback: TopUpRequestInterceptor.Callback): TopUpRequestInterceptor {
-        return TopUpRequestInterceptor(okHttpClient, gson, callback)
+    fun create(tradeSellCallback: TradeSellCallback): MercuryoSellRequestInterceptor {
+        return MercuryoSellRequestInterceptor(okHttpClient, gson, tradeSellCallback)
     }
 }
 
-class TopUpRequestInterceptor(
+class MercuryoSellRequestInterceptor(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson,
-    private val onCardCreatedListener: Callback
-) : NovaCardInterceptor {
-
-    interface Callback {
-
-        fun onTopUpCompleted(orderId: String)
-
-        fun onTopUpStart(orderId: String, amount: BigDecimal, address: String)
-    }
+    private val onCardCreatedListener: TradeSellCallback
+) : WebViewRequestInterceptor {
 
     private val interceptionPattern = Regex("https://api\\.mercuryo\\.io/[a-zA-Z0-9.]+/widget/sell-request/([a-zA-Z0-9]+)/status.*")
 
@@ -47,12 +44,12 @@ class TopUpRequestInterceptor(
 
         return try {
             val response = okHttpClient.makeRequestBlocking(requestBuilder)
-            val topUpResponse = gson.fromJson(response.body!!.string(), TopUpResponse::class.java)
+            val sellStatusResponse = gson.fromJson(response.body!!.string(), SellStatusResponse::class.java)
 
             when {
-                topUpResponse.isNew() -> onCardCreatedListener.onTopUpStart(orderId, topUpResponse.getAmount(), topUpResponse.getAddress())
+                sellStatusResponse.isNew() -> onCardCreatedListener.onSellStart(orderId, sellStatusResponse.getAmount(), sellStatusResponse.getAddress())
 
-                topUpResponse.isCompleted() -> onCardCreatedListener.onTopUpCompleted(orderId)
+                sellStatusResponse.isCompleted() -> onCardCreatedListener.onSellCompleted(orderId)
             }
 
             true
@@ -99,7 +96,7 @@ class TopUpRequestInterceptor(
  *     }
  * }
  */
-private class TopUpResponse(val data: Data) {
+private class SellStatusResponse(val data: Data) {
 
     class Data(
         val status: String,
@@ -115,14 +112,14 @@ private class TopUpResponse(val data: Data) {
     }
 }
 
-private fun TopUpResponse.getAmount(): BigDecimal {
+private fun SellStatusResponse.getAmount(): BigDecimal {
     return data.amounts.request.amount.toBigDecimal()
 }
 
-private fun TopUpResponse.getAddress(): String {
+private fun SellStatusResponse.getAddress(): String {
     return data.address
 }
 
-private fun TopUpResponse.isNew() = data.status == "new"
+private fun SellStatusResponse.isNew() = data.status == "new"
 
-private fun TopUpResponse.isCompleted() = data.status == "completed"
+private fun SellStatusResponse.isCompleted() = data.status == "completed"

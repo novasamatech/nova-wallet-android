@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.tradeProvider.di
+package io.novafoundation.nova.feature_assets.presentation.trade.provider.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -10,8 +10,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListPayload
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListViewModel
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListViewModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
