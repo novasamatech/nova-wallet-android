@@ -55,7 +55,6 @@ import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
-import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory

@@ -1,15 +1,12 @@
 package io.novafoundation.nova.feature_buy_impl.domain.providers.banxa
 
-import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
-import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.CoroutineScope
 
 private const val COIN_KEY = "coinType"
 private const val BLOCKCHAIN_KEY = "blockchain"

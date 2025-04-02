@@ -27,7 +27,6 @@ import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChoos
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
-import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.HoldsDao

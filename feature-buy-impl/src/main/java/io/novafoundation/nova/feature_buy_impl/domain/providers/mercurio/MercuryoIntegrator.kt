@@ -11,8 +11,6 @@ import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
 import io.novafoundation.nova.feature_buy_api.domain.providers.ProviderUtils
 import io.novafoundation.nova.feature_buy_impl.domain.providers.mercurio.MercuryoIntegrator.Payload
 import io.novasama.substrate_sdk_android.extensions.toHexString
-import kotlinx.coroutines.CoroutineScope
-
 
 class MercuryoIntegratorFactory {
 

@@ -10,5 +10,4 @@ class TradeProviderListPayload(
     val chainId: ChainId,
     val assetId: Int,
     val type: TradeProviderFlowType
-) : Parcelable {
-}
+) : Parcelable

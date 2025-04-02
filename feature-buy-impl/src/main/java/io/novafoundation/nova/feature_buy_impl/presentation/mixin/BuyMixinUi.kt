@@ -5,7 +5,6 @@ import android.view.View
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.view.dialog.infoDialog
 import io.novafoundation.nova.feature_buy_api.domain.TradeProvider
-import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_buy_impl.R
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 class RealBuyMixinUi : BuyMixinUi {
 
     override fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: TradeMixin) = with(fragment) {
-
     }
 
     override fun setupBuyButton(

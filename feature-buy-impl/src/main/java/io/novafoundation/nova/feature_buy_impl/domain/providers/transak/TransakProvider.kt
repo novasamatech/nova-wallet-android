@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.CoroutineScope
 
 private const val NETWORK_KEY = "network"
 
@@ -103,6 +102,6 @@ class TransakProvider(
 private class TransakWebViewClient : WebViewClient() {
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         view.loadUrl(request.url.toString())
-        return true;
+        return true
     }
 }
