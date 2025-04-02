@@ -14,7 +14,9 @@ interface VoteValidationPayload {
 
     val trackVoting: List<Voting>
 
-    val maxAmount: BigDecimal
+    val amount: BigDecimal
+
+    val maxAvailableAmount: BigDecimal
 
     val fee: Fee
 }

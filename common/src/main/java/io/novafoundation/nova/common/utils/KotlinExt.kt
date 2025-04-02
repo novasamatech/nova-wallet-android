@@ -261,9 +261,13 @@ fun BigDecimal.coerceInOrNull(from: BigDecimal, to: BigDecimal): BigDecimal? = i
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
-inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
-    acc + extractor(element)
-}
+@Deprecated(
+    message = "Use sumOf from stdlib instead",
+    replaceWith = ReplaceWith(
+        expression = "this.sumOf(extractor)",
+    )
+)
+inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = sumOf { extractor(it) }
 
 fun Iterable<BigInteger>.sum() = sumOf { it }
 
@@ -290,6 +294,15 @@ fun ByteArray.padEnd(expectedSize: Int, padding: Byte = 0): ByteArray {
 
 fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
+}
+
+fun <K1, K2, KR, V> Map<K1, Map<K2, V>>.flattenKeys(keyTransform: (K1, K2) -> KR): Map<KR, V> {
+    return flatMap { (key1, innerMap) ->
+        innerMap.map { (key2, value) ->
+            val key = keyTransform(key1, key2)
+            key to value
+        }
+    }.toMap()
 }
 
 fun <T> Iterable<T>.isAscending(comparator: Comparator<T>) = zipWithNext().all { (first, second) -> comparator.compare(first, second) < 0 }
@@ -672,4 +685,8 @@ suspend fun <T> scopeAsync(
     return coroutineScope {
         async(context, block = block)
     }
+}
+
+fun Int.collectionIndexOrNull(): Int? {
+    return takeIf { it >= 0 }
 }

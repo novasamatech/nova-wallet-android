@@ -6,13 +6,13 @@ import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.feature_governance_api.domain.referendum.details.ReferendumCall
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallAdapter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParseContext
+import io.novafoundation.nova.feature_xcm_api.asset.LocatableMultiAsset
+import io.novafoundation.nova.feature_xcm_api.asset.bindVersionedLocatableMultiAsset
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainMultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.multiLocation.accountId
+import io.novafoundation.nova.feature_xcm_api.multiLocation.bindVersionedMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.accountId
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.asset.LocatableMultiAsset
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.asset.bindVersionedLocatableMultiAsset
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.bindVersionedMultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.chain.ChainMultiLocationConverterFactory
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class TreasurySpendAdapter(
@@ -27,13 +27,13 @@ class TreasurySpendAdapter(
         if (!call.instanceOf(Modules.TREASURY, "spend")) return null
 
         val amount = bindNonce(call.arguments["amount"])
-        val beneficiaryLocation = bindVersionedMultiLocation(call.arguments["beneficiary"])
+        val beneficiaryLocation = bindVersionedMultiLocation(call.arguments["beneficiary"]).xcm
         val asset = bindVersionedLocatableMultiAsset(call.arguments["asset_kind"])
 
         return ReferendumCall.TreasuryRequest(
             amount = amount,
-            beneficiary = beneficiaryLocation.accountId() ?: return null,
-            chainAsset = resolveChainAsset(asset, context.chain) ?: return null
+            beneficiary = beneficiaryLocation.accountId()?.value ?: return null,
+            chainAsset = resolveChainAsset(asset.xcm, context.chain) ?: return null
         )
     }
 

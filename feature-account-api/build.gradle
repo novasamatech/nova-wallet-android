@@ -33,6 +33,8 @@ dependencies {
     implementation project(":feature-currency-api")
     implementation project(":feature-proxy-api")
     implementation project(':feature-cloud-backup-api')
+    implementation project(':feature-ledger-api')
+    implementation project(':feature-xcm:api')
     implementation project(':web3names')
     
     implementation liveDataKtxDep
@@ -47,7 +49,6 @@ dependencies {
     implementation constraintDep
 
     implementation daggerDep
-    implementation project(':feature-ledger-api')
     kapt daggerKapt
 
     api substrateSdkDep

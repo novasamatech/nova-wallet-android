@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.balances
 import io.novafoundation.nova.common.utils.decodeValue
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -35,7 +36,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novafoundation.nova.runtime.storage.typed.account
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.runtime.AccountId

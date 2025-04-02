@@ -18,7 +18,8 @@ android {
         buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readStringSecret("EHTERSCAN_API_KEY_MOONRIVER")
         buildConfigField "String", "EHTERSCAN_API_KEY_ETHEREUM", readStringSecret("EHTERSCAN_API_KEY_ETHEREUM")
 
-        buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v6/transfers_dev.json\""
+        buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v7/transfers_dev.json\""
+        buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v7/transfers_dynamic_dev.json\""
     }
 
     buildTypes {
@@ -26,7 +27,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v6/transfers.json\""
+            buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v7/transfers.json\""
+            buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v7/transfers_dynamic.json\""
         }
     }
 
@@ -50,6 +52,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(":feature-swap-core")
     implementation project(':runtime')
+    implementation project(':feature-xcm:api')
 
     implementation kotlinDep
 

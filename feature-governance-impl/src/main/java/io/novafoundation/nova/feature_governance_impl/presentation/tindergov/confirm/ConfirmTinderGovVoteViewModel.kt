@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.confir
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -164,13 +165,17 @@ class ConfirmTinderGovVoteViewModel(
     private suspend fun getValidationPayload(): VoteTinderGovValidationPayload {
         val voteAssistant = voteAssistantFlow.first()
         val basket = basketFlow.first().values.toList()
+        val asset = assetFlow.first()
+        val maxAvailablePlanks = interactor.maxAvailableForVote(asset)
+        val maxAvailableAmount = asset.token.amountFromPlanks(maxAvailablePlanks)
 
         return VoteTinderGovValidationPayload(
             onChainReferenda = voteAssistant.onChainReferenda,
-            asset = assetFlow.first(),
+            asset = asset,
             trackVoting = voteAssistant.trackVoting,
             fee = originFeeMixin.awaitFee(),
-            basket = basket
+            basket = basket,
+            maxAvailableAmount = maxAvailableAmount
         )
     }
 }

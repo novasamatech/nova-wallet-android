@@ -37,6 +37,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadE
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
 import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
@@ -156,6 +157,26 @@ fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) 
     bytesOrNull(runtime, value)?.toHexString(withPrefix = true)
 
 fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
+
+fun RuntimeSnapshot.composeCall(
+    moduleName: String,
+    callName: String,
+    args: Map<String, Any?>
+): GenericCall.Instance {
+    val module = metadata.module(moduleName)
+    val call = module.call(callName)
+
+    return GenericCall.Instance(module, call, args)
+}
+
+context(RuntimeContext)
+fun composeCall(
+    moduleName: String,
+    callName: String,
+    args: Map<String, Any?>
+): GenericCall.Instance {
+    return runtime.composeCall(moduleName, callName, args)
+}
 
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
 
@@ -418,9 +439,10 @@ fun SignatureWrapper.asHexString() = signature.toHexString(withPrefix = true)
 fun String.ethereumAddressToAccountId() = asEthereumAddress().toAccountId().value
 fun AccountId.ethereumAccountIdToAddress(withChecksum: Boolean = true) = asEthereumAccountId().toAddress(withChecksum).value
 
+// We do not use all-zeros account here or for emptySubstrateAccountId since most substrate chains forbid transfers from this account
 fun emptyEthereumAccountId() = ByteArray(20) { 1 }
 
-fun emptySubstrateAccountId() = ByteArray(32)
+fun emptySubstrateAccountId() = ByteArray(32) { 1 }
 
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 

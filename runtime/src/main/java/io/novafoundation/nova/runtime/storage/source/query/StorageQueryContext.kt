@@ -8,7 +8,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageKey
 import io.novafoundation.nova.runtime.storage.source.StorageValue
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
@@ -124,7 +123,3 @@ suspend fun StorageQueryContext.multi(
 }
 
 fun Iterable<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
-
-@Deprecated("Use RuntimeContext.metadata")
-val StorageQueryContext.metadata: RuntimeMetadata
-    get() = runtime.metadata
