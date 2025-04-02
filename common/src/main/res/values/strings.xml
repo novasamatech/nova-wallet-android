@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_parity_signer_show_mode_legacy">Legacy</string>
+    <string name="account_parity_signer_show_mode_new">New (Vault v7+)</string>
+
+<!--    <string name="account_parity_signer_scan_with">Scan the QR code with the %s</string>-->
+
     <string name="unified_address_title">New Unified Address</string>
     <string name="unified_address_subtitle">Some exchanges may still require the legacy format\nfor operations while they update. %s</string>
     <string name="unified_address_format_new_badge">new format</string>
@@ -986,7 +991,6 @@
     <string name="account_parity_signer_sign_title">Sign with %s</string>
     <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from %s</string>
     <string name="account_parity_signer_scan_from">Scan the QR code from the %s</string>
-    <string name="account_parity_signer_scan_with">Scan the QR code with the %s</string>
     <string name="account_parity_signer_import_start_title">Add wallet from %s</string>
     <string name="account_details_parity_signer_alert">This wallet is paired with %1$s. Nova will help you to form any operations you want, and you will be requested to sign them using %1$s</string>
     <string name="account_details_parity_signer_not_supported">Not supported by %s</string>

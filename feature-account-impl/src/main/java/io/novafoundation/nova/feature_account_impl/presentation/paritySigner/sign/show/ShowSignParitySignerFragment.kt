@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setSequence
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -17,10 +19,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowAddress
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowContinue
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowHaveError
+import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowMode
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowQr
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowTimer
 import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerShowToolbar
-import kotlinx.android.synthetic.main.fragment_sign_parity_signer_show.signParitySignerSignLabel
 
 class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>() {
 
@@ -80,7 +82,23 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel>
         }
 
         signParitySignerShowToolbar.setTitle(viewModel.title)
-        signParitySignerSignLabel.text = viewModel.signLabel
         signParitySignerShowHaveError.text = viewModel.errorButtonLabel
+
+        setupModeSwitcher(viewModel)
+    }
+
+    private fun setupModeSwitcher(viewModel: ShowSignParitySignerViewModel) {
+        signParitySignerShowMode.setVisible(viewModel.supportsMultipleSigningModes)
+
+        if (!viewModel.supportsMultipleSigningModes) return
+
+        initTabs()
+
+        signParitySignerShowMode bindTo viewModel.selectedSigningModeIndex
+    }
+
+    private fun initTabs() = with(signParitySignerShowMode) {
+        addTab(newTab().setText(R.string.account_parity_signer_show_mode_new))
+        addTab(newTab().setText(R.string.account_parity_signer_show_mode_legacy))
     }
 }
