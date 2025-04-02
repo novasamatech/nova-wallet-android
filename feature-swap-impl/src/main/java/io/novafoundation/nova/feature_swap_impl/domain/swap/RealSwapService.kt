@@ -98,7 +98,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
-import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
