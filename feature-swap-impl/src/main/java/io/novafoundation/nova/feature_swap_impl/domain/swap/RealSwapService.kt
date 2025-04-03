@@ -97,6 +97,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
@@ -505,7 +506,7 @@ internal class RealSwapService(
     private suspend fun createIndividualChainExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
         val host = createInnerSwapHost(coroutineScope)
 
-        return chainRegistry.chainsById.first().mapValues { (_, chain) ->
+        return chainRegistry.enabledChainById().mapValues { (_, chain) ->
             createSingleExchange(chain, host)
         }
             .filterNotNull()
