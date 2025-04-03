@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_buy_api.domain
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias TradeProvider = TradeTokenRegistry.Provider<*>
@@ -31,7 +33,13 @@ interface TradeTokenRegistry {
 
         fun getPaymentMethods(tradeFlow: TradeFlow): List<PaymentMethod>
 
-        fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeFlow): I
+        fun createIntegrator(
+            chainAsset: Chain.Asset,
+            address: String,
+            tradeFlow: TradeFlow,
+            onCloseListener: OnTradeOperationFinishedListener,
+            onSellOrderCreatedListener: OnSellOrderCreatedListener
+        ): I
     }
 
     interface Integrator<T> {

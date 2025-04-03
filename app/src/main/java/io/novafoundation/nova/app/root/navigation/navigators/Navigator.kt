@@ -57,8 +57,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
@@ -453,8 +451,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun finishAndAwaitTopUp() {
-        navigationBuilder().action(R.id.action_finish_top_up_flow)
+    override fun openAwaitNovaCardTopUp() {
+        navigationBuilder().action(R.id.action_awaitTopUp)
             .navigateInFirstAttachedContext()
     }
 
@@ -544,14 +542,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openTopUpCard(payload: TopUpCardPayload) {
-        navigationBuilder().action(R.id.action_open_topUpCard)
-            .setArgs(TopUpCardFragment.getBundle(payload))
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun closeTopUp() {
-        navigationBuilder().action(R.id.action_close_top_up_with_browser)
+    override fun returnToMainScreen() {
+        navigationBuilder().action(R.id.action_returnToMainScreen)
             .navigateInFirstAttachedContext()
     }
 

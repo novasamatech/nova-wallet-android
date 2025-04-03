@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.novacard.topup
+package io.novafoundation.nova.feature_assets.presentation.topup
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -13,10 +13,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setAddress
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
-import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
-import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
@@ -43,16 +40,16 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class TopUpCardViewModel(
+class TopUpAddressViewModel(
     private val chainRegistry: ChainRegistry,
     private val interactor: WalletInteractor,
     private val sendInteractor: SendInteractor,
     private val router: AssetsRouter,
-    private val payload: TopUpCardPayload,
+    private val payload: TopUpAddressPayload,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val novaCardInteractor: NovaCardInteractor,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val responder: TopUpAddressResponder,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -76,9 +73,9 @@ class TopUpCardViewModel(
     val addressInputMixin = with(addressInputMixinFactory) {
         create(
             inputSpecProvider = singleChainInputSpec(chainFlow),
-            errorDisplayer = this@TopUpCardViewModel::showError,
+            errorDisplayer = this@TopUpAddressViewModel::showError,
             showAccountEvent = null,
-            coroutineScope = this@TopUpCardViewModel,
+            coroutineScope = this@TopUpAddressViewModel,
         )
     }
 
@@ -96,9 +93,8 @@ class TopUpCardViewModel(
         maxActionProvider = maxActionProvider
     )
 
-    val titleFlow = chainAssetFlow.map {
-        resourceManager.getString(R.string.fragment_top_up_card_title, it.symbol)
-    }
+    val titleFlow = flowOf { payload.screenTitle }
+        .shareInBackground()
 
     val continueButtonState = sendInProgressFlow.map { isSending ->
         when {
@@ -154,26 +150,15 @@ class TopUpCardViewModel(
     }
 
     fun backClicked() {
-        router.closeTopUp()
+        responder.respond(TopUpAddressResponder.Response.Cancel)
+        router.back()
     }
 
     private fun transferTokensAndFinishFlow(payload: AssetTransferPayload) = launch {
         sendInteractor.performTransfer(payload.transfer, payload.originFee, null, viewModelScope)
 
-        updateCardState()
-        updateLastTopUpTime()
-
-        router.finishAndAwaitTopUp()
-    }
-
-    private fun updateCardState() {
-        if (!novaCardInteractor.isNovaCardCreated()) {
-            novaCardInteractor.setNovaCardState(NovaCardState.CREATION)
-        }
-    }
-
-    private fun updateLastTopUpTime() {
-        novaCardInteractor.setLastTopUpTime(System.currentTimeMillis())
+        responder.respond(TopUpAddressResponder.Response.Success)
+        router.back()
     }
 
     private fun setupFees() {

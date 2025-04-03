@@ -4,7 +4,9 @@ import android.net.Uri
 import android.webkit.WebView
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
+import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.domain.providers.WebViewIntegrationProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -13,7 +15,7 @@ private const val BLOCKCHAIN_KEY = "blockchain"
 
 class BanxaProvider(
     private val host: String
-) : InternalProvider {
+) : WebViewIntegrationProvider {
 
     override val id: String = "banxa"
 
@@ -39,7 +41,13 @@ class BanxaProvider(
         }
     }
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeTokenRegistry.TradeFlow): InternalProvider.Integrator {
+    override fun createIntegrator(
+        chainAsset: Chain.Asset,
+        address: String,
+        tradeFlow: TradeTokenRegistry.TradeFlow,
+        onCloseListener: OnTradeOperationFinishedListener,
+        onSellOrderCreatedListener: OnSellOrderCreatedListener
+    ): WebViewIntegrationProvider.Integrator {
         val providerDetails = chainAsset.buyProviders.getValue(id)
         val blockchain = providerDetails[BLOCKCHAIN_KEY] as? String
         val coinType = providerDetails[COIN_KEY] as? String
@@ -51,7 +59,7 @@ class BanxaProvider(
         private val blockchain: String?,
         private val coinType: String?,
         private val address: String
-    ) : InternalProvider.Integrator {
+    ) : WebViewIntegrationProvider.Integrator {
 
         override fun run(using: WebView) {
             using.loadUrl(createLink())

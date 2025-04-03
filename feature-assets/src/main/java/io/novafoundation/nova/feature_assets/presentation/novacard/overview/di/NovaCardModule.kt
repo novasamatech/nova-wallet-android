@@ -10,6 +10,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
@@ -24,6 +25,7 @@ import io.novafoundation.nova.common.utils.webView.NovaCardWebViewClientFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
 import io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo.MercuryoSellRequestInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -87,7 +89,9 @@ class NovaCardModule {
         novaCardInteractor: NovaCardInteractor,
         cardCreationInterceptorFactory: CardCreationInterceptorFactory,
         mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory,
-        novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory
+        novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory,
+        topUpAddressCommunicator: TopUpAddressCommunicator,
+        resourceManager: ResourceManager
     ): ViewModel {
         return NovaCardViewModel(
             chainRegistry = chainRegistry,
@@ -96,7 +100,9 @@ class NovaCardModule {
             novaCardInteractor = novaCardInteractor,
             cardCreationInterceptorFactory = cardCreationInterceptorFactory,
             mercuryoSellRequestInterceptorFactory = mercuryoSellRequestInterceptorFactory,
-            novaCardWebViewControllerFactory = novaCardWebViewControllerFactory
+            novaCardWebViewControllerFactory = novaCardWebViewControllerFactory,
+            topUpRequester = topUpAddressCommunicator,
+            resourceManager = resourceManager
         )
     }
 

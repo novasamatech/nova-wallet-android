@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/topUpCardContainer"
+    android:id="@+id/topUpAddressContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/topUpCardToolbar"
+        android:id="@+id/topUpAddressToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
@@ -48,7 +48,7 @@
     </FrameLayout>
 
     <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
-        android:id="@+id/topUpCardRecipient"
+        android:id="@+id/topUpAddressRecipient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -58,7 +58,7 @@
         app:hasExternalAccountIdentifiers="true" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
-        android:id="@+id/topUpCardAmount"
+        android:id="@+id/topUpAddressAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -81,7 +81,7 @@
         android:layout_weight="1" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/topUpCardContinue"
+        android:id="@+id/topUpAddressContinue"
         style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

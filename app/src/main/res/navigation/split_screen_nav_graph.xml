@@ -54,6 +54,14 @@
     <include app:graph="@navigation/nova_card_graph" />
 
     <action
+        android:id="@+id/action_returnToMainScreen"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit"
+        app:popUpTo="@id/mainFragment" />
+
+    <action
         android:id="@+id/action_importWalletOptionsFragment"
         app:destination="@id/import_wallet_options_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
@@ -376,6 +384,14 @@
     <action
         android:id="@+id/action_tradeWebFragment"
         app:destination="@id/tradeWebFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_topUpAddress"
+        app:destination="@id/topUpAddressFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -1128,5 +1144,22 @@
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.favorites.DappFavoritesFragment"
         android:label="fragment_favorites"
         tools:layout="@layout/fragment_favorites_dapp" />
+
+    <fragment
+        android:id="@+id/topUpAddressFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressFragment"
+        android:label="fragment_top_up"
+        app:useAdd="true"
+        tools:layout="@layout/fragment_top_up_address">
+
+        <action
+            android:id="@+id/action_awaitTopUp"
+            app:destination="@id/waitingForTopUpCardFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
 
 </navigation>

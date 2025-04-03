@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.sha512
 import io.novafoundation.nova.common.utils.urlEncoded
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
+import io.novafoundation.nova.feature_buy_api.domain.providers.WebViewIntegrationProvider
 import io.novafoundation.nova.feature_buy_api.domain.providers.ProviderUtils
 import io.novafoundation.nova.feature_buy_impl.domain.providers.mercurio.MercuryoIntegrator.Payload
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -23,7 +23,7 @@ class MercuryoIntegratorFactory {
 
 class MercuryoIntegrator(
     private val payload: Payload
-) : InternalProvider.Integrator {
+) : WebViewIntegrationProvider.Integrator {
 
     class Payload(
         val host: String,
