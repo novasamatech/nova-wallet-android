@@ -273,7 +273,10 @@ class Navigator(
     override fun openSend(payload: SendPayload, initialRecipientAddress: String?) {
         val extras = SelectSendFragment.getBundle(payload, initialRecipientAddress)
 
-        navigationBuilder().action(R.id.action_open_send)
+        navigationBuilder().cases()
+            .addCase(R.id.sendFlowFragment, R.id.action_sendFlow_to_send)
+            .addCase(R.id.sendFlowNetworkFragment, R.id.action_sendFlowNetwork_to_send)
+            .setFallbackCase(R.id.action_open_send)
             .setArgs(extras)
             .navigateInFirstAttachedContext()
     }
@@ -357,7 +360,11 @@ class Navigator(
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
-        navigationBuilder().action(R.id.action_open_receive)
+
+        navigationBuilder().cases()
+            .addCase(R.id.receiveFlowFragment, R.id.action_receiveFlow_to_receive)
+            .addCase(R.id.receiveFlowNetworkFragment, R.id.action_receiveFlowNetwork_to_receive)
+            .setFallbackCase(R.id.action_open_receive)
             .setArgs(ReceiveFragment.getBundle(assetPayload))
             .navigateInFirstAttachedContext()
     }
