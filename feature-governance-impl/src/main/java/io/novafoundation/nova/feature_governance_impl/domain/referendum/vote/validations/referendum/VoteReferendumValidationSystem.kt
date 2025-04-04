@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.MaximumTrackVotesNotReachedValidation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.NotDelegatingInTrackValidation
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.common.ReferendumIsOngoingValidation
-import io.novafoundation.nova.feature_wallet_api.domain.validation.hasEnoughFreeBalance
+import io.novafoundation.nova.feature_wallet_api.domain.validation.hasEnoughBalance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 
 typealias VoteReferendumValidationSystem = ValidationSystem<VoteReferendaValidationPayload, VoteReferendumValidationFailure>
@@ -19,10 +19,10 @@ fun ValidationSystem.Companion.voteReferendumValidationSystem(
     governanceSourceRegistry: GovernanceSourceRegistry,
     governanceSharedState: GovernanceSharedState,
 ): VoteReferendumValidationSystem = ValidationSystem {
-    hasEnoughFreeBalance(
-        asset = { it.asset },
-        fee = { it.fee },
-        requestedAmount = { it.maxAmount },
+    hasEnoughBalance(
+        availableBalance = { it.maxAvailableAmount },
+        requestedAmount = { it.amount },
+        chainAsset = { it.asset.token.configuration },
         error = VoteReferendumValidationFailure::AmountIsTooBig
     )
 

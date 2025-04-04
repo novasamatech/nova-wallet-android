@@ -6,6 +6,9 @@ import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.tabs.TabLayout
+import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -424,6 +427,38 @@ inline fun <T> EditText.bindTo(
 fun EditText.moveSelectionToTheEnd() {
     if (hasFocus()) {
         setSelection(text.length)
+    }
+}
+
+context(BaseFragment<*>)
+infix fun TabLayout.bindTo(pageIndexFlow: MutableSharedFlow<Int>) = bindTo(pageIndexFlow, this@BaseFragment.lifecycleScope)
+
+fun TabLayout.bindTo(
+    pageIndexFlow: MutableSharedFlow<Int>,
+    scope: LifecycleCoroutineScope
+) {
+    var currentTabPosition = -1
+
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            val newIndex = tab.position
+            if (currentTabPosition != newIndex) {
+                currentTabPosition = newIndex
+                scope.launch {
+                    pageIndexFlow.emit(newIndex)
+                }
+            }
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
+
+    pageIndexFlow.observe(scope) { index ->
+        if (index != currentTabPosition && index in 0 until tabCount) {
+            currentTabPosition = index
+            this@bindTo.getTabAt(index)?.select()
+        }
     }
 }
 

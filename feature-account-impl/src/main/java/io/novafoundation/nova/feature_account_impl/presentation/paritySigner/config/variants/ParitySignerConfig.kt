@@ -11,6 +11,7 @@ internal fun ParitySignerConfig(resourceManager: ResourceManager, appLinksProvid
     return BuildPolkadotVaultVariantConfig(resourceManager) {
         sign {
             troubleShootingLink = appLinksProvider.paritySignerTroubleShooting
+            supportsProofSigning = false
         }
 
         connect {

@@ -23,18 +23,18 @@ interface NotEnoughFreeBalanceError {
     val freeAfterFees: BigDecimal
 }
 
-class HasEnoughFreeBalanceValidation<P, E>(
-    private val asset: (P) -> Asset,
-    private val fee: SimpleFeeProducer<P>,
+class HasEnoughBalanceValidation<P, E>(
+    private val chainAsset: (P) -> Chain.Asset,
+    private val availableBalance: AmountProducer<P>,
     private val requestedAmount: AmountProducer<P>,
     private val error: HasEnoughFreeBalanceErrorProducer<E>
 ) : Validation<P, E> {
 
     override suspend fun validate(value: P): ValidationStatus<E> {
-        val freeBalanceAfterFees = asset(value).free - fee(value)?.decimalAmountByExecutingAccount.orZero()
+        val balanceAfterFees = availableBalance(value)
 
-        return (freeBalanceAfterFees >= requestedAmount(value)) isTrueOrError {
-            error(asset(value).token.configuration, freeBalanceAfterFees.atLeastZero())
+        return (balanceAfterFees >= requestedAmount(value)) isTrueOrError {
+            error(chainAsset(value), balanceAfterFees.atLeastZero())
         }
     }
 }
@@ -45,7 +45,28 @@ fun <P, E> ValidationSystemBuilder<P, E>.hasEnoughFreeBalance(
     requestedAmount: AmountProducer<P>,
     error: HasEnoughFreeBalanceErrorProducer<E>
 ) {
-    validate(HasEnoughFreeBalanceValidation(asset, fee, requestedAmount, error))
+    hasEnoughBalance(
+        chainAsset = { asset(it).token.configuration },
+        requestedAmount = requestedAmount,
+        error = error,
+        availableBalance = { asset(it).free - fee(it)?.decimalAmountByExecutingAccount.orZero() }
+    )
+}
+
+fun <P, E> ValidationSystemBuilder<P, E>.hasEnoughBalance(
+    chainAsset: (P) -> Chain.Asset,
+    availableBalance: AmountProducer<P>,
+    requestedAmount: AmountProducer<P>,
+    error: HasEnoughFreeBalanceErrorProducer<E>
+) {
+    validate(
+        HasEnoughBalanceValidation(
+            chainAsset = chainAsset,
+            availableBalance = availableBalance,
+            requestedAmount = requestedAmount,
+            error = error
+        )
+    )
 }
 
 fun handleNotEnoughFreeBalanceError(

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.network.isSystemAsset
@@ -13,7 +14,6 @@ import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuot
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 

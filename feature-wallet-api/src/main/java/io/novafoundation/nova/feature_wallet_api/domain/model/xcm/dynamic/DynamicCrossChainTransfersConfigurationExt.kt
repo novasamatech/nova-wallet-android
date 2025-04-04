@@ -42,7 +42,7 @@ fun DynamicCrossChainTransfersConfiguration.availableInDestinations(): List<Edge
     }
 }
 
-fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
+suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     originXcmChain: XcmChain,
     originAsset: Chain.Asset,
     destinationXcmChain: XcmChain,
@@ -63,7 +63,6 @@ fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
         supportsXcmExecute = targetTransfer.supportsXcmExecute
     )
 }
-
 /**
  * @return null if transfer is unknown, true if delivery fee has to be paid, false otherwise
  */

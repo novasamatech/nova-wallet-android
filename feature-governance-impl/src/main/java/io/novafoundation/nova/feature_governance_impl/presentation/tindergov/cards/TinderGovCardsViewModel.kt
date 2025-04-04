@@ -184,10 +184,6 @@ class TinderGovCardsViewModel(
         }
     }
 
-    private fun skipCard() {
-        _skipCardEvent.sendEvent()
-    }
-
     private fun writeVote(position: Int, voteType: VoteType) {
         if (isVotingInProgress.value) return
         isVotingInProgress.value = true
@@ -200,13 +196,7 @@ class TinderGovCardsViewModel(
                 return@launch
             }
 
-            val votingPowerState = interactor.getVotingPowerState()
-            val isSufficientAmount = when (votingPowerState) {
-                VotingPowerState.Empty -> openSetVotingPowerScreen(referendum.id)
-                is VotingPowerState.InsufficientAmount -> showInsufficientBalanceDialog(referendum.id, votingPowerState.votingPower)
-
-                is VotingPowerState.SufficientAmount -> true
-            }
+            val isSufficientAmount = tryEnsureSufficientAmountForVote(referendum.id)
 
             if (isSufficientAmount) {
                 basketInteractor.addItemToBasket(referendum.id, voteType)
@@ -216,6 +206,16 @@ class TinderGovCardsViewModel(
             }
 
             isVotingInProgress.value = false
+        }
+    }
+
+    private suspend fun tryEnsureSufficientAmountForVote(referendumId: ReferendumId): Boolean {
+        return when (val votingPowerState = interactor.getVotingPowerState()) {
+            VotingPowerState.Empty -> openSetVotingPowerScreen(referendumId)
+
+            is VotingPowerState.InsufficientAmount -> showInsufficientBalanceDialog(referendumId, votingPowerState.votingPower)
+
+            is VotingPowerState.SufficientAmount -> true
         }
     }
 

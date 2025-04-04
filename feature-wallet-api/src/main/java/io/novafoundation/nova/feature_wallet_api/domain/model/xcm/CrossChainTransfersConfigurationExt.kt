@@ -35,7 +35,7 @@ fun CrossChainTransfersConfiguration.hasDeliveryFee(
     return dynamic.hasDeliveryFee(origin, destination) ?: legacy.hasDeliveryFee(origin.chainId)
 }
 
-fun CrossChainTransfersConfiguration.transferConfiguration(
+suspend fun CrossChainTransfersConfiguration.transferConfiguration(
     originChain: XcmChain,
     originAsset: Chain.Asset,
     destinationChain: XcmChain,

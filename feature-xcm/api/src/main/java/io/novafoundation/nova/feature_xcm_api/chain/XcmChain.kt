@@ -2,8 +2,7 @@ package io.novafoundation.nova.feature_xcm_api.chain
 
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.chainLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
@@ -13,12 +12,7 @@ class XcmChain(
 )
 
 fun XcmChain.absoluteLocation(): AbsoluteMultiLocation {
-    val junctions = listOfNotNull(parachainId?.let(MultiLocation.Junction::ParachainId))
-    return junctions.asLocation()
-}
-
-fun XcmChain.chainLocation(): ChainLocation {
-    return ChainLocation(chain.id, absoluteLocation())
+    return AbsoluteMultiLocation.chainLocation(parachainId)
 }
 
 fun XcmChain.isRelay(): Boolean {
@@ -27,4 +21,8 @@ fun XcmChain.isRelay(): Boolean {
 
 fun XcmChain.isSystemChain(): Boolean {
     return parachainId != null && parachainId.toInt() in 1000 until 2000
+}
+
+fun XcmChain.chainLocation(): ChainLocation {
+    return ChainLocation(chain.id, absoluteLocation())
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.addPlanks
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -45,6 +46,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.disabledChains
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -87,7 +89,11 @@ class CrossChainTransferAssetExchange(
 
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
         val config = crossChainConfig.firstNotNull()
-        return config.availableInDestinations().map(::CrossChainTransferEdge)
+        val disabledChainIds = chainRegistry.disabledChains().mapToSet { it.id }
+
+        return config.availableInDestinations()
+            .filter { it.from.chainId !in disabledChainIds && it.to.chainId !in disabledChainIds }
+            .map(::CrossChainTransferEdge)
     }
 
     override fun feePaymentOverrides(): List<FeePaymentProviderOverride> {

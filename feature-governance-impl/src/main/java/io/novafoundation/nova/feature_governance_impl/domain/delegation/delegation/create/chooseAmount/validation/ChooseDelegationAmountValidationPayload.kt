@@ -9,5 +9,6 @@ class ChooseDelegationAmountValidationPayload(
     val fee: Fee,
     val asset: Asset,
     val amount: BigDecimal,
+    val maxAvailableAmount: BigDecimal,
     val delegate: AccountId
 )
