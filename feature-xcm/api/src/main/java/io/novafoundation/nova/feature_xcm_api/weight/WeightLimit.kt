@@ -20,7 +20,7 @@ sealed class WeightLimit : ToDynamicScaleInstance {
         }
     }
 
-    class Limited(val weightV2: WeightV2): WeightLimit() {
+    class Limited(val weightV2: WeightV2) : WeightLimit() {
 
         override fun toEncodableInstance(): Any? {
             return DictEnum.Entry("Limited", weightV2.toEncodableInstance())

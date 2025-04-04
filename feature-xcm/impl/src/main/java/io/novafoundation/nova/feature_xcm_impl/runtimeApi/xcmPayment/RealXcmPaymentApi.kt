@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ScaleResult
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.data.network.runtime.binding.bindWeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.model.QueryXcmWeightErr
@@ -12,9 +11,6 @@ import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
-import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import javax.inject.Inject
 
 @FeatureScope

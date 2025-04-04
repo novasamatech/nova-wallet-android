@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.call
 
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.utils.hasDetectedRuntimeApi
-import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix

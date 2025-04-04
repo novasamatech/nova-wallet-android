@@ -63,6 +63,7 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
         supportsXcmExecute = targetTransfer.supportsXcmExecute
     )
 }
+
 /**
  * @return null if transfer is unknown, true if delivery fee has to be paid, false otherwise
  */

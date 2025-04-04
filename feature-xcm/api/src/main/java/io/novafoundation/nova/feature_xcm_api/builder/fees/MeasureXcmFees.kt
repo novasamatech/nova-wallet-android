@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_xcm_api.builder.fees
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
-import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AssetLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 

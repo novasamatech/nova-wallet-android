@@ -39,7 +39,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findRelayChainOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.BlockEvents
@@ -128,7 +127,7 @@ class RealCrossChainTransactor(
     }
 
     override suspend fun requiredRemainingAmountAfterTransfer(configuration: CrossChainTransferConfiguration): Balance {
-        return when(configuration) {
+        return when (configuration) {
             is CrossChainTransferConfiguration.Dynamic -> dynamic.requiredRemainingAmountAfterTransfer(configuration.config)
             is CrossChainTransferConfiguration.Legacy -> legacy.requiredRemainingAmountAfterTransfer(configuration.config)
         }

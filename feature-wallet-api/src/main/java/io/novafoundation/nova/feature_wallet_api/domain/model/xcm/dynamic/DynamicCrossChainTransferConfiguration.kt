@@ -3,9 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfigurationBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.TokenReserve
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferReserve
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemote
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.remoteReserveLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
 import io.novafoundation.nova.feature_xcm_api.chain.absoluteLocation
 import io.novafoundation.nova.feature_xcm_api.chain.chainLocation
@@ -45,7 +43,6 @@ class DynamicCrossChainTransferConfiguration(
         }
     }
 }
-
 
 private fun DynamicCrossChainTransferConfiguration.shouldUseTeleport(): Boolean {
     val systemToRelay = originChain.isSystemChain() && destinationChain.isRelay()

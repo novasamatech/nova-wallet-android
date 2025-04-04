@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.builder.buyExecution
 import io.novafoundation.nova.feature_xcm_api.builder.createWithoutFeesMeasurement
-import io.novafoundation.nova.feature_xcm_api.builder.relativeToLocal
 import io.novafoundation.nova.feature_xcm_api.builder.withdrawAsset
 import io.novafoundation.nova.feature_xcm_api.extrinsic.composeXcmExecute
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage

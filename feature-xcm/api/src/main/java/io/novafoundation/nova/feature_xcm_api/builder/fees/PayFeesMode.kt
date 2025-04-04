@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_xcm_api.builder.fees
 
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AssetLocation
 

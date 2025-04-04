@@ -15,7 +15,7 @@ sealed class MultiAssetFilter : VersionedToDynamicScaleInstance {
 
     class Definite(val assets: MultiAssets) : MultiAssetFilter() {
 
-        constructor(asset: MultiAsset): this(asset.intoMultiAssets())
+        constructor(asset: MultiAsset) : this(asset.intoMultiAssets())
 
         override fun toEncodableInstance(xcmVersion: XcmVersion): Any? {
             return DictEnum.Entry("Definite", assets.toEncodableInstance(xcmVersion))

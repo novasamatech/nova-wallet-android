@@ -8,7 +8,7 @@ import java.math.BigInteger
 
 typealias Weight = BigInteger
 
-data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger): ToDynamicScaleInstance {
+data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger) : ToDynamicScaleInstance {
 
     companion object {
 
