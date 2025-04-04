@@ -384,14 +384,6 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_tradeWebFragment"
-        app:destination="@id/tradeWebFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
         android:id="@+id/action_open_topUpAddress"
         app:destination="@id/topUpAddressFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -1043,7 +1035,19 @@
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/buyFlowFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_buyFlow_to_tradeProvidersFragment"
+            app:destination="@id/tradeProvidersFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/buyFlowFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 
@@ -1058,14 +1062,38 @@
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sellFlowFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_sellFlow_to_tradeProvidersFragment"
+            app:destination="@id/tradeProvidersFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sellFlowFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 
     <fragment
         android:id="@+id/tradeProvidersFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment"
-        android:label="TradeProviderListFragment" />
+        android:label="TradeProviderListFragment">
+
+        <action
+            android:id="@+id/action_tradeWebFragment"
+            app:destination="@id/tradeWebFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/tradeProvidersFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/tradeWebFragment"
@@ -1085,12 +1113,36 @@
     <fragment
         android:id="@+id/buyFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.network.NetworkBuyFlowFragment"
-        android:label="NetworkBuyFlowFragment" />
+        android:label="NetworkBuyFlowFragment" >
+
+        <action
+            android:id="@+id/action_buyFlowNetworks_to_tradeProvidersFragment"
+            app:destination="@id/tradeProvidersFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/buyFlowNetworkFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/sellFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.NetworkSellFlowFragment"
-        android:label="NetworkBuyFlowFragment" />
+        android:label="NetworkBuyFlowFragment" >
+
+        <action
+            android:id="@+id/action_sellFlowNetworks_to_tradeProvidersFragment"
+            app:destination="@id/tradeProvidersFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sellFlowNetworkFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/walletConnectScanFragment"
@@ -1152,16 +1204,6 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressFragment"
         android:label="fragment_top_up"
         app:useAdd="true"
-        tools:layout="@layout/fragment_top_up_address">
-
-        <action
-            android:id="@+id/action_awaitTopUp"
-            app:destination="@id/waitingForTopUpCardFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-    </fragment>
+        tools:layout="@layout/fragment_top_up_address" />
 
 </navigation>

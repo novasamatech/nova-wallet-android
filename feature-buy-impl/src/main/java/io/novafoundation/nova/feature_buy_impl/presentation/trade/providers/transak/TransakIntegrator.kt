@@ -12,7 +12,8 @@ import io.novafoundation.nova.feature_buy_api.presentation.trade.providers.WebVi
 import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
 import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
 
-private const val JS_BRIDGE_NAME = "TransakAndroidBridge"
+// You can find a valid implementation in https://github.com/agtransak/TransakAndroidSample/blob/events/app/src/main/java/com/transak/sample/MainActivity.kt
+private const val JS_BRIDGE_NAME = "Android"
 
 class TransakIntegrator(
     private val payload: Payload,
@@ -67,22 +68,5 @@ private class TransakWebViewClient : WebViewClient() {
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         view.loadUrl(request.url.toString())
         return true
-    }
-
-    override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
-        super.onPageStarted(view, url, favicon)
-
-        val js = """
-            (function() {
-                window.addEventListener('message', function(event) {
-                    const eventId = event?.data?.event_id;
-                    if (eventId) {
-                        $JS_BRIDGE_NAME.onTransakEvent(eventId, JSON.stringify(event.data));
-                    }
-                });
-            })();
-        """.trimIndent()
-
-        view.evaluateJavascript(js, null)
     }
 }

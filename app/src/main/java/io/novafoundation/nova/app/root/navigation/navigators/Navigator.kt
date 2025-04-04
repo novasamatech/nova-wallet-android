@@ -451,11 +451,6 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openAwaitNovaCardTopUp() {
-        navigationBuilder().action(R.id.action_awaitTopUp)
-            .navigateInFirstAttachedContext()
-    }
-
     override fun openAwaitingCardCreation() {
         navigationBuilder().action(R.id.action_open_awaiting_card_creation)
             .navigateInFirstAttachedContext()
@@ -493,14 +488,20 @@ class Navigator(
 
     override fun openBuyProviders(chainId: String, chainAssetId: Int) {
         val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.BUY)
-        navigationBuilder().action(R.id.action_tradeProvidersFragment)
+        navigationBuilder().cases()
+            .addCase(R.id.buyFlowFragment, R.id.action_buyFlow_to_tradeProvidersFragment)
+            .addCase(R.id.buyFlowNetworkFragment, R.id.action_buyFlowNetworks_to_tradeProvidersFragment)
+            .setFallbackCase(R.id.action_tradeProvidersFragment)
             .setArgs(TradeProviderListFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSellProviders(chainId: String, chainAssetId: Int) {
         val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.SELL)
-        navigationBuilder().action(R.id.action_tradeProvidersFragment)
+        navigationBuilder().cases()
+            .addCase(R.id.sellFlowFragment, R.id.action_sellFlow_to_tradeProvidersFragment)
+            .addCase(R.id.sellFlowNetworkFragment, R.id.action_sellFlowNetworks_to_tradeProvidersFragment)
+            .setFallbackCase(R.id.action_tradeProvidersFragment)
             .setArgs(TradeProviderListFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }

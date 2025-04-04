@@ -85,8 +85,6 @@ interface AssetsRouter {
 
     fun openNovaCard()
 
-    fun openAwaitNovaCardTopUp()
-
     fun openAwaitingCardCreation()
 
     fun openSendNetworks(payload: NetworkFlowPayload)

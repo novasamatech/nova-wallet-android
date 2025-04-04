@@ -128,7 +128,7 @@ class NovaCardViewModel(
                     TopUpAddressResponder.Response.Success -> {
                         updateCardState()
                         updateLastTopUpTime()
-                        assetsRouter.openAwaitNovaCardTopUp()
+                        assetsRouter.openAwaitingCardCreation()
                     }
                 }
             }

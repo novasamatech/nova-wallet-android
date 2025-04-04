@@ -12,14 +12,16 @@ class TransakJsEventBridge(
 ) {
 
     @JavascriptInterface
-    fun onTransakEvent(eventId: String, eventData: String) {
-        val json = JSONObject(eventData).getJSONObject("data")
-        Log.d("TransakEvent", "Event: $eventId, Data: $json")
+    fun onTransakEvent(eventData: String) {
+        val json = JSONObject(eventData)
+        val eventId = json.getString("event_id")
+        Log.d("TransakEvent", "Event: $eventId, Data: $eventData")
 
         when (eventId) {
             "TRANSAK_WIDGET_CLOSE" -> closeListener.onTradeOperationFinished()
 
             "TRANSAK_ORDER_CREATED" -> {
+                val json = JSONObject(eventData).getJSONObject("data")
                 if (json.getString("isBuyOrSell") == "SELL") {
                     tradeSellCallback.onSellOrderCreated(
                         json.getString("id"),
