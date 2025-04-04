@@ -17,6 +17,9 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
@@ -39,6 +42,13 @@ class SelectLedgerImportLedgerModule {
     ): LedgerMessageFormatter = factory.createLegacy(selectLedgerPayload.chainId, showAlerts = false)
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SelectLedgerLegacyImportViewModel::class)
     fun provideViewModel(
@@ -50,7 +60,9 @@ class SelectLedgerImportLedgerModule {
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        messageFormatter: LedgerMessageFormatter
+        messageFormatter: LedgerMessageFormatter,
+        deviceMapperFactory: LedgerDeviceMapper,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectLedgerLegacyImportViewModel(
             migrationUseCase = migrationUseCase,
@@ -61,7 +73,9 @@ class SelectLedgerImportLedgerModule {
             locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
-            messageFormatter = messageFormatter
+            messageFormatter = messageFormatter,
+            ledgerDeviceMapper = deviceMapperFactory,
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 

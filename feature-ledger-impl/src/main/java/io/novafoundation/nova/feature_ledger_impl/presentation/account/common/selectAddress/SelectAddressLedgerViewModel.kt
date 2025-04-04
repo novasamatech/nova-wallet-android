@@ -19,15 +19,15 @@ import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
+import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.reviewAddress
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +45,7 @@ abstract class SelectAddressLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
-    private val messageFormatter: LedgerMessageFormatter
+    private val messageCommandFormatter: MessageCommandFormatter
 ) : BaseViewModel(),
     LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
@@ -104,7 +104,7 @@ abstract class SelectAddressLedgerViewModel(
     protected fun verifyAccount(id: Int) {
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
-            val account = loadedAccounts.value.first { it.index == id.toInt() }
+            val account = loadedAccounts.value.first { it.index == id }
 
             if (needToVerifyAccount) {
                 verifyAccountInternal(account)
@@ -115,10 +115,11 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     private suspend fun verifyAccountInternal(account: LedgerAccountWithBalance) {
-        ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
-            resourceManager = resourceManager,
+        val device = device.first()
+
+        ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
             address = account.account.address,
-            deviceName = device.first().name,
+            device = device,
             onCancel = ::verifyAddressCancelled,
         ).event()
 
@@ -127,26 +128,31 @@ abstract class SelectAddressLedgerViewModel(
         }
 
         result.onFailure {
-            handleLedgerError(it) { verifyAccount(account.index) }
+            handleLedgerError(it, device) { verifyAccount(account.index) }
         }.onSuccess {
-            ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+            ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
 
             onAccountVerified(account)
         }
     }
 
-    private fun handleLedgerError(error: Throwable, retry: () -> Unit) {
-        handleLedgerError(error, messageFormatter, resourceManager, retry)
+    private fun handleLedgerError(error: Throwable, device: LedgerDevice, retry: () -> Unit) {
+        handleLedgerError(
+            reason = error,
+            device = device,
+            commandFormatter = messageCommandFormatter,
+            onRetry = retry
+        )
     }
 
     private fun verifyAddressCancelled() {
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
         verifyAddressJob?.cancel()
         verifyAddressJob = null
     }
 
     private fun loadNewAccount() {
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
 
         launch(Dispatchers.Default) {
             loadingAccount.withFlagSet {
@@ -157,7 +163,7 @@ abstract class SelectAddressLedgerViewModel(
                         loadedAccounts.value = loadedAccounts.value.added(it)
                     }.onFailure {
                         Log.d("Ledger", "Error", it)
-                        handleLedgerError(it) { loadNewAccount() }
+                        handleLedgerError(it, device.first()) { loadNewAccount() }
                     }
             }
         }
