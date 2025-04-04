@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 

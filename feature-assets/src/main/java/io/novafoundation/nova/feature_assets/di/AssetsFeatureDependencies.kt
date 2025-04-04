@@ -27,6 +27,7 @@ import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChoos
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.HoldsDao
@@ -47,9 +48,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -204,6 +206,10 @@ interface AssetsFeatureDependencies {
     val webViewFileChooserFactory: WebViewFileChooserFactory
 
     val tradeTokenRegistry: TradeTokenRegistry
+
+    val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
+
+    val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

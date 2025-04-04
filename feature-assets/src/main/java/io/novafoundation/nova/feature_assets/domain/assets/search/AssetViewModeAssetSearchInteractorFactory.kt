@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.domain.assets.search
 
 import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 class AssetViewModeAssetSearchInteractorFactory(

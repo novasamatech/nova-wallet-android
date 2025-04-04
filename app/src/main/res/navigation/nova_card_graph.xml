@@ -12,47 +12,12 @@
         tools:layout="@layout/fragment_nova_card">
 
         <action
-            android:id="@+id/action_open_topUpCard"
-            app:destination="@id/topUpCardFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_open_awaiting_card_creation"
             app:destination="@id/waitingForTopUpCardFragment"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/topUpCardFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment"
-        android:label="fragment_top_up"
-        app:useAdd="true"
-        tools:layout="@layout/fragment_top_up_card">
-
-        <action
-            android:id="@+id/action_close_top_up_with_browser"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/novaCardFragment"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_finish_top_up_flow"
-            app:destination="@id/waitingForTopUpCardFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/novaCardFragment" />
 
     </fragment>
 
