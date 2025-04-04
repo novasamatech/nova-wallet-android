@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeFl
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.first
@@ -78,7 +79,7 @@ class TradeProviderListViewModel(
         launch {
             val chainAsset = chainAssetFlow.first()
 
-            router.openTradeWebInterface(TradeWebPayload(chainAsset.chainId, chainAsset.id, item.providerId, tradeFlow.toModel()))
+            router.openTradeWebInterface(TradeWebPayload(AssetPayload(chainAsset.chainId, chainAsset.id), item.providerId, tradeFlow.toModel()))
         }
     }
 }

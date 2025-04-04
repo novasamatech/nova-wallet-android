@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation
 import android.os.Bundle
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
@@ -76,9 +75,7 @@ interface AssetsRouter {
 
     fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
-    fun openTopUpCard(payload: TopUpCardPayload)
-
-    fun closeTopUp()
+    fun returnToMainScreen()
 
     fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
@@ -88,7 +85,7 @@ interface AssetsRouter {
 
     fun openNovaCard()
 
-    fun finishAndAwaitTopUp()
+    fun openAwaitNovaCardTopUp()
 
     fun openAwaitingCardCreation()
 

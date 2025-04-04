@@ -1,22 +1,19 @@
 package io.novafoundation.nova.feature_buy_impl.domain.providers.transak
 
-import android.net.Uri
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.domain.providers.InternalProvider
+import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.domain.providers.WebViewIntegrationProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-private const val NETWORK_KEY = "network"
+const val TRANSAK_NETWORK_KEY = "network"
 
 class TransakProvider(
     private val host: String,
     private val apiKey: String,
     private val environment: String
-) : InternalProvider {
+) : WebViewIntegrationProvider {
 
     override val id = "transak"
     override val name = "Transak"
@@ -46,62 +43,27 @@ class TransakProvider(
         }
     }
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeTokenRegistry.TradeFlow): InternalProvider.Integrator {
-        val network = chainAsset.buyProviders.getValue(id)[NETWORK_KEY] as? String
+    override fun createIntegrator(
+        chainAsset: Chain.Asset,
+        address: String,
+        tradeFlow: TradeTokenRegistry.TradeFlow,
+        onCloseListener: OnTradeOperationFinishedListener,
+        onSellOrderCreatedListener: OnSellOrderCreatedListener
+    ): WebViewIntegrationProvider.Integrator {
+        val network = chainAsset.buyProviders.getValue(id)[TRANSAK_NETWORK_KEY] as? String
 
-        return Integrator(
-            host = host,
-            apiKey = apiKey,
-            environment = environment,
-            network = network,
-            chainAsset = chainAsset,
-            address = address,
-            tradeFlow = tradeFlow
+        return TransakIntegrator(
+            payload = TransakIntegrator.Payload(
+                host = host,
+                apiKey = apiKey,
+                environment = environment,
+                network = network,
+                tokenSymbol = chainAsset.symbol,
+                address = address,
+                tradeFlow = tradeFlow
+            ),
+            onCloseListener,
+            onSellOrderCreatedListener
         )
-    }
-
-    private class Integrator(
-        private val host: String,
-        private val apiKey: String,
-        private val environment: String,
-        private val network: String?,
-        private val chainAsset: Chain.Asset,
-        private val address: String,
-        private val tradeFlow: TradeTokenRegistry.TradeFlow
-    ) : InternalProvider.Integrator {
-
-        override fun run(using: WebView) {
-            using.webViewClient = TransakWebViewClient()
-            using.loadUrl(createLink())
-        }
-
-        private fun createLink(): String {
-            return Uri.Builder()
-                .scheme("https")
-                .authority(host)
-                .appendQueryParameter("uctsAvailed", tradeFlow.getType())
-                .appendQueryParameter("apiKey", apiKey)
-                .appendQueryParameter("environment", environment)
-                .appendQueryParameter("cryptoCurrencyCode", chainAsset.symbol.value)
-                .appendNullableQueryParameter(NETWORK_KEY, network)
-                .appendQueryParameter("walletAddress", address)
-                .appendQueryParameter("disableWalletAddressForm", "true")
-                .build()
-                .toString()
-        }
-
-        private fun TradeTokenRegistry.TradeFlow.getType(): String {
-            return when (this) {
-                TradeTokenRegistry.TradeFlow.BUY -> "BUY"
-                TradeTokenRegistry.TradeFlow.SELL -> "SELL"
-            }
-        }
-    }
-}
-
-private class TransakWebViewClient : WebViewClient() {
-    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        view.loadUrl(request.url.toString())
-        return true
     }
 }

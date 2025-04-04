@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermission
 import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebViewModel
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
@@ -60,7 +61,8 @@ class TradeWebModule {
         chainRegistry: ChainRegistry,
         router: AssetsRouter,
         accountUseCase: SelectedAccountUseCase,
-        baseWebChromeClientFactory: BaseWebChromeClientFactory
+        baseWebChromeClientFactory: BaseWebChromeClientFactory,
+        topUpAddressCommunicator: TopUpAddressCommunicator
     ): ViewModel {
         return TradeWebViewModel(
             payload = payload,
@@ -69,7 +71,8 @@ class TradeWebModule {
             chainRegistry = chainRegistry,
             router = router,
             accountUseCase = accountUseCase,
-            baseWebChromeClientFactory = baseWebChromeClientFactory
+            baseWebChromeClientFactory = baseWebChromeClientFactory,
+            topUpRequester = topUpAddressCommunicator
         )
     }
 }

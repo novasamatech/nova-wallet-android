@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="fragment_sell_token_title">Sell %s token</string>
     <string name="sell_network_flow_title">Select network for selling %s</string>
 
     <string name="mercurio_provider_description">Best price with fees up to 3.95%</string>

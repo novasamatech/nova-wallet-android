@@ -21,6 +21,7 @@ import io.novafoundation.nova.splash.SplashRouter
 @Module(
     includes = [
         AccountNavigationModule::class,
+        AssetNavigationModule::class,
         DAppNavigationModule::class,
         NftNavigationModule::class,
         StakingNavigationModule::class,
@@ -36,7 +37,8 @@ import io.novafoundation.nova.splash.SplashRouter
         BuyNavigationModule::class,
         PushNotificationsNavigationModule::class,
         DeepLinkingNavigationModule::class,
-        CloudBackupNavigationModule::class
+        CloudBackupNavigationModule::class,
+        AssetNavigationModule::class
     ]
 )
 class NavigationModule {
