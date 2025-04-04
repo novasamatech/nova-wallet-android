@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,94 +11,49 @@
         android:id="@+id/startImportLedgerToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:dividerVisible="false" />
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startImportLedgerToolbar">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/startImportLedgerTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical"
-            android:paddingBottom="16dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/account_ledger_import_start_title"
+            android:textColor="@color/text_primary" />
 
-            <TextView
-                android:id="@+id/startImportLedgerTitle"
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/account_ledger_import_start_title"
-                android:textColor="@color/text_primary" />
+        <io.novafoundation.nova.common.view.SegmentedTabLayout
+            android:id="@+id/startImportLedgerConnectionMode"
+            style="@style/SegmentedTab"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp" />
 
-            <io.novafoundation.nova.common.view.LinkView
-                android:id="@+id/startImportLedgerGuideLink"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="8dp"
-                app:linkText="@string/account_ledger_import_start_guide" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/startImportLedgerConnectionModePages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
 
-            <io.novafoundation.nova.common.view.NovaConnectView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="32dp"
-                app:targetImage="@drawable/ic_ledger" />
-
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportLedgerStep1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                app:stepNumber="1" />
-
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportLedgerStep2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:stepNumber="2" />
-
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportLedgerStep3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:stepNumber="3" />
-
-            <io.novafoundation.nova.common.view.InstructionStepView
-                android:id="@+id/startImportLedgerStep4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:stepNumber="4" />
-
-            <io.novafoundation.nova.common.view.AlertView
-                android:id="@+id/startImportLedgerDepractionWarning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/account_ledger_legacy_warning_title"
-                android:visibility="gone"
-                app:AlertView_action="@string/common_find_out_more"
-                app:AlertView_description="@string/account_ledger_legacy_warning_message"
-                app:alertMode="warning"
-                tools:visibility="visible" />
-        </LinearLayout>
-
-    </ScrollView>
+    </LinearLayout>
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/startImportLedgerContinue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="@string/common_continue" />
+        android:text="@string/common_continue"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

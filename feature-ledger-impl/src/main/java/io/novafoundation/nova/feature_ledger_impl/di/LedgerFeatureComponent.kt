@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.l
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.finish.di.FinishImportLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectAddress.di.SelectAddressImportLedgerLegacyComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.di.SelectLedgerImportLedgerComponent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.di.StartImportLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.start.di.StartImportLegacyLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.di.SignLedgerComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -49,7 +49,7 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
         ): LedgerFeatureComponent
     }
 
-    fun startImportLedgerComponentFactory(): StartImportLedgerComponent.Factory
+    fun startImportLegacyLedgerComponentFactory(): StartImportLegacyLedgerComponent.Factory
     fun fillWalletImportLedgerComponentFactory(): FillWalletImportLedgerComponent.Factory
     fun selectLedgerImportComponentFactory(): SelectLedgerImportLedgerComponent.Factory
     fun selectAddressImportLedgerLegacyComponentFactory(): SelectAddressImportLedgerLegacyComponent.Factory

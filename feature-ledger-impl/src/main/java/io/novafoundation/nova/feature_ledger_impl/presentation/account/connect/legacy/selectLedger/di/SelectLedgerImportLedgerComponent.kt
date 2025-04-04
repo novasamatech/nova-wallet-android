@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerImportFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyImportFragment
 
 @Subcomponent(
     modules = [
@@ -20,9 +20,9 @@ interface SelectLedgerImportLedgerComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: SelectLedgerPayload,
+            @BindsInstance payload: SelectLedgerLegacyPayload,
         ): SelectLedgerImportLedgerComponent
     }
 
-    fun inject(fragment: SelectLedgerImportFragment)
+    fun inject(fragment: SelectLedgerLegacyImportFragment)
 }

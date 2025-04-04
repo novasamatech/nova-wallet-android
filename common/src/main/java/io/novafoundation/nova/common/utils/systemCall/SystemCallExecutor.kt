@@ -33,7 +33,7 @@ class SystemCallExecutor(
     }
 
     @Suppress("UNCHECKED_CAST") // type-safety is guaranteed by PendingRequest<T>
-    fun <T> executeSystemCallNotBlocking(systemCall: SystemCall<T>, onResult: (Result<T>) -> Unit): Boolean {
+    fun <T> executeSystemCallNotBlocking(systemCall: SystemCall<T>, onResult: (Result<T>) -> Unit = {}): Boolean {
         try {
             val request = handleRequest(systemCall)
 

@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">Ứng dụng Migration sẽ không còn khả dụng trong tương lai gần. Sử dụng nó để di chuyển các tài khoản của bạn sang ứng dụng Ledger mới để tránh mất tiền của bạn.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Ứng dụng Generic Polkadot)</string>
+    <string name="account_ledger_generic_item_title">Ledger Nano X (Ứng dụng Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Hãy bật Bluetooth trong cài đặt điện thoại của bạn và thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_ledger_select_device_title">Chọn thiết bị Ledger của bạn</string>

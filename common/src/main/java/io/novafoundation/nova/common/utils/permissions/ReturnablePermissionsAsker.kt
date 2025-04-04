@@ -30,7 +30,7 @@ private open class BasePermissionsAsker(
 
     override val showPermissionsDenied = actionAwaitableMixinFactory.create<PermissionDeniedLevel, PermissionDeniedAction>()
 
-    override suspend fun requirePermissionsOrExit(vararg permissions: Permission): Boolean {
+    override suspend fun requirePermissions(vararg permissions: Permission): Boolean {
         try {
             fragment.askPermission(*permissions)
 
@@ -52,7 +52,7 @@ private open class BasePermissionsAsker(
 
     protected suspend fun onRetry(e: PermissionException, vararg permissions: Permission): Boolean {
         if (e.hasDenied()) {
-            return requirePermissionsOrExit(*permissions)
+            return requirePermissions(*permissions)
         }
 
         if (e.hasForeverDenied()) {

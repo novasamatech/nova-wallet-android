@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">La aplicación Migration no estará disponible en un futuro cercano. Úsala para migrar tus cuentas a la nueva aplicación Ledger para evitar la pérdida de tus fondos.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (aplicación Generic Polkadot)</string>
+    <string name="account_ledger_generic_item_title">Ledger Nano X (aplicación Generic Polkadot)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
     <string name="account_ledger_select_device_description">Por favor, activa el Bluetooth en la configuración de tu teléfono y en el dispositivo Ledger. Desbloquea tu dispositivo Ledger y abre la aplicación %s.</string>
     <string name="account_ledger_select_device_title">Selecciona tu dispositivo Ledger</string>

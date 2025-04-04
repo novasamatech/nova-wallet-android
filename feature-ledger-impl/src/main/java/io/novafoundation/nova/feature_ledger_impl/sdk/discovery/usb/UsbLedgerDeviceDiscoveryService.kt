@@ -8,6 +8,7 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
+import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.usb.UsbLedgerConnection
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ class UsbLedgerDeviceDiscoveryService(
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     device?.let { discoverDevices() }
                 }
+
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     device?.let { discoverDevices() }
@@ -62,19 +64,27 @@ class UsbLedgerDeviceDiscoveryService(
 
     private fun discoverDevices() {
         try {
-            val deviceList = usbManager.deviceList
-            val devices = deviceList.values.map { createLedgerDeviceFromUsbDevice(it) }
+            val devices = usbManager.deviceList
+                .values.mapNotNull { createLedgerDeviceIfSupported(it) }
             discoveredDevices.tryEmit(devices)
         } catch (e: Exception) {
             errors.tryEmit(e)
         }
     }
 
-    private fun createLedgerDeviceFromUsbDevice(usbDevice: UsbDevice): LedgerDevice {
+    private fun createLedgerDeviceIfSupported(usbDevice: UsbDevice): LedgerDevice? {
+        val ledgerDeviceType = usbDevice.getLedgerDeviceType() ?: return null
         val id = "${usbDevice.vendorId}:${usbDevice.productId}"
-        val name = usbDevice.deviceName
         val connection = UsbLedgerConnection(appContext, usbDevice, coroutineScope)
 
-        return LedgerDevice(id, name, connection = connection)
+        return LedgerDevice(id, ledgerDeviceType, null, connection = connection)
+    }
+
+    private fun UsbDevice.getLedgerDeviceType(): LedgerDeviceType? {
+        val searchingVendorId = this.vendorId
+        val searchingProductId = this.productId
+
+        return LedgerDeviceType.values()
+            .firstOrNull { it.usbOptions.vendorId == searchingVendorId && it.usbOptions.productId == searchingProductId }
     }
 }
