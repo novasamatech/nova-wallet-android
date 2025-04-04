@@ -38,7 +38,7 @@ class TransakIntegrator(
     }
 
     private fun createLink(): String {
-        return Uri.Builder()
+        val urlBuilder = Uri.Builder()
             .scheme("https")
             .authority(payload.host)
             .appendQueryParameter("productsAvailed", payload.tradeFlow.getType())
@@ -46,10 +46,13 @@ class TransakIntegrator(
             .appendQueryParameter("environment", environment)
             .appendQueryParameter("cryptoCurrencyCode", payload.tokenSymbol.value)
             .appendNullableQueryParameter(TRANSAK_NETWORK_KEY, payload.network)
-            .appendQueryParameter("walletAddress", payload.address)
-            .appendQueryParameter("disableWalletAddressForm", "true")
-            .build()
-            .toString()
+
+        if (payload.tradeFlow == TradeTokenRegistry.TradeFlow.BUY) {
+            urlBuilder.appendQueryParameter("walletAddress", payload.address)
+                .appendQueryParameter("disableWalletAddressForm", "true")
+        }
+
+        return urlBuilder.build().toString()
     }
 
     private fun TradeTokenRegistry.TradeFlow.getType(): String {
