@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.tradeProvider
+package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
 import android.view.View
 import android.view.ViewGroup

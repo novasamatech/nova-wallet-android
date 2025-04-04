@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_assets.presentation.tradeProvider.di
+package io.novafoundation.nova.feature_assets.presentation.trade.provider.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListFragment
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
 
 @Subcomponent(
     modules = [

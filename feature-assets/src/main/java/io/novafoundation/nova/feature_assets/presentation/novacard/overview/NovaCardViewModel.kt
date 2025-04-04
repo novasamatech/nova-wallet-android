@@ -12,8 +12,8 @@ import io.novafoundation.nova.feature_assets.presentation.novacard.overview.mode
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptor
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo.MercuryoSellRequestInterceptorFactory
+import io.novafoundation.nova.feature_assets.presentation.common.trade.callback.TradeSellCallback
 import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.ChainGeneses
@@ -31,9 +31,9 @@ class NovaCardViewModel(
     private val assetsRouter: AssetsRouter,
     private val novaCardInteractor: NovaCardInteractor,
     private val cardCreationInterceptorFactory: CardCreationInterceptorFactory,
-    private val topUpRequestInterceptorFactory: TopUpRequestInterceptorFactory,
+    private val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory,
     private val novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory
-) : BaseViewModel(), CardCreationInterceptor.Callback, TopUpRequestInterceptor.Callback {
+) : BaseViewModel(), CardCreationInterceptor.Callback, TradeSellCallback {
 
     private val openedOrderIds = mutableSetOf<String>()
 
@@ -51,7 +51,7 @@ class NovaCardViewModel(
         novaCardWebViewControllerFactory.create(
             interceptors = listOf(
                 cardCreationInterceptorFactory.create(this),
-                topUpRequestInterceptorFactory.create(this)
+                mercuryoSellRequestInterceptorFactory.create(this)
             ),
             setupConfig = setupConfig,
             scope = viewModelScope
@@ -62,7 +62,7 @@ class NovaCardViewModel(
         ensureCardCreationIsBlocking()
     }
 
-    override fun onTopUpStart(orderId: String, amount: BigDecimal, address: String) {
+    override fun onSellStart(orderId: String, amount: BigDecimal, address: String) {
         if (orderId in openedOrderIds) return // To not handle same order twice
         openedOrderIds.add(orderId)
 
@@ -77,7 +77,7 @@ class NovaCardViewModel(
         }
     }
 
-    override fun onTopUpCompleted(orderId: String) {
+    override fun onSellCompleted(orderId: String) {
         launch {
             openedOrderIds.remove(orderId)
 

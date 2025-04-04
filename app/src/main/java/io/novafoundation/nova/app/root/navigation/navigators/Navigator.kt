@@ -72,8 +72,11 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.A
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListFragment
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
@@ -491,16 +494,22 @@ class Navigator(
     }
 
     override fun openBuyProviders(chainId: String, chainAssetId: Int) {
-        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderListPayload.Type.BUY)
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.BUY)
         navigationBuilder().action(R.id.action_tradeProvidersFragment)
             .setArgs(TradeProviderListFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 
     override fun openSellProviders(chainId: String, chainAssetId: Int) {
-        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderListPayload.Type.SELL)
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.SELL)
         navigationBuilder().action(R.id.action_tradeProvidersFragment)
             .setArgs(TradeProviderListFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openTradeWebInterface(payload: TradeWebPayload) {
+        navigationBuilder().action(R.id.action_tradeWebFragment)
+            .setArgs(TradeWebFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 

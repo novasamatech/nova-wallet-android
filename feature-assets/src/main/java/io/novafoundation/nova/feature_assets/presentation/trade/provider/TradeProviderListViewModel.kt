@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.tradeProvider
+package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -7,6 +7,9 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.trade.common.toModel
+import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeFlow
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -55,11 +58,6 @@ class TradeProviderListViewModel(
         router.back()
     }
 
-    private fun TradeProviderListPayload.Type.toTradeFlow() = when (this) {
-        TradeProviderListPayload.Type.BUY -> TradeTokenRegistry.TradeFlow.BUY
-        TradeProviderListPayload.Type.SELL -> TradeTokenRegistry.TradeFlow.SELL
-    }
-
     private fun TradeTokenRegistry.PaymentMethod.toModel() = when (this) {
         TradeTokenRegistry.PaymentMethod.ApplePay -> TradeProviderRvItem.PaymentMethod.ByResId(R.drawable.ic_apple_pay)
         TradeTokenRegistry.PaymentMethod.BankTransfer -> TradeProviderRvItem.PaymentMethod.ByResId(R.drawable.ic_bank)
@@ -78,9 +76,9 @@ class TradeProviderListViewModel(
 
     fun onProviderClicked(item: TradeProviderRvItem) {
         launch {
-            val provider = providers.first().first { it.id == item.id }
             val chainAsset = chainAssetFlow.first()
-            tradeMixin.openProvider(chainAsset, provider, tradeFlow)
+
+            router.openTradeWebInterface(TradeWebPayload(chainAsset.chainId, chainAsset.id, item.providerId, tradeFlow.toModel()))
         }
     }
 }

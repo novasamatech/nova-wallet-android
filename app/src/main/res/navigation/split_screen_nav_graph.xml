@@ -368,6 +368,16 @@
     <action
         android:id="@+id/action_tradeProvidersFragment"
         app:destination="@id/tradeProvidersFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_tradeWebFragment"
+        app:destination="@id/tradeWebFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
@@ -1036,8 +1046,13 @@
 
     <fragment
         android:id="@+id/tradeProvidersFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.tradeProvider.TradeProviderListFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment"
         android:label="TradeProviderListFragment" />
+
+    <fragment
+        android:id="@+id/tradeWebFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebFragment"
+        android:label="TradeWebFragment" />
 
     <fragment
         android:id="@+id/sendFlowNetworkFragment"

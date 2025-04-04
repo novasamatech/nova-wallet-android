@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController
+package io.novafoundation.nova.common.utils.webView
 
 import android.net.Uri
 import android.webkit.PermissionRequest
@@ -9,18 +9,18 @@ import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChoos
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
 import kotlinx.coroutines.CoroutineScope
 
-class NovaCardWebChromeClientFactory(
+class BaseWebChromeClientFactory(
     private val permissionsAsker: WebViewPermissionAsker,
     private val webViewFileChooser: WebViewFileChooser
 ) {
-    fun create(coroutineScope: CoroutineScope) = NovaCardWebChromeClient(
+    fun create(coroutineScope: CoroutineScope) = BaseWebChromeClient(
         permissionsAsker = permissionsAsker,
         webViewFileChooser = webViewFileChooser,
         coroutineScope = coroutineScope
     )
 }
 
-class NovaCardWebChromeClient(
+open class BaseWebChromeClient(
     private val permissionsAsker: WebViewPermissionAsker,
     private val webViewFileChooser: WebViewFileChooser,
     private val coroutineScope: CoroutineScope

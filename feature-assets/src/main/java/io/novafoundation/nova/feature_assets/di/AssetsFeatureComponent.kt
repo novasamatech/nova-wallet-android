@@ -32,7 +32,8 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.asset.di.AssetSellFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.di.NetworkSellFlowComponent
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.di.TradeProviderListComponent
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.di.TradeProviderListComponent
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.di.TradeWebComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.PoolRewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
@@ -105,6 +106,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun sellFlowComponent(): AssetSellFlowComponent.Factory
 
     fun tradeProviderListComponent(): TradeProviderListComponent.Factory
+
+    fun tradeWebComponent(): TradeWebComponent.Factory
 
     fun networkBuyFlowComponent(): NetworkBuyFlowComponent.Factory
 
