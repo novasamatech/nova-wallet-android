@@ -39,8 +39,8 @@ class DynamicCrossChainTransferConfiguration(
     private fun transferType(): XcmTransferReserve {
         return when {
             shouldUseTeleport() -> XcmTransferReserve.Teleport
-            originChainId == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Origin
-            destinationChainId == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Destination
+            originChain.chain.id == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Origin
+            destinationChain.chain.id == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Destination
             else -> XcmTransferReserve.Reserve.Remote(reserve.reserveChainLocation)
         }
     }
@@ -50,8 +50,9 @@ class DynamicCrossChainTransferConfiguration(
 private fun DynamicCrossChainTransferConfiguration.shouldUseTeleport(): Boolean {
     val systemToRelay = originChain.isSystemChain() && destinationChain.isRelay()
     val relayToSystem = originChain.isRelay() && destinationChain.isSystemChain()
+    val systemToSystem = originChain.isSystemChain() && destinationChain.isSystemChain()
 
-    return systemToRelay || relayToSystem
+    return systemToRelay || relayToSystem || systemToSystem
 }
 
 fun DynamicCrossChainTransferConfiguration.destinationChainLocationOnOrigin(): RelativeMultiLocation {
