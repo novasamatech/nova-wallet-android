@@ -86,7 +86,6 @@ class DynamicCrossChainTransactor @Inject constructor(
     private suspend fun shouldUseXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {
         val supportsXcmExecute = configuration.supportsXcmExecute
         val hasXcmPaymentApi = xcmPaymentApi.isSupported(configuration.originChainId)
-
         // For now, only enable xcm execute approach for the directions that will hugely benefit from it
         // In particular, xcm execute allows us to pay delivery fee from the holding register and not in JIT mode (from account)
         val hasDeliveryFee = configuration.hasDeliveryFee
@@ -191,15 +190,14 @@ class DynamicCrossChainTransactor @Inject constructor(
         beneficiary: AccountIdKey,
         amount: Balance,
     ) {
-        val feesAmount = amount / 3.toBigInteger()
+        val feesAmount = amount / 2.toBigInteger()
 
         // Origin
         withdrawAsset(assetLocation, amount)
         // Here and onward: we use buy execution for the very first segment to be able to pay delivery fees in sending asset
         // WeightLimit.zero() is used since it doesn't matter anyways as the message on origin is already weighted
         buyExecution(assetLocation, feesAmount, WeightLimit.zero())
-        val feeAssetOnOrigin = MultiAsset.from(assetLocation.relativeToLocal(), feesAmount)
-        initiateTeleport(MultiAssetFilter.Definite(feeAssetOnOrigin), destinationChainLocation)
+        initiateTeleport(MultiAssetFilter.singleCounted(), destinationChainLocation)
 
         // Destination
         buyExecution(assetLocation, feesAmount, WeightLimit.Unlimited)
@@ -249,7 +247,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         beneficiary: AccountIdKey,
         amount: Balance,
     ) {
-        val feesAmount = amount / 3.toBigInteger()
+        val feesAmount = amount / 2.toBigInteger()
 
         // Origin
         withdrawAsset(assetLocation, amount)
