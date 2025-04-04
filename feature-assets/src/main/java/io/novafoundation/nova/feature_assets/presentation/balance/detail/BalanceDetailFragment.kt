@@ -117,7 +117,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
         viewModel.state.observe(transfersContainer::showState)
 
-        buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
         buyMixinUi.setupBuyButton(this, balanceDetailActions.buy, viewModel.buySellEnabled) {
             viewModel.buyClicked()
         }

@@ -1,28 +1,28 @@
-package io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo
+package io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo
 
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
 import io.novafoundation.nova.common.utils.webView.makeRequestBlocking
 import io.novafoundation.nova.common.utils.webView.toOkHttpRequestBuilder
-import io.novafoundation.nova.feature_assets.presentation.common.trade.callback.TradeBuyCallback
-import io.novafoundation.nova.feature_assets.presentation.common.trade.callback.TradeSellCallback
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptor
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import okhttp3.OkHttpClient
 
-class MercuryoBuyRequestInterceptorFactory(
+class RealMercuryoBuyRequestInterceptorFactory(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson
-) {
-    fun create(tradeSellCallback: TradeSellCallback): MercuryoSellRequestInterceptor {
-        return MercuryoSellRequestInterceptor(okHttpClient, gson, tradeSellCallback)
+) : MercuryoBuyRequestInterceptorFactory {
+    override fun create(onTradeOperationFinishedListener: OnTradeOperationFinishedListener): MercuryoBuyRequestInterceptor {
+        return RealMercuryoBuyRequestInterceptor(okHttpClient, gson, onTradeOperationFinishedListener)
     }
 }
 
-class MercuryoBuyRequestInterceptor(
+class RealMercuryoBuyRequestInterceptor(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson,
-    private val callback: TradeBuyCallback
-) : WebViewRequestInterceptor {
+    private val onTradeOperationFinishedListener: OnTradeOperationFinishedListener
+) : MercuryoBuyRequestInterceptor {
 
     private val interceptionPattern = Regex("https://api\\.mercuryo\\.io/[a-zA-Z0-9.]+/widget/buy/([a-zA-Z0-9]+)/status.*")
 
@@ -32,14 +32,13 @@ class MercuryoBuyRequestInterceptor(
         val matches = interceptionPattern.find(url)
 
         if (matches != null) {
-            val orderId = matches.groupValues[1]
-            return performOkHttpRequest(orderId, request)
+            return performOkHttpRequest(request)
         }
 
         return false
     }
 
-    private fun performOkHttpRequest(orderId: String, request: WebResourceRequest): Boolean {
+    private fun performOkHttpRequest(request: WebResourceRequest): Boolean {
         val requestBuilder = request.toOkHttpRequestBuilder()
 
         return try {
@@ -47,7 +46,7 @@ class MercuryoBuyRequestInterceptor(
             val buyStatusResponse = gson.fromJson(response.body!!.string(), BuyStatusResponse::class.java)
 
             if (buyStatusResponse.isPaid()) {
-                callback.onBuyCompleted(orderId)
+                onTradeOperationFinishedListener.onTradeOperationFinished()
             }
 
             true

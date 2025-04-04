@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.trade.common
 
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 
 enum class TradeProviderFlowType {
     BUY, SELL

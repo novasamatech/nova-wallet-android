@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermission
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.systemCall.WebViewFilePickerSystemCallFactory
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 
 @Module
 class WebViewModule {
@@ -28,4 +29,8 @@ class WebViewModule {
         systemCallExecutor: SystemCallExecutor,
         webViewFilePickerSystemCallFactory: WebViewFilePickerSystemCallFactory
     ) = WebViewFileChooserFactory(systemCallExecutor, webViewFilePickerSystemCallFactory)
+
+    @Provides
+    @ApplicationScope
+    fun provideInterceptingWebViewClientFactory() = InterceptingWebViewClientFactory()
 }

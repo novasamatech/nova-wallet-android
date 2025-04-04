@@ -1,28 +1,36 @@
-package io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo
+package io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo
 
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
 import io.novafoundation.nova.common.utils.webView.makeRequestBlocking
 import io.novafoundation.nova.common.utils.webView.toOkHttpRequestBuilder
-import io.novafoundation.nova.feature_assets.presentation.common.trade.callback.TradeSellCallback
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptor
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import java.math.BigDecimal
 import okhttp3.OkHttpClient
 
-class MercuryoSellRequestInterceptorFactory(
+class RealMercuryoSellRequestInterceptorFactory(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson
-) {
-    fun create(tradeSellCallback: TradeSellCallback): MercuryoSellRequestInterceptor {
-        return MercuryoSellRequestInterceptor(okHttpClient, gson, tradeSellCallback)
+) : MercuryoSellRequestInterceptorFactory {
+    override fun create(
+        tradeSellCallback: OnSellOrderCreatedListener,
+        onTradeOperationFinishedListener: OnTradeOperationFinishedListener
+    ): MercuryoSellRequestInterceptor {
+        return RealMercuryoSellRequestInterceptor(okHttpClient, gson, tradeSellCallback, onTradeOperationFinishedListener)
     }
 }
 
-class MercuryoSellRequestInterceptor(
+class RealMercuryoSellRequestInterceptor(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson,
-    private val onCardCreatedListener: TradeSellCallback
-) : WebViewRequestInterceptor {
+    private val tradeSellCallback: OnSellOrderCreatedListener,
+    private val onTradeOperationFinishedListener: OnTradeOperationFinishedListener
+) : MercuryoSellRequestInterceptor {
+
+    private val openedOrderIds = mutableSetOf<String>()
 
     private val interceptionPattern = Regex("https://api\\.mercuryo\\.io/[a-zA-Z0-9.]+/widget/sell-request/([a-zA-Z0-9]+)/status.*")
 
@@ -47,9 +55,12 @@ class MercuryoSellRequestInterceptor(
             val sellStatusResponse = gson.fromJson(response.body!!.string(), SellStatusResponse::class.java)
 
             when {
-                sellStatusResponse.isNew() -> onCardCreatedListener.onSellStart(orderId, sellStatusResponse.getAmount(), sellStatusResponse.getAddress())
+                sellStatusResponse.isNew() && orderId !in openedOrderIds -> {
+                    openedOrderIds.add(orderId)
+                    tradeSellCallback.onSellOrderCreated(orderId, sellStatusResponse.getAddress(), sellStatusResponse.getAmount())
+                }
 
-                sellStatusResponse.isCompleted() -> onCardCreatedListener.onSellCompleted(orderId)
+                sellStatusResponse.isCompleted() -> onTradeOperationFinishedListener.onTradeOperationFinished()
             }
 
             true

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_buy_impl.domain.providers.transak
+package io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.transak
 
 import android.graphics.Bitmap
 import android.net.Uri
@@ -7,24 +7,24 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.domain.providers.WebViewIntegrationProvider
-import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
-import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.providers.WebViewIntegrationProvider
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
 
 private const val JS_BRIDGE_NAME = "TransakAndroidBridge"
 
 class TransakIntegrator(
     private val payload: Payload,
     private val closeListener: OnTradeOperationFinishedListener,
-    private val sellOrderCreatedListener: OnSellOrderCreatedListener,
-    private val environment: String
+    private val sellOrderCreatedListener: OnSellOrderCreatedListener
 ) : WebViewIntegrationProvider.Integrator {
 
     class Payload(
         val host: String,
         val apiKey: String,
         val network: String?,
+        val environment: String,
         val tokenSymbol: TokenSymbol,
         val address: String,
         val tradeFlow: TradeTokenRegistry.TradeFlow
@@ -43,7 +43,7 @@ class TransakIntegrator(
             .authority(payload.host)
             .appendQueryParameter("productsAvailed", payload.tradeFlow.getType())
             .appendQueryParameter("apiKey", payload.apiKey)
-            .appendQueryParameter("environment", environment)
+            .appendQueryParameter("environment", payload.environment)
             .appendQueryParameter("cryptoCurrencyCode", payload.tokenSymbol.value)
             .appendNullableQueryParameter(TRANSAK_NETWORK_KEY, payload.network)
 

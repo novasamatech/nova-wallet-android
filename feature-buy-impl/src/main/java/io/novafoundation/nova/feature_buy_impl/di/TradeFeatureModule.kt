@@ -1,27 +1,62 @@
 package io.novafoundation.nova.feature_buy_impl.di
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.BuildConfig
-import io.novafoundation.nova.feature_buy_impl.domain.RealTradeTokenRegistry
-import io.novafoundation.nova.feature_buy_impl.domain.providers.banxa.BanxaProvider
-import io.novafoundation.nova.feature_buy_impl.domain.providers.mercurio.MercuryoIntegratorFactory
-import io.novafoundation.nova.feature_buy_impl.domain.providers.mercurio.MercuryoProvider
-import io.novafoundation.nova.feature_buy_impl.domain.providers.transak.TransakProvider
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.RealTradeTokenRegistry
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.banxa.BanxaProvider
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.mercurio.MercuryoIntegratorFactory
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.mercurio.MercuryoProvider
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.transak.TransakProvider
 import io.novafoundation.nova.feature_buy_impl.presentation.mixin.TradeMixinFactory
 import io.novafoundation.nova.feature_buy_impl.presentation.mixin.RealBuyMixinUi
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoBuyRequestInterceptorFactory
+import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoSellRequestInterceptorFactory
+import okhttp3.OkHttpClient
 
 @Module
 class BuyFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMercuryoIntegratorFactory(): MercuryoIntegratorFactory {
-        return MercuryoIntegratorFactory()
+    fun provideMercuryoSellRequestInterceptorFactory(
+        gson: Gson,
+        okHttpClient: OkHttpClient
+    ): MercuryoSellRequestInterceptorFactory = RealMercuryoSellRequestInterceptorFactory(
+        gson = gson,
+        okHttpClient = okHttpClient
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideMercuryoBuyRequestInterceptorFactory(
+        gson: Gson,
+        okHttpClient: OkHttpClient
+    ): MercuryoBuyRequestInterceptorFactory = RealMercuryoBuyRequestInterceptorFactory(
+        gson = gson,
+        okHttpClient = okHttpClient
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideMercuryoIntegratorFactory(
+        mercuryoBuyInterceptorFactory: MercuryoBuyRequestInterceptorFactory,
+        mercuryoSellInterceptorFactory: MercuryoSellRequestInterceptorFactory,
+        interceptingWebViewClientFactory: InterceptingWebViewClientFactory,
+    ): MercuryoIntegratorFactory {
+        return MercuryoIntegratorFactory(
+            mercuryoBuyInterceptorFactory,
+            mercuryoSellInterceptorFactory,
+            interceptingWebViewClientFactory
+        )
     }
 
     @Provides

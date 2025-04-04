@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_buy_impl.domain.providers.transak
+package io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.transak
 
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
-import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
-import io.novafoundation.nova.feature_buy_api.domain.providers.WebViewIntegrationProvider
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.providers.WebViewIntegrationProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 

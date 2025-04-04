@@ -1,6 +1,6 @@
-package io.novafoundation.nova.feature_buy_impl.domain
+package io.novafoundation.nova.feature_buy_impl.presentation.trade
 
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class RealTradeTokenRegistry(private val providers: List<TradeTokenRegistry.Provider<*>>) : TradeTokenRegistry {
