@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.legacy.fillWallet.FillWalletImportLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.LedgerChainAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.SelectLedgerAddressInterScreenRequester
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.model.FillableChainAccountModel
@@ -37,6 +37,7 @@ class FillWalletImportLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val actionAwaitableMixin: ActionAwaitableMixin.Factory,
     private val selectLedgerAddressRequester: SelectLedgerAddressInterScreenRequester,
+    private val payload: FillWalletImportLedgerLegacyPayload
 ) : BaseViewModel() {
 
     private val filledAccountsFlow = MutableStateFlow<Map<ChainId, LedgerSubstrateAccount>>(emptyMap())
@@ -86,7 +87,7 @@ class FillWalletImportLedgerViewModel(
     }
 
     fun itemClicked(item: FillableChainAccountModel) {
-        val payload = SelectLedgerPayload(item.chainUi.id)
+        val payload = SelectLedgerLegacyPayload(item.chainUi.id, payload.connectionMode)
 
         selectLedgerAddressRequester.openRequest(payload)
     }

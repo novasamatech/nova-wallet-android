@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -20,6 +21,13 @@ import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWal
 import javax.inject.Inject
 
 class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewModel>(), FillWalletImportLedgerAdapter.Handler {
+
+    companion object {
+
+        private const val PAYLOAD_KEY = "SelectLedgerGenericImportFragment.PAYLOAD_KEY"
+
+        fun getBundle(payload: FillWalletImportLedgerLegacyPayload): Bundle = bundleOf(PAYLOAD_KEY to payload)
+    }
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -48,7 +56,7 @@ class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewMo
     override fun inject() {
         FeatureUtils.getFeature<LedgerFeatureComponent>(requireContext(), LedgerFeatureApi::class.java)
             .fillWalletImportLedgerComponentFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD_KEY))
             .inject(this)
     }
 

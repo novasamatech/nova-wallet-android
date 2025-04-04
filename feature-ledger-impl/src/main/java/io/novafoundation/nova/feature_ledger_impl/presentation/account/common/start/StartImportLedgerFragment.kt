@@ -15,6 +15,9 @@ import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLe
 import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerContinue
 import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerToolbar
 
+private const val BLUETOOTH_PAGE_INDEX = 0
+private const val USB_PAGE_INDEX = 1
+
 abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> : BaseFragment<VM>(), StartImportLedgerPagerAdapter.Handler {
 
     protected val pageAdapter by lazy(LazyThreadSafetyMode.NONE) { StartImportLedgerPagerAdapter(createPages(), this) }
@@ -27,7 +30,12 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> : Base
         startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
         startImportLedgerToolbar.applyStatusBarInsets()
 
-        startImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
+        startImportLedgerContinue.setOnClickListener {
+            when (startImportLedgerConnectionModePages.currentItem) {
+                BLUETOOTH_PAGE_INDEX -> viewModel.continueWithBluetooth()
+                USB_PAGE_INDEX -> viewModel.continueWithUsb()
+            }
+        }
 
         startImportLedgerConnectionModePages.adapter = pageAdapter
         startImportLedgerConnectionMode.setupWithViewPager2(startImportLedgerConnectionModePages, pageAdapter::getPageTitle)
@@ -42,7 +50,10 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> : Base
     }
 
     private fun createPages(): List<ConnectionModePageModel> {
-        return listOf(createBluetoothPage(), createUSBPage())
+        return buildList {
+            add(BLUETOOTH_PAGE_INDEX, createBluetoothPage())
+            add(USB_PAGE_INDEX, createUSBPage())
+        }
     }
 
     private fun createBluetoothPage(): ConnectionModePageModel {
