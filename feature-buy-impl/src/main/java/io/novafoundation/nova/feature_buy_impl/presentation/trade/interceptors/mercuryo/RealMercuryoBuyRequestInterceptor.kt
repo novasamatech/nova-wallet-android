@@ -57,7 +57,6 @@ class RealMercuryoBuyRequestInterceptor(
 }
 
 /**
- * https://api.mercuryo.io/v1.6/widget/buy/0da637056a0c85319/status?user_deviceid=5add1aa846969ead8e1f0d5d4da43d65&user_user_agent=Mozilla%2F5.0+(Linux%3B+Android+11%3B+RMX2063+Build%2FRKQ1.201112.002%3B+wv)+AppleWebKit%2F537.36+(KHTML,+like+Gecko)+Version%2F4.0+Chrome%2F134.0.6998.135+Mobile+Safari%2F537.36&user_time_zone=-120&user_language=ru&user_platform=Linux+aarch64
  * {
  *     "status": 200,
  *     "data": {

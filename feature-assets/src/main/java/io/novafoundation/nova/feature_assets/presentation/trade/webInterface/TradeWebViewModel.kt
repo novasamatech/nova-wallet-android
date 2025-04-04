@@ -50,7 +50,13 @@ class TradeWebViewModel(
     val integrator = combine(chainFlow, chainAssetFlow) { chain, chainAsset ->
         val address = accountUseCase.getSelectedMetaAccount().requireAddressIn(chain)
         tradeMixin.providerFor<WebViewIntegrationProvider>(chainAsset, tradeFlow, payload.providerId)
-            .createIntegrator(chainAsset, address, tradeFlow, this, this)
+            .createIntegrator(
+                chainAsset = chainAsset,
+                address = address,
+                tradeFlow = tradeFlow,
+                onCloseListener = this,
+                onSellOrderCreatedListener = this
+            )
     }
         .shareInBackground()
 
