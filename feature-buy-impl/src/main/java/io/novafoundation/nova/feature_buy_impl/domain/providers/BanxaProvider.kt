@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
+import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -19,9 +20,27 @@ class BanxaProvider(
 
     override val name: String = "Banxa"
     override val officialUrl: String = "banxa.com"
-    override val icon: Int = R.drawable.ic_banxa
+    override val logoRes: Int = R.drawable.ic_banxa_provider_logo
+    override val descriptionRes: Int = R.string.banxa_provider_description
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
+    override val supportedFlows = setOf(TradeTokenRegistry.TradeFlow.BUY)
+
+    override fun getPaymentMethods(tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeTokenRegistry.PaymentMethod> {
+        return when (tradeFlow) {
+            TradeTokenRegistry.TradeFlow.BUY -> listOf(
+                TradeTokenRegistry.PaymentMethod.Visa,
+                TradeTokenRegistry.PaymentMethod.MasterCard,
+                TradeTokenRegistry.PaymentMethod.ApplePay,
+                TradeTokenRegistry.PaymentMethod.GooglePay,
+                TradeTokenRegistry.PaymentMethod.Sepa,
+                TradeTokenRegistry.PaymentMethod.Other(5)
+            )
+
+            TradeTokenRegistry.TradeFlow.SELL -> throw IllegalStateException("Sell is not supported for Banxa provider")
+        }
+    }
+
+    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeTokenRegistry.TradeFlow): ExternalProvider.Integrator {
         val providerDetails = chainAsset.buyProviders.getValue(id)
         val blockchain = providerDetails[BLOCKCHAIN_KEY] as? String
         val coinType = providerDetails[COIN_KEY] as? String
@@ -32,10 +51,10 @@ class BanxaProvider(
         private val host: String,
         private val blockchain: String?,
         private val coinType: String?,
-        private val address: String,
+        private val address: String
     ) : ExternalProvider.Integrator {
 
-        override fun openBuyFlow(using: Context) {
+        override fun openFlow(using: Context) {
             using.showBrowser(createPurchaseLink())
         }
 

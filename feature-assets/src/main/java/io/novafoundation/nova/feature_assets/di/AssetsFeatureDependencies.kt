@@ -47,7 +47,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -164,7 +165,7 @@ interface AssetsFeatureDependencies {
 
     val bannerVisibilityRepository: BannerVisibilityRepository
 
-    val buyMixinFactory: BuyMixin.Factory
+    val tradeMixinFactory: TradeMixin.Factory
 
     val buyMixinUi: BuyMixinUi
 
@@ -201,6 +202,8 @@ interface AssetsFeatureDependencies {
     val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
 
     val webViewFileChooserFactory: WebViewFileChooserFactory
+
+    val tradeTokenRegistry: TradeTokenRegistry
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownIn
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
@@ -88,7 +89,8 @@ class BalanceListModule {
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetListMixinFactory: AssetListMixinFactory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -103,7 +105,8 @@ class BalanceListModule {
             walletConnectSessionsUseCase = walletConnectSessionsUseCase,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory
         )
     }
 

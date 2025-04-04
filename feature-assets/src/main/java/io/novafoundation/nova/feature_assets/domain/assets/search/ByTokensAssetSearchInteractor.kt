@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
+import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
@@ -22,14 +23,16 @@ import kotlinx.coroutines.flow.map
 
 class ByTokensAssetSearchInteractor(
     private val assetSearchUseCase: AssetSearchUseCase,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val tradeTokenRegistry: TradeTokenRegistry
 ) : AssetSearchInteractor {
 
-    override fun buyAssetSearch(
+    override fun tradeAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
+        tradeFlow: TradeTokenRegistry.TradeFlow
     ): Flow<AssetsByViewModeResult> {
-        val filter = { asset: Asset -> asset.token.configuration.buyProviders.isNotEmpty() }
+        val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeFlow) }
 
         return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
     }

@@ -23,6 +23,8 @@ import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -33,7 +35,7 @@ import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.Pric
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPriceChangeTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPricePriceTextInjector
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -70,7 +72,7 @@ class BalanceDetailViewModel(
     private val sendInteractor: SendInteractor,
     private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
-    buyMixinFactory: BuyMixin.Factory,
+    tradeMixinFactory: TradeMixin.Factory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
@@ -79,7 +81,8 @@ class BalanceDetailViewModel(
     private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetIconProvider: AssetIconProvider,
-    private val chartsInteractor: ChartsInteractor
+    private val chartsInteractor: ChartsInteractor,
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -126,9 +129,11 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
+    val buySellSelectorMixin = buySellSelectorMixinFactory.create()
+
     val chainUI = chainFlow.map { mapChainToUi(it) }
 
-    val buyMixin = buyMixinFactory.create(scope = this)
+    val buyMixin = tradeMixinFactory.create(scope = this)
 
     val swapButtonEnabled = assetFlow.flatMapLatest {
         swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
@@ -136,8 +141,8 @@ class BalanceDetailViewModel(
         .onStart { emit(false) }
         .shareInBackground()
 
-    val buyEnabled: Flow<Boolean> = assetFlow
-        .flatMapLatest { buyMixin.buyEnabledFlow(it.token.configuration) }
+    val buySellEnabled: Flow<Boolean> = assetFlow
+        .flatMapLatest { buyMixin.tradeEnabledFlow(it.token.configuration) }
         .inBackground()
         .share()
 
@@ -230,7 +235,7 @@ class BalanceDetailViewModel(
     fun buyClicked() = checkControllableAsset {
         launch {
             val chainAsset = assetFlow.first().token.configuration
-            buyMixin.buyClicked(chainAsset)
+            buySellSelectorMixin.openSelector(BuySellSelectorMixin.Selector.Asset(chainAsset.chainId, chainAsset.id))
         }
     }
 

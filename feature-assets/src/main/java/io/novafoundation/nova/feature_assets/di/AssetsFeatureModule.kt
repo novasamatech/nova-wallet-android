@@ -38,9 +38,11 @@ import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
+import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
@@ -84,16 +86,17 @@ class AssetsFeatureModule {
     fun provideSearchInteractorFactory(
         assetViewModeRepository: AssetsViewModeRepository,
         assetSearchUseCase: AssetSearchUseCase,
-        chainRegistry: ChainRegistry
-    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry)
+        chainRegistry: ChainRegistry,
+        tradeTokenRegistry: TradeTokenRegistry
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry, tradeTokenRegistry)
 
     @Provides
     @FeatureScope
     fun provideAssetNetworksInteractor(
         chainRegistry: ChainRegistry,
-        swapService: SwapService,
-        assetSearchUseCase: AssetSearchUseCase
-    ) = AssetNetworksInteractor(chainRegistry, swapService, assetSearchUseCase)
+        assetSearchUseCase: AssetSearchUseCase,
+        tradeTokenRegistry: TradeTokenRegistry
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry)
 
     @Provides
     @FeatureScope
@@ -238,5 +241,13 @@ class AssetsFeatureModule {
         currencyRepository: CurrencyRepository
     ): ChartsInteractor {
         return RealChartsInteractor(coinPriceRepository, currencyRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBuySellMixinFactory(
+        assetsRouter: AssetsRouter
+    ): BuySellSelectorMixinFactory {
+        return BuySellSelectorMixinFactory(assetsRouter)
     }
 }

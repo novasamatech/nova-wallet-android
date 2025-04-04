@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
@@ -65,7 +66,7 @@ class BalanceListFragment :
     private val emptyAssetsPlaceholder by lazy(LazyThreadSafetyMode.NONE) {
         EditablePlaceholderAdapter(
             model = getAssetsPlaceholderModel(),
-            clickListener = { buyClicked() }
+            clickListener = { buySellClicked() }
         )
     }
 
@@ -120,6 +121,8 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
+        setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
+
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
             balanceListAssets.invalidateItemDecorations()
         }
@@ -216,8 +219,8 @@ class BalanceListFragment :
         viewModel.receiveClicked()
     }
 
-    override fun buyClicked() {
-        viewModel.buyClicked()
+    override fun buySellClicked() {
+        viewModel.buySellClicked()
     }
 
     override fun novaCardClick() {

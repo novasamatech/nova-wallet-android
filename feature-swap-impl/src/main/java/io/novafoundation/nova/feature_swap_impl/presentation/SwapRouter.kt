@@ -27,4 +27,6 @@ interface SwapRouter : ReturnableRouter {
     fun openReceive(assetPayload: AssetPayload)
 
     fun openBalanceDetails(assetPayload: AssetPayload)
+
+    fun openBuyToken(chainId: String, assetId: Int)
 }

@@ -105,8 +105,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
         viewModel.feeMixin.setupFeeLoading(swapMainSettingsDetailsNetworkFee)
 
-        buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
-
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.swapRouteState.observe(swapMainSettingsRoute::setSwapRouteState)
         viewModel.swapExecutionTime.observe(swapMainSettingsExecutionTime::showLoadingValue)

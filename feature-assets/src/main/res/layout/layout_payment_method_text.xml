@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/paymentMethodText"
+    style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+    android:layout_width="24dp"
+    android:layout_height="16dp"
+    android:layout_marginStart="6dp"
+    android:gravity="center"
+    android:background="@drawable/chips_background_2"
+    android:textColor="@color/chip_text" />

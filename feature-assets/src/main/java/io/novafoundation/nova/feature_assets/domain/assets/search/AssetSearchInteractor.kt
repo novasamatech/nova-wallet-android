@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
+import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -16,9 +17,10 @@ typealias AssetSearchFilter = suspend (Asset) -> Boolean
 
 interface AssetSearchInteractor {
 
-    fun buyAssetSearch(
+    fun tradeAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
+        tradeFlow: TradeTokenRegistry.TradeFlow
     ): Flow<AssetsByViewModeResult>
 
     fun sendAssetSearch(
