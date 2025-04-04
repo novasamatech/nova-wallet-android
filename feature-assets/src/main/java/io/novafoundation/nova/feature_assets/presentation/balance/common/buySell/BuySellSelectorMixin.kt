@@ -6,9 +6,9 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixin.Selector
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin.Selector
 
-interface BuySellMixin {
+interface BuySellSelectorMixin {
 
     sealed interface Selector {
 
@@ -24,20 +24,20 @@ interface BuySellMixin {
     fun openSelector(selector: Selector)
 }
 
-class RealBuySellMixin(
+class RealBuySellSelectorMixin(
     private val router: AssetsRouter
-) : BuySellMixin {
+) : BuySellSelectorMixin {
 
-    override val actionLiveData: MutableLiveData<Event<BuySellMixin.SelectorPayload>> = MutableLiveData()
+    override val actionLiveData: MutableLiveData<Event<BuySellSelectorMixin.SelectorPayload>> = MutableLiveData()
 
     override fun openSelector(selector: Selector) {
         val payload = when (selector) {
-            Selector.AllAssets -> BuySellMixin.SelectorPayload(
+            Selector.AllAssets -> BuySellSelectorMixin.SelectorPayload(
                 buyItem { router.openBuyFlow() },
                 sellItem { router.openSellFlow() }
             )
 
-            is Selector.Asset -> BuySellMixin.SelectorPayload(
+            is Selector.Asset -> BuySellSelectorMixin.SelectorPayload(
                 buyItem { router.openBuyFlow() },
                 sellItem { router.openSellFlow() }
             )

@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.buySel
 
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
-class BuySellMixinFactory(
+class BuySellSelectorMixinFactory(
     private val router: AssetsRouter
 ) {
 
-    fun create(): BuySellMixin = RealBuySellMixin(router)
+    fun create(): BuySellSelectorMixin = RealBuySellSelectorMixin(router)
 }
