@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.deliveryFeesOrNull
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.paidByAccountOrNull
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.IncomingDirection
@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
 private const val INCOMING_DIRECTIONS = "RealCrossChainTransfersUseCase.INCOMING_DIRECTIONS"
@@ -110,8 +111,19 @@ internal class RealCrossChainTransfersUseCase(
         return crossChainTransfersRepository.getConfiguration()
     }
 
-    override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
-        return crossChainTransactor.requiredRemainingAmountAfterTransfer(sendingAsset, originChain)
+    override suspend fun requiredRemainingAmountAfterTransfer(
+        originChain: Chain,
+        sendingAsset: Chain.Asset,
+        destinationChain: Chain,
+    ): Balance {
+        val xcmConfig = cachedConfigurationFlow(CoroutineScope(coroutineContext)).first()
+        val transferConfig = xcmConfig.transferConfiguration(
+            originChain = parachainInfoRepository.getXcmChain(originChain),
+            originAsset = sendingAsset,
+            destinationChain = parachainInfoRepository.getXcmChain(destinationChain),
+        )!!
+
+        return crossChainTransactor.requiredRemainingAmountAfterTransfer(transferConfig)
     }
 
     override suspend fun ExtrinsicService.estimateFee(
@@ -133,13 +145,12 @@ internal class RealCrossChainTransfersUseCase(
 
         CrossChainTransferFee(
             submissionFee = originFee,
-            deliveryFee = crossChainFee.deliveryFeesOrNull()?.let {
-                // Delivery fees are also paid by an actual account
+            postSubmissionByAccount = crossChainFee.paidByAccountOrNull()?.let {
                 val submissionOrigin = SubmissionOrigin.singleOrigin(originFee.submissionOrigin.signingAccount)
                 SubstrateFee(it, submissionOrigin, transfer.originChain.commissionAsset)
             },
-            executionFee = SubstrateFeeBase(
-                amount = crossChainFee.executionFees,
+            postSubmissionFromAmount = SubstrateFeeBase(
+                amount = crossChainFee.paidFromHolding,
                 asset = transfer.originChainAsset,
             ),
         )

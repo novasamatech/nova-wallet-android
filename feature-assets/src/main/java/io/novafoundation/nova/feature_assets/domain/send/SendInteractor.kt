@@ -40,10 +40,10 @@ class SendInteractor(
 
             val originFee = OriginFee(
                 submissionFee = fees.submissionFee,
-                deliveryFee = fees.deliveryFee,
+                deliveryFee = fees.postSubmissionByAccount,
             )
 
-            TransferFee(originFee, fees.executionFee)
+            TransferFee(originFee, fees.postSubmissionFromAmount)
         } else {
             TransferFee(
                 originFee = getOriginFee(transfer, coroutineScope),
