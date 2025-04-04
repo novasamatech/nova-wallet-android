@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_buy_impl.domain.providers.transak
+package io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.transak
 
 import android.util.Log
 import android.webkit.JavascriptInterface
-import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
-import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
 import org.json.JSONObject
 
 class TransakJsEventBridge(

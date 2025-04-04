@@ -14,11 +14,12 @@ import io.novafoundation.nova.feature_assets.presentation.novacard.overview.mode
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo.MercuryoSellRequestInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.common.trade.callback.TradeSellCallback
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressPayload
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressRequester
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressResponder
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -41,9 +42,7 @@ class NovaCardViewModel(
     private val novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory,
     private val topUpRequester: TopUpAddressRequester,
     private val resourceManager: ResourceManager
-) : BaseViewModel(), CardCreationInterceptor.Callback, TradeSellCallback {
-
-    private val openedOrderIds = mutableSetOf<String>()
+) : BaseViewModel(), CardCreationInterceptor.Callback, OnSellOrderCreatedListener, OnTradeOperationFinishedListener {
 
     private val metaAccount = flowOf { accountInteractor.selectedMetaAccount() }
 
@@ -59,7 +58,7 @@ class NovaCardViewModel(
         novaCardWebViewControllerFactory.create(
             interceptors = listOf(
                 cardCreationInterceptorFactory.create(this),
-                mercuryoSellRequestInterceptorFactory.create(this)
+                mercuryoSellRequestInterceptorFactory.create(this, this)
             ),
             setupConfig = setupConfig,
             scope = viewModelScope
@@ -72,10 +71,7 @@ class NovaCardViewModel(
         observeTopUp()
     }
 
-    override fun onSellStart(orderId: String, amount: BigDecimal, address: String) {
-        if (orderId in openedOrderIds) return // To not handle same order twice
-        openedOrderIds.add(orderId)
-
+    override fun onSellOrderCreated(orderId: String, address: String, amount: BigDecimal) {
         launch {
             val asset = setupCardConfig.first().spendToken
 
@@ -90,10 +86,8 @@ class NovaCardViewModel(
         }
     }
 
-    override fun onSellCompleted(orderId: String) {
+    override fun onTradeOperationFinished() {
         launch {
-            openedOrderIds.remove(orderId)
-
             novaCardInteractor.setTopUpFinishedEvent()
             setCardStateCreated()
         }

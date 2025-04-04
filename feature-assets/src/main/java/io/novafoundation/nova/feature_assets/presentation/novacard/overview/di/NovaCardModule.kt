@@ -21,11 +21,11 @@ import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.NovaCardViewModel
 import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
-import io.novafoundation.nova.common.utils.webView.NovaCardWebViewClientFactory
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.common.trade.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressCommunicator
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
@@ -48,18 +48,6 @@ class NovaCardModule {
     )
 
     @Provides
-    fun provideTopUpRequestInterceptorFactory(
-        gson: Gson,
-        okHttpClient: OkHttpClient
-    ): MercuryoSellRequestInterceptorFactory = MercuryoSellRequestInterceptorFactory(
-        gson = gson,
-        okHttpClient = okHttpClient
-    )
-
-    @Provides
-    fun provideNovaCardWebViewClientFactory() = NovaCardWebViewClientFactory()
-
-    @Provides
     fun provideBaseWebChromeClientFactory(
         permissionsAsker: WebViewPermissionAsker,
         webViewFileChooser: WebViewFileChooser
@@ -68,11 +56,11 @@ class NovaCardModule {
     @Provides
     fun provideNovaCardWebViewControllerFactory(
         appLinksProvider: AppLinksProvider,
-        novaCardWebViewClientFactory: NovaCardWebViewClientFactory,
+        interceptingWebViewClientFactory: InterceptingWebViewClientFactory,
         novaCardWebChromeClientFactory: BaseWebChromeClientFactory,
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
-            novaCardWebViewClientFactory,
+            interceptingWebViewClientFactory,
             novaCardWebChromeClientFactory,
             appLinksProvider,
             BuildConfig.NOVA_CARD_WIDGET_ID

@@ -12,10 +12,11 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressPayload
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressRequester
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressResponder
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeFlow
-import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
-import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
-import io.novafoundation.nova.feature_buy_api.domain.providers.WebViewIntegrationProvider
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.providers.WebViewIntegrationProvider
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -65,6 +66,12 @@ class TradeWebViewModel(
     }
 
     override fun onTradeOperationFinished() {
+        val messageResId = when (payload.type) {
+            TradeProviderFlowType.BUY -> R.string.buy_order_completed_message
+            TradeProviderFlowType.SELL -> R.string.sell_order_completed_message
+        }
+        showToast(resourceManager.getString(messageResId))
+
         router.returnToMainScreen()
     }
 

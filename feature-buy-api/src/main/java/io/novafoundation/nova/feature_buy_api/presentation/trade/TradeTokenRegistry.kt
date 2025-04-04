@@ -1,9 +1,9 @@
-package io.novafoundation.nova.feature_buy_api.domain
+package io.novafoundation.nova.feature_buy_api.presentation.trade
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import io.novafoundation.nova.feature_buy_api.domain.common.OnTradeOperationFinishedListener
-import io.novafoundation.nova.feature_buy_api.domain.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias TradeProvider = TradeTokenRegistry.Provider<*>

@@ -1,7 +1,7 @@
-package io.novafoundation.nova.feature_buy_api.domain.providers
+package io.novafoundation.nova.feature_buy_api.presentation.trade.providers
 
 import android.webkit.WebView
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 
 interface WebViewIntegrationProvider : TradeTokenRegistry.Provider<WebViewIntegrationProvider.Integrator> {
 

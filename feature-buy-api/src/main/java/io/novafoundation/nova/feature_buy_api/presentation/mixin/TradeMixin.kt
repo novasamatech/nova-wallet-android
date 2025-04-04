@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_buy_api.presentation.mixin
 
 import io.novafoundation.nova.common.mixin.MixinFactory
-import io.novafoundation.nova.feature_buy_api.domain.TradeProvider
-import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeProvider
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
