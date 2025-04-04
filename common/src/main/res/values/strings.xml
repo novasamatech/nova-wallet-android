@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="account_ledger_import_start_step_otg">%s in your phone settings</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Enable OTG</string>
+
+    <string name="select_ledger_grant_permissions">Enable Bluetooth &amp; Grant Permissions</string>
+
     <string name="ledger_verify_address_message_both_buttons">Press both buttons on your %s to approve the address</string>
     <string name="ledger_verify_address_message_confirm_button">Press confirm button on your %s to approve the address</string>
     <string name="ledger_hold_to_sign">Hold confirm button on your %s to approve the transaction</string>
@@ -12,6 +17,7 @@
     <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
 
+    <string name="account_ledger_select_device_all_description">If using a Ledger via Bluetooth, enable Bluetooth on both devices and grant Nova Bluetooth and location permissions. For USB, enable OTG in your phone settings.</string>
     <string name="account_ledger_select_device_usb_description">Please, enable Ledger device. Unlock your Ledger device and open the %s app.</string>
 
     <!--<string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>-->

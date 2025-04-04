@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -25,6 +26,7 @@ import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerHints
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress
 import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerGrantPermissions
 
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>(), SelectLedgerAdapter.Handler {
 
@@ -63,6 +65,8 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         onBackPressed { viewModel.backClicked() }
         selectLedgerToolbar.applyStatusBarInsets()
 
+        selectLedgerGrantPermissions.setOnClickListener { viewModel.requirePermissionsAndEnableBluetooth() }
+
         selectLedgerDevices.setHasFixedSize(true)
         selectLedgerDevices.adapter = adapter
     }
@@ -85,6 +89,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         }
 
         viewModel.hints.observe(selectLedgerHints::setText)
+        viewModel.showPermissionsButton.observe { selectLedgerGrantPermissions.isVisible = it }
 
         setupPermissionAsker(viewModel)
         setupLedgerMessages(ledgerMessagePresentable)
