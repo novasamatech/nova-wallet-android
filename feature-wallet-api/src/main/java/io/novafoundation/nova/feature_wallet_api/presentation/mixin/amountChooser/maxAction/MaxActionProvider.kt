@@ -28,6 +28,10 @@ interface MaxActionProviderDsl {
 
     companion object : MaxActionProviderDsl
 
+    fun Flow<Asset>.providingMaxOf(field: suspend (Asset) -> Balance): MaxActionProvider {
+        return AssetMaxActionProvider(this, field)
+    }
+
     fun Flow<Asset>.providingMaxOf(field: (Asset) -> Balance): MaxActionProvider {
         return AssetMaxActionProvider(this, field)
     }

@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.di.ConfirmGovernanceUnlockComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.di.GovernanceLocksOverviewComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -132,6 +133,7 @@ interface GovernanceFeatureComponent : GovernanceFeatureApi {
             AccountFeatureApi::class,
             DAppFeatureApi::class,
             DbApi::class,
+            XcmFeatureApi::class,
             DeepLinkBuildingFeatureApi::class
         ]
     )

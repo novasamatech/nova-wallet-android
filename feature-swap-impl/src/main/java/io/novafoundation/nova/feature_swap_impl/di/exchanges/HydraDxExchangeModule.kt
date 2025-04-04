@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
@@ -61,7 +62,8 @@ class HydraDxExchangeModule {
         quotingFactory: HydraDxQuoting.Factory,
         hydrationFeeInjector: HydrationFeeInjector,
         chainStateRepository: ChainStateRepository,
-        swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase
+        swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
+        hydrationPriceConversionFallback: HydrationPriceConversionFallback,
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
@@ -72,7 +74,8 @@ class HydraDxExchangeModule {
             quotingFactory = quotingFactory,
             hydrationFeeInjector = hydrationFeeInjector,
             chainStateRepository = chainStateRepository,
-            swapDeductionUseCase = swapDeductionUseCase
+            swapDeductionUseCase = swapDeductionUseCase,
+            hydrationPriceConversionFallback = hydrationPriceConversionFallback
         )
     }
 }

@@ -46,7 +46,10 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -54,10 +57,9 @@ import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
+import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -117,6 +119,10 @@ interface AccountFeatureDependencies {
     val xcmVersionDetector: XcmVersionDetector
 
     val chainStateRepository: ChainStateRepository
+
+    val metadataShortenerService: MetadataShortenerService
+
+    val hydrationPriceConversionFallback: HydrationPriceConversionFallback
 
     fun appLinksProvider(): AppLinksProvider
 

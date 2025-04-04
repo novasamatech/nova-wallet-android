@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetAndOption
 import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class AssetSelectorFactory(
     private val assetIconProvider: AssetIconProvider,
@@ -30,7 +30,7 @@ class AssetSelectorFactory(
 
     fun create(
         scope: CoroutineScope,
-        amountProvider: (Asset) -> BigDecimal
+        amountProvider: suspend (SelectableAssetAndOption) -> Balance
     ): AssetSelectorMixin.Presentation {
         return AssetSelectorProvider(assetIconProvider, assetUseCase, resourceManager, singleAssetSharedState, scope, amountProvider)
     }
@@ -42,7 +42,7 @@ private class AssetSelectorProvider(
     private val resourceManager: ResourceManager,
     private val singleAssetSharedState: SingleAssetSharedState,
     private val scope: CoroutineScope,
-    private val amountProvider: (Asset) -> BigDecimal
+    private val amountProvider: suspend (SelectableAssetAndOption) -> Balance
 ) : AssetSelectorMixin.Presentation, CoroutineScope by scope, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 
     override val showAssetChooser = MutableLiveData<Event<DynamicListBottomSheet.Payload<AssetSelectorModel>>>()
@@ -60,7 +60,7 @@ private class AssetSelectorProvider(
         launch {
             val availableToSelect = assetUseCase.availableAssetsToSelect()
 
-            val models = availableToSelect.map(::mapAssetAndOptionToSelectorModel)
+            val models = availableToSelect.map { mapAssetAndOptionToSelectorModel(it) }
             val selectedOption = selectedAssetAndOptionFlow.first()
             val selectedChainAsset = selectedOption.asset.token.configuration
 
@@ -82,14 +82,14 @@ private class AssetSelectorProvider(
         )
     }
 
-    private fun mapAssetAndOptionToSelectorModel(assetAndOption: SelectableAssetAndOption): AssetSelectorModel {
+    private suspend fun mapAssetAndOptionToSelectorModel(assetAndOption: SelectableAssetAndOption): AssetSelectorModel {
         val assetModel = mapAssetToAssetModel(
             assetIconProvider,
             assetAndOption.asset,
             resourceManager,
             icon = assetAndOption.option.assetWithChain.chain.iconOrFallback(),
             patternId = null,
-            retrieveAmount = amountProvider
+            balance = amountProvider(assetAndOption)
         )
         val title = assetAndOption.formatTitle()
 

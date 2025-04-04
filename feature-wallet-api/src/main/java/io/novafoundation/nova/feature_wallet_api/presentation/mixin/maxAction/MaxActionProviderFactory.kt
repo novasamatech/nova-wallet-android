@@ -24,8 +24,8 @@ class MaxActionProviderFactory(
         viewModelScope: CoroutineScope,
         assetInFlow: Flow<Asset>,
         feeLoaderMixin: FeeLoaderMixinV2<F, *>,
-        balance: (Asset) -> BigInteger,
-        deductEd: Flow<Boolean>
+        balance: suspend (Asset) -> BigInteger,
+        deductEd: Flow<Boolean> = flowOf(false)
     ): MaxActionProvider {
         return MaxActionProvider.create(viewModelScope) {
             assetInFlow.providingMaxOf(balance)

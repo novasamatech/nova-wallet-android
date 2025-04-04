@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNotNullToSet
+import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
@@ -308,9 +309,7 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
 }
 
 suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeContext.() -> R): R {
-    return with(RuntimeContext(getRuntime(chainId))) {
-        action()
-    }
+    return getRuntime(chainId).provideContext(action)
 }
 
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
@@ -387,6 +386,9 @@ fun ChainRegistry.enabledChainsFlow() = currentChains
     .filterList { it.isEnabled }
 
 suspend fun ChainRegistry.enabledChains() = enabledChainsFlow().first()
+
+suspend fun ChainRegistry.disabledChains() = currentChains.filterList { it.isDisabled }
+    .first()
 
 fun ChainRegistry.enabledChainByIdFlow() = enabledChainsFlow().map { chains -> chains.associateBy { it.id } }
 

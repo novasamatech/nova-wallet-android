@@ -3,14 +3,14 @@ package io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.assetConversionOrNull
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 
 interface AssetHubFeePaymentAssetsFetcher {
 
@@ -47,7 +47,7 @@ private class RealAssetHubFeePaymentAssetsFetcher(
         }
     }
 
-    private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<MultiLocation, MultiLocation>>): Set<Int> {
+    private suspend fun constructAvailableCustomFeeAssets(pools: List<Pair<RelativeMultiLocation, RelativeMultiLocation>>): Set<Int> {
         return pools.mapNotNullToSet { (firstLocation, secondLocation) ->
             val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@mapNotNullToSet null
             if (!firstAsset.isUtilityAsset) return@mapNotNullToSet null

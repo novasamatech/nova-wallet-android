@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackMo
 import io.novafoundation.nova.feature_governance_impl.presentation.track.formatTracks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -166,11 +167,14 @@ class NewDelegationConfirmViewModel(
     fun confirmClicked() = launch {
         val asset = assetFlow.first()
         val amountPlanks = asset.token.planksFromAmount(payload.amount)
+        val maxAmount = interactor.maxAvailableBalanceToDelegate(asset)
+        val maxPlanks = asset.token.amountFromPlanks(maxAmount)
         val validationPayload = ChooseDelegationAmountValidationPayload(
             asset = asset,
             fee = decimalFee,
             amount = payload.amount,
-            delegate = payload.delegate
+            delegate = payload.delegate,
+            maxAvailableAmount = maxPlanks
         )
 
         validationExecutor.requireValid(

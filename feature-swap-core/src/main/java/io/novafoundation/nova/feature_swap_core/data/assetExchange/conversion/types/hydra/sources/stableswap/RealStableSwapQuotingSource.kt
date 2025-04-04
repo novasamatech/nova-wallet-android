@@ -29,7 +29,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.encrypt.json.asLittleEndianBytes
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId

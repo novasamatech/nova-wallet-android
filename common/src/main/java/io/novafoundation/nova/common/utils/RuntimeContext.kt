@@ -15,5 +15,11 @@ fun RuntimeContext(runtime: RuntimeSnapshot): RuntimeContext {
     return InlineRuntimeContext(runtime)
 }
 
+inline fun <R> RuntimeSnapshot.provideContext(action: RuntimeContext.() -> R): R {
+    return with(RuntimeContext(this)) {
+        action()
+    }
+}
+
 @JvmInline
 private value class InlineRuntimeContext(override val runtime: RuntimeSnapshot) : RuntimeContext

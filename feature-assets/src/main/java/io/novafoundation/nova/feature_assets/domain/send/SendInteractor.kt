@@ -10,11 +10,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.transferConfiguration
+import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.CoroutineScope
@@ -68,8 +69,8 @@ class SendInteractor(
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
-            with(crossChainTransactor) {
-                extrinsicService.performTransfer(config, transfer, crossChainFee!!.amount)
+            with(extrinsicService) {
+                crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amount)
             }
         } else {
             val submissionFee = originFee.submissionFee
@@ -93,9 +94,8 @@ class SendInteractor(
     private fun getAssetTransfers(transfer: AssetTransfer) = assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers
 
     private suspend fun CrossChainTransfersConfiguration.configurationFor(transfer: AssetTransfer) = transferConfiguration(
-        originChain = transfer.originChain,
+        originChain = parachainInfoRepository.getXcmChain(transfer.originChain),
         originAsset = transfer.originChainAsset,
-        destinationChain = transfer.destinationChain,
-        destinationParaId = parachainInfoRepository.paraId(transfer.destinationChain.id)
+        destinationChain = parachainInfoRepository.getXcmChain(transfer.destinationChain),
     )
 }

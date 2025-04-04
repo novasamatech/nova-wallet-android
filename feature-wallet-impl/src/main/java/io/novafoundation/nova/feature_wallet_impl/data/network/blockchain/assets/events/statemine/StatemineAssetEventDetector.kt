@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.AssetEventDetector
@@ -51,7 +51,7 @@ class StatemineAssetEventDetector(
         if (assetIdAsString != targetAssetId) return null
 
         return DepositEvent(
-            destination = bindAccountId(who),
+            destination = bindAccountIdKey(who),
             amount = bindNumber(amount)
         )
     }
