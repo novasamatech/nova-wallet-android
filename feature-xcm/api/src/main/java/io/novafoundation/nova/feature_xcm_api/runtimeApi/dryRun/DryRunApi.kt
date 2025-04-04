@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.DryRunEffe
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.XcmDryRunEffects
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcmLocation
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
@@ -21,6 +22,7 @@ interface DryRunApi {
     suspend fun dryRunCall(
         originCaller: OriginCaller,
         call: GenericCall.Instance,
+        xcmResultsVersion: XcmVersion,
         chainId: ChainId
     ): Result<ScaleResult<CallDryRunEffects, DryRunEffectsResultErr>>
 }

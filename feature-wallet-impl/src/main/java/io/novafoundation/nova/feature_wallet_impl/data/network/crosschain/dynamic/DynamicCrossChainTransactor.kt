@@ -2,10 +2,8 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.composeCall
-import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -14,7 +12,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.destinationChainLocationOnOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferReserve
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.transferType
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
@@ -40,9 +37,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
-import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -92,14 +86,14 @@ class DynamicCrossChainTransactor @Inject constructor(
     private suspend fun shouldUseXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {
         val supportsXcmExecute = configuration.supportsXcmExecute
         val hasXcmPaymentApi = xcmPaymentApi.isSupported(configuration.originChainId)
-        
+
         // For now, only enable xcm execute approach for the directions that will hugely benefit from it
         // In particular, xcm execute allows us to pay delivery fee from the holding register and not in JIT mode (from account)
         val hasDeliveryFee = configuration.hasDeliveryFee
-        
+
         return supportsXcmExecute && hasXcmPaymentApi && hasDeliveryFee
     }
-    
+
     private suspend fun composeTransferAssetsCall(
         configuration: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
@@ -159,31 +153,31 @@ class DynamicCrossChainTransactor @Inject constructor(
     ) {
         val totalTransferAmount = transfer.amountPlanks + crossChainFee
 
-        when (configuration.transferType()) {
-            XcmTransferReserve.TELEPORT -> buildTeleportProgram(
+        when (val transferType = configuration.transferType) {
+            XcmTransferReserve.Teleport -> buildTeleportProgram(
                 assetLocation = configuration.assetAbsoluteLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount
             )
 
-            XcmTransferReserve.ORIGIN_RESERVE -> buildOriginReserveProgram(
+            XcmTransferReserve.Reserve.Origin -> buildOriginReserveProgram(
                 assetLocation = configuration.assetAbsoluteLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount
             )
 
-            XcmTransferReserve.DESTINATION_RESERVE -> buildDestinationReserveProgram(
+            XcmTransferReserve.Reserve.Destination -> buildDestinationReserveProgram(
                 assetLocation = configuration.assetAbsoluteLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount
             )
 
-            XcmTransferReserve.REMOTE_RESERVE -> buildRemoteReserveProgram(
+            is XcmTransferReserve.Reserve.Remote -> buildRemoteReserveProgram(
                 assetLocation = configuration.assetAbsoluteLocation,
-                remoteReserveLocation = configuration.remoteReserveChainLocation!!,
+                remoteReserveLocation = transferType.remoteReserveLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount

@@ -12,18 +12,19 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.remoteReserveLocation
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeDispatchAs
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.AssetIssuerRegistry
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.asset.requireFungible
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.senderXcmVersion
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.DryRunEffects
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.getByLocation
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.senderXcmVersion
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.getInnerSuccessOrThrow
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
@@ -89,7 +90,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         val dryRunResult = dryRunApi.dryRunCall(OriginCaller.System.Root, dryRunCall, xcmResultsVersion, config.originChainId)
             .getInnerSuccessOrThrow(LOG_TAG)
 
-        val nextHopLocation = (config.remoteReserveChainLocation ?: config.destinationChainLocation).location
+        val nextHopLocation = (config.transferType.remoteReserveLocation() ?: config.destinationChainLocation).location
 
         val forwardedXcm = searchForwardedXcm(
             dryRunEffects = dryRunResult,
@@ -106,7 +107,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         forwardedFromOrigin: VersionedRawXcmMessage,
     ): IntermediateDryRunResult {
         // No remote reserve - nothing to dry run, return unchanged value
-        val remoteReserveLocation = config.remoteReserveChainLocation
+        val remoteReserveLocation = config.transferType.remoteReserveLocation()
             ?: return IntermediateDryRunResult(forwardedFromOrigin, Balance.ZERO, Balance.ZERO)
 
         val runtime = chainRegistry.getRuntime(remoteReserveLocation.chainId)
@@ -137,7 +138,7 @@ class DynamicCrossChainWeigher @Inject constructor(
         transfer: AssetTransferBase,
         forwardedFromPrevious: VersionedRawXcmMessage,
     ): FinalDryRunResult {
-        val previousLocation = (config.remoteReserveChainLocation ?: config.originChainLocation).location
+        val previousLocation = (config.transferType.remoteReserveLocation() ?: config.originChainLocation).location
         val destinationLocation = config.destinationChainLocation
 
         val usedXcmVersion = forwardedFromPrevious.version

@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTran
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.TokenReserve
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferReserve
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemote
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.remoteReserveLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
 import io.novafoundation.nova.feature_xcm_api.chain.absoluteLocation
@@ -23,34 +24,31 @@ class DynamicCrossChainTransferConfiguration(
     val supportsXcmExecute: Boolean
 ) : CrossChainTransferConfigurationBase {
 
-    val assetAbsoluteLocation = reserve.location
+    val assetAbsoluteLocation = reserve.tokenLocation
 
     val originChainLocation = originChain.chainLocation()
     val destinationChainLocation = destinationChain.chainLocation()
-    val assetLocationOnOrigin = reserve.location.fromPointOfViewOf(originChain.absoluteLocation())
+    val assetLocationOnOrigin = assetAbsoluteLocation.fromPointOfViewOf(originChain.absoluteLocation())
 
-    val remoteReserveChainLocation = if (reserve.isRemote(originChain.chain.id, destinationChain.chain.id)) {
-        ChainLocation(reserve.chainId, reserve.location)
-    } else {
-        null
-    }
+    val transferType = transferType()
 
     override val originChainId: ChainId = originChain.chain.id
     override val destinationChainId: ChainId = destinationChain.chain.id
-    override val remoteReserveChainId: ChainId? = remoteReserveChainLocation?.chainId
-}
+    override val remoteReserveChainId: ChainId? = transferType.remoteReserveLocation()?.chainId
 
-fun DynamicCrossChainTransferConfiguration.transferType(): XcmTransferReserve {
-    return when {
-        shouldUseTeleport() -> XcmTransferReserve.TELEPORT
-        originChainId == reserve.chainId -> XcmTransferReserve.ORIGIN_RESERVE
-        destinationChainId == reserve.chainId -> XcmTransferReserve.DESTINATION_RESERVE
-        else -> XcmTransferReserve.REMOTE_RESERVE
+    private fun transferType(): XcmTransferReserve {
+        return when {
+            shouldUseTeleport() -> XcmTransferReserve.Teleport
+            originChainId == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Origin
+            destinationChainId == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Destination
+            else -> XcmTransferReserve.Reserve.Remote(reserve.reserveChainLocation)
+        }
     }
 }
 
+
 private fun DynamicCrossChainTransferConfiguration.shouldUseTeleport(): Boolean {
-    val systemToRelay =  originChain.isSystemChain() && destinationChain.isRelay()
+    val systemToRelay = originChain.isSystemChain() && destinationChain.isRelay()
     val relayToSystem = originChain.isRelay() && destinationChain.isSystemChain()
 
     return systemToRelay || relayToSystem
