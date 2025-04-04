@@ -28,6 +28,7 @@ class ProxiedFeeSignerFactory(
     }
 }
 
+// TODO this should support remote proxies for better fee estimation
 class ProxiedFeeSigner(
     private val proxiedMetaAccount: MetaAccount,
     private val chain: Chain,
@@ -45,7 +46,6 @@ class ProxiedFeeSigner(
             proxyAccountId = getProxyAccountId(),
             currentProxyNonce = BigInteger.ZERO,
             proxyType = ProxyType.Any,
-            call = payloadExtrinsic.call
         )
 
         return delegator.signExtrinsic(modifiedPayloadExtrinsic)
@@ -85,7 +85,7 @@ class ProxiedFeeSigner(
 
     private suspend fun getProxyMetaAccount(): MetaAccount {
         if (proxyMetaAccount == null) {
-            proxyMetaAccount = accountRepository.getMetaAccount(proxiedMetaAccount.proxy!!.metaId)
+            proxyMetaAccount = accountRepository.getMetaAccount(proxiedMetaAccount.proxy!!.proxyMetaId)
         }
 
         return requireNotNull(proxyMetaAccount)

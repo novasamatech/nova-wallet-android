@@ -8,11 +8,15 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.proxy
 import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
+import io.novafoundation.nova.feature_proxy_api.data.model.RelaychainRemoteProxyProof
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_proxy_api.data.storage.blockToRoot
+import io.novafoundation.nova.feature_proxy_api.data.storage.remoteProxyRelayChain
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.model.fromString
 import io.novafoundation.nova.feature_proxy_impl.data.common.RealNestedProxiesGraphConstructor
@@ -20,11 +24,16 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.withRuntime
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import java.math.BigInteger
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -43,6 +52,7 @@ class RealGetProxyRepository(
     private val remoteSource: StorageDataSource,
     private val localSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val rpcCalls: RpcCalls,
 ) : GetProxyRepository {
 
     override suspend fun findAllProxiedsForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<NestedProxiesGraphConstructor.Node> {
@@ -111,6 +121,29 @@ class RealGetProxyRepository(
             .map { it.size }
     }
 
+    override suspend fun getRelaychainProxyProof(
+        mainProxyChainId: ChainId,
+        remoteProxyChainId: ChainId,
+        proxiedAccountId: AccountId
+    ): RelaychainRemoteProxyProof {
+        val proxyDefinitionKey = chainRegistry.withRuntime(mainProxyChainId) {
+            // TODO typed api
+            metadata.proxy().storage("Proxies").storageKey(runtime, proxiedAccountId)
+        }
+
+        val proofBlock = remoteSource.query(remoteProxyChainId) {
+            metadata.remoteProxyRelayChain.blockToRoot.queryNonNull().last().block
+        }
+        val proofBlockHash = rpcCalls.getBlockHash(mainProxyChainId, proofBlock)
+
+        val stateProof = rpcCalls.getReadProof(mainProxyChainId, listOf(proxyDefinitionKey), at = proofBlockHash)
+
+        return RelaychainRemoteProxyProof(
+            proofBlock = proofBlock,
+            proof = stateProof.proof.map { it.fromHex() }
+        )
+    }
+
     private suspend fun getDelegatedProxyTypes(
         storageDataSource: StorageDataSource,
         chainId: ChainId,
@@ -137,7 +170,7 @@ class RealGetProxyRepository(
 
     private suspend fun receiveAllProxiesInChain(chainId: ChainId): Map<AccountIdKey, OnChainProxiedModel> {
         return remoteSource.query(chainId) {
-            runtime.metadata.module(Modules.PROXY)
+            runtime.metadata.proxy()
                 .storage("Proxies")
                 .entries(
                     keyExtractor = { (accountId: AccountId) -> AccountIdKey(accountId) },
