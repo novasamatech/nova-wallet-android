@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 
-class LedgerDeviceMapper(private val resourceManager: ResourceManager) {
+class LedgerDeviceFormatter(private val resourceManager: ResourceManager) {
 
     fun mapName(device: LedgerDevice): String = createDelegate(device).getName()
 

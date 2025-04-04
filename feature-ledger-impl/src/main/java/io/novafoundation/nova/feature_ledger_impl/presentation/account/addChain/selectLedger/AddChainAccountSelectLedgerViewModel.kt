@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 
@@ -28,7 +28,7 @@ class AddChainAccountSelectLedgerViewModel(
     locationManager: LocationManager,
     resourceManager: ResourceManager,
     messageFormatter: LedgerMessageFormatter,
-    ledgerDeviceMapper: LedgerDeviceMapper
+    ledgerDeviceFormatter: LedgerDeviceFormatter
 ) : SelectLedgerViewModel(
     discoveryServiceFactory = discoveryServiceFactory,
     permissionsAsker = permissionsAsker,
@@ -37,7 +37,7 @@ class AddChainAccountSelectLedgerViewModel(
     router = router,
     resourceManager = resourceManager,
     messageFormatter = messageFormatter,
-    ledgerDeviceMapper = ledgerDeviceMapper,
+    ledgerDeviceFormatter = ledgerDeviceFormatter,
     messageCommandFormatter = messageCommandFormatter,
     payload = payload
 ) {

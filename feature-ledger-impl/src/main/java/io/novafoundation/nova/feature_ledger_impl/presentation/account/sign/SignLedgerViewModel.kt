@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -53,7 +53,7 @@ class SignLedgerViewModel(
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
     locationManager: LocationManager,
-    ledgerDeviceMapper: LedgerDeviceMapper,
+    ledgerDeviceFormatter: LedgerDeviceFormatter,
 ) : SelectLedgerViewModel(
     discoveryServiceFactory = discoveryServiceFactory,
     permissionsAsker = permissionsAsker,
@@ -62,7 +62,7 @@ class SignLedgerViewModel(
     router = router,
     resourceManager = resourceManager,
     messageFormatter = messageFormatter,
-    ledgerDeviceMapper = ledgerDeviceMapper,
+    ledgerDeviceFormatter = ledgerDeviceFormatter,
     messageCommandFormatter = messageCommandFormatter,
     payload = payload
 ) {

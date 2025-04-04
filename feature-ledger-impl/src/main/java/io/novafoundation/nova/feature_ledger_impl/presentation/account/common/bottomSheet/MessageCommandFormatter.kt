@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Ledge
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter.MessageKind
 import io.novafoundation.nova.runtime.extrinsic.ValidityPeriod
@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.extrinsic.closeToExpire
 
 class MessageCommandFormatterFactory(
     private val resourceManager: ResourceManager,
-    private val deviceMapper: LedgerDeviceMapper
+    private val deviceMapper: LedgerDeviceFormatter
 ) {
 
     fun create(messageFormatter: LedgerMessageFormatter): MessageCommandFormatter {
@@ -25,7 +25,7 @@ class MessageCommandFormatterFactory(
 
 class MessageCommandFormatter(
     private val resourceManager: ResourceManager,
-    private val deviceMapper: LedgerDeviceMapper,
+    private val deviceMapper: LedgerDeviceFormatter,
     private val messageFormatter: LedgerMessageFormatter,
 ) {
 

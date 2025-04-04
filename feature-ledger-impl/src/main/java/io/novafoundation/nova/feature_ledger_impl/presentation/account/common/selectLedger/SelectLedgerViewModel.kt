@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
@@ -56,7 +56,7 @@ abstract class SelectLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val messageFormatter: LedgerMessageFormatter,
     private val payload: SelectLedgerPayload,
-    private val ledgerDeviceMapper: LedgerDeviceMapper,
+    private val ledgerDeviceFormatter: LedgerDeviceFormatter,
     private val messageCommandFormatter: MessageCommandFormatter,
 ) : BaseViewModel(),
     PermissionsAsker by permissionsAsker,
@@ -242,7 +242,7 @@ abstract class SelectLedgerViewModel(
         return devices.map {
             SelectLedgerModel(
                 id = it.id,
-                name = ledgerDeviceMapper.mapName(it),
+                name = ledgerDeviceFormatter.mapName(it),
                 isConnecting = it.id == connectingTo?.id
             )
         }

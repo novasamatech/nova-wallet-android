@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportViewModel
@@ -56,7 +56,7 @@ class SelectLedgerGenericImportModule {
         resourceManager: ResourceManager,
         messageFormatter: LedgerMessageFormatter,
         payload: SelectLedgerGenericPayload,
-        deviceMapperFactory: LedgerDeviceMapper,
+        deviceMapperFactory: LedgerDeviceFormatter,
         messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectLedgerGenericImportViewModel(

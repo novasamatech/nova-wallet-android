@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrati
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
@@ -94,7 +94,7 @@ class SignLedgerModule {
         interactor: SignLedgerInteractor,
         responder: LedgerSignCommunicator,
         messageFormatter: LedgerMessageFormatter,
-        deviceMapperFactory: LedgerDeviceMapper,
+        deviceMapperFactory: LedgerDeviceFormatter,
         messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SignLedgerViewModel(
@@ -110,7 +110,7 @@ class SignLedgerModule {
             payload = payload,
             responder = responder,
             interactor = interactor,
-            ledgerDeviceMapper = deviceMapperFactory,
+            ledgerDeviceFormatter = deviceMapperFactory,
             messageCommandFormatter = messageCommandFormatter
         )
     }

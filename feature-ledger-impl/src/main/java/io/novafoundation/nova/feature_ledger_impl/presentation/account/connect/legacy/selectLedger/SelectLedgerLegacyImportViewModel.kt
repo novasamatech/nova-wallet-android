@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrati
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceMapper
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
@@ -27,7 +27,7 @@ class SelectLedgerLegacyImportViewModel(
     locationManager: LocationManager,
     resourceManager: ResourceManager,
     messageFormatter: LedgerMessageFormatter,
-    ledgerDeviceMapper: LedgerDeviceMapper
+    ledgerDeviceFormatter: LedgerDeviceFormatter
 ) : SelectLedgerViewModel(
     discoveryServiceFactory = discoveryServiceFactory,
     permissionsAsker = permissionsAsker,
@@ -36,7 +36,7 @@ class SelectLedgerLegacyImportViewModel(
     router = router,
     resourceManager = resourceManager,
     messageFormatter = messageFormatter,
-    ledgerDeviceMapper = ledgerDeviceMapper,
+    ledgerDeviceFormatter = ledgerDeviceFormatter,
     messageCommandFormatter = messageCommandFormatter,
     payload = selectLedgerPayload
 ) {
