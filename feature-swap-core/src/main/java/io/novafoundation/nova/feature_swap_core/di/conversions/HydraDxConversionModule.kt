@@ -17,7 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
-@Module
+@Module(includes = [HydraDxBindsModule::class])
 class HydraDxConversionModule {
 
     @Provides

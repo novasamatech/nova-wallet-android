@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
@@ -120,6 +121,8 @@ interface AccountFeatureDependencies {
     val chainStateRepository: ChainStateRepository
 
     val metadataShortenerService: MetadataShortenerService
+
+    val hydrationPriceConversionFallback: HydrationPriceConversionFallback
 
     fun appLinksProvider(): AppLinksProvider
 
