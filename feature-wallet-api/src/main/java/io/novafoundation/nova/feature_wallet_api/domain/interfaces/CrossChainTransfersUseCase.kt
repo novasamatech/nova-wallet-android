@@ -32,8 +32,9 @@ interface CrossChainTransfersUseCase {
     suspend fun getConfiguration(): CrossChainTransfersConfiguration
 
     suspend fun requiredRemainingAmountAfterTransfer(
+        originChain: Chain,
         sendingAsset: Chain.Asset,
-        originChain: Chain
+        destinationChain: Chain,
     ): Balance
 
     /**

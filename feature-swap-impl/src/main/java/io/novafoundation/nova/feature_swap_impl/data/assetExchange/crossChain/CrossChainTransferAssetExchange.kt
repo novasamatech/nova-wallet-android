@@ -216,10 +216,11 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction {
-            val (chain, chainAsset) = chainRegistry.chainWithAsset(edge.from)
+            val (originChain, originChainAsset) = chainRegistry.chainWithAsset(edge.from)
+            val destinationChain = chainRegistry.getChain(edge.to.chainId)
 
             return SwapMaxAdditionalAmountDeduction(
-                fromCountedTowardsEd = crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(chainAsset, chain)
+                fromCountedTowardsEd = crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(originChain, originChainAsset, destinationChain)
             )
         }
 

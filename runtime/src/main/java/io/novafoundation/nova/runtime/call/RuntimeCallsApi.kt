@@ -1,6 +1,8 @@
 package io.novafoundation.nova.runtime.call
 
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
+import io.novafoundation.nova.common.utils.hasDetectedRuntimeApi
+import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
@@ -47,6 +49,11 @@ interface RuntimeCallsApi {
         arguments: Map<String, Any?>,
         returnBinding: (Any?) -> R
     ): R
+
+    fun isSupported(
+        section: String,
+        method: String
+    ): Boolean
 }
 
 suspend fun <R> RuntimeCallsApi.callCatching(
@@ -96,6 +103,10 @@ internal class RealRuntimeCallsApi(
         val decoded = response?.let { apiMethod.decodeOutput(runtime, it) }
 
         return returnBinding(decoded)
+    }
+
+    override fun isSupported(section: String, method: String): Boolean {
+        return runtime.metadata.hasDetectedRuntimeApi(section, method)
     }
 
     private fun decodeResponse(responseHex: String?, returnTypeName: String): Any? {

@@ -127,8 +127,11 @@ class RealCrossChainTransactor(
         }
     }
 
-    override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
-        return assetSourceRegistry.sourceFor(sendingAsset).balance.existentialDeposit(sendingAsset)
+    override suspend fun requiredRemainingAmountAfterTransfer(configuration: CrossChainTransferConfiguration): Balance {
+        return when(configuration) {
+            is CrossChainTransferConfiguration.Dynamic -> dynamic.requiredRemainingAmountAfterTransfer(configuration.config)
+            is CrossChainTransferConfiguration.Legacy -> legacy.requiredRemainingAmountAfterTransfer(configuration.config)
+        }
     }
 
     context(ExtrinsicService)

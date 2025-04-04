@@ -27,7 +27,7 @@ interface CrossChainTransactor {
         crossChainFee: Balance
     ): Result<ExtrinsicSubmission>
 
-    suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance
+    suspend fun requiredRemainingAmountAfterTransfer(configuration: CrossChainTransferConfiguration): Balance
 
     /**
      * @return result of actual received balance on destination

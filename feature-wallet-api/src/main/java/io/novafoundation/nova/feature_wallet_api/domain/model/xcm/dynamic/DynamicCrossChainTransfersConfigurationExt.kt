@@ -57,8 +57,10 @@ fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     return DynamicCrossChainTransferConfiguration(
         originChain = originXcmChain,
         destinationChain = destinationXcmChain,
+        originChainAsset = originAsset,
         reserve = reserve,
-        hasDeliveryFee = targetTransfer.hasDeliveryFee
+        hasDeliveryFee = targetTransfer.hasDeliveryFee,
+        supportsXcmExecute = targetTransfer.supportsXcmExecute
     )
 }
 

@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
 private const val INCOMING_DIRECTIONS = "RealCrossChainTransfersUseCase.INCOMING_DIRECTIONS"
@@ -110,8 +111,20 @@ internal class RealCrossChainTransfersUseCase(
         return crossChainTransfersRepository.getConfiguration()
     }
 
-    override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
-        return crossChainTransactor.requiredRemainingAmountAfterTransfer(sendingAsset, originChain)
+
+    override suspend fun requiredRemainingAmountAfterTransfer(
+        originChain: Chain,
+        sendingAsset: Chain.Asset,
+        destinationChain: Chain,
+    ): Balance {
+        val xcmConfig = cachedConfigurationFlow(CoroutineScope(coroutineContext)).first()
+        val transferConfig = xcmConfig.transferConfiguration(
+            originChain = parachainInfoRepository.getXcmChain(originChain),
+            originAsset = sendingAsset,
+            destinationChain = parachainInfoRepository.getXcmChain(destinationChain),
+        )!!
+
+        return crossChainTransactor.requiredRemainingAmountAfterTransfer(transferConfig)
     }
 
     override suspend fun ExtrinsicService.estimateFee(

@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.composeCall
+import io.novafoundation.nova.common.utils.hasRuntimeApisMetadata
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.xcmPalletName
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
@@ -38,6 +40,9 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApiOrNull
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -47,7 +52,8 @@ private val USED_XCM_VERSION = XcmVersion.V4
 class DynamicCrossChainTransactor @Inject constructor(
     private val chainRegistry: ChainRegistry,
     private val xcmBuilderFactory: XcmBuilder.Factory,
-    private val xcmPaymentApi: XcmPaymentApi
+    private val xcmPaymentApi: XcmPaymentApi,
+    private val assetSourceRegistry: AssetSourceRegistry,
 ) {
 
     context(ExtrinsicBuilder)
@@ -60,20 +66,40 @@ class DynamicCrossChainTransactor @Inject constructor(
         call(call)
     }
 
+    suspend fun requiredRemainingAmountAfterTransfer(
+        configuration: DynamicCrossChainTransferConfiguration
+    ): Balance {
+        return if (shouldUseXcmExecute(configuration)) {
+            BigInteger.ZERO
+        } else {
+            val chainAsset = configuration.originChainAsset
+            assetSourceRegistry.sourceFor(chainAsset).balance.existentialDeposit(chainAsset)
+        }
+    }
+
     suspend fun composeCrossChainTransferCall(
         configuration: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ): GenericCall.Instance {
-        return if (configuration.hasDeliveryFee) {
-            // Apply new xcm.execute logic only for cases when we have delivery fees as "transfer_assets" cannot handle them for non-native assets
-            // We can fully switch to this in the future once we are sure all the relevant chains use XcmExecuteFilter=Everything
+        return if (shouldUseXcmExecute(configuration)) {
             composeXcmExecuteCall(configuration, transfer, crossChainFee)
         } else {
             composeTransferAssetsCall(configuration, transfer, crossChainFee)
         }
     }
 
+    private suspend fun shouldUseXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {
+        val supportsXcmExecute = configuration.supportsXcmExecute
+        val hasXcmPaymentApi = xcmPaymentApi.isSupported(configuration.originChainId)
+        
+        // For now, only enable xcm execute approach for the directions that will hugely benefit from it
+        // In particular, xcm execute allows us to pay delivery fee from the holding register and not in JIT mode (from account)
+        val hasDeliveryFee = configuration.hasDeliveryFee
+        
+        return supportsXcmExecute && hasXcmPaymentApi && hasDeliveryFee
+    }
+    
     private suspend fun composeTransferAssetsCall(
         configuration: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,
@@ -170,9 +196,8 @@ class DynamicCrossChainTransactor @Inject constructor(
         destinationChainLocation: ChainLocation,
         beneficiary: AccountIdKey,
         amount: Balance,
-        fees: Balance? = null
     ) {
-        val feesAmount = fees ?: (amount / 3.toBigInteger())
+        val feesAmount = amount / 3.toBigInteger()
 
         // Origin
         withdrawAsset(assetLocation, amount)
