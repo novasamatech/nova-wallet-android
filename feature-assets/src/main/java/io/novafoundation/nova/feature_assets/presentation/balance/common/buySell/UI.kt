@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.buySel
 import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.view.input.selector.DynamicSelectorBottomSheet
 
-fun BaseFragmentMixin<*>.setupBuySellMixin(buySellMixin: BuySellMixin) {
-    buySellMixin.actionLiveData.observeEvent { action ->
+fun BaseFragmentMixin<*>.setupBuySellSelectorMixin(buySellSelectorMixin: BuySellSelectorMixin) {
+    buySellSelectorMixin.actionLiveData.observeEvent { action ->
         DynamicSelectorBottomSheet(
             context = fragment.requireContext(),
             payload = DynamicSelectorBottomSheet.Payload(

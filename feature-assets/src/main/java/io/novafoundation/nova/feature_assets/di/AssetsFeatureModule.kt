@@ -38,7 +38,7 @@ import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
@@ -247,7 +247,7 @@ class AssetsFeatureModule {
     @FeatureScope
     fun provideBuySellMixinFactory(
         assetsRouter: AssetsRouter
-    ): BuySellMixinFactory {
-        return BuySellMixinFactory(assetsRouter)
+    ): BuySellSelectorMixinFactory {
+        return BuySellSelectorMixinFactory(assetsRouter)
     }
 }

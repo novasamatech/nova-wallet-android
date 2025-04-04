@@ -23,8 +23,8 @@ import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -82,7 +82,7 @@ class BalanceDetailViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetIconProvider: AssetIconProvider,
     private val chartsInteractor: ChartsInteractor,
-    private val buySellMixinFactory: BuySellMixinFactory
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -129,7 +129,7 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    val buySellMixin = buySellMixinFactory.create()
+    val buySellSelectorMixin = buySellSelectorMixinFactory.create()
 
     val chainUI = chainFlow.map { mapChainToUi(it) }
 
@@ -235,7 +235,7 @@ class BalanceDetailViewModel(
     fun buyClicked() = checkControllableAsset {
         launch {
             val chainAsset = assetFlow.first().token.configuration
-            buySellMixin.openSelector(BuySellMixin.Selector.Asset(chainAsset.chainId, chainAsset.id))
+            buySellSelectorMixin.openSelector(BuySellSelectorMixin.Selector.Asset(chainAsset.chainId, chainAsset.id))
         }
     }
 

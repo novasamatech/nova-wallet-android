@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
-import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
@@ -121,7 +121,7 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        setupBuySellMixin(viewModel.buySellMixin)
+        setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
 
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
             balanceListAssets.invalidateItemDecorations()
