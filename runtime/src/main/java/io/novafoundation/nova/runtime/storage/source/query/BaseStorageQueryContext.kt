@@ -211,12 +211,6 @@ abstract class BaseStorageQueryContext(
         return MultiQueryResult(delegate)
     }
 
-    override suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V {
-        val rawValue = type!!.fromByteArrayOrIncompatible(value, runtime)
-
-        return binding(rawValue)
-    }
-
     private fun <V> StorageEntry.decodeStorageValue(
         scale: String?,
         binding: DynamicInstanceBinder<V>

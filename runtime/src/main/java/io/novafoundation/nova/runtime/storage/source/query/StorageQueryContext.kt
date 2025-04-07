@@ -106,8 +106,6 @@ interface StorageQueryContext : RuntimeContext {
         keyExtractor = { it.component1<Any?>() as K },
         binding = binding
     )
-
-    suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V
 }
 
 @Suppress("DEPRECATION")

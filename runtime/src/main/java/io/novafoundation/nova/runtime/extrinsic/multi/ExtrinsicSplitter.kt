@@ -1,12 +1,13 @@
 package io.novafoundation.nova.runtime.extrinsic.multi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
-import io.novafoundation.nova.common.data.network.runtime.binding.Weight
-import io.novafoundation.nova.common.utils.times
+import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
+import io.novafoundation.nova.common.data.network.runtime.binding.fitsIn
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.network.binding.total
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -29,9 +30,9 @@ interface ExtrinsicSplitter {
     suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls
 }
 
-private typealias CallWeightsByType = Map<String, Deferred<Weight>>
+private typealias CallWeightsByType = Map<String, Deferred<WeightV2>>
 
-private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.6
+private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 
 internal class RealExtrinsicSplitter(
     private val rpcCalls: RpcCalls,
@@ -41,15 +42,16 @@ internal class RealExtrinsicSplitter(
     override suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
         val weightByCallId = estimateWeightByCallType(signer, callBuilder, chain)
 
-        val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id) * LEAVE_SOME_SPACE_MULTIPLIER
+        val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id)
+        val lastBlockWeight = blockLimitsRepository.lastBlockWeight(chain.id).total()
+        val remainingLimit = (blockLimit - lastBlockWeight) * LEAVE_SOME_SPACE_MULTIPLIER
 
-        callBuilder.splitCallsWith(weightByCallId, blockLimit)
+        callBuilder.splitCallsWith(weightByCallId, remainingLimit)
     }
 
     private val GenericCall.Instance.uniqueId: String
         get() {
             val (moduleIdx, functionIdx) = function.index
-
             return "$moduleIdx:$functionIdx"
         }
 
@@ -64,17 +66,18 @@ internal class RealExtrinsicSplitter(
             }
     }
 
-    private suspend fun CallBuilder.splitCallsWith(weights: CallWeightsByType, blockLimit: Weight): SplitCalls {
+    private suspend fun CallBuilder.splitCallsWith(weights: CallWeightsByType, blockLimit: WeightV2): SplitCalls {
         val split = mutableListOf<List<GenericCall.Instance>>()
 
         var currentBatch = mutableListOf<GenericCall.Instance>()
-        var currentBatchWeight: Weight = Weight.ZERO
+        var currentBatchWeight: WeightV2 = WeightV2.zero()
 
         calls.forEach { call ->
             val estimatedCallWeight = weights.getValue(call.uniqueId).await()
+            val newWeight = currentBatchWeight + estimatedCallWeight
 
-            if (currentBatchWeight + estimatedCallWeight > blockLimit) {
-                if (estimatedCallWeight > blockLimit) throw IllegalArgumentException("Impossible to fit call $call into a block")
+            if (!newWeight.fitsIn(blockLimit)) {
+                if (!estimatedCallWeight.fitsIn(blockLimit)) throw IllegalArgumentException("Impossible to fit call $call into a block")
 
                 split += currentBatch
 

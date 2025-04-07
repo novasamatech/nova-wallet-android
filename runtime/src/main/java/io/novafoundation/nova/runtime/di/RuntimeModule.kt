@@ -192,8 +192,9 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideBlockLimitsRepository(
-        @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
-    ): BlockLimitsRepository = RealBlockLimitsRepository(localStorageSource)
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        chainRegistry: ChainRegistry
+    ): BlockLimitsRepository = RealBlockLimitsRepository(remoteStorageSource, chainRegistry)
 
     @Provides
     @ApplicationScope

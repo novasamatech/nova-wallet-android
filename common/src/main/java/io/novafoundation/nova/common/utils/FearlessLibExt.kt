@@ -212,6 +212,13 @@ fun Constant.decodedValue(runtimeSnapshot: RuntimeSnapshot): Any? {
     return type.fromByteArrayOrIncompatible(value, runtimeSnapshot)
 }
 
+context(RuntimeContext)
+fun <V> Constant.getAs(binding: (dynamicInstance: Any?) -> V): V {
+    val rawValue = decodedValue(runtime)
+    return binding(rawValue)
+}
+
+
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
 fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger

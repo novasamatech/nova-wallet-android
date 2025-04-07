@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInf
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindEventRecords
 import io.novafoundation.nova.common.utils.system
+import io.novafoundation.nova.runtime.network.binding.PerDispatchClassWeight
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry0
@@ -35,3 +36,8 @@ val SystemRuntimeApi.account: QueryableStorageEntry1<AccountId, AccountInfo>
 context(StorageQueryContext)
 val SystemRuntimeApi.events: QueryableStorageEntry0<List<EventRecord>>
     get() = storage0("Events", binding = ::bindEventRecords)
+
+
+context(StorageQueryContext)
+val SystemRuntimeApi.blockWeight: QueryableStorageEntry0<PerDispatchClassWeight>
+    get() = storage0("BlockWeight", binding = PerDispatchClassWeight::bind)
