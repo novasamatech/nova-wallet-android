@@ -12,21 +12,25 @@ class TransakJsEventBridge(
 ) {
 
     @JavascriptInterface
-    fun onTransakEvent(eventData: String) {
+    fun postMessage(eventData: String) {
         val json = JSONObject(eventData)
         val eventId = json.getString("event_id")
         Log.d("TransakEvent", "Event: $eventId, Data: $eventData")
 
+        val data = json.get("data")
         when (eventId) {
-            "TRANSAK_WIDGET_CLOSE" -> closeListener.onTradeOperationFinished()
+            "TRANSAK_WIDGET_CLOSE" -> {
+                val isOrderSuccessful = data == true // For unsuccessful order data is JSONObject
+                closeListener.onTradeOperationFinished(isOrderSuccessful)
+            }
 
             "TRANSAK_ORDER_CREATED" -> {
-                val json = JSONObject(eventData).getJSONObject("data")
-                if (json.getString("isBuyOrSell") == "SELL") {
+                require(data is JSONObject)
+                if (data.getString("isBuyOrSell") == "SELL") {
                     tradeSellCallback.onSellOrderCreated(
-                        json.getString("id"),
-                        json.getJSONObject("cryptoPaymentData").getString("paymentAddress"),
-                        json.getString("cryptoAmount").toBigDecimal()
+                        data.getString("id"),
+                        data.getJSONObject("cryptoPaymentData").getString("paymentAddress"),
+                        data.getString("cryptoAmount").toBigDecimal()
                     )
                 }
             }

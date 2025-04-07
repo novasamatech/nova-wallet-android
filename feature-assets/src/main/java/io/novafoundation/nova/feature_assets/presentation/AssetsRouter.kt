@@ -17,6 +17,8 @@ interface AssetsRouter {
 
     fun openAssetDetails(assetPayload: AssetPayload)
 
+    fun finishTradeOperation(assetPayload: AssetPayload)
+
     fun back()
 
     fun openFilter(payload: TransactionHistoryFilterPayload)
@@ -104,4 +106,6 @@ interface AssetsRouter {
     fun openSellProviders(chainId: String, chainAssetId: Int)
 
     fun openTradeWebInterface(payload: TradeWebPayload)
+
+    fun finishTopUp()
 }

@@ -53,6 +53,8 @@
 
     <include app:graph="@navigation/nova_card_graph" />
 
+    <include app:graph="@navigation/mnemonic_nav_graph" />
+
     <action
         android:id="@+id/action_returnToMainScreen"
         app:destination="@id/mainFragment"
@@ -744,8 +746,6 @@
         android:label="ChangeWatchAccountFragment"
         tools:layout="@layout/fragment_change_watch_wallet" />
 
-    <include app:graph="@navigation/mnemonic_nav_graph" />
-
     <action
         android:id="@+id/action_open_mnemonic_nav_graph"
         app:destination="@id/mnemonic_nav_graph"
@@ -1098,7 +1098,19 @@
     <fragment
         android:id="@+id/tradeWebFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebFragment"
-        android:label="TradeWebFragment" />
+        android:label="TradeWebFragment">
+
+        <action
+            android:id="@+id/action_tradeWebFragment_to_balanceDetailFragment"
+            app:destination="@+id/balanceDetailFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/tradeWebFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/sendFlowNetworkFragment"
@@ -1113,7 +1125,7 @@
     <fragment
         android:id="@+id/buyFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.network.NetworkBuyFlowFragment"
-        android:label="NetworkBuyFlowFragment" >
+        android:label="NetworkBuyFlowFragment">
 
         <action
             android:id="@+id/action_buyFlowNetworks_to_tradeProvidersFragment"
@@ -1130,7 +1142,7 @@
     <fragment
         android:id="@+id/sellFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.NetworkSellFlowFragment"
-        android:label="NetworkBuyFlowFragment" >
+        android:label="NetworkBuyFlowFragment">
 
         <action
             android:id="@+id/action_sellFlowNetworks_to_tradeProvidersFragment"
@@ -1204,6 +1216,17 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressFragment"
         android:label="fragment_top_up"
         app:useAdd="true"
-        tools:layout="@layout/fragment_top_up_address" />
+        tools:layout="@layout/fragment_top_up_address">
+
+        <action
+            android:id="@+id/action_finishTopUpFlow"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/topUpAddressFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
 </navigation>

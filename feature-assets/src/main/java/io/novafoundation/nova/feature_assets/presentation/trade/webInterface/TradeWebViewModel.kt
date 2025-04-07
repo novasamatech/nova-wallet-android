@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class TradeWebViewModel(
     private val payload: TradeWebPayload,
@@ -71,29 +71,31 @@ class TradeWebViewModel(
         observeTopUp()
     }
 
-    override fun onTradeOperationFinished() {
-        val messageResId = when (payload.type) {
-            TradeProviderFlowType.BUY -> R.string.buy_order_completed_message
-            TradeProviderFlowType.SELL -> R.string.sell_order_completed_message
-        }
-        showToast(resourceManager.getString(messageResId))
+    override fun onTradeOperationFinished(success: Boolean) = launchUnit {
+        if (success) {
+            val messageResId = when (payload.type) {
+                TradeProviderFlowType.BUY -> R.string.buy_order_completed_message
+                TradeProviderFlowType.SELL -> R.string.sell_order_completed_message
+            }
+            showToast(resourceManager.getString(messageResId))
 
-        router.returnToMainScreen()
+            router.finishTradeOperation(payload.asset)
+        } else {
+            router.returnToMainScreen()
+        }
     }
 
-    override fun onSellOrderCreated(orderId: String, address: String, amount: BigDecimal) {
-        launch {
-            val asset = chainAssetFlow.first()
+    override fun onSellOrderCreated(orderId: String, address: String, amount: BigDecimal) = launchUnit {
+        val asset = chainAssetFlow.first()
 
-            val request = TopUpAddressPayload(
-                address,
-                amount,
-                payload.asset,
-                screenTitle = resourceManager.getString(R.string.fragment_sell_token_title, asset.symbol.value)
-            )
+        val request = TopUpAddressPayload(
+            address,
+            amount,
+            payload.asset,
+            screenTitle = resourceManager.getString(R.string.fragment_sell_token_title, asset.symbol.value)
+        )
 
-            topUpRequester.openRequest(request)
-        }
+        topUpRequester.openRequest(request)
     }
 
     private fun observeTopUp() {

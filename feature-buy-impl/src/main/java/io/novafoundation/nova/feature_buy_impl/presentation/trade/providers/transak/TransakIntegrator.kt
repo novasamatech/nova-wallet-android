@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.transak
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView

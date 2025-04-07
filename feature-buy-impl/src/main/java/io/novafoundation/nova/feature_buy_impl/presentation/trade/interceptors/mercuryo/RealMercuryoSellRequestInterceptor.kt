@@ -60,7 +60,7 @@ class RealMercuryoSellRequestInterceptor(
                     tradeSellCallback.onSellOrderCreated(orderId, sellStatusResponse.getAddress(), sellStatusResponse.getAmount())
                 }
 
-                sellStatusResponse.isCompleted() -> onTradeOperationFinishedListener.onTradeOperationFinished()
+                sellStatusResponse.isCompleted() -> onTradeOperationFinishedListener.onTradeOperationFinished(success = true)
             }
 
             true

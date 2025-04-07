@@ -86,7 +86,7 @@ class NovaCardViewModel(
         }
     }
 
-    override fun onTradeOperationFinished() {
+    override fun onTradeOperationFinished(success: Boolean) { // Always success for mercuryo
         launch {
             novaCardInteractor.setTopUpFinishedEvent()
             setCardStateCreated()

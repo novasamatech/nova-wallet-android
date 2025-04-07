@@ -629,6 +629,14 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun finishTradeOperation(assetPayload: AssetPayload) {
+        val bundle = BalanceDetailFragment.getBundle(assetPayload)
+
+        navigationBuilder().action(R.id.action_tradeWebFragment_to_balanceDetailFragment)
+            .setArgs(bundle)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openAddNode() {
         navigationBuilder().action(R.id.action_nodesFragment_to_addNodeFragment)
             .navigateInFirstAttachedContext()
@@ -872,5 +880,10 @@ class Navigator(
                     .navigateInFirstAttachedContext()
             }
         }
+    }
+
+    override fun finishTopUp() {
+        navigationBuilder().action(R.id.action_finishTopUpFlow)
+            .navigateInFirstAttachedContext()
     }
 }

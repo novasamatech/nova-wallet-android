@@ -19,8 +19,8 @@ android {
         buildConfigField "String", "RAMP_TOKEN", "\"n8ev677z3z7enckabyc249j84ajpc28o9tmsgob7\""
         buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""
 
-        buildConfigField "String", "TRANSAK_TOKEN", "\"861a131b-1721-4e99-8ec3-7349840c888f\""
-        buildConfigField "String", "TRANSAK_HOST", "\"global.transak.com\""
+        buildConfigField "String", "TRANSAK_TOKEN", "\"ed6a6887-57fd-493a-8075-4718b463913b\""
+        buildConfigField "String", "TRANSAK_HOST", "\"staging-global.transak.com\""
 
         buildConfigField "String", "MOONPAY_PRIVATE_KEY", readStringSecret("MOONPAY_TEST_SECRET")
         buildConfigField "String", "MOONPAY_HOST", "\"buy-staging.moonpay.com\""

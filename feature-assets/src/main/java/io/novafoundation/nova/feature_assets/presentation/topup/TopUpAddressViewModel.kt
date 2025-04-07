@@ -151,14 +151,14 @@ class TopUpAddressViewModel(
 
     fun backClicked() {
         responder.respond(TopUpAddressResponder.Response.Cancel)
-        router.back()
+        router.finishTopUp()
     }
 
     private fun transferTokensAndFinishFlow(payload: AssetTransferPayload) = launch {
         sendInteractor.performTransfer(payload.transfer, payload.originFee, null, viewModelScope)
 
         responder.respond(TopUpAddressResponder.Response.Success)
-        router.back()
+        router.finishTopUp()
     }
 
     private fun setupFees() {

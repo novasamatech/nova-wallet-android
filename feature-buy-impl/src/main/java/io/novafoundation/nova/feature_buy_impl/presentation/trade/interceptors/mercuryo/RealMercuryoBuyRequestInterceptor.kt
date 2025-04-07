@@ -46,7 +46,7 @@ class RealMercuryoBuyRequestInterceptor(
             val buyStatusResponse = gson.fromJson(response.body!!.string(), BuyStatusResponse::class.java)
 
             if (buyStatusResponse.isPaid()) {
-                onTradeOperationFinishedListener.onTradeOperationFinished()
+                onTradeOperationFinishedListener.onTradeOperationFinished(success = true)
             }
 
             true
