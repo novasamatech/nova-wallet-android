@@ -1,13 +1,14 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.structOf
+import io.novafoundation.nova.feature_proxy_api.data.model.RelaychainRemoteProxyProof
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.encodeNonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.replaceBaseNone
@@ -18,7 +19,6 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
     proxyAccountId: AccountId,
     currentProxyNonce: BigInteger,
     proxyType: ProxyType,
-    call: GenericCall.Instance
 ): SignerPayloadExtrinsic {
     val proxiedAccountId = accountId
     val callBuilder = SimpleCallBuilder(runtime)
@@ -29,6 +29,40 @@ fun SignerPayloadExtrinsic.wrapIntoProxyPayload(
             "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
             "force_proxy_type" to DictEnum.Entry(proxyType.name, null),
             "call" to call
+        )
+    )
+
+    val newNonce = nonce.replaceBaseNone(currentProxyNonce)
+
+    return copy(
+        accountId = proxyAccountId,
+        call = callBuilder.calls.first(),
+        signedExtras = signedExtras.modifyNonce(runtime, newNonce.nonce),
+        nonce = newNonce
+    )
+}
+
+fun SignerPayloadExtrinsic.wrapIntoRemoteProxyPayload(
+    proxyAccountId: AccountId,
+    currentProxyNonce: BigInteger,
+    proof: RelaychainRemoteProxyProof,
+): SignerPayloadExtrinsic {
+    val proxiedAccountId = accountId
+    val callBuilder = SimpleCallBuilder(runtime)
+
+    val relaychainProof = structOf(
+        "proof" to proof.proof,
+        "block" to proof.proofBlock
+    )
+
+    callBuilder.addCall(
+        moduleName = Modules.REMOTE_PROXY_RELAY_CHAIN,
+        callName = "remote_proxy",
+        arguments = mapOf(
+            "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
+            "force_proxy_type" to null,
+            "call" to call,
+            "proof" to DictEnum.Entry("RelayChain", relaychainProof)
         )
     )
 

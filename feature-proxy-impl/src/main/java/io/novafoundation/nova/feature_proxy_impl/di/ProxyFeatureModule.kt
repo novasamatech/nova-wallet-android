@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_proxy_impl.data.repository.RealProxyConsta
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -23,11 +24,13 @@ class ProxyFeatureModule {
     fun provideProxyRepository(
         @Named(REMOTE_STORAGE_SOURCE) remoteSource: StorageDataSource,
         @Named(LOCAL_STORAGE_SOURCE) localSource: StorageDataSource,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        rpcCalls: RpcCalls
     ): GetProxyRepository = RealGetProxyRepository(
         remoteSource = remoteSource,
         localSource = localSource,
-        chainRegistry
+        chainRegistry,
+        rpcCalls
     )
 
     @Provides

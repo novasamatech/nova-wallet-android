@@ -338,6 +338,8 @@ fun RuntimeMetadata.utility() = module(Modules.UTILITY)
 
 fun RuntimeMetadata.collatorStaking() = module(Modules.COLLATOR_STAKING)
 
+fun RuntimeMetadata.remoteProxyRelayChain() = module(Modules.REMOTE_PROXY_RELAY_CHAIN)
+
 fun RuntimeMetadata.firstExistingModuleName(vararg options: String): String {
     return options.first(::hasModule)
 }
@@ -565,4 +567,6 @@ object Modules {
     const val ASSET_REGISTRY = "AssetRegistry"
 
     const val COLLATOR_STAKING = "CollatorStaking"
+
+    const val REMOTE_PROXY_RELAY_CHAIN = "RemoteProxyRelayChain"
 }

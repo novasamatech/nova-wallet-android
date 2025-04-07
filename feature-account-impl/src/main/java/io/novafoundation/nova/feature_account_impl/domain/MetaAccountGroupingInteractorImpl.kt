@@ -84,7 +84,7 @@ class MetaAccountGroupingInteractorImpl(
                 .mapNotNull {
                     ProxiedAndProxyMetaAccount(
                         it,
-                        metaById[it.proxy?.metaId] ?: return@mapNotNull null,
+                        metaById[it.proxy?.proxyMetaId] ?: return@mapNotNull null,
                         chainsById[it.proxy?.chainId] ?: return@mapNotNull null
                     )
                 }
@@ -116,7 +116,7 @@ class MetaAccountGroupingInteractorImpl(
             totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
         }
 
-        val proxyMetaAccount = metaAccount.proxy?.let { proxy -> allMetaAccounts.firstOrNull { it.id == proxy.metaId } }
+        val proxyMetaAccount = metaAccount.proxy?.let { proxy -> allMetaAccounts.firstOrNull { it.id == proxy.proxyMetaId } }
 
         return MetaAccountWithTotalBalance(
             metaAccount = metaAccount,

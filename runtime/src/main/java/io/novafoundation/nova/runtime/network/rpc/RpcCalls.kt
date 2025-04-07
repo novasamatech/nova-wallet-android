@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.network.rpc
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindWeight
@@ -9,12 +10,14 @@ import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockHashRequ
 import io.novafoundation.nova.common.data.network.runtime.calls.GetBlockRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetFinalizedHeadRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.GetHeaderRequest
+import io.novafoundation.nova.common.data.network.runtime.calls.GetReadProof
 import io.novafoundation.nova.common.data.network.runtime.calls.GetStorageSize
 import io.novafoundation.nova.common.data.network.runtime.calls.GetSystemPropertiesRequest
 import io.novafoundation.nova.common.data.network.runtime.calls.NextAccountIndexRequest
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock
 import io.novafoundation.nova.common.data.network.runtime.model.SignedBlock.Block.Header
+import io.novafoundation.nova.common.data.network.runtime.model.StateReadProof
 import io.novafoundation.nova.common.data.network.runtime.model.SystemProperties
 import io.novafoundation.nova.common.utils.asGsonParsedNumber
 import io.novafoundation.nova.common.utils.extrinsicHash
@@ -147,6 +150,14 @@ class RpcCalls(
 
     suspend fun getStorageSize(chainId: ChainId, storageKey: String): BigInteger {
         return socketFor(chainId).executeAsync(GetStorageSize(storageKey)).result?.asGsonParsedNumber().orZero()
+    }
+
+    suspend fun getReadProof(
+        chainId: ChainId,
+        storageKeys: List<String>,
+        at: BlockHash? = null
+    ): StateReadProof {
+        return socketFor(chainId).executeAsync(GetReadProof(storageKeys, at), mapper = pojo<StateReadProof>().nonNull())
     }
 
     private fun RuntimeMetadata.hasDetectedPaymentApi(): Boolean {
