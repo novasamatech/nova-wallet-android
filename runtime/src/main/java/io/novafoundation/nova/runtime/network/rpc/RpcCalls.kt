@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.network.rpc
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
-import io.novafoundation.nova.common.data.network.runtime.binding.bindWeight
 import io.novafoundation.nova.common.data.network.runtime.binding.bindWeightV2
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.calls.FeeCalculationRequest

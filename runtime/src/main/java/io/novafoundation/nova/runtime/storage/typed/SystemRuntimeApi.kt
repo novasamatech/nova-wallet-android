@@ -37,7 +37,6 @@ context(StorageQueryContext)
 val SystemRuntimeApi.events: QueryableStorageEntry0<List<EventRecord>>
     get() = storage0("Events", binding = ::bindEventRecords)
 
-
 context(StorageQueryContext)
 val SystemRuntimeApi.blockWeight: QueryableStorageEntry0<PerDispatchClassWeight>
     get() = storage0("BlockWeight", binding = PerDispatchClassWeight::bind)

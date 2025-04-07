@@ -218,7 +218,6 @@ fun <V> Constant.getAs(binding: (dynamicInstance: Any?) -> V): V {
     return binding(rawValue)
 }
 
-
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
 fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger

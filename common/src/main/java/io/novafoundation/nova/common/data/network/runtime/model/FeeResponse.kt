@@ -6,7 +6,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.JsonAdapter
-import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import java.lang.reflect.Type
 import java.math.BigInteger

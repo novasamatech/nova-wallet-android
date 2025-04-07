@@ -62,5 +62,3 @@ fun bindWeightV2(decoded: Any?): WeightV2 {
         else -> incompatible()
     }
 }
-
-

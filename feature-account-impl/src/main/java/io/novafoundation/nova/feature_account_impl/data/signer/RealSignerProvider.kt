@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerFeeSigner
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerFeeSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignerFactory

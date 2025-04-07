@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.common.utils.takeWhileInclusive
 import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
