@@ -19,8 +19,8 @@ class LedgerFeeSigner(delegate: DefaultFeeSigner) : FeeSigner by delegate {
 
     companion object {
 
-        // Ledger runs with quite severe resource restrictions so we should specifically lower the number of calls per transaction
-        // Otherwise Ledger will run out of RAM when decoding such a big tx
+        // Ledger runs with quite severe resource restrictions so we should explicitly lower the number of calls per transaction
+        // Otherwise Ledger will run out of RAM when decoding such big txs
         private const val MAX_CALLS_PER_TRANSACTION = 6
     }
 
