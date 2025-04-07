@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadotアプリがインストールされています</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで%s</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">ポルカドットアプリを開く</string>
+    <string name="account_ledger_generic_item_subtitle">フレックス、スタックス、ナノ X、ナノ S プラス</string>
+    <string name="account_ledger_generic_item_title">Ledger (一般的な Polkadot アプリ)</string>
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
-    <string name="account_ledger_import_start_guide">Ledgerの公式Bluetooth接続ガイド</string>
+    <string name="account_ledger_import_start_guide">Ledger 接続ガイド</string>
     <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使ってLedgerデバイスに%sを確実にしてください</string>
     <string name="account_ledger_import_start_step_1_highlighted">ネットワークアプリがインストールされている</string>
     <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">Bluetoothと位置情報へのアクセスを許可</string>
     <string name="account_ledger_import_start_step_4">%s を選択する。</string>
     <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
-    <string name="account_ledger_import_start_title">Ledger Nano Xを接続</string>
+    <string name="account_ledger_import_start_step_otg">%s を電話の設定で</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">OTGを有効にする</string>
+    <string name="account_ledger_import_start_title">Ledger を接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migrationアプリは近い将来使用できなくなります。新しいLedgerアプリにアカウントを移行して資金を失わないようにしてください。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_generic_item_title">Ledger Nano X (Generic Polkadot 専用水玉アプリ)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger レガシー</string>
+    <string name="account_ledger_select_device_all_description">LedgerをBluetoothで使用する場合は、両方のデバイスでBluetoothを有効にし、NovaにBluetoothおよび位置情報の権限を付与してください。USBの場合は、電話の設定でOTGを有効にしてください。</string>
     <string name="account_ledger_select_device_description">電話の設定とLedgerデバイスでBluetoothを有効にしてください。Ledgerデバイスを解除し、%sアプリを開いてください。</string>
     <string name="account_ledger_select_device_title">Ledgerデバイスを選択</string>
+    <string name="account_ledger_select_device_usb_description">Ledgerデバイスを有効にしてください。Ledgerデバイスをアンロックし、%s アプリを開いてください。</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21または24単語のフレーズ</string>
     <string name="account_needed_message">このネットワークにはアカウントがありません。アカウントを作成するか、インポートすることができます。</string>
     <string name="account_needed_title">アカウントが必要です</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%sは任意のメッセージの署名をサポートしていません — トランザクションのみをサポートします</string>
     <string name="account_parity_signer_not_supported_title">署名はサポートされていません</string>
     <string name="account_parity_signer_scan_from">%sからQRコードをスキャン</string>
-    <string name="account_parity_signer_scan_with">%sでQRコードをスキャン</string>
+    <string name="account_parity_signer_show_mode_legacy">レガシー</string>
+    <string name="account_parity_signer_show_mode_new">新しい (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">%sにエラーがあります</string>
     <string name="account_parity_signer_sign_qr_code_expired">QRコードの有効期限が切れました</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">セキュリティ上の理由から、生成された操作は%s間のみ有効です。\n新しいQRコードを生成し、%sで署名してください</string>
@@ -799,12 +805,17 @@
     <string name="json_export_btn">JSONファイルをエクスポート</string>
     <string name="language_title">言語</string>
     <string name="ledger_chain_not_supported">Ledgerは〜をサポートしていません</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">ナノ X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">操作はデバイスによってキャンセルされました。Ledgerがロック解除されていることを確認してください。</string>
     <string name="ledger_error_app_cancelled_title">操作がキャンセルされました</string>
     <string name="ledger_error_app_not_launched_message">Ledgerデバイスで〜アプリを開いてください</string>
     <string name="ledger_error_app_not_launched_title">〜アプリが起動されていません</string>
     <string name="ledger_error_general_message">デバイスでエラーが発生して操作が完了しました。後でもう一度お試しください。</string>
     <string name="ledger_error_general_title">Ledger操作失敗</string>
+    <string name="ledger_hold_to_sign">%s の確認ボタンを長押しして取引を承認</string>
     <string name="ledger_import_select_address_load_more">アカウントをもっと読み込む</string>
     <string name="ledger_review_approve_title">レビューして承認</string>
     <string name="ledger_sign_approve_message">トランザクションを承認するために両方のボタンを押してください</string>
@@ -817,7 +828,8 @@
     <string name="ledger_sign_transaction_validity_format">トランザクションは%s有効です</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledgerはこのトランザクションをサポートしていません。</string>
     <string name="ledger_sign_tx_not_supported_title">トランザクションがサポートされていません</string>
-    <string name="ledger_verify_address_subtitle">アドレスを承認するには、%sの両方のボタンを押してください</string>
+    <string name="ledger_verify_address_message_both_buttons">%s の両方のボタンを押してアドレスを承認</string>
+    <string name="ledger_verify_address_message_confirm_button">%s の確認ボタンを押してアドレスを承認</string>
     <string name="ledger_wallet_details_description">このウォレットはLedgerとペアリングされています。Novaは望む操作を形成する手助けをし、Ledgerを使用してそれらを署名するよう求められます</string>
     <string name="ledher_import_select_address_title">ウォレットに追加するアカウントを選択</string>
     <string name="loading_network_info">ネットワーク情報を読み込み中...</string>
@@ -1155,6 +1167,7 @@
     <string name="select_delegation_tracks_edit_title">デリゲーションを編集するトラックを選択</string>
     <string name="select_delegation_tracks_revoke_title">デリゲーションを取り消すトラックを選択</string>
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
+    <string name="select_ledger_grant_permissions">Bluetoothを有効にして権限を付与</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
     <string name="select_network_title">ネットワークを選択</string>
@@ -1501,6 +1514,8 @@
     <string name="start_create_wallet_name_your_wallet">ウォレットに名前を付けてください</string>
     <string name="start_create_wallet_set_wallet_name_explanation">これはあなたにしか見えず、後で編集することができます。</string>
     <string name="start_create_wallet_your_wallet_is_ready">あなたのウォレットは準備ができました</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">あなたのバランスには%sによってロックされたトークンがあります。続行するには、%s未満または%s以上を入力してください。別の金額をStakeするには、%sロックを解除する必要があります。</string>
     <string name="start_staking_cant_stake_amount">指定された金額をStakeすることはできません</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">選択済み: %d (最大 %d)</string>
