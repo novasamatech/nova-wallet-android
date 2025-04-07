@@ -4,6 +4,8 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerFeeSigner
+import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerFeeSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedFeeSignerFactory
@@ -21,6 +23,7 @@ internal class RealSignerProvider(
     private val polkadotVaultSignerFactory: PolkadotVaultVariantSignerFactory,
     private val proxiedFeeSignerFactory: ProxiedFeeSignerFactory,
     private val ledgerSignerFactory: LedgerSignerFactory,
+    private val ledgerFeeSignerFactory: LedgerFeeSignerFactory,
 ) : SignerProvider {
 
     override fun rootSignerFor(metaAccount: MetaAccount): NovaSigner {
@@ -36,9 +39,10 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
             LightMetaAccount.Type.PARITY_SIGNER,
-            LightMetaAccount.Type.POLKADOT_VAULT,
+            LightMetaAccount.Type.POLKADOT_VAULT -> DefaultFeeSigner(metaAccount, chain)
+
             LightMetaAccount.Type.LEDGER,
-            LightMetaAccount.Type.LEDGER_LEGACY -> DefaultFeeSigner(metaAccount, chain)
+            LightMetaAccount.Type.LEDGER_LEGACY -> ledgerFeeSignerFactory.create(metaAccount, chain)
 
             LightMetaAccount.Type.PROXIED -> proxiedFeeSignerFactory.create(metaAccount, chain, this)
         }
