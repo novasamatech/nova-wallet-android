@@ -89,7 +89,7 @@
     <string name="account_ledger_migration_deprecation_message">A közeljövőben a Migration alkalmazás nem lesz elérhető. Használja azt fiókjainak az új Ledger alkalmazásra történő migrálásához, hogy elkerülje az alapok elvesztését.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Általános Polkadot alkalmazás)</string>
+    <string name="account_ledger_generic_item_title">Ledger Nano X (Általános Polkadot alkalmazás)</string>
     <string name="account_ledger_nano_x_legacy">Ledger Nano X (Örökség)</string>
     <string name="account_ledger_select_device_description">Kérlek, kapcsold be a Bluetooth-t a telefonodon és a Ledger eszközön. Old fel a Ledger eszközt és nyisd meg a(z) %s alkalmazást.</string>
     <string name="account_ledger_select_device_title">Válaszd ki Ledger eszközöd</string>

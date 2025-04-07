@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils.stateMachine
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -47,6 +48,7 @@ private class StateMachineImpl<STATE : StateMachine.State<STATE, SIDE_EFFECT, EV
     override val sideEffects = Channel<SIDE_EFFECT>(capacity = Channel.UNLIMITED)
 
     override fun onEvent(event: EVENT) {
+        Log.d("StateMachineTAG", "onEvent: $event")
         launch {
             mutex.withLock {
                 with(state.value) {
@@ -59,10 +61,12 @@ private class StateMachineImpl<STATE : StateMachine.State<STATE, SIDE_EFFECT, EV
     private inner class TransitionImpl : StateMachine.Transition<STATE, SIDE_EFFECT> {
 
         override suspend fun emitState(newState: STATE) {
+            Log.d("StateMachineTAG", "state: $newState")
             state.value = newState
         }
 
         override suspend fun emitSideEffect(sideEffect: SIDE_EFFECT) {
+            Log.d("StateMachineTAG", "sideEffect: $sideEffect")
             sideEffects.send(sideEffect)
         }
     }
