@@ -135,10 +135,14 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
+            // TODO check whether `shouldExecuteXcm` is used when delivery fee is present
+            // This should be done before PR is merged!!
             return true
         }
 
         override suspend fun canTransferOutWholeAccountBalance(): Boolean {
+            // TODO check whether `shouldExecuteXcm` is used when delivery fee is present
+            // This should be done before PR is merged!!
             return true
         }
 
