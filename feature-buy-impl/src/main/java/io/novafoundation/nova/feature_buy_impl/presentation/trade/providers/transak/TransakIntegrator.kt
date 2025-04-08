@@ -64,6 +64,7 @@ class TransakIntegrator(
 }
 
 private class TransakWebViewClient : WebViewClient() {
+    // We use it to override base transak loading otherwise transak navigates to android native browser
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         view.loadUrl(request.url.toString())
         return true
