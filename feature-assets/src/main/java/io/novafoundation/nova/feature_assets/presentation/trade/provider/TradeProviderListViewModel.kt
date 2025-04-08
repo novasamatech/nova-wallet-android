@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.common.toModel
-import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeFlow
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
@@ -59,9 +59,9 @@ class TradeProviderListViewModel(
         router.back()
     }
 
-    private fun TradeProviderListPayload.Type.toTradeFlow() = when (this) {
-        TradeProviderListPayload.Type.BUY -> TradeTokenRegistry.TradeType.BUY
-        TradeProviderListPayload.Type.SELL -> TradeTokenRegistry.TradeType.SELL
+    private fun TradeProviderFlowType.toTradeFlow() = when (this) {
+        TradeProviderFlowType.BUY -> TradeTokenRegistry.TradeType.BUY
+        TradeProviderFlowType.SELL -> TradeTokenRegistry.TradeType.SELL
     }
 
     private fun TradeTokenRegistry.PaymentMethod.toModel() = when (this) {

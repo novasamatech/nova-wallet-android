@@ -37,7 +37,7 @@ private class TradeProviderMixin(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> providerFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow, providerId: String): T {
+    override fun <T> providerFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeType, providerId: String): T {
         return providersFor(chainAsset, tradeFlow)
             .first { it.id == providerId } as T
     }
