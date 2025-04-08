@@ -1,6 +1,12 @@
 package io.novafoundation.nova.feature_ledger_api.sdk.discovery
 
-class DiscoveryMethods(vararg val methods: Method) {
+import io.novafoundation.nova.common.utils.filterToSet
+
+@JvmInline
+value class DiscoveryMethods(val methods: List<Method>) {
+
+    constructor(vararg methods: Method) : this(methods.toList())
+
     enum class Method {
         BLE,
         USB
@@ -15,7 +21,25 @@ enum class DiscoveryRequirement {
     BLUETOOTH, LOCATION
 }
 
-fun DiscoveryMethods.hasRequirement(requirement: DiscoveryRequirement) = discoveryRequirements().contains(requirement)
+fun DiscoveryMethods.filterBySatisfiedRequirements(
+    discoveryRequirementAvailability: DiscoveryRequirementAvailability
+): Set<DiscoveryMethods.Method> {
+    return methods.filterToSet { method ->
+        val methodRequirements = method.discoveryRequirements()
+        val requirementsSatisfied = methodRequirements.all { it in discoveryRequirementAvailability.satisfiedRequirements }
+        val availableWithPermissions = methodRequirements.availableWithPermissions(discoveryRequirementAvailability.permissionsGranted)
+
+        requirementsSatisfied && availableWithPermissions
+    }
+}
+
+private fun List<DiscoveryRequirement>.availableWithPermissions(permissionsGranted: Boolean): Boolean {
+    return if (isEmpty()) {
+        true
+    } else {
+        permissionsGranted
+    }
+}
 
 fun DiscoveryMethods.discoveryRequirements() = methods.flatMap {
     when (it) {
@@ -24,9 +48,9 @@ fun DiscoveryMethods.discoveryRequirements() = methods.flatMap {
     }
 }
 
-// Requirements are necessary when we use single discovery method and requrements aren't empty
-fun DiscoveryMethods.isRequirementsNecessary() = this.methods.size == 1 && discoveryRequirements().isNotEmpty()
-
-fun DiscoveryMethods.isPermissionsRequired() = isRequirementsNecessary()
-
-fun DiscoveryMethods.isBluetoothUsing() = methods.contains(DiscoveryMethods.Method.BLE)
+fun DiscoveryMethods.Method.discoveryRequirements(): List<DiscoveryRequirement> {
+    return when (this) {
+        DiscoveryMethods.Method.BLE -> listOf(DiscoveryRequirement.BLUETOOTH, DiscoveryRequirement.LOCATION)
+        DiscoveryMethods.Method.USB -> emptyList()
+    }
+}

@@ -19,10 +19,6 @@ class RealLedgerDiscoveryServiceFactory(
             }
         }
 
-        return if (services.size == 1) {
-            services.single()
-        } else {
-            CompoundLedgerDiscoveryService(services)
-        }
+        return CompoundLedgerDiscoveryService(services)
     }
 }

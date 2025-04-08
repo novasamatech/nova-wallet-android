@@ -17,5 +17,11 @@ interface PermissionsAsker {
 
     interface Presentation : PermissionsAsker {
         suspend fun requirePermissions(vararg permissions: Permission): Boolean
+
+        fun checkPermissions(vararg permissions: Permission): Boolean
     }
+}
+
+fun PermissionsAsker.Presentation.checkPermissions(permissions: List<Permission>): Boolean {
+    return checkPermissions(*permissions.toTypedArray())
 }
