@@ -30,9 +30,9 @@ class ByNetworkAssetSearchInteractor(
     override fun tradeAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-        tradeFlow: TradeTokenRegistry.TradeFlow
+        tradeType: TradeTokenRegistry.TradeType
     ): Flow<AssetsByViewModeResult> {
-        val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeFlow) }
+        val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeType) }
 
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
     }

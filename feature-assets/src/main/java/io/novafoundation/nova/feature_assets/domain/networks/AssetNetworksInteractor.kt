@@ -34,9 +34,9 @@ class AssetNetworksInteractor(
     fun tradeAssetFlow(
         tokenSymbol: TokenSymbol,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-        tradeFlow: TradeTokenRegistry.TradeFlow
+        tradeType: TradeTokenRegistry.TradeType
     ): Flow<List<AssetWithNetwork>> {
-        val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeFlow) }
+        val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeType) }
 
         return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = filter)
     }

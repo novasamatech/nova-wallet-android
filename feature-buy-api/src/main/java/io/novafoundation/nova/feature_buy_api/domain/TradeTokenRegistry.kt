@@ -10,9 +10,9 @@ interface TradeTokenRegistry {
 
     fun hasProvider(chainAsset: Chain.Asset): Boolean
 
-    fun hasProvider(chainAsset: Chain.Asset, tradeFlow: TradeFlow): Boolean
+    fun hasProvider(chainAsset: Chain.Asset, tradeType: TradeType): Boolean
 
-    fun availableProvidersFor(chainAsset: Chain.Asset, tradeFlow: TradeFlow): List<Provider<*>>
+    fun availableProvidersFor(chainAsset: Chain.Asset, tradeType: TradeType): List<Provider<*>>
 
     interface Provider<I : Integrator<*>> {
         val id: String
@@ -21,7 +21,7 @@ interface TradeTokenRegistry {
 
         val officialUrl: String
 
-        val supportedFlows: Set<TradeFlow>
+        val supportedFlows: Set<TradeType>
 
         @get:DrawableRes
         val logoRes: Int
@@ -29,9 +29,9 @@ interface TradeTokenRegistry {
         @get:StringRes
         val descriptionRes: Int
 
-        fun getPaymentMethods(tradeFlow: TradeFlow): List<PaymentMethod>
+        fun getPaymentMethods(tradeType: TradeType): List<PaymentMethod>
 
-        fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeFlow): I
+        fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeType: TradeType): I
     }
 
     interface Integrator<T> {
@@ -39,7 +39,7 @@ interface TradeTokenRegistry {
         fun openFlow(using: T)
     }
 
-    enum class TradeFlow {
+    enum class TradeType {
         BUY, SELL
     }
 

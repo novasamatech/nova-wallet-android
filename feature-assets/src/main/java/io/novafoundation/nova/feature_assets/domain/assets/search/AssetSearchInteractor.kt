@@ -20,7 +20,7 @@ interface AssetSearchInteractor {
     fun tradeAssetSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
-        tradeFlow: TradeTokenRegistry.TradeFlow
+        tradeType: TradeTokenRegistry.TradeType
     ): Flow<AssetsByViewModeResult>
 
     fun sendAssetSearch(

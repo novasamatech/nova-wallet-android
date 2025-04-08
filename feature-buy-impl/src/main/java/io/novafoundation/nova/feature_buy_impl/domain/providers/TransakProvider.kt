@@ -23,11 +23,11 @@ class TransakProvider(
     override val logoRes: Int = R.drawable.ic_transak_provider_logo
     override val descriptionRes: Int = R.string.transak_provider_description
 
-    override val supportedFlows = setOf(TradeTokenRegistry.TradeFlow.BUY, TradeTokenRegistry.TradeFlow.SELL)
+    override val supportedFlows = setOf(TradeTokenRegistry.TradeType.BUY, TradeTokenRegistry.TradeType.SELL)
 
-    override fun getPaymentMethods(tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeTokenRegistry.PaymentMethod> {
-        return when (tradeFlow) {
-            TradeTokenRegistry.TradeFlow.BUY -> listOf(
+    override fun getPaymentMethods(tradeType: TradeTokenRegistry.TradeType): List<TradeTokenRegistry.PaymentMethod> {
+        return when (tradeType) {
+            TradeTokenRegistry.TradeType.BUY -> listOf(
                 TradeTokenRegistry.PaymentMethod.Visa,
                 TradeTokenRegistry.PaymentMethod.MasterCard,
                 TradeTokenRegistry.PaymentMethod.ApplePay,
@@ -36,7 +36,7 @@ class TransakProvider(
                 TradeTokenRegistry.PaymentMethod.Other(12)
             )
 
-            TradeTokenRegistry.TradeFlow.SELL -> listOf(
+            TradeTokenRegistry.TradeType.SELL -> listOf(
                 TradeTokenRegistry.PaymentMethod.Visa,
                 TradeTokenRegistry.PaymentMethod.MasterCard,
                 TradeTokenRegistry.PaymentMethod.Sepa,
@@ -45,7 +45,7 @@ class TransakProvider(
         }
     }
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeFlow: TradeTokenRegistry.TradeFlow): ExternalProvider.Integrator {
+    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeType: TradeTokenRegistry.TradeType): ExternalProvider.Integrator {
         val network = chainAsset.buyProviders.getValue(id)[NETWORK_KEY] as? String
 
         return Integrator(
@@ -55,7 +55,7 @@ class TransakProvider(
             network = network,
             chainAsset = chainAsset,
             address = address,
-            tradeFlow = tradeFlow
+            tradeType = tradeType
         )
     }
 
@@ -66,7 +66,7 @@ class TransakProvider(
         private val network: String?,
         private val chainAsset: Chain.Asset,
         private val address: String,
-        private val tradeFlow: TradeTokenRegistry.TradeFlow
+        private val tradeType: TradeTokenRegistry.TradeType
     ) : ExternalProvider.Integrator {
 
         override fun openFlow(using: Context) {

@@ -53,15 +53,15 @@ private class TradeProviderMixin(
         return flowOf { buyTokenRegistry.hasProvider(chainAsset) }
     }
 
-    override fun providersFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeProvider> {
-        return buyTokenRegistry.availableProvidersFor(chainAsset, tradeFlow)
+    override fun providersFor(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType): List<TradeProvider> {
+        return buyTokenRegistry.availableProvidersFor(chainAsset, tradeType)
     }
 
-    override suspend fun openProvider(chainAsset: Chain.Asset, provider: TradeTokenRegistry.Provider<*>, tradeFlow: TradeTokenRegistry.TradeFlow) {
+    override suspend fun openProvider(chainAsset: Chain.Asset, provider: TradeTokenRegistry.Provider<*>, tradeType: TradeTokenRegistry.TradeType) {
         val chain = chainRegistry.getChain(chainAsset.chainId)
         val address = accountUseCase.getSelectedMetaAccount().requireAddressIn(chain)
 
-        val integrator = provider.createIntegrator(chainAsset, address, tradeFlow)
+        val integrator = provider.createIntegrator(chainAsset, address, tradeType)
 
         integrateWithBuyProviderEvent.value = TradeMixin.IntegrationPayload(provider, integrator).event()
     }

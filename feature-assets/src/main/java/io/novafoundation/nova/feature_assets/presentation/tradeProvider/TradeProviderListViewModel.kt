@@ -32,8 +32,8 @@ class TradeProviderListViewModel(
 
     val titleFlow = chainAssetFlow.map {
         when (tradeFlow) {
-            TradeTokenRegistry.TradeFlow.BUY -> resourceManager.getString(R.string.trade_provider_list_buy_title, it.symbol.value)
-            TradeTokenRegistry.TradeFlow.SELL -> resourceManager.getString(R.string.trade_provider_list_sell_title, it.symbol.value)
+            TradeTokenRegistry.TradeType.BUY -> resourceManager.getString(R.string.trade_provider_list_buy_title, it.symbol.value)
+            TradeTokenRegistry.TradeType.SELL -> resourceManager.getString(R.string.trade_provider_list_sell_title, it.symbol.value)
         }
     }
 
@@ -56,8 +56,8 @@ class TradeProviderListViewModel(
     }
 
     private fun TradeProviderListPayload.Type.toTradeFlow() = when (this) {
-        TradeProviderListPayload.Type.BUY -> TradeTokenRegistry.TradeFlow.BUY
-        TradeProviderListPayload.Type.SELL -> TradeTokenRegistry.TradeFlow.SELL
+        TradeProviderListPayload.Type.BUY -> TradeTokenRegistry.TradeType.BUY
+        TradeProviderListPayload.Type.SELL -> TradeTokenRegistry.TradeType.SELL
     }
 
     private fun TradeTokenRegistry.PaymentMethod.toModel() = when (this) {

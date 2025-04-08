@@ -19,11 +19,11 @@ interface TradeMixin {
 
     fun tradeEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean>
 
-    fun providersFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeProvider>
+    fun providersFor(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType): List<TradeProvider>
 
     interface Presentation : TradeMixin
 
     interface Factory : MixinFactory<TradeMixin>
 
-    suspend fun openProvider(chainAsset: Chain.Asset, provider: TradeTokenRegistry.Provider<*>, tradeFlow: TradeTokenRegistry.TradeFlow)
+    suspend fun openProvider(chainAsset: Chain.Asset, provider: TradeTokenRegistry.Provider<*>, tradeType: TradeTokenRegistry.TradeType)
 }

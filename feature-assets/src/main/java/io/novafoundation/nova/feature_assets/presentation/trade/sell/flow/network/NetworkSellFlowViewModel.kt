@@ -42,7 +42,7 @@ class NetworkSellFlowViewModel(
     }
 
     override fun assetsFlow(tokenSymbol: TokenSymbol): Flow<List<AssetWithNetwork>> {
-        return interactor.tradeAssetFlow(tokenSymbol, externalBalancesFlow, TradeTokenRegistry.TradeFlow.SELL)
+        return interactor.tradeAssetFlow(tokenSymbol, externalBalancesFlow, TradeTokenRegistry.TradeType.SELL)
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
