@@ -10,6 +10,6 @@ class LedgerDevice(
 ) {
 
     override fun toString(): String {
-        return "${name ?: id} (${deviceType})"
+        return "${name ?: id} ($deviceType)"
     }
 }

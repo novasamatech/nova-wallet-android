@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.BleDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.BleConnection
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleManager
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.LedgerDeviceDiscoveryServiceDelegate

@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.usb.UsbLedgerConnection
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.LedgerDeviceDiscoveryServiceDelegate
 import kotlinx.coroutines.CoroutineScope

@@ -34,13 +34,15 @@ data class DevicesFoundState(
             }
 
             is ConnectionVerified -> verifyingDevice?.let {
-                emitState(DevicesFoundState(
-                    devices = devices,
-                    verifyingDevice = null,
-                    discoveryMethods = discoveryMethods,
-                    discoveryRequirementAvailability = discoveryRequirementAvailability,
-                    usedAllowedRequirementAvailabilityRequests = usedAllowedRequirementAvailabilityRequests
-                ))
+                emitState(
+                    DevicesFoundState(
+                        devices = devices,
+                        verifyingDevice = null,
+                        discoveryMethods = discoveryMethods,
+                        discoveryRequirementAvailability = discoveryRequirementAvailability,
+                        usedAllowedRequirementAvailabilityRequests = usedAllowedRequirementAvailabilityRequests
+                    )
+                )
             }
 
             is DeviceChosen -> {
