@@ -55,6 +55,10 @@ class ProxiedFeeSigner(
         return getDelegator().signRaw(payload)
     }
 
+    override suspend fun maxCallsPerTransaction(): Int? {
+        return getDelegator().maxCallsPerTransaction()
+    }
+
     override suspend fun actualFeeSignerId(chain: Chain): AccountId {
         return getDelegator().actualFeeSignerId(chain)
     }

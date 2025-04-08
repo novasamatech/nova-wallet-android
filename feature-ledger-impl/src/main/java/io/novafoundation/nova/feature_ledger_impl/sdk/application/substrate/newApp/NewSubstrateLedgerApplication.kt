@@ -98,11 +98,11 @@ abstract class NewSubstrateLedgerApplication(
 
         val encodedTxPayloadLength = payloadBytes.size.toShort().littleEndianBytes
 
-        val metadataProof = metadataShortenerService.generateExtrinsicProof(payload)
+        val extrinsicProof = metadataShortenerService.generateExtrinsicProof(payload).value
 
-        val wholePayload = payloadBytes + metadataProof
+        val wholePayload = payloadBytes + extrinsicProof
 
-        Log.d("Ledger", "Whole payload size: ${wholePayload.size}, metadata proof size: ${metadataProof.size}")
+        Log.d("Ledger", "Whole payload size: ${wholePayload.size}, metadata proof size: ${extrinsicProof.size}")
 
         val firstChunk = encodedDerivationPath + encodedTxPayloadLength
         val nextChunks = wholePayload.chunked(CHUNK_SIZE)

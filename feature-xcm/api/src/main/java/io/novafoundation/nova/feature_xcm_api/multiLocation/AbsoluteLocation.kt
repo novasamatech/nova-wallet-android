@@ -1,10 +1,13 @@
 package io.novafoundation.nova.feature_xcm_api.multiLocation
 
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.collectionIndexOrNull
 
 class AbsoluteMultiLocation(
     interior: Interior,
 ) : MultiLocation(interior) {
+
+    companion object;
 
     constructor(vararg junctions: Junction) : this(junctions.toList().toInterior())
 
@@ -36,4 +39,8 @@ class AbsoluteMultiLocation(
             selfJunction == otherJunction
         }.collectionIndexOrNull()
     }
+}
+
+fun AbsoluteMultiLocation.Companion.chainLocation(parachainId: ParaId?): AbsoluteMultiLocation {
+    return listOfNotNull(parachainId?.let(MultiLocation.Junction::ParachainId)).asLocation()
 }

@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericPayload
 
 @Subcomponent(
     modules = [
@@ -19,6 +20,7 @@ interface SelectLedgerGenericImportComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
+            @BindsInstance payload: SelectLedgerGenericPayload,
         ): SelectLedgerGenericImportComponent
     }
 

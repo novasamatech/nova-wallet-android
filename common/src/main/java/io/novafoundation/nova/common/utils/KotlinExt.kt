@@ -261,9 +261,13 @@ fun BigDecimal.coerceInOrNull(from: BigDecimal, to: BigDecimal): BigDecimal? = i
 
 fun Long.daysFromMillis() = TimeUnit.MILLISECONDS.toDays(this)
 
-inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = fold(BigInteger.ZERO) { acc, element ->
-    acc + extractor(element)
-}
+@Deprecated(
+    message = "Use sumOf from stdlib instead",
+    replaceWith = ReplaceWith(
+        expression = "this.sumOf(extractor)",
+    )
+)
+inline fun <T> Collection<T>.sumByBigInteger(extractor: (T) -> BigInteger) = sumOf { extractor(it) }
 
 fun Iterable<BigInteger>.sum() = sumOf { it }
 

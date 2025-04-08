@@ -20,7 +20,7 @@ fun ValidationSystem.Companion.voteTinderGovValidationSystem(
     hasEnoughFreeBalance(
         asset = { it.asset },
         fee = { it.fee },
-        requestedAmount = { it.maxAmount },
+        requestedAmount = { it.amount },
         error = VoteTinderGovValidationFailure::AmountIsTooBig
     )
 

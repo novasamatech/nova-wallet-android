@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Ứng dụng Polkadot đã được cài đặt</string>
     <string name="account_ledger_generic_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Mở ứng dụng Polkadot</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Ứng dụng Polkadot chung)</string>
     <string name="account_ledger_import_fill_description">Đảm bảo ứng dụng mạng được cài đặt vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live. Mở ứng dụng mạng trên thiết bị Ledger của bạn.</string>
     <string name="account_ledger_import_fill_disabled_hint">Thêm ít nhất một tài khoản</string>
     <string name="account_ledger_import_fill_title">Thêm tài khoản vào ví của bạn</string>
-    <string name="account_ledger_import_start_guide">Hướng dẫn kết nối Bluetooth chính thức của Ledger</string>
+    <string name="account_ledger_import_start_guide">Hướng dẫn Kết nối Ledger</string>
     <string name="account_ledger_import_start_step_1">Đảm bảo %s vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">Ứng dụng mạng đã được cài đặt</string>
     <string name="account_ledger_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth và Vị trí</string>
     <string name="account_ledger_import_start_step_4">%s để thêm vào ví</string>
     <string name="account_ledger_import_start_step_4_highlighted">Chọn tài khoản</string>
-    <string name="account_ledger_import_start_title">Kết nối Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s trong cài đặt điện thoại của bạn</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Bật OTG</string>
+    <string name="account_ledger_import_start_title">Kết nối Ledger</string>
     <string name="account_ledger_legacy_warning_message">Để ký kết các hoạt động và di chuyển các tài khoản của bạn sang ứng dụng Generic Ledger mới, cài đặt và mở ứng dụng Migration. Ứng dụng Ledger (Legacy) và Migration Ledger sẽ không còn được hỗ trợ trong tương lai.</string>
     <string name="account_ledger_legacy_warning_title">Ứng dụng Ledger mới đã được phát hành</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Ứng dụng Migration sẽ không còn khả dụng trong tương lai gần. Sử dụng nó để di chuyển các tài khoản của bạn sang ứng dụng Ledger mới để tránh mất tiền của bạn.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Ứng dụng Generic Polkadot)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Nếu sử dụng Ledger qua Bluetooth, hãy bật Bluetooth trên cả hai thiết bị và cấp quyền Bluetooth và vị trí cho Nova. Đối với USB, hãy bật OTG trong cài đặt điện thoại của bạn.</string>
     <string name="account_ledger_select_device_description">Hãy bật Bluetooth trong cài đặt điện thoại của bạn và thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_ledger_select_device_title">Chọn thiết bị Ledger của bạn</string>
+    <string name="account_ledger_select_device_usb_description">Vui lòng bật thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_mnmonic_length_variants">Cụm từ gồm 12, 15, 18, 21 hoặc 24 từ</string>
     <string name="account_needed_message">Bạn không có tài khoản cho mạng này, bạn có thể tạo hoặc nhập tài khoản.</string>
     <string name="account_needed_title">Cần tài khoản</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s không hỗ trợ ký các thông báo tùy ý — chỉ hỗ trợ giao dịch</string>
     <string name="account_parity_signer_not_supported_title">Không hỗ trợ ký</string>
     <string name="account_parity_signer_scan_from">Quét mã QR từ %s</string>
-    <string name="account_parity_signer_scan_with">Quét mã QR với %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Cũ</string>
+    <string name="account_parity_signer_show_mode_new">Mới (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">Tôi gặp lỗi trong %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Mã QR đã hết hạn</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Vì lý do bảo mật, các thao tác được tạo ra chỉ có giá trị trong %s.\nVui lòng tạo mã QR mới và ký với %s</string>
@@ -799,12 +805,17 @@
     <string name="json_export_btn">Xuất tệp JSON</string>
     <string name="language_title">Ngôn ngữ</string>
     <string name="ledger_chain_not_supported">Ledger không hỗ trợ %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">Hoạt động đã bị hủy bởi thiết bị. Đảm bảo bạn đã mở khóa Ledger của mình.</string>
     <string name="ledger_error_app_cancelled_title">Hoạt động bị hủy</string>
     <string name="ledger_error_app_not_launched_message">Mở ứng dụng %s trên thiết bị Ledger của bạn</string>
     <string name="ledger_error_app_not_launched_title">Ứng dụng %s chưa được khởi động</string>
     <string name="ledger_error_general_message">Hoạt động hoàn thành với lỗi trên thiết bị. Vui lòng thử lại sau.</string>
     <string name="ledger_error_general_title">Hoạt động Ledger thất bại</string>
+    <string name="ledger_hold_to_sign">Giữ nút xác nhận trên %s của bạn để chấp thuận giao dịch</string>
     <string name="ledger_import_select_address_load_more">Tải thêm tài khoản</string>
     <string name="ledger_review_approve_title">Xem xét và Phê duyệt</string>
     <string name="ledger_sign_approve_message">Nhấn cả hai nút trên %s của bạn để phê duyệt giao dịch</string>
@@ -817,7 +828,8 @@
     <string name="ledger_sign_transaction_validity_format">Giao dịch có hiệu lực trong %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger không hỗ trợ giao dịch này.</string>
     <string name="ledger_sign_tx_not_supported_title">Giao dịch không được hỗ trợ</string>
-    <string name="ledger_verify_address_subtitle">Nhấn cả hai nút trên %s của bạn để phê duyệt địa chỉ</string>
+    <string name="ledger_verify_address_message_both_buttons">Nhấn cả hai nút trên %s của bạn để chấp thuận địa chỉ</string>
+    <string name="ledger_verify_address_message_confirm_button">Nhấn nút xác nhận trên %s của bạn để chấp thuận địa chỉ</string>
     <string name="ledger_wallet_details_description">Ví này đã được ghép đôi với Ledger. Nova sẽ giúp bạn thực hiện bất kỳ thao tác nào bạn muốn, và bạn sẽ được yêu cầu ký chúng bằng Ledger</string>
     <string name="ledher_import_select_address_title">Chọn tài khoản để thêm vào ví</string>
     <string name="loading_network_info">Đang tải thông tin mạng...</string>
@@ -1155,6 +1167,7 @@
     <string name="select_delegation_tracks_edit_title">Chọn track để chỉnh sửa ủy quyền</string>
     <string name="select_delegation_tracks_revoke_title">Chọn track để hủy ủy quyền</string>
     <string name="select_delegation_tracks_unavailable_tracks">Track không có sẵn</string>
+    <string name="select_ledger_grant_permissions">Bật Bluetooth &amp; Cấp Quyền</string>
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
     <string name="select_network_title">Chọn mạng</string>
@@ -1501,6 +1514,8 @@
     <string name="start_create_wallet_name_your_wallet">Đặt tên cho ví của bạn</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Điều này chỉ hiển thị với bạn và bạn có thể chỉnh sửa sau.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Ví của bạn đã sẵn sàng</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Bạn có token khóa trên số dư của mình do %s. Để tiếp tục, bạn nên nhập ít hơn %s hoặc nhiều hơn %s. Để stake số lượng khác, bạn nên loại bỏ khóa %s của mình.</string>
     <string name="start_staking_cant_stake_amount">Bạn không thể stake số lượng đã chỉ định</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Đã chọn: %d (tối đa %d)</string>

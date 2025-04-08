@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Response
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.SignLedgerPayload
 
@@ -29,7 +30,7 @@ class LedgerSignCommunicatorImpl(navigationHoldersRegistry: NavigationHoldersReg
     override fun openRequest(request: Request) {
         super.openRequest(request)
 
-        val payload = SignLedgerPayload(request, requireNotNull(usedVariant))
+        val payload = SignLedgerPayload(request, requireNotNull(usedVariant), SelectLedgerPayload.ConnectionMode.ALL)
         val bundle = SignLedgerFragment.getBundle(payload)
         navController.navigate(R.id.action_open_sign_ledger, bundle)
     }

@@ -156,7 +156,7 @@ class SwapInteractor(
     }
 
     private fun buyAvailable(chainAssetFlow: Flow<Chain.Asset?>): Flow<Boolean> {
-        return chainAssetFlow.map { it != null && buyTokenRegistry.hasProvider(it, TradeTokenRegistry.TradeFlow.BUY) }
+        return chainAssetFlow.map { it != null && buyTokenRegistry.hasProvider(it, TradeTokenRegistry.TradeType.BUY) }
     }
 
     private fun receiveAvailable(chainAssetFlow: Flow<Chain.Asset?>): Flow<Boolean> {

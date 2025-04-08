@@ -27,14 +27,13 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxBalanceType
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,7 +83,7 @@ abstract class SetupVoteViewModel(
         viewModelScope = viewModelScope,
         assetInFlow = selectedAsset,
         feeLoaderMixin = originFeeMixin,
-        maxBalanceType = MaxBalanceType.FREE
+        balance = interactor::maxAvailableForVote,
     )
 
     val amountChooserMixin = amountChooserMixinFactory.create(
@@ -163,15 +162,17 @@ abstract class SetupVoteViewModel(
         val asset = selectedAsset.first()
         val amount = amountChooserMixin.amount.first()
         val conviction = selectedConvictionFlow.first()
+        val maxAmount = maxActionProvider.maxAvailableBalance.first().actualAmount
 
         val payload = VoteReferendaValidationPayload(
             onChainReferenda = voteAssistant.onChainReferenda,
             asset = asset,
             trackVoting = voteAssistant.trackVoting,
-            maxAmount = amount,
+            amount = amount,
             voteType = voteType,
             conviction = conviction,
-            fee = originFeeMixin.awaitFee()
+            fee = originFeeMixin.awaitFee(),
+            maxAvailableAmount = maxAmount
         )
 
         validationExecutor.requireValid(

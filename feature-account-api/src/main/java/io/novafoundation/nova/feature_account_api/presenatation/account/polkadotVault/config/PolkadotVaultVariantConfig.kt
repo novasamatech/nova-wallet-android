@@ -19,7 +19,7 @@ class PolkadotVaultVariantConfig(
         }
     }
 
-    class Sign(val troubleShootingLink: String)
+    class Sign(val troubleShootingLink: String, val supportsProofSigning: Boolean)
 
     class Common(@DrawableRes val iconRes: Int, @StringRes val nameRes: Int)
 }

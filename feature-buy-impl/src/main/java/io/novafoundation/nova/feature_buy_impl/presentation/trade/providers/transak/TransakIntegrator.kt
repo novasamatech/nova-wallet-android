@@ -27,7 +27,7 @@ class TransakIntegrator(
         val environment: String,
         val tokenSymbol: TokenSymbol,
         val address: String,
-        val tradeFlow: TradeTokenRegistry.TradeFlow
+        val tradeFlow: TradeTokenRegistry.TradeType
     )
 
     override fun run(using: WebView) {
@@ -47,7 +47,7 @@ class TransakIntegrator(
             .appendQueryParameter("cryptoCurrencyCode", payload.tokenSymbol.value)
             .appendNullableQueryParameter(TRANSAK_NETWORK_KEY, payload.network)
 
-        if (payload.tradeFlow == TradeTokenRegistry.TradeFlow.BUY) {
+        if (payload.tradeFlow == TradeTokenRegistry.TradeType.BUY) {
             urlBuilder.appendQueryParameter("walletAddress", payload.address)
                 .appendQueryParameter("disableWalletAddressForm", "true")
         }
@@ -55,15 +55,16 @@ class TransakIntegrator(
         return urlBuilder.build().toString()
     }
 
-    private fun TradeTokenRegistry.TradeFlow.getType(): String {
+    private fun TradeTokenRegistry.TradeType.getType(): String {
         return when (this) {
-            TradeTokenRegistry.TradeFlow.BUY -> "BUY"
-            TradeTokenRegistry.TradeFlow.SELL -> "SELL"
+            TradeTokenRegistry.TradeType.BUY -> "BUY"
+            TradeTokenRegistry.TradeType.SELL -> "SELL"
         }
     }
 }
 
 private class TransakWebViewClient : WebViewClient() {
+    // We use it to override base transak loading otherwise transak navigates to android native browser
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         view.loadUrl(request.url.toString())
         return true

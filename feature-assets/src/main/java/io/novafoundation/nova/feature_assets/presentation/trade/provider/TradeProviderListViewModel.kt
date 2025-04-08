@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.common.toModel
-import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeFlow
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
@@ -36,8 +36,8 @@ class TradeProviderListViewModel(
 
     val titleFlow = chainAssetFlow.map {
         when (tradeFlow) {
-            TradeTokenRegistry.TradeFlow.BUY -> resourceManager.getString(R.string.trade_provider_list_buy_title, it.symbol.value)
-            TradeTokenRegistry.TradeFlow.SELL -> resourceManager.getString(R.string.trade_provider_list_sell_title, it.symbol.value)
+            TradeTokenRegistry.TradeType.BUY -> resourceManager.getString(R.string.trade_provider_list_buy_title, it.symbol.value)
+            TradeTokenRegistry.TradeType.SELL -> resourceManager.getString(R.string.trade_provider_list_sell_title, it.symbol.value)
         }
     }
 
@@ -57,6 +57,11 @@ class TradeProviderListViewModel(
 
     fun back() {
         router.back()
+    }
+
+    private fun TradeProviderFlowType.toTradeFlow() = when (this) {
+        TradeProviderFlowType.BUY -> TradeTokenRegistry.TradeType.BUY
+        TradeProviderFlowType.SELL -> TradeTokenRegistry.TradeType.SELL
     }
 
     private fun TradeTokenRegistry.PaymentMethod.toModel() = when (this) {

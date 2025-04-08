@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot uygulamanın yüklü</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda %s açın</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot uygulamasını açın</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Genel Polkadot uygulaması)</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
-    <string name="account_ledger_import_start_guide">Ledger’ın resmi Bluetooth Bağlantı Kılavuzu</string>
+    <string name="account_ledger_import_start_guide">Ledger Bağlantı Rehberi</string>
     <string name="account_ledger_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınızda %s olduğundan emin olun</string>
     <string name="account_ledger_import_start_step_1_highlighted">ağ uygulaması yüklendi</string>
     <string name="account_ledger_import_start_step_2">Ledger cihazınızda %s</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">Bluetooth ve Konum\'a erişimini</string>
     <string name="account_ledger_import_start_step_4">Cüzdana eklenecek %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">Hesabı seçin</string>
-    <string name="account_ledger_import_start_title">Ledger Nano X’i bağlayın</string>
+    <string name="account_ledger_import_start_step_otg">%s telefon ayarlarında</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">OTG\'yi Etkinleştir</string>
+    <string name="account_ledger_import_start_title">Ledger’ı Bağla</string>
     <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
     <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot uygulaması)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Eski)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Eğer Ledger kullanıyorsanız Bluetooth ile her iki cihazda da Bluetooth\'u etkinleştirin ve Nova\'ya Bluetooth ve konum izinleri verin. USB için, telefon ayarlarınızda OTG\'yi etkinleştirin.</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
+    <string name="account_ledger_select_device_usb_description">Lütfen Ledger cihazını etkinleştirin. Ledger cihazınızı açın ve %s uygulamasını açın.</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 veya 24 kelime uzunluğunda ifade</string>
     <string name="account_needed_message">Bu ağ için bir hesabınız yok, hesap oluşturabilir veya hesap aktarabilirsiniz.</string>
     <string name="account_needed_title">Hesap Gerekli</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s, rasgele mesajların imzalanmasını desteklemez - yalnızca işlemler</string>
     <string name="account_parity_signer_not_supported_title">İmza desteklenmiyor</string>
     <string name="account_parity_signer_scan_from">%s\'ten QR kodunu tarayın</string>
-    <string name="account_parity_signer_scan_with">%s ile QR kodunu tarayın</string>
+    <string name="account_parity_signer_show_mode_legacy">Eski</string>
+    <string name="account_parity_signer_show_mode_new">Yeni (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">%s\'ta bir hata var</string>
     <string name="account_parity_signer_sign_qr_code_expired">QR kodunun süresi doldu</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Güvenlik nedenleriyle oluşturulan işlemler yalnızca %s için geçerlidir.\nLütfen yeni bir QR kodu oluşturun ve %s ile imzalayın</string>
@@ -806,12 +812,17 @@
     <string name="json_export_btn">JSON dosyasını dışa aktar</string>
     <string name="language_title">Dil</string>
     <string name="ledger_chain_not_supported">Ledger %s desteklemiyor</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">Operasyon cihaz tarafından iptal edildi. Ledger\'ınızın kilidini açtığınızdan emin olun.</string>
     <string name="ledger_error_app_cancelled_title">Operasyon iptal edildi</string>
     <string name="ledger_error_app_not_launched_message">Ledger cihazınızda %s uygulamasını açın</string>
     <string name="ledger_error_app_not_launched_title">%s uygulaması başlatılmadı</string>
     <string name="ledger_error_general_message">Operasyon cihazda bir hata ile tamamlandı. Lütfen, daha sonra tekrar deneyin.</string>
     <string name="ledger_error_general_title">Ledger operasyonu başarısız</string>
+    <string name="ledger_hold_to_sign">İşlemi onaylamak için %s üzerinde onaylama düğmesini basılı tutun</string>
     <string name="ledger_import_select_address_load_more">Daha fazla hesap yükle</string>
     <string name="ledger_review_approve_title">İnceleyin ve Onaylayın</string>
     <string name="ledger_sign_approve_message">İşlemi onaylamak için %s üzerindeki her iki düğmeye basın</string>
@@ -824,7 +835,8 @@
     <string name="ledger_sign_transaction_validity_format">İşlem %s için geçerlidir</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger bu işlemi desteklemiyor.</string>
     <string name="ledger_sign_tx_not_supported_title">İşlem desteklenmiyor</string>
-    <string name="ledger_verify_address_subtitle">Adresi onaylamak için %s üzerindeki her iki düğmeye basın</string>
+    <string name="ledger_verify_address_message_both_buttons">Adresi onaylamak için %s üzerindeki her iki düğmeye de basın</string>
+    <string name="ledger_verify_address_message_confirm_button">Adresi onaylamak için %s üzerindeki onaylama düğmesine basın</string>
     <string name="ledger_wallet_details_description">Bu cüzdan Ledger ile eşleştirildi. Nova istediğiniz herhangi bir işlemi oluşturmanıza yardımcı olacak ve bunları Ledger kullanarak imzalamanız istenecektir.</string>
     <string name="ledher_import_select_address_title">Cüzdana eklemek için hesap seçin</string>
     <string name="loading_network_info">Ağ bilgisi yükleniyor...</string>
@@ -1164,6 +1176,7 @@
     <string name="select_delegation_tracks_edit_title">Delegasyonu düzenlemek için yolları seçin</string>
     <string name="select_delegation_tracks_revoke_title">Delegasyonunuzu iptal etmek için yolları seçin</string>
     <string name="select_delegation_tracks_unavailable_tracks">Ulaşılamayan yollar</string>
+    <string name="select_ledger_grant_permissions">Bluetooth\'u Etkinleştir &amp; İzin Ver</string>
     <string name="select_ledger_location_enable_request_message">Nova\'nın Bluetooth taraması yaparak Ledger cihazınızı bulabilmesi için konumun etkinleştirilmesi gerekiyor</string>
     <string name="select_ledger_location_enable_request_title">Lütfen cihaz ayarlarında coğrafi konumu etkinleştirin</string>
     <string name="select_network_title">Ağ seç</string>
@@ -1512,6 +1525,8 @@
     <string name="start_create_wallet_name_your_wallet">Cüzdanınıza bir ad verin</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Bu yalnızca sizin tarafınızdan görülecek ve daha sonra düzenleyebilirsiniz.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Cüzdanınız hazır</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Bakiyenizde %s nedeniyle kilitlenmiş tokenlarınız var. Devam etmek için %s\'dan az ya da %s\'dan fazla bir miktar girmelisiniz. Başka bir miktar yatırmak için %s kilitlerinizi kaldırmalısınız.</string>
     <string name="start_staking_cant_stake_amount">Belirtilen miktarı yatıramazsınız</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Seçilen: %d (maksimum %d)</string>

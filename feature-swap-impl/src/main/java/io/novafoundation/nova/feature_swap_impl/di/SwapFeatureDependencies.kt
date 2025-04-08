@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -104,6 +105,8 @@ interface SwapFeatureDependencies {
     val hydraDxAssetIdConverter: HydraDxAssetIdConverter
 
     val hydraDxQuotingFactory: HydraDxQuoting.Factory
+
+    val hydrationPriceConversionFallback: HydrationPriceConversionFallback
 
     val runtimeCallsApi: MultiChainRuntimeCallsApi
 

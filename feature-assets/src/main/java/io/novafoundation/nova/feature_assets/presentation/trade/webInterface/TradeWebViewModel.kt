@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressPayl
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressRequester
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressResponder
 import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
-import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeFlow
+import io.novafoundation.nova.feature_assets.presentation.trade.common.toTradeType
 import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
 import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
 import io.novafoundation.nova.feature_buy_api.presentation.trade.providers.WebViewIntegrationProvider
@@ -40,7 +40,7 @@ class TradeWebViewModel(
 
     private val tradeMixin = tradeMixinFactory.create(viewModelScope)
 
-    private val tradeFlow = payload.type.toTradeFlow()
+    private val tradeFlow = payload.type.toTradeType()
 
     private val chainFlow = flowOf { chainRegistry.getChain(payload.asset.chainId) }
 

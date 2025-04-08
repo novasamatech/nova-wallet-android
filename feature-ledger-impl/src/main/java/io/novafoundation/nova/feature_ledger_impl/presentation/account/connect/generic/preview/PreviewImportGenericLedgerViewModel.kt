@@ -14,9 +14,8 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.reviewAddress
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +33,7 @@ class PreviewImportGenericLedgerViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
-    private val messageFormatter: LedgerMessageFormatter,
+    private val messageCommandFormatter: MessageCommandFormatter
 ) : BaseChainAccountsPreviewViewModel(
     iconGenerator = iconGenerator,
     externalActions = externalActions,
@@ -67,13 +66,13 @@ class PreviewImportGenericLedgerViewModel(
     }
 
     private suspend fun verifyAccount() {
-        ledgerMessageCommands.value = LedgerMessageCommand.reviewAddress(
-            resourceManager = resourceManager,
+        val device = device.first()
+
+        ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
             address = payload.account.address,
-            deviceName = device.first().name,
+            device = device,
             onCancel = ::verifyAddressCancelled,
         ).event()
-
         val result = withContext(Dispatchers.Default) {
             interactor.verifyAddressOnLedger(payload.accountIndex, payload.deviceId)
         }
@@ -81,12 +80,12 @@ class PreviewImportGenericLedgerViewModel(
         result.onFailure {
             handleLedgerError(
                 reason = it,
-                messageFormatter = messageFormatter,
-                resourceManager = resourceManager,
-                retry = ::continueClicked
+                device = device,
+                commandFormatter = messageCommandFormatter,
+                onRetry = ::continueClicked
             )
         }.onSuccess {
-            ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+            ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
 
             onAccountVerified()
         }
@@ -98,7 +97,7 @@ class PreviewImportGenericLedgerViewModel(
     }
 
     private fun verifyAddressCancelled() {
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
         verifyAddressJob?.cancel()
         verifyAddressJob = null
     }

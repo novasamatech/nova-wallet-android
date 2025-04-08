@@ -12,9 +12,7 @@ class SignLedgerFragment : SelectLedgerFragment<SignLedgerViewModel>() {
 
         private const val PAYLOAD_KEY = "SignLedgerFragment.Payload"
 
-        fun getBundle(
-            payload: SignLedgerPayload
-        ): Bundle {
+        fun getBundle(payload: SignLedgerPayload): Bundle {
             return Bundle().apply {
                 putParcelable(PAYLOAD_KEY, payload)
             }

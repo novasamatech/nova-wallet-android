@@ -79,7 +79,7 @@ class ReferendaListViewModel(
 
     override val assetSelectorMixin = assetSelectorFactory.create(
         scope = this,
-        amountProvider = Asset::free
+        amountProvider = referendaListInteractor::availableVoteAmount
     )
 
     private val selectedMetaAccount = selectedAccountUseCase.selectedMetaAccountFlow()

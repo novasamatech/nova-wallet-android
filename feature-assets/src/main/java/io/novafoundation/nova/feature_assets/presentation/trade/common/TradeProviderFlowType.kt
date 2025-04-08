@@ -6,12 +6,12 @@ enum class TradeProviderFlowType {
     BUY, SELL
 }
 
-fun TradeProviderFlowType.toTradeFlow() = when (this) {
-    TradeProviderFlowType.BUY -> TradeTokenRegistry.TradeFlow.BUY
-    TradeProviderFlowType.SELL -> TradeTokenRegistry.TradeFlow.SELL
+fun TradeProviderFlowType.toTradeType() = when (this) {
+    TradeProviderFlowType.BUY -> TradeTokenRegistry.TradeType.BUY
+    TradeProviderFlowType.SELL -> TradeTokenRegistry.TradeType.SELL
 }
 
-fun TradeTokenRegistry.TradeFlow.toModel() = when (this) {
-    TradeTokenRegistry.TradeFlow.BUY -> TradeProviderFlowType.BUY
-    TradeTokenRegistry.TradeFlow.SELL -> TradeProviderFlowType.SELL
+fun TradeTokenRegistry.TradeType.toModel() = when (this) {
+    TradeTokenRegistry.TradeType.BUY -> TradeProviderFlowType.BUY
+    TradeTokenRegistry.TradeType.SELL -> TradeProviderFlowType.SELL
 }

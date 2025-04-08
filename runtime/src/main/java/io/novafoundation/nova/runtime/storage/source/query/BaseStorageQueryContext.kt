@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZero
-import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
@@ -18,7 +17,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u16
 import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import io.novasama.substrate_sdk_android.runtime.metadata.StorageEntryModifier
-import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntryType
@@ -209,12 +207,6 @@ abstract class BaseStorageQueryContext(
         }
 
         return MultiQueryResult(delegate)
-    }
-
-    override suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V {
-        val rawValue = type!!.fromByteArrayOrIncompatible(value, runtime)
-
-        return binding(rawValue)
     }
 
     private fun <V> StorageEntry.decodeStorageValue(

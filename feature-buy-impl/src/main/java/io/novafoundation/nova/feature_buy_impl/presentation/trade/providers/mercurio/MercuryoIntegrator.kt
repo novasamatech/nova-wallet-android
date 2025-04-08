@@ -54,7 +54,7 @@ class MercuryoIntegrator(
         val network: String?,
         val address: String,
         val secret: String,
-        val tradeFlow: TradeTokenRegistry.TradeFlow
+        val tradeFlow: TradeTokenRegistry.TradeType
     )
 
     override fun run(using: WebView) {
@@ -79,18 +79,18 @@ class MercuryoIntegrator(
             .appendQueryParameter("fix_currency", true.toString())
 
         when (payload.tradeFlow) {
-            TradeTokenRegistry.TradeFlow.BUY -> urlBuilder.appendQueryParameter("address", payload.address)
-            TradeTokenRegistry.TradeFlow.SELL -> urlBuilder.appendQueryParameter("refund_address", payload.address)
+            TradeTokenRegistry.TradeType.BUY -> urlBuilder.appendQueryParameter("address", payload.address)
+            TradeTokenRegistry.TradeType.SELL -> urlBuilder.appendQueryParameter("refund_address", payload.address)
                 .appendQueryParameter("hide_refund_address", true.toString())
         }
 
         return urlBuilder.build().toString()
     }
 
-    private fun TradeTokenRegistry.TradeFlow.getType(): String {
+    private fun TradeTokenRegistry.TradeType.getType(): String {
         return when (this) {
-            TradeTokenRegistry.TradeFlow.BUY -> "buy"
-            TradeTokenRegistry.TradeFlow.SELL -> "sell"
+            TradeTokenRegistry.TradeType.BUY -> "buy"
+            TradeTokenRegistry.TradeType.SELL -> "sell"
         }
     }
 }

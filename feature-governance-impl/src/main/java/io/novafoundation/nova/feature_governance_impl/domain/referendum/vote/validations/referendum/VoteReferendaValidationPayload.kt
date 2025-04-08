@@ -13,8 +13,9 @@ data class VoteReferendaValidationPayload(
     override val onChainReferenda: List<OnChainReferendum>,
     override val asset: Asset,
     override val trackVoting: List<Voting>,
-    override val maxAmount: BigDecimal,
+    override val amount: BigDecimal,
     val voteType: VoteType?,
     val conviction: Conviction?,
-    override val fee: Fee
+    override val fee: Fee,
+    override val maxAvailableAmount: BigDecimal
 ) : VoteValidationPayload
