@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_xcm_api.dryRun.model
+package io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.scale.ToDynamicScaleInstance

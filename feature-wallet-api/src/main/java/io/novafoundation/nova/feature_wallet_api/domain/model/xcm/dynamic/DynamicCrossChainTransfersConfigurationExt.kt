@@ -3,12 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemote
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
-import io.novafoundation.nova.feature_xcm_api.chain.absoluteLocation
-import io.novafoundation.nova.feature_xcm_api.chain.isRelay
-import io.novafoundation.nova.feature_xcm_api.chain.isSystemChain
-import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -53,40 +48,20 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     destinationXcmChain: XcmChain,
 ): DynamicCrossChainTransferConfiguration? {
     val destinationChain = destinationXcmChain.chain
-    val originChain = originXcmChain.chain
 
     val assetTransfers = outComingAssetTransfers(originAsset.fullId) ?: return null
     val targetTransfer = assetTransfers.destinations.find { it.fullChainAssetId.chainId == destinationChain.id } ?: return null
 
     val reserve = reserveRegistry.getReserve(originAsset)
 
-    val originChainLocation = originXcmChain.absoluteLocation()
-    val assetLocationOnOrigin = reserve.tokenLocation.fromPointOfViewOf(originChainLocation)
-
-    val shouldUseReserveTransfers = originXcmChain.shouldUseReserveTransferTo(destinationXcmChain)
-
-    val remoteReserveChainLocation = if (shouldUseReserveTransfers && reserve.isRemote(originChain.id, destinationChain.id)) {
-        reserve.reserveChainLocation
-    } else {
-        null
-    }
-
     return DynamicCrossChainTransferConfiguration(
-        assetLocationOnOrigin = assetLocationOnOrigin,
-        originChainLocation = ChainLocation(originChain.id, originChainLocation),
-        destinationChainLocation = ChainLocation(destinationChain.id, destinationXcmChain.absoluteLocation()),
-        remoteReserveChainLocation = remoteReserveChainLocation,
+        originChain = originXcmChain,
+        destinationChain = destinationXcmChain,
+        originChainAsset = originAsset,
+        reserve = reserve,
+        hasDeliveryFee = targetTransfer.hasDeliveryFee,
+        supportsXcmExecute = targetTransfer.supportsXcmExecute
     )
-}
-
-private fun XcmChain.shouldUseReserveTransferTo(destination: XcmChain): Boolean {
-    return !shouldUseTeleportTo(destination)
-}
-
-private fun XcmChain.shouldUseTeleportTo(destination: XcmChain): Boolean {
-    return isRelay() && destination.isSystemChain() ||
-        isSystemChain() && destination.isRelay() ||
-        isSystemChain() && destination.isSystemChain()
 }
 
 /**
