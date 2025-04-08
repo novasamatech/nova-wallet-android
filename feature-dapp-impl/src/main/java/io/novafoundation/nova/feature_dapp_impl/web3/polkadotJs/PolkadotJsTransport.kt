@@ -44,10 +44,10 @@ class PolkadotJsTransport(
 
         return when (parsedMessage["msgType"]) {
             PolkadotJsTransportRequest.Identifier.AUTHORIZE_TAB.id ->
-                PolkadotJsTransportRequest.Single.AuthorizeTab(web3Responder, url)
+                PolkadotJsTransportRequest.Single.AuthorizeTab(web3Responder, url, requestId)
 
             PolkadotJsTransportRequest.Identifier.LIST_ACCOUNTS.id ->
-                PolkadotJsTransportRequest.Single.ListAccounts(web3Responder, url, gson)
+                PolkadotJsTransportRequest.Single.ListAccounts(web3Responder, url, gson, requestId)
 
             PolkadotJsTransportRequest.Identifier.SIGN_EXTRINSIC.id -> {
                 val maybePayload = mapRawPayloadToSignerPayloadJSON(parsedMessage["request"], gson)
@@ -69,10 +69,10 @@ class PolkadotJsTransport(
                 PolkadotJsTransportRequest.Subscription.SubscribeAccounts(scope = this, requestId, web3Responder, url, gson)
 
             PolkadotJsTransportRequest.Identifier.LIST_METADATA.id ->
-                PolkadotJsTransportRequest.Single.ListMetadata(web3Responder, url, gson)
+                PolkadotJsTransportRequest.Single.ListMetadata(web3Responder, url, gson, requestId)
 
             PolkadotJsTransportRequest.Identifier.PROVIDE_METADATA.id ->
-                PolkadotJsTransportRequest.Single.ProvideMetadata(web3Responder, url)
+                PolkadotJsTransportRequest.Single.ProvideMetadata(web3Responder, url, requestId)
 
             else -> null
         }

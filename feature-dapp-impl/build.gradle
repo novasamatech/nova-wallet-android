@@ -47,6 +47,8 @@ task actualizeJsScripts(type: Exec) {
         copy {
             from "$rootDir/nova-wallet-dapp-js/dist/nova_min.js"
             into "$rootDir/feature-dapp-impl/src/main/res/raw"
+
+            rename('nova_min.js', 'polkadotjs_min.js')
         }
     }
 }
