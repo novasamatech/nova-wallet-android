@@ -39,6 +39,6 @@ class AssetActionsView @JvmOverloads constructor(
     val swap: TextView
         get() = assetActionsSwap
 
-    val buy: TextView
+    val buySell: TextView
         get() = assetActionsBuy
 }

@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.view.bottomSheet.description.observeDescrip
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -51,9 +50,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             }
         }
     }
-
-    @Inject
-    lateinit var buyMixinUi: BuyMixinUi
 
     override fun onCreateView(
         inflater: LayoutInflater,

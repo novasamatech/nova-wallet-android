@@ -35,7 +35,6 @@ import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.Pric
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPriceChangeTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPricePriceTextInjector
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -72,7 +71,6 @@ class BalanceDetailViewModel(
     private val sendInteractor: SendInteractor,
     private val router: AssetsRouter,
     private val assetPayload: AssetPayload,
-    tradeMixinFactory: TradeMixin.Factory,
     private val transactionHistoryMixin: TransactionHistoryMixin,
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
@@ -129,22 +127,18 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
-    val buySellSelectorMixin = buySellSelectorMixinFactory.create()
+    val buySellSelectorMixin = buySellSelectorMixinFactory.create(
+        BuySellSelectorMixin.SelectorType.Asset(assetPayload.chainId, assetPayload.chainAssetId),
+        viewModelScope
+    )
 
     val chainUI = chainFlow.map { mapChainToUi(it) }
-
-    val buyMixin = tradeMixinFactory.create(scope = this)
 
     val swapButtonEnabled = assetFlow.flatMapLatest {
         swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
     }
         .onStart { emit(false) }
         .shareInBackground()
-
-    val buySellEnabled: Flow<Boolean> = assetFlow
-        .flatMapLatest { buyMixin.tradeEnabledFlow(it.token.configuration) }
-        .inBackground()
-        .share()
 
     val sendEnabled = assetFlow.map {
         sendInteractor.areTransfersEnabled(it.token.configuration)
@@ -235,7 +229,7 @@ class BalanceDetailViewModel(
     fun buyClicked() = checkControllableAsset {
         launch {
             val chainAsset = assetFlow.first().token.configuration
-            buySellSelectorMixin.openSelector(BuySellSelectorMixin.Selector.Asset(chainAsset.chainId, chainAsset.id))
+            buySellSelectorMixin.openSelector()
         }
     }
 

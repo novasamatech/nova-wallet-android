@@ -246,8 +246,16 @@ class AssetsFeatureModule {
     @Provides
     @FeatureScope
     fun provideBuySellMixinFactory(
-        assetsRouter: AssetsRouter
+        router: AssetsRouter,
+        tradeTokenRegistry: TradeTokenRegistry,
+        chainRegistry: ChainRegistry,
+        resourceManager: ResourceManager
     ): BuySellSelectorMixinFactory {
-        return BuySellSelectorMixinFactory(assetsRouter)
+        return BuySellSelectorMixinFactory(
+            router,
+            tradeTokenRegistry,
+            chainRegistry,
+            resourceManager
+        )
     }
 }
