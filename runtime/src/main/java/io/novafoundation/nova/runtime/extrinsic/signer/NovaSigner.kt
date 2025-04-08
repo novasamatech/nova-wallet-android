@@ -24,6 +24,13 @@ interface NovaSigner : Signer {
 interface FeeSigner : NovaSigner {
 
     /**
+     * Determines whether this particular instance of signer imposes additional limits to the number of calls
+     * it is possible to add to a single transaction.
+     * This is useful for signers that run in resource-constrained environment and thus cannot handle large transactions, e.g. Ledger
+     */
+    suspend fun maxCallsPerTransaction(): Int?
+
+    /**
      * In contrast with [signerAccountId] which for [FeeSigner] is supposed to return an account id derived from a fake keypair,
      * This method returns a real account id that later will sign the transaction we're calculating fee
      * This is useful for the client code to understand which account which actually pay the fee since it might differ from the requested account id
