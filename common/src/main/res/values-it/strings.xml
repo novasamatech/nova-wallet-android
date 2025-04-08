@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">l\'app Polkadot sia installata</string>
     <string name="account_ledger_generic_import_start_step_2">%s sul tuo dispositivo Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Apri l\'app Polkadot</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (App Polkadot Generico)</string>
     <string name="account_ledger_import_fill_description">Assicurati che l\'app di rete sia installata sul tuo dispositivo Ledger utilizzando l\'app Ledger Live. Apri l\'app di rete sul tuo dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Aggiungi almeno un account</string>
     <string name="account_ledger_import_fill_title">Aggiungi account al tuo portafoglio</string>
-    <string name="account_ledger_import_start_guide">Guida ufficiale alla connessione Bluetooth di Ledger</string>
+    <string name="account_ledger_import_start_guide">Guida alla Connessione Ledger</string>
     <string name="account_ledger_import_start_step_1">Assicurati che l\'app di %s sul tuo dispositivo Ledger utilizzando l\'app Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">l\'app Network è installata</string>
     <string name="account_ledger_import_start_step_2">%s sul tuo dispositivo Ledger</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">accedere a Bluetooth e Posizione</string>
     <string name="account_ledger_import_start_step_4">%s da aggiungere al portafoglio</string>
     <string name="account_ledger_import_start_step_4_highlighted">Seleziona account</string>
-    <string name="account_ledger_import_start_title">Collega Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s nelle impostazioni del tuo telefono</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Abilita OTG</string>
+    <string name="account_ledger_import_start_title">Connetti Ledger</string>
     <string name="account_ledger_legacy_warning_message">Per firmare operazioni e migrare i tuoi account alla nuova app Generic Ledger, installa e apri l\'app Migration. Le app Ledger Legacy e Migration non saranno supportate in futuro.</string>
     <string name="account_ledger_legacy_warning_title">È stata rilasciata una nuova app Ledger</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">L\'app Migration sarà non più disponibile nel prossimo futuro. Usala per migrare i tuoi account alla nuova app Ledger per evitare di perdere i tuoi fondi.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_generic_item_title">Ledger Nano X (applicazione Generic Polkadot)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Se utilizzi un Ledger via Bluetooth, abilita il Bluetooth su entrambi i dispositivi e concedi i permessi di Bluetooth e posizione a Nova. Per l\'USB, abilita OTG nelle impostazioni del tuo telefono.</string>
     <string name="account_ledger_select_device_description">Si prega di abilitare Bluetooth nelle impostazioni del telefono e sul dispositivo Ledger. Sblocca il tuo dispositivo Ledger e apri l\'app %s.</string>
     <string name="account_ledger_select_device_title">Seleziona il tuo dispositivo Ledger</string>
+    <string name="account_ledger_select_device_usb_description">Per favore, abilita il dispositivo Ledger. Sblocca il tuo dispositivo Ledger e apri l\'app %s.</string>
     <string name="account_mnmonic_length_variants">Frase di 12, 15, 18, 21 o 24 parole</string>
     <string name="account_needed_message">Non hai un account per questa rete, puoi creare o importare un account.</string>
     <string name="account_needed_title">Account necessario</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s non supporta la firma di messaggi arbitrari — solo transazioni</string>
     <string name="account_parity_signer_not_supported_title">La firma non è supportata</string>
     <string name="account_parity_signer_scan_from">Scansiona il codice QR da %s</string>
-    <string name="account_parity_signer_scan_with">Scansiona il codice QR con il %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Legacy</string>
+    <string name="account_parity_signer_show_mode_new">Nuovo (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">Ho un errore in %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Il codice QR è scaduto</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Per motivi di sicurezza le operazioni generate sono valide solo per %s.\nGenera un nuovo codice QR e firmalo con %s</string>
@@ -806,12 +812,17 @@
     <string name="json_export_btn">Esporta file JSON</string>
     <string name="language_title">Lingua</string>
     <string name="ledger_chain_not_supported">Ledger non supporta %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">L\'operazione è stata annullata dal dispositivo. Assicurati di aver sbloccato il tuo Ledger.</string>
     <string name="ledger_error_app_cancelled_title">Operazione annullata</string>
     <string name="ledger_error_app_not_launched_message">Apri l\'applicazione %s sul tuo dispositivo Ledger</string>
     <string name="ledger_error_app_not_launched_title">Applicazione %s non avviata</string>
     <string name="ledger_error_general_message">Operazione completata con errore sul dispositivo. Per favore, riprova più tardi.</string>
     <string name="ledger_error_general_title">Operazione Ledger fallita</string>
+    <string name="ledger_hold_to_sign">Tieni premuto il pulsante di conferma sul tuo %s per approvare la transazione</string>
     <string name="ledger_import_select_address_load_more">Carica più account</string>
     <string name="ledger_review_approve_title">Revisione e Approvazione</string>
     <string name="ledger_sign_approve_message">Premi entrambi i pulsanti sul tuo %s per approvare la transazione</string>
@@ -824,7 +835,8 @@
     <string name="ledger_sign_transaction_validity_format">La transazione è valida per %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger non supporta questa transazione.</string>
     <string name="ledger_sign_tx_not_supported_title">La transazione non è supportata</string>
-    <string name="ledger_verify_address_subtitle">Premi entrambi i pulsanti sul tuo %s per approvare l\'indirizzo</string>
+    <string name="ledger_verify_address_message_both_buttons">Premi entrambi i pulsanti sul tuo %s per approvare l\'indirizzo</string>
+    <string name="ledger_verify_address_message_confirm_button">Premi il pulsante di conferma sul tuo %s per approvare l\'indirizzo</string>
     <string name="ledger_wallet_details_description">Questo portafoglio è abbinato a Ledger. Nova ti aiuterà a effettuare qualsiasi operazione desideri e ti verrà richiesto di firmarle usando Ledger</string>
     <string name="ledher_import_select_address_title">Seleziona l\'account da aggiungere al portafoglio</string>
     <string name="loading_network_info">Caricamento informazioni della rete...</string>
@@ -1164,6 +1176,7 @@
     <string name="select_delegation_tracks_edit_title">Seleziona le tracce da modificare per la delega</string>
     <string name="select_delegation_tracks_revoke_title">Seleziona le tracce per revocare la tua delega</string>
     <string name="select_delegation_tracks_unavailable_tracks">Tracce non disponibili</string>
+    <string name="select_ledger_grant_permissions">Abilita Bluetooth &amp; Concedi Permessi</string>
     <string name="select_ledger_location_enable_request_message">Nova ha bisogno che la posizione sia attivata per poter effettuare la scansione Bluetooth per trovare il tuo dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Si prega di abilitare la geolocalizzazione nelle impostazioni del dispositivo</string>
     <string name="select_network_title">Seleziona rete</string>
@@ -1512,6 +1525,8 @@
     <string name="start_create_wallet_name_your_wallet">Dai un nome al tuo wallet</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Questo sarà visibile solo a te e potrai modificarlo in seguito.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Il tuo wallet è pronto</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Hai bloccato token sul tuo saldo a causa di %s. Per continuare, dovresti inserire meno di %s o più di %s. Per bloccare un\'altra quantità, dovresti rimuovere i tuoi blocchi %s.</string>
     <string name="start_staking_cant_stake_amount">Non puoi bloccare l\'importo specificato</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Selezionato: %d (massimo %d)</string>

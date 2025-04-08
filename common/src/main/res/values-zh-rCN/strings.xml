@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot 应用程序</string>
     <string name="account_ledger_generic_import_start_step_2">在 Ledger 设备上%s</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">打开 Polkadot 应用程序</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger（通用 Polkadot 应用）</string>
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
     <string name="account_ledger_import_fill_title">将账户添加到您的钱包</string>
-    <string name="account_ledger_import_start_guide">Ledger官方蓝牙连接指南</string>
+    <string name="account_ledger_import_start_guide">Ledger 连接指南</string>
     <string name="account_ledger_import_start_step_1">确保%s到您的Ledger设备中，使用Ledger Live应用</string>
     <string name="account_ledger_import_start_step_1_highlighted">Network应用程序已安装</string>
     <string name="account_ledger_import_start_step_2">在您的Ledger设备上%s</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">访问蓝牙和位置</string>
     <string name="account_ledger_import_start_step_4">%s添加到钱包</string>
     <string name="account_ledger_import_start_step_4_highlighted">选择账户</string>
-    <string name="account_ledger_import_start_title">连接Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s 在你的手机设置中</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">启用 OTG</string>
+    <string name="account_ledger_import_start_title">连接 Ledger</string>
     <string name="account_ledger_legacy_warning_message">要进行操作签名并将您的账户迁移到新的 Generic Ledger 应用程序，请安装并打开 Migration 应用程序。旧版 Legacy 和 Migration Ledger 应用程序将来不会被支持。</string>
     <string name="account_ledger_legacy_warning_title">新版 Ledger 应用程序已发布</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 应用程序在不久的将来将无法使用。使用它将您的账户迁移到新的 Ledger 应用程序，以免丢失资金。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_generic_item_title">Ledger Nano X (Generic Polkadot 应用程序)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X（旧版）</string>
+    <string name="account_ledger_nano_x_legacy">Ledger 旧版</string>
+    <string name="account_ledger_select_device_all_description">如果使用通过蓝牙连接的 Ledger，请在两个设备上启用蓝牙，并授予 Nova 蓝牙和位置权限。如需使用 USB，请在手机设置中启用 OTG。</string>
     <string name="account_ledger_select_device_description">请在手机设置和Ledger设备中启用蓝牙。解锁您的Ledger设备并打开%s应用。</string>
     <string name="account_ledger_select_device_title">选择您的Ledger设备</string>
+    <string name="account_ledger_select_device_usb_description">请启用 Ledger 设备。解锁你的 Ledger 设备并打开 %s 应用。</string>
     <string name="account_mnmonic_length_variants">12、15、18、21或24个单词的短语</string>
     <string name="account_needed_message">您在这个网络上没有账户，您可以创建或导入账户。</string>
     <string name="account_needed_title">需要账户</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s不支持签名任意消息 — 只有交易</string>
     <string name="account_parity_signer_not_supported_title">不支持签名</string>
     <string name="account_parity_signer_scan_from">从%s扫描QR码</string>
-    <string name="account_parity_signer_scan_with">用%s扫描QR码</string>
+    <string name="account_parity_signer_show_mode_legacy">传统</string>
+    <string name="account_parity_signer_show_mode_new">新的 (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">我在%s中有一个错误</string>
     <string name="account_parity_signer_sign_qr_code_expired">QR码已过期</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">出于安全原因，生成的操作仅在%s内有效。\n请生成新的QR码并用%s签名</string>
@@ -799,12 +805,17 @@
     <string name="json_export_btn">导出 JSON 文件</string>
     <string name="language_title">语言</string>
     <string name="ledger_chain_not_supported">Ledger不支持%s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">操作已被设备取消。请确保您已解锁您的Ledger。</string>
     <string name="ledger_error_app_cancelled_title">操作已取消</string>
     <string name="ledger_error_app_not_launched_message">请在您的Ledger设备上打开%s应用</string>
     <string name="ledger_error_app_not_launched_title">%s应用未启动</string>
     <string name="ledger_error_general_message">设备上的操作出错已完成。请稍后再试。</string>
     <string name="ledger_error_general_title">Ledger操作失败</string>
+    <string name="ledger_hold_to_sign">在你的 %s 上按住确认按钮以批准交易</string>
     <string name="ledger_import_select_address_load_more">加载更多账户</string>
     <string name="ledger_review_approve_title">审核并批准</string>
     <string name="ledger_sign_approve_message">按下您%s上的两个按钮以批准交易</string>
@@ -817,7 +828,8 @@
     <string name="ledger_sign_transaction_validity_format">交易有效期为%s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger不支持此交易。</string>
     <string name="ledger_sign_tx_not_supported_title">交易不受支持</string>
-    <string name="ledger_verify_address_subtitle">按下您%s上的两个按钮以批准地址</string>
+    <string name="ledger_verify_address_message_both_buttons">按住你的 %s 上的两个按钮以批准地址</string>
+    <string name="ledger_verify_address_message_confirm_button">按下你的 %s 上的确认按钮以批准地址</string>
     <string name="ledger_wallet_details_description">这个钱包与Ledger配对。Nova将帮助您形成任何您想要的操作，并且您将被要求使用Ledger签名</string>
     <string name="ledher_import_select_address_title">选择要添加到钱包的账户</string>
     <string name="loading_network_info">加载网络信息...</string>
@@ -1155,6 +1167,7 @@
     <string name="select_delegation_tracks_edit_title">选择要编辑委托的轨道</string>
     <string name="select_delegation_tracks_revoke_title">选择要撤销委托的轨道</string>
     <string name="select_delegation_tracks_unavailable_tracks">不可用的轨道</string>
+    <string name="select_ledger_grant_permissions">启用蓝牙并授予权限</string>
     <string name="select_ledger_location_enable_request_message">Nova需要启用地理位置，以便能够进行蓝牙扫描查找您的Ledger设备</string>
     <string name="select_ledger_location_enable_request_title">请在设备设置中启用地理位置</string>
     <string name="select_network_title">选择网络</string>
@@ -1501,6 +1514,8 @@
     <string name="start_create_wallet_name_your_wallet">给您的钱包取个名字</string>
     <string name="start_create_wallet_set_wallet_name_explanation">这将只对您可见，您可以稍后编辑它。</string>
     <string name="start_create_wallet_your_wallet_is_ready">您的钱包已准备好</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">蓝牙</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">由于%s，您的余额中有锁定的代币。为了继续，请输入少于%s或多于%s的金额。要质押其他金额，您应该解除%s的锁定。</string>
     <string name="start_staking_cant_stake_amount">您不能质押指定的金额</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">已选：%d（最多 %d）</string>

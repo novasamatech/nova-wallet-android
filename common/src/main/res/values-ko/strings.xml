@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">폴카닷 앱이 설치되었습니다</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger 기기에서 %s</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot 앱 열기</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot 앱)</string>
     <string name="account_ledger_import_fill_description">Ledger Live 앱을 사용하여 Ledger 장치에 Network 앱이 설치되어 있는지 확인하십시오. Ledger 장치에서 네트워크 앱을 여십시오.</string>
     <string name="account_ledger_import_fill_disabled_hint">계정을 적어도 하나 추가하십시오</string>
     <string name="account_ledger_import_fill_title">지갑에 계정을 추가하십시오</string>
-    <string name="account_ledger_import_start_guide">Ledger의 공식 Bluetooth 연결 가이드</string>
+    <string name="account_ledger_import_start_guide">Ledger 연결 가이드</string>
     <string name="account_ledger_import_start_step_1">Ledger Live 앱을 사용하여 Ledger 기기에 %s 있는지 확인하십시오</string>
     <string name="account_ledger_import_start_step_1_highlighted">네트워크 앱이 설치되었습니다</string>
     <string name="account_ledger_import_start_step_2">Ledger 기기에서 %s</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 및 위치</string>
     <string name="account_ledger_import_start_step_4">지갑에 추가하려면 %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">계정을 선택</string>
-    <string name="account_ledger_import_start_title">Ledger Nano X 연결</string>
+    <string name="account_ledger_import_start_step_otg">%s 전화 설정에서</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">OTG 활성화</string>
+    <string name="account_ledger_import_start_title">Ledger 연결</string>
     <string name="account_ledger_legacy_warning_message">작업을 서명하고 계정을 새로운 Generic Ledger 앱으로 마이그레이션하려면 Migration 앱을 설치하고 여십시오. 레거시 구형 및 Migration Ledger 앱은 더 이상 지원되지 않을 것입니다.</string>
     <string name="account_ledger_legacy_warning_title">새로운 Ledger 앱이 출시되었습니다</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 앱은 곧 사용 불가능할 것입니다. 자금을 잃지 않기 위해 새 Ledger 앱으로 계정을 마이그레이션하세요.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_generic_item_title">Ledger Nano X(Generic Polkadot 앱)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger 레거시</string>
+    <string name="account_ledger_select_device_all_description">Ledger를 Bluetooth로 사용하는 경우, 두 기기에서 Bluetooth를 활성화하고 Nova Bluetooth 및 위치 권한을 부여하세요. USB를 사용하려면, 전화 설정에서 OTG를 활성화하세요.</string>
     <string name="account_ledger_select_device_description">전화 설정에서 Bluetooth를 활성화하고 Ledger 장치를 여십시오. Ledger 장치를 잠금 해제하고 %s 앱을 여십시오.</string>
     <string name="account_ledger_select_device_title">Ledger 장치를 선택하십시오</string>
+    <string name="account_ledger_select_device_usb_description">Ledger 장치를 활성화해주세요. Ledger 장치를 잠금 해제하고 %s 앱을 여세요.</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 또는 24 단어 구</string>
     <string name="account_needed_message">이 네트워크에 사용할 계정이 없습니다. 계정을 생성하거나 가져올 수 있습니다.</string>
     <string name="account_needed_title">계정 필요</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s는 임의의 메시지 서명을 지원하지 않습니다 \n— 오직 거래만 지원합니다</string>
     <string name="account_parity_signer_not_supported_title">서명이 지원되지 않음</string>
     <string name="account_parity_signer_scan_from">%s에서 QR 코드를 스캔하세요</string>
-    <string name="account_parity_signer_scan_with">%s로 QR 코드를 스캔하세요</string>
+    <string name="account_parity_signer_show_mode_legacy">레거시</string>
+    <string name="account_parity_signer_show_mode_new">새로운 (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">%s에 오류가 있습니다</string>
     <string name="account_parity_signer_sign_qr_code_expired">QR 코드가 만료되었습니다</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">보안을 위해 생성된 작업은 %s 동안만 유효합니다.\n새 QR 코드를 생성하고 %s로 서명하세요</string>
@@ -799,12 +805,17 @@
     <string name="json_export_btn">JSON 파일 내보내기</string>
     <string name="language_title">언어</string>
     <string name="ledger_chain_not_supported">Ledger는 %s을(를) 지원하지 않습니다</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">기기에서 작업이 취소되었습니다. Ledger를 잠금 해제했는지 확인하세요.</string>
     <string name="ledger_error_app_cancelled_title">작업이 취소되었습니다</string>
     <string name="ledger_error_app_not_launched_message">Ledger 기기에서 %s 앱을 여세요</string>
     <string name="ledger_error_app_not_launched_title">%s 앱이 실행되지 않았습니다</string>
     <string name="ledger_error_general_message">기기에서 작업이 오류로 완료되었습니다. 나중에 다시 시도해 주세요.</string>
     <string name="ledger_error_general_title">Ledger 작업 실패</string>
+    <string name="ledger_hold_to_sign">%s의 확인 버튼을 길게 눌러 거래를 승인하세요</string>
     <string name="ledger_import_select_address_load_more">더 많은 계정을 로드</string>
     <string name="ledger_review_approve_title">검토하고 승인하기</string>
     <string name="ledger_sign_approve_message">거래를 승인하려면 %s에서 두 버튼을 모두 누르세요</string>
@@ -817,7 +828,8 @@
     <string name="ledger_sign_transaction_validity_format">거래는 %s 동안 유효합니다</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger가 이 거래를 지원하지 않습니다.</string>
     <string name="ledger_sign_tx_not_supported_title">거래가 지원되지 않습니다</string>
-    <string name="ledger_verify_address_subtitle">주소를 승인하려면 %s에서 두 버튼을 모두 누르세요</string>
+    <string name="ledger_verify_address_message_both_buttons">%s의 두 버튼을 눌러 주소를 승인하세요</string>
+    <string name="ledger_verify_address_message_confirm_button">%s의 확인 버튼을 눌러 주소를 승인하세요</string>
     <string name="ledger_wallet_details_description">이 지갑은 Ledger와 연동되어 있습니다. Nova는 원하는 모든 작업을 생성하는 데 도움을 줄 것이며, Ledger를 사용하여 서명하라는 요청을 받을 것입니다.</string>
     <string name="ledher_import_select_address_title">지갑에 추가할 계정을 선택하세요</string>
     <string name="loading_network_info">네트워크 정보를 불러오는 중...</string>
@@ -1155,6 +1167,7 @@
     <string name="select_delegation_tracks_edit_title">위임 수정할 트랙 선택</string>
     <string name="select_delegation_tracks_revoke_title">위임 취소할 트랙 선택</string>
     <string name="select_delegation_tracks_unavailable_tracks">사용할 수 없는 트랙</string>
+    <string name="select_ledger_grant_permissions">Bluetooth 활성화 및 권한 부여</string>
     <string name="select_ledger_location_enable_request_message">Ledger 장치를 찾기 위해 블루투스 스캔을 수행하려면 Nova는 위치 기능을 활성화해야 합니다.</string>
     <string name="select_ledger_location_enable_request_title">기기 설정에서 지리적 위치를 활성화해주세요.</string>
     <string name="select_network_title">네트워크 선택</string>
@@ -1501,6 +1514,8 @@
     <string name="start_create_wallet_name_your_wallet">지갑에 이름을 지정하세요</string>
     <string name="start_create_wallet_set_wallet_name_explanation">이것은 당신에게만 보이며 나중에 수정할 수 있습니다.</string>
     <string name="start_create_wallet_your_wallet_is_ready">지갑이 준비되었습니다.</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">블루투스</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">당신의 잔액에는 %s에 의해 잠긴 토큰이 있습니다. 계속하려면 %s 이하 또는 %s 이상을 입력해야 합니다. 다른 금액을 스테이크하려면 %s 잠금을 해제해야 합니다.</string>
     <string name="start_staking_cant_stake_amount">지정된 금액을 스테이크할 수 없습니다</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">선택됨: %d (최대 %d)</string>
