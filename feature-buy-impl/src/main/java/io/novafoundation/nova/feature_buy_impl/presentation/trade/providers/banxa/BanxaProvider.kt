@@ -24,11 +24,11 @@ class BanxaProvider(
     override val logoRes: Int = R.drawable.ic_banxa_provider_logo
     override val descriptionRes: Int = R.string.banxa_provider_description
 
-    override val supportedFlows = setOf(TradeTokenRegistry.TradeFlow.BUY)
+    override val supportedFlows = setOf(TradeTokenRegistry.TradeType.BUY)
 
-    override fun getPaymentMethods(tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeTokenRegistry.PaymentMethod> {
-        return when (tradeFlow) {
-            TradeTokenRegistry.TradeFlow.BUY -> listOf(
+    override fun getPaymentMethods(tradeType: TradeTokenRegistry.TradeType): List<TradeTokenRegistry.PaymentMethod> {
+        return when (tradeType) {
+            TradeTokenRegistry.TradeType.BUY -> listOf(
                 TradeTokenRegistry.PaymentMethod.Visa,
                 TradeTokenRegistry.PaymentMethod.MasterCard,
                 TradeTokenRegistry.PaymentMethod.ApplePay,
@@ -37,14 +37,14 @@ class BanxaProvider(
                 TradeTokenRegistry.PaymentMethod.Other(5)
             )
 
-            TradeTokenRegistry.TradeFlow.SELL -> throw IllegalStateException("Sell is not supported for Banxa provider")
+            TradeTokenRegistry.TradeType.SELL -> emptyList()
         }
     }
 
     override fun createIntegrator(
         chainAsset: Chain.Asset,
         address: String,
-        tradeFlow: TradeTokenRegistry.TradeFlow,
+        tradeFlow: TradeTokenRegistry.TradeType,
         onCloseListener: OnTradeOperationFinishedListener,
         onSellOrderCreatedListener: OnSellOrderCreatedListener
     ): WebViewIntegrationProvider.Integrator {

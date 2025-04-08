@@ -10,9 +10,9 @@ interface TradeMixin {
 
     fun tradeEnabledFlow(chainAsset: Chain.Asset): Flow<Boolean>
 
-    fun providersFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeProvider>
+    fun providersFor(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType): List<TradeProvider>
 
-    fun <T> providerFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow, providerId: String): T
+    fun <T> providerFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeType, providerId: String): T
 
     interface Presentation : TradeMixin
 

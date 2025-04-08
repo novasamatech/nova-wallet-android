@@ -32,8 +32,8 @@ private class TradeProviderMixin(
         return flowOf { buyTokenRegistry.hasProvider(chainAsset) }
     }
 
-    override fun providersFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow): List<TradeProvider> {
-        return buyTokenRegistry.availableProvidersFor(chainAsset, tradeFlow)
+    override fun providersFor(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType): List<TradeProvider> {
+        return buyTokenRegistry.availableProvidersFor(chainAsset, tradeType)
     }
 
     @Suppress("UNCHECKED_CAST")

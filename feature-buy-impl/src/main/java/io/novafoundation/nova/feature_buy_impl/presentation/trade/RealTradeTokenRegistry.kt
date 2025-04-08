@@ -9,11 +9,11 @@ class RealTradeTokenRegistry(private val providers: List<TradeTokenRegistry.Prov
         return providers.any { it.id in chainAsset.buyProviders }
     }
 
-    override fun hasProvider(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow): Boolean {
-        return availableProvidersFor(chainAsset, tradeFlow).isNotEmpty()
+    override fun hasProvider(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType): Boolean {
+        return availableProvidersFor(chainAsset, tradeType).isNotEmpty()
     }
 
-    override fun availableProvidersFor(chainAsset: Chain.Asset, tradeFlow: TradeTokenRegistry.TradeFlow) = providers
-        .filter { tradeFlow in it.supportedFlows }
+    override fun availableProvidersFor(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType) = providers
+        .filter { tradeType in it.supportedFlows }
         .filter { provider -> provider.id in chainAsset.buyProviders }
 }
