@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.di.Balanc
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.di.NovaCardComponent
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.di.TopUpCardComponent
+import io.novafoundation.nova.feature_assets.presentation.topup.di.TopUpAddressComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.di.WaitingNovaCardTopUpComponent
 import io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.asset.di.AssetBuyFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.network.di.NetworkBuyFlowComponent
@@ -30,9 +30,11 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.d
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
+import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.asset.di.AssetSellFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.di.NetworkSellFlowComponent
-import io.novafoundation.nova.feature_assets.presentation.tradeProvider.di.TradeProviderListComponent
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.di.TradeProviderListComponent
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.di.TradeWebComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.ExtrinsicDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.PoolRewardDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.di.RewardDetailComponent
@@ -106,6 +108,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun tradeProviderListComponent(): TradeProviderListComponent.Factory
 
+    fun tradeWebComponent(): TradeWebComponent.Factory
+
     fun networkBuyFlowComponent(): NetworkBuyFlowComponent.Factory
 
     fun networkSellFlowComponent(): NetworkSellFlowComponent.Factory
@@ -116,7 +120,7 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun networkSwapFlowComponent(): NetworkSwapFlowComponent.Factory
 
-    fun topUpCardComponentFactory(): TopUpCardComponent.Factory
+    fun topUpCardComponentFactory(): TopUpAddressComponent.Factory
 
     fun novaCardComponentFactory(): NovaCardComponent.Factory
 
@@ -130,6 +134,7 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
         fun create(
             @BindsInstance accountRouter: AssetsRouter,
             @BindsInstance selectAddressCommunicator: SelectAddressCommunicator,
+            @BindsInstance topUpAddressCommunicator: TopUpAddressCommunicator,
             deps: AssetsFeatureDependencies
         ): AssetsFeatureComponent
     }

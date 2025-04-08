@@ -266,7 +266,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         dappBrowserProgress.progress = 0
     }
 
-    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, dappBrowserProgress, viewModel.viewModelScope)
+    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, viewModel.viewModelScope, dappBrowserProgress)
 
     private fun updateButtonsState() {
         dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false
