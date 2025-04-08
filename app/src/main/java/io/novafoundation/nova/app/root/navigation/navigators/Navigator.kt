@@ -73,6 +73,7 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.Ma
 import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.OnSuccessfulTradeStrategyType
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebFragment
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
@@ -488,8 +489,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openBuyProviders(chainId: String, chainAssetId: Int) {
-        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.BUY)
+    override fun openBuyProviders(
+        chainId: String,
+        chainAssetId: Int
+    ) {
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.BUY, OnSuccessfulTradeStrategyType.OPEN_ASSET)
         navigationBuilder().cases()
             .addCase(R.id.buyFlowFragment, R.id.action_buyFlow_to_tradeProvidersFragment)
             .addCase(R.id.buyFlowNetworkFragment, R.id.action_buyFlowNetworks_to_tradeProvidersFragment)
@@ -498,8 +502,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openSellProviders(chainId: String, chainAssetId: Int) {
-        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.SELL)
+    override fun openSellProviders(
+        chainId: String,
+        chainAssetId: Int
+    ) {
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.SELL, OnSuccessfulTradeStrategyType.OPEN_ASSET)
         navigationBuilder().cases()
             .addCase(R.id.sellFlowFragment, R.id.action_sellFlow_to_tradeProvidersFragment)
             .addCase(R.id.sellFlowNetworkFragment, R.id.action_sellFlowNetworks_to_tradeProvidersFragment)
@@ -627,15 +634,13 @@ class Navigator(
             .addCase(R.id.mainFragment, R.id.action_mainFragment_to_balanceDetailFragment)
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
+            .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
 
-    override fun finishTradeOperation(assetPayload: AssetPayload) {
-        val bundle = BalanceDetailFragment.getBundle(assetPayload)
-
-        navigationBuilder().action(R.id.action_tradeWebFragment_to_balanceDetailFragment)
-            .setArgs(bundle)
+    override fun finishTradeOperation() {
+        navigationBuilder().action(R.id.action_finishTradeOperation)
             .navigateInFirstAttachedContext()
     }
 

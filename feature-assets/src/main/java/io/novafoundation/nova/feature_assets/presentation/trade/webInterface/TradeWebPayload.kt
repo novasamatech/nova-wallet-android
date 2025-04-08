@@ -9,5 +9,6 @@ import kotlinx.android.parcel.Parcelize
 class TradeWebPayload(
     val asset: AssetPayload,
     val providerId: String,
-    val type: TradeProviderFlowType
+    val type: TradeProviderFlowType,
+    val onSuccessfulTradeStrategyType: OnSuccessfulTradeStrategyType
 ) : Parcelable

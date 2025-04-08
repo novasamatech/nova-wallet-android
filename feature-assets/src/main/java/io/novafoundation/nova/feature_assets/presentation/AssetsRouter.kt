@@ -17,7 +17,7 @@ interface AssetsRouter {
 
     fun openAssetDetails(assetPayload: AssetPayload)
 
-    fun finishTradeOperation(assetPayload: AssetPayload)
+    fun finishTradeOperation()
 
     fun back()
 

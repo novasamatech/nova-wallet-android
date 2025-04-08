@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPay
 import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.OnSuccessfulTradeStrategyType
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
@@ -61,7 +62,14 @@ class SwapNavigator(
     }
 
     override fun openBuyToken(chainId: String, assetId: Int) {
-        val bundle = TradeProviderListFragment.createPayload(TradeProviderListPayload(chainId, assetId, TradeProviderFlowType.BUY))
+        val bundle = TradeProviderListFragment.createPayload(
+            TradeProviderListPayload(
+                chainId,
+                assetId,
+                TradeProviderFlowType.BUY,
+                OnSuccessfulTradeStrategyType.RETURN_BACK
+            )
+        )
 
         navigationBuilder().action(R.id.action_tradeProvidersFragment)
             .setArgs(bundle)

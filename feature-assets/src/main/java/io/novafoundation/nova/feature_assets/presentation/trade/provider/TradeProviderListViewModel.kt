@@ -84,7 +84,14 @@ class TradeProviderListViewModel(
         launch {
             val chainAsset = chainAssetFlow.first()
 
-            router.openTradeWebInterface(TradeWebPayload(AssetPayload(chainAsset.chainId, chainAsset.id), item.providerId, tradeFlow.toModel()))
+            router.openTradeWebInterface(
+                TradeWebPayload(
+                    AssetPayload(chainAsset.chainId, chainAsset.id),
+                    item.providerId,
+                    tradeFlow.toModel(),
+                    payload.onSuccessfulTradeStrategyType
+                )
+            )
         }
     }
 }

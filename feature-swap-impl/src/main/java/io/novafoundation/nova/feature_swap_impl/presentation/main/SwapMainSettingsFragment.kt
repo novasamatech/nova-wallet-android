@@ -36,7 +36,6 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsRoute
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
-import javax.inject.Inject
 
 class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 

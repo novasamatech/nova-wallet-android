@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin.SelectorType
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
-import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry.TradeFlow
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.CoroutineScope
@@ -77,8 +76,8 @@ class RealBuySellSelectorMixin(
 
     private suspend fun openSpecifiedAssetSelector(selectorType: SelectorType.Asset): BuySellSelectorMixin.SelectorPayload? {
         val chainAsset = chainRegistry.asset(selectorType.chaiId, selectorType.assetId)
-        val buyAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeFlow.BUY)
-        val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeFlow.SELL)
+        val buyAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.BUY)
+        val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.SELL)
 
         if (!buyAvailable && !sellAvailable) {
             showErrorMessage(R.string.trade_token_not_supported_title, R.string.trade_token_not_supported_message)
