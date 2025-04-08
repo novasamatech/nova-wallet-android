@@ -12,12 +12,6 @@ class FileStorageAdapterTest {
             initial = "ipfs://ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4",
             expected = "${FileStorage.IPFS.defaultHttpsGateway}bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4"
         )
-
-        runTest(
-            initial = "ipfs://ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4",
-            customGateways = mapOf(FileStorage.IPFS to "custom.domain.com/ipfs/"),
-            expected = "custom.domain.com/ipfs/bafkreig7jn6iwz4fo3mwkl3ndljbrf7ot4mwyvpmzrj4vm2nvwzw6dysb4"
-        )
     }
 
     @Test
@@ -44,9 +38,8 @@ class FileStorageAdapterTest {
     private fun runTest(
         initial: String,
         expected: String,
-        customGateways: Map<FileStorage, String> = emptyMap()
     ) {
-        val actual = FileStorageAdapter.adaptToHttps(initial, customGateways)
+        val actual = FileStorageAdapter.adaptToHttps(initial)
 
         assertEquals(expected, actual)
     }

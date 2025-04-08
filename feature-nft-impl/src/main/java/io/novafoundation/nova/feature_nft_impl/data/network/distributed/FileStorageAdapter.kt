@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.network.distributed
 
 enum class FileStorage(val prefix: String, val defaultHttpsGateway: String?) {
-    IPFS("ipfs://ipfs/", "https://ipfs.rmrk.link/ipfs/"),
+    IPFS("ipfs://ipfs/", "https://image.w.kodadot.xyz/ipfs/"),
     HTTPS("https://", null),
     HTTP("http://", null);
 
@@ -18,22 +18,14 @@ private fun validateHttpsGateway(gateway: String?) {
 
 object FileStorageAdapter {
 
-    fun String.adoptFileStorageLinkToHttps(
-        customGateways: Map<FileStorage, String> = emptyMap(),
-        noProtocolStorage: FileStorage = FileStorage.IPFS
-    ) = adaptToHttps(this, customGateways, noProtocolStorage)
+    fun String.adoptFileStorageLinkToHttps() = adaptToHttps(this)
 
-    fun adaptToHttps(
-        distributedStorageLink: String,
-        customGateways: Map<FileStorage, String> = emptyMap(),
-        noProtocolStorage: FileStorage = FileStorage.IPFS
-    ): String {
+    fun adaptToHttps(distributedStorageLink: String): String {
         val distributedStorage = FileStorage.values().firstOrNull { storage ->
             distributedStorageLink.pointsTo(storage)
-        } ?: noProtocolStorage
+        } ?: FileStorage.IPFS
 
-        val gateway = customGateways[distributedStorage] ?: distributedStorage.defaultHttpsGateway
-            ?: return distributedStorageLink
+        val gateway = distributedStorage.defaultHttpsGateway ?: return distributedStorageLink
 
         validateHttpsGateway(gateway)
 
