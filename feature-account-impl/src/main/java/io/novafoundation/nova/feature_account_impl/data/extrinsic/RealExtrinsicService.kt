@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.common.utils.takeWhileInclusive
 import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -22,6 +21,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
+import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
@@ -200,9 +200,8 @@ class RealExtrinsicService(
 
         if (extrinsics.isEmpty()) return getZeroFee(chain, feeSigner, submissionOptions)
 
-        val fees = extrinsics.map { estimateNativeFee(chain, it, feeSigner.submissionOrigin(chain)) }
-
-        val totalFeeAmount = fees.sumByBigInteger { it.amount }
+        val fees = extrinsics.mapAsync { estimateNativeFee(chain, it, feeSigner.submissionOrigin(chain)) }
+        val totalFeeAmount = fees.sumOf { it.amount }
 
         val totalNativeFee = SubstrateFee(
             totalFeeAmount,

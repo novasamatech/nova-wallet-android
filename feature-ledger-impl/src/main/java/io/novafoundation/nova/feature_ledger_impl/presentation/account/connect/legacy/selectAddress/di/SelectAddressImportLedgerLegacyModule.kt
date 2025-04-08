@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
@@ -31,6 +33,13 @@ class SelectAddressImportLedgerLegacyModule {
     ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SelectAddressImportLedgerLegacyViewModel::class)
     fun provideViewModel(
@@ -41,7 +50,7 @@ class SelectAddressImportLedgerLegacyModule {
         payload: SelectLedgerAddressPayload,
         chainRegistry: ChainRegistry,
         selectLedgerAddressInterScreenCommunicator: SelectLedgerAddressInterScreenCommunicator,
-        messageFormatter: LedgerMessageFormatter
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectAddressImportLedgerLegacyViewModel(
             router = router,
@@ -51,7 +60,7 @@ class SelectAddressImportLedgerLegacyModule {
             payload = payload,
             chainRegistry = chainRegistry,
             responder = selectLedgerAddressInterScreenCommunicator,
-            messageFormatter = messageFormatter
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 

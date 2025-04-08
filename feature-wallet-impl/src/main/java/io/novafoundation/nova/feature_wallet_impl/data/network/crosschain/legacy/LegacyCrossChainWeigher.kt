@@ -137,7 +137,7 @@ class LegacyCrossChainWeigher @Inject constructor(
         val xcmMessageSizeWithTopic = xcmMessageSize + SET_TOPIC_SIZE.toBigInteger()
 
         val feeSize = (deliveryConfig.sizeBase + xcmMessageSizeWithTopic * deliveryConfig.sizeFactor)
-        val deliveryFee = BigRational.fixedU128(deliveryFeeFactor * feeSize)
+        val deliveryFee = BigRational.fixedU128(deliveryFeeFactor * feeSize).integralQuotient
 
         val isSenderPaysOriginDelivery = !deliveryConfig.alwaysHoldingPays
         return if (isSenderPaysOriginDelivery && isSendingFromOrigin) {

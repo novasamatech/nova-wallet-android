@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Aplikasi Polkadot sudah terinstal</string>
     <string name="account_ledger_generic_import_start_step_2">%s di perangkat Ledger Anda</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Polkadot</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Aplikasi Polkadot Generik)</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
     <string name="account_ledger_import_fill_disabled_hint">Tambahkan setidaknya satu akun</string>
     <string name="account_ledger_import_fill_title">Tambahkan akun ke dompet Anda</string>
-    <string name="account_ledger_import_start_guide">Panduan Koneksi Bluetooth Resmi Ledger</string>
+    <string name="account_ledger_import_start_guide">Panduan Koneksi Ledger</string>
     <string name="account_ledger_import_start_step_1">Pastikan %s di perangkat Ledger Anda menggunakan aplikasi Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">aplikasi Network terpasang</string>
     <string name="account_ledger_import_start_step_2">%s pada perangkat Ledger Anda</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">akses Bluetooth dan Lokasi</string>
     <string name="account_ledger_import_start_step_4">%s untuk ditambahkan ke dompet</string>
     <string name="account_ledger_import_start_step_4_highlighted">Pilih akun</string>
-    <string name="account_ledger_import_start_title">Hubungkan Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s di pengaturan ponsel Anda</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Aktifkan OTG</string>
+    <string name="account_ledger_import_start_title">Hubungkan Ledger</string>
     <string name="account_ledger_legacy_warning_message">Untuk menandatangani operasi dan memigrasikan akun Anda ke aplikasi Ledger Generik yang baru, instal dan buka aplikasi Migrasi. Aplikasi Ledger Lama dan Ledger Migrasi tidak akan didukung di masa depan.</string>
     <string name="account_ledger_legacy_warning_title">Aplikasi Ledger Baru Telah Dirilis</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Aplikasi Migrasi akan tidak tersedia dalam waktu dekat. Gunakan untuk memigrasikan akun Anda ke aplikasi Ledger baru untuk menghindari kehilangan dana Anda.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (aplikasi Generic Polkadot)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Jika menggunakan Ledger via Bluetooth, aktifkan Bluetooth pada kedua perangkat dan berikan izin Bluetooth dan lokasi ke Nova. Untuk USB, aktifkan OTG di pengaturan ponsel Anda.</string>
     <string name="account_ledger_select_device_description">Harap, aktifkan Bluetooth dalam pengaturan ponsel Anda dan perangkat Ledger. Buka perangkat Ledger Anda dan buka aplikasi %s.</string>
     <string name="account_ledger_select_device_title">Pilih Perangkat Ledger Anda</string>
+    <string name="account_ledger_select_device_usb_description">Silakan, aktifkan perangkat Ledger. Buka kunci perangkat Ledger Anda dan buka aplikasi %s.</string>
     <string name="account_mnmonic_length_variants">Frasa 12, 15, 18, 21 atau 24 kata</string>
     <string name="account_needed_message">Anda tidak memiliki akun untuk jaringan ini, Anda dapat membuat atau mengimpor akun.</string>
     <string name="account_needed_title">Akun Diperlukan</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s tidak mendukung penandatanganan pesan sembarangan — hanya transaksi</string>
     <string name="account_parity_signer_not_supported_title">Penandatanganan tidak didukung</string>
     <string name="account_parity_signer_scan_from">Pindai kode QR dari %s</string>
-    <string name="account_parity_signer_scan_with">Pindai kode QR dengan %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Legacy</string>
+    <string name="account_parity_signer_show_mode_new">Baru (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">Saya memiliki kesalahan di %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Kode QR telah kedaluwarsa</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Untuk alasan keamanan, operasi yang dihasilkan hanya berlaku untuk %s.\nSilakan hasilkan kode QR baru dan tandai dengan %s</string>
@@ -799,12 +805,17 @@
     <string name="json_export_btn">Ekspor file JSON.</string>
     <string name="language_title">Bahasa</string>
     <string name="ledger_chain_not_supported">Ledger tidak mendukung %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">Operasi dibatalkan oleh perangkat. Pastikan Anda membuka kunci Ledger Anda.</string>
     <string name="ledger_error_app_cancelled_title">Operasi dibatalkan</string>
     <string name="ledger_error_app_not_launched_message">Buka aplikasi %s pada perangkat Ledger Anda</string>
     <string name="ledger_error_app_not_launched_title">Aplikasi %s tidak diluncurkan</string>
     <string name="ledger_error_general_message">Operasi selesai dengan kesalahan pada perangkat. Harap, coba lagi nanti.</string>
     <string name="ledger_error_general_title">Operasi Ledger gagal</string>
+    <string name="ledger_hold_to_sign">Tahan tombol konfirmasi di %s Anda untuk menyetujui transaksi</string>
     <string name="ledger_import_select_address_load_more">Muat lebih banyak akun</string>
     <string name="ledger_review_approve_title">Tinjau dan Setujui</string>
     <string name="ledger_sign_approve_message">Tekan kedua tombol pada %s Anda untuk menyetujui transaksi</string>
@@ -817,7 +828,8 @@
     <string name="ledger_sign_transaction_validity_format">Transaksi valid selama %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger tidak mendukung transaksi ini.</string>
     <string name="ledger_sign_tx_not_supported_title">Transaksi tidak didukung</string>
-    <string name="ledger_verify_address_subtitle">Tekan kedua tombol pada %s Anda untuk menyetujui alamat</string>
+    <string name="ledger_verify_address_message_both_buttons">Tekan kedua tombol di %s Anda untuk menyetujui alamat</string>
+    <string name="ledger_verify_address_message_confirm_button">Tekan tombol konfirmasi di %s Anda untuk menyetujui alamat</string>
     <string name="ledger_wallet_details_description">Dompet ini dipasangkan dengan Ledger. Nova akan membantu Anda melakukan operasi apa pun yang Anda inginkan, dan Anda akan diminta untuk menandatanganinya menggunakan Ledger</string>
     <string name="ledher_import_select_address_title">Pilih akun untuk ditambahkan ke dompet</string>
     <string name="loading_network_info">Memuat info jaringan...</string>
@@ -1155,6 +1167,7 @@
     <string name="select_delegation_tracks_edit_title">Select tracks to edit delegation</string>
     <string name="select_delegation_tracks_revoke_title">Select tracks to revoke your delegation</string>
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
+    <string name="select_ledger_grant_permissions">Aktifkan Bluetooth &amp; Berikan Izin</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
     <string name="select_network_title">Pilih jaringan</string>
@@ -1501,6 +1514,8 @@
     <string name="start_create_wallet_name_your_wallet">Berikan nama pada dompet Anda</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Ini hanya akan terlihat oleh Anda dan Anda dapat mengeditnya nanti.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Dompet Anda sudah siap</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Anda telah mengunci token pada saldo Anda karena %s. Untuk melanjutkan, Anda harus memasukkan kurang dari %s atau lebih dari %s. Untuk melakukan stake pada jumlah lain, Anda harus menghapus penguncian %s Anda.</string>
     <string name="start_staking_cant_stake_amount">Anda tidak dapat melakukan stake pada jumlah yang ditentukan</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Dipilih: %d (maks %d)</string>
