@@ -38,7 +38,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 
         fun receiveClicked()
 
-        fun buyClicked()
+        fun buySellClicked()
 
         fun swapClicked()
 
@@ -146,7 +146,7 @@ class AssetsHeaderHolder(
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
-            balanceListTotalBalance.onBuyClick { handler.buyClicked() }
+            balanceListTotalBalance.onBuyClick { handler.buySellClicked() }
             balanceListNovaCard.setOnClickListener { handler.novaCardClick() }
 
             balanceListTotalBalance.onSwapClick { handler.swapClicked() }

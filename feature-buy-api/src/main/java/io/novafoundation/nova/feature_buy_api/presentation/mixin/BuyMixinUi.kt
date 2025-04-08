@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface BuyMixinUi {
 
-    fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: BuyMixin)
+    fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: TradeMixin)
 
     fun setupBuyButton(
         fragment: BaseFragment<*>,

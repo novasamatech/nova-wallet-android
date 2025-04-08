@@ -66,6 +66,10 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
         dynamicListSheetTitle.setText(titleId)
     }
 
+    fun hideTitle() {
+        dynamicListSheetTitle.setVisible(false)
+    }
+
     fun setupRightAction(
         @DrawableRes drawableRes: Int,
         onClickListener: View.OnClickListener

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.common.utils.showBrowser
+import io.novafoundation.nova.feature_buy_api.domain.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -19,9 +20,32 @@ class TransakProvider(
     override val id = "transak"
     override val name = "Transak"
     override val officialUrl: String = "transak.com"
-    override val icon: Int = R.drawable.ic_transak
+    override val logoRes: Int = R.drawable.ic_transak_provider_logo
+    override val descriptionRes: Int = R.string.transak_provider_description
 
-    override fun createIntegrator(chainAsset: Chain.Asset, address: String): ExternalProvider.Integrator {
+    override val supportedFlows = setOf(TradeTokenRegistry.TradeType.BUY, TradeTokenRegistry.TradeType.SELL)
+
+    override fun getPaymentMethods(tradeType: TradeTokenRegistry.TradeType): List<TradeTokenRegistry.PaymentMethod> {
+        return when (tradeType) {
+            TradeTokenRegistry.TradeType.BUY -> listOf(
+                TradeTokenRegistry.PaymentMethod.Visa,
+                TradeTokenRegistry.PaymentMethod.MasterCard,
+                TradeTokenRegistry.PaymentMethod.ApplePay,
+                TradeTokenRegistry.PaymentMethod.GooglePay,
+                TradeTokenRegistry.PaymentMethod.Sepa,
+                TradeTokenRegistry.PaymentMethod.Other(12)
+            )
+
+            TradeTokenRegistry.TradeType.SELL -> listOf(
+                TradeTokenRegistry.PaymentMethod.Visa,
+                TradeTokenRegistry.PaymentMethod.MasterCard,
+                TradeTokenRegistry.PaymentMethod.Sepa,
+                TradeTokenRegistry.PaymentMethod.BankTransfer
+            )
+        }
+    }
+
+    override fun createIntegrator(chainAsset: Chain.Asset, address: String, tradeType: TradeTokenRegistry.TradeType): ExternalProvider.Integrator {
         val network = chainAsset.buyProviders.getValue(id)[NETWORK_KEY] as? String
 
         return Integrator(
@@ -30,7 +54,8 @@ class TransakProvider(
             environment = environment,
             network = network,
             chainAsset = chainAsset,
-            address = address
+            address = address,
+            tradeType = tradeType
         )
     }
 
@@ -40,10 +65,11 @@ class TransakProvider(
         private val environment: String,
         private val network: String?,
         private val chainAsset: Chain.Asset,
-        private val address: String
+        private val address: String,
+        private val tradeType: TradeTokenRegistry.TradeType
     ) : ExternalProvider.Integrator {
 
-        override fun openBuyFlow(using: Context) {
+        override fun openFlow(using: Context) {
             using.showBrowser(buildPurchaseUrl())
         }
 

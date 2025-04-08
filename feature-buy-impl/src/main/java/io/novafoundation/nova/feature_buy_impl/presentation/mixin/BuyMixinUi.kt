@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.View
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.view.dialog.infoDialog
-import io.novafoundation.nova.feature_buy_api.domain.BuyProvider
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
+import io.novafoundation.nova.feature_buy_api.domain.TradeProvider
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_buy_impl.R
 import io.novafoundation.nova.feature_buy_api.domain.providers.ExternalProvider
@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.Flow
 
 class RealBuyMixinUi : BuyMixinUi {
 
-    override fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: BuyMixin) = with(fragment) {
+    override fun setupBuyIntegration(fragment: BaseFragment<*>, mixin: TradeMixin) = with(fragment) {
         mixin.integrateWithBuyProviderEvent.observeEvent {
             with(it) {
                 when (val integrator = integrator) {
-                    is ExternalProvider.Integrator -> showBuyDisclaimer(requireContext(), buyProvider) {
-                        integrator.openBuyFlow(requireContext())
+                    is ExternalProvider.Integrator -> showBuyDisclaimer(requireContext(), tradeProvider) {
+                        integrator.openFlow(requireContext())
                     }
                 }
             }
@@ -48,7 +48,7 @@ class RealBuyMixinUi : BuyMixinUi {
 
 private fun showBuyDisclaimer(
     context: Context,
-    item: BuyProvider,
+    item: TradeProvider,
     positiveButton: () -> Unit
 ) {
     infoDialog(context) {
