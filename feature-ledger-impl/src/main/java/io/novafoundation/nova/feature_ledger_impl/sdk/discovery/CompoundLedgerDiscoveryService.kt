@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.discovery
 
+import android.util.Log
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +19,7 @@ class CompoundLedgerDiscoveryService(
 
     override val discoveredDevices: Flow<List<LedgerDevice>> by lazy {
         discoveringSubscribersTracker.subscribedMethods.flatMapLatest { subscribedMethods ->
+            Log.d("Ledger", "Subscribed discovery methods: $subscribedMethods")
             val devicesFromSubscribedMethodsFlows = delegates.filter { it.method in subscribedMethods }
                 .map { it.discoveredDevices }
 
@@ -31,21 +33,31 @@ class CompoundLedgerDiscoveryService(
         delegates.map(LedgerDeviceDiscoveryServiceDelegate::errors).merge()
     }
 
-    override fun startDiscovery(method: DiscoveryMethod) {
-        if (discoveringSubscribersTracker.noSubscribers(method)) {
-            getDelegate(method).startDiscovery()
-        }
+    override fun startDiscovery(methods: Set<DiscoveryMethod>) {
+        discoveringSubscribersTracker.withTransaction {
+            methods.forEach { method ->
+                if (discoveringSubscribersTracker.noSubscribers(method)) {
+                    getDelegate(method).startDiscovery()
+                }
 
-        discoveringSubscribersTracker.addSubscriber(method)
+                discoveringSubscribersTracker.addSubscriber(method)
+            }
+        }
     }
 
-    override fun stopDiscovery(method: DiscoveryMethod) {
-        val delegate = getDelegate(method)
-        stopDiscovery(delegate)
+    override fun stopDiscovery(methods: Set<DiscoveryMethod>) {
+        discoveringSubscribersTracker.withTransaction {
+            methods.forEach { method ->
+                val delegate = getDelegate(method)
+                stopDiscovery(delegate)
+            }
+        }
     }
 
     override fun stopDiscovery() {
-        delegates.forEach(::stopDiscovery)
+        discoveringSubscribersTracker.withTransaction {
+            delegates.forEach(::stopDiscovery)
+        }
     }
 
     private fun stopDiscovery(delegate: LedgerDeviceDiscoveryServiceDelegate) {
@@ -67,6 +79,27 @@ private class DiscoveringSubscribersTracker {
 
     private val _subscribedMethods = MutableStateFlow(emptySet<DiscoveryMethod>())
     val subscribedMethods = _subscribedMethods.asStateFlow()
+
+    private var txInProgress: Boolean = false
+
+    /**
+     * During the transaction, no values will be emitted to `subscribedMethods`
+     */
+    fun beginTransaction() {
+        require(!txInProgress) { "Nested transactions are not supported" }
+
+        txInProgress = true
+    }
+
+    /**
+     * Commits the currently present transaction
+     */
+    fun commitTransaction() {
+        require(txInProgress) { "Transaction not strated" }
+
+        txInProgress = false
+        emitNewEnabledValue()
+    }
 
     fun addSubscriber(method: DiscoveryMethod) {
         subscribersByMethod[method] = subscribersByMethod.getValue(method) + 1
@@ -92,7 +125,19 @@ private class DiscoveringSubscribersTracker {
     }
 
     private fun emitNewEnabledValue() {
+        if (!txInProgress) return
+
         // Using `toSet()` here as StateFlow would not notify subscribers for the same object passed multiple times
         _subscribedMethods.value = subscribersByMethod.keys.toSet()
+    }
+}
+
+private inline fun DiscoveringSubscribersTracker.withTransaction(block: DiscoveringSubscribersTracker.() -> Unit) {
+    beginTransaction()
+
+    try {
+        block()
+    } finally {
+        commitTransaction()
     }
 }

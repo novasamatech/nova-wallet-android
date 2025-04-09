@@ -168,13 +168,13 @@ abstract class SelectLedgerViewModel(
 
             is SideEffect.VerifyConnection -> performConnectionVerification(effect.device)
 
-            is SideEffect.StartDiscovery -> discoveryService.startDiscovery(effect.method)
+            is SideEffect.StartDiscovery -> discoveryService.startDiscovery(effect.methods)
 
             is SideEffect.RequestPermissions -> requestPermissions(effect.requirements, effect.shouldExitUponDenial)
 
             is SideEffect.RequestSatisfyRequirement -> requestSatisfyRequirement(effect.requirements)
 
-            is SideEffect.StopDiscovery -> discoveryService.stopDiscovery(effect.method)
+            is SideEffect.StopDiscovery -> discoveryService.stopDiscovery(effect.methods)
         }
     }
 

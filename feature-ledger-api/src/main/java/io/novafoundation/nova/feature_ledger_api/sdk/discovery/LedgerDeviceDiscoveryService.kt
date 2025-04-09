@@ -10,9 +10,9 @@ interface LedgerDeviceDiscoveryService {
 
     val errors: Flow<Throwable>
 
-    fun startDiscovery(method: DiscoveryMethods.Method)
+    fun startDiscovery(methods: Set<DiscoveryMethods.Method>)
 
-    fun stopDiscovery(method: DiscoveryMethods.Method)
+    fun stopDiscovery(methods: Set<DiscoveryMethods.Method>)
 
     fun stopDiscovery()
 }

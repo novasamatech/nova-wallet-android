@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.requirementMissin
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.requirementSatisfied
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SideEffect
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods.Method as DiscoveryMethod
 
 sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffect, SelectLedgerEvent> {
 
@@ -67,7 +68,7 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
     context(Transition<SelectLedgerState, SideEffect>)
     protected suspend fun updateActiveDiscoveryMethods(
         allDiscoveryMethods: DiscoveryMethods,
-        previousActiveMethods: Set<DiscoveryMethods.Method>,
+        previousActiveMethods: Set<DiscoveryMethod>,
         newRequirementsAvailability: DiscoveryRequirementAvailability,
     ) {
         val newActiveMethods = allDiscoveryMethods.filterBySatisfiedRequirements(newRequirementsAvailability)
@@ -75,8 +76,8 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         val methodsToStart = newActiveMethods - previousActiveMethods
         val methodsToStop = previousActiveMethods - newActiveMethods
 
-        methodsToStart.forEach { emitSideEffect(SideEffect.StartDiscovery(it)) }
-        methodsToStop.forEach { emitSideEffect(SideEffect.StopDiscovery(it)) }
+        startDiscovery(methodsToStart)
+        stopDiscovery(methodsToStop)
     }
 
     context(Transition<SelectLedgerState, SideEffect>)
@@ -150,6 +151,20 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
             is SelectLedgerEvent.DiscoveryRequirementSatisfied -> availability.requirementSatisfied(event.requirement)
             is SelectLedgerEvent.PermissionsGranted -> availability.permissionGranted()
             else -> null
+        }
+    }
+
+    context(Transition<SelectLedgerState, SideEffect>)
+    private suspend fun startDiscovery(methods: Set<DiscoveryMethod>) {
+        if (methods.isNotEmpty()) {
+            emitSideEffect(SideEffect.StartDiscovery(methods))
+        }
+    }
+
+    context(Transition<SelectLedgerState, SideEffect>)
+    private suspend fun stopDiscovery(methods: Set<DiscoveryMethod>) {
+        if (methods.isNotEmpty()) {
+            emitSideEffect(SideEffect.StopDiscovery(methods))
         }
     }
 }

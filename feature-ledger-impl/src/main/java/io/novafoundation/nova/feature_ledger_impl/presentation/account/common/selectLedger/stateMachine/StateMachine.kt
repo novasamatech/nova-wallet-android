@@ -14,9 +14,9 @@ sealed class SideEffect {
 
     data class VerifyConnection(val device: LedgerDevice) : SideEffect()
 
-    data class StartDiscovery(val method: DiscoveryMethods.Method) : SideEffect()
+    data class StartDiscovery(val methods: Set<DiscoveryMethods.Method>) : SideEffect()
 
-    data class StopDiscovery(val method: DiscoveryMethods.Method) : SideEffect()
+    data class StopDiscovery(val methods: Set<DiscoveryMethods.Method>) : SideEffect()
 }
 
 sealed class SelectLedgerEvent {
