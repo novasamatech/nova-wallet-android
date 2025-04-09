@@ -15,10 +15,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIc
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupButSellActionButton
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.showState
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
@@ -49,9 +50,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
     @Inject
     lateinit var imageLoader: ImageLoader
-
-    @Inject
-    lateinit var buyMixinUi: BuyMixinUi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,12 +110,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
     }
 
     override fun subscribe(viewModel: BalanceDetailViewModel) {
-        viewModel.state.observe(transfersContainer::showState)
+        setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
+        setupButSellActionButton(viewModel.buySellSelectorMixin, balanceDetailActions.buySell)
 
-        buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
-        buyMixinUi.setupBuyButton(this, balanceDetailActions.buy, viewModel.buyEnabled) {
-            viewModel.buyClicked()
-        }
+        viewModel.state.observe(transfersContainer::showState)
 
         viewModel.assetDetailsModel.observe { asset ->
             balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)

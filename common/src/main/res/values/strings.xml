@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="buy_token_not_supported_title">This token is not supported by the buy feature</string>
+    <string name="buy_token_not_supported_message">None of our providers currently support the buying of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="sell_token_not_supported_title">This token is not supported by the sell feature</string>
+    <string name="sell_token_not_supported_message">None of our providers currently support the selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="trade_token_not_supported_title">This token is not supported by the buy/sell feature</string>
+    <string name="trade_token_not_supported_message">None of our providers currently support the buying or selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="buy_order_completed_message">Purchase initiated! Please wait up to 60 minutes. You can track status on the email.</string>
+    <string name="sell_order_completed_message">Sale initiated! Please wait up to 60 minutes. You can track status on the email.</string>
+
+    <string name="fragment_sell_token_title">Sell %s token</string>
+    <string name="sell_network_flow_title">Select network for selling %s</string>
+
+    <string name="mercurio_provider_description">Best price with fees up to 3.95%</string>
+    <string name="transak_provider_description">Buy crypto starting from just $5</string>
+    <string name="banxa_provider_description">Straightforward and efficient KYC process</string>
+
+    <string name="wallet_asset_sell">Sell</string>
+
+    <string name="additional_payment_methods">+%d</string>
+
+    <string name="trade_provider_list_buy_title">Select a provider to buy %s token</string>
+
+    <string name="trade_provider_list_sell_title">Select a provider to sell %s token</string>
+
+    <string name="trade_provider_list_footer">Payment methods, fees and limits differ by provider.\nCompare their quotes to find the best option for you.</string>
+
+    <string name="wallet_asset_sell_tokens">Sell tokens</string>
+    <string name="wallet_asset_buy_tokens">Buy tokens</string>
+
+    <string name="wallet_asset_buy_sell">Buy/Sell</string>
+
+
     <string name="account_ledger_import_start_step_otg">%s in your phone settings</string>
     <string name="account_ledger_import_start_step_otg_highlighted">Enable OTG</string>
 

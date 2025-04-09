@@ -57,8 +57,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardFragment
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
 import io.novafoundation.nova.feature_assets.presentation.receive.ReceiveFragment
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
@@ -72,6 +70,12 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.A
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.OnSuccessfulTradeStrategyType
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
@@ -401,6 +405,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openSellFlow() {
+        navigationBuilder().action(R.id.action_mainFragment_to_sellFlow)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openBuyFlowFromSendFlow() {
         navigationBuilder().action(R.id.action_sendFlow_to_buyFlow)
             .navigateInFirstAttachedContext()
@@ -445,11 +454,6 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun finishAndAwaitTopUp() {
-        navigationBuilder().action(R.id.action_finish_top_up_flow)
-            .navigateInFirstAttachedContext()
-    }
-
     override fun openAwaitingCardCreation() {
         navigationBuilder().action(R.id.action_open_awaiting_card_creation)
             .navigateInFirstAttachedContext()
@@ -476,6 +480,44 @@ class Navigator(
     override fun openBuyNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_buyFlow_to_buyFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSellNetworks(payload: NetworkFlowPayload) {
+        navigationBuilder().action(R.id.action_sellFlow_to_sellFlowNetwork)
+            .setArgs(NetworkFlowFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBuyProviders(
+        chainId: String,
+        chainAssetId: Int
+    ) {
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.BUY, OnSuccessfulTradeStrategyType.OPEN_ASSET)
+        navigationBuilder().cases()
+            .addCase(R.id.buyFlowFragment, R.id.action_buyFlow_to_tradeProvidersFragment)
+            .addCase(R.id.buyFlowNetworkFragment, R.id.action_buyFlowNetworks_to_tradeProvidersFragment)
+            .setFallbackCase(R.id.action_tradeProvidersFragment)
+            .setArgs(TradeProviderListFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSellProviders(
+        chainId: String,
+        chainAssetId: Int
+    ) {
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.SELL, OnSuccessfulTradeStrategyType.OPEN_ASSET)
+        navigationBuilder().cases()
+            .addCase(R.id.sellFlowFragment, R.id.action_sellFlow_to_tradeProvidersFragment)
+            .addCase(R.id.sellFlowNetworkFragment, R.id.action_sellFlowNetworks_to_tradeProvidersFragment)
+            .setFallbackCase(R.id.action_tradeProvidersFragment)
+            .setArgs(TradeProviderListFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openTradeWebInterface(payload: TradeWebPayload) {
+        navigationBuilder().action(R.id.action_tradeWebFragment)
+            .setArgs(TradeWebFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 
@@ -510,14 +552,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openTopUpCard(payload: TopUpCardPayload) {
-        navigationBuilder().action(R.id.action_open_topUpCard)
-            .setArgs(TopUpCardFragment.getBundle(payload))
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun closeTopUp() {
-        navigationBuilder().action(R.id.action_close_top_up_with_browser)
+    override fun returnToMainScreen() {
+        navigationBuilder().action(R.id.action_returnToMainScreen)
             .navigateInFirstAttachedContext()
     }
 
@@ -598,7 +634,13 @@ class Navigator(
             .addCase(R.id.mainFragment, R.id.action_mainFragment_to_balanceDetailFragment)
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
+            .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
             .setArgs(bundle)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun finishTradeOperation() {
+        navigationBuilder().action(R.id.action_finishTradeOperation)
             .navigateInFirstAttachedContext()
     }
 
@@ -846,5 +888,10 @@ class Navigator(
                     .navigateInFirstAttachedContext()
             }
         }
+    }
+
+    override fun finishTopUp() {
+        navigationBuilder().action(R.id.action_finishTopUpFlow)
+            .navigateInFirstAttachedContext()
     }
 }

@@ -12,7 +12,7 @@ import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
@@ -112,7 +112,7 @@ class SwapFeatureModule {
         swapService: SwapService,
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
-        buyTokenRegistry: BuyTokenRegistry,
+        buyTokenRegistry: TradeTokenRegistry,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
         swapTransactionHistoryRepository: SwapTransactionHistoryRepository,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,

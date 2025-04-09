@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.view.bottomSheet.description.observeDescrip
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -37,7 +36,6 @@ import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettin
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsRoute
 import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
-import javax.inject.Inject
 
 class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
 
@@ -51,9 +49,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             }
         }
     }
-
-    @Inject
-    lateinit var buyMixinUi: BuyMixinUi
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -104,8 +99,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
 
         viewModel.feeMixin.setupFeeLoading(swapMainSettingsDetailsNetworkFee)
-
-        buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
 
         viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.swapRouteState.observe(swapMainSettingsRoute::setSwapRouteState)
