@@ -11,7 +11,7 @@ interface FeeInteractor {
 
     suspend fun canPayFeeInNonUtilityAsset(chainAsset: Chain.Asset, coroutineScope: CoroutineScope): Boolean
 
-    suspend fun assetFlow(asset: Chain.Asset): Flow<Asset>
+    suspend fun assetFlow(asset: Chain.Asset): Flow<Asset?>
 
     suspend fun hasEnoughBalanceToPayFee(feeAsset: Asset, inspectedFeeAmount: FeeInspector.InspectedFeeAmount): Boolean
 

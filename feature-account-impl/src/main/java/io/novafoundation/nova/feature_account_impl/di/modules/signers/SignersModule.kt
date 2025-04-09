@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.RealSignerProvider
+import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerFeeSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignerFactory
@@ -84,13 +85,15 @@ class SignersModule {
         watchOnlySignerFactory: WatchOnlySignerFactory,
         polkadotVaultSignerFactory: PolkadotVaultVariantSignerFactory,
         proxiedFeeSignerFactory: ProxiedFeeSignerFactory,
-        ledgerSignerFactory: LedgerSignerFactory
+        ledgerSignerFactory: LedgerSignerFactory,
+        ledgerFeeSignerFactory: LedgerFeeSignerFactory,
     ): SignerProvider = RealSignerProvider(
         secretsSignerFactory = secretsSignerFactory,
         watchOnlySigner = watchOnlySignerFactory,
         polkadotVaultSignerFactory = polkadotVaultSignerFactory,
         proxiedSignerFactory = proxiedSignerFactory,
         proxiedFeeSignerFactory = proxiedFeeSignerFactory,
-        ledgerSignerFactory = ledgerSignerFactory
+        ledgerSignerFactory = ledgerSignerFactory,
+        ledgerFeeSignerFactory = ledgerFeeSignerFactory
     )
 }

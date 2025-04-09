@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion
 
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
@@ -35,6 +36,12 @@ import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDedu
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
+import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.feature_xcm_api.versions.orDefault
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.emptyAccountId
@@ -42,19 +49,11 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersion
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.orDefault
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventOrThrow
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
@@ -126,7 +125,7 @@ private class AssetConversionExchange(
             .map { ReQuoteTrigger }
     }
 
-    private suspend fun constructAllAvailableDirections(pools: List<Pair<MultiLocation, MultiLocation>>): List<AssetConversionEdge> {
+    private suspend fun constructAllAvailableDirections(pools: List<Pair<RelativeMultiLocation, RelativeMultiLocation>>): List<AssetConversionEdge> {
         return buildList {
             pools.forEach { (firstLocation, secondLocation) ->
                 val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@forEach

@@ -11,5 +11,7 @@ interface MultiStakingSelectionType {
 
     suspend fun availableBalance(asset: Asset): Balance
 
+    suspend fun maxAmountToStake(asset: Asset): Balance
+
     suspend fun updateSelectionFor(stake: Balance)
 }

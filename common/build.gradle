@@ -43,8 +43,12 @@ android {
 
         buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://play.google.com/store/apps/details?id=io.novafoundation.nova.market\""
 
+        buildConfigField "String", "NOVA_CARD_WIDGET_URL", "\"https://exchange.mercuryo.io\""
+
         buildConfigField "String", "ASSET_COLORED_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/colored\""
         buildConfigField "String", "ASSET_WHITE_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/white/v1\""
+
+        buildConfigField "String", "UNIFIED_ADDRESS_ARTICLE", "\"https://docs.novawallet.io/nova-wallet-wiki/asset-management/how-to-receive-tokens#unified-and-legacy-addresses\""
     }
 
     buildTypes {
@@ -73,6 +77,8 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
+    namespace 'io.novafoundation.nova.common'
+
     buildFeatures {
         viewBinding true
     }
@@ -87,7 +93,7 @@ dependencies {
 
     implementation kotlinDep
 
-    
+
     implementation androidDep
     implementation cardViewDep
     implementation recyclerViewDep

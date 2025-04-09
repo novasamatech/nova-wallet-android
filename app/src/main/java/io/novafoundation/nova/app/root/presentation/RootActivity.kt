@@ -119,6 +119,10 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
                 showToast(it)
             }
         )
+
+        viewModel.toastMessagesEvents.observeEvent { showToast(it) }
+
+        viewModel.walletConnectErrorsLiveData.observeEvent { it?.let { showError(it) } }
     }
 
     override fun removeSplashBackground() {

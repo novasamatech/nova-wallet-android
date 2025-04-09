@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.Po
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.models.UnbondingPools
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import kotlinx.coroutines.flow.Flow
 
 interface NominationPoolUnbondRepository {

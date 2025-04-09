@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.di.SwapMainSet
 import io.novafoundation.nova.feature_swap_impl.presentation.options.di.SwapOptionsComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.route.di.SwapRouteComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -60,6 +61,7 @@ interface SwapFeatureComponent : SwapFeatureApi {
             BuyFeatureApi::class,
             DbApi::class,
             SwapCoreApi::class,
+            XcmFeatureApi::class,
         ]
     )
     interface SwapFeatureDependenciesComponent : SwapFeatureDependencies

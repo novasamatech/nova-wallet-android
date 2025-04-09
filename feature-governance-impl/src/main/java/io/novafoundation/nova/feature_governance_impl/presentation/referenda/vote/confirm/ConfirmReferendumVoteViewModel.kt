@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
@@ -150,15 +151,19 @@ class ConfirmReferendumVoteViewModel(
 
     private suspend fun getValidationPayload(): VoteReferendaValidationPayload {
         val voteAssistant = voteAssistantFlow.first()
+        val asset = assetFlow.first()
+        val maxAmount = interactor.maxAvailableForVote(asset)
+        val maxPlanks = asset.token.amountFromPlanks(maxAmount)
 
         return VoteReferendaValidationPayload(
             onChainReferenda = voteAssistant.onChainReferenda,
-            asset = assetFlow.first(),
+            asset = asset,
             trackVoting = voteAssistant.trackVoting,
-            maxAmount = payload.vote.amount,
+            amount = payload.vote.amount,
             conviction = payload.vote.conviction,
             voteType = payload.vote.voteType,
-            fee = originFeeMixin.awaitFee()
+            fee = originFeeMixin.awaitFee(),
+            maxAvailableAmount = maxPlanks
         )
     }
 }

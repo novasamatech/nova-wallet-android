@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.common.utils.takeWhileInclusive
 import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -18,14 +17,16 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.DispatchError
+import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.bindDispatchError
+import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
+import io.novafoundation.nova.common.utils.mapAsync
+import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_account_api.data.model.toFeePaymentAsset
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
@@ -162,7 +163,6 @@ class RealExtrinsicService(
         chain: Chain,
         extrinsic: String,
         usedSigner: FeeSigner,
-        submissionOptions: SubmissionOptions
     ): Fee {
         val runtime = chainRegistry.getRuntime(chain.id)
         val sendableExtrinsic = SendableExtrinsic(runtime, Extrinsic.fromHex(runtime, extrinsic))
@@ -170,7 +170,7 @@ class RealExtrinsicService(
         val nativeFee = estimateNativeFee(chain, sendableExtrinsic, usedSigner.submissionOrigin(chain))
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
-        val feePayment = feePaymentProvider.feePaymentFor(submissionOptions.feePaymentCurrency, coroutineScope)
+        val feePayment = feePaymentProvider.detectFeePaymentFromExtrinsic(sendableExtrinsic)
 
         return feePayment.convertNativeFee(nativeFee)
     }
@@ -200,14 +200,13 @@ class RealExtrinsicService(
 
         if (extrinsics.isEmpty()) return getZeroFee(chain, feeSigner, submissionOptions)
 
-        val fees = extrinsics.map { estimateNativeFee(chain, it, feeSigner.submissionOrigin(chain)) }
-
-        val totalFeeAmount = fees.sumByBigInteger { it.amount }
+        val fees = extrinsics.mapAsync { estimateNativeFee(chain, it, feeSigner.submissionOrigin(chain)) }
+        val totalFeeAmount = fees.sumOf { it.amount }
 
         val totalNativeFee = SubstrateFee(
             totalFeeAmount,
             feeSigner.submissionOrigin(chain),
-            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
+            submissionOptions.feePaymentCurrency.toChainAsset(chain)
         )
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
@@ -256,7 +255,7 @@ class RealExtrinsicService(
     private fun parseErrorEvent(errorEvent: GenericEvent.Instance, runtimeSnapshot: RuntimeSnapshot): DispatchError {
         val dispatchError = errorEvent.arguments.first()
 
-        return bindDispatchError(dispatchError, runtimeSnapshot)
+        return runtimeSnapshot.provideContext { bindDispatchError(dispatchError) }
     }
 
     private suspend fun constructSplitExtrinsicsForSubmission(
@@ -350,7 +349,7 @@ class RealExtrinsicService(
         return SubstrateFee(
             BigInteger.ZERO,
             signer.submissionOrigin(chain),
-            submissionOptions.feePaymentCurrency.toFeePaymentAsset(chain)
+            submissionOptions.feePaymentCurrency.toChainAsset(chain)
         )
     }
 

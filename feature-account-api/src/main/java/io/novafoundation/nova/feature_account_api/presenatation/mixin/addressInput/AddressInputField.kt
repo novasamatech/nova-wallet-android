@@ -49,10 +49,10 @@ class AddressInputField @JvmOverloads constructor(
     fun setState(state: AddressInputState) {
         setIdenticonState(state.iconState)
 
-        binder.addressInputScan.setVisible(state.scanShown)
-        binder.addressInputPaste.setVisible(state.pasteShown)
-        binder.addressInputClear.setVisible(state.clearShown)
-        binder.addressInputMyself.setVisible(state.myselfShown)
+        binder.addressInputScan.setVisible(state.scanShown && isEnabled)
+        binder.addressInputPaste.setVisible(state.pasteShown && isEnabled)
+        binder.addressInputClear.setVisible(state.clearShown && isEnabled)
+        binder.addressInputMyself.setVisible(state.myselfShown && isEnabled)
     }
 
     fun setExternalAccount(externalAccountState: ExtendedLoadingState<ExternalAccount?>) {
@@ -99,12 +99,18 @@ class AddressInputField @JvmOverloads constructor(
         binder.addressInputW3NAddress.setOnClickListener(listener)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        content.isEnabled = enabled
+        super.setEnabled(enabled)
+    }
+
     private fun setIdenticonState(state: AddressInputState.IdenticonState) {
         when (state) {
             is AddressInputState.IdenticonState.Address -> {
                 binder.addressInputIdenticon.makeVisible()
                 binder.addressInputIdenticon.setImageDrawable(state.drawable)
             }
+
             AddressInputState.IdenticonState.Placeholder -> {
                 binder.addressInputIdenticon.makeVisible()
                 binder.addressInputIdenticon.setImageResource(R.drawable.ic_identicon_placeholder)
@@ -123,6 +129,8 @@ class AddressInputField @JvmOverloads constructor(
     private fun Context.buttonBackground() = addRipple(getRoundedCornerDrawable(R.color.button_background_secondary))
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.AddressInputField) {
+        isEnabled = it.getBoolean(R.styleable.AddressInputField_android_enabled, true)
+
         val hint = it.getString(R.styleable.AddressInputField_android_hint)
         hint?.let { content.hint = hint }
 

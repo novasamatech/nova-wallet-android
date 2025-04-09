@@ -2,17 +2,17 @@ package io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.utils.Filter
 import io.novafoundation.nova.common.utils.constantOrNull
 import io.novafoundation.nova.common.utils.nominationPoolsOrNull
-import io.novafoundation.nova.common.utils.startsWith
 import io.novafoundation.nova.common.utils.toByteArray
+import io.novafoundation.nova.feature_account_api.domain.account.system.PrefixSystemAccountMatcher
+import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation.PoolAccountType
 import io.novafoundation.nova.feature_staking_api.domain.nominationPool.model.PoolId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.scale.dataType.uint32
 
@@ -42,10 +42,9 @@ class RealPoolAccountDerivation(
         )
     }
 
-    override suspend fun poolAccountFilter(derivationType: PoolAccountType, chainId: ChainId): Filter<AccountId>? {
+    override suspend fun poolAccountMatcher(derivationType: PoolAccountType, chainId: ChainId): SystemAccountMatcher? {
         val poolAccountPrefix = poolAccountPrefix(derivationType, chainId) ?: return null
-
-        return IsPoolAccountFilter(poolAccountPrefix)
+        return PrefixSystemAccountMatcher(poolAccountPrefix)
     }
 
     private fun ByteArray.truncateToAccountId(): AccountId = copyOf(newSize = 32)
@@ -75,12 +74,5 @@ class RealPoolAccountDerivation(
         val derivationTypeIndex = derivationType.derivationIndex
 
         return prefixBytes + palletId + derivationTypeIndex
-    }
-}
-
-private class IsPoolAccountFilter(private val prefix: ByteArray) : Filter<AccountId> {
-
-    override fun shouldInclude(model: AccountId): Boolean {
-        return model.startsWith(prefix)
     }
 }

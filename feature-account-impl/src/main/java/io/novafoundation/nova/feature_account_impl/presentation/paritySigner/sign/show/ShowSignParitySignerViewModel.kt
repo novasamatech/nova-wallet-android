@@ -11,6 +11,8 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.mediatorLiveData
+import io.novafoundation.nova.common.utils.reversed
+import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -18,9 +20,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
+import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ParitySignerSignMode
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.sign.show.ShowSignParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.common.QrCodeExpiredPresentableFactory
@@ -32,7 +36,15 @@ import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+
+private val MODE_TO_INDEX = mapOf(
+    ParitySignerSignMode.WITH_METADATA_PROOF to 0,
+    ParitySignerSignMode.LEGACY to 1
+)
+
+private val INDEX_TO_MODE = MODE_TO_INDEX.reversed()
 
 class ShowSignParitySignerViewModel(
     private val router: AccountRouter,
@@ -64,13 +76,20 @@ class ShowSignParitySignerViewModel(
         chainRegistry.getChain(chainId)
     }.shareInBackground()
 
-    val qrCodeSequence = flowOf {
+    val supportsMultipleSigningModes = polkadotVaultVariantConfigProvider.variantConfigFor(payload.polkadotVaultVariant)
+        .sign.supportsProofSigning
+
+    val selectedSigningModeIndex = singleReplaySharedFlow<Int>()
+
+    private val selectedSigningMode = selectedSigningModeIndex.map { INDEX_TO_MODE.getValue(it) }
+        .shareInBackground()
+
+    val qrCodeSequence = selectedSigningMode.mapLatest {
         val signPayload = signSharedState.getOrThrow()
 
-        val frames = interactor.qrCodeContent(signPayload.extrinsic).frames
+        val frames = interactor.qrCodeContent(signPayload.extrinsic, it).frames
 
-        frames.map { qrCodeGenerator.generateQrBitmap(it) }
-            .cycleMultiple()
+        frames.map { qrCodeGenerator.generateQrBitmap(it) }.cycleMultiple()
     }.shareInBackground()
 
     val addressModel = chain.map { chain ->
@@ -84,9 +103,12 @@ class ShowSignParitySignerViewModel(
     }.shareInBackground()
 
     val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_title, payload.polkadotVaultVariant)
-    val signLabel = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_scan_with, payload.polkadotVaultVariant)
 
     val errorButtonLabel = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_have_error, payload.polkadotVaultVariant)
+
+    init {
+        setInitialSigningMode()
+    }
 
     fun backClicked() {
         responder.respond(request.cancelled())
@@ -116,6 +138,17 @@ class ShowSignParitySignerViewModel(
         val address = addressModel.first().address
         val chain = chain.first()
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), chain)
+        externalActions.showAddressActions(address, chain)
+    }
+
+    private fun setInitialSigningMode() {
+        val mode = if (supportsMultipleSigningModes) {
+            ParitySignerSignMode.WITH_METADATA_PROOF
+        } else {
+            ParitySignerSignMode.LEGACY
+        }
+        val modeIndex = MODE_TO_INDEX.getValue(mode)
+
+        launch { selectedSigningModeIndex.emit(modeIndex) }
     }
 }

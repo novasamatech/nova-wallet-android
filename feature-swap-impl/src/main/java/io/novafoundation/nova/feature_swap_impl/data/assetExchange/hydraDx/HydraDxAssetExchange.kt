@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.common.utils.times
@@ -17,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.chains.CustomOrNativeFeePaymentProvider
+import io.novafoundation.nova.feature_account_api.data.fee.types.NativeFeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.ResetMode
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.SetFeesMode
@@ -51,6 +53,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.Quotabl
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
@@ -72,11 +75,11 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEventO
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -98,6 +101,7 @@ class HydraDxExchangeFactory(
     private val hydrationFeeInjector: HydrationFeeInjector,
     private val chainStateRepository: ChainStateRepository,
     private val swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
+    private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
 ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost): AssetExchange {
@@ -110,9 +114,10 @@ class HydraDxExchangeFactory(
             swapSourceFactories = swapSourceFactories,
             swapHost = swapHost,
             hydrationFeeInjector = hydrationFeeInjector,
-            delegate = quotingFactory.create(chain),
+            delegate = quotingFactory.create(chain, swapHost),
             chainStateRepository = chainStateRepository,
-            swapDeductionUseCase = swapDeductionUseCase
+            swapDeductionUseCase = swapDeductionUseCase,
+            hydrationPriceConversionFallback = hydrationPriceConversionFallback
         )
     }
 }
@@ -132,6 +137,7 @@ private class HydraDxAssetExchange(
     private val hydrationFeeInjector: HydrationFeeInjector,
     private val chainStateRepository: ChainStateRepository,
     private val swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
+    private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
 ) : AssetExchange {
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
@@ -515,6 +521,11 @@ private class HydraDxAssetExchange(
             return ReusableQuoteFeePayment(customFeeAsset)
         }
 
+        override suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment {
+            // Todo Hydration fee support from extrinsic
+            return NativeFeePayment()
+        }
+
         override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?> {
             return runCatching {
                 val acceptedCurrencies = fetchAcceptedCurrencies()
@@ -556,7 +567,9 @@ private class HydraDxAssetExchange(
                 swapDirection = SwapDirection.SPECIFIED_OUT
             )
 
-            val quotedFee = swapHost.quote(args)
+            val quotedFee = runCatching { swapHost.quote(args) }
+                .recoverCatching { hydrationPriceConversionFallback.convertNativeAmount(nativeFee.amount, customFeeAsset) }
+                .getOrThrow()
 
             // Fees in non-native assets are especially volatile since conversion happens through swaps so we add some buffer to mitigate volatility
             val quotedFeeWithBuffer = quotedFee * FEE_QUOTE_BUFFER
@@ -576,8 +589,6 @@ private class HydraDxAssetExchange(
     private inner class HydrationFastLookupFeeCapability(
         private val acceptedCurrencies: Set<ChainAssetId>
     ) : FastLookupCustomFeeCapability {
-
-        private var acceptedCurrenciesCache: Set<HydraDxAssetId>? = null
 
         override fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
             return chainAssetId in acceptedCurrencies

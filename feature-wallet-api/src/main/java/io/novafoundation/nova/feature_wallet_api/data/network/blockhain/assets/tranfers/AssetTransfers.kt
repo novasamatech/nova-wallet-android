@@ -1,13 +1,17 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -29,14 +33,18 @@ interface AssetTransferDirection {
 
 interface AssetTransferBase : AssetTransferDirection {
 
-    val recipientAccountId: AccountId
-        get() = destinationChain.accountIdOf(recipient)
+    val recipientAccountId: AccountIdKey
+        get() = destinationChain.accountIdOrDefault(recipient).intoKey()
 
     val recipient: String
 
     val feePaymentCurrency: FeePaymentCurrency
 
     val amountPlanks: Balance
+}
+
+fun AssetTransferBase.amount(): BigDecimal {
+    return originChainAsset.amountFromPlanks(amountPlanks)
 }
 
 fun AssetTransferBase.replaceAmount(newAmount: Balance): AssetTransferBase {
@@ -49,6 +57,8 @@ interface AssetTransfer : AssetTransferBase {
     val sender: MetaAccount
 
     val amount: BigDecimal
+
+    val transferringMaxAmount: Boolean
 
     override val amountPlanks: Balance
         get() = originChainAsset.planksFromAmount(amount)
@@ -97,6 +107,7 @@ class BaseAssetTransfer(
     override val destinationChainAsset: Chain.Asset,
     override val feePaymentCurrency: FeePaymentCurrency,
     override val amount: BigDecimal,
+    override val transferringMaxAmount: Boolean
 ) : AssetTransfer
 
 data class WeightedAssetTransfer(
@@ -108,6 +119,7 @@ data class WeightedAssetTransfer(
     override val destinationChainAsset: Chain.Asset,
     override val feePaymentCurrency: FeePaymentCurrency,
     override val amount: BigDecimal,
+    override val transferringMaxAmount: Boolean,
     val fee: OriginFee,
 ) : AssetTransfer {
 
@@ -120,6 +132,7 @@ data class WeightedAssetTransfer(
         destinationChainAsset = assetTransfer.destinationChainAsset,
         feePaymentCurrency = assetTransfer.feePaymentCurrency,
         amount = assetTransfer.amount,
+        transferringMaxAmount = assetTransfer.transferringMaxAmount,
         fee = fee
     )
 }

@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
@@ -26,7 +25,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactF
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
@@ -95,7 +94,6 @@ class SwapMainSettingsModule {
         payload: SwapSettingsPayload,
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
         accountUseCase: SelectedAccountUseCase,
-        buyMixinFactory: BuyMixin.Factory,
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
@@ -123,7 +121,6 @@ class SwapMainSettingsModule {
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapRateFormatter = swapRateFormatter,
             selectedAccountUseCase = accountUseCase,
-            buyMixinFactory = buyMixinFactory,
             swapStateStoreProvider = swapStateStoreProvider,
             maxActionProviderFactory = maxActionProviderFactory,
             swapRouteFormatter = swapRouteFormatter,

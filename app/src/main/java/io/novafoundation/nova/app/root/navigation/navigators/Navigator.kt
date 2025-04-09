@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.Export
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.ExportJsonFragment
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.ExportSeedFragment
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountFragment
+import io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorFragment
+import io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountFragment
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.ManualBackupSelectAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
@@ -68,6 +70,12 @@ import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.A
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.OnSuccessfulTradeStrategyType
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.extrinsic.ExtrinsicDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct.RewardDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.pool.PoolRewardDetailFragment
@@ -84,7 +92,9 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
@@ -395,6 +405,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openSellFlow() {
+        navigationBuilder().action(R.id.action_mainFragment_to_sellFlow)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openBuyFlowFromSendFlow() {
         navigationBuilder().action(R.id.action_sendFlow_to_buyFlow)
             .navigateInFirstAttachedContext()
@@ -434,6 +449,16 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openNovaCard() {
+        navigationBuilder().action(R.id.action_open_novaCard)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openAwaitingCardCreation() {
+        navigationBuilder().action(R.id.action_open_awaiting_card_creation)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openSendNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_sendFlow_to_sendFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
@@ -458,6 +483,57 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openSellNetworks(payload: NetworkFlowPayload) {
+        navigationBuilder().action(R.id.action_sellFlow_to_sellFlowNetwork)
+            .setArgs(NetworkFlowFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBuyProviders(
+        chainId: String,
+        chainAssetId: Int
+    ) {
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.BUY, OnSuccessfulTradeStrategyType.OPEN_ASSET)
+        navigationBuilder().cases()
+            .addCase(R.id.buyFlowFragment, R.id.action_buyFlow_to_tradeProvidersFragment)
+            .addCase(R.id.buyFlowNetworkFragment, R.id.action_buyFlowNetworks_to_tradeProvidersFragment)
+            .setFallbackCase(R.id.action_tradeProvidersFragment)
+            .setArgs(TradeProviderListFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSellProviders(
+        chainId: String,
+        chainAssetId: Int
+    ) {
+        val payload = TradeProviderListPayload(chainId, chainAssetId, TradeProviderFlowType.SELL, OnSuccessfulTradeStrategyType.OPEN_ASSET)
+        navigationBuilder().cases()
+            .addCase(R.id.sellFlowFragment, R.id.action_sellFlow_to_tradeProvidersFragment)
+            .addCase(R.id.sellFlowNetworkFragment, R.id.action_sellFlowNetworks_to_tradeProvidersFragment)
+            .setFallbackCase(R.id.action_tradeProvidersFragment)
+            .setArgs(TradeProviderListFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openTradeWebInterface(payload: TradeWebPayload) {
+        navigationBuilder().action(R.id.action_tradeWebFragment)
+            .setArgs(TradeWebFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openChainAddressSelector(chainId: String, accountId: ByteArray) {
+        val payload = ChainAddressSelectorPayload(chainId, accountId)
+
+        navigationBuilder().action(R.id.action_openUnifiedAddressDialog)
+            .setArgs(ChainAddressSelectorFragment.getBundle(payload))
+            .navigateInRoot()
+    }
+
+    override fun closeChainAddressesSelector() {
+        navigationBuilder().action(R.id.action_closeChainAddressesFragment)
+            .navigateInRoot()
+    }
+
     override fun returnToMainSwapScreen() {
         navigationBuilder().action(R.id.action_return_to_swap_settings)
             .navigateInFirstAttachedContext()
@@ -473,6 +549,11 @@ class Navigator(
     override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
         navigationBuilder().action(R.id.action_open_swapSetupAmount)
             .setArgs(SwapMainSettingsFragment.getBundle(swapSettingsPayload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun returnToMainScreen() {
+        navigationBuilder().action(R.id.action_returnToMainScreen)
             .navigateInFirstAttachedContext()
     }
 
@@ -553,7 +634,13 @@ class Navigator(
             .addCase(R.id.mainFragment, R.id.action_mainFragment_to_balanceDetailFragment)
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
+            .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
             .setArgs(bundle)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun finishTradeOperation() {
+        navigationBuilder().action(R.id.action_finishTradeOperation)
             .navigateInFirstAttachedContext()
     }
 
@@ -650,7 +737,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount) {
+    override fun openAddLedgerChainAccountFlow(addAccountPayload: AddAccountPayload.ChainAccount) {
+        val payload = AddChainAccountSelectLedgerPayload(addAccountPayload, SelectLedgerPayload.ConnectionMode.ALL)
         val bundle = AddChainAccountSelectLedgerFragment.getBundle(payload)
 
         navigationBuilder().action(R.id.action_accountDetailsFragment_to_addLedgerAccountGraph)
@@ -800,5 +888,10 @@ class Navigator(
                     .navigateInFirstAttachedContext()
             }
         }
+    }
+
+    override fun finishTopUp() {
+        navigationBuilder().action(R.id.action_finishTopUpFlow)
+            .navigateInFirstAttachedContext()
     }
 }

@@ -21,7 +21,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 
 @Module(includes = [ViewModelModule::class, CommonMultiStakingModule::class])
 class SetupAmountMultiStakingModule {
@@ -39,7 +40,8 @@ class SetupAmountMultiStakingModule {
         @MultiStakingSelectionStoreProviderKey selectionStoreProvider: StartMultiStakingSelectionStoreProvider,
         startMultiStakingInteractor: StartMultiStakingInteractor,
         payload: SetupAmountMultiStakingPayload,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        maxActionProviderFactory: MaxActionProviderFactory,
         validationExecutor: ValidationExecutor
     ): ViewModel {
         return SetupAmountMultiStakingViewModel(
@@ -53,7 +55,8 @@ class SetupAmountMultiStakingModule {
             payload = payload,
             validationExecutor = validationExecutor,
             interactor = startMultiStakingInteractor,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            maxActionProviderFactory = maxActionProviderFactory,
         )
     }
 

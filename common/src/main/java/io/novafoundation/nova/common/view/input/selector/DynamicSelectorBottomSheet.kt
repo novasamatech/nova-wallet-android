@@ -27,7 +27,7 @@ class DynamicSelectorBottomSheet(
 ) {
 
     class Payload(
-        val titleRes: Int,
+        val titleRes: Int?,
         val subtitle: String?,
         data: List<ListSelectorMixin.Item>
     ) : DynamicListBottomSheet.Payload<ListSelectorMixin.Item>(data)
@@ -35,7 +35,12 @@ class DynamicSelectorBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle(payload.titleRes)
+        if (payload.titleRes == null) {
+            hideTitle()
+        } else {
+            setTitle(payload.titleRes)
+        }
+
         binder.dynamicListSheetSubtitle.setTextOrHide(payload.subtitle)
     }
 

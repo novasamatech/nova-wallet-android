@@ -37,7 +37,7 @@ class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel, FragmentSelectU
 
     override fun subscribe(viewModel: SelectUnbondViewModel) {
         observeValidations(viewModel)
-        setupFeeLoading(viewModel, binder.unbondFee)
+        setupFeeLoading(viewModel.originFeeMixin, binder.unbondFee)
         observeHints(viewModel.hintsMixin, binder.unbondHints)
         setupAmountChooser(viewModel.amountMixin, binder.unbondAmount)
 

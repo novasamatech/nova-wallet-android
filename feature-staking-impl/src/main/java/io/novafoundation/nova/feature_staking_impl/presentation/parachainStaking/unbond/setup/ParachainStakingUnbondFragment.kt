@@ -45,10 +45,10 @@ class ParachainStakingUnbondFragment : BaseFragment<ParachainStakingUnbondViewMo
         observeRetries(viewModel)
         observeValidations(viewModel)
         setupAmountChooser(viewModel.amountChooserMixin, binder.parachainStakingUnbondAmountField)
-        setupFeeLoading(viewModel, binder.parachainStakingUnbondFee)
+        setupFeeLoading(viewModel.originFeeMixin, binder.parachainStakingUnbondFee)
         observeHints(viewModel.hintsMixin, binder.parachainStakingUnbondHints)
 
-        viewModel.selectedCollatorModel.observe(binder.parachainStakingUnbondCollator::setSelectedCollator)
+        viewModel.selectedCollatorModel.observe(binder.parachainStakingUnbondCollator::setSelectedTarget)
 
         viewModel.buttonState.observe(binder.parachainStakingUnbondNext::setState)
 

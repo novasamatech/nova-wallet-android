@@ -8,15 +8,13 @@
         <attr name="actionIcon" />
     </declare-styleable>
 
-    <declare-styleable name="BalancesView">
-        <attr name="title" />
-    </declare-styleable>
-
     <declare-styleable name="PriceSectionView">
         <attr name="sectionTitle" />
     </declare-styleable>
 
     <declare-styleable name="ChooseAmountView">
         <attr name="title" />
+
+        <attr name="android:enabled" />
     </declare-styleable>
 </resources>

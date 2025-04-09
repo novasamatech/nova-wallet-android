@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.view.bottomSheet.description.observeDescrip
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showLoadingValue
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -40,9 +39,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
     }
 
     override fun createBinding() = FragmentMainSwapSettingsBinding.inflate(layoutInflater)
-
-    @Inject
-    lateinit var buyMixinUi: BuyMixinUi
 
     override fun initViews() {
         binder.swapMainSettingsToolbar.applyStatusBarInsets()
@@ -85,8 +81,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
         setupSwapAmountInput(viewModel.amountOutInput, binder.swapMainSettingsReceiveInput, maxAvailableView = null)
 
         viewModel.feeMixin.setupFeeLoading(binder.swapMainSettingsDetailsNetworkFee)
-
-        buyMixinUi.setupBuyIntegration(this, viewModel.buyMixin)
 
         viewModel.rateDetails.observe { binder.swapMainSettingsDetailsRate.showLoadingValue(it) }
         viewModel.swapRouteState.observe(binder.swapMainSettingsRoute::setSwapRouteState)

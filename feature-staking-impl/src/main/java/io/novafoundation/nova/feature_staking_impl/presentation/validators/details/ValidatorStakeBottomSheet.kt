@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottom
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmountOrHide
 
 class ValidatorStakeBottomSheet(
     context: Context,
@@ -24,8 +25,8 @@ class ValidatorStakeBottomSheet(
     ) {
 
     class Payload(
-        val own: AmountModel,
-        val stakers: AmountModel,
+        val own: AmountModel?,
+        val stakers: AmountModel?,
         val total: AmountModel,
         @StringRes val stakersLabel: Int
     )
@@ -37,12 +38,12 @@ class ValidatorStakeBottomSheet(
 
         item(createCellView()) {
             it.setTitle(R.string.staking_validator_own_stake)
-            it.showAmount(payload.own)
+            it.showAmountOrHide(payload.own)
         }
 
         item(createCellView()) {
             it.setTitle(payload.stakersLabel)
-            it.showAmount(payload.stakers)
+            it.showAmountOrHide(payload.stakers)
         }
 
         item(createCellView()) {

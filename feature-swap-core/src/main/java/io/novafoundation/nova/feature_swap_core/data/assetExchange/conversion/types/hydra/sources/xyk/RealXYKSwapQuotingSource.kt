@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.poolFeesConstant
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
@@ -43,7 +44,7 @@ class XYKSwapQuotingSourceFactory(
         const val ID = "XYK"
     }
 
-    override fun create(chain: Chain): XYKSwapQuotingSource {
+    override fun create(chain: Chain, host: SwapQuoting.QuotingHost): XYKSwapQuotingSource {
         return RealXYKSwapQuotingSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,

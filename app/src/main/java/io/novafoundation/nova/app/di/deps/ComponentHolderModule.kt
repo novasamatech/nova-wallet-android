@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
+import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
+import io.novafoundation.nova.feature_banners_impl.di.BannersFeatureHolder
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_buy_impl.di.BuyFeatureHolder
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
@@ -28,6 +30,8 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureHolder
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
@@ -62,6 +66,8 @@ import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.di.WalletConnectFeatureHolder
 import io.novafoundation.nova.feature_wallet_impl.di.WalletFeatureHolder
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
+import io.novafoundation.nova.feature_xcm_impl.di.XcmFeatureHolder
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeHolder
 import io.novafoundation.nova.splash.di.SplashFeatureApi
@@ -246,6 +252,12 @@ interface ComponentHolderModule {
 
     @ApplicationScope
     @Binds
+    @ClassKey(DeepLinkBuildingFeatureApi::class)
+    @IntoMap
+    fun provideDeepLinkBuildingFeatureHolder(holder: DeepLinkBuildingFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
     @ClassKey(CloudBackupFeatureApi::class)
     @IntoMap
     fun provideCloudBackupFeatureHolder(holder: CloudBackupFeatureHolder): FeatureApiHolder
@@ -255,4 +267,16 @@ interface ComponentHolderModule {
     @ClassKey(SwapCoreApi::class)
     @IntoMap
     fun provideSwapCoreFeatureHolder(holder: SwapCoreHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(BannersFeatureApi::class)
+    @IntoMap
+    fun provideBannersFeatureApi(holder: BannersFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(XcmFeatureApi::class)
+    @IntoMap
+    fun provideXcmFeatureHolder(holder: XcmFeatureHolder): FeatureApiHolder
 }

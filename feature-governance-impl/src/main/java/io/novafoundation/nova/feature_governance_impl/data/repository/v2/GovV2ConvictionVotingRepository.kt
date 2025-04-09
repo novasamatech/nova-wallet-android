@@ -37,6 +37,8 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.common.bin
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.toOffChainVotes
 import io.novafoundation.nova.feature_governance_impl.data.repository.common.votersFor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
@@ -61,7 +63,11 @@ class GovV2ConvictionVotingRepository(
     private val delegateSubqueryApi: DelegationsSubqueryApi
 ) : ConvictionVotingRepository {
 
-    override val voteLockId: String = "pyconvot"
+    override val voteLockId = BalanceLockId.fromFullId("pyconvot")
+
+    override suspend fun maxAvailableForVote(asset: Asset): Balance {
+        return asset.totalInPlanks
+    }
 
     override suspend fun voteLockingPeriod(chainId: ChainId): BlockNumber {
         val runtime = chainRegistry.getRuntime(chainId)

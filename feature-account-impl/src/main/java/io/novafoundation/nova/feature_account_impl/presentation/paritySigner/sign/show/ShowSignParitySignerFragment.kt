@@ -5,6 +5,8 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setSequence
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -70,7 +72,23 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel,
         }
 
         binder.signParitySignerShowToolbar.setTitle(viewModel.title)
-        binder.signParitySignerSignLabel.text = viewModel.signLabel
         binder.signParitySignerShowHaveError.text = viewModel.errorButtonLabel
+
+        setupModeSwitcher(viewModel)
+    }
+
+    private fun setupModeSwitcher(viewModel: ShowSignParitySignerViewModel) {
+        binder.signParitySignerShowMode.setVisible(viewModel.supportsMultipleSigningModes)
+
+        if (!viewModel.supportsMultipleSigningModes) return
+
+        initTabs()
+
+        binder.signParitySignerShowMode bindTo viewModel.selectedSigningModeIndex
+    }
+
+    private fun initTabs() = with(binder.signParitySignerShowMode) {
+        addTab(newTab().setText(R.string.account_parity_signer_show_mode_new))
+        addTab(newTab().setText(R.string.account_parity_signer_show_mode_legacy))
     }
 }

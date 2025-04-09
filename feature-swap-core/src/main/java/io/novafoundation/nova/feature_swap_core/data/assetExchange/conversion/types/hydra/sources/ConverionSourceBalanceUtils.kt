@@ -10,7 +10,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.runtime.storage.typed.account
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.runtime.AccountId

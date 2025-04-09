@@ -1,18 +1,24 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types.hydra
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.SharedComputation
+import io.novafoundation.nova.common.data.memory.SharedFlowCache
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuotingSubscriptions
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 
@@ -21,8 +27,8 @@ class HydraDxQuoteSharedComputation(
     private val quotingFactory: HydraDxQuoting.Factory,
     private val pathQuoterFactory: PathQuoter.Factory,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-    private val blockNumberUpdater: BlockNumberUpdater
-) {
+    private val chainStateRepository: ChainStateRepository,
+) : SharedComputation(computationalCache) {
 
     suspend fun getQuoter(
         chain: Chain,
@@ -48,12 +54,12 @@ class HydraDxQuoteSharedComputation(
         val key = "HydraDxAssetConversion:${chain.id}:${accountId.toHexString()}"
 
         return computationalCache.useCache(key, scope) {
-            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
-            val hydraDxQuoting = quotingFactory.create(chain)
+            val sharedSubscriptions = RealSwapQuotingSubscriptions(scope)
+            val host = RealQuotingHost(sharedSubscriptions)
 
-            // Required at least for stable swap
-            blockNumberUpdater.listenForUpdates(subscriptionBuilder, chain)
-                .launchIn(this)
+            val subscriptionBuilder = storageSharedRequestsBuilderFactory.create(chain.id)
+
+            val hydraDxQuoting = quotingFactory.create(chain, host)
 
             hydraDxQuoting.sync()
             hydraDxQuoting.runSubscriptions(accountId, subscriptionBuilder)
@@ -62,6 +68,21 @@ class HydraDxQuoteSharedComputation(
             subscriptionBuilder.subscribe(this)
 
             hydraDxQuoting
+        }
+    }
+
+    private class RealQuotingHost(
+        override val sharedSubscriptions: SwapQuotingSubscriptions,
+    ) : SwapQuoting.QuotingHost
+
+    private inner class RealSwapQuotingSubscriptions(scope: CoroutineScope) : SwapQuotingSubscriptions {
+
+        private val blockNumberCache = SharedFlowCache<ChainId, BlockNumber>(scope) { chainId ->
+            chainStateRepository.currentRemoteBlockNumberFlow(chainId)
+        }
+
+        override suspend fun blockNumber(chainId: ChainId): Flow<BlockNumber> {
+            return blockNumberCache.getOrCompute(chainId)
         }
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.addPlanks
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -33,10 +34,11 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentPro
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.implementations.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
-import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.hasDeliveryFee
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -44,6 +46,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
+import io.novafoundation.nova.runtime.multiNetwork.disabledChains
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -86,7 +89,11 @@ class CrossChainTransferAssetExchange(
 
     override suspend fun availableDirectSwapConnections(): List<SwapGraphEdge> {
         val config = crossChainConfig.firstNotNull()
-        return config.availableInDestinations().map(::CrossChainTransferEdge)
+        val disabledChainIds = chainRegistry.disabledChains().mapToSet { it.id }
+
+        return config.availableInDestinations()
+            .filter { it.from.chainId !in disabledChainIds && it.to.chainId !in disabledChainIds }
+            .map(::CrossChainTransferEdge)
     }
 
     override fun feePaymentOverrides(): List<FeePaymentProviderOverride> {
@@ -143,7 +150,7 @@ class CrossChainTransferAssetExchange(
 
         private fun hasDeliveryFees(): Boolean {
             val config = crossChainConfig.value ?: return false
-            return delegate.from.chainId in config.deliveryFeeConfigurations
+            return config.hasDeliveryFee(delegate.from, delegate.to)
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {

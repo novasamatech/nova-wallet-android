@@ -23,6 +23,7 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+    namespace 'io.novafoundation.nova.feature_account_api'
 
     buildFeatures {
         viewBinding true
@@ -36,9 +37,10 @@ dependencies {
     implementation project(":feature-currency-api")
     implementation project(":feature-proxy-api")
     implementation project(':feature-cloud-backup-api')
+    implementation project(':feature-ledger-api')
+    implementation project(':feature-xcm:api')
     implementation project(':web3names')
 
-    
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep
     implementation androidDep
@@ -51,7 +53,6 @@ dependencies {
     implementation constraintDep
 
     implementation daggerDep
-    implementation project(':feature-ledger-api')
     kapt daggerKapt
 
     api substrateSdkDep

@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.subscribeToTransferableBalance
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
@@ -29,7 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
-import io.novafoundation.nova.runtime.storage.source.query.metadata
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -51,7 +52,7 @@ class OmniPoolQuotingSourceFactory(
         const val SOURCE_ID = "OmniPool"
     }
 
-    override fun create(chain: Chain): OmniPoolQuotingSource {
+    override fun create(chain: Chain, host: SwapQuoting.QuotingHost): OmniPoolQuotingSource {
         return RealOmniPoolQuotingSource(
             remoteStorageSource = remoteStorageSource,
             chainRegistry = chainRegistry,

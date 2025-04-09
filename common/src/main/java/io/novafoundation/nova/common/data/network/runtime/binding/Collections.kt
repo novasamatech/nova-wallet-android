@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 
 fun <T> bindList(dynamicInstance: Any?, itemBinder: (Any?) -> T): List<T> {
@@ -8,6 +9,12 @@ fun <T> bindList(dynamicInstance: Any?, itemBinder: (Any?) -> T): List<T> {
     return dynamicInstance.cast<List<*>>().map {
         itemBinder(it)
     }
+}
+
+fun <T> bindSet(dynamicInstance: Any?, itemBinder: (Any?) -> T): Set<T> {
+    if (dynamicInstance == null) return emptySet()
+
+    return dynamicInstance.cast<List<*>>().mapToSet { itemBinder(it) }
 }
 
 inline fun <T1, T2> bindPair(

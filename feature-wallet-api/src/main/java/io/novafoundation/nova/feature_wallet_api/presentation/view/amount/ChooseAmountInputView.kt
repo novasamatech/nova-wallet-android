@@ -30,9 +30,34 @@ class ChooseAmountInputView @JvmOverloads constructor(
     }
 
     init {
-        setAddStatesFromChildren(true) // so view will be focused when `chooseAmountInput` is focused
-
         background = context.getInputBackground()
+    }
+
+    // To propagate state_focused from chooseAmountInputField
+    override fun childDrawableStateChanged(child: View) {
+        refreshDrawableState()
+    }
+
+    // Allocate all the state chooseAmountInputField can have, e.g. state_focused and state_enabled
+    override fun onCreateDrawableState(extraSpace: Int): IntArray {
+        val fieldState: IntArray? = amountInput.drawableState
+
+        val need = fieldState?.size ?: 0
+
+        val selfState = super.onCreateDrawableState(extraSpace + need)
+
+        return mergeDrawableStates(selfState, fieldState)
+    }
+
+    // Propagate state_enabled to children
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+
+        binder.chooseAmountInputImage.alpha = if (enabled) 1f else 0.48f
+
+        binder.chooseAmountInputField.isEnabled = enabled
+        binder.chooseAmountInputToken.isEnabled = enabled
+        binder.chooseAmountInputFiat.isEnabled = enabled
     }
 
     fun loadAssetImage(icon: Icon) {

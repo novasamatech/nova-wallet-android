@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -107,5 +108,12 @@ class ExternalSignFragment : BaseFragment<ExternaSignViewModel, FragmentConfirmS
                 setMessage(it.payload)
             }
         }
+    }
+
+    private fun setupFeeLoading(viewModel: ExternaSignViewModel, feeView: FeeView) {
+        val mixin = viewModel.originFeeMixin
+        feeView.setVisible(mixin != null)
+
+        mixin?.let { setupFeeLoading(it, feeView) }
     }
 }

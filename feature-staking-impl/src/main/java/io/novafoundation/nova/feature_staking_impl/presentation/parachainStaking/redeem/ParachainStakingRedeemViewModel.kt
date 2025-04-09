@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.ParachainStakingRedeemInteractor
@@ -102,7 +103,7 @@ class ParachainStakingRedeemViewModel(
     fun originAccountClicked() = launch {
         val address = currentAccountModelFlow.first().address
 
-        externalActions.showExternalActions(ExternalActions.Type.Address(address), selectedAssetState.chain())
+        externalActions.showAddressActions(address, selectedAssetState.chain())
     }
 
     private fun sendTransactionIfValid() = launch {

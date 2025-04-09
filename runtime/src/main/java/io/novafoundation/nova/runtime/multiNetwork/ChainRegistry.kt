@@ -3,11 +3,13 @@ package io.novafoundation.nova.runtime.multiNetwork
 import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.diffed
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.mapNotNullToSet
+import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core_db.dao.ChainDao
@@ -36,10 +38,10 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSubscriptionPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeSyncService
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchronizer
-import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -306,10 +308,8 @@ fun ChainsById.assets(ids: Collection<FullChainAssetId>): List<Chain.Asset> {
     }
 }
 
-suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeSnapshot.() -> R): R {
-    return with(getRuntime(chainId)) {
-        action()
-    }
+suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: RuntimeContext.() -> R): R {
+    return getRuntime(chainId).provideContext(action)
 }
 
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
@@ -378,10 +378,17 @@ suspend fun ChainRegistry.findRelayChainOrThrow(chainId: ChainId): ChainId {
     return chain.parentId ?: chainId
 }
 
+fun ChainRegistry.chainFlow(chainId: ChainId): Flow<Chain> {
+    return chainsById.mapNotNull { it[chainId] }
+}
+
 fun ChainRegistry.enabledChainsFlow() = currentChains
     .filterList { it.isEnabled }
 
 suspend fun ChainRegistry.enabledChains() = enabledChainsFlow().first()
+
+suspend fun ChainRegistry.disabledChains() = currentChains.filterList { it.isDisabled }
+    .first()
 
 fun ChainRegistry.enabledChainByIdFlow() = enabledChainsFlow().map { chains -> chains.associateBy { it.id } }
 

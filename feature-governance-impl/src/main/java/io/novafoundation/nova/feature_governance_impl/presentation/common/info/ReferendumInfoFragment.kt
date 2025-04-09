@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendumInfoBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.setupReferendumSharing
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
 
@@ -32,6 +33,8 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel, FragmentRef
     override fun initViews() {
         binder.referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
 
+        binder.referendumInfoToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
+
         binder.referendumInfoProposer.setOnClickListener {
             viewModel.proposerClicked()
         }
@@ -46,6 +49,7 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel, FragmentRef
 
     override fun subscribe(viewModel: ReferendumInfoViewModel) {
         setupExternalActions(viewModel)
+        setupReferendumSharing(viewModel.shareReferendumMixin)
 
         viewModel.titleFlow.observe { binder.referendumInfoTitle.text = it }
         viewModel.subtitleFlow.observe { binder.referendumInfoDescription.text = it }

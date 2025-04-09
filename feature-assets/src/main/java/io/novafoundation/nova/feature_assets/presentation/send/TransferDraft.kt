@@ -9,11 +9,12 @@ import java.math.BigDecimal
 @Parcelize
 class TransferDraft(
     val amount: BigDecimal,
+    val transferringMaxAmount: Boolean,
     val origin: AssetPayload,
     val feePaymentCurrency: FeePaymentCurrencyParcel,
     val destination: AssetPayload,
     val recipientAddress: String,
-    val openAssetDetailsOnCompletion: Boolean,
+    val openAssetDetailsOnCompletion: Boolean
 ) : Parcelable
 
 val TransferDraft.isCrossChain

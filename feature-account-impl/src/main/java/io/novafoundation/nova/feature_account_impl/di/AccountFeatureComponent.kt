@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.exporting.json.d
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.seed.di.ExportSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.importing.di.ImportAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.language.di.LanguagesComponent
+import io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.di.ChainAddressSelectorComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.accounts.di.ManualBackupSelectAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.advanced.di.ManualBackupAdvancedSecretsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.main.di.ManualBackupSecretsComponent
@@ -62,6 +63,7 @@ import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.web3names.di.Web3NamesApi
 
@@ -106,6 +108,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun selectWalletComponentFactory(): SelectWalletComponent.Factory
 
     fun selectAddressComponentFactory(): SelectAddressComponent.Factory
+
+    fun chainAddressSelectorComponent(): ChainAddressSelectorComponent.Factory
 
     fun selectMultipleWalletsComponentFactory(): SelectMultipleWalletsComponent.Factory
 
@@ -179,7 +183,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
             Web3NamesApi::class,
             LedgerCoreApi::class,
             CloudBackupFeatureApi::class,
-            SwapCoreApi::class
+            SwapCoreApi::class,
+            XcmFeatureApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : AccountFeatureDependencies

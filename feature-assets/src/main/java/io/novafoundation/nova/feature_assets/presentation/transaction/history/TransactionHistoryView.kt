@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.history
 
+import android.animation.ArgbEvaluator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -12,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import android.graphics.Rect
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.DrawableExtension
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.enableShowingNewlyAddedTopElements
 import io.novafoundation.nova.common.utils.inflater
@@ -37,7 +40,7 @@ private const val PULLER_VISIBILITY_OFFSET = 0.9
 private const val OFFSET_KEY = "OFFSET"
 private const val SUPER_STATE = "SUPER_STATE"
 
-private const val OFFSET_BACKGROUND_CHANGE_THRESHOLD = 0.2
+private const val MIN_HEIGHT_DP = 126
 
 class TransferHistorySheet @JvmOverloads constructor(
     context: Context,
@@ -48,6 +51,8 @@ class TransferHistorySheet @JvmOverloads constructor(
     private var bottomSheetBehavior: LockBottomSheetBehavior<View>? = null
 
     private var anchor: View? = null
+
+    private val argbEvaluator = ArgbEvaluator()
 
     private var scrollingListener: ScrollingListener? = null
     private var slidingStateListener: SlidingStateListener? = null
@@ -71,17 +76,29 @@ class TransferHistorySheet @JvmOverloads constructor(
 
     private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
         anchor?.let {
-            bottomSheetBehavior?.peekHeight = parentView.measuredHeight - it.bottom
+            bottomSheetBehavior?.peekHeight = max(parentView.measuredHeight - it.bottom, MIN_HEIGHT_DP.dp)
         }
     }
 
-    private val collapsedBackgroundColor: Int = context.getColor(R.color.block_background)
+    private val collapsedBackgroundColor: Int = context.getColor(R.color.android_history_background)
     private val expandedBackgroundColor: Int = context.getColor(R.color.secondary_screen_background)
 
     private val binder = ViewTransferHistoryBinding.inflate(inflater(), this)
 
     init {
-        background = context.getTopRoundedCornerDrawable(fillColorRes = R.color.secondary_screen_background, cornerSizeInDp = 16)
+        val contentBackgroundDrawable = context.getTopRoundedCornerDrawable(
+            fillColorRes = R.color.android_history_background,
+            strokeColorRes = R.color.container_border,
+            cornerSizeInDp = 16
+        )
+
+        // Extend background drawable from left and right to make stroke in background on sides hidden
+        val borderDrawable = DrawableExtension(
+            contentDrawable = contentBackgroundDrawable,
+            extensionOffset = Rect(1.dp(context), 0, 1.dp(context), 0),
+        )
+
+        background = borderDrawable
 
         binder.transactionHistoryList.adapter = adapter
         binder.transactionHistoryList.setHasFixedSize(true)
@@ -112,7 +129,7 @@ class TransferHistorySheet @JvmOverloads constructor(
 
         adapter.submitList(emptyList())
 
-        bottomSheetBehavior?.isDraggable = false
+        bottomSheetBehavior?.isDraggable = true
     }
 
     fun showTransactions(transactions: List<Any>) {
@@ -245,9 +262,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     private fun updateBackgroundAlpha() {
-        val background = if (lastOffset > OFFSET_BACKGROUND_CHANGE_THRESHOLD) expandedBackgroundColor else collapsedBackgroundColor
+        val backgroundColor = argbEvaluator.evaluate(lastOffset, collapsedBackgroundColor, expandedBackgroundColor) as Int
 
-        backgroundTintList = ColorStateList.valueOf(background)
+        backgroundTintList = ColorStateList.valueOf(backgroundColor)
     }
 
     private val parentView: View

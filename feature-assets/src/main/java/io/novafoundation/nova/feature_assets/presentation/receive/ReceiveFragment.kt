@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 
 import androidx.core.view.drawToBitmap
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -47,6 +48,8 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>()
 
         binder.receiveQrCodeContainer.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)
         binder.receiveQrCodeContainer.clipToOutline = true
+
+        binder.receiveAddressesButton.setOnClickListener { viewModel.chainAddressesClicked() }
     }
 
     override fun inject() {
@@ -66,6 +69,10 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>()
         viewModel.qrCodeFlow.observe(binder.receiveQrCode::setQrModel)
         viewModel.accountNameFlow.observe(binder.receiveAccount::setText)
         viewModel.addressFlow.observe(binder.receiveAddress::setText)
+        viewModel.chainSupportsLegacyAddressFlow.observe {
+            binder.receiveAddressesWarning.isVisible = it
+            binder.receiveAddressesButton.isVisible = it
+        }
 
         viewModel.shareEvent.observeEvent(::startQrSharingIntent)
     }

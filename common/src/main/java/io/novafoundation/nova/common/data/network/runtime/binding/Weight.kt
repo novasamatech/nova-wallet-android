@@ -11,7 +11,7 @@ fun bindWeight(decoded: Any?): Weight {
         is BalanceOf -> decoded
 
         // weight v2
-        is Struct.Instance -> bindNumber(decoded["refTime"])
+        is Struct.Instance -> bindWeightV2(decoded).refTime
 
         else -> incompatible()
     }

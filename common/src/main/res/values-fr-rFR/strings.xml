@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">L\'application Polkadot est installée</string>
     <string name="account_ledger_generic_import_start_step_2">%s sur votre appareil Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Ouvrez l\'application Polkadot</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Application Polkadot Générique)</string>
     <string name="account_ledger_import_fill_description">Assurez-vous que l\'application réseau est installée sur votre Ledger à l\'aide de l\'application Ledger Live. Puis ouvrez l\'application réseau sur votre Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Ajoutez au moins un compte</string>
     <string name="account_ledger_import_fill_title">Ajouter des comptes à votre portefeuille</string>
-    <string name="account_ledger_import_start_guide">Guide officiel de connexion Bluetooth de Ledger</string>
+    <string name="account_ledger_import_start_guide">Guide de Connexion Ledger</string>
     <string name="account_ledger_import_start_step_1">Assurez-vous que %s sur votre appareil Ledger à l\'aide de l\'application Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">l\'application Network est installée</string>
     <string name="account_ledger_import_start_step_2">%s sur votre appareil Ledger</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">accéder au Bluetooth et à la localisation</string>
     <string name="account_ledger_import_start_step_4">%s à ajouter au portefeuille</string>
     <string name="account_ledger_import_start_step_4_highlighted">Sélectionnez un compte</string>
-    <string name="account_ledger_import_start_title">Connecter Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s dans les paramètres de votre téléphone</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Activer OTG</string>
+    <string name="account_ledger_import_start_title">Connecter Ledger</string>
     <string name="account_ledger_legacy_warning_message">Pour signer des opérations et migrer vos comptes vers la nouvelle application Generic Ledger, installez et ouvrez l\'application Migration. Les applications Ledger Legacy Old et Migration ne seront plus supportées à l\'avenir.</string>
     <string name="account_ledger_legacy_warning_title">Une nouvelle application Ledger a été publiée</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">L\'application Migration sera bientôt indisponible. Utilisez-la pour migrer vos comptes vers la nouvelle application Ledger afin d\'éviter de perdre vos fonds.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Application Generic Polkadot)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Héritage</string>
+    <string name="account_ledger_select_device_all_description">Si vous utilisez un Ledger via Bluetooth, activez le Bluetooth sur les deux appareils et accordez à Nova les permissions Bluetooth et de localisation. Pour l\'USB, activez OTG dans les paramètres de votre téléphone.</string>
     <string name="account_ledger_select_device_description">Veuillez activer le Bluetooth dans les paramètres de votre téléphone et de votre appareil Ledger. Déverrouillez votre Ledger et ouvrez l\'application %s.</string>
     <string name="account_ledger_select_device_title">Sélectionnez votre appareil Ledger</string>
+    <string name="account_ledger_select_device_usb_description">Veuillez activer l\'appareil Ledger. Déverrouillez votre appareil Ledger et ouvrez l\'application %s.</string>
     <string name="account_mnmonic_length_variants">Phrase de 12, 15, 18, 21 ou 24 mots</string>
     <string name="account_needed_message">Vous n\'avez pas de compte pour ce réseau, vous pouvez créer ou importer un compte.</string>
     <string name="account_needed_title">Compte nécessaire</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s ne prend pas en charge la signature de messages arbitraires, uniquement les transactions</string>
     <string name="account_parity_signer_not_supported_title">La signature n’est pas prise en charge</string>
     <string name="account_parity_signer_scan_from">Scannez le code QR à partir de %s</string>
-    <string name="account_parity_signer_scan_with">Scanner le code QR avec %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Héritage</string>
+    <string name="account_parity_signer_show_mode_new">Nouveau (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">J’ai une erreur dans %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Le code QR a expiré</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Pour des raisons de sécurité, les opérations générées ne sont valables que pour %s. Veuillez générer un nouveau code QR et le signer avec %s.</string>
@@ -653,8 +659,6 @@
     <string name="dapp_favourites_remove_description">La dApp «%s» sera retirée des favoris</string>
     <string name="dapp_favourites_remove_title">Retirer des favoris ?</string>
     <string name="dapp_list_placeholder">La liste des DApps apparaîtra ici</string>
-    <string name="dapp_main_welcome_subtitle">Naviguez sur le web en utilisant vos comptes depuis Nova</string>
-    <string name="dapp_main_welcome_title">Bienvenue dans le navigateur Nova</string>
     <string name="dapp_options_add_to_favorite">Ajouter aux favoris</string>
     <string name="dapp_options_desktop_mode">Mode bureau</string>
     <string name="dapp_options_remove_from_favorite">Supprimer des favoris</string>
@@ -753,18 +757,24 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Réseau : %s\nMnémonique : %s</string>
     <string name="fee_not_yet_loaded_message">Veuillez patienter jusqu\'à ce que les frais soient calculés</string>
     <string name="fee_not_yet_loaded_title">Le calcul des frais est en cours</string>
+    <string name="fragment_assets_nova_card">Gérer la carte de débit</string>
     <string name="fragment_set_staking_proxy_title">Ajouter une délégation pour le staking %s</string>
     <string name="fragment_swap_main_settings_details_title">Détails de l\'échange</string>
     <string name="fragment_swap_main_settings_max_button">Max :</string>
     <string name="fragment_swap_main_settings_pay_title">Vous payez</string>
     <string name="fragment_swap_main_settings_receive_title">Vous recevez</string>
     <string name="fragment_swap_main_settings_select_token">Sélectionnez un token</string>
+    <string name="fragment_top_up_card_title">Recharger la carte avec %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Veuillez contacter support@novawallet.io. Incluez l\'adresse email que vous avez utilisée pour émettre la carte.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Contacter le support</string>
     <string name="governance_notification_channel_name">Canal de notification de gouvernance</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Vous devez sélectionner au moins %d piste</item>
         <item quantity="other">Vous devez sélectionner au moins %d pistes</item>
     </plurals>
     <string name="governance_unlock">Débloquer</string>
+    <string name="high_price_impact_detacted_message">Exécuter cet échange entraînera un glissement significatif et des pertes financières. Envisagez de réduire la taille de votre transaction ou de diviser votre transaction en plusieurs transactions.</string>
+    <string name="high_price_impact_detacted_title">Impact de prix élevé détecté (%s)</string>
     <string name="history_v1.9.0">Historique</string>
     <string name="identity_email_title">E-mail</string>
     <string name="identity_legal_name_title">Nom légal</string>
@@ -802,12 +812,17 @@
     <string name="json_export_btn">Exporter le fichier JSON</string>
     <string name="language_title">Langue</string>
     <string name="ledger_chain_not_supported">Ledger ne prend pas en charge %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">L\'opération a été annulée par l\'appareil. Assurez-vous d\'avoir déverrouillé votre Ledger.</string>
     <string name="ledger_error_app_cancelled_title">Opération annulée</string>
     <string name="ledger_error_app_not_launched_message">Ouvrez l\'application %s sur votre appareil Ledger</string>
     <string name="ledger_error_app_not_launched_title">L\'application %s n\'a pas été lancée</string>
     <string name="ledger_error_general_message">L\'opération s\'est terminée par une erreur sur l\'appareil. Veuillez réessayer plus tard.</string>
     <string name="ledger_error_general_title">Échec de l\'opération Ledger</string>
+    <string name="ledger_hold_to_sign">Maintenez le bouton de confirmation sur votre %s pour approuver la transaction</string>
     <string name="ledger_import_select_address_load_more">Charger d\'autres comptes</string>
     <string name="ledger_review_approve_title">Examiner et approuver</string>
     <string name="ledger_sign_approve_message">Appuyez sur les deux boutons de votre %s pour approuver la transaction.</string>
@@ -820,7 +835,8 @@
     <string name="ledger_sign_transaction_validity_format">La transaction est valable pour %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger ne prend pas en charge cette transaction.</string>
     <string name="ledger_sign_tx_not_supported_title">La transaction n\'est pas prise en charge</string>
-    <string name="ledger_verify_address_subtitle">Appuyez sur les deux boutons de votre %s pour approuver l\'adresse</string>
+    <string name="ledger_verify_address_message_both_buttons">Appuyez sur les deux boutons de votre %s pour approuver l\'adresse</string>
+    <string name="ledger_verify_address_message_confirm_button">Appuyez sur le bouton de confirmation de votre %s pour approuver l\'adresse</string>
     <string name="ledger_wallet_details_description">Ce portefeuille est associé à Ledger. Nova vous aidera à former toutes les opérations que vous souhaitez, et il vous sera demandé de les signer en utilisant Ledger</string>
     <string name="ledher_import_select_address_title">Sélectionner le compte à ajouter au portefeuille</string>
     <string name="loading_network_info">Chargement des informations du réseau...</string>
@@ -929,10 +945,24 @@
     <string name="pool_inactive_failure_title">Le pool n\'est pas ouvert</string>
     <string name="pool_staking_conflict_message">Vous ne pouvez plus utiliser à la fois le Stake direct et le Pool Staking depuis le même compte. Pour gérer votre Pool Staking, vous devez d\'abord unstake vos tokens du Stake direct.</string>
     <string name="pool_staking_conflict_title">Les opérations de Pool ne sont pas disponibles</string>
+    <string name="popular_dapps_title">Populaires</string>
     <string name="pre_configured_networks_add_custom_button">Ajouter un réseau manuellement</string>
     <string name="pre_configured_networks_progress_text">Chargement de la liste des réseaux...</string>
     <string name="pre_configured_networks_search_hint">Rechercher par nom de réseau</string>
     <string name="pre_configured_networks_title">Ajouter un réseau</string>
+    <string name="price_chart_date_format" formatted="false">%s à %s</string>
+    <string name="price_chart_day">1J</string>
+    <string name="price_chart_max">Tout</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">prix de %s</string>
+    <string name="price_chart_week">1S</string>
+    <string name="price_chart_year">1A</string>
+    <string name="price_charts_period_all">Depuis le début</string>
+    <string name="price_charts_period_month">Le mois dernier</string>
+    <string name="price_charts_period_today">Aujourd’hui</string>
+    <string name="price_charts_period_week">La semaine dernière</string>
+    <string name="price_charts_period_year">L\'année dernière</string>
     <string name="profile_accounts_title">Comptes</string>
     <string name="profile_accounts_title_2_0">Portefeuilles</string>
     <string name="profile_language_title">Langue</string>
@@ -1146,6 +1176,7 @@
     <string name="select_delegation_tracks_edit_title">Sélectionnez des chemins pour modifier une délégation</string>
     <string name="select_delegation_tracks_revoke_title">Sélectionnez des chemins pour révoquer votre délégation</string>
     <string name="select_delegation_tracks_unavailable_tracks">Chemins non disponibles</string>
+    <string name="select_ledger_grant_permissions">Activer Bluetooth &amp; Accorder les Permissions</string>
     <string name="select_ledger_location_enable_request_message">Nova a besoin que la localisation soit activée pour pouvoir effectuer un balayage Bluetooth afin de trouver votre appareil Ledger</string>
     <string name="select_ledger_location_enable_request_title">Veuillez activer la géolocalisation dans les paramètres de l\'appareil</string>
     <string name="select_network_title">Sélectionner un réseau</string>
@@ -1494,6 +1525,8 @@
     <string name="start_create_wallet_name_your_wallet">Donnez un nom à votre portefeuille</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Cela ne sera visible que par vous et vous pourrez le modifier plus tard.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Votre portefeuille est prêt</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Vous avez des tokens verrouillés sur votre solde en raison de %s. Pour continuer, vous devez entrer moins de %s ou plus de %s. Pour stake un autre montant, vous devez supprimer vos verrous %s.</string>
     <string name="start_staking_cant_stake_amount">Vous ne pouvez pas stake le montant spécifié</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Sélectionné : %d (max %d)</string>
@@ -1649,6 +1682,11 @@
     <string name="unavailable_tracks_delegated_group">Chemins auxquels vous avez déjà délégué des votes</string>
     <string name="unavailable_tracks_title">Chemins indisponibles</string>
     <string name="unavailable_tracks_voted_group">Chemins dans lesquels vous avez des votes en cours</string>
+    <string name="unified_address_format_checkbox_warning">Ne plus afficher cela.\nVous pouvez trouver l\'adresse legacy dans Recevoir.</string>
+    <string name="unified_address_format_legacy_badge">Format legacy</string>
+    <string name="unified_address_format_new_badge">Nouveau format</string>
+    <string name="unified_address_subtitle">Certaines plateformes peuvent encore nécessiter le format legacy\npour des opérations pendant qu\'elles mettent à jour.</string>
+    <string name="unified_address_title">Nouvelle adresse unifiée</string>
     <string name="update_notification_install_btn">Installer</string>
     <string name="update_notification_item_version">Version %s</string>
     <string name="update_notification_title">Mise à jour disponible</string>
@@ -1667,6 +1705,10 @@
     <string name="vote_revote">Revoter</string>
     <string name="vote_vote">Voter</string>
     <string name="voting_status">Statut du scrutin</string>
+    <string name="waiting_existing_card_top_up_card_title">Votre carte est en cours de financement !</string>
+    <string name="waiting_initial_top_up_card_title">Votre carte est en cours d\'émission !</string>
+    <string name="waiting_top_up_card_description">Cela peut prendre jusqu\'à 5 minutes.\nCette fenêtre se fermera automatiquement.</string>
+    <string name="waiting_top_up_card_timer">Estimé %s</string>
     <string name="wallet_asset_buy">Acheter</string>
     <string name="wallet_asset_buy_with">Acheter avec</string>
     <string name="wallet_asset_receive">Recevoir</string>

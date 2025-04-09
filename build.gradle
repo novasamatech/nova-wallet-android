@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '9.2.0'
-        versionCode = 168
+        versionName = '9.7.0'
+        versionCode = 194
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -217,6 +217,10 @@ buildscript {
         kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
         cardStackView = "com.github.yuyakaido:cardstackview:$cardStackVersion"
+
+        chartsDep = "com.github.PhilJay:MPAndroidChart:v3.1.0"
+
+        swipeRefershLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
     }
 
     repositories {
@@ -226,10 +230,10 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.7.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.14'
-        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.3'
+        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.6'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"
         classpath "com.github.triplet.gradle:play-publisher:$playPublisherVersion"
     }

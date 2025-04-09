@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.bluetooth.RealBluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.location.RealLocationManager
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
@@ -65,7 +66,9 @@ class NetworkModule {
             email = BuildConfig.EMAIL,
             youtube = BuildConfig.YOUTUBE_URL,
             storeUrl = BuildConfig.APP_UPDATE_SOURCE_LINK,
-            ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE
+            ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE,
+            novaCardWidgetUrl = BuildConfig.NOVA_CARD_WIDGET_URL,
+            unifiedAddressArticle = BuildConfig.UNIFIED_ADDRESS_ARTICLE
         )
     }
 
@@ -147,8 +150,9 @@ class NetworkModule {
     @Provides
     @ApplicationScope
     fun provideBluetoothManager(
-        contextManager: ContextManager
-    ): BluetoothManager = RealBluetoothManager(contextManager)
+        contextManager: ContextManager,
+        systemCallExecutor: SystemCallExecutor
+    ): BluetoothManager = RealBluetoothManager(contextManager, systemCallExecutor)
 
     @Provides
     @ApplicationScope

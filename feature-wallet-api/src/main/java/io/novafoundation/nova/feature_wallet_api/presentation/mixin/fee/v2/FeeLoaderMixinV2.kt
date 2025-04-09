@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
@@ -14,12 +15,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.Ch
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeContext.OperationUtilityAssetSource
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Factory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 
 interface FeeLoaderMixinV2<F, D> : Retriable {
 
@@ -67,7 +70,7 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
 
         fun <F, D> create(
             scope: CoroutineScope,
-            selectedChainAssetFlow: Flow<Chain.Asset>,
+            feeContextFlow: Flow<FeeContext>,
             feeFormatter: FeeFormatter<F, D>,
             feeInspector: FeeInspector<F>,
             configuration: Configuration<F, D> = Configuration()
@@ -77,16 +80,40 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
 
 typealias FeeConstructor<F> = suspend (FeePaymentCurrency) -> F?
 
-fun <F : SubmissionFee> Factory.createDefault(
+fun Factory.createDefault(
     scope: CoroutineScope,
     selectedChainAssetFlow: Flow<Chain.Asset>,
+    configuration: Configuration<Fee, FeeDisplay> = Configuration()
+): FeeLoaderMixinV2.Presentation<Fee, FeeDisplay> = createDefaultBy(scope, selectedChainAssetFlow.asFeeContextFromChain(), configuration)
+
+fun <F : SubmissionFee> Factory.createDefaultBy(
+    scope: CoroutineScope,
+    feeContext: Flow<FeeContext>,
     configuration: Configuration<F, FeeDisplay> = Configuration()
 ): FeeLoaderMixinV2.Presentation<F, FeeDisplay> {
     return create(
         scope = scope,
-        selectedChainAssetFlow = selectedChainAssetFlow,
+        feeContextFlow = feeContext,
         feeFormatter = DefaultFeeFormatter(),
         feeInspector = DefaultFeeInspector(),
         configuration = configuration
     )
+}
+
+fun Flow<Chain.Asset>.asFeeContextFromChain(): Flow<FeeContext> {
+    return map { operationAsset ->
+        FeeContext(
+            operationAsset = operationAsset,
+            operationChainUtilityAssetSource = OperationUtilityAssetSource.DetectFromOperationChain
+        )
+    }
+}
+
+fun Flow<Chain.Asset>.asFeeContextFromSelf(): Flow<FeeContext> {
+    return map { operationAsset ->
+        FeeContext(
+            operationAsset = operationAsset,
+            operationChainUtilityAssetSource = OperationUtilityAssetSource.Specified(operationAsset)
+        )
+    }
 }

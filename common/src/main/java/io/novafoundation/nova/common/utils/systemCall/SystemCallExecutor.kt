@@ -3,8 +3,8 @@ package io.novafoundation.nova.common.utils.systemCall
 import android.content.Intent
 import io.novafoundation.nova.common.resources.ContextManager
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class SystemCallExecutor(
@@ -12,7 +12,7 @@ class SystemCallExecutor(
 ) {
 
     private class PendingRequest<T>(
-        val continuation: Continuation<Result<T>>,
+        val callback: (Result<T>) -> Unit,
         val systemCall: SystemCall<T>
     )
 
@@ -20,15 +20,30 @@ class SystemCallExecutor(
 
     @Suppress("UNCHECKED_CAST") // type-safety is guaranteed by PendingRequest<T>
     suspend fun <T> executeSystemCall(systemCall: SystemCall<T>) = suspendCoroutine<Result<T>> { continuation ->
-        contextManager.getActivity()?.let {
-            val request = systemCall.createRequest(it)
-
-            it.startActivityForResult(request.intent, request.requestCode)
+        try {
+            val request = handleRequest(systemCall)
 
             ongoingRequests[request.requestCode] = PendingRequest(
-                continuation = continuation as Continuation<Result<Any?>>,
+                callback = { continuation.resume(it as Result<T>) },
                 systemCall = systemCall as SystemCall<Any?>
             )
+        } catch (e: Exception) {
+            continuation.resumeWithException(e)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST") // type-safety is guaranteed by PendingRequest<T>
+    fun <T> executeSystemCallNotBlocking(systemCall: SystemCall<T>, onResult: (Result<T>) -> Unit = {}): Boolean {
+        try {
+            val request = handleRequest(systemCall)
+
+            ongoingRequests[request.requestCode] = PendingRequest(
+                callback = onResult as (Result<Any?>) -> Unit,
+                systemCall = systemCall as SystemCall<Any?>
+            )
+            return true
+        } catch (e: Exception) {
+            return false
         }
     }
 
@@ -36,9 +51,16 @@ class SystemCallExecutor(
         val removed = ongoingRequests.remove(requestCode)?.let { systemCallRequest ->
             val parsedResult = systemCallRequest.systemCall.parseResult(requestCode, resultCode, data)
 
-            systemCallRequest.continuation.resume(parsedResult)
+            systemCallRequest.callback(parsedResult)
         }
 
         return removed != null
+    }
+
+    private fun <T> handleRequest(systemCall: SystemCall<T>): SystemCall.Request {
+        val activity = contextManager.getActivity()!!
+        val request = systemCall.createRequest(activity)
+        activity.startActivityForResult(request.intent, request.requestCode)
+        return request
     }
 }

@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
 import android.os.Bundle
-import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -19,17 +19,9 @@ import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentSelectLedg
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
-
 import javax.inject.Inject
 
 abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V, FragmentSelectLedgerBinding>(), SelectLedgerAdapter.Handler {
-
-    companion object {
-
-        private const val PAYLOAD_KEY = "SelectLedgerFragment.PAYLOAD_KEY"
-
-        fun getBundle(payload: SelectLedgerPayload): Bundle = bundleOf(PAYLOAD_KEY to payload)
-    }
 
     override fun createBinding() = FragmentSelectLedgerBinding.inflate(layoutInflater)
 
@@ -64,6 +56,8 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V,
         onBackPressed { viewModel.backClicked() }
         binder.selectLedgerToolbar.applyStatusBarInsets()
 
+        binder.selectLedgerGrantPermissions.setOnClickListener { viewModel.requirePermissionsAndEnableBluetooth() }
+
         binder.selectLedgerDevices.setHasFixedSize(true)
         binder.selectLedgerDevices.adapter = adapter
     }
@@ -86,6 +80,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V,
         }
 
         viewModel.hints.observe(binder.selectLedgerHints::setText)
+        viewModel.showPermissionsButton.observe { selectLedgerGrantPermissions.isVisible = it }
 
         setupPermissionAsker(viewModel)
         setupLedgerMessages(ledgerMessagePresentable)
@@ -105,8 +100,6 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V,
         disableBluetoothConnectivityTracker()
         disableLocationStateTracker()
     }
-
-    protected fun payload() = argument<SelectLedgerPayload>(PAYLOAD_KEY)
 
     private fun enableLocationStateTracker() {
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)

@@ -15,12 +15,16 @@ import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.stateMachine.StateMachine
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.isPermissionsRequired
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.performDiscovery
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
@@ -29,6 +33,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DevicesFoundState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.DiscoveringState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.MissingDiscoveryRequirementState
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.SelectDiscoveryModeState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.SelectLedgerState
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.states.WaitingForPermissionsState
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleScanFailed
@@ -42,26 +47,48 @@ enum class BluetoothState {
 }
 
 abstract class SelectLedgerViewModel(
-    private val discoveryService: LedgerDeviceDiscoveryService,
+    private val discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val bluetoothManager: BluetoothManager,
     private val locationManager: LocationManager,
     private val router: ReturnableRouter,
     private val resourceManager: ResourceManager,
     private val messageFormatter: LedgerMessageFormatter,
+    private val payload: SelectLedgerPayload,
+    private val ledgerDeviceFormatter: LedgerDeviceFormatter,
+    private val messageCommandFormatter: MessageCommandFormatter,
 ) : BaseViewModel(),
     PermissionsAsker by permissionsAsker,
     LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
 
-    private val stateMachine = StateMachine(WaitingForPermissionsState(), coroutineScope = this)
+    private val discoveryMethods = payload.connectionMode.toDiscoveryMethod()
+
+    private val discoveryService = discoveryServiceFactory.create(discoveryMethods)
+
+    private val stateMachine = StateMachine(SelectDiscoveryModeState(), coroutineScope = this)
 
     val deviceModels = stateMachine.state.map(::mapStateToUi)
         .shareInBackground()
 
     val hints = flowOf {
-        resourceManager.getString(R.string.account_ledger_select_device_description, messageFormatter.appName())
+        when (payload.connectionMode) {
+            SelectLedgerPayload.ConnectionMode.BLUETOOTH -> resourceManager.getString(
+                R.string.account_ledger_select_device_description,
+                messageFormatter.appName()
+            )
+
+            SelectLedgerPayload.ConnectionMode.USB -> resourceManager.getString(
+                R.string.account_ledger_select_device_usb_description,
+                messageFormatter.appName()
+            )
+
+            SelectLedgerPayload.ConnectionMode.ALL -> resourceManager.getString(R.string.account_ledger_select_device_all_description)
+        }
     }.shareInBackground()
+
+    val showPermissionsButton = flowOf { payload.connectionMode == SelectLedgerPayload.ConnectionMode.ALL }
+        .shareInBackground()
 
     override val ledgerMessageCommands = MutableLiveData<Event<LedgerMessageCommand>>()
 
@@ -71,10 +98,14 @@ abstract class SelectLedgerViewModel(
     private var isLocationEnabled: Boolean? = null
 
     init {
+        emitDiscoveryMethod()
+
         emitInitialBluetoothState()
         emitLocationState()
 
-        requirePermissions()
+        if (discoveryMethods.isPermissionsRequired()) {
+            requirePermissions()
+        }
 
         handleSideEffects()
     }
@@ -84,9 +115,9 @@ abstract class SelectLedgerViewModel(
     open suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
         handleLedgerError(
             reason = reason,
-            messageFormatter = messageFormatter,
-            resourceManager = resourceManager,
-            retry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
+            device = device,
+            commandFormatter = messageCommandFormatter,
+            onRetry = { stateMachine.onEvent(SelectLedgerEvent.DeviceChosen(device)) }
         )
     }
 
@@ -117,6 +148,10 @@ abstract class SelectLedgerViewModel(
 
     fun enableLocation() {
         locationManager.enableLocation()
+    }
+
+    private fun emitDiscoveryMethod() {
+        stateMachine.onEvent(SelectLedgerEvent.DiscoveryMethodSelected(payload.connectionMode.toDiscoveryMethod()))
     }
 
     private fun emitInitialBluetoothState() {
@@ -167,6 +202,8 @@ abstract class SelectLedgerViewModel(
     }
 
     private fun requestLocation() {
+        if (locationManager.isLocationEnabled()) return
+
         _showRequestLocationDialog.value = true
     }
 
@@ -179,21 +216,33 @@ abstract class SelectLedgerViewModel(
         }.launchIn(this)
     }
 
-    private fun requirePermissions() = launch {
-        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            listOf(
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        } else {
-            listOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
+    fun requirePermissionsAndEnableBluetooth() = launch {
+        if (!requirePermissionsInternal()) return@launch
+        if (!bluetoothManager.enableBluetoothAndAwait()) return@launch
+        requestLocation()
+    }
 
-        val granted = permissionsAsker.requirePermissionsOrExit(*permissions.toTypedArray())
+    private fun requirePermissions() = launch {
+        requirePermissionsInternal()
+    }
+
+    private suspend fun requirePermissionsInternal(): Boolean {
+        val permissions = discoveryMethods.requiredPermissions()
+
+        val granted = permissionsAsker.requirePermissions(*permissions.toTypedArray())
 
         if (granted) {
             stateMachine.onEvent(SelectLedgerEvent.PermissionsGranted)
+        } else {
+            onPermissionsNotGranted()
+        }
+
+        return granted
+    }
+
+    private fun onPermissionsNotGranted() {
+        if (discoveryMethods.isPermissionsRequired()) {
+            router.back()
         }
     }
 
@@ -209,6 +258,7 @@ abstract class SelectLedgerViewModel(
             is DiscoveringState -> emptyList()
             is MissingDiscoveryRequirementState -> emptyList()
             is WaitingForPermissionsState -> emptyList()
+            is SelectDiscoveryModeState -> emptyList()
         }
     }
 
@@ -216,9 +266,35 @@ abstract class SelectLedgerViewModel(
         return devices.map {
             SelectLedgerModel(
                 id = it.id,
-                name = it.name,
+                name = ledgerDeviceFormatter.mapName(it),
                 isConnecting = it.id == connectingTo?.id
             )
         }
+    }
+
+    private fun SelectLedgerPayload.ConnectionMode.toDiscoveryMethod(): DiscoveryMethods {
+        return when (this) {
+            SelectLedgerPayload.ConnectionMode.BLUETOOTH -> DiscoveryMethods(DiscoveryMethods.Method.BLE)
+            SelectLedgerPayload.ConnectionMode.USB -> DiscoveryMethods(DiscoveryMethods.Method.USB)
+            SelectLedgerPayload.ConnectionMode.ALL -> DiscoveryMethods(DiscoveryMethods.Method.BLE, DiscoveryMethods.Method.USB)
+        }
+    }
+
+    private fun DiscoveryMethods.requiredPermissions() = methods.flatMap { it.permissions() }
+
+    private fun DiscoveryMethods.Method.permissions() = when (this) {
+        DiscoveryMethods.Method.BLE -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                listOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            } else {
+                listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+
+        DiscoveryMethods.Method.USB -> emptyList()
     }
 }

@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.identity.Governance
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_impl.presentation.common.share.ShareReferendumMixin
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.ReferendumDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 
@@ -58,7 +59,8 @@ class ReferendumDetailsModule {
         validationSystem: ReferendumPreVoteValidationSystem,
         validationExecutor: ValidationExecutor,
         updateSystem: UpdateSystem,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        shareReferendumMixin: ShareReferendumMixin
     ): ViewModel {
         return ReferendumDetailsViewModel(
             router = router,
@@ -77,7 +79,8 @@ class ReferendumDetailsModule {
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
             updateSystem = updateSystem,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            shareReferendumMixin = shareReferendumMixin,
         )
     }
 

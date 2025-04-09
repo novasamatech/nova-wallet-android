@@ -37,6 +37,7 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+    namespace 'io.novafoundation.nova.feature_versions_impl'
 
     buildFeatures {
         viewBinding true
@@ -49,7 +50,6 @@ dependencies {
 
     implementation kotlinDep
 
-    
     implementation androidDep
     implementation materialDep
     implementation constraintDep

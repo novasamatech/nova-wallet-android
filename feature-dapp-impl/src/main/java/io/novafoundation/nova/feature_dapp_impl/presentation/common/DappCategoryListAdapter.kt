@@ -20,6 +20,10 @@ class DappCategoryListAdapter(
     override fun onBindViewHolder(holder: DappCategoryViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    override fun getItemViewType(position: Int): Int {
+        return DappCategoryViewHolder.viewType
+    }
 }
 
 private object DappCategoryDiffCallback : DiffUtil.ItemCallback<DappCategoryModel>() {
@@ -37,6 +41,10 @@ class DappCategoryViewHolder(
     private val binder: ItemDappGroupBinding,
     itemHandler: DAppClickHandler,
 ) : BaseViewHolder(binder.root) {
+
+    companion object : WithViewType {
+        override val viewType: Int = R.layout.item_dapp_group
+    }
 
     private val adapter = DappListAdapter(itemHandler)
 

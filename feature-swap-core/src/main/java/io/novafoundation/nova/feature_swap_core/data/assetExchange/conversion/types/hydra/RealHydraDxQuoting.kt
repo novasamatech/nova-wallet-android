@@ -3,16 +3,17 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.network.isSystemAsset
 import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
@@ -22,12 +23,13 @@ class RealHydraDxQuotingFactory(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : HydraDxQuoting.Factory {
 
-    override fun create(chain: Chain): HydraDxQuoting {
+    override fun create(chain: Chain, host: SwapQuoting.QuotingHost): HydraDxQuoting {
         return RealHydraDxQuoting(
             chain = chain,
             remoteStorageSource = remoteStorageSource,
             quotingSourceFactories = conversionSourceFactories,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter
+            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
+            host = host
         )
     }
 }
@@ -37,6 +39,7 @@ private class RealHydraDxQuoting(
     private val remoteStorageSource: StorageDataSource,
     private val quotingSourceFactories: Iterable<HydraDxQuotingSource.Factory<*>>,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val host: SwapQuoting.QuotingHost,
 ) : HydraDxQuoting {
 
     private val quotingSources: Map<String, HydraDxQuotingSource<*>> = createSources()
@@ -72,7 +75,7 @@ private class RealHydraDxQuoting(
     }
 
     private fun createSources(): Map<String, HydraDxQuotingSource<*>> {
-        return quotingSourceFactories.map { it.create(chain) }
+        return quotingSourceFactories.map { it.create(chain, host) }
             .associateBy { it.identifier }
     }
 }

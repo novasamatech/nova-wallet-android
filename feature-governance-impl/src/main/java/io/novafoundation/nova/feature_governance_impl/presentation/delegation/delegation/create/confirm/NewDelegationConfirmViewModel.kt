@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -39,6 +40,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackMo
 import io.novafoundation.nova.feature_governance_impl.presentation.track.formatTracks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
@@ -147,16 +149,14 @@ class NewDelegationConfirmViewModel(
 
     fun accountClicked() = launch {
         val addressModel = currentAddressModelFlow.first()
-        val type = ExternalActions.Type.Address(addressModel.address)
 
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+        externalActions.showAddressActions(addressModel.address, governanceSharedState.chain())
     }
 
     fun delegateClicked() = launch {
         val address = delegateLabelModel.firstLoaded().address
-        val type = ExternalActions.Type.Address(address)
 
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+        externalActions.showAddressActions(address, governanceSharedState.chain())
     }
 
     fun tracksClicked() = launch {
@@ -167,11 +167,14 @@ class NewDelegationConfirmViewModel(
     fun confirmClicked() = launch {
         val asset = assetFlow.first()
         val amountPlanks = asset.token.planksFromAmount(payload.amount)
+        val maxAmount = interactor.maxAvailableBalanceToDelegate(asset)
+        val maxPlanks = asset.token.amountFromPlanks(maxAmount)
         val validationPayload = ChooseDelegationAmountValidationPayload(
             asset = asset,
             fee = decimalFee,
             amount = payload.amount,
-            delegate = payload.delegate
+            delegate = payload.delegate,
+            maxAvailableAmount = maxPlanks
         )
 
         validationExecutor.requireValid(

@@ -51,8 +51,12 @@ fun Chain.Asset.toFeePaymentCurrency(): FeePaymentCurrency {
 }
 
 fun FeePaymentCurrency.toChainAsset(chain: Chain): Chain.Asset {
+    return toChainAsset(chain.utilityAsset)
+}
+
+fun FeePaymentCurrency.toChainAsset(chainUtilityAsset: Chain.Asset): Chain.Asset {
     return when (this) {
         is FeePaymentCurrency.Asset -> asset
-        FeePaymentCurrency.Native -> chain.utilityAsset
+        FeePaymentCurrency.Native -> chainUtilityAsset
     }
 }

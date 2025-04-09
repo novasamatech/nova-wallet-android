@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayloa
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -15,6 +16,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 interface AssetsRouter {
 
     fun openAssetDetails(assetPayload: AssetPayload)
+
+    fun finishTradeOperation()
 
     fun back()
 
@@ -58,6 +61,8 @@ interface AssetsRouter {
 
     fun openBuyFlow()
 
+    fun openSellFlow()
+
     fun openBuyFlowFromSendFlow()
 
     fun openNfts()
@@ -72,11 +77,17 @@ interface AssetsRouter {
 
     fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
+    fun returnToMainScreen()
+
     fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
     fun openStaking()
 
     fun closeSendFlow()
+
+    fun openNovaCard()
+
+    fun openAwaitingCardCreation()
 
     fun openSendNetworks(payload: NetworkFlowPayload)
 
@@ -87,4 +98,14 @@ interface AssetsRouter {
     fun returnToMainSwapScreen()
 
     fun openBuyNetworks(payload: NetworkFlowPayload)
+
+    fun openSellNetworks(payload: NetworkFlowPayload)
+
+    fun openBuyProviders(chainId: String, chainAssetId: Int)
+
+    fun openSellProviders(chainId: String, chainAssetId: Int)
+
+    fun openTradeWebInterface(payload: TradeWebPayload)
+
+    fun finishTopUp()
 }

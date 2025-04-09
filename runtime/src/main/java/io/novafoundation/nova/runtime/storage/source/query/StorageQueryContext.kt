@@ -1,11 +1,13 @@
 package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.utils.ComponentHolder
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.storage.source.StorageEntries
+import io.novafoundation.nova.runtime.storage.source.StorageKey
+import io.novafoundation.nova.runtime.storage.source.StorageValue
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
@@ -17,13 +19,11 @@ typealias StorageKeyComponents = ComponentHolder
 typealias DynamicInstanceBinder<V> = (dynamicInstance: Any?) -> V
 typealias DynamicInstanceBinderWithKey<K, V> = (dynamicInstance: Any?, key: K) -> V
 
-interface StorageQueryContext {
+interface StorageQueryContext : RuntimeContext {
 
     val chainId: ChainId
 
-    val runtime: RuntimeSnapshot
-
-    fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String
+    override val runtime: RuntimeSnapshot
 
     suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents>
 
@@ -37,7 +37,7 @@ interface StorageQueryContext {
         binding: DynamicInstanceBinder<V>
     ): Flow<WithRawValue<V>>
 
-    suspend fun <K, V> StorageEntry.observe(
+    fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>
@@ -58,11 +58,11 @@ interface StorageQueryContext {
 
     suspend fun StorageEntry.entriesRaw(
         vararg prefixArgs: Any?,
-    ): Map<String, String?>
+    ): Map<StorageKey, StorageValue>
 
     suspend fun StorageEntry.entriesRaw(
         keysArguments: List<List<Any?>>
-    ): Map<String, String?>
+    ): StorageEntries
 
     suspend fun <K, V> StorageEntry.entries(
         keysArguments: List<List<Any?>>,
@@ -78,7 +78,7 @@ interface StorageQueryContext {
 
     suspend fun StorageEntry.queryRaw(
         vararg keyArguments: Any?
-    ): String?
+    ): StorageValue
 
     @Deprecated("Use multi for better smart-casting", replaceWith = ReplaceWith(expression = "multi(builderBlock)"))
     suspend fun multiInternal(
@@ -105,8 +105,6 @@ interface StorageQueryContext {
         keyExtractor = { it.component1<Any?>() as K },
         binding = binding
     )
-
-    suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V
 }
 
 @Suppress("DEPRECATION")
@@ -122,6 +120,3 @@ suspend fun StorageQueryContext.multi(
 }
 
 fun Iterable<*>.wrapSingleArgumentKeys(): List<List<Any?>> = map(::listOf)
-
-val StorageQueryContext.metadata: RuntimeMetadata
-    get() = runtime.metadata

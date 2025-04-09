@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
@@ -74,7 +75,7 @@ class ConfirmContributeViewModel(
         .share()
 
     val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager) }
+        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager, it.transferableInPlanks) }
         .inBackground()
         .share()
 
@@ -159,7 +160,7 @@ class ConfirmContributeViewModel(
             val accountAddress = selectedAddressModelFlow.first().address
             val chain = assetSharedState.chain()
 
-            externalActions.showExternalActions(ExternalActions.Type.Address(accountAddress), chain)
+            externalActions.showAddressActions(accountAddress, chain)
         }
     }
 

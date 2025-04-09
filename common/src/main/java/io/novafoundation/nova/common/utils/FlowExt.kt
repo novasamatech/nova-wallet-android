@@ -6,6 +6,9 @@ import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.tabs.TabLayout
+import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -67,6 +70,13 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline mapper: suspend (T) -> R) = 
 
 inline fun <T, R> Flow<Result<T>>.mapResult(crossinline mapper: suspend (T) -> R) = map { result ->
     result.map { item -> mapper(item) }
+}
+
+/**
+ * Maps nullable values by transforming non-null values and  propagating null to downstream
+ */
+inline fun <T : Any, R : Any> Flow<T?>.mapOptional(crossinline mapper: suspend (T) -> R?): Flow<R?> = map { result ->
+    result?.let { mapper(it) }
 }
 
 inline fun <T, R> Flow<List<T>>.mapListNotNull(crossinline mapper: suspend (T) -> R?) = map { list ->
@@ -391,7 +401,7 @@ inline fun <T> EditText.bindTo(
     scope: CoroutineScope,
     moveSelectionToEndOnInsertion: Boolean = false,
     crossinline toT: suspend (String) -> T,
-    crossinline fromT: suspend (T) -> String,
+    crossinline fromT: suspend (T) -> String?,
 ) {
     val textWatcher = onTextChanged {
         scope.launch {
@@ -402,7 +412,7 @@ inline fun <T> EditText.bindTo(
     scope.launch {
         flow.collect { input ->
             val inputString = fromT(input)
-            if (text.toString() != inputString) {
+            if (inputString != null && text.toString() != inputString) {
                 removeTextChangedListener(textWatcher)
                 setText(inputString)
                 if (moveSelectionToEndOnInsertion) {
@@ -417,6 +427,38 @@ inline fun <T> EditText.bindTo(
 fun EditText.moveSelectionToTheEnd() {
     if (hasFocus()) {
         setSelection(text.length)
+    }
+}
+
+context(BaseFragment<*>)
+infix fun TabLayout.bindTo(pageIndexFlow: MutableSharedFlow<Int>) = bindTo(pageIndexFlow, this@BaseFragment.lifecycleScope)
+
+fun TabLayout.bindTo(
+    pageIndexFlow: MutableSharedFlow<Int>,
+    scope: LifecycleCoroutineScope
+) {
+    var currentTabPosition = -1
+
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            val newIndex = tab.position
+            if (currentTabPosition != newIndex) {
+                currentTabPosition = newIndex
+                scope.launch {
+                    pageIndexFlow.emit(newIndex)
+                }
+            }
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+    })
+
+    pageIndexFlow.observe(scope) { index ->
+        if (index != currentTabPosition && index in 0 until tabCount) {
+            currentTabPosition = index
+            this@bindTo.getTabAt(index)?.select()
+        }
     }
 }
 

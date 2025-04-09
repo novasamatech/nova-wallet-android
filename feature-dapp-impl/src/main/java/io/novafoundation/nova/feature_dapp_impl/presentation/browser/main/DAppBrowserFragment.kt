@@ -35,9 +35,9 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewFileChooser
+import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewPermissionAsker
+import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import javax.inject.Inject
 
@@ -249,7 +249,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         binder.dappBrowserProgress.progress = 0
     }
 
-    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, binder.dappBrowserProgress, viewModel.viewModelScope)
+    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, viewModel.viewModelScope, binder.dappBrowserProgress)
 
     private fun updateButtonsState() {
         binder.dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false

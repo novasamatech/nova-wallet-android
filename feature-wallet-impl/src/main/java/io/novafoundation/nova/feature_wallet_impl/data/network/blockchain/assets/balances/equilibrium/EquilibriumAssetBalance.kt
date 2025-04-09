@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.constantOrNull
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.eqBalances
+import io.novafoundation.nova.common.utils.getAs
 import io.novafoundation.nova.common.utils.hasUpdated
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.second
@@ -39,6 +40,7 @@ import io.novafoundation.nova.runtime.ext.requireEquilibrium
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novafoundation.nova.runtime.network.binding.number
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -93,9 +95,9 @@ class EquilibriumAssetBalance(
         return true
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         return if (chainAsset.isUtilityAsset) {
-            remoteStorageSource.query(chain.id) {
+            chainRegistry.withRuntime(chainAsset.chainId) {
                 runtime.metadata.eqBalances().constantOrNull("ExistentialDepositBasic")?.getAs(number())
                     .orZero()
             }

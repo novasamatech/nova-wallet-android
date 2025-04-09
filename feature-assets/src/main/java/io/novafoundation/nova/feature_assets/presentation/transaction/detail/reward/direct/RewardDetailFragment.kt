@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -59,7 +60,7 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel, FragmentRewardS
             binder.rewardDetailToolbar.setTitle(time.formatDateTime())
             binder.rewardDetailAmount.setAmount(amount.toAmountModel())
 
-            binder.rewardDetailEra.showValue(era)
+            binder.rewardDetailEra.showValueOrHide(era)
 
             binder.rewardDetailStatus.showOperationStatus(statusAppearance)
 

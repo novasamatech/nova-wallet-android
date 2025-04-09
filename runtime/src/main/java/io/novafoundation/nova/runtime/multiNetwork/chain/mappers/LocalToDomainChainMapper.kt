@@ -37,7 +37,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 private fun mapStakingTypeFromLocal(stakingTypesLocal: String): List<Chain.Asset.StakingType> {
     if (stakingTypesLocal.isEmpty()) return emptyList()
 
-    return stakingTypesLocal.split(",").map(Chain.Asset.StakingType::valueOf)
+    return stakingTypesLocal.split(",").mapNotNull { enumValueOfOrNull<Chain.Asset.StakingType>(it) }
 }
 
 fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
@@ -259,6 +259,7 @@ fun mapChainLocalToChain(
             icon = icon.takeIf { it.isNotBlank() },
             externalApis = externalApis,
             addressPrefix = prefix,
+            legacyAddressPrefix = legacyPrefix,
             isEthereumBased = isEthereumBased,
             isTestNet = isTestNet,
             hasCrowdloans = hasCrowdloans,

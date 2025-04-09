@@ -25,16 +25,16 @@ import io.novafoundation.nova.feature_governance_impl.presentation.delegation.de
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegation.create.confirm.NewDelegationConfirmPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class NewDelegationChooseAmountViewModel(
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     private val assetUseCase: AssetUseCase,
     private val amountChooserMixinFactory: AmountChooserMixin.Factory,
     private val interactor: NewDelegationChooseAmountInteractor,
@@ -56,26 +55,39 @@ class NewDelegationChooseAmountViewModel(
     private val convictionValuesProvider: ConvictionValuesProvider,
     private val locksFormatter: LocksFormatter,
     private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
+    private val maxActionProviderFactory: MaxActionProviderFactory,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
-    WithFeeLoaderMixin,
     Validatable by validationExecutor {
 
     val title = flowOf {
         resourceManager.newDelegationTitle(isEditMode = payload.isEditMode)
     }.shareInBackground()
 
-    private val selectedAsset = assetUseCase.currentAssetFlow()
+    private val assetWithOption = assetUseCase.currentAssetAndOptionFlow()
+        .shareInBackground()
+
+    private val selectedAsset = assetWithOption.map { it.asset }
+        .shareInBackground()
+
+    private val selectedChainAsset = selectedAsset.map { it.token.configuration }
         .shareInBackground()
 
     private val delegateAssistantFlow = interactor.delegateAssistantFlow(viewModelScope)
 
-    override val originFeeMixin = feeLoaderMixinFactory.create(selectedAsset)
+    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
+
+    private val maxActionProvider = maxActionProviderFactory.create(
+        viewModelScope = viewModelScope,
+        assetInFlow = selectedAsset,
+        feeLoaderMixin = originFeeMixin,
+        balance = interactor::maxAvailableBalanceToDelegate
+    )
 
     val amountChooserMixin = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = selectedAsset,
-        balanceField = Asset::free,
-        balanceLabel = R.string.wallet_balance_available
+        maxActionProvider = maxActionProvider
     )
 
     val hintsMixin = resourcesHintsMixinFactory.newDelegationHints(viewModelScope)
@@ -129,12 +141,11 @@ class NewDelegationChooseAmountViewModel(
 
     init {
         originFeeMixin.connectWith(
-            inputSource1 = amountChooserMixin.backPressuredAmount,
+            inputSource1 = amountChooserMixin.backPressuredPlanks,
             inputSource2 = selectedConvictionFlow,
-            scope = this,
-            feeConstructor = { amount, conviction ->
+            feeConstructor = { _, amount, conviction ->
                 interactor.estimateFee(
-                    amount = amount.toPlanks(),
+                    amount = amount,
                     conviction = conviction,
                     delegate = payload.delegate,
                     tracks = payload.trackIds,
@@ -163,7 +174,8 @@ class NewDelegationChooseAmountViewModel(
             asset = selectedAsset.first(),
             fee = originFeeMixin.awaitFee(),
             amount = amountChooserMixin.amount.first(),
-            delegate = payload.delegate
+            delegate = payload.delegate,
+            maxAvailableAmount = maxActionProvider.maxAvailableBalance.first().actualAmount
         )
 
         validationExecutor.requireValid(

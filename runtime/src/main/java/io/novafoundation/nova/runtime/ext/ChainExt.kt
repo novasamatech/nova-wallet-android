@@ -1,5 +1,7 @@
 package io.novafoundation.nova.runtime.ext
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
 import io.novafoundation.nova.common.utils.Modules
@@ -15,6 +17,7 @@ import io.novafoundation.nova.common.utils.substrateAccountId
 import io.novafoundation.nova.core_db.model.AssetAndChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
@@ -163,7 +166,7 @@ fun ChainId.chainIdHexPrefix16(): String {
 
 enum class StakingTypeGroup {
 
-    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, UNSUPPORTED
+    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, UNSUPPORTED
 }
 
 fun Chain.Asset.StakingType.group(): StakingTypeGroup {
@@ -171,6 +174,7 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
         UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
         RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
         PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+        MYTHOS -> StakingTypeGroup.MYTHOS
         NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
     }
 }
@@ -207,17 +211,12 @@ fun Chain.Asset.normalizeSymbol(): String {
     return normalizeTokenSymbol(this.symbol.value)
 }
 
-private const val MOONBEAM_XC_PREFIX = "xc"
-
 fun TokenSymbol.normalize(): TokenSymbol {
     return normalizeTokenSymbol(value).asTokenSymbol()
 }
 
 fun normalizeTokenSymbol(symbol: String): String {
-    if (symbol.startsWith(XC_PREFIX)) {
-        return symbol.removePrefix(XC_PREFIX)
-    }
-    return symbol
+    return symbol.removePrefix(XC_PREFIX)
 }
 
 val Chain.Node.isWss: Boolean
@@ -246,6 +245,10 @@ val Chain.genesisHash: String?
         runCatching { it.fromHex() }.isSuccess
     }
 
+fun Chain.hasOnlyOneAddressFormat() = legacyAddressPrefix == null
+
+fun Chain.supportsLegacyAddressFormat() = legacyAddressPrefix != null
+
 fun Chain.requireGenesisHash() = requireNotNull(genesisHash)
 
 fun Chain.addressOf(accountId: ByteArray): String {
@@ -253,6 +256,14 @@ fun Chain.addressOf(accountId: ByteArray): String {
         accountId.toEthereumAddress()
     } else {
         accountId.toAddress(addressPrefix.toShort())
+    }
+}
+
+fun Chain.legacyAddressOfOrNull(accountId: ByteArray): String? {
+    return if (isEthereumBased) {
+        null
+    } else {
+        legacyAddressPrefix?.let { accountId.toAddress(it.toShort()) }
     }
 }
 
@@ -266,6 +277,10 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
+}
+
+fun Chain.accountIdKeyOf(address: String): AccountIdKey {
+    return accountIdOf(address).intoKey()
 }
 
 fun String.anyAddressToAccountId(): ByteArray {
@@ -287,6 +302,8 @@ fun Chain.emptyAccountId() = if (isEthereumBased) {
 } else {
     emptySubstrateAccountId()
 }
+
+fun Chain.emptyAccountIdKey() = emptyAccountId().intoKey()
 
 fun Chain.accountIdOrDefault(maybeAddress: String): ByteArray {
     return accountIdOrNull(maybeAddress) ?: emptyAccountId()
@@ -319,7 +336,8 @@ fun Chain.isValidAddress(address: String): Boolean {
         } else {
             address.toAccountId() // verify supplied address can be converted to account id
 
-            address.addressPrefix() == addressPrefix.toShort()
+            addressPrefix.toShort() == address.addressPrefix() ||
+                legacyAddressPrefix?.toShort() == address.addressPrefix()
         }
     }.getOrDefault(false)
 }
@@ -469,12 +487,14 @@ fun Chain.Asset.requireEquilibrium(): Type.Equilibrium {
 }
 
 fun Chain.Asset.ormlCurrencyId(runtime: RuntimeSnapshot): Any? {
-    val ormlType = requireOrml()
+    return requireOrml().currencyId(runtime)
+}
 
-    val currencyIdType = runtime.typeRegistry[ormlType.currencyIdType]
-        ?: error("Cannot find type ${ormlType.currencyIdType}")
+fun Type.Orml.currencyId(runtime: RuntimeSnapshot): Any? {
+    val currencyIdType = runtime.typeRegistry[currencyIdType]
+        ?: error("Cannot find type $currencyIdType")
 
-    return currencyIdType.fromHex(runtime, ormlType.currencyIdScale)
+    return currencyIdType.fromHex(runtime, currencyIdScale)
 }
 
 val Chain.Asset.fullId: FullChainAssetId

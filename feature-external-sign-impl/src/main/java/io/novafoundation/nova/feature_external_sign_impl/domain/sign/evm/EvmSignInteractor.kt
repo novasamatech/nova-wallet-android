@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.decodeEvmQuantity
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.parseArbitraryObject
@@ -57,9 +58,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionDecoder
@@ -119,7 +119,7 @@ class EvmSignInteractor(
             checkForFeeChanges(
                 calculateFee = { calculateFee()!! },
                 currentFee = { it.fee },
-                chainAsset = { it.token!!.configuration },
+                chainAsset = { it.fee!!.asset },
                 error = ConfirmDAppOperationValidationFailure::FeeSpikeDetected
             )
         }
@@ -144,18 +144,13 @@ class EvmSignInteractor(
         }
     }
 
-    override fun commissionTokenFlow(): Flow<Token?>? {
+    override fun utilityAssetFlow(): Flow<Chain.Asset>? {
         if (payload !is ConfirmTx) return null
 
-        return flow {
-            val chain = chainRegistry.findEvmChain(payload.chainSource.evmChainId)
-
-            if (chain != null) {
-                emitAll(tokenRepository.observeToken(chain.utilityAsset))
-            } else {
-                emit(createTokenFrom(payload.chainSource.unknownChainOptions))
-            }
-        }
+        return flowOf {
+            chainRegistry.findEvmChain(payload.chainSource.evmChainId)?.utilityAsset
+                ?: createAssetFrom(payload.chainSource.unknownChainOptions)
+        }.filterNotNull()
     }
 
     override suspend fun calculateFee(): Fee? = withContext(Dispatchers.Default) {

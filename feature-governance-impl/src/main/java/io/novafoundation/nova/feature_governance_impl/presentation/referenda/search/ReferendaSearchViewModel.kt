@@ -19,9 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.ReferendumModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.toReferendumDetailsPrefilledData
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
+import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -29,21 +27,19 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 
 class ReferendaSearchViewModel(
-    assetSelectorFactory: AssetSelectorFactory,
     private val referendaListInteractor: ReferendaListInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val selectedAssetSharedState: GovernanceSharedState,
     private val governanceRouter: GovernanceRouter,
     private val referendumFormatter: ReferendumFormatter,
-    private val resourceManager: ResourceManager
-) : BaseViewModel(), WithAssetSelector {
-
-    override val assetSelectorMixin = assetSelectorFactory.create(
-        scope = this,
-        amountProvider = Asset::free
-    )
+    private val resourceManager: ResourceManager,
+    private val tokenUseCase: TokenUseCase,
+) : BaseViewModel() {
 
     val queryFlow = MutableStateFlow("")
+
+    private val tokenFlow = tokenUseCase.currentTokenFlow()
+        .shareInBackground()
 
     private val accountAndChainFlow = combineToPair(selectedAccountUseCase.selectedMetaAccountFlow(), selectedAssetSharedState.selectedOption)
 
@@ -64,7 +60,7 @@ class ReferendaSearchViewModel(
         .shareWhileSubscribed()
 
     private suspend fun mapReferendaListToStateList(referenda: List<ReferendumPreview>): ReferendaListStateModel {
-        val asset = assetSelectorMixin.selectedAssetFlow.first()
+        val token = tokenFlow.first()
         val chain = selectedAssetSharedState.chain()
 
         val placeholder = if (referenda.isEmpty()) {
@@ -76,7 +72,7 @@ class ReferendaSearchViewModel(
             null
         }
 
-        val referendaUi = referenda.map { referendumFormatter.formatReferendumPreview(it, asset.token, chain) }
+        val referendaUi = referenda.map { referendumFormatter.formatReferendumPreview(it, token, chain) }
 
         return ReferendaListStateModel(placeholder, referendaUi)
     }

@@ -58,6 +58,10 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
         binder.dynamicListSheetTitle.setText(titleId)
     }
 
+    fun hideTitle() {
+        dynamicListSheetTitle.setVisible(false)
+    }
+
     fun setupRightAction(
         @DrawableRes drawableRes: Int,
         onClickListener: View.OnClickListener

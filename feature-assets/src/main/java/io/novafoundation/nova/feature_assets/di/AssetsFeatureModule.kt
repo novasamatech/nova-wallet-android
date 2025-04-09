@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
+import io.novafoundation.nova.feature_assets.data.repository.NovaCardStateRepository
+import io.novafoundation.nova.feature_assets.data.repository.RealNovaCardStateRepository
 import io.novafoundation.nova.feature_assets.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
@@ -25,19 +27,26 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
+import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -46,7 +55,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFormatter
@@ -77,16 +86,17 @@ class AssetsFeatureModule {
     fun provideSearchInteractorFactory(
         assetViewModeRepository: AssetsViewModeRepository,
         assetSearchUseCase: AssetSearchUseCase,
-        chainRegistry: ChainRegistry
-    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry)
+        chainRegistry: ChainRegistry,
+        tradeTokenRegistry: TradeTokenRegistry
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry, tradeTokenRegistry)
 
     @Provides
     @FeatureScope
     fun provideAssetNetworksInteractor(
         chainRegistry: ChainRegistry,
-        swapService: SwapService,
-        assetSearchUseCase: AssetSearchUseCase
-    ) = AssetNetworksInteractor(chainRegistry, swapService, assetSearchUseCase)
+        assetSearchUseCase: AssetSearchUseCase,
+        tradeTokenRegistry: TradeTokenRegistry
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry)
 
     @Provides
     @FeatureScope
@@ -162,13 +172,27 @@ class AssetsFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         operationsDao: OperationDao,
         coinPriceRepository: CoinPriceRepository,
-        poolAccountDerivation: PoolAccountDerivation
+        poolAccountDerivation: PoolAccountDerivation,
+        mythosMainPotMatcherFactory: MythosMainPotMatcherFactory,
     ): TransactionHistoryRepository = RealTransactionHistoryRepository(
         assetSourceRegistry = assetSourceRegistry,
         operationDao = operationsDao,
         coinPriceRepository = coinPriceRepository,
-        poolAccountDerivation = poolAccountDerivation
+        poolAccountDerivation = poolAccountDerivation,
+        mythosMainPotMatcherFactory = mythosMainPotMatcherFactory
     )
+
+    @Provides
+    @FeatureScope
+    fun provideNovaCardRepository(preferences: Preferences): NovaCardStateRepository {
+        return RealNovaCardStateRepository(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNovaCardInteractor(repository: NovaCardStateRepository): NovaCardInteractor {
+        return RealNovaCardInteractor(repository)
+    }
 
     @Provides
     @FeatureScope
@@ -207,6 +231,31 @@ class AssetsFeatureModule {
             currencyInteractor,
             assetsViewModeRepository,
             amountFormatter
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideChartsInteractor(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ChartsInteractor {
+        return RealChartsInteractor(coinPriceRepository, currencyRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBuySellMixinFactory(
+        router: AssetsRouter,
+        tradeTokenRegistry: TradeTokenRegistry,
+        chainRegistry: ChainRegistry,
+        resourceManager: ResourceManager
+    ): BuySellSelectorMixinFactory {
+        return BuySellSelectorMixinFactory(
+            router,
+            tradeTokenRegistry,
+            chainRegistry,
+            resourceManager
         )
     }
 }

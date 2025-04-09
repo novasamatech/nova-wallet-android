@@ -7,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
-import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -21,7 +20,10 @@ import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownIn
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
+import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
+import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
@@ -38,9 +40,8 @@ class BalanceListModule {
     fun provideInteractor(
         accountRepository: AccountRepository,
         nftRepository: NftRepository,
-        bannerVisibilityRepository: BannerVisibilityRepository,
         assetsViewModeRepository: AssetsViewModeRepository
-    ) = AssetsListInteractor(accountRepository, nftRepository, bannerVisibilityRepository, assetsViewModeRepository)
+    ) = AssetsListInteractor(accountRepository, nftRepository, assetsViewModeRepository)
 
     @Provides
     @ScreenScope
@@ -76,6 +77,8 @@ class BalanceListModule {
     @IntoMap
     @ViewModelKey(BalanceListViewModel::class)
     fun provideViewModel(
+        promotionBannersMixinFactory: PromotionBannersMixinFactory,
+        bannerSourceFactory: BannersSourceFactory,
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
@@ -86,9 +89,12 @@ class BalanceListModule {
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetListMixinFactory: AssetListMixinFactory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
+            promotionBannersMixinFactory = promotionBannersMixinFactory,
+            bannerSourceFactory = bannerSourceFactory,
             walletInteractor = walletInteractor,
             assetsListInteractor = assetsListInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
@@ -99,7 +105,8 @@ class BalanceListModule {
             walletConnectSessionsUseCase = walletConnectSessionsUseCase,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory
         )
     }
 

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.absoluteDifference
@@ -127,8 +128,7 @@ class ConfirmGovernanceUnlockViewModel(
         val chain = governanceSharedState.chain()
         val addressModel = currentAddressModelFlow.first()
 
-        val type = ExternalActions.Type.Address(addressModel.address)
-        externalActions.showExternalActions(type, chain)
+        externalActions.showAddressActions(addressModel.address, chain)
     }
 
     fun backClicked() {

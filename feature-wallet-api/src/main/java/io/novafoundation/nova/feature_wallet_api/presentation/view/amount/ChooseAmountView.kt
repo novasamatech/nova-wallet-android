@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -31,10 +32,6 @@ class ChooseAmountView @JvmOverloads constructor(
         attrs?.let(::applyAttrs)
     }
 
-    fun setBalanceLabel(label: String?) {
-        binder.chooseAmountBalanceLabel.setTextOrHide(label)
-    }
-
     fun loadAssetImage(icon: Icon) {
         binder.chooseAmountInput.loadAssetImage(icon)
     }
@@ -47,6 +44,12 @@ class ChooseAmountView @JvmOverloads constructor(
         binder.chooseAmountInput.setAssetName(name)
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+
+        binder.chooseAmountInput.isEnabled = enabled
+    }
+
     override fun setFiatAmount(fiat: CharSequence?) {
         binder.chooseAmountInput.setFiatAmount(fiat)
     }
@@ -56,21 +59,23 @@ class ChooseAmountView @JvmOverloads constructor(
     }
 
     override fun setMaxAmountDisplay(maxAmountDisplay: String?) {
-        binder.chooseAmountBalance.setTextOrHide(maxAmountDisplay)
+        binder.chooseAmountMaxButton.setMaxAmountDisplay(maxAmountDisplay)
     }
 
     override fun setMaxActionAvailability(availability: MaxActionAvailability) {
-        // TODO amount chooser max button
+        binder.chooseAmountMaxButton.isVisible = availability is MaxActionAvailability.Available
+
+        binder.chooseAmountMaxButton.setMaxActionAvailability(availability)
     }
 
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ChooseAmountView) {
+        isEnabled = it.getBoolean(R.styleable.ChooseAmountView_android_enabled, true)
+
         val title = it.getString(R.styleable.ChooseAmountView_title) ?: context.getString(R.string.common_amount)
         setTitle(title)
     }
 }
 
 fun ChooseAmountView.setChooseAmountModel(chooseAmountModel: ChooseAmountModel) {
-    setBalanceLabel(chooseAmountModel.balanceLabel)
-
     binder.chooseAmountInput.setChooseAmountInputModel(chooseAmountModel.input)
 }

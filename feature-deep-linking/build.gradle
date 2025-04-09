@@ -30,6 +30,7 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+    namespace 'io.novafoundation.nova.feature_deep_linking'
 
     buildFeatures {
         viewBinding true
@@ -45,11 +46,11 @@ dependencies {
     implementation project(':feature-governance-api')
     implementation project(':feature-currency-api')
     implementation project(':feature-buy-api')
-    implementation project(":feature-wallet-connect-api")
+    implementation project(':feature-wallet-connect-api')
+    implementation project(':feature-deep-link-building')
 
     implementation kotlinDep
 
-    
     implementation androidDep
     implementation materialDep
 

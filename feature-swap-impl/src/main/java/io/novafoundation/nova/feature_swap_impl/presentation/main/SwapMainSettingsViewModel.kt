@@ -36,7 +36,6 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -63,7 +62,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidat
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
@@ -92,6 +91,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.ext.fullId
@@ -140,7 +140,6 @@ class SwapMainSettingsViewModel(
     private val enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val buyMixinFactory: BuyMixin.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapRateFormatter: SwapRateFormatter,
     private val swapRouteFormatter: SwapRouteFormatter,
@@ -203,8 +202,6 @@ class SwapMainSettingsViewModel(
             )
         )
     )
-
-    val buyMixin = buyMixinFactory.create(viewModelScope)
 
     private val maxAssetInProvider = createMaxActionProvider()
 
@@ -470,7 +467,7 @@ class SwapMainSettingsViewModel(
 
     private fun buySelected() = launch {
         val chainAssetIn = chainAssetIn.first() ?: return@launch
-        buyMixin.buyClicked(chainAssetIn)
+        swapRouter.openBuyToken(chainAssetIn.chainId, chainAssetIn.id)
     }
 
     private fun receiveSelected() = launch {

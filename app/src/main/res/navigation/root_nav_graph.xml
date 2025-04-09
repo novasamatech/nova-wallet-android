@@ -21,9 +21,19 @@
 
     <include app:graph="@navigation/sign_ledger_nav_graph" />
 
+    <include app:graph="@navigation/sign_parity_signer_graph" />
+
     <action
         android:id="@+id/action_open_externalSignGraph"
         app:destination="@id/external_sign_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_sign_ledger"
+        app:destination="@id/sign_ledger_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -80,14 +90,6 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_open_dappBrowser"
-        app:destination="@id/dapp_browser_graph"
-        app:enterAnim="@anim/fragment_slide_in"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_slide_out" />
-
-    <action
         android:id="@+id/action_import_nav_graph"
         app:destination="@id/import_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
@@ -126,6 +128,14 @@
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_select_wallet"
+        app:destination="@id/selectWalletFragment" />
+
+    <action
+        android:id="@+id/action_openUnifiedAddressDialog"
+        app:destination="@id/chainAddressesFragment" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -206,5 +216,22 @@
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
         android:label="WalletConnectApproveSessionFragment" />
+
+    <dialog
+        android:id="@+id/selectWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.SelectWalletFragment"
+        android:label="SelectWalletFragment" />
+
+    <dialog
+        android:id="@+id/chainAddressesFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.legacyAddress.ChainAddressSelectorFragment"
+        android:label="fragment_chain_addresses"
+        tools:layout="@layout/fragment_chain_address_selector">
+
+        <action android:id="@+id/action_closeChainAddressesFragment"
+            app:popUpTo="@+id/chainAddressesFragment"
+            app:popUpToInclusive="true" />
+
+    </dialog>
 
 </navigation>

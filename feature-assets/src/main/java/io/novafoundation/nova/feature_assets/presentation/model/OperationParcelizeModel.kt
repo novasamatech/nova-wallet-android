@@ -20,7 +20,7 @@ sealed class OperationParcelizeModel : Parcelable {
         val time: Long,
         val amount: AmountParcelModel,
         val type: String,
-        val era: String,
+        val era: String?,
         val validator: String?,
         val statusAppearance: OperationStatusAppearance,
     ) : OperationParcelizeModel()

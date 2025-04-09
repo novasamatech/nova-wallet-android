@@ -5,7 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.viewbinding.ViewBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import javax.inject.Inject
 
@@ -33,5 +34,9 @@ abstract class BaseBottomSheetFragment<T : BaseViewModel, B : ViewBinding> : Bot
         super.onViewCreated(view, savedInstanceState)
 
         delegate.onViewCreated(view, savedInstanceState)
+    }
+
+    protected fun getBehaviour(): BottomSheetBehavior<*> {
+        return (dialog as BottomSheetDialog).behavior
     }
 }

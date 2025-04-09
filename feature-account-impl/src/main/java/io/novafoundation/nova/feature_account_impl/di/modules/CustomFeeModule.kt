@@ -18,13 +18,15 @@ import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.RealHydr
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -50,14 +52,14 @@ class CustomFeeModule {
         quotingFactory: HydraDxQuoting.Factory,
         pathQuoterFactory: PathQuoter.Factory,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-        blockNumberUpdater: BlockNumberUpdater
+        chainStateRepository: ChainStateRepository
     ): HydraDxQuoteSharedComputation {
         return HydraDxQuoteSharedComputation(
             computationalCache = computationalCache,
             quotingFactory = quotingFactory,
             pathQuoterFactory = pathQuoterFactory,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
-            blockNumberUpdater = blockNumberUpdater
+            chainStateRepository = chainStateRepository
         )
     }
 
@@ -100,12 +102,14 @@ class CustomFeeModule {
         chainRegistry: ChainRegistry,
         hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
         hydrationFeeInjector: HydrationFeeInjector,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        hydrationPriceConversionFallback: HydrationPriceConversionFallback
     ) = HydrationFeePaymentProvider(
-        chainRegistry,
-        hydraDxQuoteSharedComputation,
-        hydrationFeeInjector,
-        accountRepository
+        chainRegistry = chainRegistry,
+        hydraDxQuoteSharedComputation = hydraDxQuoteSharedComputation,
+        hydrationFeeInjector = hydrationFeeInjector,
+        hydrationPriceConversionFallback = hydrationPriceConversionFallback,
+        accountRepository = accountRepository,
     )
 
     @Provides

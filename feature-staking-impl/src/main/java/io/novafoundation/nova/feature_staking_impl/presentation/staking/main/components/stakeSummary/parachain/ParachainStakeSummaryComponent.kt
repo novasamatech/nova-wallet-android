@@ -73,18 +73,11 @@ private class ParachainStakeSummaryComponent(
         delegatorStatus: DelegatorStatus
     ): StakeStatusModel {
         return when (delegatorStatus) {
-            DelegatorStatus.Active -> StakeStatusModel.Active(
-                details = resourceManager.getString(R.string.staking_nominator_status_alert_active_title) to
-                    resourceManager.getString(R.string.staking_parachain_delegator_status_active_message)
-            )
-            DelegatorStatus.Inactive -> StakeStatusModel.Inactive(
-                details = resourceManager.getString(R.string.staking_nominator_status_alert_inactive_title) to
-                    resourceManager.getString(R.string.staking_parachain_status_inactive_message)
-            )
+            DelegatorStatus.Active -> StakeStatusModel.Active
+            DelegatorStatus.Inactive -> StakeStatusModel.Inactive
             is DelegatorStatus.Waiting -> StakeStatusModel.Waiting(
                 timeLeft = delegatorStatus.timeLeft.inWholeMilliseconds,
                 messageFormat = R.string.staking_parachain_next_round_format,
-                details = null
             )
         }
     }

@@ -29,10 +29,7 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
-
-    buildFeatures {
-        viewBinding true
-    }
+    namespace 'io.novafoundation.nova.feature_ledger_impl'
 
     buildFeatures {
         viewBinding true
@@ -56,7 +53,6 @@ dependencies {
 
     implementation kotlinDep
 
-    
     implementation androidDep
 
     implementation permissionsDep

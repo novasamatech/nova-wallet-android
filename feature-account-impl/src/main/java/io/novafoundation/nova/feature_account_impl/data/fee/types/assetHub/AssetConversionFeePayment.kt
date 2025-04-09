@@ -1,26 +1,26 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub
 
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.assetConversionAssetIdType
-import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
+import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.chargeAssetTxPayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
+import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.feature_xcm_api.versions.orDefault
+import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.MultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersion
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.XcmVersionDetector
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.MultiLocationConverter
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.converter.toMultiLocationOrThrow
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.orDefault
-import io.novafoundation.nova.runtime.multiNetwork.multiLocation.toEncodableInstance
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionValue
 import java.math.BigInteger
 
 internal class AssetConversionFeePayment(
@@ -33,7 +33,7 @@ internal class AssetConversionFeePayment(
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
         val xcmVersion = detectAssetIdXcmVersion(extrinsicBuilder.runtime)
-        return extrinsicBuilder.assetTxPayment(encodableAssetId(xcmVersion))
+        return extrinsicBuilder.chargeAssetTxPayment(encodableAssetId(xcmVersion))
     }
 
     override suspend fun convertNativeFee(nativeFee: Fee): Fee {
@@ -57,26 +57,10 @@ internal class AssetConversionFeePayment(
     }
 
     private fun encodableNativeAssetId(xcmVersion: XcmVersion): Any {
-        return MultiLocation(
-            parents = BigInteger.ONE,
-            interior = MultiLocation.Interior.Here
+        return RelativeMultiLocation(
+            parents = 1,
+            interior = Interior.Here
         ).toEncodableInstance(xcmVersion)
-    }
-
-    private fun ExtrinsicBuilder.assetTxPayment(assetId: Any?, tip: BigInteger = BigInteger.ZERO) {
-        val extensionValue = assetTxPaymentPayload(assetId, tip)
-
-        signedExtension(
-            id = "ChargeAssetTxPayment",
-            value = SignedExtensionValue(includedInExtrinsic = extensionValue)
-        )
-    }
-
-    private fun assetTxPaymentPayload(assetId: Any?, tip: BigInteger = BigInteger.ZERO): Any {
-        return structOf(
-            "tip" to tip,
-            "assetId" to assetId
-        )
     }
 
     private suspend fun RuntimeCallsApi.convertNativeFee(amount: BigInteger): BigInteger? {

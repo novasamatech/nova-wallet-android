@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_swap_impl.domain.swap
 
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.SharedFlowCache
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.atLeastZero
@@ -68,6 +70,7 @@ import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.SharedSwapSubscriptions
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
@@ -94,6 +97,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAssetOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -118,6 +123,7 @@ private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 private const val EXTRINSIC_SERVICE_CACHE = "RealSwapService.ExtrinsicService"
 private const val QUOTER_CACHE = "RealSwapService.QUOTER"
 private const val NODE_VISIT_FILTER = "RealSwapService.NodeVisitFilter"
+private const val SHARED_SUBSCRIPTIONS = "RealSwapService.SharedSubscriptions"
 
 private val ADDITIONAL_ESTIMATE_BUFFER = 3.seconds
 
@@ -133,6 +139,7 @@ internal class RealSwapService(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
+    private val chainStateRepository: ChainStateRepository,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
 
@@ -479,7 +486,7 @@ internal class RealSwapService(
         return ExchangeRegistry(
             singleChainExchanges = createIndividualChainExchanges(coroutineScope),
             multiChainExchanges = listOf(
-                crossChainTransferFactory.create(InnerSwapHost(coroutineScope))
+                crossChainTransferFactory.create(createInnerSwapHost(coroutineScope))
             )
         )
     }
@@ -497,20 +504,36 @@ internal class RealSwapService(
     }
 
     private suspend fun createIndividualChainExchanges(coroutineScope: CoroutineScope): Map<ChainId, AssetExchange> {
-        return chainRegistry.chainsById.first().mapValues { (_, chain) ->
-            createSingleExchange(coroutineScope, chain)
+        val host = createInnerSwapHost(coroutineScope)
+
+        return chainRegistry.enabledChainById().mapValues { (_, chain) ->
+            createSingleExchange(chain, host)
         }
             .filterNotNull()
     }
 
-    private suspend fun createSingleExchange(computationScope: CoroutineScope, chain: Chain): AssetExchange? {
+    private suspend fun createSingleExchange(
+        chain: Chain,
+        host: AssetExchange.SwapHost
+    ): AssetExchange? {
         val factory = when {
             chain.swap.assetConversionSupported() -> assetConversionFactory
             chain.swap.hydraDxSupported() -> hydraDxExchangeFactory
             else -> null
         }
 
-        return factory?.create(chain, InnerSwapHost(computationScope))
+        return factory?.create(chain, host)
+    }
+
+    private suspend fun createInnerSwapHost(computationScope: CoroutineScope): InnerSwapHost {
+        val subscriptions = sharedSwapSubscriptions(computationScope)
+        return InnerSwapHost(computationScope, subscriptions)
+    }
+
+    private suspend fun sharedSwapSubscriptions(computationScope: CoroutineScope): SharedSwapSubscriptions {
+        return computationalCache.useCache(SHARED_SUBSCRIPTIONS, computationScope) {
+            RealSharedSwapSubscriptions(computationScope)
+        }
     }
 
     // Assumes each flow will have only single element
@@ -642,7 +665,8 @@ internal class RealSwapService(
     }
 
     private inner class InnerSwapHost(
-        override val scope: CoroutineScope
+        override val scope: CoroutineScope,
+        override val sharedSubscriptions: SharedSwapSubscriptions
     ) : AssetExchange.SwapHost {
 
         override suspend fun quote(quoteArgs: ParentQuoterArgs): Balance {
@@ -838,6 +862,19 @@ internal class RealSwapService(
             return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
                 .onFailure { Log.e("Swap", "Failed to construct fast custom fee lookup for chain $chainId", it) }
                 .getOrNull()
+        }
+    }
+
+    private inner class RealSharedSwapSubscriptions(
+        private val coroutineScope: CoroutineScope,
+    ) : SharedSwapSubscriptions, CoroutineScope by coroutineScope {
+
+        private val blockNumberCache = SharedFlowCache<ChainId, BlockNumber>(coroutineScope) { chainId ->
+            chainStateRepository.currentRemoteBlockNumberFlow(chainId)
+        }
+
+        override suspend fun blockNumber(chainId: ChainId): Flow<BlockNumber> {
+            return blockNumberCache.getOrCompute(chainId)
         }
     }
 

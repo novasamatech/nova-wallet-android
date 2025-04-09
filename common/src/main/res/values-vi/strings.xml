@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Ứng dụng Polkadot đã được cài đặt</string>
     <string name="account_ledger_generic_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Mở ứng dụng Polkadot</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Ứng dụng Polkadot chung)</string>
     <string name="account_ledger_import_fill_description">Đảm bảo ứng dụng mạng được cài đặt vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live. Mở ứng dụng mạng trên thiết bị Ledger của bạn.</string>
     <string name="account_ledger_import_fill_disabled_hint">Thêm ít nhất một tài khoản</string>
     <string name="account_ledger_import_fill_title">Thêm tài khoản vào ví của bạn</string>
-    <string name="account_ledger_import_start_guide">Hướng dẫn kết nối Bluetooth chính thức của Ledger</string>
+    <string name="account_ledger_import_start_guide">Hướng dẫn Kết nối Ledger</string>
     <string name="account_ledger_import_start_step_1">Đảm bảo %s vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">Ứng dụng mạng đã được cài đặt</string>
     <string name="account_ledger_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth và Vị trí</string>
     <string name="account_ledger_import_start_step_4">%s để thêm vào ví</string>
     <string name="account_ledger_import_start_step_4_highlighted">Chọn tài khoản</string>
-    <string name="account_ledger_import_start_title">Kết nối Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s trong cài đặt điện thoại của bạn</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Bật OTG</string>
+    <string name="account_ledger_import_start_title">Kết nối Ledger</string>
     <string name="account_ledger_legacy_warning_message">Để ký kết các hoạt động và di chuyển các tài khoản của bạn sang ứng dụng Generic Ledger mới, cài đặt và mở ứng dụng Migration. Ứng dụng Ledger (Legacy) và Migration Ledger sẽ không còn được hỗ trợ trong tương lai.</string>
     <string name="account_ledger_legacy_warning_title">Ứng dụng Ledger mới đã được phát hành</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Ứng dụng Migration sẽ không còn khả dụng trong tương lai gần. Sử dụng nó để di chuyển các tài khoản của bạn sang ứng dụng Ledger mới để tránh mất tiền của bạn.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Ứng dụng Generic Polkadot)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Nếu sử dụng Ledger qua Bluetooth, hãy bật Bluetooth trên cả hai thiết bị và cấp quyền Bluetooth và vị trí cho Nova. Đối với USB, hãy bật OTG trong cài đặt điện thoại của bạn.</string>
     <string name="account_ledger_select_device_description">Hãy bật Bluetooth trong cài đặt điện thoại của bạn và thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_ledger_select_device_title">Chọn thiết bị Ledger của bạn</string>
+    <string name="account_ledger_select_device_usb_description">Vui lòng bật thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_mnmonic_length_variants">Cụm từ gồm 12, 15, 18, 21 hoặc 24 từ</string>
     <string name="account_needed_message">Bạn không có tài khoản cho mạng này, bạn có thể tạo hoặc nhập tài khoản.</string>
     <string name="account_needed_title">Cần tài khoản</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s không hỗ trợ ký các thông báo tùy ý — chỉ hỗ trợ giao dịch</string>
     <string name="account_parity_signer_not_supported_title">Không hỗ trợ ký</string>
     <string name="account_parity_signer_scan_from">Quét mã QR từ %s</string>
-    <string name="account_parity_signer_scan_with">Quét mã QR với %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Cũ</string>
+    <string name="account_parity_signer_show_mode_new">Mới (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">Tôi gặp lỗi trong %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Mã QR đã hết hạn</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Vì lý do bảo mật, các thao tác được tạo ra chỉ có giá trị trong %s.\nVui lòng tạo mã QR mới và ký với %s</string>
@@ -647,8 +653,6 @@
     <string name="dapp_favourites_remove_description">DApp “%s” sẽ bị xóa khỏi Yêu thích</string>
     <string name="dapp_favourites_remove_title">Xóa khỏi Yêu thích?</string>
     <string name="dapp_list_placeholder">Danh sách DApps sẽ xuất hiện ở đây</string>
-    <string name="dapp_main_welcome_subtitle">Lướt web sử dụng tài khoản từ Nova Wallet</string>
-    <string name="dapp_main_welcome_title">Chào mừng đến với Nova Browser</string>
     <string name="dapp_options_add_to_favorite">Thêm vào Yêu thích</string>
     <string name="dapp_options_desktop_mode">Chế độ máy tính</string>
     <string name="dapp_options_remove_from_favorite">Xóa khỏi Yêu thích</string>
@@ -747,17 +751,23 @@
     <string name="export_mnemonic_without_derivation" formatted="false">Mạng: %s\nMnemonic: %s</string>
     <string name="fee_not_yet_loaded_message">Vui lòng chờ cho đến khi phí được tính toán</string>
     <string name="fee_not_yet_loaded_title">Đang tính toán phí</string>
+    <string name="fragment_assets_nova_card">Quản lý Thẻ Ghi Nợ</string>
     <string name="fragment_set_staking_proxy_title">Thêm ủy quyền cho %s staking</string>
     <string name="fragment_swap_main_settings_details_title">Chi tiết đổi</string>
     <string name="fragment_swap_main_settings_max_button">Tối đa:</string>
     <string name="fragment_swap_main_settings_pay_title">Bạn trả</string>
     <string name="fragment_swap_main_settings_receive_title">Bạn nhận</string>
     <string name="fragment_swap_main_settings_select_token">Chọn một token</string>
+    <string name="fragment_top_up_card_title">Nạp thẻ với %s</string>
+    <string name="fragment_waiting_top_up_time_out_error_message">Vui lòng liên hệ support@novawallet.io. Bao gồm địa chỉ email mà bạn đã sử dụng để phát hành thẻ.</string>
+    <string name="fragment_waiting_top_up_time_out_error_title">Liên hệ hỗ trợ</string>
     <string name="governance_notification_channel_name">Kênh thông báo quản trị</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">Bạn cần chọn ít nhất %d track</item>
     </plurals>
     <string name="governance_unlock">Mở khóa</string>
+    <string name="high_price_impact_detacted_message">Thực hiện giao dịch này sẽ dẫn đến trượt giá đáng kể và thiệt hại tài chính. Xem xét giảm kích thước giao dịch của bạn hoặc chia giao dịch thành nhiều lần thực hiện.</string>
+    <string name="high_price_impact_detacted_title">Phát hiện tác động giá cao (%s)</string>
     <string name="history_v1.9.0">Lịch sử</string>
     <string name="identity_email_title">Email</string>
     <string name="identity_legal_name_title">Tên pháp lý</string>
@@ -795,12 +805,17 @@
     <string name="json_export_btn">Xuất tệp JSON</string>
     <string name="language_title">Ngôn ngữ</string>
     <string name="ledger_chain_not_supported">Ledger không hỗ trợ %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">Hoạt động đã bị hủy bởi thiết bị. Đảm bảo bạn đã mở khóa Ledger của mình.</string>
     <string name="ledger_error_app_cancelled_title">Hoạt động bị hủy</string>
     <string name="ledger_error_app_not_launched_message">Mở ứng dụng %s trên thiết bị Ledger của bạn</string>
     <string name="ledger_error_app_not_launched_title">Ứng dụng %s chưa được khởi động</string>
     <string name="ledger_error_general_message">Hoạt động hoàn thành với lỗi trên thiết bị. Vui lòng thử lại sau.</string>
     <string name="ledger_error_general_title">Hoạt động Ledger thất bại</string>
+    <string name="ledger_hold_to_sign">Giữ nút xác nhận trên %s của bạn để chấp thuận giao dịch</string>
     <string name="ledger_import_select_address_load_more">Tải thêm tài khoản</string>
     <string name="ledger_review_approve_title">Xem xét và Phê duyệt</string>
     <string name="ledger_sign_approve_message">Nhấn cả hai nút trên %s của bạn để phê duyệt giao dịch</string>
@@ -813,7 +828,8 @@
     <string name="ledger_sign_transaction_validity_format">Giao dịch có hiệu lực trong %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger không hỗ trợ giao dịch này.</string>
     <string name="ledger_sign_tx_not_supported_title">Giao dịch không được hỗ trợ</string>
-    <string name="ledger_verify_address_subtitle">Nhấn cả hai nút trên %s của bạn để phê duyệt địa chỉ</string>
+    <string name="ledger_verify_address_message_both_buttons">Nhấn cả hai nút trên %s của bạn để chấp thuận địa chỉ</string>
+    <string name="ledger_verify_address_message_confirm_button">Nhấn nút xác nhận trên %s của bạn để chấp thuận địa chỉ</string>
     <string name="ledger_wallet_details_description">Ví này đã được ghép đôi với Ledger. Nova sẽ giúp bạn thực hiện bất kỳ thao tác nào bạn muốn, và bạn sẽ được yêu cầu ký chúng bằng Ledger</string>
     <string name="ledher_import_select_address_title">Chọn tài khoản để thêm vào ví</string>
     <string name="loading_network_info">Đang tải thông tin mạng...</string>
@@ -921,10 +937,24 @@
     <string name="pool_inactive_failure_title">Bể chưa mở</string>
     <string name="pool_staking_conflict_message">Bạn không thể sử dụng cả Staking trực tiếp và Pool Staking từ cùng một tài khoản. Để quản lý Pool Staking bạn trước tiên cần unstake token của mình từ Staking trực tiếp.</string>
     <string name="pool_staking_conflict_title">Các thao tác trong Pool không khả dụng</string>
+    <string name="popular_dapps_title">Phổ biến</string>
     <string name="pre_configured_networks_add_custom_button">Thêm mạng thủ công</string>
     <string name="pre_configured_networks_progress_text">Đang tải danh sách mạng...</string>
     <string name="pre_configured_networks_search_hint">Tìm kiếm theo tên mạng</string>
     <string name="pre_configured_networks_title">Thêm mạng</string>
+    <string name="price_chart_date_format" formatted="false">%s lúc %s</string>
+    <string name="price_chart_day">1D</string>
+    <string name="price_chart_max">Tất cả</string>
+    <string name="price_chart_month">1M</string>
+    <string name="price_chart_price_change" formatted="false">%s (%s)</string>
+    <string name="price_chart_title">giá của %s</string>
+    <string name="price_chart_week">1W</string>
+    <string name="price_chart_year">1Y</string>
+    <string name="price_charts_period_all">Tất cả thời gian</string>
+    <string name="price_charts_period_month">Tháng trước</string>
+    <string name="price_charts_period_today">Hôm nay</string>
+    <string name="price_charts_period_week">Tuần trước</string>
+    <string name="price_charts_period_year">Năm trước</string>
     <string name="profile_accounts_title">Tài khoản</string>
     <string name="profile_accounts_title_2_0">Ví tiền</string>
     <string name="profile_language_title">Ngôn ngữ</string>
@@ -1137,6 +1167,7 @@
     <string name="select_delegation_tracks_edit_title">Chọn track để chỉnh sửa ủy quyền</string>
     <string name="select_delegation_tracks_revoke_title">Chọn track để hủy ủy quyền</string>
     <string name="select_delegation_tracks_unavailable_tracks">Track không có sẵn</string>
+    <string name="select_ledger_grant_permissions">Bật Bluetooth &amp; Cấp Quyền</string>
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
     <string name="select_network_title">Chọn mạng</string>
@@ -1483,6 +1514,8 @@
     <string name="start_create_wallet_name_your_wallet">Đặt tên cho ví của bạn</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Điều này chỉ hiển thị với bạn và bạn có thể chỉnh sửa sau.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Ví của bạn đã sẵn sàng</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Bạn có token khóa trên số dư của mình do %s. Để tiếp tục, bạn nên nhập ít hơn %s hoặc nhiều hơn %s. Để stake số lượng khác, bạn nên loại bỏ khóa %s của mình.</string>
     <string name="start_staking_cant_stake_amount">Bạn không thể stake số lượng đã chỉ định</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Đã chọn: %d (tối đa %d)</string>
@@ -1637,6 +1670,11 @@
     <string name="unavailable_tracks_delegated_group">Các track mà bạn đã ủy quyền bỏ phiếu</string>
     <string name="unavailable_tracks_title">Các track không khả dụng</string>
     <string name="unavailable_tracks_voted_group">Các track mà bạn đã có bỏ phiếu sẵn</string>
+    <string name="unified_address_format_checkbox_warning">Không hiển thị lại điều này.\nBạn có thể tìm thấy địa chỉ cũ trong Nhận.</string>
+    <string name="unified_address_format_legacy_badge">Định dạng cũ</string>
+    <string name="unified_address_format_new_badge">Định dạng mới</string>
+    <string name="unified_address_subtitle">Một số sàn giao dịch có thể vẫn yêu cầu định dạng cũ\ncho các hoạt động trong khi họ cập nhật.</string>
+    <string name="unified_address_title">Địa Chỉ Thống Nhất Mới</string>
     <string name="update_notification_install_btn">Cài đặt</string>
     <string name="update_notification_item_version">Phiên bản %s</string>
     <string name="update_notification_title">Có cập nhật mới</string>
@@ -1655,6 +1693,10 @@
     <string name="vote_revote">Bỏ phiếu lại</string>
     <string name="vote_vote">Bỏ phiếu</string>
     <string name="voting_status">Trạng thái bỏ phiếu</string>
+    <string name="waiting_existing_card_top_up_card_title">Thẻ của bạn đang được nạp tiền!</string>
+    <string name="waiting_initial_top_up_card_title">Thẻ của bạn đang được phát hành!</string>
+    <string name="waiting_top_up_card_description">Có thể mất đến 5 phút.\nCửa sổ này sẽ tự động đóng.</string>
+    <string name="waiting_top_up_card_timer">Dự đoán %s</string>
     <string name="wallet_asset_buy">Mua</string>
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>

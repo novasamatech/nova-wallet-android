@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_impl.di.modules.AssetsModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.BalanceLocksModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.ValidationsModule
+import io.novafoundation.nova.feature_wallet_impl.di.modules.WalletBindsModule
+import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -19,6 +21,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         WalletFeatureModule::class,
+        WalletBindsModule::class,
         ValidationsModule::class,
         AssetsModule::class,
         BalanceLocksModule::class,
@@ -42,7 +45,8 @@ interface WalletFeatureComponent : WalletFeatureApi {
             RuntimeApi::class,
             AccountFeatureApi::class,
             CurrencyFeatureApi::class,
-            SwapCoreApi::class
+            SwapCoreApi::class,
+            XcmFeatureApi::class
         ]
     )
     interface WalletFeatureDependenciesComponent : WalletFeatureDependencies

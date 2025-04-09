@@ -8,8 +8,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.utils.updatePadding
-import io.novafoundation.nova.common.utils.useAttributes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.showLoadingState
@@ -26,28 +25,18 @@ abstract class BalancesView @JvmOverloads constructor(
 
     private val binder = ViewBalancesBinding.inflate(inflater(), this)
 
+    protected val expandableView
+        get() = binder.viewBalanceExpandableView
+
     init {
         orientation = VERTICAL
-
-        val commonPadding = 16.dp(context)
-
-        updatePadding(
-            top = commonPadding,
-            start = commonPadding,
-            end = commonPadding,
-            bottom = 8.dp(context)
-        )
-
-        attrs?.let {
-            applyAttributes(it)
-        }
 
         background = context.getBlockDrawable()
     }
 
-    private fun applyAttributes(attributes: AttributeSet) = context.useAttributes(attributes, R.styleable.BalancesView) {
-        val title = it.getString(R.styleable.BalancesView_title)
-        binder.viewBalancesTitle.text = title
+    fun setTotalBalance(token: CharSequence, fiat: CharSequence?) {
+        binder.viewBalanceToken.text = token
+        binder.viewBalanceFiat.setTextOrHide(fiat)
     }
 
     protected fun item(@StringRes titleRes: Int): TableCellView {
@@ -56,14 +45,20 @@ abstract class BalancesView @JvmOverloads constructor(
 
             valueSecondary.setTextColorRes(R.color.text_secondary)
             title.setTextColorRes(R.color.text_secondary)
+            setPadding(16.dp, 0, 16.dp, 0)
 
+            isClickable = true // To not propagate parent state to children. isDuplicateParentState not working in this case
             setTitle(titleRes)
         }
 
-        addView(item)
+        binder.viewBalanceExpandableContainer.addView(item)
 
         return item
     }
+}
+
+fun BalancesView.setTotalAmount(amountModel: AmountModel) {
+    setTotalBalance(amountModel.token, amountModel.fiat)
 }
 
 fun TableCellView.showAmount(amountModel: AmountModel) {

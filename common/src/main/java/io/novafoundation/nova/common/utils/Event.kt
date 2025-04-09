@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.utils
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 
 class Event<T>(private val content: T) {
@@ -28,3 +29,5 @@ class EventObserver<T>(private val onEventUnhandledContent: (T) -> Unit) : Obser
 }
 
 fun <T> T.event(): Event<T> = Event(this)
+
+fun <T, R> LiveData<Event<T>>.mapEvent(mapper: (T) -> R): LiveData<Event<R>> = this.map { Event(mapper(it.peekContent())) }

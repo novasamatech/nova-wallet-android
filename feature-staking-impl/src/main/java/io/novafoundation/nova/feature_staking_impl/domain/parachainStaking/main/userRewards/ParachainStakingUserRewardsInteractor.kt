@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.fullId
-import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +14,6 @@ import kotlinx.coroutines.withContext
 
 class ParachainStakingUserRewardsInteractor(
     private val stakingRewardsRepository: StakingRewardsRepository,
-    private val stakingPeriodRepository: StakingPeriodRepository
 ) {
 
     suspend fun syncRewards(

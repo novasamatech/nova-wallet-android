@@ -2,12 +2,13 @@ package io.novafoundation.nova.runtime.storage.source.query
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZero
-import io.novafoundation.nova.common.data.network.runtime.binding.fromByteArrayOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
+import io.novafoundation.nova.common.utils.createStorageKey
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.storage.source.StorageEntries
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilderImpl
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -16,7 +17,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u16
 import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import io.novasama.substrate_sdk_android.runtime.metadata.StorageEntryModifier
-import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntryType
@@ -45,13 +45,9 @@ abstract class BaseStorageQueryContext(
 
     protected abstract fun observeKey(key: String): Flow<StorageUpdate>
 
-    protected abstract suspend fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
+    protected abstract fun observeKeys(keys: List<String>): Flow<Map<String, String?>>
 
     protected abstract suspend fun observeKeysByPrefix(prefix: String): Flow<Map<String, String?>>
-
-    override fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
-        return storageKeyWith(keyArguments)
-    }
 
     override suspend fun StorageEntry.keys(vararg prefixArgs: Any?): List<StorageKeyComponents> {
         val prefix = storageKey(runtime, *prefixArgs)
@@ -112,11 +108,11 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-    override suspend fun StorageEntry.entriesRaw(vararg prefixArgs: Any?): Map<String, String?> {
+    override suspend fun StorageEntry.entriesRaw(vararg prefixArgs: Any?): StorageEntries {
         return queryEntriesByPrefix(storageKey(runtime, *prefixArgs), at)
     }
 
-    override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): Map<String, String?> {
+    override suspend fun StorageEntry.entriesRaw(keysArguments: List<List<Any?>>): StorageEntries {
         return queryKeys(storageKeys(runtime, keysArguments), at)
     }
 
@@ -137,15 +133,13 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): V {
-        val storageKey = storageKeyWith(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
         val scaleResult = queryKey(storageKey, at)
-        val decoded = scaleResult?.let { type.value?.fromHex(runtime, scaleResult) } ?: takeDefaultIfAllowed()
-
-        return binding(decoded)
+        return decodeStorageValue(scaleResult, binding)
     }
 
     override suspend fun StorageEntry.queryRaw(vararg keyArguments: Any?): String? {
-        val storageKey = storageKeyWith(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
 
         return queryKey(storageKey, at)
     }
@@ -154,7 +148,7 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<V> {
-        val storageKey = storageKeyWith(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
 
         return observeKey(storageKey).map { storageUpdate ->
             decodeStorageValue(storageUpdate.value, binding)
@@ -165,7 +159,7 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<WithRawValue<V>> {
-        val storageKey = storageKeyWith(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
 
         return observeKey(storageKey).map { storageUpdate ->
             val decoded = decodeStorageValue(storageUpdate.value, binding)
@@ -179,7 +173,7 @@ abstract class BaseStorageQueryContext(
         }
     }
 
-    override suspend fun <K, V> StorageEntry.observe(
+    override fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
         binding: DynamicInstanceBinderWithKey<K, V>
@@ -215,29 +209,15 @@ abstract class BaseStorageQueryContext(
         return MultiQueryResult(delegate)
     }
 
-    override suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V {
-        val rawValue = type!!.fromByteArrayOrIncompatible(value, runtime)
-
-        return binding(rawValue)
-    }
-
     private fun <V> StorageEntry.decodeStorageValue(
         scale: String?,
         binding: DynamicInstanceBinder<V>
     ): V {
         val dynamicInstance = scale?.let {
             type.value?.fromHex(runtime, scale)
-        }
+        } ?: takeDefaultIfAllowed()
 
         return binding(dynamicInstance)
-    }
-
-    private fun StorageEntry.storageKeyWith(keyArguments: Array<out Any?>): String {
-        return if (keyArguments.isEmpty()) {
-            storageKey()
-        } else {
-            storageKey(runtime, *keyArguments)
-        }
     }
 
     private fun <K, V> applyMappersToEntries(

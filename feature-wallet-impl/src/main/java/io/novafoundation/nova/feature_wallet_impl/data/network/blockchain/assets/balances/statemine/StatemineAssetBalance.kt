@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.decodeValue
-import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
 import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
@@ -12,8 +11,11 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.StatemineAssetDetails
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.transfersFrozen
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.statemineModule
@@ -22,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.network.updaters.insert
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
@@ -31,15 +32,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 
+// TODO Migrate low-level subscription to storage to AssetsApi
 class StatemineAssetBalance(
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
     private val remoteStorage: StorageDataSource,
-    private val localStorage: StorageDataSource,
-    private val storageCache: StorageCache
+    private val statemineAssetsRepository: StatemineAssetsRepository,
 ) : AssetBalance {
 
     override suspend fun startSyncingBalanceLocks(
@@ -56,7 +56,7 @@ class StatemineAssetBalance(
         return chainAsset.requireStatemine().isSufficient
     }
 
-    override suspend fun existentialDeposit(chain: Chain, chainAsset: Chain.Asset): BigInteger {
+    override suspend fun existentialDeposit(chainAsset: Chain.Asset): BigInteger {
         return queryAssetDetails(chainAsset).minimumBalance
     }
 
@@ -134,25 +134,14 @@ class StatemineAssetBalance(
 
         val module = runtime.metadata.statemineModule(statemineType)
 
-        val assetDetailsStorage = module.storage("Asset")
-        val assetDetailsKey = assetDetailsStorage.storageKey(runtime, encodableAssetId)
-
         val assetAccountStorage = module.storage("Account")
         val assetAccountKey = assetAccountStorage.storageKey(runtime, encodableAssetId, accountId)
 
-        val assetDetailsFlow = subscriptionBuilder.subscribe(assetDetailsKey)
-            .onEach { storageCache.insert(it, chain.id) }
-
-        val isFrozenFlow = assetDetailsFlow
-            .map {
-                val decoded = assetDetailsStorage.decodeValue(it.value, runtime)
-
-                bindAssetDetails(decoded).status.transfersFrozen
-            }
+        val assetDetailsFlow = statemineAssetsRepository.subscribeAndSyncAssetDetails(chain.id, statemineType, subscriptionBuilder)
 
         return combine(
             subscriptionBuilder.subscribe(assetAccountKey),
-            isFrozenFlow
+            assetDetailsFlow.map { it.status.transfersFrozen }
         ) { balanceStorageChange, isAssetFrozen ->
             val assetAccountDecoded = assetAccountStorage.decodeValue(balanceStorageChange.value, runtime)
             val assetAccount = bindAssetAccountOrEmpty(assetAccountDecoded)
@@ -167,13 +156,9 @@ class StatemineAssetBalance(
         }
     }
 
-    private suspend fun queryAssetDetails(chainAsset: Chain.Asset): AssetDetails {
+    private suspend fun queryAssetDetails(chainAsset: Chain.Asset): StatemineAssetDetails {
         val statemineType = chainAsset.requireStatemine()
-        return localStorage.query(chainAsset.chainId) {
-            val encodableAssetId = statemineType.prepareIdForEncoding(runtime)
-
-            runtime.metadata.statemineModule(statemineType).storage("Asset").query(encodableAssetId, binding = ::bindAssetDetails)
-        }
+        return statemineAssetsRepository.getAssetDetails(chainAsset.chainId, statemineType)
     }
 
     private suspend fun updateAssetBalance(

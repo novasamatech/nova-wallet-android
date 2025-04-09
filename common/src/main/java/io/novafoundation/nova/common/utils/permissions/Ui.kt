@@ -6,16 +6,14 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker.Permissi
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker.PermissionDeniedLevel.CAN_ASK_AGAIN
 import io.novafoundation.nova.common.view.dialog.warningDialog
 
-fun BaseFragment<*, *>.setupPermissionAsker(
-    component: PermissionsAsker,
-) {
+fun BaseFragment<*, *>.setupPermissionAsker(component: PermissionsAsker) {
     component.showPermissionsDenied.awaitableActionLiveData.observeEvent {
         val level = it.payload
 
         warningDialog(
             context = requireContext(),
             onPositiveClick = { it.onSuccess(PermissionDeniedAction.RETRY) },
-            onNegativeClick = { it.onSuccess(PermissionDeniedAction.BACK) },
+            onNegativeClick = { it.onSuccess(PermissionDeniedAction.CANCEL) },
             positiveTextRes = if (level == CAN_ASK_AGAIN) R.string.common_ask_again else R.string.common_to_settings
         ) {
             if (level == CAN_ASK_AGAIN) {

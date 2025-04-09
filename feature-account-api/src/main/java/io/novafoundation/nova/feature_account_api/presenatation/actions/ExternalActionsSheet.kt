@@ -13,7 +13,7 @@ import io.novafoundation.nova.runtime.ext.availableExplorersFor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias ExternalViewCallback = (Chain.Explorer, ExternalActions.Type) -> Unit
-typealias CopyCallback = (String) -> Unit
+typealias CopyCallback = (ExternalActions.Payload) -> Unit
 
 open class ExternalActionsSheet(
     context: Context,
@@ -46,13 +46,11 @@ open class ExternalActionsSheet(
             binder.externalActionsIcon.makeGone()
         }
 
-        val primaryValue = payload.type.primaryValue
+        setTitle(payload.type.primaryValue)
 
-        setTitle(primaryValue)
-
-        primaryValue?.let {
+        payload.copyLabelRes?.let {
             textItem(R.drawable.ic_copy_outline, payload.copyLabelRes) {
-                onCopy(primaryValue)
+                onCopy(payload)
             }
 
             showExplorers()

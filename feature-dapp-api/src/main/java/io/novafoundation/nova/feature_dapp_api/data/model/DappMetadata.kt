@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_dapp_api.data.model
 
+typealias DAppUrl = String
+
 class DappCatalog(
+    val popular: List<DAppUrl>,
     val categories: List<DappCategory>,
     val dApps: List<DappMetadata>
 )
@@ -8,7 +11,7 @@ class DappCatalog(
 class DappMetadata(
     val name: String,
     val iconLink: String,
-    val url: String,
+    val url: DAppUrl,
     val baseUrl: String,
     val categories: Set<DappCategory>
 )

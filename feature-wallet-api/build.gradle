@@ -18,6 +18,7 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+    namespace 'io.novafoundation.nova.feature_wallet_api'
 
     buildFeatures {
         viewBinding true
@@ -35,6 +36,7 @@ dependencies {
     implementation materialDep
 
     implementation daggerDep
+    implementation project(':feature-xcm:api')
     kapt daggerKapt
 
     implementation substrateSdkDep

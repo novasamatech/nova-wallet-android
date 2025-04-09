@@ -8,6 +8,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.Balance
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
+import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
+import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.OnSuccessfulTradeStrategyType
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
@@ -53,6 +57,21 @@ class SwapNavigator(
         val bundle = BalanceDetailFragment.getBundle(assetPayload)
 
         navigationBuilder().action(R.id.action_swapExecutionFragment_to_assetDetails)
+            .setArgs(bundle)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBuyToken(chainId: String, assetId: Int) {
+        val bundle = TradeProviderListFragment.createPayload(
+            TradeProviderListPayload(
+                chainId,
+                assetId,
+                TradeProviderFlowType.BUY,
+                OnSuccessfulTradeStrategyType.RETURN_BACK
+            )
+        )
+
+        navigationBuilder().action(R.id.action_tradeProvidersFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }

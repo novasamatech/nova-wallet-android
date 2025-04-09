@@ -44,6 +44,7 @@ dependencies {
     implementation project(":feature-swap-core")
     implementation project(':feature-currency-api')
     implementation project(':feature-buy-api')
+    implementation project(':feature-xcm:api')
 
     implementation project(":common")
     implementation project(":runtime")

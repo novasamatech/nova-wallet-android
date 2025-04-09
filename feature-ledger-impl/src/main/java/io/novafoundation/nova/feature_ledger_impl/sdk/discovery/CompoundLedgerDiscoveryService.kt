@@ -10,7 +10,7 @@ class CompoundLedgerDiscoveryService(
     private val delegates: List<LedgerDeviceDiscoveryService>
 ) : LedgerDeviceDiscoveryService {
 
-    constructor(vararg delegates: LedgerDeviceDiscoveryService) : this(delegates.toList())
+    private var discoveringSubscribersManager = DiscoveringSubscribersManager()
 
     override val discoveredDevices: Flow<List<LedgerDevice>> by lazy {
         combine(
@@ -26,10 +26,37 @@ class CompoundLedgerDiscoveryService(
     }
 
     override fun startDiscovery() {
-        delegates.forEach { it.startDiscovery() }
+        if (discoveringSubscribersManager.noSubscribers()) {
+            delegates.forEach { it.startDiscovery() }
+        }
+
+        discoveringSubscribersManager.addSubscriber()
     }
 
     override fun stopDiscovery() {
-        delegates.forEach { it.stopDiscovery() }
+        discoveringSubscribersManager.removeSubscriber()
+
+        if (discoveringSubscribersManager.noSubscribers()) {
+            delegates.forEach { it.stopDiscovery() }
+        }
+    }
+}
+
+private class DiscoveringSubscribersManager {
+
+    private var subscribers = 0
+
+    fun addSubscriber() {
+        subscribers++
+    }
+
+    fun removeSubscriber() {
+        if (subscribers == 0) return
+
+        subscribers--
+    }
+
+    fun noSubscribers(): Boolean {
+        return subscribers == 0
     }
 }

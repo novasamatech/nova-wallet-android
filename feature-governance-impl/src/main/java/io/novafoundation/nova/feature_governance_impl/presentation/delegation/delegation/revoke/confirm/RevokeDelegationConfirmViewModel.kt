@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -129,16 +130,14 @@ class RevokeDelegationConfirmViewModel(
 
     fun accountClicked() = launch {
         val addressModel = currentAddressModelFlow.first()
-        val type = ExternalActions.Type.Address(addressModel.address)
 
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+        externalActions.showAddressActions(addressModel.address, governanceSharedState.chain())
     }
 
     fun delegateClicked() = launch {
         val address = delegateLabelModel.firstLoaded().address
-        val type = ExternalActions.Type.Address(address)
 
-        externalActions.showExternalActions(type, governanceSharedState.chain())
+        externalActions.showAddressActions(address, governanceSharedState.chain())
     }
 
     fun tracksClicked() = launch {
