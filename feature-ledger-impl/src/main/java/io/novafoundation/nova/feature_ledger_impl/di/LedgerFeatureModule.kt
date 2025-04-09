@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker

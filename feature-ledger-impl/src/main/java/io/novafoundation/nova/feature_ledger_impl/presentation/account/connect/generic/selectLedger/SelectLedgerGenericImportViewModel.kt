@@ -28,7 +28,7 @@ class SelectLedgerGenericImportViewModel(
     payload: SelectLedgerPayload,
     deviceMapperFactory: LedgerDeviceFormatter,
 ) : SelectLedgerViewModel(
-    discoveryService= discoveryService,
+    discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
     locationManager = locationManager,

@@ -98,7 +98,7 @@ class SignLedgerModule {
         messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SignLedgerViewModel(
-            discoveryService= discoveryService,
+            discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
             locationManager = locationManager,

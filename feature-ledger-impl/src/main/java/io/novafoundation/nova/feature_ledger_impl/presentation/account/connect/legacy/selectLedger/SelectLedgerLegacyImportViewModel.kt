@@ -29,7 +29,7 @@ class SelectLedgerLegacyImportViewModel(
     messageFormatter: LedgerMessageFormatter,
     ledgerDeviceFormatter: LedgerDeviceFormatter
 ) : SelectLedgerViewModel(
-    discoveryService= discoveryService,
+    discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
     locationManager = locationManager,

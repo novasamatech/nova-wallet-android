@@ -66,7 +66,7 @@ class AddChainAccountSelectLedgerModule {
     ): ViewModel {
         return AddChainAccountSelectLedgerViewModel(
             migrationUseCase = migrationUseCase,
-            discoveryService= discoveryService,
+            discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
             locationManager = locationManager,

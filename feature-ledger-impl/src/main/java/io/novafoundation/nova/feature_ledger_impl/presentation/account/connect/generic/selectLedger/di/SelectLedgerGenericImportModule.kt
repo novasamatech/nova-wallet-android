@@ -60,7 +60,7 @@ class SelectLedgerGenericImportModule {
         messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectLedgerGenericImportViewModel(
-            discoveryService= discoveryService,
+            discoveryService = discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
             locationManager = locationManager,
