@@ -98,7 +98,7 @@ class BalanceListViewModel(
         walletInteractor::syncAllNfts
     )
 
-    val buySellSelectorMixin = buySellSelectorMixinFactory.create()
+    val buySellSelectorMixin = buySellSelectorMixinFactory.create(BuySellSelectorMixin.SelectorType.AllAssets, viewModelScope)
 
     val assetListMixin = assetListMixinFactory.create(viewModelScope)
 
@@ -310,7 +310,7 @@ class BalanceListViewModel(
     }
 
     fun buySellClicked() {
-        buySellSelectorMixin.openSelector(BuySellSelectorMixin.Selector.AllAssets)
+        buySellSelectorMixin.openSelector()
     }
 
     fun swapClicked() {

@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="buy_token_not_supported_title">This token is not supported by the buy feature</string>
+    <string name="buy_token_not_supported_message">None of our providers currently support the buying of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="sell_token_not_supported_title">This token is not supported by the sell feature</string>
+    <string name="sell_token_not_supported_message">None of our providers currently support the selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="trade_token_not_supported_title">This token is not supported by the buy/sell feature</string>
+    <string name="trade_token_not_supported_message">None of our providers currently support the buying or selling of this token. Please choose a different token, a different network, or check back later.</string>
+
     <string name="buy_order_completed_message">Purchase initiated! Please wait up to 60 minutes. You can track status on the email.</string>
     <string name="sell_order_completed_message">Sale initiated! Please wait up to 60 minutes. You can track status on the email.</string>
 

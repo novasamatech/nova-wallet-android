@@ -79,9 +79,12 @@ class TradeWebViewModel(
             }
             showToast(resourceManager.getString(messageResId))
 
-            router.finishTradeOperation(payload.asset)
+            when (payload.onSuccessfulTradeStrategyType) {
+                OnSuccessfulTradeStrategyType.OPEN_ASSET -> router.openAssetDetails(payload.asset)
+                OnSuccessfulTradeStrategyType.RETURN_BACK -> router.finishTradeOperation()
+            }
         } else {
-            router.returnToMainScreen()
+            router.finishTradeOperation()
         }
     }
 
@@ -102,7 +105,7 @@ class TradeWebViewModel(
         topUpRequester.responseFlow
             .onEach {
                 if (it == TopUpAddressResponder.Response.Cancel) {
-                    router.returnToMainScreen()
+                    router.finishTradeOperation()
                 }
             }
             .launchIn(this)

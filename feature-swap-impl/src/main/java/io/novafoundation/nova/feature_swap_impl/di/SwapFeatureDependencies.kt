@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
@@ -124,8 +123,6 @@ interface SwapFeatureDependencies {
     val buyTokenRegistry: TradeTokenRegistry
 
     val tradeMixinFactory: TradeMixin.Factory
-
-    val buyMixinUi: BuyMixinUi
 
     val crossChainTransfersUseCase: CrossChainTransfersUseCase
 

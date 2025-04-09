@@ -122,9 +122,9 @@ class SwapInteractor(
     fun availableGetAssetInOptionsFlow(chainAssetFlow: Flow<Chain.Asset?>): Flow<Set<GetAssetInOption>> {
         return combine(
             crossChainTransfersUseCase.incomingCrossChainDirectionsAvailable(chainAssetFlow),
-            buyAvailable(chainAssetFlow),
             receiveAvailable(chainAssetFlow),
-        ) { crossChainTransfersAvailable, buyAvailable, receiveAvailable ->
+            buyAvailable(chainAssetFlow),
+        ) { crossChainTransfersAvailable, receiveAvailable, buyAvailable ->
             setOfNotNull(
                 GetAssetInOption.CROSS_CHAIN.takeIf { crossChainTransfersAvailable },
                 GetAssetInOption.RECEIVE.takeIf { receiveAvailable },

@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.BuildConfig
@@ -17,7 +16,6 @@ import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.merc
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.mercurio.MercuryoProvider
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.transak.TransakProvider
 import io.novafoundation.nova.feature_buy_impl.presentation.mixin.TradeMixinFactory
-import io.novafoundation.nova.feature_buy_impl.presentation.mixin.RealBuyMixinUi
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoSellRequestInterceptorFactory
 import okhttp3.OkHttpClient
@@ -111,10 +109,4 @@ class BuyFeatureModule {
     ): TradeMixin.Factory = TradeMixinFactory(
         buyTokenRegistry = buyTokenRegistry
     )
-
-    @Provides
-    @FeatureScope
-    fun provideBuyMixinUi(): BuyMixinUi {
-        return RealBuyMixinUi()
-    }
 }
