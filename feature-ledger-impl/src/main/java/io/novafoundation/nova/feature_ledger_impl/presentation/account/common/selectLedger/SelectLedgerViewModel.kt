@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryRequirement
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryRequirementAvailability
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.discoveryRequirements
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDevice
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -46,7 +46,7 @@ enum class BluetoothState {
 }
 
 abstract class SelectLedgerViewModel(
-    private val discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
+    private val discoveryService: LedgerDeviceDiscoveryService,
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val bluetoothManager: BluetoothManager,
     private val locationManager: LocationManager,
@@ -62,8 +62,6 @@ abstract class SelectLedgerViewModel(
     Browserable.Presentation by Browserable() {
 
     private val discoveryMethods = payload.connectionMode.toDiscoveryMethod()
-
-    private val discoveryService = discoveryServiceFactory.create(discoveryMethods)
 
     private val stateMachine = StateMachine(createInitialState(), coroutineScope = this)
 
@@ -137,6 +135,10 @@ abstract class SelectLedgerViewModel(
 
     fun enableLocationAcknowledged() {
         locationManager.enableLocation()
+    }
+
+    override fun onCleared() {
+        discoveryService.stopDiscovery()
     }
 
     private fun emitLocationState() {

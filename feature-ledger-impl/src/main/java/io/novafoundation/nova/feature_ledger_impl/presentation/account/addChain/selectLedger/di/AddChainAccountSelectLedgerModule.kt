@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
@@ -54,7 +54,7 @@ class AddChainAccountSelectLedgerModule {
     fun provideViewModel(
         migrationUseCase: LedgerMigrationUseCase,
         payload: AddChainAccountSelectLedgerPayload,
-        discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
+        discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
         locationManager: LocationManager,
@@ -66,7 +66,7 @@ class AddChainAccountSelectLedgerModule {
     ): ViewModel {
         return AddChainAccountSelectLedgerViewModel(
             migrationUseCase = migrationUseCase,
-            discoveryServiceFactory = discoveryServiceFactory,
+            discoveryService= discoveryService,
             permissionsAsker = permissionsAsker,
             bluetoothManager = bluetoothManager,
             locationManager = locationManager,

@@ -54,7 +54,7 @@ data class DiscoveringState(
     context(StateMachine.Transition<SelectLedgerState, SideEffect>)
     override suspend fun bootstrap() {
         // Start discovery for all methods available from the start
-        // I.e. those that do not have any requirements
+        // I.e. those that do not have any requirements or already have all permissions / requirements satisfied
         updateActiveDiscoveryMethods(
             allDiscoveryMethods = discoveryMethods,
             previousActiveMethods = emptySet(),

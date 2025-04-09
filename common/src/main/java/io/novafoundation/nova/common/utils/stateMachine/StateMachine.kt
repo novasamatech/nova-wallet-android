@@ -76,6 +76,7 @@ private class StateMachineImpl<STATE : StateMachine.State<STATE, SIDE_EFFECT, EV
 
     private fun bootstrap() {
         launch {
+            Log.d("StateMachineTAG", "initial state: $initialState")
             Log.d("StateMachineTAG", "bootstrap started")
             mutex.withLock {
                 with(TransitionImpl()) {
@@ -83,7 +84,7 @@ private class StateMachineImpl<STATE : StateMachine.State<STATE, SIDE_EFFECT, EV
                 }
             }
             bootstrapped.value = true
-            Log.d("StateMachineTAG", "bootstrap fini")
+            Log.d("StateMachineTAG", "bootstrap finished")
         }
     }
 

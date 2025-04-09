@@ -76,7 +76,7 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         val methodsToStop = previousActiveMethods - newActiveMethods
 
         methodsToStart.forEach { emitSideEffect(SideEffect.StartDiscovery(it)) }
-        methodsToStop.forEach { emitSideEffect(SideEffect.StartDiscovery(it)) }
+        methodsToStop.forEach { emitSideEffect(SideEffect.StopDiscovery(it)) }
     }
 
     context(Transition<SelectLedgerState, SideEffect>)
@@ -114,7 +114,9 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         val allRequirements = discoveryMethods.discoveryRequirements()
         val missingRequirements = allRequirements - discoveryRequirementAvailability.satisfiedRequirements
 
-        emitSideEffect(SideEffect.RequestSatisfyRequirement(missingRequirements))
+        if (missingRequirements.isNotEmpty()) {
+            emitSideEffect(SideEffect.RequestSatisfyRequirement(missingRequirements))
+        }
     }
 
     context(Transition<SelectLedgerState, SideEffect>)
