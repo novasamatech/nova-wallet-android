@@ -34,7 +34,6 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.CustomTransactionExtensions
 import io.novafoundation.nova.runtime.extrinsic.extensions.ChargeAssetTxPayment.Companion.chargeAssetTxPayment
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.metadata.generateMetadataProofWithSignerRestrictions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
@@ -273,8 +272,7 @@ class PolkadotExternalSignInteractor(
         }
 
         // Else generate and use our own proof
-        val signerSupportsCheckMetadataHash = signer.supportsCheckMetadataHash(chain)
-        val metadataProof = metadataShortenerService.generateMetadataProofWithSignerRestrictions(chain, signerSupportsCheckMetadataHash)
+        val metadataProof = metadataShortenerService.generateMetadataProof(chain.id)
         return ActualMetadataHash(modifiedOriginal = true, checkMetadataHash = metadataProof.checkMetadataHash)
     }
 

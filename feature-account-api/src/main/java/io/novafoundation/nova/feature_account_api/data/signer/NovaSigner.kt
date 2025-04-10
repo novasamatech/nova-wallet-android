@@ -43,15 +43,6 @@ interface NovaSigner : Signer {
     suspend fun actualSignerAccountId(chain: Chain): AccountId
 
     /**
-     * Indicate whether it is possible to include CheckMetadataHash.Enabled into extrinsic
-     * This method will become redundant once Ledger releases both Generic and Migration apps
-     * After that, there wont be a need in additional check and runtime-based check will be enough
-     */
-    suspend fun supportsCheckMetadataHash(chain: Chain): Boolean {
-        return true
-    }
-
-    /**
      * Determines whether this particular instance of signer imposes additional limits to the number of calls
      * it is possible to add to a single transaction.
      * This is useful for signers that run in resource-constrained environment and thus cannot handle large transactions, e.g. Ledger

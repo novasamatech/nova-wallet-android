@@ -241,7 +241,6 @@ class RealExtrinsicService(
 
         val extrinsicBuilderSequence = extrinsicBuilderFactory.createMulti(
             chain = chain,
-            supportsCheckMetadataHash = signer.supportsCheckMetadataHash(chain),
             options = submissionOptions.toBuilderFactoryOptions()
         )
 
@@ -318,7 +317,6 @@ class RealExtrinsicService(
         // Create empty builder
         val extrinsicBuilder = extrinsicBuilderFactory.create(
             chain = chain,
-            supportsCheckMetadataHash = signer.supportsCheckMetadataHash(chain),
             options = submissionOptions.toBuilderFactoryOptions()
         )
 

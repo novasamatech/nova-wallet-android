@@ -3,7 +3,6 @@ package io.novafoundation.nova.runtime.extrinsic
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.metadata.generateMetadataProofWithSignerRestrictions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -30,22 +29,19 @@ class ExtrinsicBuilderFactory(
 
     suspend fun create(
         chain: Chain,
-        supportsCheckMetadataHash: Boolean,
         options: Options,
     ): ExtrinsicBuilder {
-        return createMulti(chain, supportsCheckMetadataHash, options).first()
+        return createMulti(chain, options).first()
     }
 
     suspend fun createMulti(
         chain: Chain,
-        supportsCheckMetadataHash: Boolean,
         options: Options,
     ): Sequence<ExtrinsicBuilder> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val mortality = mortalityConstructor.constructMortality(chain.id)
-
-        val metadataProof = metadataShortenerService.generateMetadataProofWithSignerRestrictions(chain, supportsCheckMetadataHash)
+        val metadataProof = metadataShortenerService.generateMetadataProof(chain.id)
 
         return generateSequence {
             ExtrinsicBuilder(

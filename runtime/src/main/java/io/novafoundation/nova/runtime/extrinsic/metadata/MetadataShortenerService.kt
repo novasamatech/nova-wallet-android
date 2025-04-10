@@ -32,17 +32,6 @@ interface MetadataShortenerService {
     suspend fun generateDisabledMetadataProof(chainId: ChainId): MetadataProof
 }
 
-suspend fun MetadataShortenerService.generateMetadataProofWithSignerRestrictions(
-    chain: Chain,
-    signerSupportsCheckMetadataHash: Boolean,
-): MetadataProof {
-    return if (signerSupportsCheckMetadataHash) {
-        generateMetadataProof(chain.id)
-    } else {
-        generateDisabledMetadataProof(chain.id)
-    }
-}
-
 private const val MINIMUM_METADATA_VERSION_TO_CALCULATE_HASH = 15
 
 internal class RealMetadataShortenerService(
