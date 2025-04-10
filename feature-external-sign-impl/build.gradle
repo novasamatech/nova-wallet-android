@@ -34,6 +34,10 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
+    packagingOptions {
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
+
     buildFeatures {
         viewBinding true
     }
