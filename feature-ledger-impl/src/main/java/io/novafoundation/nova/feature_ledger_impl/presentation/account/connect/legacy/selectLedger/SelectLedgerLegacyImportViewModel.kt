@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -21,7 +21,7 @@ class SelectLedgerLegacyImportViewModel(
     private val selectLedgerPayload: SelectLedgerLegacyPayload,
     private val router: LedgerRouter,
     private val messageCommandFormatter: MessageCommandFormatter,
-    discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
+    discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
     locationManager: LocationManager,
@@ -29,7 +29,7 @@ class SelectLedgerLegacyImportViewModel(
     messageFormatter: LedgerMessageFormatter,
     ledgerDeviceFormatter: LedgerDeviceFormatter
 ) : SelectLedgerViewModel(
-    discoveryServiceFactory = discoveryServiceFactory,
+    discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
     locationManager = locationManager,
