@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.states
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_dapp_impl.data.repository.DefaultMetamaskChainRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.model.MetamaskChain
@@ -20,9 +21,11 @@ class MetamaskStateFactory(
 
     fun default(
         hostApi: Web3StateMachineHost,
-        chain: MetamaskChain = MetamaskChain.ETHEREUM,
+        chain: MetamaskChain? = null,
         selectedAddress: String? = null
     ): DefaultMetamaskState {
+        val usedChain = chain ?: interactor.getDefaultMetamaskChain()
+
         return DefaultMetamaskState(
             interactor = interactor,
             commonInteractor = commonInteractor,
@@ -31,7 +34,7 @@ class MetamaskStateFactory(
             web3Session = web3Session,
             walletUiUseCase = walletUiUseCase,
             hostApi = hostApi,
-            chain = chain,
+            chain = usedChain,
             selectedAccountAddress = selectedAddress,
             stateFactory = this
         )
