@@ -50,7 +50,7 @@ class MnemonicImportSource(
         }
     }
 
-    override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*>): ImportSourceView<*> {
+    override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*, *>): ImportSourceView<*> {
         return MnemonicImportView(fragment.requireContext()).apply {
             observeCommon(viewModel, fragment.viewLifecycleOwner)
             observeSource(this@MnemonicImportSource, fragment.viewLifecycleOwner)

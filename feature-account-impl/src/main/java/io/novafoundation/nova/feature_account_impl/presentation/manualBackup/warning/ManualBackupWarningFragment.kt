@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.warning
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.condition.setupConditions
@@ -14,15 +12,13 @@ import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentManualBackupWarningBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.common.ManualBackupCommonPayload
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningButtonContinue
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition1
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition2
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningCondition3
-import kotlinx.android.synthetic.main.fragment_manual_backup_warning.manualBackupWarningToolbar
 
-class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>() {
+class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel, FragmentManualBackupWarningBinding>() {
+
+    override fun createBinding() = FragmentManualBackupWarningBinding.inflate(layoutInflater)
 
     companion object {
 
@@ -33,38 +29,30 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_manual_backup_warning, container, false)
-    }
-
     override fun initViews() {
-        manualBackupWarningToolbar.applyStatusBarInsets()
-        manualBackupWarningToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.manualBackupWarningToolbar.applyStatusBarInsets()
+        binder.manualBackupWarningToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        manualBackupWarningButtonContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.manualBackupWarningButtonContinue.setOnClickListener { viewModel.continueClicked() }
 
         buildConditions()
     }
 
     private fun buildConditions() {
-        manualBackupWarningCondition1.setText(
+        binder.manualBackupWarningCondition1.setText(
             buildCondition(R.string.backup_secrets_warning_condition_1, R.string.backup_secrets_warning_condition_1_highlight)
         )
-        manualBackupWarningCondition2.setText(
+        binder.manualBackupWarningCondition2.setText(
             buildCondition(R.string.backup_secrets_warning_condition_2, R.string.backup_secrets_warning_condition_2_highlight)
         )
-        manualBackupWarningCondition3.setText(
+        binder.manualBackupWarningCondition3.setText(
             buildCondition(R.string.backup_secrets_warning_condition_3, R.string.backup_secrets_warning_condition_3_highlight)
         )
 
         viewModel.conditionMixin.setupConditions(
-            manualBackupWarningCondition1,
-            manualBackupWarningCondition2,
-            manualBackupWarningCondition3
+            binder.manualBackupWarningCondition1,
+            binder.manualBackupWarningCondition2,
+            binder.manualBackupWarningCondition3
         )
     }
 
@@ -88,7 +76,7 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel>()
 
     override fun subscribe(viewModel: ManualBackupWarningViewModel) {
         viewModel.buttonState.observe {
-            manualBackupWarningButtonContinue.setState(it)
+            binder.manualBackupWarningButtonContinue.setState(it)
         }
     }
 }

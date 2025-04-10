@@ -1,44 +1,37 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.start
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_ledger_impl.R
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerConnectionMode
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerConnectionModePages
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerContinue
-import kotlinx.android.synthetic.main.fragment_import_ledger_start.startImportLedgerToolbar
+import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerStartBinding
 
 private const val BLUETOOTH_PAGE_INDEX = 0
 private const val USB_PAGE_INDEX = 1
 
-abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> : BaseFragment<VM>(), StartImportLedgerPagerAdapter.Handler {
+abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> :
+    BaseFragment<VM, FragmentImportLedgerStartBinding>(),
+    StartImportLedgerPagerAdapter.Handler {
 
     protected val pageAdapter by lazy(LazyThreadSafetyMode.NONE) { StartImportLedgerPagerAdapter(createPages(), this) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_ledger_start, container, false)
-    }
+    override fun createBinding() = FragmentImportLedgerStartBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
-        startImportLedgerToolbar.applyStatusBarInsets()
+        binder.startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.startImportLedgerToolbar.applyStatusBarInsets()
 
-        startImportLedgerContinue.setOnClickListener {
-            when (startImportLedgerConnectionModePages.currentItem) {
+        binder.startImportLedgerContinue.setOnClickListener {
+            when (binder.startImportLedgerConnectionModePages.currentItem) {
                 BLUETOOTH_PAGE_INDEX -> viewModel.continueWithBluetooth()
                 USB_PAGE_INDEX -> viewModel.continueWithUsb()
             }
         }
 
-        startImportLedgerConnectionModePages.adapter = pageAdapter
-        startImportLedgerConnectionMode.setupWithViewPager2(startImportLedgerConnectionModePages, pageAdapter::getPageTitle)
+        binder.startImportLedgerConnectionModePages.adapter = pageAdapter
+        binder.startImportLedgerConnectionMode.setupWithViewPager2(binder.startImportLedgerConnectionModePages, pageAdapter::getPageTitle)
     }
 
     override fun subscribe(viewModel: VM) {

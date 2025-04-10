@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: "../scripts/secrets.gradle"
 
@@ -36,6 +36,14 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_dapp_impl'
+
+    packagingOptions {
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 task actualizeJsScripts(type: Exec) {

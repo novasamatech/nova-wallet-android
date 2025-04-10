@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 
 import android.content.Context
 import android.os.Bundle
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textItem
@@ -16,7 +17,7 @@ class SelectHardwareWalletBottomSheet(
     context: Context,
     private val payload: Payload,
     private val onSuccess: (HardwareWalletModel) -> Unit
-) : FixedListBottomSheet(context) {
+) : FixedListBottomSheet<BottomSheeetFixedListBinding>(context, viewConfiguration = ViewConfiguration.default(context)) {
 
     class Payload(
         val genericLedgerSupported: Boolean

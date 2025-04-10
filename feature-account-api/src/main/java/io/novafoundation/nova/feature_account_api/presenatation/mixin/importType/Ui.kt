@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.mixin.importTyp
 
 import io.novafoundation.nova.common.base.BaseFragment
 
-fun BaseFragment<*>.setupImportTypeChooser(mixin: ImportTypeChooserMixin) {
+fun BaseFragment<*, *>.setupImportTypeChooser(mixin: ImportTypeChooserMixin) {
     mixin.showChooserEvent.observeEvent {
         ImportTypeChooserBottomSheet(
             context = requireContext(),

@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerView
 
-context(BaseFragment<T>)
+context(BaseFragment<T, *>)
 fun <T : BaseViewModel> PromotionBannersMixin.bindWithAdapter(
     adapter: PromotionBannerAdapter,
     onSubmitList: () -> Unit = {}

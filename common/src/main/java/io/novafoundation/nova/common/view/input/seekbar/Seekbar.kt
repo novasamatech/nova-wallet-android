@@ -12,9 +12,9 @@ import android.widget.TextView
 import androidx.core.view.children
 import com.google.android.flexbox.FlexboxLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewSeekbarBinding
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
-import kotlinx.android.synthetic.main.view_seekbar.view.seekbarInner
-import kotlinx.android.synthetic.main.view_seekbar.view.seekbarTickLabelsContainer
 
 class Seekbar @JvmOverloads constructor(
     context: Context,
@@ -22,16 +22,16 @@ class Seekbar @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewSeekbarBinding.inflate(inflater(), this)
+
     init {
         orientation = VERTICAL
-
-        View.inflate(context, R.layout.view_seekbar, this)
     }
 
     var progress: Int
-        get() = seekbarInner.progress
+        get() = binder.seekbarInner.progress
         set(value) {
-            seekbarInner.progress = value
+            binder.seekbarInner.progress = value
         }
 
     init {
@@ -39,18 +39,18 @@ class Seekbar @JvmOverloads constructor(
     }
 
     fun setValues(values: SeekbarValues<*>) {
-        seekbarInner.max = values.max
+        binder.seekbarInner.max = values.max
 
-        seekbarTickLabelsContainer.removeAllViews()
+        binder.seekbarTickLabelsContainer.removeAllViews()
 
         values.values.forEach { seekbarValue ->
             val tickLabel = tickLabelView(seekbarValue)
-            seekbarTickLabelsContainer.addView(tickLabel)
+            binder.seekbarTickLabelsContainer.addView(tickLabel)
         }
     }
 
     fun setOnProgressChangedListener(listener: (Int) -> Unit) {
-        seekbarInner.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+        binder.seekbarInner.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 listener(progress)
             }
@@ -75,12 +75,12 @@ class Seekbar @JvmOverloads constructor(
     }
 
     private fun addTickLabelOnLayoutListener() {
-        seekbarTickLabelsContainer.addOnLayoutChangeListener { viewGroup, _, _, _, _, _, _, _, _ ->
+        binder.seekbarTickLabelsContainer.addOnLayoutChangeListener { viewGroup, _, _, _, _, _, _, _, _ ->
             require(viewGroup is ViewGroup)
 
-            val seekbarSteps = seekbarInner.max
-            val seekbarStartPadding = seekbarInner.paddingStart
-            val seekbarEndPadding = seekbarInner.paddingEnd
+            val seekbarSteps = binder.seekbarInner.max
+            val seekbarStartPadding = binder.seekbarInner.paddingStart
+            val seekbarEndPadding = binder.seekbarInner.paddingEnd
             val slideZoneWidth = getParentMeasuredWidth() - (seekbarStartPadding + seekbarEndPadding)
             val seekbarStepWidth = slideZoneWidth / seekbarSteps
 

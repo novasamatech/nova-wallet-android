@@ -15,8 +15,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import androidx.viewbinding.ViewBinding
 
-abstract class BaseBottomSheet(
+abstract class BaseBottomSheet<B : ViewBinding>(
     context: Context,
     style: Int = R.style.BottomSheetDialog,
     private val onCancel: (() -> Unit)? = null,
@@ -25,6 +26,8 @@ abstract class BaseBottomSheet(
     DialogExtensions,
     CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main) {
 
+    protected abstract val binder: B
+
     private val backgroundAccessObserver: BackgroundAccessObserver
 
     final override val dialogInterface: DialogInterface
@@ -32,6 +35,8 @@ abstract class BaseBottomSheet(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setContentView(binder.root)
 
         window?.decorView
             ?.findViewById<View>(R.id.touch_outside)

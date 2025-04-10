@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.pools.selectPool
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,18 +13,14 @@ import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSelectPoolBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.PoolRvItem
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolCount
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolList
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolProgressBar
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolRecommendedAction
-import kotlinx.android.synthetic.main.fragment_select_pool.selectPoolToolbar
 
-class SelectPoolFragment : BaseFragment<SelectPoolViewModel>(), PoolAdapter.ItemHandler {
+class SelectPoolFragment : BaseFragment<SelectPoolViewModel, FragmentSelectPoolBinding>(), PoolAdapter.ItemHandler {
 
     companion object {
 
@@ -39,6 +33,8 @@ class SelectPoolFragment : BaseFragment<SelectPoolViewModel>(), PoolAdapter.Item
         }
     }
 
+    override fun createBinding() = FragmentSelectPoolBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
@@ -46,27 +42,19 @@ class SelectPoolFragment : BaseFragment<SelectPoolViewModel>(), PoolAdapter.Item
         PoolAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_select_pool, container, false)
-    }
-
     override fun initViews() {
-        selectPoolToolbar.applyStatusBarInsets()
+        binder.selectPoolToolbar.applyStatusBarInsets()
 
-        selectPoolToolbar.setHomeButtonListener { viewModel.backClicked() }
-        selectPoolToolbar.addCustomAction(R.drawable.ic_search) {
+        binder.selectPoolToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectPoolToolbar.addCustomAction(R.drawable.ic_search) {
             viewModel.searchClicked()
         }
 
-        selectPoolList.adapter = adapter
-        selectPoolList.setHasFixedSize(true)
-        selectPoolList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
+        binder.selectPoolList.adapter = adapter
+        binder.selectPoolList.setHasFixedSize(true)
+        binder.selectPoolList.scrollToTopWhenItemsShuffled(viewLifecycleOwner)
 
-        selectPoolRecommendedAction.setOnClickListener { viewModel.selectRecommended() }
+        binder.selectPoolRecommendedAction.setOnClickListener { viewModel.selectRecommended() }
     }
 
     override fun inject() {
@@ -86,12 +74,12 @@ class SelectPoolFragment : BaseFragment<SelectPoolViewModel>(), PoolAdapter.Item
             loadingState.onLoaded {
                 adapter.submitList(it)
             }
-            selectPoolProgressBar.isVisible = loadingState.isLoading()
+            binder.selectPoolProgressBar.isVisible = loadingState.isLoading()
         }
 
-        viewModel.selectedTitle.observe(selectPoolCount::setText)
+        viewModel.selectedTitle.observe(binder.selectPoolCount::setText)
 
-        viewModel.fillWithRecommendedEnabled.observe(selectPoolRecommendedAction::setEnabled)
+        viewModel.fillWithRecommendedEnabled.observe(binder.selectPoolRecommendedAction::setEnabled)
     }
 
     override fun poolInfoClicked(poolItem: PoolRvItem) {

@@ -7,9 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -18,17 +15,15 @@ import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentSelectLedgerBinding
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
-import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerDevices
-import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerHints
-import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerProgress
-import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerToolbar
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_select_ledger.selectLedgerGrantPermissions
 
-abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>(), SelectLedgerAdapter.Handler {
+abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V, FragmentSelectLedgerBinding>(), SelectLedgerAdapter.Handler {
+
+    override fun createBinding() = FragmentSelectLedgerBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var ledgerMessagePresentable: LedgerMessagePresentable
@@ -56,27 +51,23 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_select_ledger, container, false)
-    }
-
     override fun initViews() {
-        selectLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.selectLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
-        selectLedgerToolbar.applyStatusBarInsets()
+        binder.selectLedgerToolbar.applyStatusBarInsets()
 
-        selectLedgerGrantPermissions.setOnClickListener { viewModel.allowAvailabilityRequests() }
+        binder.selectLedgerGrantPermissions.setOnClickListener { viewModel.allowAvailabilityRequests() }
 
-        selectLedgerDevices.setHasFixedSize(true)
-        selectLedgerDevices.adapter = adapter
+        binder.selectLedgerDevices.setHasFixedSize(true)
+        binder.selectLedgerDevices.adapter = adapter
     }
 
     override fun subscribe(viewModel: V) {
         viewModel.deviceModels.observe {
             adapter.submitList(it)
 
-            selectLedgerDevices.setVisible(it.isNotEmpty())
-            selectLedgerProgress.setVisible(it.isEmpty())
+            binder.selectLedgerDevices.setVisible(it.isNotEmpty())
+            binder.selectLedgerProgress.setVisible(it.isEmpty())
         }
 
         viewModel.showRequestLocationDialog.observe {
@@ -88,8 +79,8 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
             }
         }
 
-        viewModel.hints.observe(selectLedgerHints::setText)
-        viewModel.showPermissionsButton.observe { selectLedgerGrantPermissions.isVisible = it }
+        viewModel.hints.observe(binder.selectLedgerHints::setText)
+        viewModel.showPermissionsButton.observe { binder.selectLedgerGrantPermissions.isVisible = it }
 
         setupPermissionAsker(viewModel)
         setupLedgerMessages(ledgerMessagePresentable)

@@ -2,16 +2,15 @@ package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.item_trade_provider.view.itemTradeProviderDescription
-import kotlinx.android.synthetic.main.item_trade_provider.view.itemTradeProviderLogo
-import kotlinx.android.synthetic.main.item_trade_provider.view.itemTradeProviderPaymentMethods
-import kotlinx.android.synthetic.main.layout_payment_method_image.view.paymentMethodImage
-import kotlinx.android.synthetic.main.layout_payment_method_text.view.paymentMethodText
+import io.novafoundation.nova.feature_assets.databinding.ItemTradeProviderBinding
 
 class TradeProviderAdapter(
     private val itemHandler: ItemHandler,
@@ -22,7 +21,8 @@ class TradeProviderAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TradeProviderViewHolder {
-        return TradeProviderViewHolder(parent.inflateChild(R.layout.item_trade_provider), itemHandler)
+        val binder = ItemTradeProviderBinding.inflate(parent.inflater(), parent, false)
+        return TradeProviderViewHolder(binder, itemHandler)
     }
 
     override fun onBindViewHolder(holder: TradeProviderViewHolder, position: Int) {
@@ -42,21 +42,21 @@ private object DiffCallback : DiffUtil.ItemCallback<TradeProviderRvItem>() {
 }
 
 class TradeProviderViewHolder(
-    containerView: View,
+    private val binder: ItemTradeProviderBinding,
     private val itemHandler: TradeProviderAdapter.ItemHandler,
-) : GroupedListHolder(containerView) {
+) : GroupedListHolder(binder.root) {
 
     fun bind(item: TradeProviderRvItem) = with(containerView) {
         containerView.setOnClickListener { itemHandler.providerClicked(item) }
 
-        itemTradeProviderLogo.setImageResource(item.providerLogoRes)
-        itemTradeProviderDescription.text = item.description
+        binder.itemTradeProviderLogo.setImageResource(item.providerLogoRes)
+        binder.itemTradeProviderDescription.text = item.description
 
         fillPaymentMethods(item)
     }
 
     private fun fillPaymentMethods(item: TradeProviderRvItem) = with(containerView) {
-        itemTradeProviderPaymentMethods.removeAllViews()
+        binder.itemTradeProviderPaymentMethods.removeAllViews()
 
         item.paymentMethods.forEach {
             val view = when (it) {
@@ -64,21 +64,23 @@ class TradeProviderViewHolder(
                 is TradeProviderRvItem.PaymentMethod.ByText -> createText(it.text)
             }
 
-            itemTradeProviderPaymentMethods.addView(view)
+            binder.itemTradeProviderPaymentMethods.addView(view)
         }
     }
 
     private fun createImage(resId: Int): View {
-        return containerView.itemTradeProviderPaymentMethods.inflateChild(R.layout.layout_payment_method_image, false)
+        return binder.itemTradeProviderPaymentMethods.inflateChild(R.layout.layout_payment_method_image, false)
             .apply {
-                paymentMethodImage.setImageResource(resId)
+                require(this is ImageView)
+                this.setImageResource(resId)
             }
     }
 
     private fun createText(text: String): View {
-        return containerView.itemTradeProviderPaymentMethods.inflateChild(R.layout.layout_payment_method_text, false)
+        return binder.itemTradeProviderPaymentMethods.inflateChild(R.layout.layout_payment_method_text, false)
             .apply {
-                paymentMethodText.text = text
+                require(this is TextView)
+                this.text = text
             }
     }
 }

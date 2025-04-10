@@ -2,7 +2,7 @@ package io.novafoundation.nova.common.sequrity
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.data.storage.Preferences
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 

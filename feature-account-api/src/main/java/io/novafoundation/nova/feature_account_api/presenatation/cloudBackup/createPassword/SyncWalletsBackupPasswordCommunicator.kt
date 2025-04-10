@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.cre
 import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface SyncWalletsBackupPasswordRequester :
     InterScreenRequester<SyncWalletsBackupPasswordRequester.EmptyRequest, SyncWalletsBackupPasswordResponder.Response> {

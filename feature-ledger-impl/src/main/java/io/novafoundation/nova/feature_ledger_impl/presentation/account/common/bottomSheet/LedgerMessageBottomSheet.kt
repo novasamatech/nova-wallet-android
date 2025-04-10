@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -13,15 +14,7 @@ import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_ledger_impl.R
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageActions
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageAlert
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageCancel
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageConfirm
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageContainer
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageFooterMessage
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageImage
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageSubtitle
-import kotlinx.android.synthetic.main.fragment_ledger_message.ledgerMessageTitle
+import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentLedgerMessageBinding
 
 sealed class LedgerMessageCommand {
 
@@ -91,18 +84,16 @@ sealed class LedgerMessageCommand {
 
 class LedgerMessageBottomSheet(
     context: Context,
-) : BaseBottomSheet(context) {
+) : BaseBottomSheet<FragmentLedgerMessageBinding>(context) {
+
+    override val binder = FragmentLedgerMessageBinding.inflate(LayoutInflater.from(context))
 
     val container: View
-        get() = ledgerMessageContainer
-
-    init {
-        setContentView(R.layout.fragment_ledger_message)
-    }
+        get() = binder.ledgerMessageContainer
 
     fun receiveCommand(command: LedgerMessageCommand) {
-        ledgerMessageActions.setVisible(command is LedgerMessageCommand.Show.Error)
-        ledgerMessageCancel.setVisible(command is LedgerMessageCommand.Show.Error.RecoverableError)
+        binder.ledgerMessageActions.setVisible(command is LedgerMessageCommand.Show.Error)
+        binder.ledgerMessageCancel.setVisible(command is LedgerMessageCommand.Show.Error.RecoverableError)
         setupFooterVisibility(command is LedgerMessageCommand.Show.Info)
 
         when (command) {
@@ -110,15 +101,15 @@ class LedgerMessageBottomSheet(
 
             is LedgerMessageCommand.Show.Error.FatalError -> {
                 setupBaseShow(command)
-                ledgerMessageConfirm.setOnClickListener { command.onConfirm() }
-                ledgerMessageConfirm.setText(R.string.common_ok_back)
+                binder.ledgerMessageConfirm.setOnClickListener { command.onConfirm() }
+                binder.ledgerMessageConfirm.setText(R.string.common_ok_back)
             }
 
             is LedgerMessageCommand.Show.Error.RecoverableError -> {
                 setupBaseShow(command)
-                ledgerMessageConfirm.setOnClickListener { command.onRetry() }
-                ledgerMessageConfirm.setText(R.string.common_retry)
-                ledgerMessageCancel.setOnClickListener { command.onCancel() }
+                binder.ledgerMessageConfirm.setOnClickListener { command.onRetry() }
+                binder.ledgerMessageConfirm.setText(R.string.common_retry)
+                binder.ledgerMessageCancel.setOnClickListener { command.onCancel() }
             }
 
             is LedgerMessageCommand.Show.Info -> {
@@ -129,21 +120,21 @@ class LedgerMessageBottomSheet(
     }
 
     private fun setupFooterVisibility(visible: Boolean) {
-        ledgerMessageFooterMessage.setVisible(visible)
+        binder.ledgerMessageFooterMessage.setVisible(visible)
 
         if (!visible) {
-            ledgerMessageFooterMessage.stopTimer()
+            binder.ledgerMessageFooterMessage.stopTimer()
         }
     }
 
     private fun showFooter(footer: LedgerMessageCommand.Footer) {
         when (footer) {
             is LedgerMessageCommand.Footer.Value -> {
-                ledgerMessageFooterMessage.text = footer.value
+                binder.ledgerMessageFooterMessage.text = footer.value
             }
 
             is LedgerMessageCommand.Footer.Timer -> {
-                ledgerMessageFooterMessage.startTimer(
+                binder.ledgerMessageFooterMessage.startTimer(
                     value = footer.timerValue,
                     customMessageFormat = footer.messageFormat,
                     onTick = { view, _ ->
@@ -158,10 +149,10 @@ class LedgerMessageBottomSheet(
     }
 
     private fun setupBaseShow(command: LedgerMessageCommand.Show) {
-        ledgerMessageTitle.text = command.title
-        ledgerMessageSubtitle.text = command.subtitle
-        ledgerMessageImage.setImageResource(command.graphics.ledgerImageRes)
-        ledgerMessageAlert.setModelOrHide(command.alert)
+        binder.ledgerMessageTitle.text = command.title
+        binder.ledgerMessageSubtitle.text = command.subtitle
+        binder.ledgerMessageImage.setImageResource(command.graphics.ledgerImageRes)
+        binder.ledgerMessageAlert.setModelOrHide(command.alert)
 
         setOnCancelListener { command.onCancel() }
     }

@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ParachainMetadataParcelModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeParcelModel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
 @Parcelize

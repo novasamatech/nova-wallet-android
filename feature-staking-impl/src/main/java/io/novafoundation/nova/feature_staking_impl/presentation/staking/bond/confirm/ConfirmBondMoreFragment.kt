@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,17 +10,12 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentConfirmBondMoreBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreAmount
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreConfirm
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreHints
-import kotlinx.android.synthetic.main.fragment_confirm_bond_more.confirmBondMoreToolbar
 
 private const val PAYLOAD_KEY = "PAYLOAD_KEY"
 
-class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
+class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel, FragmentConfirmBondMoreBinding>() {
 
     companion object {
 
@@ -31,26 +24,20 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_confirm_bond_more, container, false)
-    }
+    override fun createBinding() = FragmentConfirmBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        confirmBondMoreToolbar.applyInsetter {
+        binder.confirmBondMoreToolbar.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
         }
 
-        confirmBondMoreExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.confirmBondMoreExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        confirmBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
-        confirmBondMoreConfirm.prepareForProgress(viewLifecycleOwner)
-        confirmBondMoreConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.confirmBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.confirmBondMoreConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.confirmBondMoreConfirm.setOnClickListener { viewModel.confirmClicked() }
     }
 
     override fun inject() {
@@ -68,14 +55,14 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel>() {
     override fun subscribe(viewModel: ConfirmBondMoreViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        observeHints(viewModel.hintsMixin, confirmBondMoreHints)
+        observeHints(viewModel.hintsMixin, binder.confirmBondMoreHints)
 
-        viewModel.showNextProgress.observe(confirmBondMoreConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.confirmBondMoreConfirm::setProgressState)
 
-        viewModel.amountModelFlow.observe(confirmBondMoreAmount::setAmount)
+        viewModel.amountModelFlow.observe(binder.confirmBondMoreAmount::setAmount)
 
-        viewModel.feeStatusFlow.observe(confirmBondMoreExtrinsicInformation::setFeeStatus)
-        viewModel.walletUiFlow.observe(confirmBondMoreExtrinsicInformation::setWallet)
-        viewModel.originAddressModelFlow.observe(confirmBondMoreExtrinsicInformation::setAccount)
+        viewModel.feeStatusFlow.observe(binder.confirmBondMoreExtrinsicInformation::setFeeStatus)
+        viewModel.walletUiFlow.observe(binder.confirmBondMoreExtrinsicInformation::setWallet)
+        viewModel.originAddressModelFlow.observe(binder.confirmBondMoreExtrinsicInformation::setAccount)
     }
 }

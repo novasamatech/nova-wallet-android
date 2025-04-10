@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.view.bottomSheet.list.dynamic
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.CallSuper
@@ -9,17 +10,12 @@ import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.BottomSheetDynamicListBinding
 import io.novafoundation.nova.common.utils.DialogExtensions
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetContent
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetHeader
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetItemContainer
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetRightAction
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetSubtitle
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetTitle
 
 typealias ClickHandler<T> = (BaseDynamicListBottomSheet, T) -> Unit
 
@@ -35,52 +31,48 @@ class ReferentialEqualityDiffCallBack<T : Any> : DiffUtil.ItemCallback<T>() {
 }
 
 abstract class BaseDynamicListBottomSheet(context: Context) :
-    BaseBottomSheet(context, R.style.BottomSheetDialog),
+    BaseBottomSheet<BottomSheetDynamicListBinding>(context, R.style.BottomSheetDialog),
     WithContextExtensions by WithContextExtensions(context),
     DialogExtensions {
 
+    override val binder: BottomSheetDynamicListBinding = BottomSheetDynamicListBinding.inflate(LayoutInflater.from(context))
+
     protected val container: LinearLayout
-        get() = dynamicListSheetItemContainer
+        get() = binder.dynamicListSheetItemContainer
 
     protected val headerView: View
-        get() = dynamicListSheetHeader
+        get() = binder.dynamicListSheetHeader
 
     protected val recyclerView: RecyclerView
-        get() = dynamicListSheetContent
-
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setContentView(R.layout.bottom_sheet_dynamic_list)
-        super.onCreate(savedInstanceState)
-    }
+        get() = binder.dynamicListSheetContent
 
     final override fun setTitle(title: CharSequence?) {
-        dynamicListSheetTitle.text = title
+        binder.dynamicListSheetTitle.text = title
     }
 
     fun setSubtitle(subtitle: CharSequence?) {
-        dynamicListSheetSubtitle.setTextOrHide(subtitle)
+        binder.dynamicListSheetSubtitle.setTextOrHide(subtitle)
     }
 
     final override fun setTitle(titleId: Int) {
-        dynamicListSheetTitle.setText(titleId)
+        binder.dynamicListSheetTitle.setText(titleId)
     }
 
     fun hideTitle() {
-        dynamicListSheetTitle.setVisible(false)
+        binder.dynamicListSheetTitle.setVisible(false)
     }
 
     fun setupRightAction(
         @DrawableRes drawableRes: Int,
         onClickListener: View.OnClickListener
     ) {
-        dynamicListSheetRightAction.setImageResource(drawableRes)
-        dynamicListSheetRightAction.setVisible(true)
-        dynamicListSheetRightAction.setOnClickListener(onClickListener)
+        binder.dynamicListSheetRightAction.setImageResource(drawableRes)
+        binder.dynamicListSheetRightAction.setVisible(true)
+        binder.dynamicListSheetRightAction.setOnClickListener(onClickListener)
     }
 }
 
-abstract class DynamicListBottomSheet<T>(
+abstract class DynamicListBottomSheet<T : Any>(
     context: Context,
     private val payload: Payload<T>,
     private val diffCallback: DiffUtil.ItemCallback<T>,
@@ -95,10 +87,10 @@ abstract class DynamicListBottomSheet<T>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        dynamicListSheetContent.setHasFixedSize(true)
+        binder.dynamicListSheetContent.setHasFixedSize(true)
 
         val adapter = DynamicListSheetAdapter(payload.selected, this, diffCallback, holderCreator())
-        dynamicListSheetContent.adapter = adapter
+        binder.dynamicListSheetContent.adapter = adapter
 
         adapter.submitList(payload.data)
 

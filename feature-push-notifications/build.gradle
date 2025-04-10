@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
@@ -32,6 +32,10 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_push_notifications'
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {

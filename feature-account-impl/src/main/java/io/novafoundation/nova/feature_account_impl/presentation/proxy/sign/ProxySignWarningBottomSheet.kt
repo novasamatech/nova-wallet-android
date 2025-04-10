@@ -2,40 +2,37 @@ package io.novafoundation.nova.feature_account_impl.presentation.proxy.sign
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningCancel
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningContinue
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningDontShowAgain
-import kotlinx.android.synthetic.main.bottom_sheet_proxy_warning.proxySigningWarningMessage
+import io.novafoundation.nova.feature_account_impl.databinding.BottomSheetProxyWarningBinding
 
 class ProxySignWarningBottomSheet(
     context: Context,
     private val subtitle: CharSequence,
     private val onFinish: (Boolean) -> Unit,
     private val dontShowAgain: () -> Unit
-) : BaseBottomSheet(context, io.novafoundation.nova.common.R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
+) : BaseBottomSheet<BottomSheetProxyWarningBinding>(context, io.novafoundation.nova.common.R.style.BottomSheetDialog),
+    WithContextExtensions by WithContextExtensions(context) {
+
+    override val binder: BottomSheetProxyWarningBinding = BottomSheetProxyWarningBinding.inflate(LayoutInflater.from(context))
 
     private var finishWithContinue = false
-
-    init {
-        setContentView(R.layout.bottom_sheet_proxy_warning)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        proxySigningWarningMessage.setText(subtitle)
+        binder.proxySigningWarningMessage.setText(subtitle)
 
-        proxySigningWarningContinue.setDismissingClickListener {
-            if (proxySigningWarningDontShowAgain.isChecked) {
+        binder.proxySigningWarningContinue.setDismissingClickListener {
+            if (binder.proxySigningWarningDontShowAgain.isChecked) {
                 dontShowAgain()
             }
             finishWithContinue = true
         }
 
-        proxySigningWarningCancel.setDismissingClickListener {
+        binder.proxySigningWarningCancel.setDismissingClickListener {
             finishWithContinue = false
         }
 

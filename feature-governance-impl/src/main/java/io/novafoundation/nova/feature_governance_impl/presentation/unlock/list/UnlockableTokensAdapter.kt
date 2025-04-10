@@ -1,27 +1,25 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.unlock.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemGovernanceLockBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel.StatusContent
-import kotlinx.android.synthetic.main.item_governance_lock.view.leftToUnlock
-import kotlinx.android.synthetic.main.item_governance_lock.view.unlockableTokensAmount
 
 class UnlockableTokensAdapter : ListAdapter<GovernanceLockModel, UnlockableTokenHolder>(GovernanceLockCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UnlockableTokenHolder {
-        return UnlockableTokenHolder(parent.inflateChild(R.layout.item_governance_lock, false))
+        return UnlockableTokenHolder(ItemGovernanceLockBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: UnlockableTokenHolder, position: Int) {
@@ -61,20 +59,20 @@ private object GovernanceLockCallback : DiffUtil.ItemCallback<GovernanceLockMode
 }
 
 class UnlockableTokenHolder(
-    containerView: View,
-) : RecyclerView.ViewHolder(containerView) {
+    private val binder: ItemGovernanceLockBinding,
+) : RecyclerView.ViewHolder(binder.root) {
 
-    fun bind(item: GovernanceLockModel) = with(itemView) {
+    fun bind(item: GovernanceLockModel) = with(binder) {
         bindUnlockAmount(item)
 
         bindUnlockStatus(item)
     }
 
-    fun bindUnlockAmount(item: GovernanceLockModel) = with(itemView) {
+    fun bindUnlockAmount(item: GovernanceLockModel) = with(binder) {
         unlockableTokensAmount.text = item.amount
     }
 
-    fun bindUnlockStatus(item: GovernanceLockModel) = with(itemView) {
+    fun bindUnlockStatus(item: GovernanceLockModel) = with(binder) {
         when (val status = item.status) {
             is StatusContent.Text -> {
                 leftToUnlock.stopTimer()

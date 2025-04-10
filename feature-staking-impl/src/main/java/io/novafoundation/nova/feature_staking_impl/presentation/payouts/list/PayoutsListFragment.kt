@@ -1,10 +1,5 @@
-
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,44 +8,32 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentPayoutsListBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.model.PendingPayoutsStatisticsModel
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutListPlaceholder
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsList
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListAll
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListContainer
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListProgress
-import kotlinx.android.synthetic.main.fragment_payouts_list.payoutsListToolbar
 
-class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.ItemHandler {
+class PayoutsListFragment : BaseFragment<PayoutsListViewModel, FragmentPayoutsListBinding>(), PayoutAdapter.ItemHandler {
+
+    override fun createBinding() = FragmentPayoutsListBinding.inflate(layoutInflater)
 
     lateinit var adapter: PayoutAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_payouts_list, container, false)
-    }
-
     override fun initViews() {
-        payoutsListContainer.applyInsetter {
+        binder.payoutsListContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
         }
 
         adapter = PayoutAdapter(this)
-        payoutsList.adapter = adapter
+        binder.payoutsList.adapter = adapter
 
-        payoutsList.setHasFixedSize(true)
+        binder.payoutsList.setHasFixedSize(true)
 
-        payoutsListToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.payoutsListToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        payoutsListAll.setOnClickListener {
+        binder.payoutsListAll.setOnClickListener {
             viewModel.payoutAllClicked()
         }
     }
@@ -71,12 +54,12 @@ class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.
                 val placeholderVisible = it.data.placeholderVisible
 
                 setContentVisible(!placeholderVisible)
-                payoutListPlaceholder.setVisible(placeholderVisible)
-                payoutsListProgress.makeGone()
+                binder.payoutListPlaceholder.setVisible(placeholderVisible)
+                binder.payoutsListProgress.makeGone()
 
                 adapter.submitList(it.data.payouts)
 
-                payoutsListAll.text = it.data.payoutAllTitle
+                binder.payoutsListAll.text = it.data.payoutAllTitle
             }
         }
 
@@ -88,7 +71,7 @@ class PayoutsListFragment : BaseFragment<PayoutsListViewModel>(), PayoutAdapter.
     }
 
     private fun setContentVisible(visible: Boolean) {
-        payoutsList.setVisible(visible)
-        payoutsListAll.setVisible(visible)
+        binder.payoutsList.setVisible(visible)
+        binder.payoutsListAll.setVisible(visible)
     }
 }

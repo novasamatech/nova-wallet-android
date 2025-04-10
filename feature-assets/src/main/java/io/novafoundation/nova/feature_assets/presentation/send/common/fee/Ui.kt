@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 
-context(BaseFragment<V>)
+context(BaseFragment<V, *>)
 fun <V : BaseViewModel> FeeLoaderMixinV2<TransferFee, TransferFeeDisplay>.setupFeeLoading(originFeeView: FeeView, crossChainFeeView: FeeView) {
     setupFeeLoading(
         setFeeStatus = {

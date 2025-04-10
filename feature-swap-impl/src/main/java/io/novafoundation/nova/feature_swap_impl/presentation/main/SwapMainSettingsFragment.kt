@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -19,25 +17,13 @@ import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
-import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
+import io.novafoundation.nova.feature_swap_impl.databinding.FragmentMainSwapSettingsBinding
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsContinue
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetails
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsNetworkFee
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsDetailsRate
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsExecutionTime
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsFlip
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsGetAssetIn
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsMaxAmount
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsPayInput
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsReceiveInput
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsRoute
-import kotlinx.android.synthetic.main.fragment_main_swap_settings.swapMainSettingsToolbar
 
-class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
+class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, FragmentMainSwapSettingsBinding>() {
 
     companion object {
 
@@ -50,36 +36,30 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_main_swap_settings, container, false)
-    }
+    override fun createBinding() = FragmentMainSwapSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        swapMainSettingsToolbar.applyStatusBarInsets()
-        swapMainSettingsContinue.prepareForProgress(this)
-        swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
+        binder.swapMainSettingsToolbar.applyStatusBarInsets()
+        binder.swapMainSettingsContinue.prepareForProgress(this)
+        binder.swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }
 
-        swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
-        swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
-        swapMainSettingsFlip.setOnClickListener {
+        binder.swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
+        binder.swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
+        binder.swapMainSettingsFlip.setOnClickListener {
             viewModel.flipAssets()
         }
-        swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
-        swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
-        swapMainSettingsContinue.setOnClickListener { viewModel.continueButtonClicked() }
-        swapMainSettingsContinue.prepareForProgress(this)
-        swapMainSettingsRoute.setOnClickListener {
+        binder.swapMainSettingsDetailsRate.setOnClickListener { viewModel.rateDetailsClicked() }
+        binder.swapMainSettingsDetailsNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
+        binder.swapMainSettingsContinue.setOnClickListener { viewModel.continueButtonClicked() }
+        binder.swapMainSettingsContinue.prepareForProgress(this)
+        binder.swapMainSettingsRoute.setOnClickListener {
             viewModel.routeClicked()
 
             hideKeyboard()
         }
 
-        swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
+        binder.swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
     }
 
     override fun inject() {
@@ -95,22 +75,22 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
         observeDescription(viewModel)
         observeValidations(viewModel)
-        setupSwapAmountInput(viewModel.amountInInput, swapMainSettingsPayInput, swapMainSettingsMaxAmount)
-        setupSwapAmountInput(viewModel.amountOutInput, swapMainSettingsReceiveInput, maxAvailableView = null)
+        setupSwapAmountInput(viewModel.amountInInput, binder.swapMainSettingsPayInput, binder.swapMainSettingsMaxAmount)
+        setupSwapAmountInput(viewModel.amountOutInput, binder.swapMainSettingsReceiveInput, maxAvailableView = null)
 
-        viewModel.feeMixin.setupFeeLoading(swapMainSettingsDetailsNetworkFee)
+        viewModel.feeMixin.setupFeeLoading(binder.swapMainSettingsDetailsNetworkFee)
 
-        viewModel.rateDetails.observe { swapMainSettingsDetailsRate.showLoadingValue(it) }
-        viewModel.swapRouteState.observe(swapMainSettingsRoute::setSwapRouteState)
-        viewModel.swapExecutionTime.observe(swapMainSettingsExecutionTime::showLoadingValue)
-        viewModel.showDetails.observe { swapMainSettingsDetails.setVisible(it) }
-        viewModel.buttonState.observe(swapMainSettingsContinue::setState)
+        viewModel.rateDetails.observe { binder.swapMainSettingsDetailsRate.showLoadingValue(it) }
+        viewModel.swapRouteState.observe(binder.swapMainSettingsRoute::setSwapRouteState)
+        viewModel.swapExecutionTime.observe(binder.swapMainSettingsExecutionTime::showLoadingValue)
+        viewModel.showDetails.observe { binder.swapMainSettingsDetails.setVisible(it) }
+        viewModel.buttonState.observe(binder.swapMainSettingsContinue::setState)
 
         viewModel.swapDirectionFlipped.observeEvent {
             postToUiThread {
                 val field = when (it) {
-                    SwapDirection.SPECIFIED_IN -> swapMainSettingsPayInput
-                    SwapDirection.SPECIFIED_OUT -> swapMainSettingsReceiveInput
+                    SwapDirection.SPECIFIED_IN -> binder.swapMainSettingsPayInput
+                    SwapDirection.SPECIFIED_OUT -> binder.swapMainSettingsReceiveInput
                 }
 
                 field.requestFocus()
@@ -118,9 +98,9 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel>() {
             }
         }
 
-        viewModel.validationProgress.observe(swapMainSettingsContinue::setProgressState)
+        viewModel.validationProgress.observe(binder.swapMainSettingsContinue::setProgressState)
 
-        viewModel.getAssetInOptionsButtonState.observe(swapMainSettingsGetAssetIn::setState)
+        viewModel.getAssetInOptionsButtonState.observe(binder.swapMainSettingsGetAssetIn::setState)
 
         viewModel.selectGetAssetInOption.awaitableActionLiveData.observeEvent {
             GetAssetInBottomSheet(

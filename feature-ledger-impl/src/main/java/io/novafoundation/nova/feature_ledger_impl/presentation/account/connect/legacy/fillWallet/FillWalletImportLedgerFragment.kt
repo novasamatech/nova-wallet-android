@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -13,14 +10,17 @@ import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerFillWalletBinding
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.fillWallet.model.FillableChainAccountModel
-import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerAccounts
-import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerContinue
-import kotlinx.android.synthetic.main.fragment_import_ledger_fill_wallet.fillWalletImportLedgerToolbar
+
 import javax.inject.Inject
 
-class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewModel>(), FillWalletImportLedgerAdapter.Handler {
+class FillWalletImportLedgerFragment :
+    BaseFragment<FillWalletImportLedgerViewModel, FragmentImportLedgerFillWalletBinding>(),
+    FillWalletImportLedgerAdapter.Handler {
+
+    override fun createBinding() = FragmentImportLedgerFillWalletBinding.inflate(layoutInflater)
 
     companion object {
 
@@ -36,21 +36,17 @@ class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewMo
         FillWalletImportLedgerAdapter(this, imageLoader)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_ledger_fill_wallet, container, false)
-    }
-
     override fun initViews() {
-        fillWalletImportLedgerToolbar.applyStatusBarInsets()
-        fillWalletImportLedgerToolbar.setHomeButtonListener {
+        binder.fillWalletImportLedgerToolbar.applyStatusBarInsets()
+        binder.fillWalletImportLedgerToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
         onBackPressed { viewModel.backClicked() }
 
-        fillWalletImportLedgerAccounts.setHasFixedSize(true)
-        fillWalletImportLedgerAccounts.adapter = adapter
+        binder.fillWalletImportLedgerAccounts.setHasFixedSize(true)
+        binder.fillWalletImportLedgerAccounts.adapter = adapter
 
-        fillWalletImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
+        binder.fillWalletImportLedgerContinue.setOnClickListener { viewModel.continueClicked() }
     }
 
     override fun inject() {
@@ -65,7 +61,7 @@ class FillWalletImportLedgerFragment : BaseFragment<FillWalletImportLedgerViewMo
     }
 
     override fun subscribe(viewModel: FillWalletImportLedgerViewModel) {
-        viewModel.continueState.observe(fillWalletImportLedgerContinue::setState)
+        viewModel.continueState.observe(binder.fillWalletImportLedgerContinue::setState)
         viewModel.fillableChainAccountModels.observe(adapter::submitList)
 
         viewModel.confirmExit.awaitableActionLiveData.observeEvent {

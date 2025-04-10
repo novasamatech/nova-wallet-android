@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.manualBackup.co
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_impl.presentation.exporting.ExportPayload
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed interface ManualBackupCommonPayload : Parcelable {
 

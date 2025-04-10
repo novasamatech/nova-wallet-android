@@ -430,7 +430,7 @@ fun EditText.moveSelectionToTheEnd() {
     }
 }
 
-context(BaseFragment<*>)
+context(BaseFragment<*, *>)
 infix fun TabLayout.bindTo(pageIndexFlow: MutableSharedFlow<Int>) = bindTo(pageIndexFlow, this@BaseFragment.lifecycleScope)
 
 fun TabLayout.bindTo(

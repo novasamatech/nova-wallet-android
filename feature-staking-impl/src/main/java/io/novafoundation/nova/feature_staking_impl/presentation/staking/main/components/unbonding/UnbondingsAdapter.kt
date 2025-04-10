@@ -1,31 +1,27 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.removeCompoundDrawables
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemUnbondingBinding
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_unbonding.view.itemUnbondAmount
-import kotlinx.android.synthetic.main.item_unbonding.view.itemUnbondStatus
+
 import kotlin.time.ExperimentalTime
 
 class UnbondingsAdapter : ListAdapter<UnbondingModel, UnbondingsHolder>(UnbondingModelDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UnbondingsHolder {
-        val view = parent.inflateChild(R.layout.item_unbonding)
-
-        return UnbondingsHolder(view)
+        return UnbondingsHolder(ItemUnbondingBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: UnbondingsHolder, position: Int, payloads: MutableList<Any>) {
@@ -47,18 +43,18 @@ class UnbondingsAdapter : ListAdapter<UnbondingModel, UnbondingsHolder>(Unbondin
     }
 }
 
-class UnbondingsHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+class UnbondingsHolder(private val binder: ItemUnbondingBinding) : RecyclerView.ViewHolder(binder.root) {
 
-    fun bind(unbonding: UnbondingModel) = with(containerView) {
+    fun bind(unbonding: UnbondingModel) {
         bindStatus(unbonding)
         bindAmount(unbonding)
     }
 
     fun bindAmount(unbonding: UnbondingModel) {
-        containerView.itemUnbondAmount.text = unbonding.amountModel.token
+        binder.itemUnbondAmount.text = unbonding.amountModel.token
     }
 
-    fun bindStatus(unbonding: UnbondingModel) = with(containerView) {
+    fun bindStatus(unbonding: UnbondingModel) = with(binder) {
         when (val status = unbonding.status) {
             Unbonding.Status.Redeemable -> {
                 itemUnbondStatus.setTextColorRes(R.color.text_positive)

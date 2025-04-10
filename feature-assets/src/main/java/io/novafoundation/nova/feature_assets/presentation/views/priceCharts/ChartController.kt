@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.vibrate
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.view_price_charts.view.priceChart
 
 class ChartController(private val chart: LineChart, private val callback: Callback) : View.OnTouchListener {
 
@@ -173,7 +172,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         }
     }
 
-    private fun LineChart.priceChartRenderer() = priceChart.renderer as PriceChartRenderer
+    private fun LineChart.priceChartRenderer() = renderer as PriceChartRenderer
 
     private fun List<Entry>.getColorResForEntries(): Int {
         if (useNeutralColor) return R.color.neutral_price_chart_line

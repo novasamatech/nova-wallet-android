@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.period
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import io.novafoundation.nova.common.base.BaseFragment
@@ -16,32 +13,21 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentPeriodStakingBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import kotlinx.android.synthetic.main.fragment_period_staking.customPeriodSettings
-import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPeriodAlwaysToday
-import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPeriodEnd
-import kotlinx.android.synthetic.main.fragment_period_staking.customStakingPeriodStart
-import kotlinx.android.synthetic.main.fragment_period_staking.stakingPeriodGroup
-import kotlinx.android.synthetic.main.fragment_period_staking.stakingPeriodToolbar
 
 private const val DATE_PICKER_TAG = "datePicker"
 
-class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
+class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel, FragmentPeriodStakingBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_period_staking, container, false)
-    }
+    override fun createBinding() = FragmentPeriodStakingBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        stakingPeriodToolbar.applyStatusBarInsets()
-        stakingPeriodToolbar.setRightActionClickListener { viewModel.onSaveClick() }
-        stakingPeriodToolbar.setHomeButtonListener { viewModel.backClicked() }
-        customStakingPeriodStart.setOnClickListener { viewModel.openStartDatePicker() }
-        customStakingPeriodEnd.setOnClickListener { viewModel.openEndDatePicker() }
+        binder.stakingPeriodToolbar.applyStatusBarInsets()
+        binder.stakingPeriodToolbar.setRightActionClickListener { viewModel.onSaveClick() }
+        binder.stakingPeriodToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.customStakingPeriodStart.setOnClickListener { viewModel.openStartDatePicker() }
+        binder.customStakingPeriodEnd.setOnClickListener { viewModel.openEndDatePicker() }
     }
 
     override fun inject() {
@@ -55,8 +41,8 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
     }
 
     override fun subscribe(viewModel: StakingPeriodViewModel) {
-        stakingPeriodGroup.bindTo(viewModel.selectedPeriod, this.lifecycleScope)
-        customStakingPeriodAlwaysToday.bindTo(viewModel.endIsToday, this.lifecycleScope, viewModel::endIsAlwaysTodayChanged)
+        binder.stakingPeriodGroup.bindTo(viewModel.selectedPeriod, this.lifecycleScope)
+        binder.customStakingPeriodAlwaysToday.bindTo(viewModel.endIsToday, this.lifecycleScope, viewModel::endIsAlwaysTodayChanged)
 
         viewModel.startDatePickerEvent.observeEvent {
             startDatePicker(R.string.staking_period_start_date_picker_title, it, ::onStartDateSelected)
@@ -67,23 +53,23 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel>() {
         }
 
         viewModel.startCustomPeriod.observe {
-            customStakingPeriodStart.showValue(it)
+            binder.customStakingPeriodStart.showValue(it)
         }
 
         viewModel.showCustomDetails.observe {
-            customPeriodSettings.isVisible = it
+            binder.customPeriodSettings.isVisible = it
         }
 
         viewModel.endIsToday.observe {
-            customStakingPeriodEnd.isVisible = !it
+            binder.customStakingPeriodEnd.isVisible = !it
         }
 
         viewModel.endCustomPeriod.observe {
-            customStakingPeriodEnd.showValue(it)
+            binder.customStakingPeriodEnd.showValue(it)
         }
 
         viewModel.saveButtonEnabledState.observe {
-            stakingPeriodToolbar.setRightActionEnabled(it)
+            binder.stakingPeriodToolbar.setRightActionEnabled(it)
         }
     }
 

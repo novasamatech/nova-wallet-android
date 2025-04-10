@@ -4,7 +4,7 @@ import android.os.Parcelable
 import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator.Response
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface DAppSearchRequester : InterScreenRequester<SearchPayload, Response>
 

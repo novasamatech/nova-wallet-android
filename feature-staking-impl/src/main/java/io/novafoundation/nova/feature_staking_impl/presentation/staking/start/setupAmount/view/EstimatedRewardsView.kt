@@ -3,16 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeGoneViews
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.makeVisibleViews
-import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_estimated_rewards.view.viewEstimatedRewardsEarnings
-import kotlinx.android.synthetic.main.view_estimated_rewards.view.viewEstimatedRewardsEarningsShimmer
-import kotlinx.android.synthetic.main.view_estimated_rewards.view.viewEstimatedRewardsEarningsSuffix
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewEstimatedRewardsBinding
 
 class EstimatedRewardsView @JvmOverloads constructor(
     context: Context,
@@ -20,22 +17,22 @@ class EstimatedRewardsView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
-    init {
-        View.inflate(context, R.layout.view_estimated_rewards, this)
+    private val binder = ViewEstimatedRewardsBinding.inflate(inflater(), this)
 
+    init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
     }
 
     fun showLoading() {
-        makeGoneViews(viewEstimatedRewardsEarnings, viewEstimatedRewardsEarningsSuffix)
-        viewEstimatedRewardsEarningsShimmer.makeVisible()
+        makeGoneViews(binder.viewEstimatedRewardsEarnings, binder.viewEstimatedRewardsEarningsSuffix)
+        binder.viewEstimatedRewardsEarningsShimmer.makeVisible()
     }
 
     fun showEarnings(earnings: String) {
-        makeVisibleViews(viewEstimatedRewardsEarnings, viewEstimatedRewardsEarningsSuffix)
-        viewEstimatedRewardsEarningsShimmer.makeGone()
+        makeVisibleViews(binder.viewEstimatedRewardsEarnings, binder.viewEstimatedRewardsEarningsSuffix)
+        binder.viewEstimatedRewardsEarningsShimmer.makeGone()
 
-        viewEstimatedRewardsEarnings.text = earnings
+        binder.viewEstimatedRewardsEarnings.text = earnings
     }
 }

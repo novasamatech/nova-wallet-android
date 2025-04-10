@@ -1,20 +1,17 @@
 package io.novafoundation.nova.feature_account_impl.presentation.view.mnemonic
 
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.item_mnemonic_word.view.numberTv
-import kotlinx.android.synthetic.main.item_mnemonic_word.view.wordTv
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_account_impl.databinding.ItemMnemonicWordBinding
 
 class MnemonicWordsAdapter : ListAdapter<MnemonicWordModel, MnemonicWordViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MnemonicWordViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_mnemonic_word, parent, false)
-        return MnemonicWordViewHolder(view)
+        val binder = ItemMnemonicWordBinding.inflate(parent.inflater(), parent, false)
+        return MnemonicWordViewHolder(binder)
     }
 
     override fun onBindViewHolder(holder: MnemonicWordViewHolder, position: Int) {
@@ -33,10 +30,10 @@ object DiffCallback : DiffUtil.ItemCallback<MnemonicWordModel>() {
     }
 }
 
-class MnemonicWordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class MnemonicWordViewHolder(private val binder: ItemMnemonicWordBinding) : RecyclerView.ViewHolder(binder.root) {
 
     fun bind(mnemonicWord: MnemonicWordModel) {
-        with(itemView) {
+        with(binder) {
             numberTv.text = mnemonicWord.numberToShow
             wordTv.text = mnemonicWord.word
         }

@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.view.AccountView
 
-fun BaseFragment<*>.setupSelectWalletMixin(mixin: SelectWalletMixin, view: AccountView) {
+fun BaseFragment<*, *>.setupSelectWalletMixin(mixin: SelectWalletMixin, view: AccountView) {
     view.setActionTint(R.color.icon_secondary)
     view.setShowBackground(true)
 

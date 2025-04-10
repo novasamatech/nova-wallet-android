@@ -1,16 +1,12 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.start
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.setModelOrHide
-import io.novafoundation.nova.feature_ledger_impl.R
-import kotlinx.android.synthetic.main.item_import_ledger_start_page.view.startImportLedgerGuideLink
-import kotlinx.android.synthetic.main.item_import_ledger_start_page.view.startImportLedgerInstructions
-import kotlinx.android.synthetic.main.item_import_ledger_start_page.view.startImportLedgerWarning
+import io.novafoundation.nova.feature_ledger_impl.databinding.ItemImportLedgerStartPageBinding
 
 class ConnectionModePageModel(
     val modeName: String,
@@ -33,7 +29,8 @@ class StartImportLedgerPagerAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StartImportLedgerPageViewHolder {
-        return StartImportLedgerPageViewHolder(parent.inflateChild(R.layout.item_import_ledger_start_page), handler)
+        val binder = ItemImportLedgerStartPageBinding.inflate(parent.inflater(), parent, false)
+        return StartImportLedgerPageViewHolder(binder, handler)
     }
 
     override fun onBindViewHolder(holder: StartImportLedgerPageViewHolder, position: Int) {
@@ -51,19 +48,19 @@ class StartImportLedgerPagerAdapter(
 }
 
 class StartImportLedgerPageViewHolder(
-    itemView: View,
+    private val binder: ItemImportLedgerStartPageBinding,
     private val handler: StartImportLedgerPagerAdapter.Handler
-) : ViewHolder(itemView) {
+) : ViewHolder(binder.root) {
 
     private val adapter = StartImportLedgerInstructionAdapter()
 
     init {
-        itemView.startImportLedgerInstructions.adapter = adapter
-        itemView.startImportLedgerGuideLink.setOnClickListener { handler.guideLinkClicked() }
+        binder.startImportLedgerInstructions.adapter = adapter
+        binder.startImportLedgerGuideLink.setOnClickListener { handler.guideLinkClicked() }
     }
 
     fun bind(page: ConnectionModePageModel, alertModel: AlertModel?) {
         adapter.submitList(page.guideItems)
-        itemView.startImportLedgerWarning.setModelOrHide(alertModel)
+        binder.startImportLedgerWarning.setModelOrHide(alertModel)
     }
 }

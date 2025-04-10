@@ -3,13 +3,12 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
-import kotlinx.android.synthetic.main.view_accent_action.view.accentActionIcon
-import kotlinx.android.synthetic.main.view_accent_action.view.accentActionText
+import io.novafoundation.nova.common.databinding.ViewAccentActionBinding
+import io.novafoundation.nova.common.utils.inflater
 
 class AccentActionView @JvmOverloads constructor(
     context: Context,
@@ -17,9 +16,9 @@ class AccentActionView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    init {
-        View.inflate(context, R.layout.view_accent_action, this)
+    private val binder = ViewAccentActionBinding.inflate(inflater(), this)
 
+    init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
 
@@ -27,10 +26,10 @@ class AccentActionView @JvmOverloads constructor(
     }
 
     fun setText(@StringRes textRes: Int) {
-        accentActionText.setText(textRes)
+        binder.accentActionText.setText(textRes)
     }
 
     fun setIcon(@DrawableRes iconRes: Int) {
-        accentActionIcon.setImageResource(iconRes)
+        binder.accentActionIcon.setImageResource(iconRes)
     }
 }

@@ -1,39 +1,27 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentConfirmNominationsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
-import kotlinx.android.synthetic.main.fragment_confirm_nominations.confirmNominationsList
-import kotlinx.android.synthetic.main.fragment_confirm_nominations.confirmNominationsToolbar
 
-class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
+class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel, FragmentConfirmNominationsBinding>(), StakeTargetAdapter.ItemHandler<Validator> {
 
     lateinit var adapter: StakeTargetAdapter<Validator>
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_confirm_nominations, container, false)
-    }
+    override fun createBinding() = FragmentConfirmNominationsBinding.inflate(layoutInflater)
 
     override fun initViews() {
         adapter = StakeTargetAdapter(this)
-        confirmNominationsList.adapter = adapter
+        binder.confirmNominationsList.adapter = adapter
 
-        confirmNominationsList.setHasFixedSize(true)
+        binder.confirmNominationsList.setHasFixedSize(true)
 
-        confirmNominationsToolbar.setHomeButtonListener {
+        binder.confirmNominationsToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
     }
@@ -51,7 +39,7 @@ class ConfirmNominationsFragment : BaseFragment<ConfirmNominationsViewModel>(), 
     override fun subscribe(viewModel: ConfirmNominationsViewModel) {
         viewModel.selectedValidatorsLiveData.observe(adapter::submitList)
 
-        viewModel.toolbarTitle.observe(confirmNominationsToolbar::setTitle)
+        viewModel.toolbarTitle.observe(binder.confirmNominationsToolbar::setTitle)
     }
 
     override fun stakeTargetInfoClicked(validatorModel: ValidatorStakeTargetModel) {
