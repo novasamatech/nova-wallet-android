@@ -1006,7 +1006,20 @@
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/sendFlowFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_sendFlow_to_send"
+            app:destination="@id/selectSendFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sendFlowFragment"
+            app:popUpToInclusive="true" />
+
     </fragment>
 
     <fragment
@@ -1020,7 +1033,19 @@
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/receiveFlowFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_receiveFlow_to_receive"
+            app:destination="@id/receiveFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/receiveFlowFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 
@@ -1124,12 +1149,46 @@
     <fragment
         android:id="@+id/sendFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment"
-        android:label="NetworkSendFlowFragment" />
+        android:label="NetworkSendFlowFragment">
+
+        <action
+            android:id="@+id/action_sendFlowNetwork_to_send"
+            app:destination="@id/selectSendFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sendFlowNetworkFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/receiveFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.receive.flow.network.NetworkReceiveFlowFragment"
-        android:label="NetworkReceiveFlowFragment" />
+        android:label="NetworkReceiveFlowFragment">
+
+        <action
+            android:id="@+id/action_receiveFlowNetwork_to_send"
+            app:destination="@id/selectSendFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/receiveFlowNetworkFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_receiveFlowNetwork_to_receive"
+            app:destination="@id/receiveFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/receiveFlowNetworkFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/buyFlowNetworkFragment"
