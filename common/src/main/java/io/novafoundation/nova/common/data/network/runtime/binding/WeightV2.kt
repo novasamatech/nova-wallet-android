@@ -1,5 +1,6 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
+import io.novafoundation.nova.common.utils.Min
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.scale.ToDynamicScaleInstance
 import io.novafoundation.nova.common.utils.structOf
@@ -7,7 +8,7 @@ import io.novafoundation.nova.common.utils.times
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 
-data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger) : ToDynamicScaleInstance {
+data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger) : ToDynamicScaleInstance, Min<WeightV2> {
 
     companion object {
 
@@ -44,10 +45,17 @@ data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger) : ToDyna
     override fun toEncodableInstance(): Struct.Instance {
         return structOf("refTime" to refTime, "proofSize" to proofSize)
     }
+
+    override fun min(other: WeightV2): WeightV2 {
+        return WeightV2(
+            refTime = refTime.min(other.refTime),
+            proofSize = proofSize.min(other.proofSize)
+        )
+    }
 }
 
 fun WeightV2.fitsIn(limit: WeightV2): Boolean {
-    return refTime <= limit.refTime && proofSize < limit.proofSize
+    return refTime <= limit.refTime && proofSize <= limit.proofSize
 }
 
 fun bindWeightV2(decoded: Any?): WeightV2 {
