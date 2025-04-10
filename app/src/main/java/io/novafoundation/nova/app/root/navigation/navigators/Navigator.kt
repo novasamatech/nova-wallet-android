@@ -360,7 +360,6 @@ class Navigator(
     }
 
     override fun openReceive(assetPayload: AssetPayload) {
-
         navigationBuilder().cases()
             .addCase(R.id.receiveFlowFragment, R.id.action_receiveFlow_to_receive)
             .addCase(R.id.receiveFlowNetworkFragment, R.id.action_receiveFlowNetwork_to_receive)
