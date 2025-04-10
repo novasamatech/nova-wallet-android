@@ -3,11 +3,8 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.setPadding
-import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.databinding.ViewInputFieldBinding
 import io.novafoundation.nova.common.databinding.ViewYourWalletsBinding
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getRippleMask

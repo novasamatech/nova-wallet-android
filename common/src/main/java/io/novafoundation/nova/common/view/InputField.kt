@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.text.InputType
 import android.util.AttributeSet
-import android.view.View
 import android.widget.EditText
 import com.google.android.material.textfield.TextInputLayout
 import io.novafoundation.nova.common.R
