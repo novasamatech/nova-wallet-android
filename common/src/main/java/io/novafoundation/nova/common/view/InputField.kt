@@ -5,11 +5,12 @@ import android.text.InputType
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
-import androidx.core.view.setPadding
 import com.google.android.material.textfield.TextInputLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewInputFieldBinding
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import kotlin.math.roundToInt
@@ -26,12 +27,12 @@ class InputField @JvmOverloads constructor(
     defStyle: Int = R.style.Widget_Nova_Input_Primary_External,
 ) : TextInputLayout(context, attrs, defStyle) {
 
+    private val binder = ViewInputFieldBinding.inflate(inflater(), this)
+
     val content: EditText
         get() = editText!!
 
     init {
-        View.inflate(context, R.layout.view_input_field, this)
-
         content.setHintTextColor(context.getColor(R.color.hint_text))
         content.background = context.getCornersStateDrawable()
 

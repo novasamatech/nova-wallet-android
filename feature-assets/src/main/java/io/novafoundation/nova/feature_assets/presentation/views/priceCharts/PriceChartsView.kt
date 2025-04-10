@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.LayoutPriceChartButtonBinding
 import io.novafoundation.nova.feature_assets.databinding.ViewPriceChartsBinding
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.DateChartTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.PriceChangeTextInjector
@@ -143,10 +144,11 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun createButton(text: String, index: Int): View {
-        val button = View.inflate(context, R.layout.layout_price_chart_button, null) as TextView
-        button.text = text
-        button.setOnClickListener { selectChart(index) }
-        return button
+        val buttonBinder = LayoutPriceChartButtonBinding.inflate(inflater())
+        return buttonBinder.priceChartButtonText.apply {
+            setText(text)
+            setOnClickListener { selectChart(index) }
+        }
     }
 
     private fun createSpace(): Space {
