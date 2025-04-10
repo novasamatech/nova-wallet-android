@@ -5,17 +5,17 @@ data class DiscoveryRequirementAvailability(
     val permissionsGranted: Boolean
 )
 
-fun DiscoveryRequirementAvailability.permissionGranted(): DiscoveryRequirementAvailability {
+fun DiscoveryRequirementAvailability.grantPermissions(): DiscoveryRequirementAvailability {
     return copy(permissionsGranted = true)
 }
 
-fun DiscoveryRequirementAvailability.requirementSatisfied(requirement: DiscoveryRequirement): DiscoveryRequirementAvailability {
+fun DiscoveryRequirementAvailability.satisfyRequirement(requirement: DiscoveryRequirement): DiscoveryRequirementAvailability {
     return copy(
         satisfiedRequirements = satisfiedRequirements + requirement
     )
 }
 
-fun DiscoveryRequirementAvailability.requirementMissing(requirement: DiscoveryRequirement): DiscoveryRequirementAvailability {
+fun DiscoveryRequirementAvailability.missRequirement(requirement: DiscoveryRequirement): DiscoveryRequirementAvailability {
     return copy(
         satisfiedRequirements = satisfiedRequirements - requirement
     )

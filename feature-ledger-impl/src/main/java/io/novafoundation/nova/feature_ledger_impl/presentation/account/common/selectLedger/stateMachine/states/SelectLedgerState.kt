@@ -7,9 +7,9 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryRequirem
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryRequirementAvailability
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.discoveryRequirements
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.filterBySatisfiedRequirements
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.permissionGranted
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.requirementMissing
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.requirementSatisfied
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.grantPermissions
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.missRequirement
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.satisfyRequirement
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SelectLedgerEvent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine.SideEffect
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods.Method as DiscoveryMethod
@@ -88,9 +88,7 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
     ) {
         val allDiscoveryRequirements = allDiscoveryMethods.discoveryRequirements()
 
-        // We can only request permissions if there is a single method or a user explicitly pressed a button to request permissions
-        // Otherwise we don't bother them with the automatic requests as there might be method that do not require permissions at all
-        val canRequestPermissions = allDiscoveryMethods.methods.size == 1 || usedAllowedRequirementAvailabilityRequests
+        val canRequestPermissions = canPerformAvailabilityRequests(allDiscoveryMethods, usedAllowedRequirementAvailabilityRequests)
 
         // We only need permissions when there is at least one requirement (assuming each requirement requires at least one permission)
         // and permissions has not been granted yet
@@ -109,7 +107,7 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         discoveryRequirementAvailability: DiscoveryRequirementAvailability,
         usedAllowedRequirementAvailabilityRequests: Boolean
     ) {
-        val canRequestRequirement = canRequestDiscoveryRequirements(discoveryMethods, usedAllowedRequirementAvailabilityRequests)
+        val canRequestRequirement = canPerformAvailabilityRequests(discoveryMethods, usedAllowedRequirementAvailabilityRequests)
         if (!canRequestRequirement) return
 
         val allRequirements = discoveryMethods.discoveryRequirements()
@@ -126,19 +124,19 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         requirement: DiscoveryRequirement,
         usedAllowedRequirementAvailabilityRequests: Boolean
     ) {
-        val canRequestRequirement = canRequestDiscoveryRequirements(allDiscoveryMethods, usedAllowedRequirementAvailabilityRequests)
+        val canRequestRequirement = canPerformAvailabilityRequests(allDiscoveryMethods, usedAllowedRequirementAvailabilityRequests)
 
         if (canRequestRequirement) {
             emitSideEffect(SideEffect.RequestSatisfyRequirement(listOf(requirement)))
         }
     }
 
-    private fun canRequestDiscoveryRequirements(
+    private fun canPerformAvailabilityRequests(
         allDiscoveryMethods: DiscoveryMethods,
         usedAllowedRequirementAvailabilityRequests: Boolean
     ): Boolean {
-        // We can only request permissions if there is a single method or a user explicitly pressed a button to request discovery requirements
-        // Otherwise we don't bother them with the automatic requests as there might be method that do not require any requirements at all
+        // We can only perform availability requests if there is a single method or a user explicitly pressed a button to allow such requests
+        // Otherwise we don't bother them with the automatic requests as there might be methods that do not need any requirements at all
         return allDiscoveryMethods.methods.size == 1 || usedAllowedRequirementAvailabilityRequests
     }
 
@@ -147,9 +145,9 @@ sealed class SelectLedgerState : StateMachine.State<SelectLedgerState, SideEffec
         event: SelectLedgerEvent
     ): DiscoveryRequirementAvailability? {
         return when (event) {
-            is SelectLedgerEvent.DiscoveryRequirementMissing -> availability.requirementMissing(event.requirement)
-            is SelectLedgerEvent.DiscoveryRequirementSatisfied -> availability.requirementSatisfied(event.requirement)
-            is SelectLedgerEvent.PermissionsGranted -> availability.permissionGranted()
+            is SelectLedgerEvent.DiscoveryRequirementMissing -> availability.missRequirement(event.requirement)
+            is SelectLedgerEvent.DiscoveryRequirementSatisfied -> availability.satisfyRequirement(event.requirement)
+            is SelectLedgerEvent.PermissionsGranted -> availability.grantPermissions()
             else -> null
         }
     }
