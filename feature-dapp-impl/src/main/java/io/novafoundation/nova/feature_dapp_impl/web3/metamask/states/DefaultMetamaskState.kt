@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.data.repository.DefaultMetamaskChainRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.accept
