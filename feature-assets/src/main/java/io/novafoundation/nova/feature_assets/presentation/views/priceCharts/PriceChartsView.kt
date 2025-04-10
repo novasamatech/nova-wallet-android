@@ -14,7 +14,6 @@ import com.github.mikephil.charting.data.Entry
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.LayoutPriceChartButtonBinding
 import io.novafoundation.nova.feature_assets.databinding.ViewPriceChartsBinding
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.DateChartTextInjector
