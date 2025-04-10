@@ -59,7 +59,7 @@ abstract class BaseDynamicListBottomSheet(context: Context) :
     }
 
     fun hideTitle() {
-        dynamicListSheetTitle.setVisible(false)
+        binder.dynamicListSheetTitle.setVisible(false)
     }
 
     fun setupRightAction(

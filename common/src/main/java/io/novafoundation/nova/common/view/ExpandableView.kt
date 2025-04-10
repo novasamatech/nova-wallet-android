@@ -69,10 +69,6 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
-    fun setImage(@DrawableRes imageRes: Int) {
-        bannerImage.setImageResource(imageRes)
-    }
-
     fun setState(state: ExpandableViewState) {
         when (state) {
             ExpandableViewState.COLLAPSED -> collapse()

@@ -23,8 +23,6 @@ import io.novafoundation.nova.feature_swap_impl.databinding.FragmentMainSwapSett
 import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 
-import javax.inject.Inject
-
 class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, FragmentMainSwapSettingsBinding>() {
 
     companion object {

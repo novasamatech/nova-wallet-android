@@ -80,7 +80,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V,
         }
 
         viewModel.hints.observe(binder.selectLedgerHints::setText)
-        viewModel.showPermissionsButton.observe { selectLedgerGrantPermissions.isVisible = it }
+        viewModel.showPermissionsButton.observe { binder.selectLedgerGrantPermissions.isVisible = it }
 
         setupPermissionAsker(viewModel)
         setupLedgerMessages(ledgerMessagePresentable)

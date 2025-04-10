@@ -127,7 +127,7 @@ private class ViewHolder<T : Identifiable>(
 
 fun <T : Identifiable> ChooseStakedStakeTargetsBottomSheet(
     context: Context,
-    payload: Payload<SelectStakeTargetModel<T>>,
+    payload: ChooseStakedStakeTargetsBottomSheet.Payload<SelectStakeTargetModel<T>>,
     onResponse: (ChooseStakedStakeTargetsResponse<T>) -> Unit,
     onCancel: () -> Unit,
     selectionStyle: SelectionStyle = SelectionStyle.RadioGroup

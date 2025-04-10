@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isGone
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -24,9 +21,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsChain
-import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
 private const val KEY_TOKEN = "KEY_TOKEN"
 
@@ -45,17 +39,6 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
 
     @Inject
     lateinit var imageLoader: ImageLoader
-
-    @Inject
-    lateinit var buyMixinUi: BuyMixinUi
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_balance_detail, container, false)
-    }
 
     override fun initViews() {
         hideKeyboard()
@@ -109,7 +92,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
 
     override fun subscribe(viewModel: BalanceDetailViewModel) {
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
-        setupButSellActionButton(viewModel.buySellSelectorMixin, balanceDetailActions.buySell)
+        setupButSellActionButton(viewModel.buySellSelectorMixin, binder.balanceDetailActions.buySell)
 
         viewModel.state.observe(binder.transfersContainer::showState)
 
@@ -127,20 +110,20 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         }
 
         viewModel.priceChartFormatters.observe {
-            priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
+            binder.priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
         }
 
         viewModel.priceChartTitle.observe {
-            priceChartView.setTitle(it)
+            binder.priceChartView.setTitle(it)
         }
 
         viewModel.priceChartModels.observe {
             if (it == null) {
-                priceChartView.isGone = true
+                binder.priceChartView.isGone = true
                 return@observe
             }
 
-            priceChartView.setCharts(it)
+            binder.priceChartView.setCharts(it)
         }
 
         viewModel.hideRefreshEvent.observeEvent {
@@ -162,7 +145,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         }
 
         viewModel.chainUI.observe {
-            balanceDetailsChain.setChain(it)
+            binder.balanceDetailsChain.setChain(it)
         }
     }
 

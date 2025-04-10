@@ -120,7 +120,7 @@ class MainDAppFragment :
     }
 
     private fun setupRecyclerViewSpacing() {
-        dappRecyclerViewCatalog.addSpaceItemDecoration {
+        binder.dappRecyclerViewCatalog.addSpaceItemDecoration {
             // Add extra space between items
             add(SpaceBetween(DappCategoryViewHolder, spaceDp = 8))
         }

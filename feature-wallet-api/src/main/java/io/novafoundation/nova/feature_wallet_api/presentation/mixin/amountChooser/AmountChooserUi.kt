@@ -83,7 +83,7 @@ fun BaseFragment<*, *>.setupAmountChooserBase(
     }
 }
 
-private fun BaseFragment<*>.bindInputStateToField(
+private fun BaseFragment<*, *>.bindInputStateToField(
     amountInputView: AmountInputView,
     flow: MutableSharedFlow<InputState<String>>,
     scope: CoroutineScope

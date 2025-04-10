@@ -186,8 +186,4 @@ class AssetsHeaderHolder(
     fun bindWalletConnect(walletConnectModel: WalletConnectSessionsModel?) = walletConnectModel?.let {
         binder.balanceListWalletConnect.setConnectionCount(it.connections)
     }
-
-    fun bindNovaCardText(text: CharSequence?) = with(containerView) {
-        assetNovaCardText.setText(text)
-    }
 }

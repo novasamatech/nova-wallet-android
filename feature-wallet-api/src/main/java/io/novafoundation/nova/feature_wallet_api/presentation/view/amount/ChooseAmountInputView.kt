@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view.amount
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader

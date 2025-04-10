@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.singleSe
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -13,7 +12,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
-import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.model.SelectCollatorModel
 
 class SelectStakeTargetView @JvmOverloads constructor(
     context: Context,

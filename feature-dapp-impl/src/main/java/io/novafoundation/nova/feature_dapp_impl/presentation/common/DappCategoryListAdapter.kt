@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.recyclerView.WithViewType
+import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappGroupBinding
 
 class DappCategoryListAdapter(

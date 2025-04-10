@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_external_sign_impl.R
 import io.novafoundation.nova.feature_external_sign_impl.databinding.FragmentConfirmSignExtrinsicBinding
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 
 import javax.inject.Inject
 

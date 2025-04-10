@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.Expa
 import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
 import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.common.view.PlaceholderModel
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -113,7 +114,7 @@ class BalanceListFragment :
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
 
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
-            balanceListAssets.invalidateItemDecorations()
+            binder.balanceListAssets.invalidateItemDecorations()
         }
 
         viewModel.assetListMixin.assetModelsFlow.observe {
@@ -234,9 +235,9 @@ class BalanceListFragment :
 
     private fun setupAssetsDecorationForRecyclerView() {
         val animationSettings = ExpandableAnimationSettings.createForAssets()
-        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
+        val animator = ExpandableAnimator(binder.balanceListAssets, animationSettings, assetsAdapter)
 
-        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        AssetBaseDecoration.applyDefaultTo(binder.balanceListAssets, assetsAdapter)
 
         binder.balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
         binder.balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)

@@ -27,6 +27,7 @@ import io.novafoundation.nova.common.view.bottomSheet.LockBottomSheetBehavior
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.ViewTransferHistoryBinding
+import kotlin.math.max
 
 typealias ScrollingListener = (position: Int) -> Unit
 typealias SlidingStateListener = (Int) -> Unit

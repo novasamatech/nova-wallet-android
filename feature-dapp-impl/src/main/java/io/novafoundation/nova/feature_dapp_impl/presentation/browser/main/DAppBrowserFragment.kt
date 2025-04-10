@@ -100,10 +100,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
             }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        fileChooser.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun initViews() {
         binder.dappBrowserAddressBarGroup.applyStatusBarInsets()
 

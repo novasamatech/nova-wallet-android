@@ -2,17 +2,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import androidx.core.os.bundleOf
 
-import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingStartConfirmBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.startConfirm.ConfirmStartSingleTargetStakingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
-class ConfirmStartParachainStakingFragment :
-    ConfirmStartSingleTargetStakingFragment<ConfirmStartParachainStakingViewModel, FragmentParachainStakingStartConfirmBinding>() {
+class ConfirmStartParachainStakingFragment : ConfirmStartSingleTargetStakingFragment<ConfirmStartParachainStakingViewModel>() {
 
     companion object {
 

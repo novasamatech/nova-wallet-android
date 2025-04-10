@@ -9,8 +9,6 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappHeaderBinding
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.DAppClickHandler
-import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 
