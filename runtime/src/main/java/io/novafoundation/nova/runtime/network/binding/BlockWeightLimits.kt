@@ -45,9 +45,17 @@ class BlockWeightLimits(
             fun bind(decoded: Any?): ClassLimits {
                 val asStruct = decoded.castToStruct()
                 return ClassLimits(
-                    maxExtrinsic = bindWeightV2(asStruct["maxExtrinsic"]),
-                    maxTotal = bindWeightV2(asStruct["maxTotal"])
+                    maxExtrinsic = bindWeightOrMax(asStruct["maxExtrinsic"]),
+                    maxTotal = bindWeightOrMax(asStruct["maxTotal"])
                 )
+            }
+
+            private fun bindWeightOrMax(decoded: Any?): WeightV2 {
+                return if (decoded != null) {
+                    bindWeightV2(decoded)
+                } else {
+                    WeightV2.max()
+                }
             }
         }
     }
