@@ -1,5 +1,7 @@
 package io.novafoundation.nova.common.utils.permissions
 
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.florent37.runtimepermission.kotlin.PermissionException
 import com.github.florent37.runtimepermission.kotlin.coroutines.experimental.askPermission
@@ -47,6 +49,12 @@ private open class BasePermissionsAsker(
 
                 PermissionDeniedAction.CANCEL -> return onCancel()
             }
+        }
+    }
+
+    override fun checkPermissions(vararg permissions: Permission): Boolean {
+        return permissions.all {
+            ContextCompat.checkSelfPermission(fragment.requireContext(), it) == PackageManager.PERMISSION_GRANTED
         }
     }
 

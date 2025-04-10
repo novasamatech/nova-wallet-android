@@ -7,4 +7,9 @@ class LedgerDevice(
     val deviceType: LedgerDeviceType,
     val name: String?,
     val connection: LedgerConnection,
-)
+) {
+
+    override fun toString(): String {
+        return "${name ?: id} (${connection.type})"
+    }
+}

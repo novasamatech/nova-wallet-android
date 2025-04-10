@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse.INVALID_DATA
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryServiceFactory
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -49,13 +49,13 @@ class SignLedgerViewModel(
     private val messageFormatter: LedgerMessageFormatter,
     private val messageCommandFormatter: MessageCommandFormatter,
     private val payload: SignLedgerPayload,
-    discoveryServiceFactory: LedgerDeviceDiscoveryServiceFactory,
+    discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
     locationManager: LocationManager,
     ledgerDeviceFormatter: LedgerDeviceFormatter,
 ) : SelectLedgerViewModel(
-    discoveryServiceFactory = discoveryServiceFactory,
+    discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
     bluetoothManager = bluetoothManager,
     locationManager = locationManager,

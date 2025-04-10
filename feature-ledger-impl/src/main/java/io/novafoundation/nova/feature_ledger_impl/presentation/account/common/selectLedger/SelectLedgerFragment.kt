@@ -65,7 +65,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
         onBackPressed { viewModel.backClicked() }
         selectLedgerToolbar.applyStatusBarInsets()
 
-        selectLedgerGrantPermissions.setOnClickListener { viewModel.requirePermissionsAndEnableBluetooth() }
+        selectLedgerGrantPermissions.setOnClickListener { viewModel.allowAvailabilityRequests() }
 
         selectLedgerDevices.setHasFixedSize(true)
         selectLedgerDevices.adapter = adapter
@@ -83,7 +83,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V>
             dialog(requireContext(), R.style.AccentAlertDialogTheme) {
                 setTitle(R.string.select_ledger_location_enable_request_title)
                 setMessage(getString(R.string.select_ledger_location_enable_request_message))
-                setPositiveButton(R.string.common_enable) { _, _ -> viewModel.enableLocation() }
+                setPositiveButton(R.string.common_enable) { _, _ -> viewModel.enableLocationAcknowledged() }
                 setNegativeButton(R.string.common_cancel, null)
             }
         }

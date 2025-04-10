@@ -9,8 +9,9 @@ import android.hardware.usb.UsbManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
-import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.usb.UsbLedgerConnection
+import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.LedgerDeviceDiscoveryServiceDelegate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.channels.BufferOverflow
@@ -20,9 +21,11 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 class UsbLedgerDeviceDiscoveryService(
     private val contextManager: ContextManager
-) : LedgerDeviceDiscoveryService {
+) : LedgerDeviceDiscoveryServiceDelegate {
 
     private val appContext = contextManager.getApplicationContext()
+
+    override val method = DiscoveryMethods.Method.USB
 
     override val discoveredDevices = MutableStateFlow(emptyList<LedgerDevice>())
     override val errors = MutableSharedFlow<Throwable>(replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
