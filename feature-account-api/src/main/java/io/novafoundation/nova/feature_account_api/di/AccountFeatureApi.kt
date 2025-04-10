@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -124,4 +125,6 @@ interface AccountFeatureApi {
     val customFeeCapabilityFacade: CustomFeeCapabilityFacade
 
     val hydrationFeeInjector: HydrationFeeInjector
+
+    val signingContextFactory: SigningContext.Factory
 }

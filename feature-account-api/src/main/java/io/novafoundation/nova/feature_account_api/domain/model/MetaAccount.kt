@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
@@ -140,6 +141,11 @@ fun MetaAccount.substrateMultiChainEncryption(): MultiChainEncryption? {
 fun MetaAccount.requireAccountIdIn(chain: Chain): ByteArray {
     return requireNotNull(accountIdIn(chain))
 }
+
+fun MetaAccount.requireAccountIdKeyIn(chain: Chain): AccountIdKey {
+    return requireAccountIdIn(chain).intoKey()
+}
+
 
 fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType? {
     return multiChainEncryptionIn(chain)?.toCryptoType()

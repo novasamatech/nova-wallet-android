@@ -1,12 +1,13 @@
-package io.novafoundation.nova.runtime.extrinsic.multi
+package io.novafoundation.nova.feature_account_impl.data.extrinsic
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.data.network.runtime.binding.fitsIn
+import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
-import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
-import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
-import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
+import io.novafoundation.nova.runtime.extrinsic.CustomTransactionExtensions
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.binding.total
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -15,32 +16,43 @@ import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
+import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
-import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.ChargeTransactionPayment
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckGenesis
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckMortality
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckSpecVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckTxVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.checkMetadataHash.CheckMetadataHash
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.checkMetadataHash.CheckMetadataHashMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.math.BigInteger
+import javax.inject.Inject
 
 typealias SplitCalls = List<List<GenericCall.Instance>>
 
 interface ExtrinsicSplitter {
 
-    suspend fun split(signer: FeeSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls
+    suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls
 }
 
 private typealias CallWeightsByType = Map<String, Deferred<WeightV2>>
 
 private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 
-internal class RealExtrinsicSplitter(
+@FeatureScope
+internal class RealExtrinsicSplitter @Inject constructor(
     private val rpcCalls: RpcCalls,
     private val blockLimitsRepository: BlockLimitsRepository,
+    private val signingContextFactory: SigningContext.Factory,
 ) : ExtrinsicSplitter {
 
-    override suspend fun split(signer: FeeSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
+    override suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
         val weightByCallId = estimateWeightByCallType(signer, callBuilder, chain)
 
         val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id)
@@ -105,22 +117,32 @@ internal class RealExtrinsicSplitter(
         return split
     }
 
-    private suspend fun wrapInFakeExtrinsic(signer: NovaSigner, call: GenericCall.Instance, runtime: RuntimeSnapshot, chain: Chain): SendableExtrinsic {
+    private suspend fun wrapInFakeExtrinsic(
+        signer: NovaSigner,
+        call: GenericCall.Instance,
+        runtime: RuntimeSnapshot,
+        chain: Chain
+    ): SendableExtrinsic {
         val genesisHash = chain.requireGenesisHash().fromHex()
 
         return ExtrinsicBuilder(
-            tip = BalanceOf.ZERO,
             runtime = runtime,
-            nonce = Nonce.zero(),
-            runtimeVersion = RuntimeVersion(specVersion = 0, transactionVersion = 0),
-            genesisHash = genesisHash,
-            blockHash = genesisHash,
-            era = Era.Immortal,
-            customSignedExtensions = CustomSignedExtensions.extensionsWithValues(),
-            signer = signer,
-            accountId = signer.signerAccountId(chain)
-        )
-            .call(call)
-            .buildExtrinsic()
+            extrinsicVersion = ExtrinsicVersion.V4,
+            batchMode = BatchMode.BATCH,
+        ).apply {
+            setTransactionExtension(CheckMortality(Era.Immortal, genesisHash))
+            setTransactionExtension(CheckGenesis(chain.requireGenesisHash().fromHex()))
+            setTransactionExtension(ChargeTransactionPayment(BigInteger.ZERO))
+            setTransactionExtension(CheckMetadataHash(CheckMetadataHashMode.Disabled))
+            setTransactionExtension(CheckSpecVersion(0))
+            setTransactionExtension(CheckTxVersion(0))
+
+            CustomTransactionExtensions.defaultValues().forEach(::setTransactionExtension)
+
+            call(call)
+
+            val signingContext = signingContextFactory.default(chain)
+            signer.setSignerDataForFee(signingContext)
+        }.buildExtrinsic()
     }
 }

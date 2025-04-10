@@ -22,7 +22,8 @@ import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.math.roundToLong

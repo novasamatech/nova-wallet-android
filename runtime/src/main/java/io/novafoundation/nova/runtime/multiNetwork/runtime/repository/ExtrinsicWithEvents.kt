@@ -40,14 +40,6 @@ fun ExtrinsicWithEvents.isSuccess(): Boolean {
     return status == ExtrinsicStatus.SUCCESS
 }
 
-fun Extrinsic.Instance.signer(): AccountId {
-    val accountIdentifier = requireNotNull(signature?.accountIdentifier) {
-        "Extrinsic is unsigned"
-    }
-
-    return bindAccountIdentifier(accountIdentifier)
-}
-
 fun List<GenericEvent.Instance>.nativeFee(): BigInteger? {
     val event = findEvent(Modules.TRANSACTION_PAYMENT, "TransactionFeePaid") ?: return null
     val (_, actualFee, tip) = event.arguments

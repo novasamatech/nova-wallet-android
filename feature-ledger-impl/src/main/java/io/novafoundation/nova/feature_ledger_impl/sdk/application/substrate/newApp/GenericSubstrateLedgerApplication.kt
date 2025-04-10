@@ -17,11 +17,10 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 
 class GenericSubstrateLedgerApplication(
     transport: LedgerTransport,
-    chainRegistry: ChainRegistry,
     metadataShortenerService: MetadataShortenerService,
     private val ledgerRepository: LedgerRepository,
     private val legacyApplicationConfigs: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all()
-) : NewSubstrateLedgerApplication(transport, chainRegistry, metadataShortenerService) {
+) : NewSubstrateLedgerApplication(transport, metadataShortenerService) {
 
     private val universalConfig = legacyApplicationConfigs.getConfig(Chain.Geneses.POLKADOT)
 

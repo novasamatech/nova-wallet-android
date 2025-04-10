@@ -68,7 +68,7 @@ class SignLedgerViewModel(
 ) {
 
     private val validityPeriod = flowOf {
-        extrinsicValidityUseCase.extrinsicValidityPeriod(signPayloadState.getOrThrow().extrinsic)
+        extrinsicValidityUseCase.extrinsicValidityPeriod(signPayloadState.getOrThrow().inheritedImplication)
     }.shareInBackground()
 
     private var signingJob: Deferred<SignatureWrapper>? = null
@@ -117,7 +117,7 @@ class SignLedgerViewModel(
             interactor.getSignature(
                 device = device,
                 metaId = signingMetaAccount.id,
-                payload = signState.extrinsic
+                payload = signState.inheritedImplication
             )
         }
 

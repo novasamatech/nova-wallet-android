@@ -1,90 +1,67 @@
 package io.novafoundation.nova.runtime.extrinsic
 
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
-import io.novafoundation.nova.runtime.extrinsic.signer.generateMetadataProofWithSignerRestrictions
+import io.novafoundation.nova.runtime.extrinsic.metadata.generateMetadataProofWithSignerRestrictions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
-import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novasama.substrate_sdk_android.extensions.fromHex
-import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
-import java.math.BigInteger
+import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.ChargeTransactionPayment
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckGenesis
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckMortality
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckSpecVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckTxVersion
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.checkMetadataHash.CheckMetadataHash
 
 class ExtrinsicBuilderFactory(
-    private val rpcCalls: RpcCalls,
     private val chainRegistry: ChainRegistry,
     private val mortalityConstructor: MortalityConstructor,
     private val metadataShortenerService: MetadataShortenerService,
 ) {
 
-    /**
-     * Create with special signer for fee calculation
-     */
-    suspend fun createForFee(
-        signer: NovaSigner,
-        chain: Chain,
-    ): ExtrinsicBuilder {
-        return createMultiForFee(signer, chain).first()
-    }
+    class Options(
+        val batchMode: BatchMode,
+    )
 
-    /**
-     * Create with real keypair
-     */
     suspend fun create(
         chain: Chain,
-        signer: NovaSigner,
-        accountId: AccountId,
+        supportsCheckMetadataHash: Boolean,
+        options: Options,
     ): ExtrinsicBuilder {
-        return createMulti(chain, signer, accountId).first()
-    }
-
-    suspend fun createMultiForFee(
-        signer: NovaSigner,
-        chain: Chain,
-    ): Sequence<ExtrinsicBuilder> {
-        return createMulti(chain, signer, signer.signerAccountId(chain))
+        return createMulti(chain, supportsCheckMetadataHash, options).first()
     }
 
     suspend fun createMulti(
         chain: Chain,
-        signer: NovaSigner,
-        accountId: AccountId,
+        supportsCheckMetadataHash: Boolean,
+        options: Options,
     ): Sequence<ExtrinsicBuilder> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val accountAddress = chain.addressOf(accountId)
-
         val mortality = mortalityConstructor.constructMortality(chain.id)
 
-        val baseNonce = rpcCalls.getNonce(chain.id, accountAddress)
-        var nonceOffset = BigInteger.ZERO
-
-        val metadataProof = metadataShortenerService.generateMetadataProofWithSignerRestrictions(chain, signer)
+        val metadataProof = metadataShortenerService.generateMetadataProofWithSignerRestrictions(chain, supportsCheckMetadataHash)
 
         return generateSequence {
-            val newElement = ExtrinsicBuilder(
-                tip = chain.additional?.defaultTip.orZero(),
+            ExtrinsicBuilder(
                 runtime = runtime,
-                nonce = Nonce(baseNonce, nonceOffset),
-                runtimeVersion = metadataProof.usedVersion,
-                genesisHash = chain.requireGenesisHash().fromHex(),
-                blockHash = mortality.blockHash.fromHex(),
-                era = mortality.era,
-                customSignedExtensions = CustomSignedExtensions.extensionsWithValues(),
-                checkMetadataHash = metadataProof.checkMetadataHash,
-                signer = signer,
-                accountId = accountId
-            )
+                extrinsicVersion = ExtrinsicVersion.V4,
+                batchMode = options.batchMode,
+            ).apply {
+                setTransactionExtension(CheckMortality(mortality.era, mortality.blockHash.fromHex()))
+                setTransactionExtension(CheckGenesis(chain.requireGenesisHash().fromHex()))
+                setTransactionExtension(ChargeTransactionPayment(chain.additional?.defaultTip.orZero()))
+                setTransactionExtension(CheckMetadataHash(metadataProof.checkMetadataHash))
+                setTransactionExtension(CheckSpecVersion(metadataProof.usedVersion.specVersion))
+                setTransactionExtension(CheckTxVersion(metadataProof.usedVersion.transactionVersion))
 
-            nonceOffset++
-
-            newElement
+                CustomTransactionExtensions.defaultValues().forEach(::setTransactionExtension)
+            }
         }
     }
 }

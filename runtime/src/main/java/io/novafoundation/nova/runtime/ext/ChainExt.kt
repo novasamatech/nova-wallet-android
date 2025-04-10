@@ -259,6 +259,10 @@ fun Chain.addressOf(accountId: ByteArray): String {
     }
 }
 
+fun Chain.addressOf(accountId: AccountIdKey): String {
+    return addressOf(accountId.value)
+}
+
 fun Chain.legacyAddressOfOrNull(accountId: ByteArray): String? {
     return if (isEthereumBased) {
         null

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.calls.
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.model.Unbonding
 import io.novafoundation.nova.runtime.state.selectedOption
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.N
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.state.chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

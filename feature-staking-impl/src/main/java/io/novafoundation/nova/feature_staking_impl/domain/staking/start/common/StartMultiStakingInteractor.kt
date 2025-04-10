@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.StartMultiStakingSelection
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

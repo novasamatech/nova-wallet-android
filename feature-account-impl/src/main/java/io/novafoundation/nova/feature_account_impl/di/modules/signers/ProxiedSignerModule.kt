@@ -30,16 +30,14 @@ class ProxiedSignerModule {
         accountRepository: AccountRepository,
         proxySigningPresenter: ProxySigningPresenter,
         proxyRepository: GetProxyRepository,
-        rpcCalls: RpcCalls,
         proxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
         proxyCallFilterFactory: ProxyCallFilterFactory
     ) = ProxiedSignerFactory(
-        chainRegistry,
-        accountRepository,
-        proxySigningPresenter,
-        proxyRepository,
-        rpcCalls,
-        proxyExtrinsicValidationRequestBus,
-        proxyCallFilterFactory
+        chainRegistry = chainRegistry,
+        accountRepository = accountRepository,
+        proxySigningPresenter = proxySigningPresenter,
+        getProxyRepository = proxyRepository,
+        proxyExtrinsicValidationEventBus = proxyExtrinsicValidationRequestBus,
+        proxyCallFilterFactory = proxyCallFilterFactory
     )
 }

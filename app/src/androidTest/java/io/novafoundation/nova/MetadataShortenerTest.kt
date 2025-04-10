@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTr
 import io.novafoundation.nova.metadata_shortener.MetadataShortener
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
-import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.runtime.extrinsic.systemRemark
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
@@ -109,7 +109,7 @@ class MetadataShortenerTest : BaseIntegrationTest() {
             error("Not implemented")
         }
 
-        override suspend fun signerAccountId(chain: Chain): AccountId {
+        override suspend fun actualSignerAccountId(chain: Chain): AccountId {
             return accountId
         }
 

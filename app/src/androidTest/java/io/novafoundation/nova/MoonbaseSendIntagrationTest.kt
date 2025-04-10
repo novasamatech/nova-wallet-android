@@ -12,7 +12,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 import io.novafoundation.nova.runtime.di.RuntimeComponent
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
-import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
@@ -71,7 +71,7 @@ class MoonbaseSendIntagrationTest {
             error("Not implemented")
         }
 
-        override suspend fun signerAccountId(chain: Chain): AccountId {
+        override suspend fun actualSignerAccountId(chain: Chain): AccountId {
             return accountId
         }
 

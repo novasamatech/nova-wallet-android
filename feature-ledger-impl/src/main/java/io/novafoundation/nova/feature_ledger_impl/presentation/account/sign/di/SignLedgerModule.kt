@@ -63,7 +63,7 @@ class SignLedgerModule {
         signLedgerPayload: SignLedgerPayload,
         factory: LedgerMessageFormatterFactory
     ): LedgerMessageFormatter {
-        val chainId = signPayloadState.getOrThrow().extrinsic.chainId
+        val chainId = signPayloadState.getOrThrow().inheritedImplication.chainId
 
         return when (signLedgerPayload.ledgerVariant) {
             LedgerVariant.LEGACY -> factory.createLegacy(chainId, showAlerts = true)

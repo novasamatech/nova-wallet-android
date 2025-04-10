@@ -1,26 +1,25 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub
 
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.assetConversionAssetIdType
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
-import io.novafoundation.nova.feature_account_api.data.fee.types.assetHub.chargeAssetTxPayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
 import io.novafoundation.nova.feature_xcm_api.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
+import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.feature_xcm_api.versions.orDefault
-import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
+import io.novafoundation.nova.runtime.extrinsic.extensions.ChargeAssetTxPayment.Companion.chargeAssetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import java.math.BigInteger
 
 internal class AssetConversionFeePayment(
