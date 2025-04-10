@@ -146,7 +146,6 @@ fun MetaAccount.requireAccountIdKeyIn(chain: Chain): AccountIdKey {
     return requireAccountIdIn(chain).intoKey()
 }
 
-
 fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType? {
     return multiChainEncryptionIn(chain)?.toCryptoType()
 }

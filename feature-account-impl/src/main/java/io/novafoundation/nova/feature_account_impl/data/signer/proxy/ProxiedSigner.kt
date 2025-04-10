@@ -94,7 +94,6 @@ class ProxiedSigner(
     override suspend fun setSignerDataForFee(context: SigningContext) {
         wrapCallsInProxyForFee()
         delegateSigner().setSignerDataForFee(context)
-
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {

@@ -9,7 +9,7 @@ import javax.inject.Inject
 @FeatureScope
 internal class SigningContextFactory @Inject constructor(
     private val rpcCalls: RpcCalls
-): SigningContext.Factory {
+) : SigningContext.Factory {
 
     override fun default(chain: Chain): SigningContext {
         return DefaultSigningContext(chain, rpcCalls)

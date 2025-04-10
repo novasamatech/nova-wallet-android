@@ -7,10 +7,10 @@ import java.math.BigInteger
 
 class SequenceSigningContext(
     private val delegate: SigningContext
-): SigningContext by delegate {
-    
+) : SigningContext by delegate {
+
     private var offset: BigInteger = BigInteger.ZERO
-    
+
     fun incrementNonceOffset() {
         offset += BigInteger.ONE
     }

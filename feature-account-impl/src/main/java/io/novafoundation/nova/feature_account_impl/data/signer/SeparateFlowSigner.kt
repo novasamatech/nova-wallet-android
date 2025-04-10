@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenRequester
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignatureWrapper
 import io.novafoundation.nova.feature_account_api.presenatation.sign.awaitConfirmation
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
