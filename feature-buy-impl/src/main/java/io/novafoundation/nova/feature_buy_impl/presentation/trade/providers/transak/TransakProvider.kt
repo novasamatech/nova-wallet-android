@@ -19,9 +19,15 @@ class TransakProvider(
     override val name = "Transak"
     override val officialUrl: String = "transak.com"
     override val logoRes: Int = R.drawable.ic_transak_provider_logo
-    override val descriptionRes: Int = R.string.transak_provider_description
 
     override val supportedFlows = setOf(TradeTokenRegistry.TradeType.BUY, TradeTokenRegistry.TradeType.SELL)
+
+    override fun getDescriptionRes(tradeType: TradeTokenRegistry.TradeType): Int {
+        return when (tradeType) {
+            TradeTokenRegistry.TradeType.BUY -> R.string.transak_provider_buy_description
+            TradeTokenRegistry.TradeType.SELL -> R.string.transak_provider_sell_description
+        }
+    }
 
     override fun getPaymentMethods(tradeType: TradeTokenRegistry.TradeType): List<TradeTokenRegistry.PaymentMethod> {
         return when (tradeType) {

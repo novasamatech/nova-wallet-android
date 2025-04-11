@@ -28,10 +28,10 @@ interface TradeTokenRegistry {
         @get:DrawableRes
         val logoRes: Int
 
-        @get:StringRes
-        val descriptionRes: Int
-
         fun getPaymentMethods(tradeType: TradeType): List<PaymentMethod>
+
+        @StringRes
+        fun getDescriptionRes(tradeType: TradeType): Int
 
         fun createIntegrator(
             chainAsset: Chain.Asset,
