@@ -30,6 +30,8 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
+import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -89,7 +91,7 @@ class RealExtrinsicService(
     ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         return runMultiCatching(
             intermediateListLoading = {
-                constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, forFee = false)
+                constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, SigningMode.SUBMISSION)
                     .extrinsics
             },
             listProcessing = { extrinsic ->
@@ -169,7 +171,7 @@ class RealExtrinsicService(
         submissionOptions: SubmissionOptions,
         formExtrinsic: FormMultiExtrinsicWithOrigin
     ): Fee {
-        val (extrinsics, submissionOrigin) = constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, forFee = true)
+        val (extrinsics, submissionOrigin) = constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, SigningMode.FEE)
         require(extrinsics.isNotEmpty()) { "Empty extrinsics list" }
 
         val fees = extrinsics.mapAsync { estimateNativeFee(chain, it, submissionOrigin) }
@@ -235,7 +237,7 @@ class RealExtrinsicService(
         origin: TransactionOrigin,
         formExtrinsic: FormMultiExtrinsicWithOrigin,
         submissionOptions: SubmissionOptions,
-        forFee: Boolean
+        signingMode: SigningMode
     ): MultiSubmission {
         val signer = getSigner(chain, origin)
 
@@ -270,11 +272,7 @@ class RealExtrinsicService(
 
             // Setup signing
             with(extrinsicBuilder) {
-                if (forFee) {
-                    signer.setSignerDataForFee(signingContext)
-                } else {
-                    signer.setSignerData(signingContext)
-                }
+                signer.setSignerData(signingContext, signingMode)
             }
 
             // Build extrinsic
@@ -292,7 +290,7 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin,
         submissionOptions: SubmissionOptions,
     ): SingleSubmission {
-        return buildExtrinsic(chain, origin, formExtrinsic, submissionOptions, forFee = false)
+        return buildExtrinsic(chain, origin, formExtrinsic, submissionOptions, SigningMode.SUBMISSION)
     }
 
     private suspend fun buildFeeExtrinsic(
@@ -301,7 +299,7 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin,
         submissionOptions: SubmissionOptions,
     ): SingleSubmission {
-        return buildExtrinsic(chain, origin, formExtrinsic, submissionOptions, forFee = true)
+        return buildExtrinsic(chain, origin, formExtrinsic, submissionOptions, SigningMode.FEE)
     }
 
     private suspend fun buildExtrinsic(
@@ -309,7 +307,7 @@ class RealExtrinsicService(
         origin: TransactionOrigin,
         formExtrinsic: FormExtrinsicWithOrigin,
         submissionOptions: SubmissionOptions,
-        forFee: Boolean
+        signingMode: SigningMode
     ): SingleSubmission {
         val signer = getSigner(chain, origin)
         val submissionOrigin = signer.submissionOrigin(chain)
@@ -331,11 +329,7 @@ class RealExtrinsicService(
         // Setup signing
         val signingContext = signingContextFactory.default(chain)
         with(extrinsicBuilder) {
-            if (forFee) {
-                signer.setSignerDataForFee(signingContext)
-            } else {
-                signer.setSignerData(signingContext)
-            }
+            signer.setSignerData(signingContext, signingMode)
         }
 
         // Build extrinsic
@@ -367,7 +361,7 @@ class RealExtrinsicService(
 
     private suspend fun NovaSigner.submissionOrigin(chain: Chain): SubmissionOrigin {
         val executingAccount = metaAccount.requireAccountIdIn(chain)
-        val signingAccount = actualSignerAccountId(chain)
+        val signingAccount = submissionSignerAccountId(chain)
         return SubmissionOrigin(executingAccount, signingAccount)
     }
 

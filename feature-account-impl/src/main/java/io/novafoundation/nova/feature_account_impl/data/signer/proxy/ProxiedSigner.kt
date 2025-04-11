@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.proxy
 
+import android.util.Log
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -75,14 +76,17 @@ class ProxiedSigner(
         signerProvider.nestedSignerFor(proxyMetaAccount())
     }
 
-    override suspend fun actualSignerAccountId(chain: Chain): AccountId {
-        return delegateSigner().actualSignerAccountId(chain)
+    override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
+        return delegateSigner().submissionSignerAccountId(chain)
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerData(context: SigningContext) {
+    override suspend fun setSignerDataForSubmission(context: SigningContext) {
         wrapCallsInProxyForSubmission()
-        delegateSigner().setSignerData(context)
+
+        Log.d("Signer", "ProxiedSigner: wrapped proxy calls for submission")
+
+        delegateSigner().setSignerDataForSubmission(context)
 
         if (isRootProxied) {
             acknowledgeProxyOperation(proxyMetaAccount())
@@ -93,6 +97,9 @@ class ProxiedSigner(
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForFee(context: SigningContext) {
         wrapCallsInProxyForFee()
+
+        Log.d("Signer", "ProxiedSigner: wrapped proxy calls for fee")
+
         delegateSigner().setSignerDataForFee(context)
     }
 
@@ -106,7 +113,7 @@ class ProxiedSigner(
 
     context(ExtrinsicBuilder)
     private suspend fun validateExtrinsic(chain: Chain) {
-        val proxyAccountId = actualSignerAccountId(chain)
+        val proxyAccountId = submissionSignerAccountId(chain)
         val proxyAccount = accountRepository.findMetaAccount(proxyAccountId, chain.id) ?: throw IllegalStateException("Proxy account is not found")
 
         val validationPayload = ProxiedExtrinsicValidationPayload(

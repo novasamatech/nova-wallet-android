@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
+import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
@@ -162,7 +164,7 @@ class PolkadotExternalSignInteractor(
         val chain = signPayload.chainOrNull() ?: return@withContext null
 
         val signer = resolveWalletSigner()
-        val (extrinsic, _, parsedExtrinsic) = signPayload.analyzeAndSign(signer, forFee = true)
+        val (extrinsic, _, parsedExtrinsic) = signPayload.analyzeAndSign(signer, SigningMode.FEE)
 
         actualParsedExtrinsic.emit(parsedExtrinsic)
 
@@ -189,7 +191,7 @@ class PolkadotExternalSignInteractor(
 
     private suspend fun signExtrinsic(extrinsicPayload: PolkadotSignPayload.Json): SignedResult {
         val signer = resolveWalletSigner()
-        val (extrinsic, modifiedOriginal) = extrinsicPayload.analyzeAndSign(signer, forFee = false)
+        val (extrinsic, modifiedOriginal) = extrinsicPayload.analyzeAndSign(signer, SigningMode.SUBMISSION)
 
         val modifiedTx = if (modifiedOriginal) extrinsic.extrinsicHex else null
 
@@ -198,7 +200,7 @@ class PolkadotExternalSignInteractor(
 
     private suspend fun PolkadotSignPayload.Json.analyzeAndSign(
         signer: NovaSigner,
-        forFee: Boolean
+        signingMode: SigningMode
     ): ActualExtrinsic {
         val chain = chain()
         val runtime = chainRegistry.getRuntime(genesisHash)
@@ -221,11 +223,7 @@ class PolkadotExternalSignInteractor(
                 CustomTransactionExtensions.applyDefaultValues()
                 applyCustomSignedExtensions(parsedExtrinsic)
 
-                if (forFee) {
-                    signer.setSignerDataForFee(signingContext)
-                } else {
-                    signer.setSignerData(signingContext)
-                }
+                signer.setSignerData(signingContext, signingMode)
             }
         }.buildExtrinsic()
 

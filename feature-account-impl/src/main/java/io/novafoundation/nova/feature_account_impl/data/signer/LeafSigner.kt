@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.signer
 
+import android.util.Log
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -30,9 +31,12 @@ abstract class LeafSigner(
 ) : NovaSigner, GeneralTransactionSigner {
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerData(context: SigningContext) {
+    override suspend fun setSignerDataForSubmission(context: SigningContext) {
         val accountId = metaAccount.requireAccountIdKeyIn(context.chain)
         setNonce(context.getNonce(accountId))
+
+        Log.d("Signer", "${this::class.simpleName}: set real signature")
+
         setVerifySignature(signer = this, accountId = accountId.value)
     }
 
@@ -43,10 +47,13 @@ abstract class LeafSigner(
         setNonce(100.toBigInteger())
 
         val (signer, accountId) = createFeeSigner(context.chain)
+
+        Log.d("Signer", "${this::class.simpleName}: set fake signature")
+
         setVerifySignature(signer, accountId)
     }
 
-    override suspend fun actualSignerAccountId(chain: Chain): AccountId {
+    override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
         return metaAccount.requireAccountIdIn(chain)
     }
 

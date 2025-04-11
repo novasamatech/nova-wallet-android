@@ -109,7 +109,7 @@ class MetadataShortenerTest : BaseIntegrationTest() {
             error("Not implemented")
         }
 
-        override suspend fun actualSignerAccountId(chain: Chain): AccountId {
+        override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
             return accountId
         }
 

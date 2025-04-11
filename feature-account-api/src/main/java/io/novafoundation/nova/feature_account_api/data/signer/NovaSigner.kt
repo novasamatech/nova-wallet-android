@@ -23,10 +23,10 @@ interface NovaSigner : Signer {
      * So, this should be the final operation that modifies the extrinsic, followed just by [ExtrinsicBuilder.buildExtrinsic]
      */
     context(ExtrinsicBuilder)
-    suspend fun setSignerData(context: SigningContext)
+    suspend fun setSignerDataForSubmission(context: SigningContext)
 
     /**
-     * Same as [setSignerData] but should use fake signature so signed extrinsic can be safely used for fee calculation
+     * Same as [setSignerDataForSubmission] but should use fake signature so signed extrinsic can be safely used for fee calculation
      * This may also apply certain optimizations like hard-coding the nonce or other values to speedup the extrinsic construction
      * and thus, fee calculation
      *
@@ -40,7 +40,7 @@ interface NovaSigner : Signer {
      * Return accountId of a signer that will actually sign this extrinsic
      * For example, for Proxied account the actual signer is its Proxy
      */
-    suspend fun actualSignerAccountId(chain: Chain): AccountId
+    suspend fun submissionSignerAccountId(chain: Chain): AccountId
 
     /**
      * Determines whether this particular instance of signer imposes additional limits to the number of calls
@@ -48,4 +48,12 @@ interface NovaSigner : Signer {
      * This is useful for signers that run in resource-constrained environment and thus cannot handle large transactions, e.g. Ledger
      */
     suspend fun maxCallsPerTransaction(): Int?
+}
+
+context(ExtrinsicBuilder)
+suspend fun NovaSigner.setSignerData(context: SigningContext, mode: SigningMode) {
+    when (mode) {
+        SigningMode.FEE -> setSignerDataForFee(context)
+        SigningMode.SUBMISSION -> setSignerDataForSubmission(context)
+    }
 }
