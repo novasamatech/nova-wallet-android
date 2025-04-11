@@ -21,9 +21,12 @@ class MercuryoProvider(
     override val name: String = "Mercuryo"
     override val officialUrl: String = "mercuryo.io"
     override val logoRes: Int = R.drawable.ic_mercurio_provider_logo
-    override val descriptionRes: Int = R.string.mercurio_provider_description
 
     override val supportedFlows = setOf(TradeTokenRegistry.TradeType.BUY, TradeTokenRegistry.TradeType.SELL)
+
+    override fun getDescriptionRes(tradeType: TradeTokenRegistry.TradeType): Int {
+        return R.string.mercurio_provider_description
+    }
 
     override fun getPaymentMethods(tradeFlow: TradeTokenRegistry.TradeType): List<TradeTokenRegistry.PaymentMethod> {
         return when (tradeFlow) {
