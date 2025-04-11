@@ -1,36 +1,34 @@
 package io.novafoundation.nova.common.mixin.actionAwaitable
 
-import android.content.Context
 import androidx.annotation.StyleRes
-import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseFragmentMixin
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.dialog.dialog
 
-sealed interface ConfirmationDialogInfo {
+class ConfirmationDialogInfo(val title: String, val message: String?, val positiveButton: String, val negativeButton: String?) {
 
-    fun asText(context: Context): ByText
-
-    data class ByRes(val title: Int, val message: Int?, val positiveButton: Int, val negativeButton: Int?) : ConfirmationDialogInfo {
-        constructor(title: Int, message: Int) : this(title, message, R.string.common_enable, R.string.common_cancel)
-
-        override fun asText(context: Context): ByText = ByText(
-            context.getString(title),
-            message?.let { context.getString(message) },
-            context.getString(positiveButton),
-            negativeButton?.let { context.getString(it) }
-        )
-    }
-
-    data class ByText(val title: String, val message: String?, val positiveButton: String, val negativeButton: String?) : ConfirmationDialogInfo {
-        override fun asText(context: Context): ByText = this
-    }
-
-    companion object {
-
-        fun titleAndButton(title: Int, button: Int) = ByRes(title, null, button, null)
-    }
+    companion object;
 }
+
+fun ConfirmationDialogInfo.Companion.fromRes(
+    resourceManager: ResourceManager,
+    title: Int,
+    message: Int?,
+    positiveButton: Int,
+    negativeButton: Int?
+) = ConfirmationDialogInfo(
+    resourceManager.getString(title),
+    message?.let { resourceManager.getString(message) },
+    resourceManager.getString(positiveButton),
+    negativeButton?.let { resourceManager.getString(it) }
+)
+
+fun ConfirmationDialogInfo.Companion.titleAndButton(
+    resourceManager: ResourceManager,
+    title: Int,
+    button: Int
+) = fromRes(resourceManager, title, null, button, null)
 
 fun BaseFragmentMixin<*>.setupConfirmationDialog(
     @StyleRes style: Int,
@@ -38,7 +36,7 @@ fun BaseFragmentMixin<*>.setupConfirmationDialog(
 ) {
     awaitableMixin.awaitableActionLiveData.observeEvent { action ->
         dialog(providedContext, style) {
-            val payload = action.payload.asText(context)
+            val payload = action.payload
             setTitle(payload.title)
             payload.message?.let { setMessage(payload.message) }
             setPositiveButton(payload.positiveButton) { _, _ -> action.onSuccess(Unit) }
@@ -55,7 +53,7 @@ fun BaseFragmentMixin<*>.setupConfirmationDialog(
 fun BaseFragment<*, *>.setupConfirmationOrDenyDialog(@StyleRes style: Int, awaitableMixin: ConfirmOrDenyAwaitable<ConfirmationDialogInfo>) {
     awaitableMixin.awaitableActionLiveData.observeEvent { action ->
         dialog(requireContext(), style) {
-            val payload = action.payload.asText(context)
+            val payload = action.payload
             setTitle(payload.title)
             payload.message?.let { setMessage(payload.message) }
             setPositiveButton(payload.positiveButton) { _, _ -> action.onSuccess(true) }

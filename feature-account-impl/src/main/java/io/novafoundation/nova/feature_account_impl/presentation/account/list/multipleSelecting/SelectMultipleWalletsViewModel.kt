@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.mu
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.fromRes
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
@@ -57,7 +58,8 @@ class SelectMultipleWalletsViewModel(
 
             if (dataHasBeenChanged) {
                 closeConfirmationAction.awaitAction(
-                    ConfirmationDialogInfo.ByRes(
+                    ConfirmationDialogInfo.fromRes(
+                        resourceManager,
                         R.string.common_confirmation_title,
                         R.string.common_close_confirmation_message,
                         R.string.common_close,

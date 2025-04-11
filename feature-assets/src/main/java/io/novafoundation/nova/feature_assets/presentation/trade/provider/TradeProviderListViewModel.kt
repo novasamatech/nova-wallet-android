@@ -106,7 +106,7 @@ class TradeProviderListViewModel(
 
     private suspend fun awaitConfirmation(item: TradeProviderRvItem) {
         confirmationAwaitableAction.awaitAction(
-            ConfirmationDialogInfo.ByText(
+            ConfirmationDialogInfo(
                 resourceManager.getString(R.string.trade_provider_open_confirmation_title),
                 resourceManager.getString(R.string.trade_provider_open_confirmation_message, item.providerLink),
                 resourceManager.getString(R.string.common_continue),

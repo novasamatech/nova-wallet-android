@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.fromRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.biometry.BiometricResponse
 import io.novafoundation.nova.common.sequrity.biometry.BiometricService
@@ -212,7 +213,8 @@ class PinCodeViewModel(
     private suspend fun askForBiometry() {
         val isSuccess = try {
             confirmationAwaitableAction.awaitAction(
-                ConfirmationDialogInfo.ByRes(
+                ConfirmationDialogInfo.fromRes(
+                    resourceManager,
                     title = R.string.pincode_biometry_dialog_title,
                     message = R.string.pincode_biometric_switch_dialog_title,
                     positiveButton = R.string.common_use,
