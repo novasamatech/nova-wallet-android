@@ -23,7 +23,7 @@ private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
 
 /**
  * A basic implementation of [NovaSigner] that implements foundation for any signer that
- * does not delegate any of the [NovaSigner] to nested signers
+ * does not delegate any of the [NovaSigner] methods to the nested signers
  */
 abstract class LeafSigner(
     override val metaAccount: MetaAccount,
@@ -39,7 +39,7 @@ abstract class LeafSigner(
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForFee(context: SigningContext) {
         // We set it to 100 so we won't accidentally cause fee underestimation
-        // Underestimation might happen because fee depends on the extrinsic length and encoding of 0 more compact
+        // Underestimation might happen because fee depends on the extrinsic length and encoding of zero is more compact
         setNonce(100.toBigInteger())
 
         val (signer, accountId) = createFeeSigner(context.chain)
