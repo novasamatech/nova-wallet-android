@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
@@ -24,8 +27,11 @@ class TradeProviderListViewModel(
     private val tradeMixinFactory: TradeMixin.Factory,
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
-    private val router: AssetsRouter
+    private val router: AssetsRouter,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel() {
+
+    val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
     private val tradeMixin = tradeMixinFactory.create(viewModelScope)
 
@@ -82,6 +88,8 @@ class TradeProviderListViewModel(
 
     fun onProviderClicked(item: TradeProviderRvItem) {
         launch {
+            awaitConfirmation()
+
             val chainAsset = chainAssetFlow.first()
 
             router.openTradeWebInterface(
@@ -93,5 +101,16 @@ class TradeProviderListViewModel(
                 )
             )
         }
+    }
+
+    private suspend fun awaitConfirmation() {
+        confirmationAwaitableAction.awaitAction(
+            ConfirmationDialogInfo(
+                R.string.trade_provider_open_confirmation_title,
+                R.string.trade_provider_open_confirmation_message,
+                R.string.common_continue,
+                R.string.common_cancel
+            )
+        )
     }
 }
