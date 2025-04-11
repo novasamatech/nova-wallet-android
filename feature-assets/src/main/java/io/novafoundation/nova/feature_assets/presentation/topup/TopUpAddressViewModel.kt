@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setBlockedAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
