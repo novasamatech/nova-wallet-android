@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_buy_impl.presentation.trade
 
-import io.novafoundation.nova.common.utils.intersectsWith
+import io.novafoundation.nova.common.utils.hasIntersectionWith
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -9,8 +9,8 @@ class RealTradeTokenRegistry(private val providers: List<TradeTokenRegistry.Prov
 
     override fun hasProvider(chainAsset: Chain.Asset): Boolean {
         val supportedProviderIds = providers.mapToSet { it.id }
-        return supportedProviderIds.intersectsWith(chainAsset.buyProviders.keys) ||
-            supportedProviderIds.intersectsWith(chainAsset.sellProviders.keys)
+        return supportedProviderIds.hasIntersectionWith(chainAsset.buyProviders.keys) ||
+            supportedProviderIds.hasIntersectionWith(chainAsset.sellProviders.keys)
     }
 
     override fun hasProvider(chainAsset: Chain.Asset, tradeType: TradeTokenRegistry.TradeType): Boolean {
