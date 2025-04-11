@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Bạn đã đạt đến giới hạn %s proxy được thêm vào %s. Xóa proxy để thêm proxy mới.</string>
     <string name="add_proxy_maximum_reached_error_title">Đã đạt đến số lượng proxy tối đa</string>
     <string name="added_networks_empty_placeholder">Các mạng tùy chỉnh đã thêm\nsẽ xuất hiện ở đây</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Đã tô màu</string>
     <string name="appearance_title">Giao diện</string>
     <string name="appearance_token_assets_title">biểu tượng token</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Sao lưu</string>
     <string name="backup_title">Sao lưu</string>
+    <string name="banxa_provider_description">Quy trình KYC đơn giản và hiệu quả</string>
     <string name="biometric_auth_title">Xác thực sinh trắc học</string>
     <string name="browser_tabs_close_all">Đóng tất cả</string>
     <string name="buy_completed">Mua hàng đã được khởi tạo! Vui lòng đợi tối đa 60 phút. Bạn có thể theo dõi trạng thái trong email.</string>
     <string name="buy_network_flow_title">Chọn mạng để mua %s</string>
+    <string name="buy_order_completed_message">Đã bắt đầu mua! Vui lòng chờ tối đa 60 phút. Bạn có thể theo dõi trạng thái trên email.</string>
     <string name="buy_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
     <string name="buy_provider_open_confirmation_title">Tiếp tục trong trình duyệt?</string>
+    <string name="buy_token_not_supported_message">Không có nhà cung cấp nào của chúng tôi hiện đang hỗ trợ mua token này. Vui lòng chọn token khác, mạng khác hoặc kiểm tra lại sau.</string>
+    <string name="buy_token_not_supported_title">Token này không được tính năng mua hỗ trợ</string>
     <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
     <string name="chain_network_management_enabling">Kích hoạt kết nối</string>
     <string name="change_cloud_backup_password_subtitle">Vui lòng nhập mật khẩu sẽ được sử dụng để khôi phục ví của bạn từ sao lưu đám mây. Mật khẩu này không thể khôi phục trong tương lai, vì vậy hãy đảm bảo ghi nhớ nó!</string>
@@ -752,6 +757,7 @@
     <string name="fee_not_yet_loaded_message">Vui lòng chờ cho đến khi phí được tính toán</string>
     <string name="fee_not_yet_loaded_title">Đang tính toán phí</string>
     <string name="fragment_assets_nova_card">Quản lý Thẻ Ghi Nợ</string>
+    <string name="fragment_sell_token_title">Bán token %s</string>
     <string name="fragment_set_staking_proxy_title">Thêm ủy quyền cho %s staking</string>
     <string name="fragment_swap_main_settings_details_title">Chi tiết đổi</string>
     <string name="fragment_swap_main_settings_max_button">Tối đa:</string>
@@ -858,6 +864,7 @@
     <string name="manual_backup_select_wallet_header">Chọn ví để sao lưu</string>
     <string name="manual_backup_warning_subtitle">Vui lòng đọc kỹ những điều sau đây trước khi xem bản sao lưu của bạn</string>
     <string name="manual_backup_warning_title">Đừng chia sẻ cụm mật khẩu của bạn!</string>
+    <string name="mercurio_provider_description">Giá tốt nhất với phí lên đến 3.95%</string>
     <string name="mnemonic_card_reveal_subtitle">Hãy đảm bảo không ai có thể nhìn thấy màn hình của bạn\nvà đừng chụp màn hình</string>
     <string name="mnemonic_card_title">Vui lòng không chia sẻ với %s</string>
     <string name="mnemonic_card_title_highlight">không chia sẻ với</string>
@@ -1173,6 +1180,10 @@
     <string name="select_network_title">Chọn mạng</string>
     <string name="select_tracks_for">Chọn track cho</string>
     <string name="selected_tracks_quantity" formatted="false">%d trong %d</string>
+    <string name="sell_network_flow_title">Chọn mạng để bán %s</string>
+    <string name="sell_order_completed_message">Đã bắt đầu bán! Vui lòng chờ tối đa 60 phút. Bạn có thể theo dõi trạng thái trên email.</string>
+    <string name="sell_token_not_supported_message">Không có nhà cung cấp nào của chúng tôi hiện đang hỗ trợ bán token này. Vui lòng chọn token khác, mạng khác hoặc kiểm tra lại sau.</string>
+    <string name="sell_token_not_supported_title">Token này không được tính năng bán hỗ trợ</string>
     <string name="send_address_hint">Địa chỉ hoặc w3n</string>
     <string name="send_network_flow_title">Chọn mạng để gửi %s</string>
     <string name="send_recipient_system_account_message">Người nhận là một tài khoản hệ thống. Nó không được kiểm soát bởi bất kỳ công ty hoặc cá nhân nào.\nBạn có chắc chắn vẫn muốn thực hiện chuyển khoản này không?</string>
@@ -1648,6 +1659,11 @@
     <string name="tabbar_wallet_title">Ví</string>
     <string name="today">Hôm nay</string>
     <string name="token_price_info_provider_label">Liên kết Coingecko cho thông tin giá (Tùy chọn)</string>
+    <string name="trade_provider_list_buy_title">Chọn một nhà cung cấp để mua token %s</string>
+    <string name="trade_provider_list_footer">Phương thức thanh toán, phí và giới hạn khác nhau tùy theo nhà cung cấp.\n So sánh báo giá của họ để tìm tùy chọn tốt nhất cho bạn.</string>
+    <string name="trade_provider_list_sell_title">Chọn một nhà cung cấp để bán token %s</string>
+    <string name="trade_token_not_supported_message">Không có nhà cung cấp nào của chúng tôi hiện đang hỗ trợ mua hoặc bán token này. Vui lòng chọn token khác, mạng khác hoặc kiểm tra lại sau.</string>
+    <string name="trade_token_not_supported_title">Token này không được tính năng mua/bán hỗ trợ</string>
     <string name="transaction_details_copy_hash">Sao chép hash</string>
     <string name="transaction_details_extrinsic_fee">Phí</string>
     <string name="transaction_details_from">Từ</string>
@@ -1661,6 +1677,8 @@
     <string name="transaction_status_failed">Thất bại</string>
     <string name="transaction_status_pending">Đang chờ xử lý</string>
     <string name="transactions_notification_channel_name">Kênh thông báo giao dịch</string>
+    <string name="transak_provider_buy_description">Mua tiền điện tử bắt đầu chỉ với $5</string>
+    <string name="transak_provider_sell_description">Bán tiền điện tử bắt đầu chỉ với $10</string>
     <string name="transfer_history_income_from">Từ: %s</string>
     <string name="transfer_history_send_to">Đến: %s</string>
     <string name="transfer_title">Chuyển</string>
@@ -1698,10 +1716,14 @@
     <string name="waiting_top_up_card_description">Có thể mất đến 5 phút.\nCửa sổ này sẽ tự động đóng.</string>
     <string name="waiting_top_up_card_timer">Dự đoán %s</string>
     <string name="wallet_asset_buy">Mua</string>
+    <string name="wallet_asset_buy_sell">Mua/Bán</string>
+    <string name="wallet_asset_buy_tokens">Mua tokens</string>
     <string name="wallet_asset_buy_with">Mua với</string>
     <string name="wallet_asset_receive">Nhận</string>
     <string name="wallet_asset_receive_token">Nhận %s</string>
     <string name="wallet_asset_receive_token_subtitle">Chỉ gửi token %1$s và các token trong mạng %2$s tới địa chỉ này, nếu không bạn có thể mất tiền</string>
+    <string name="wallet_asset_sell">Bán</string>
+    <string name="wallet_asset_sell_tokens">Bán tokens</string>
     <string name="wallet_asset_send">Gửi</string>
     <string name="wallet_asset_swap">Hoán đổi</string>
     <string name="wallet_assets">Tài sản</string>

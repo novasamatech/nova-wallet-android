@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%sで追加できるプロキシの上限に達しました。新しいものを追加するためには既存のプロキシを削除してください。</string>
     <string name="add_proxy_maximum_reached_error_title">プロキシの最大数に達しました</string>
     <string name="added_networks_empty_placeholder">追加されたカスタムネットワーク\nここに表示されます</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">カラー</string>
     <string name="appearance_title">外観</string>
     <string name="appearance_token_assets_title">トークンアイコン</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Googleドライブ</string>
     <string name="backup_settings_toolbar_title">バックアップ</string>
     <string name="backup_title">バックアップ</string>
+    <string name="banxa_provider_description">簡単で効率的なKYCプロセス</string>
     <string name="biometric_auth_title">生体認証</string>
     <string name="browser_tabs_close_all">すべて閉じる</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
     <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
+    <string name="buy_order_completed_message">購入が開始されました！60分までお待ちください。ステータスはメールで確認できます。</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
     <string name="buy_provider_open_confirmation_title">ブラウザで続行しますか？</string>
+    <string name="buy_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの購入をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
+    <string name="buy_token_not_supported_title">このトークンは購入機能でサポートされていません</string>
     <string name="chain_network_management_auto_balance">自動バランスノード</string>
     <string name="chain_network_management_enabling">接続を有効にする</string>
     <string name="change_cloud_backup_password_subtitle">クラウドバックアップからウォレットを復元するために使用するパスワードを入力してください。このパスワードは将来的に復元できないため、必ず覚えておいてください！</string>
@@ -752,6 +757,7 @@
     <string name="fee_not_yet_loaded_message">手数料が計算されるまでお待ちください</string>
     <string name="fee_not_yet_loaded_title">手数料の計算中</string>
     <string name="fragment_assets_nova_card">デビットカードを管理</string>
+    <string name="fragment_sell_token_title">%s トークンを売却</string>
     <string name="fragment_set_staking_proxy_title">%s Stakingのデリゲーションを追加</string>
     <string name="fragment_swap_main_settings_details_title">スワップの詳細</string>
     <string name="fragment_swap_main_settings_max_button">最大:</string>
@@ -858,6 +864,7 @@
     <string name="manual_backup_select_wallet_header">バックアップするウォレットを選択</string>
     <string name="manual_backup_warning_subtitle">バックアップを表示する前に以下をよくお読みください</string>
     <string name="manual_backup_warning_title">パスフレーズを共有しないでください！</string>
+    <string name="mercurio_provider_description">手数料最大3.95%で最良の価格</string>
     <string name="mnemonic_card_reveal_subtitle">誰もあなたの画面を見れないようにし、スクリーンショットを撮らないでください</string>
     <string name="mnemonic_card_title">誰にも%sしないでください</string>
     <string name="mnemonic_card_title_highlight">共有しないでください</string>
@@ -1173,6 +1180,10 @@
     <string name="select_network_title">ネットワークを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
+    <string name="sell_network_flow_title">%s を売るためのネットワークを選択</string>
+    <string name="sell_order_completed_message">売却が開始されました！60分までお待ちください。ステータスはメールで確認できます。</string>
+    <string name="sell_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの売却をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
+    <string name="sell_token_not_supported_title">このトークンは売却機能でサポートされていません</string>
     <string name="send_address_hint">アドレスまたはw3n</string>
     <string name="send_network_flow_title">送信するネットワークを選択 %s</string>
     <string name="send_recipient_system_account_message">受信者はシステムアカウントです。どの会社や個人にも管理されていません。\nそれでもこの転送を実行してもよろしいですか？</string>
@@ -1648,6 +1659,11 @@
     <string name="tabbar_wallet_title">ウォレット</string>
     <string name="today">今日</string>
     <string name="token_price_info_provider_label">価格情報のためのCoingeckoリンク（オプション）</string>
+    <string name="trade_provider_list_buy_title">%s トークンを買うためのプロバイダーを選択</string>
+    <string name="trade_provider_list_footer">プロバイダーによって支払い方法、手数料、制限が異なります。\nそれらの見積もりを比較して最適なオプションを見つけてください。</string>
+    <string name="trade_provider_list_sell_title">%s トークンを売るためのプロバイダーを選択</string>
+    <string name="trade_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの購入または売却をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
+    <string name="trade_token_not_supported_title">このトークンは購入/売却機能でサポートされていません</string>
     <string name="transaction_details_copy_hash">ハッシュをコピー</string>
     <string name="transaction_details_extrinsic_fee">手数料</string>
     <string name="transaction_details_from">送信元</string>
@@ -1661,6 +1677,8 @@
     <string name="transaction_status_failed">失敗</string>
     <string name="transaction_status_pending">保留中</string>
     <string name="transactions_notification_channel_name">トランザクション通知チャネル</string>
+    <string name="transak_provider_buy_description">わずか$5からクリプトを購入</string>
+    <string name="transak_provider_sell_description">わずか$10からクリプトを売る</string>
     <string name="transfer_history_income_from">送信元: %s</string>
     <string name="transfer_history_send_to">送信先: %s</string>
     <string name="transfer_title">送金</string>
@@ -1698,10 +1716,14 @@
     <string name="waiting_top_up_card_description">最大で5分かかる場合があります。\nこのウィンドウは自動的に閉じられます。</string>
     <string name="waiting_top_up_card_timer">推定%s</string>
     <string name="wallet_asset_buy">購入</string>
+    <string name="wallet_asset_buy_sell">購入/売却</string>
+    <string name="wallet_asset_buy_tokens">トークンを購入</string>
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>
     <string name="wallet_asset_receive_token">受け取る %s</string>
     <string name="wallet_asset_receive_token_subtitle">送信するのは%1$sトークンと%2$sネットワークのトークンのみ可能です、それ以外の場合、資金を失う可能性があります</string>
+    <string name="wallet_asset_sell">販売</string>
+    <string name="wallet_asset_sell_tokens">トークンを販売</string>
     <string name="wallet_asset_send">送信</string>
     <string name="wallet_asset_swap">スワップ</string>
     <string name="wallet_assets">資産</string>

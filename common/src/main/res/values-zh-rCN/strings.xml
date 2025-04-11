@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">您已达到在%s中添加的代理的上限%s。移除代理以添加新代理。</string>
     <string name="add_proxy_maximum_reached_error_title">已达到代理最大数量</string>
     <string name="added_networks_empty_placeholder">添加的自定义网络会显示在这里</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">彩色图标</string>
     <string name="appearance_title">外观</string>
     <string name="appearance_token_assets_title">代币图标</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Google云端硬盘</string>
     <string name="backup_settings_toolbar_title">备份</string>
     <string name="backup_title">备份</string>
+    <string name="banxa_provider_description">简单高效的KYC流程</string>
     <string name="biometric_auth_title">生物认证</string>
     <string name="browser_tabs_close_all">关闭所有</string>
     <string name="buy_completed">购买已启动！请等待最多 60 分钟。你可以在电子邮件上追踪状态。</string>
     <string name="buy_network_flow_title">选择购买%s的网络</string>
+    <string name="buy_order_completed_message">购买已启动！请等待最多60分钟。您可以在电子邮件中跟踪状态。</string>
     <string name="buy_provider_open_confirmation_message">为了继续购买，你将从 Nova Wallet 应用被重定向到 %s</string>
     <string name="buy_provider_open_confirmation_title">在浏览器中继续？</string>
+    <string name="buy_token_not_supported_message">当前没有供应商支持购买此代币。请选择其他代币、其他网络或稍后再试。</string>
+    <string name="buy_token_not_supported_title">买入功能不支持此代币</string>
     <string name="chain_network_management_auto_balance">自动平衡节点</string>
     <string name="chain_network_management_enabling">启用连接</string>
     <string name="change_cloud_backup_password_subtitle">请输入用于从云备份恢复钱包的密码。此密码将无法在未来恢复，请务必记住！</string>
@@ -752,6 +757,7 @@
     <string name="fee_not_yet_loaded_message">请等待费用计算</string>
     <string name="fee_not_yet_loaded_title">费用计算正在进行中</string>
     <string name="fragment_assets_nova_card">管理借记卡</string>
+    <string name="fragment_sell_token_title">出售 %s 代币</string>
     <string name="fragment_set_staking_proxy_title">为%s质押添加委托</string>
     <string name="fragment_swap_main_settings_details_title">兑换详情</string>
     <string name="fragment_swap_main_settings_max_button">最大：</string>
@@ -858,6 +864,7 @@
     <string name="manual_backup_select_wallet_header">选择要备份的钱包</string>
     <string name="manual_backup_warning_subtitle">在查看您的备份之前，请仔细阅读以下内容</string>
     <string name="manual_backup_warning_title">不要分享您的助记词！</string>
+    <string name="mercurio_provider_description">最佳价格，手续费最高至3.95%</string>
     <string name="mnemonic_card_reveal_subtitle">确保没有人能够看到你的屏幕\n且不要截图</string>
     <string name="mnemonic_card_title">请%s任何人</string>
     <string name="mnemonic_card_title_highlight">不要分享给</string>
@@ -1173,6 +1180,10 @@
     <string name="select_network_title">选择网络</string>
     <string name="select_tracks_for">选择曲目</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
+    <string name="sell_network_flow_title">选择网络出售 %s</string>
+    <string name="sell_order_completed_message">销售已启动！请等待最多60分钟。您可以在电子邮件中跟踪状态。</string>
+    <string name="sell_token_not_supported_message">当前没有供应商支持出售此代币。请选择其他代币、其他网络或稍后再试。</string>
+    <string name="sell_token_not_supported_title">卖出功能不支持此代币</string>
     <string name="send_address_hint">地址或w3n</string>
     <string name="send_network_flow_title">选择发送%s的网络</string>
     <string name="send_recipient_system_account_message">收件人是一个系统账户。它不受任何公司或个人控制。您确定仍然要执行此转账吗？</string>
@@ -1648,6 +1659,11 @@
     <string name="tabbar_wallet_title">钱包</string>
     <string name="today">今天</string>
     <string name="token_price_info_provider_label">Coingecko链接用于价格信息（可选）</string>
+    <string name="trade_provider_list_buy_title">选择一个提供商购买 %s 代币</string>
+    <string name="trade_provider_list_footer">不同提供商的支付方式、费用和限额有所不同。\n比较他们的报价以找到适合您的最佳选项。</string>
+    <string name="trade_provider_list_sell_title">选择一个提供商出售 %s 代币</string>
+    <string name="trade_token_not_supported_message">当前没有供应商支持购买或出售此代币。请选择其他代币、其他网络或稍后再试。</string>
+    <string name="trade_token_not_supported_title">买入/卖出功能不支持此代币</string>
     <string name="transaction_details_copy_hash">复制哈希</string>
     <string name="transaction_details_extrinsic_fee">费用</string>
     <string name="transaction_details_from">来自</string>
@@ -1661,6 +1677,8 @@
     <string name="transaction_status_failed">失败</string>
     <string name="transaction_status_pending">待定</string>
     <string name="transactions_notification_channel_name">交易通知频道</string>
+    <string name="transak_provider_buy_description">最低仅需$5即可购买加密货币</string>
+    <string name="transak_provider_sell_description">最低仅需$10即可出售加密货币</string>
     <string name="transfer_history_income_from">来自：%s</string>
     <string name="transfer_history_send_to">发送至：%s</string>
     <string name="transfer_title">转账</string>
@@ -1698,10 +1716,14 @@
     <string name="waiting_top_up_card_description">最多可能需要 5 分钟。\n此窗口将自动关闭。</string>
     <string name="waiting_top_up_card_timer">预计 %s</string>
     <string name="wallet_asset_buy">购买</string>
+    <string name="wallet_asset_buy_sell">买入/卖出</string>
+    <string name="wallet_asset_buy_tokens">购买代币</string>
     <string name="wallet_asset_buy_with">用...购买</string>
     <string name="wallet_asset_receive">接收</string>
     <string name="wallet_asset_receive_token">接收 %s</string>
     <string name="wallet_asset_receive_token_subtitle">仅将%1$s代币和%2$s网络中的代币发送到此地址，否则您可能会失去资金</string>
+    <string name="wallet_asset_sell">出售</string>
+    <string name="wallet_asset_sell_tokens">出售代币</string>
     <string name="wallet_asset_send">发送</string>
     <string name="wallet_asset_swap">兑换</string>
     <string name="wallet_assets">资产</string>

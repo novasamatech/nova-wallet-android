@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Vous avez atteint la limite de %s proxies ajoutés dans %s. Supprimez des proxies pour en ajouter de nouveaux.</string>
     <string name="add_proxy_maximum_reached_error_title">Le nombre maximum de proxies a été atteint</string>
     <string name="added_networks_empty_placeholder">Les réseaux personnalisés ajoutés\napparaîtront ici</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Coloré</string>
     <string name="appearance_title">Apparence</string>
     <string name="appearance_token_assets_title">icônes des tokens</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Sauvegarde</string>
     <string name="backup_title">Sauvegarde</string>
+    <string name="banxa_provider_description">Processus KYC simple et efficace</string>
     <string name="biometric_auth_title">Auth biométrique</string>
     <string name="browser_tabs_close_all">Fermer tout</string>
     <string name="buy_completed">L\'achat est lancé ! Veuillez patienter jusqu\'à 60 minutes. Vous pouvez suivre l\'état d\'avancement sur l\'e-mail.</string>
     <string name="buy_network_flow_title">Sélectionner le réseau pour acheter %s</string>
+    <string name="buy_order_completed_message">Achat initié ! Veuillez patienter jusqu\'à 60 minutes. Vous pouvez suivre le statut par email.</string>
     <string name="buy_provider_open_confirmation_message">Pour poursuivre l\'achat, vous serez redirigé de l\'application Nova Wallet vers %s</string>
     <string name="buy_provider_open_confirmation_title">Continuer dans le navigateur?</string>
+    <string name="buy_token_not_supported_message">Aucun de nos fournisseurs ne supporte actuellement l\'achat de ce jeton. Veuillez choisir un jeton différent, un réseau différent, ou revenir plus tard.</string>
+    <string name="buy_token_not_supported_title">Ce jeton n\'est pas supporté par la fonction d\'achat</string>
     <string name="chain_network_management_auto_balance">Équilibrage automatique des nœuds</string>
     <string name="chain_network_management_enabling">Activer la connexion</string>
     <string name="change_cloud_backup_password_subtitle">Veuillez entrer un mot de passe qui sera utilisé pour récupérer vos portefeuilles à partir de la sauvegarde cloud. Ce mot de passe ne pourra pas être récupéré à l\'avenir, alors assurez-vous de vous en souvenir !</string>
@@ -758,6 +763,7 @@
     <string name="fee_not_yet_loaded_message">Veuillez patienter jusqu\'à ce que les frais soient calculés</string>
     <string name="fee_not_yet_loaded_title">Le calcul des frais est en cours</string>
     <string name="fragment_assets_nova_card">Gérer la carte de débit</string>
+    <string name="fragment_sell_token_title">Vendre le jeton %s</string>
     <string name="fragment_set_staking_proxy_title">Ajouter une délégation pour le staking %s</string>
     <string name="fragment_swap_main_settings_details_title">Détails de l\'échange</string>
     <string name="fragment_swap_main_settings_max_button">Max :</string>
@@ -865,6 +871,7 @@
     <string name="manual_backup_select_wallet_header">Sélectionnez un portefeuille à sauvegarder</string>
     <string name="manual_backup_warning_subtitle">Veuillez lire attentivement ce qui suit avant de visualiser votre sauvegarde</string>
     <string name="manual_backup_warning_title">Ne partagez pas votre phrase secrète!</string>
+    <string name="mercurio_provider_description">Meilleur prix avec des frais jusqu\'à 3,95 %</string>
     <string name="mnemonic_card_reveal_subtitle">Assurez-vous que personne ne peut voir votre écran\net ne prenez pas de captures d\'écran</string>
     <string name="mnemonic_card_title">Veuillez %s personne</string>
     <string name="mnemonic_card_title_highlight">ne partagez pas avec</string>
@@ -1182,6 +1189,10 @@
     <string name="select_network_title">Sélectionner un réseau</string>
     <string name="select_tracks_for">Sélectionner des pistes pour</string>
     <string name="selected_tracks_quantity" formatted="false">%d sur %d</string>
+    <string name="sell_network_flow_title">Sélectionnez le réseau pour vendre %s</string>
+    <string name="sell_order_completed_message">Vente initiée ! Veuillez patienter jusqu\'à 60 minutes. Vous pouvez suivre le statut par email.</string>
+    <string name="sell_token_not_supported_message">Aucun de nos fournisseurs ne supporte actuellement la vente de ce jeton. Veuillez choisir un jeton différent, un réseau différent, ou revenir plus tard.</string>
+    <string name="sell_token_not_supported_title">Ce jeton n\'est pas supporté par la fonction de vente</string>
     <string name="send_address_hint">Adresse ou w3n</string>
     <string name="send_network_flow_title">Sélectionner le réseau pour envoyer %s</string>
     <string name="send_recipient_system_account_message">Le destinataire est un compte système. Il n\'est contrôlé par aucune entreprise ou individu.\nÊtes-vous sûr de vouloir effectuer ce transfert ?</string>
@@ -1660,6 +1671,11 @@
     <string name="tabbar_wallet_title">Portefeuille</string>
     <string name="today">Aujourd’hui</string>
     <string name="token_price_info_provider_label">Lien Coingecko pour les informations sur les prix (facultatif)</string>
+    <string name="trade_provider_list_buy_title">Sélectionnez un fournisseur pour acheter le jeton %s</string>
+    <string name="trade_provider_list_footer">Les méthodes de paiement, frais et limites diffèrent selon le fournisseur.\nComparez leurs devis pour trouver la meilleure option pour vous.</string>
+    <string name="trade_provider_list_sell_title">Sélectionnez un fournisseur pour vendre le jeton %s</string>
+    <string name="trade_token_not_supported_message">Aucun de nos fournisseurs ne supporte actuellement l\'achat ou la vente de ce jeton. Veuillez choisir un jeton différent, un réseau différent, ou revenir plus tard.</string>
+    <string name="trade_token_not_supported_title">Ce jeton n\'est pas supporté par la fonction d\'achat/vente</string>
     <string name="transaction_details_copy_hash">Copier le hash</string>
     <string name="transaction_details_extrinsic_fee">Frais</string>
     <string name="transaction_details_from">De</string>
@@ -1673,6 +1689,8 @@
     <string name="transaction_status_failed">Échec</string>
     <string name="transaction_status_pending">En attente</string>
     <string name="transactions_notification_channel_name">Canal de notifications de transactions</string>
+    <string name="transak_provider_buy_description">Achetez des cryptos à partir de seulement 5 $</string>
+    <string name="transak_provider_sell_description">Vendez des cryptos à partir de seulement 10 $</string>
     <string name="transfer_history_income_from">De : %s</string>
     <string name="transfer_history_send_to">À : %s</string>
     <string name="transfer_title">Transfert</string>
@@ -1710,10 +1728,14 @@
     <string name="waiting_top_up_card_description">Cela peut prendre jusqu\'à 5 minutes.\nCette fenêtre se fermera automatiquement.</string>
     <string name="waiting_top_up_card_timer">Estimé %s</string>
     <string name="wallet_asset_buy">Acheter</string>
+    <string name="wallet_asset_buy_sell">Acheter/Vendre</string>
+    <string name="wallet_asset_buy_tokens">Acheter des jetons</string>
     <string name="wallet_asset_buy_with">Acheter avec</string>
     <string name="wallet_asset_receive">Recevoir</string>
     <string name="wallet_asset_receive_token">Recevoir %s</string>
     <string name="wallet_asset_receive_token_subtitle">Envoyez uniquement le token %1$s et les tokens dans le réseau %2$s à cette adresse, ou vous pourriez perdre vos fonds</string>
+    <string name="wallet_asset_sell">Vendre</string>
+    <string name="wallet_asset_sell_tokens">Vendre des jetons</string>
     <string name="wallet_asset_send">Envoyer</string>
     <string name="wallet_asset_swap">Échanger</string>
     <string name="wallet_assets">Actifs</string>

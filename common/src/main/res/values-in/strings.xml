@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Anda telah mencapai batas %s proxy yang ditambahkan dalam %s. Hapus proxy untuk menambahkan yang baru.</string>
     <string name="add_proxy_maximum_reached_error_title">Jumlah maksimum proxy telah tercapai</string>
     <string name="added_networks_empty_placeholder">Jaringan kustom yang ditambahkan\nakan muncul di sini</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Berwarna</string>
     <string name="appearance_title">Penampilan</string>
     <string name="appearance_token_assets_title">ikon token</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Cadangan</string>
     <string name="backup_title">Cadangan</string>
+    <string name="banxa_provider_description">Proses KYC yang sederhana dan efisien</string>
     <string name="biometric_auth_title">Otentikasi Biometrik</string>
     <string name="browser_tabs_close_all">Tutup Semua</string>
     <string name="buy_completed">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya melalui email.</string>
     <string name="buy_network_flow_title">Pilih jaringan untuk membeli %s</string>
+    <string name="buy_order_completed_message">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya di email.</string>
     <string name="buy_provider_open_confirmation_message">Untuk melanjutkan pembelian, Anda akan diarahkan dari aplikasi Nova Wallet ke %s</string>
     <string name="buy_provider_open_confirmation_title">Lanjut di browser?</string>
+    <string name="buy_token_not_supported_message">Tidak ada penyedia kami yang saat ini mendukung pembelian token ini. Silakan pilih token lain, jaringan lain, atau periksa kembali nanti.</string>
+    <string name="buy_token_not_supported_title">Token ini tidak didukung oleh fitur beli</string>
     <string name="chain_network_management_auto_balance">Node saldo otomatis</string>
     <string name="chain_network_management_enabling">Aktifkan koneksi</string>
     <string name="change_cloud_backup_password_subtitle">Silakan masukkan kata sandi yang akan digunakan untuk memulihkan dompet Anda dari cadangan cloud. Kata sandi ini tidak dapat dipulihkan di masa depan, jadi pastikan untuk mengingatnya!</string>
@@ -752,6 +757,7 @@
     <string name="fee_not_yet_loaded_message">Harap tunggu hingga biaya dihitung</string>
     <string name="fee_not_yet_loaded_title">Perhitungan biaya sedang berlangsung</string>
     <string name="fragment_assets_nova_card">Kelola Kartu Debit</string>
+    <string name="fragment_sell_token_title">Jual token %s</string>
     <string name="fragment_set_staking_proxy_title">Tambahkan delegasi untuk staking %s</string>
     <string name="fragment_swap_main_settings_details_title">Detail Swap</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
@@ -858,6 +864,7 @@
     <string name="manual_backup_select_wallet_header">Pilih dompet untuk dicadangkan</string>
     <string name="manual_backup_warning_subtitle">Mohon baca dengan seksama sebelum melihat cadangan Anda</string>
     <string name="manual_backup_warning_title">Jangan bagikan frasa sandi Anda!</string>
+    <string name="mercurio_provider_description">Harga terbaik dengan biaya hingga 3,95%</string>
     <string name="mnemonic_card_reveal_subtitle">Pastikan tidak ada yang dapat melihat layar Anda\n dan jangan mengambil tangkapan layar</string>
     <string name="mnemonic_card_title">Harap %s siapa pun</string>
     <string name="mnemonic_card_title_highlight">jangan bagi dengan</string>
@@ -1173,6 +1180,10 @@
     <string name="select_network_title">Pilih jaringan</string>
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
+    <string name="sell_network_flow_title">Pilih jaringan untuk menjual %s</string>
+    <string name="sell_order_completed_message">Penjualan dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya di email.</string>
+    <string name="sell_token_not_supported_message">Tidak ada penyedia kami yang saat ini mendukung penjualan token ini. Silakan pilih token lain, jaringan lain, atau periksa kembali nanti.</string>
+    <string name="sell_token_not_supported_title">Token ini tidak didukung oleh fitur jual</string>
     <string name="send_address_hint">Address or w3n</string>
     <string name="send_network_flow_title">Pilih jaringan untuk mengirim %s</string>
     <string name="send_recipient_system_account_message">Recipient is a system account. It is not controlled by any company or individual.\nAre you sure you still want to perform this transfer?</string>
@@ -1648,6 +1659,11 @@
     <string name="tabbar_wallet_title">Dompet</string>
     <string name="today">Hari ini</string>
     <string name="token_price_info_provider_label">Tautan Coingecko untuk info harga (Opsional)</string>
+    <string name="trade_provider_list_buy_title">Pilih penyedia untuk membeli token %s</string>
+    <string name="trade_provider_list_footer">Metode pembayaran, biaya, dan batasan berbeda-beda tergantung penyedia.\nBandingkan kutipan mereka untuk menemukan pilihan terbaik untuk Anda.</string>
+    <string name="trade_provider_list_sell_title">Pilih penyedia untuk menjual token %s</string>
+    <string name="trade_token_not_supported_message">Tidak ada penyedia kami yang saat ini mendukung pembelian atau penjualan token ini. Silakan pilih token lain, jaringan lain, atau periksa kembali nanti.</string>
+    <string name="trade_token_not_supported_title">Token ini tidak didukung oleh fitur beli/jual</string>
     <string name="transaction_details_copy_hash">Salin hash</string>
     <string name="transaction_details_extrinsic_fee">Biaya</string>
     <string name="transaction_details_from">Dari</string>
@@ -1661,6 +1677,8 @@
     <string name="transaction_status_failed">Gagal</string>
     <string name="transaction_status_pending">Menunggu</string>
     <string name="transactions_notification_channel_name">Kanal Notifikasi Transaksi</string>
+    <string name="transak_provider_buy_description">Beli kripto mulai dari $5</string>
+    <string name="transak_provider_sell_description">Jual kripto mulai dari $10</string>
     <string name="transfer_history_income_from">Dari: %s</string>
     <string name="transfer_history_send_to">Ke: %s</string>
     <string name="transfer_title">Transfer</string>
@@ -1698,10 +1716,14 @@
     <string name="waiting_top_up_card_description">Ini dapat memakan waktu hingga 5 menit.\nJendela ini akan ditutup secara otomatis.</string>
     <string name="waiting_top_up_card_timer">Perkiraan %s</string>
     <string name="wallet_asset_buy">Beli</string>
+    <string name="wallet_asset_buy_sell">Beli/Jual</string>
+    <string name="wallet_asset_buy_tokens">Beli token</string>
     <string name="wallet_asset_buy_with">Beli dengan</string>
     <string name="wallet_asset_receive">Terima</string>
     <string name="wallet_asset_receive_token">Terima %s</string>
     <string name="wallet_asset_receive_token_subtitle">Hanya kirim token %1$s dan token di jaringan %2$s ke alamat ini, atau Anda bisa kehilangan dana Anda</string>
+    <string name="wallet_asset_sell">Jual</string>
+    <string name="wallet_asset_sell_tokens">Jual token</string>
     <string name="wallet_asset_send">Kirim</string>
     <string name="wallet_asset_swap">Tukar</string>
     <string name="wallet_assets">Aset</string>
