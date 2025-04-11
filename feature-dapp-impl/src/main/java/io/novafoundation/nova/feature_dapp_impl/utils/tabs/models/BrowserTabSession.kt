@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.tabs.models
 
-import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.webkit.WebView
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
@@ -77,8 +77,8 @@ class BrowserTabSession(
         nestedPageCallback?.onPageStarted(view, url, favicon)
     }
 
-    override fun handleBrowserIntent(intent: Intent) {
-        nestedPageCallback?.handleBrowserIntent(intent)
+    override fun handleBrowserDeeplink(uri: Uri) {
+        nestedPageCallback?.handleBrowserDeeplink(uri)
     }
 
     override fun onPageChanged(view: WebView, url: String?, title: String?) {

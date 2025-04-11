@@ -137,7 +137,7 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 
     private fun processIntent(intent: Intent) {
         intent.data?.let {
-            viewModel.handleDeepLink(it)
+            viewModel.handleDeeplink(it)
         }
     }
 

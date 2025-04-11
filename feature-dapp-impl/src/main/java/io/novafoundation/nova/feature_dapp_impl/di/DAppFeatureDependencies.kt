@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -68,6 +69,8 @@ interface DAppFeatureDependencies {
     val webViewFileChooserFactory: WebViewFileChooserFactory
 
     val preferences: Preferences
+
+    val deeplinkHandler: RootDeepLinkHandler
 
     fun currencyRepository(): CurrencyRepository
 

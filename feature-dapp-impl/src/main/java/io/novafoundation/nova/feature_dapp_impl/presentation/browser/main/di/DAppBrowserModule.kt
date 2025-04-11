@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -83,7 +84,8 @@ class DAppBrowserModule {
         dAppInteractor: DappInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         chainRegistry: ChainRegistry,
-        browserTabService: BrowserTabService
+        browserTabService: BrowserTabService,
+        deepLinkHandler: RootDeepLinkHandler
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -96,7 +98,8 @@ class DAppBrowserModule {
             extensionStoreFactory = extensionStoreFactory,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             chainRegistry = chainRegistry,
-            browserTabService = browserTabService
+            browserTabService = browserTabService,
+            deepLinkHandler = deepLinkHandler
         )
     }
 }

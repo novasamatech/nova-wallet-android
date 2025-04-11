@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.bus.observeBusEvent
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapEvent
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.common.otherModules.HandleDeeplinkEventBus
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -52,7 +54,8 @@ class RootViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val toastMessageManager: ToastMessageManager
+    private val toastMessageManager: ToastMessageManager,
+    private val handleDeeplinkEventBus: HandleDeeplinkEventBus,
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -97,6 +100,11 @@ class RootViewModel(
         syncPushSettingsIfNeeded()
 
         externalServiceInitializer.initialize()
+
+        handleDeeplinkEventBus.observeEvent()
+            .observeBusEvent { request ->
+                tryHandleDeepLink(request.uri).let(HandleDeeplinkEventBus::Response)
+            }.launchIn(this)
     }
 
     private fun observeBusEvents() {
@@ -197,14 +205,20 @@ class RootViewModel(
         safeModeService.applySafeModeIfEnabled()
     }
 
-    fun handleDeepLink(data: Uri) {
-        launch {
-            try {
-                deepLinkHandler.handleDeepLink(data)
-            } catch (e: DeepLinkHandlingException) {
-                val errorMessage = formatDeepLinkHandlingException(resourceManager, e)
-                showError(errorMessage)
-            }
+    fun handleDeeplink(data: Uri) {
+        launch { tryHandleDeepLink(data) }
+    }
+
+    private suspend fun tryHandleDeepLink(data: Uri): Boolean {
+        if (!deepLinkHandler.matches(data)) return false
+
+        return try {
+            deepLinkHandler.handleDeepLink(data)
+            true
+        } catch (e: DeepLinkHandlingException) {
+            val errorMessage = formatDeepLinkHandlingException(resourceManager, e)
+            showError(errorMessage)
+            false
         }
     }
 }

@@ -32,6 +32,7 @@ import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.otherModules.HandleDeeplinkEventBus
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
@@ -107,6 +108,8 @@ interface CommonApi {
     val webViewFileChooserFactory: WebViewFileChooserFactory
 
     val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
+
+    val handleDeeplinkEventBus: HandleDeeplinkEventBus
 
     fun computationalCache(): ComputationalCache
 

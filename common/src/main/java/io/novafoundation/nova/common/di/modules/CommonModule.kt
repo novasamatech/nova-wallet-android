@@ -34,6 +34,7 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesImpl
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.domain.interactor.RealAssetViewModeInteractor
 import io.novafoundation.nova.common.interfaces.FileCache
@@ -46,6 +47,7 @@ import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.condition.RealConditionMixinFactory
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
+import io.novafoundation.nova.common.otherModules.HandleDeeplinkEventBus
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.RealAssetIconProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -97,7 +99,7 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 @Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
-@Module(includes = [ParallaxCardModule::class, WebViewModule::class])
+@Module(includes = [ParallaxCardModule::class, WebViewModule::class, OtherModulesModule::class])
 class CommonModule {
 
     @Provides

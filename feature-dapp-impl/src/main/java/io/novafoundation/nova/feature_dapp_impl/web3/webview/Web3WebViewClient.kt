@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
-import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -11,7 +11,7 @@ interface PageCallback {
 
     fun onPageStarted(webView: WebView, url: String, favicon: Bitmap?)
 
-    fun handleBrowserIntent(intent: Intent)
+    fun handleBrowserDeeplink(uri: Uri)
 
     fun onPageChanged(webView: WebView, url: String?, title: String?)
 }
@@ -35,8 +35,7 @@ class Web3WebViewClient(
         val url = request.url
 
         if (url.scheme != "http" && url.scheme != "https") {
-            val tel = Intent(Intent.ACTION_VIEW, url)
-            pageCallback.handleBrowserIntent(tel)
+            pageCallback.handleBrowserDeeplink(url)
             return true
         }
 

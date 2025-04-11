@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.View
@@ -38,6 +40,8 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
+import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import javax.inject.Inject
 
@@ -169,6 +173,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
             .inject(this)
     }
 
+    @SuppressLint("SetTextI18n")
     @Suppress("UNCHECKED_CAST")
     override fun subscribe(viewModel: DAppBrowserViewModel) {
         setupRemoveFavouritesConfirmation(viewModel.removeFromFavouritesConfirmation)
@@ -228,6 +233,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
                 binder.dappBrowserTabsContent.text = it.toString()
             }
         }
+
+        viewModel.openDeeplinkViaSystem.observeEvent(::openDeeplinkViaSystem)
     }
 
     private fun attachSession(session: BrowserTabSession) {
@@ -305,17 +312,23 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         compoundWeb3Injector.injectForPage(webView, viewModel.extensionsStore)
     }
 
-    override fun handleBrowserIntent(intent: Intent) {
+    override fun handleBrowserDeeplink(uri: Uri) {
+        viewModel.onBrowserDeeplinkOpened(uri)
+    }
+
+    override fun onPageChanged(webView: WebView, url: String?, title: String?) {
+        viewModel.onPageChanged(url, title)
+    }
+
+    private fun openDeeplinkViaSystem(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+
         try {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(requireContext(), R.string.common_no_app_to_handle_intent, Toast.LENGTH_LONG)
                 .show()
         }
-    }
-
-    override fun onPageChanged(webView: WebView, url: String?, title: String?) {
-        viewModel.onPageChanged(url, title)
     }
 
     private fun favoriteIcon(isFavorite: Boolean): Int {

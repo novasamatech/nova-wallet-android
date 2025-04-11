@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -8,6 +9,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -33,6 +35,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactor
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.ExternalEvent
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
+import io.novafoundation.nova.common.otherModules.HandleDeeplinkEventBus
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignRequester
 import io.novafoundation.nova.feature_external_sign_api.model.awaitConfirmation
@@ -78,13 +81,17 @@ class DAppBrowserViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val chainRegistry: ChainRegistry,
-    private val browserTabService: BrowserTabService
+    private val browserTabService: BrowserTabService,
+    private val handleDeeplinkEventBus: HandleDeeplinkEventBus,
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
 
     private val _showConfirmationDialog = MutableLiveData<Event<DappPendingConfirmation<*>>>()
     val showConfirmationSheet = _showConfirmationDialog
+
+    private val _openDeeplinkViaSystem = MutableLiveData<Event<Uri>>()
+    val openDeeplinkViaSystem: LiveData<Event<Uri>> = _openDeeplinkViaSystem
 
     override val selectedAccount = selectedAccountUseCase.selectedMetaAccountFlow()
         .share()
@@ -231,6 +238,15 @@ class DAppBrowserViewModel(
             isDesktopModeEnabledFlow.value = newDesktopMode
             _browserCommandEvent.postValue(BrowserCommand.ChangeDesktopMode(newDesktopMode).event())
         }
+    }
+
+    fun onBrowserDeeplinkOpened(uri: Uri) = launchUnit {
+        if (deepLinkHandler.matches(uri)) {
+            deepLinkHandler.handleDeepLink(uri)
+            return@launchUnit
+        }
+
+        _openDeeplinkViaSystem.postValue(uri.event())
     }
 
     fun openTabs() {

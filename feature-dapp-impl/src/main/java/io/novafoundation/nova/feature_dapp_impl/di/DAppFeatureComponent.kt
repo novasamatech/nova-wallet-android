@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.main.di.MainDAppCom
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearchComponent
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.di.BrowserTabsComponent
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -66,7 +67,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
             WalletFeatureApi::class,
             RuntimeApi::class,
             CurrencyFeatureApi::class,
-            BannersFeatureApi::class
+            BannersFeatureApi::class,
+            DeepLinkingFeatureApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

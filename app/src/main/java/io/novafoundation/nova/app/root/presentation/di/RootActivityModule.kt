@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.common.otherModules.HandleDeeplinkEventBus
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -60,7 +61,8 @@ class RootActivityModule {
         pushNotificationsInteractor: PushNotificationsInteractor,
         externalServiceInitializer: ExternalServiceInitializer,
         @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        toastMessageManager: ToastMessageManager
+        toastMessageManager: ToastMessageManager,
+        handleDeeplinkEventBus: HandleDeeplinkEventBus,
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -81,7 +83,8 @@ class RootActivityModule {
             pushNotificationsInteractor,
             externalServiceInitializer,
             actionBottomSheetLauncher,
-            toastMessageManager
+            toastMessageManager,
+            handleDeeplinkEventBus
         )
     }
 
