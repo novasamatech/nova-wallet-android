@@ -111,7 +111,7 @@ class PushSettingsViewModel(
         launch {
             if (pushSettingsWasChangedState.first()) {
                 closeConfirmationAction.awaitAction(
-                    ConfirmationDialogInfo(
+                    ConfirmationDialogInfo.ByRes(
                         R.string.common_confirmation_title,
                         R.string.common_close_confirmation_message,
                         R.string.common_close,

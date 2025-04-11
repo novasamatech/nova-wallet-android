@@ -165,7 +165,7 @@ class SettingsViewModel(
         launch {
             if (!twoFactorVerificationService.isEnabled()) {
                 confirmationAwaitableAction.awaitAction(
-                    ConfirmationDialogInfo(
+                    ConfirmationDialogInfo.ByRes(
                         R.string.settings_pin_code_verification_confirmation_title,
                         R.string.settings_pin_code_verification_confirmation_message
                     )
@@ -180,7 +180,7 @@ class SettingsViewModel(
         launch {
             if (!safeModeService.isSafeModeEnabled()) {
                 confirmationAwaitableAction.awaitAction(
-                    ConfirmationDialogInfo(
+                    ConfirmationDialogInfo.ByRes(
                         R.string.settings_safe_mode_confirmation_title,
                         R.string.settings_safe_mode_confirmation_message
                     )

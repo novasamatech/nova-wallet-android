@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.R
 
 suspend fun ConfirmationAwaitable<ConfirmationDialogInfo>.awaitDeleteBackupConfirmation() {
     awaitAction(
-        ConfirmationDialogInfo(
+        ConfirmationDialogInfo.ByRes(
             title = R.string.cloud_backup_delete_backup_confirmation_title,
             message = R.string.cloud_backup_delete_backup_confirmation_message,
             positiveButton = R.string.cloud_backup_delete_button,
@@ -17,7 +17,7 @@ suspend fun ConfirmationAwaitable<ConfirmationDialogInfo>.awaitDeleteBackupConfi
 
 suspend fun ConfirmationAwaitable<ConfirmationDialogInfo>.awaitBackupDestructiveChangesConfirmation() {
     awaitAction(
-        ConfirmationDialogInfo(
+        ConfirmationDialogInfo.ByRes(
             title = R.string.cloud_backup_destructive_changes_confirmation_title,
             message = R.string.cloud_backup_destructive_changes_confirmation_subtitle,
             positiveButton = R.string.common_apply,

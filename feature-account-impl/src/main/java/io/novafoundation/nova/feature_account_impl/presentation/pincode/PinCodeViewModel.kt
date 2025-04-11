@@ -212,7 +212,7 @@ class PinCodeViewModel(
     private suspend fun askForBiometry() {
         val isSuccess = try {
             confirmationAwaitableAction.awaitAction(
-                ConfirmationDialogInfo(
+                ConfirmationDialogInfo.ByRes(
                     title = R.string.pincode_biometry_dialog_title,
                     message = R.string.pincode_biometric_switch_dialog_title,
                     positiveButton = R.string.common_use,

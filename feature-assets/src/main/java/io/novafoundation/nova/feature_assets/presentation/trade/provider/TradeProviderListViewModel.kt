@@ -55,6 +55,7 @@ class TradeProviderListViewModel(
         val paymentMethods = provider.getPaymentMethods(tradeFlow).map { it.toModel() }
         TradeProviderRvItem(
             provider.id,
+            provider.officialUrl,
             provider.logoRes,
             paymentMethods,
             resourceManager.getString(provider.descriptionRes)
@@ -88,7 +89,7 @@ class TradeProviderListViewModel(
 
     fun onProviderClicked(item: TradeProviderRvItem) {
         launch {
-            awaitConfirmation()
+            awaitConfirmation(item)
 
             val chainAsset = chainAssetFlow.first()
 
@@ -103,13 +104,13 @@ class TradeProviderListViewModel(
         }
     }
 
-    private suspend fun awaitConfirmation() {
+    private suspend fun awaitConfirmation(item: TradeProviderRvItem) {
         confirmationAwaitableAction.awaitAction(
-            ConfirmationDialogInfo(
-                R.string.trade_provider_open_confirmation_title,
-                R.string.trade_provider_open_confirmation_message,
-                R.string.common_continue,
-                R.string.common_cancel
+            ConfirmationDialogInfo.ByText(
+                resourceManager.getString(R.string.trade_provider_open_confirmation_title),
+                resourceManager.getString(R.string.trade_provider_open_confirmation_message, item.providerLink),
+                resourceManager.getString(R.string.common_continue),
+                resourceManager.getString(R.string.common_cancel)
             )
         )
     }
