@@ -3,11 +3,14 @@ package io.novafoundation.nova.runtime.extrinsic.multi
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.data.network.runtime.binding.fitsIn
+import io.novafoundation.nova.common.utils.min
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomSignedExtensions
 import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.network.binding.BlockWeightLimits
+import io.novafoundation.nova.runtime.network.binding.PerDispatchClassWeight
 import io.novafoundation.nova.runtime.network.binding.total
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
@@ -43,13 +46,22 @@ internal class RealExtrinsicSplitter(
     override suspend fun split(signer: FeeSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
         val weightByCallId = estimateWeightByCallType(signer, callBuilder, chain)
 
-        val blockLimit = blockLimitsRepository.maxWeightForNormalExtrinsics(chain.id)
-        val lastBlockWeight = blockLimitsRepository.lastBlockWeight(chain.id).total()
-        val remainingLimit = (blockLimit - lastBlockWeight) * LEAVE_SOME_SPACE_MULTIPLIER
+        val blockLimit = blockLimitsRepository.blockLimits(chain.id)
+        val lastBlockWeight = blockLimitsRepository.lastBlockWeight(chain.id)
+        val extrinsicLimit = determineExtrinsicLimit(blockLimit, lastBlockWeight)
 
         val signerLimit = signer.maxCallsPerTransaction()
 
-        callBuilder.splitCallsWith(weightByCallId, remainingLimit, signerLimit)
+        callBuilder.splitCallsWith(weightByCallId, extrinsicLimit, signerLimit)
+    }
+
+    private fun determineExtrinsicLimit(blockLimits: BlockWeightLimits, lastBlockWeight: PerDispatchClassWeight): WeightV2 {
+        val extrinsicLimit = blockLimits.perClass.normal.maxExtrinsic
+        val normalClassLimit = blockLimits.perClass.normal.maxTotal - lastBlockWeight.normal
+        val blockLimit = blockLimits.maxBlock - lastBlockWeight.total()
+
+        val unionLimit = min(extrinsicLimit, normalClassLimit, blockLimit)
+        return unionLimit * LEAVE_SOME_SPACE_MULTIPLIER
     }
 
     private val GenericCall.Instance.uniqueId: String
