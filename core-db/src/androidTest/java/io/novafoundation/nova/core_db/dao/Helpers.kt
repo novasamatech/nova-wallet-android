@@ -94,6 +94,7 @@ fun ChainLocal.assetOf(
     icon = "test",
     type = "test",
     buyProviders = "test",
+    sellProviders = "test",
     typeExtras = null,
     enabled = true,
     source = AssetSourceLocal.DEFAULT
