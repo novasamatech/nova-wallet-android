@@ -49,7 +49,7 @@ fun createExtrinsic(
     events: List<GenericEvent.Instance>
 ) = ExtrinsicWithEvents(
     extrinsic = Extrinsic.Instance(
-        signature = Extrinsic.Signature(
+        type = Extrinsic.ExtrinsicType.Signed(
             accountIdentifier = bindMultiAddress(MultiAddress.Id(signer)),
             signature = null,
             signedExtras = emptyMap()
