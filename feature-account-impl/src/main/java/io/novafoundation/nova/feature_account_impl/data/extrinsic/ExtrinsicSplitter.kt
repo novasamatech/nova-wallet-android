@@ -52,6 +52,7 @@ private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 internal class RealExtrinsicSplitter @Inject constructor(
     private val rpcCalls: RpcCalls,
     private val blockLimitsRepository: BlockLimitsRepository,
+    private val signingContextFactory: SigningContext.Factory
 ) : ExtrinsicSplitter {
 
     override suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
@@ -74,8 +75,6 @@ internal class RealExtrinsicSplitter @Inject constructor(
         val unionLimit = min(extrinsicLimit, normalClassLimit, blockLimit)
         return unionLimit * LEAVE_SOME_SPACE_MULTIPLIER
     }
-
-
 
     private val GenericCall.Instance.uniqueId: String
         get() {
