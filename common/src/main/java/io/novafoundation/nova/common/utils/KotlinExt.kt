@@ -690,3 +690,7 @@ suspend fun <T> scopeAsync(
 fun Int.collectionIndexOrNull(): Int? {
     return takeIf { it >= 0 }
 }
+
+fun <T> Set<T>.intersectsWith(other: Set<T>): Boolean {
+    return this.any { it in other }
+}

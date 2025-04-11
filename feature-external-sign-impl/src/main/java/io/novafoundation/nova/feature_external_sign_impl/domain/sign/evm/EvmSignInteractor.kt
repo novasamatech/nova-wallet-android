@@ -313,6 +313,7 @@ class EvmSignInteractor(
             symbol = chainCurrency.symbol,
             precision = chainCurrency.decimals,
             buyProviders = emptyMap(),
+            sellProviders = emptyMap(),
             staking = emptyList(),
             type = Chain.Asset.Type.EvmNative,
             name = chainCurrency.name,
