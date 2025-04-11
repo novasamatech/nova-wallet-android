@@ -31,21 +31,18 @@ fun SemiUnboundedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): Stri
 
 fun BigDecimal.formatTokenAmount(
     chainAsset: Chain.Asset,
-    roundingMode: RoundingMode = RoundingMode.FLOOR,
-    includeAssetTicker: Boolean = true
+    roundingMode: RoundingMode = RoundingMode.FLOOR
 ): String {
-    return formatTokenAmount(chainAsset.symbol, roundingMode, includeAssetTicker)
+    return formatTokenAmount(chainAsset.symbol, roundingMode)
 }
 
 fun BigDecimal.formatTokenAmount(
     tokenSymbol: String,
-    roundingMode: RoundingMode = RoundingMode.FLOOR,
-    includeAssetTicker: Boolean = true
+    roundingMode: RoundingMode = RoundingMode.FLOOR
 ): String {
     return formatTokenAmount(
         tokenSymbol.asTokenSymbol(),
-        roundingMode,
-        includeAssetTicker
+        roundingMode
     )
 }
 

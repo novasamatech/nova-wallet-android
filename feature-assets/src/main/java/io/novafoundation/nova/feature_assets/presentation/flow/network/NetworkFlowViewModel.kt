@@ -75,8 +75,7 @@ abstract class NetworkFlowViewModel(
                     mapAmountToAmountModel(
                         amount = getAssetBalance(it).amount,
                         asset = it.asset,
-                        includeAssetTicker = false,
-                        formatTokenAmount = false
+                        includeAssetTicker = false
                     )
                 )
             }

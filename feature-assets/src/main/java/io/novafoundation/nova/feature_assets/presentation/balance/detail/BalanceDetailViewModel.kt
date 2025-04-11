@@ -252,7 +252,7 @@ class BalanceDetailViewModel(
 
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
-            total = mapAmountToAmountModel(asset.total + totalContributed, asset, formatTokenAmount = false),
+            total = mapAmountToAmountModel(asset.total + totalContributed, asset, useAbbreviation = false),
             transferable = mapAmountToAmountModel(asset.transferable, asset),
             locked = mapAmountToAmountModel(asset.locked + totalContributed, asset),
             assetIcon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration)

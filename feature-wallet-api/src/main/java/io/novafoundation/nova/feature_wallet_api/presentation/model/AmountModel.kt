@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import androidx.annotation.DimenRes
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatWithoutAbbreviation
 import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -33,13 +34,11 @@ fun mapAmountToAmountModel(
     amountInPlanks: BigInteger,
     asset: Asset,
     includeAssetTicker: Boolean = true,
-    formatTokenAmount: Boolean = true,
     roundingMode: RoundingMode = RoundingMode.FLOOR
 ): AmountModel = mapAmountToAmountModel(
     amount = asset.token.amountFromPlanks(amountInPlanks),
     asset = asset,
     includeAssetTicker = includeAssetTicker,
-    formatTokenAmount = formatTokenAmount,
     roundingMode = roundingMode
 )
 
@@ -62,17 +61,21 @@ fun mapAmountToAmountModel(
     token: TokenBase,
     includeZeroFiat: Boolean = true,
     includeAssetTicker: Boolean = true,
-    formatTokenAmount: Boolean = true,
+    useAbbreviation: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,
     roundingMode: RoundingMode = RoundingMode.FLOOR,
     estimatedFiat: Boolean = false
 ): AmountModel {
     val fiatAmount = token.amountToFiat(amount)
 
-    val unsignedTokenAmount = if (formatTokenAmount) {
-        amount.formatTokenAmount(token.configuration, roundingMode, includeAssetTicker)
+    val unsignedTokenAmount = if (useAbbreviation) {
+        if (includeAssetTicker) {
+            amount.formatTokenAmount(token.configuration, roundingMode)
+        } else {
+            amount.format(roundingMode)
+        }
     } else {
-        val unformattedAmount = amount.format(roundingMode)
+        val unformattedAmount = amount.formatWithoutAbbreviation()
 
         if (includeAssetTicker) {
             unformattedAmount.withTokenSymbol(token.configuration.symbol)
@@ -99,7 +102,7 @@ fun mapAmountToAmountModel(
     asset: Asset,
     includeZeroFiat: Boolean = true,
     includeAssetTicker: Boolean = true,
-    formatTokenAmount: Boolean = true,
+    useAbbreviation: Boolean = true,
     tokenAmountSign: AmountSign = AmountSign.NONE,
     roundingMode: RoundingMode = RoundingMode.FLOOR
 ): AmountModel = mapAmountToAmountModel(
@@ -107,7 +110,7 @@ fun mapAmountToAmountModel(
     token = asset.token,
     includeZeroFiat = includeZeroFiat,
     includeAssetTicker = includeAssetTicker,
-    formatTokenAmount = formatTokenAmount,
+    useAbbreviation = useAbbreviation,
     tokenAmountSign = tokenAmountSign,
     roundingMode = roundingMode
 )

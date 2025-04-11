@@ -21,18 +21,8 @@ fun BigDecimal.formatTokenAmount(roundingMode: RoundingMode = RoundingMode.FLOOR
     return format(roundingMode)
 }
 
-fun BigDecimal.formatTokenAmount(
-    tokenSymbol: TokenSymbol,
-    roundingMode: RoundingMode = RoundingMode.FLOOR,
-    includeAssetTicker: Boolean = true
-): String {
-    val formatted = format(roundingMode)
-
-    return if (includeAssetTicker) {
-        formatted.withTokenSymbol(tokenSymbol)
-    } else {
-        formatted
-    }
+fun BigDecimal.formatTokenAmount(tokenSymbol: TokenSymbol, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return format(roundingMode).withTokenSymbol(tokenSymbol)
 }
 
 fun String.withTokenSymbol(tokenSymbol: TokenSymbol): String {

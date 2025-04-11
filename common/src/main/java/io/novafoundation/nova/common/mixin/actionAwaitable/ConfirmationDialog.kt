@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.mixin.actionAwaitable
 
 import androidx.annotation.StyleRes
-import androidx.core.content.ContentProviderCompat.requireContext
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseFragmentMixin

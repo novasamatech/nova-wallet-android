@@ -89,6 +89,10 @@ fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return defaultNumberFormatter.format(this, roundingMode)
 }
 
+fun BigDecimal.formatWithoutAbbreviation(): String {
+    return this.toPlainString()
+}
+
 fun Int.format(): String {
     return defaultNumberFormatter.format(BigDecimal(this))
 }

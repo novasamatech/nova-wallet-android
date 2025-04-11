@@ -45,7 +45,7 @@ class RealLocksChangeFormatter(
         lockedChange: Change<Balance>,
         asset: Asset
     ): AmountChangeModel {
-        val fromFormatted = mapAmountToAmountModel(lockedChange.previousValue, asset, includeAssetTicker = false, formatTokenAmount = false).token
+        val fromFormatted = mapAmountToAmountModel(lockedChange.previousValue, asset, includeAssetTicker = false).token
         val toFormatted = mapAmountToAmountModel(lockedChange.newValue, asset).token
 
         return when (lockedChange) {
