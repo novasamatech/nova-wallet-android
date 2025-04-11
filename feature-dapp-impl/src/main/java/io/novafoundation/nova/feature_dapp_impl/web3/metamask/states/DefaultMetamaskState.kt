@@ -88,6 +88,7 @@ class DefaultMetamaskState(
             val knownChain = knownChains[request.chainId]
 
             if (knownChain != null) {
+                interactor.setDefaultMetamaskChain(knownChain)
                 val nextState = stateFactory.default(hostApi, knownChain, selectedAccountAddress)
                 transition.emitState(nextState)
 
@@ -209,6 +210,7 @@ class DefaultMetamaskState(
             if (chain.chainId == request.chain.chainId) {
                 request.accept()
             } else {
+                interactor.setDefaultMetamaskChain(request.chain)
                 val nextState = stateFactory.default(hostApi, request.chain, selectedAccountAddress)
                 transition.emitState(nextState)
 

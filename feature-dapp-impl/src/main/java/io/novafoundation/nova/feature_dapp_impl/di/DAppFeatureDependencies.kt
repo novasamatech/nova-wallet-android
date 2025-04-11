@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
@@ -65,6 +66,8 @@ interface DAppFeatureDependencies {
     val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
 
     val webViewFileChooserFactory: WebViewFileChooserFactory
+
+    val preferences: Preferences
 
     fun currencyRepository(): CurrencyRepository
 
