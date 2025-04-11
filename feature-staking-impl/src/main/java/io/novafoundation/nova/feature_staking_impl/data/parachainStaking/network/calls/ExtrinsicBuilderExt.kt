@@ -3,7 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.networ
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import java.math.BigInteger
 
 fun ExtrinsicBuilder.delegate(

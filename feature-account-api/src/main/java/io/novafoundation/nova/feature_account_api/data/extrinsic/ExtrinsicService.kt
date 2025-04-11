@@ -9,17 +9,15 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
-import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: SubmissionOrigin) -> Unit
-
 typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: SubmissionOrigin) -> Unit
-typealias FormMultiExtrinsic = suspend CallBuilder.() -> Unit
 
 class ExtrinsicSubmission(val hash: String, val submissionOrigin: SubmissionOrigin)
 
@@ -77,28 +75,26 @@ interface ExtrinsicService {
         chain: Chain,
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
-        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit
+        formExtrinsic: FormExtrinsicWithOrigin
     ): FeeResponse
 
     suspend fun estimateFee(
         chain: Chain,
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
-        formExtrinsic: suspend ExtrinsicBuilder.() -> Unit
+        formExtrinsic: FormExtrinsicWithOrigin
     ): Fee
-
-    suspend fun zeroFee(chain: Chain, origin: TransactionOrigin, submissionOptions: SubmissionOptions = SubmissionOptions()): Fee
 
     suspend fun estimateMultiFee(
         chain: Chain,
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
-        formExtrinsic: FormMultiExtrinsic
+        formExtrinsic: FormMultiExtrinsicWithOrigin
     ): Fee
 
     suspend fun estimateFee(
         chain: Chain,
         extrinsic: String,
-        usedSigner: FeeSigner,
+        usedSigner: NovaSigner,
     ): Fee
 }

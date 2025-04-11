@@ -21,8 +21,6 @@ import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.metadata.RealMetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
-import io.novafoundation.nova.runtime.extrinsic.multi.RealExtrinsicSplitter
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.RealExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -72,12 +70,10 @@ class RuntimeModule {
     @Provides
     @ApplicationScope
     fun provideExtrinsicBuilderFactory(
-        rpcCalls: RpcCalls,
         chainRegistry: ChainRegistry,
         mortalityConstructor: MortalityConstructor,
         metadataShortenerService: MetadataShortenerService
     ) = ExtrinsicBuilderFactory(
-        rpcCalls,
         chainRegistry,
         mortalityConstructor,
         metadataShortenerService
@@ -195,13 +191,6 @@ class RuntimeModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         chainRegistry: ChainRegistry
     ): BlockLimitsRepository = RealBlockLimitsRepository(remoteStorageSource, chainRegistry)
-
-    @Provides
-    @ApplicationScope
-    fun provideExtrinsicSplitter(
-        rpcCalls: RpcCalls,
-        blockLimitsRepository: BlockLimitsRepository,
-    ): ExtrinsicSplitter = RealExtrinsicSplitter(rpcCalls, blockLimitsRepository)
 
     @Provides
     @ApplicationScope

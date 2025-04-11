@@ -19,7 +19,7 @@ class OrmlAssetIssuer(
         return runtimeSnapshot.composeCall(
             moduleName = Modules.TOKENS,
             callName = "set_balance",
-            args = mapOf(
+            arguments = mapOf(
                 "who" to AddressInstanceConstructor.constructInstance(runtimeSnapshot.typeRegistry, destination.value),
                 "currency_id" to ormlType.currencyId(runtimeSnapshot),
                 "new_free" to amount,

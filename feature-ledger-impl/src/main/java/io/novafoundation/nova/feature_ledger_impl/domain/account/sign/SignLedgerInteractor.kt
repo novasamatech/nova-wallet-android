@@ -9,8 +9,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.Signer.MessageHashing
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.signingPayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,7 +19,7 @@ interface SignLedgerInteractor {
     suspend fun getSignature(
         device: LedgerDevice,
         metaId: Long,
-        payload: SignerPayloadExtrinsic,
+        payload: InheritedImplication,
     ): SignatureWrapper
 
     suspend fun verifySignature(
@@ -37,7 +37,7 @@ class RealSignLedgerInteractor(
     override suspend fun getSignature(
         device: LedgerDevice,
         metaId: Long,
-        payload: SignerPayloadExtrinsic
+        payload: InheritedImplication
     ): SignatureWrapper = withContext(Dispatchers.Default) {
         val chainId = payload.chainId
         val app = migrationUseCase.determineLedgerApp(chainId, usedVariant)
@@ -49,8 +49,8 @@ class RealSignLedgerInteractor(
         payload: SeparateFlowSignerState,
         signature: SignatureWrapper
     ): Boolean = runCatching {
-        val extrinsic = payload.extrinsic
-        val payloadBytes = extrinsic.encodedSignaturePayload(hashBigPayloads = true)
+        val extrinsic = payload.inheritedImplication
+        val payloadBytes = extrinsic.signingPayload()
         val chainId = extrinsic.chainId
         val chain = chainRegistry.getChain(chainId)
 

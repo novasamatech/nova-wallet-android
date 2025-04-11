@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-class ProxiedLedgerMetaAccount(
+class ProxiedMetaAccount(
     id: Long,
     globallyUniqueId: String,
     substratePublicKey: ByteArray?,

@@ -30,7 +30,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
 import kotlinx.coroutines.Dispatchers

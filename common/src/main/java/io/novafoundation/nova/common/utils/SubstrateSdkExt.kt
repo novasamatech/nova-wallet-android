@@ -21,25 +21,25 @@ import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
-import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.findExplicitOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionId
+import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.call
-import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
-import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
@@ -145,14 +145,6 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     return stream.toByteArray()
 }
 
-fun SignerPayloadExtrinsic.encodedIncludedInExtrinsic(): ByteArray {
-    return ExtrasIncludedInExtrinsic.bytes(runtime, signedExtras.includedInExtrinsic)
-}
-
-fun SignerPayloadExtrinsic.encodedIncludedInSignature(): ByteArray {
-    return ExtrasIncludedInSignature.bytes(runtime, signedExtras.includedInSignature)
-}
-
 fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) =
     bytesOrNull(runtime, value)?.toHexString(withPrefix = true)
 
@@ -161,21 +153,21 @@ fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
 fun RuntimeSnapshot.composeCall(
     moduleName: String,
     callName: String,
-    args: Map<String, Any?>
+    arguments: Map<String, Any?>
 ): GenericCall.Instance {
     val module = metadata.module(moduleName)
     val call = module.call(callName)
 
-    return GenericCall.Instance(module, call, args)
+    return GenericCall.Instance(module, call, arguments)
 }
 
 context(RuntimeContext)
 fun composeCall(
     moduleName: String,
     callName: String,
-    args: Map<String, Any?>
+    arguments: Map<String, Any?>
 ): GenericCall.Instance {
-    return runtime.composeCall(moduleName, callName, args)
+    return runtime.composeCall(moduleName, callName, arguments)
 }
 
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
@@ -220,7 +212,7 @@ fun <V> Constant.getAs(binding: (dynamicInstance: Any?) -> V): V {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
+fun Extrinsic.Instance.tip(): BigInteger? = findExplicitOrNull(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
@@ -425,7 +417,7 @@ fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
         .inputs.first().type
 }
 
-fun ExtrinsicMetadata.signedExtensionOrNull(id: SignedExtensionId): SignedExtensionMetadata? {
+fun ExtrinsicMetadata.transactionExtensionOrNull(id: TransactionExtensionId): TransactionExtensionMetadata? {
     return signedExtensions.find { it.id == id }
 }
 
@@ -452,8 +444,12 @@ fun emptySubstrateAccountId() = ByteArray(32) { 1 }
 
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
-val SignerPayloadExtrinsic.chainId: String
-    get() = genesisHash.toHexString()
+val InheritedImplication.chainId: String
+    get() = getGenesisHashOrThrow().toHexString()
+
+fun ExtrinsicBuilder.getChainIdOrThrow(): String {
+    return getGenesisHashOrThrow().toHexString()
+}
 
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
     ?: fallbacks.firstOrNull { modules[it] != null }

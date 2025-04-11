@@ -1,8 +1,6 @@
 package io.novafoundation.nova.runtime.extrinsic.metadata
 
 import android.util.Log
-import io.novafoundation.nova.common.utils.encodedIncludedInExtrinsic
-import io.novafoundation.nova.common.utils.encodedIncludedInSignature
 import io.novafoundation.nova.common.utils.hasSignedExtension
 import io.novafoundation.nova.metadata_shortener.MetadataShortener
 import io.novafoundation.nova.runtime.ext.shouldDisableMetadataHashCheck
@@ -15,10 +13,9 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
-import io.novasama.substrate_sdk_android.runtime.extrinsic.CheckMetadataHash
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedCallData
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.checkMetadataHash.CheckMetadataHashMode
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersionFull
 import kotlinx.coroutines.sync.Mutex
@@ -28,7 +25,7 @@ interface MetadataShortenerService {
 
     suspend fun isCheckMetadataHashAvailable(chainId: ChainId): Boolean
 
-    suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ExtrinsicProof
+    suspend fun generateExtrinsicProof(payloadExtrinsic: InheritedImplication): ExtrinsicProof
 
     suspend fun generateMetadataProof(chainId: ChainId): MetadataProof
 
@@ -50,15 +47,15 @@ internal class RealMetadataShortenerService(
         return shouldCalculateMetadataHash(runtime.metadata, chain)
     }
 
-    override suspend fun generateExtrinsicProof(payloadExtrinsic: SignerPayloadExtrinsic): ExtrinsicProof {
-        val chainId = payloadExtrinsic.genesisHash.toHexString(withPrefix = false)
+    override suspend fun generateExtrinsicProof(inheritedImplication: InheritedImplication): ExtrinsicProof {
+        val chainId = inheritedImplication.getGenesisHashOrThrow().toHexString(withPrefix = false)
 
         val chain = chainRegistry.getChain(chainId)
         val mainAsset = chain.utilityAsset
 
-        val call = payloadExtrinsic.encodedCallData()
-        val signedExtras = payloadExtrinsic.encodedIncludedInExtrinsic()
-        val additionalSigned = payloadExtrinsic.encodedIncludedInSignature()
+        val call = inheritedImplication.encodedCall()
+        val signedExtras = inheritedImplication.encodedExplicits()
+        val additionalSigned = inheritedImplication.encodedImplicits()
 
         val metadataVersion = rpcCalls.getRuntimeVersion(chainId)
 
@@ -91,7 +88,7 @@ internal class RealMetadataShortenerService(
                 generateMetadataProofOrDisabled(chain, runtimeVersion)
             } else {
                 MetadataProof(
-                    checkMetadataHash = CheckMetadataHash.Disabled,
+                    checkMetadataHash = CheckMetadataHashMode.Disabled,
                     usedVersion = runtimeVersion
                 )
             }
@@ -102,7 +99,7 @@ internal class RealMetadataShortenerService(
         val runtimeVersion = rpcCalls.getRuntimeVersion(chainId)
 
         return MetadataProof(
-            checkMetadataHash = CheckMetadataHash.Disabled,
+            checkMetadataHash = CheckMetadataHashMode.Disabled,
             usedVersion = runtimeVersion,
         )
     }
@@ -115,14 +112,14 @@ internal class RealMetadataShortenerService(
             val hash = generateMetadataHash(chain, runtimeVersion)
 
             MetadataProof(
-                checkMetadataHash = CheckMetadataHash.Enabled(hash),
+                checkMetadataHash = CheckMetadataHashMode.Enabled(hash),
                 usedVersion = runtimeVersion
             )
         }.getOrElse { // Fallback to disabled in case something went wrong during hash generation
             Log.w("MetadataShortenerService", "Failed to generate metadata hash", it)
 
             MetadataProof(
-                checkMetadataHash = CheckMetadataHash.Disabled,
+                checkMetadataHash = CheckMetadataHashMode.Disabled,
                 usedVersion = runtimeVersion
             )
         }

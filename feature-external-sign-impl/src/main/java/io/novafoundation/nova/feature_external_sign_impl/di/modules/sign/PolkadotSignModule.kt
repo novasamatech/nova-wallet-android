@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot.PolkadotSignInteractorFactory
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
@@ -25,7 +26,8 @@ class PolkadotSignModule {
         @ExtrinsicSerialization extrinsicGson: Gson,
         addressIconGenerator: AddressIconGenerator,
         signerProvider: SignerProvider,
-        metadataShortenerService: MetadataShortenerService
+        metadataShortenerService: MetadataShortenerService,
+        signingContextFactory: SigningContext.Factory,
     ) = PolkadotSignInteractorFactory(
         extrinsicService = extrinsicService,
         chainRegistry = chainRegistry,
@@ -33,6 +35,7 @@ class PolkadotSignModule {
         extrinsicGson = extrinsicGson,
         addressIconGenerator = addressIconGenerator,
         signerProvider = signerProvider,
-        metadataShortenerService = metadataShortenerService
+        metadataShortenerService = metadataShortenerService,
+        signingContextFactory = signingContextFactory
     )
 }

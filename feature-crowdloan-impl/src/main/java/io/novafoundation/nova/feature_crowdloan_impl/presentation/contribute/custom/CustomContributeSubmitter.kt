@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import java.math.BigDecimal
 
 interface CustomContributeSubmitter {

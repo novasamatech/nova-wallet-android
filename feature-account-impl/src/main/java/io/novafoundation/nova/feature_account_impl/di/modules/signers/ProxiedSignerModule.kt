@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExt
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxyCallFilterFactory
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
 @Module
 class ProxiedSignerModule {
@@ -30,16 +29,14 @@ class ProxiedSignerModule {
         accountRepository: AccountRepository,
         proxySigningPresenter: ProxySigningPresenter,
         proxyRepository: GetProxyRepository,
-        rpcCalls: RpcCalls,
         proxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
         proxyCallFilterFactory: ProxyCallFilterFactory
     ) = ProxiedSignerFactory(
-        chainRegistry,
-        accountRepository,
-        proxySigningPresenter,
-        proxyRepository,
-        rpcCalls,
-        proxyExtrinsicValidationRequestBus,
-        proxyCallFilterFactory
+        chainRegistry = chainRegistry,
+        accountRepository = accountRepository,
+        proxySigningPresenter = proxySigningPresenter,
+        getProxyRepository = proxyRepository,
+        proxyExtrinsicValidationEventBus = proxyExtrinsicValidationRequestBus,
+        proxyCallFilterFactory = proxyCallFilterFactory
     )
 }

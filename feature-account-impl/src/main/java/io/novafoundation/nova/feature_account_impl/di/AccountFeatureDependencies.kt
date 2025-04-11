@@ -58,11 +58,11 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
@@ -96,8 +96,6 @@ interface AccountFeatureDependencies {
 
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 
-    val extrinsicSplitter: ExtrinsicSplitter
-
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val rootScope: RootScope
@@ -123,6 +121,8 @@ interface AccountFeatureDependencies {
     val metadataShortenerService: MetadataShortenerService
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
+
+    val blockLimitsRepository: BlockLimitsRepository
 
     fun appLinksProvider(): AppLinksProvider
 

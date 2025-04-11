@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import java.math.BigInteger
 
 fun ExtrinsicBuilder.contribute(

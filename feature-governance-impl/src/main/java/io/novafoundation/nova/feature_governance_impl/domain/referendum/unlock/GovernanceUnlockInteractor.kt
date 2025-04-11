@@ -40,7 +40,7 @@ import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -51,7 +51,7 @@ import kotlinx.coroutines.withContext
 
 interface GovernanceUnlockInteractor {
 
-    suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee
+    suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee?
 
     suspend fun unlock(claimable: UnlockChunk.Claimable?): Result<ExtrinsicStatus.InBlock>
 
@@ -79,11 +79,11 @@ class RealGovernanceUnlockInteractor(
     private val extrinsicService: ExtrinsicService,
 ) : GovernanceUnlockInteractor {
 
-    override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee {
+    override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee? {
         val governanceSelectedOption = selectedAssetState.selectedOption()
         val chain = governanceSelectedOption.assetWithChain.chain
 
-        if (claimable == null) return extrinsicService.zeroFee(chain, TransactionOrigin.SelectedWallet)
+        if (claimable == null) return null
 
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val origin = metaAccount.accountIdIn(chain)!!

@@ -54,7 +54,7 @@ class ScanSignParitySignerViewModel(
     }
 
     override suspend fun scanned(result: String) {
-        interactor.encodeAndVerifySignature(signSharedState.getOrThrow().extrinsic, result)
+        interactor.encodeAndVerifySignature(signSharedState.getOrThrow().inheritedImplication, result)
             .onSuccess(::respondResult)
             .onFailure {
                 invalidQrConfirmation.awaitAction()

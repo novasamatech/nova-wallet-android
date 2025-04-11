@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeC
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 

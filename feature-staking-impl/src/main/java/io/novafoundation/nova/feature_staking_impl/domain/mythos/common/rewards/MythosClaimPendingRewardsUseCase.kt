@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.calls.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import javax.inject.Inject
 
 interface MythosClaimPendingRewardsUseCase {

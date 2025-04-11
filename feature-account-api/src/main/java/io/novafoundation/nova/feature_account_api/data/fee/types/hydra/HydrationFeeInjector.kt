@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_api.data.fee.types.hydra
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import java.math.BigInteger
 
 interface HydrationFeeInjector {
