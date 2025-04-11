@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
@@ -32,6 +32,10 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -51,6 +55,7 @@ dependencies {
 
     implementation kotlinDep
 
+    
     implementation androidDep
     implementation materialDep
     implementation cardViewDep

@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -14,14 +10,15 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentTradeProviderListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_trade_provider_list.tradeProviderList
-import kotlinx.android.synthetic.main.fragment_trade_provider_list.tradeProviderListToolbar
 
-class TradeProviderListFragment : BaseFragment<TradeProviderListViewModel>(), TradeProviderAdapter.ItemHandler {
+class TradeProviderListFragment : BaseFragment<TradeProviderListViewModel, FragmentTradeProviderListBinding>(), TradeProviderAdapter.ItemHandler {
 
     companion object : PayloadCreator<TradeProviderListPayload> by FragmentPayloadCreator()
+
+    override fun createBinding() = FragmentTradeProviderListBinding.inflate(layoutInflater)
 
     private val titleAdapter by lazy(LazyThreadSafetyMode.NONE) {
         TextAdapter(styleRes = R.style.TextAppearance_NovaFoundation_Bold_Title3)
@@ -44,18 +41,10 @@ class TradeProviderListFragment : BaseFragment<TradeProviderListViewModel>(), Tr
         ConcatAdapter(titleAdapter, providersAdapter, footerAdapter)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_trade_provider_list, container, false)
-    }
-
     override fun initViews() {
-        tradeProviderListToolbar.applyStatusBarInsets()
-        tradeProviderListToolbar.setHomeButtonListener { viewModel.back() }
-        tradeProviderList.adapter = adapter
+        binder.tradeProviderListToolbar.applyStatusBarInsets()
+        binder.tradeProviderListToolbar.setHomeButtonListener { viewModel.back() }
+        binder.tradeProviderList.adapter = adapter
     }
 
     override fun inject() {

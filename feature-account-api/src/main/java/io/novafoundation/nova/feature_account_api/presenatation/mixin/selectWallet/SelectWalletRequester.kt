@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.navigation.InterScreenRequester
 import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator.Payload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator.Response
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 interface SelectWalletRequester : InterScreenRequester<Payload, Response>
 

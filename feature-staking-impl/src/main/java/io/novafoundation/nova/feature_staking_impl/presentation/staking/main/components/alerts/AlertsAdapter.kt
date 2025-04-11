@@ -1,25 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_alert.view.alertItemGoToFlowIcon
-import kotlinx.android.synthetic.main.item_alert.view.alertItemMessage
-import kotlinx.android.synthetic.main.item_alert.view.alertItemTitle
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemAlertBinding
 
 class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(AlertDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlertViewHolder {
-        val view = parent.inflateChild(R.layout.item_alert)
-
-        return AlertViewHolder(view)
+        return AlertViewHolder(ItemAlertBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: AlertViewHolder, position: Int) {
@@ -28,16 +21,16 @@ class AlertsAdapter : ListAdapter<AlertModel, AlertsAdapter.AlertViewHolder>(Ale
         holder.bind(item)
     }
 
-    class AlertViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    class AlertViewHolder(private val binder: ItemAlertBinding) : RecyclerView.ViewHolder(binder.root) {
 
-        fun bind(alert: AlertModel) = with(containerView) {
+        fun bind(alert: AlertModel) = with(binder) {
             alertItemTitle.text = alert.title
             alertItemMessage.text = alert.extraMessage
 
             if (alert.type is AlertModel.Type.CallToAction) {
                 alertItemGoToFlowIcon.makeVisible()
 
-                setOnClickListener {
+                root.setOnClickListener {
                     alert.type.action()
                 }
             } else {

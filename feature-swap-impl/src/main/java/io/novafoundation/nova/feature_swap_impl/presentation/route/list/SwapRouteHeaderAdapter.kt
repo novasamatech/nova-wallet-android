@@ -2,9 +2,8 @@ package io.novafoundation.nova.feature_swap_impl.presentation.route.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_swap_impl.R
-import kotlinx.android.synthetic.main.item_route_header.view.swapRouteBack
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_swap_impl.databinding.ItemRouteHeaderBinding
 
 class SwapRouteHeaderAdapter(
     private val handler: Handler
@@ -16,7 +15,7 @@ class SwapRouteHeaderAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwapRouteHeaderViewHolder {
-        return SwapRouteHeaderViewHolder(parent, handler)
+        return SwapRouteHeaderViewHolder(ItemRouteHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun getItemCount(): Int {
@@ -27,11 +26,11 @@ class SwapRouteHeaderAdapter(
 }
 
 class SwapRouteHeaderViewHolder(
-    parentView: ViewGroup,
+    binder: ItemRouteHeaderBinding,
     handler: SwapRouteHeaderAdapter.Handler
-) : RecyclerView.ViewHolder(parentView.inflateChild(R.layout.item_route_header)) {
+) : RecyclerView.ViewHolder(binder.root) {
 
     init {
-        itemView.swapRouteBack.setHomeButtonListener { handler.backClicked() }
+        binder.swapRouteBack.setHomeButtonListener { handler.backClicked() }
     }
 }

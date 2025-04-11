@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.se
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.math.BigInteger
 

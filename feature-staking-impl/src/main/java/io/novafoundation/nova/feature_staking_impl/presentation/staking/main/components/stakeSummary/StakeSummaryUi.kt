@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 
-fun BaseFragment<*>.setupStakeSummaryComponent(component: StakeSummaryComponent, view: StakeSummaryView) {
+fun BaseFragment<*, *>.setupStakeSummaryComponent(component: StakeSummaryComponent, view: StakeSummaryView) {
     // state
     component.state.observe { stakeSummaryState ->
         if (stakeSummaryState == null) {

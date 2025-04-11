@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -24,6 +24,14 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_account_api'
+
+    packagingOptions {
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -36,7 +44,7 @@ dependencies {
     implementation project(':feature-ledger-api')
     implementation project(':feature-xcm:api')
     implementation project(':web3names')
-    
+
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep
     implementation androidDep

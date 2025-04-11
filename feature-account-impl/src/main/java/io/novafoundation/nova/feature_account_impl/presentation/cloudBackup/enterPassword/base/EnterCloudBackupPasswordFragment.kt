@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.base
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -13,51 +10,40 @@ import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_impl.R
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.enterBackupPasswordSubtitle
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.enterBackupPasswordTitle
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupContinueBtn
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupForgotPassword
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupInput
-import kotlinx.android.synthetic.main.fragment_restore_cloud_backup.restoreCloudBackupToolbar
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentRestoreCloudBackupBinding
 
-abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T>() {
+abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordViewModel> : BaseFragment<T, FragmentRestoreCloudBackupBinding>() {
+
+    override fun createBinding() = FragmentRestoreCloudBackupBinding.inflate(layoutInflater)
 
     abstract val titleRes: Int
     abstract val subtitleRes: Int
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_restore_cloud_backup, container, false)
-    }
-
     override fun initViews() {
-        restoreCloudBackupToolbar.applyStatusBarInsets()
-        restoreCloudBackupToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.restoreCloudBackupToolbar.applyStatusBarInsets()
+        binder.restoreCloudBackupToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        enterBackupPasswordTitle.setText(titleRes)
-        enterBackupPasswordSubtitle.setText(subtitleRes)
+        binder.enterBackupPasswordTitle.setText(titleRes)
+        binder.enterBackupPasswordSubtitle.setText(subtitleRes)
 
-        restoreCloudBackupContinueBtn.prepareForProgress(viewLifecycleOwner)
-        restoreCloudBackupContinueBtn.setOnClickListener { viewModel.continueClicked() }
-        restoreCloudBackupInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
-        restoreCloudBackupForgotPassword.setOnClickListener { viewModel.forgotPasswordClicked() }
+        binder.restoreCloudBackupContinueBtn.prepareForProgress(viewLifecycleOwner)
+        binder.restoreCloudBackupContinueBtn.setOnClickListener { viewModel.continueClicked() }
+        binder.restoreCloudBackupInput.setEndIconOnClickListener { viewModel.toggleShowPassword() }
+        binder.restoreCloudBackupForgotPassword.setOnClickListener { viewModel.forgotPasswordClicked() }
     }
 
     override fun subscribe(viewModel: T) {
         observeActionBottomSheet(viewModel)
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.confirmationAwaitableAction)
 
-        restoreCloudBackupInput.content.bindTo(viewModel.passwordFlow, lifecycleScope)
+        binder.restoreCloudBackupInput.content.bindTo(viewModel.passwordFlow, lifecycleScope)
 
         viewModel.continueButtonState.observe { state ->
-            restoreCloudBackupContinueBtn.setState(state)
+            binder.restoreCloudBackupContinueBtn.setState(state)
         }
 
         viewModel.showPassword.observe {
-            restoreCloudBackupInput.content.switchPasswordInputType(it)
+            binder.restoreCloudBackupInput.content.switchPasswordInputType(it)
         }
     }
 }

@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.DrawableExtension
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.enableShowingNewlyAddedTopElements
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -25,12 +26,7 @@ import io.novafoundation.nova.common.utils.updateTopMargin
 import io.novafoundation.nova.common.view.bottomSheet.LockBottomSheetBehavior
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.view_transfer_history.view.placeholder
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryFilter
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryList
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryProgress
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryPuller
-import kotlinx.android.synthetic.main.view_transfer_history.view.transactionHistoryTitle
+import io.novafoundation.nova.feature_assets.databinding.ViewTransferHistoryBinding
 import kotlin.math.max
 
 typealias ScrollingListener = (position: Int) -> Unit
@@ -88,9 +84,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     private val collapsedBackgroundColor: Int = context.getColor(R.color.android_history_background)
     private val expandedBackgroundColor: Int = context.getColor(R.color.secondary_screen_background)
 
-    init {
-        View.inflate(context, R.layout.view_transfer_history, this)
+    private val binder = ViewTransferHistoryBinding.inflate(inflater(), this)
 
+    init {
         val contentBackgroundDrawable = context.getTopRoundedCornerDrawable(
             fillColorRes = R.color.android_history_background,
             strokeColorRes = R.color.container_border,
@@ -105,8 +101,8 @@ class TransferHistorySheet @JvmOverloads constructor(
 
         background = borderDrawable
 
-        transactionHistoryList.adapter = adapter
-        transactionHistoryList.setHasFixedSize(true)
+        binder.transactionHistoryList.adapter = adapter
+        binder.transactionHistoryList.setHasFixedSize(true)
 
         addScrollListener()
 
@@ -114,13 +110,13 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     fun setFiltersVisible(visible: Boolean) {
-        transactionHistoryFilter.setVisible(visible)
+        binder.transactionHistoryFilter.setVisible(visible)
     }
 
     fun showProgress() {
-        placeholder.makeGone()
-        transactionHistoryProgress.makeVisible()
-        transactionHistoryList.makeGone()
+        binder.placeholder.makeGone()
+        binder.transactionHistoryProgress.makeVisible()
+        binder.transactionHistoryList.makeGone()
 
         adapter.submitList(emptyList())
 
@@ -128,9 +124,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     fun showPlaceholder() {
-        placeholder.makeVisible()
-        transactionHistoryProgress.makeGone()
-        transactionHistoryList.makeGone()
+        binder.placeholder.makeVisible()
+        binder.transactionHistoryProgress.makeGone()
+        binder.transactionHistoryList.makeGone()
 
         adapter.submitList(emptyList())
 
@@ -138,9 +134,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     fun showTransactions(transactions: List<Any>) {
-        placeholder.makeGone()
-        transactionHistoryProgress.makeGone()
-        transactionHistoryList.makeVisible()
+        binder.placeholder.makeGone()
+        binder.transactionHistoryProgress.makeGone()
+        binder.transactionHistoryList.makeVisible()
 
         bottomSheetBehavior?.isDraggable = true
 
@@ -182,7 +178,7 @@ class TransferHistorySheet @JvmOverloads constructor(
     }
 
     fun setFilterClickListener(clickListener: OnClickListener) {
-        transactionHistoryFilter.setOnClickListener(clickListener)
+        binder.transactionHistoryFilter.setOnClickListener(clickListener)
     }
 
     fun initializeBehavior(anchorView: View) {
@@ -208,7 +204,7 @@ class TransferHistorySheet @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        adapterDataObserver = transactionHistoryList.enableShowingNewlyAddedTopElements()
+        adapterDataObserver = binder.transactionHistoryList.enableShowingNewlyAddedTopElements()
     }
 
     override fun onDetachedFromWindow() {
@@ -234,7 +230,7 @@ class TransferHistorySheet @JvmOverloads constructor(
             }
         }
 
-        transactionHistoryList.addOnScrollListener(scrollListener)
+        binder.transactionHistoryList.addOnScrollListener(scrollListener)
     }
 
     private fun removeLayoutListener() {
@@ -259,11 +255,11 @@ class TransferHistorySheet @JvmOverloads constructor(
         val newMargin = linearUpdate(MIN_MARGIN, MAX_MARGIN, lastOffset)
         val newMarginPx = newMargin.dp(context)
 
-        transactionHistoryTitle.updateTopMargin(newMarginPx)
+        binder.transactionHistoryTitle.updateTopMargin(newMarginPx)
     }
 
     private fun updatePullerVisibility() {
-        transactionHistoryPuller.setVisible(lastOffset < PULLER_VISIBILITY_OFFSET, falseState = View.INVISIBLE)
+        binder.transactionHistoryPuller.setVisible(lastOffset < PULLER_VISIBILITY_OFFSET, falseState = View.INVISIBLE)
     }
 
     private fun updateBackgroundAlpha() {

@@ -2,15 +2,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.vi
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setShimmerVisible
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoGain
-import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoGainShimmer
-import kotlinx.android.synthetic.main.view_staking_info.view.stakingInfoTitle
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewStakingInfoBinding
 
 class StakingInfoView @JvmOverloads constructor(
     context: Context,
@@ -18,9 +16,9 @@ class StakingInfoView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : LinearLayout(context, attrs, defStyle) {
 
-    init {
-        View.inflate(context, R.layout.view_staking_info, this)
+    private val binder = ViewStakingInfoBinding.inflate(inflater(), this)
 
+    init {
         orientation = VERTICAL
 
         attrs?.let { applyAttributes(it) }
@@ -36,18 +34,18 @@ class StakingInfoView @JvmOverloads constructor(
     }
 
     fun setTitle(title: String) {
-        stakingInfoTitle.text = title
+        binder.stakingInfoTitle.text = title
     }
 
     fun showLoading() {
-        stakingInfoGainShimmer.setShimmerVisible(true)
-        stakingInfoGain.makeGone()
+        binder.stakingInfoGainShimmer.setShimmerVisible(true)
+        binder.stakingInfoGain.makeGone()
     }
 
     fun showGain(gain: String) {
-        stakingInfoGainShimmer.setShimmerVisible(false)
-        stakingInfoGain.makeVisible()
+        binder.stakingInfoGainShimmer.setShimmerVisible(false)
+        binder.stakingInfoGain.makeVisible()
 
-        stakingInfoGain.text = gain
+        binder.stakingInfoGain.text = gain
     }
 }

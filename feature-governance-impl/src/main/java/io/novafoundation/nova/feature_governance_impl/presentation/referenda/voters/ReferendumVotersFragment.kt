@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -13,18 +11,14 @@ import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendumVotersBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VoterItemDecoration
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.voters.list.VotersAdapter
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersCount
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersList
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersPlaceholder
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersProgress
-import kotlinx.android.synthetic.main.fragment_referendum_voters.referendumVotersToolbar
+
 import javax.inject.Inject
 
-class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), VotersAdapter.Handler {
+class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel, FragmentReferendumVotersBinding>(), VotersAdapter.Handler {
 
     companion object {
         private const val KEY_PAYLOAD = "payload"
@@ -36,25 +30,19 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
         }
     }
 
+    override fun createBinding() = FragmentReferendumVotersBinding.inflate(layoutInflater)
+
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private val votersAdapter by lazy(LazyThreadSafetyMode.NONE) { VotersAdapter(this, imageLoader) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_referendum_voters, container, false)
-    }
-
     override fun initViews() {
-        referendumVotersToolbar.setTitle(viewModel.title)
-        referendumVotersList.setHasFixedSize(true)
-        referendumVotersList.adapter = votersAdapter
-        referendumVotersList.addItemDecoration(VoterItemDecoration(requireContext(), votersAdapter))
-        referendumVotersToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.referendumVotersToolbar.setTitle(viewModel.title)
+        binder.referendumVotersList.setHasFixedSize(true)
+        binder.referendumVotersList.adapter = votersAdapter
+        binder.referendumVotersList.addItemDecoration(VoterItemDecoration(requireContext(), votersAdapter))
+        binder.referendumVotersToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun inject() {
@@ -74,17 +62,17 @@ class ReferendumVotersFragment : BaseFragment<ReferendumVotersViewModel>(), Vote
             if (it is LoadingState.Loaded) {
                 val voters = it.data
                 votersAdapter.submitList(voters)
-                referendumVotersPlaceholder.isVisible = voters.isEmpty()
-                referendumVotersList.isVisible = voters.isNotEmpty()
-                referendumVotersCount.makeVisible()
-                referendumVotersProgress.makeGone()
+                binder.referendumVotersPlaceholder.isVisible = voters.isEmpty()
+                binder.referendumVotersList.isVisible = voters.isNotEmpty()
+                binder.referendumVotersCount.makeVisible()
+                binder.referendumVotersProgress.makeGone()
             } else {
-                referendumVotersPlaceholder.makeGone()
-                referendumVotersProgress.makeVisible()
+                binder.referendumVotersPlaceholder.makeGone()
+                binder.referendumVotersProgress.makeVisible()
             }
         }
 
-        viewModel.votersCount.observe(referendumVotersCount::setText)
+        viewModel.votersCount.observe(binder.referendumVotersCount::setText)
     }
 
     override fun onVoterClick(position: Int) {

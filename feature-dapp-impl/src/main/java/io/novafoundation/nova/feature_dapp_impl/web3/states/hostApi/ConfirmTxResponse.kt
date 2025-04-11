@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class ConfirmTxResponse : Parcelable {
 

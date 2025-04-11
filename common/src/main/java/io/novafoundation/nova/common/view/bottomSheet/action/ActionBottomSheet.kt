@@ -1,26 +1,24 @@
 package io.novafoundation.nova.common.view.bottomSheet.action
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.BottomSheetActionBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
-import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetCheckBox
-import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetImage
-import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetNeutralBtn
-import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetPositiveBtn
-import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetSubtitle
-import kotlinx.android.synthetic.main.bottom_sheet_action.actionBottomSheetTitle
 
 class ActionBottomSheet(
     context: Context,
     payload: Payload
-) : BaseBottomSheet(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
+) : BaseBottomSheet<BottomSheetActionBinding>(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
+
+    override val binder: BottomSheetActionBinding = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
 
     class Payload(
         @DrawableRes val imageRes: Int,
@@ -47,26 +45,24 @@ class ActionBottomSheet(
     }
 
     private val iconView: ImageView
-        get() = actionBottomSheetImage
+        get() = binder.actionBottomSheetImage
 
     private val titleView: TextView
-        get() = actionBottomSheetTitle
+        get() = binder.actionBottomSheetTitle
 
     private val subtitleView: TextView
-        get() = actionBottomSheetSubtitle
+        get() = binder.actionBottomSheetSubtitle
 
     private val neutralButton: PrimaryButton
-        get() = actionBottomSheetNeutralBtn
+        get() = binder.actionBottomSheetNeutralBtn
 
     private val actionButton: PrimaryButton
-        get() = actionBottomSheetPositiveBtn
+        get() = binder.actionBottomSheetPositiveBtn
 
     private val checkBox: CheckBox
-        get() = actionBottomSheetCheckBox
+        get() = binder.actionBottomSheetCheckBox
 
     init {
-        setContentView(R.layout.bottom_sheet_action)
-
         iconView.setImageResource(payload.imageRes)
         titleView.text = payload.title
         subtitleView.text = payload.subtitle

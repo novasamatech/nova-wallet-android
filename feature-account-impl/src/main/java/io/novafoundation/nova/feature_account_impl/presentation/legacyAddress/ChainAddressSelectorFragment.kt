@@ -2,8 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.legacyAddress
 
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -17,16 +15,10 @@ import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentChainAddressSelectorBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.addressFormatAddress
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.addressFormatAddressLegacy
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.addressLegacyContainer
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.addressNewContainer
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.legacyAddressButton
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.legacyAddressCheckbox
-import kotlinx.android.synthetic.main.fragment_chain_address_selector.selectLegacyAddressSubtitle
 
-class ChainAddressSelectorFragment : BaseBottomSheetFragment<ChainAddressSelectorViewModel>() {
+class ChainAddressSelectorFragment : BaseBottomSheetFragment<ChainAddressSelectorViewModel, FragmentChainAddressSelectorBinding>() {
 
     companion object {
         private const val KEY_PAYLOAD = "KEY_REQUEST"
@@ -38,25 +30,21 @@ class ChainAddressSelectorFragment : BaseBottomSheetFragment<ChainAddressSelecto
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ) = layoutInflater.inflate(R.layout.fragment_chain_address_selector, container, false)
+    override fun createBinding() = FragmentChainAddressSelectorBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        selectLegacyAddressSubtitle.movementMethod = LinkMovementMethod.getInstance()
-        selectLegacyAddressSubtitle.text = getDescriptionSpannableText()
+        binder.selectLegacyAddressSubtitle.movementMethod = LinkMovementMethod.getInstance()
+        binder.selectLegacyAddressSubtitle.text = getDescriptionSpannableText()
 
-        legacyAddressCheckbox.isChecked = viewModel.addressSelectorDisabled()
-        legacyAddressCheckbox.setOnCheckedChangeListener { _, isChecked -> viewModel.disableAddressSelector(isChecked) }
+        binder.legacyAddressCheckbox.isChecked = viewModel.addressSelectorDisabled()
+        binder.legacyAddressCheckbox.setOnCheckedChangeListener { _, isChecked -> viewModel.disableAddressSelector(isChecked) }
 
-        legacyAddressButton.setOnClickListener { viewModel.back() }
-        addressNewContainer.setOnClickListener { viewModel.copyNewAddress() }
-        addressLegacyContainer.setOnClickListener { viewModel.copyLegacyAddress() }
+        binder.legacyAddressButton.setOnClickListener { viewModel.back() }
+        binder.addressNewContainer.setOnClickListener { viewModel.copyNewAddress() }
+        binder.addressLegacyContainer.setOnClickListener { viewModel.copyLegacyAddress() }
 
-        addressNewContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 16).withRippleMask()
-        addressLegacyContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 16).withRippleMask()
+        binder.addressNewContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 16).withRippleMask()
+        binder.addressLegacyContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 16).withRippleMask()
     }
 
     override fun inject() {
@@ -72,8 +60,8 @@ class ChainAddressSelectorFragment : BaseBottomSheetFragment<ChainAddressSelecto
     override fun subscribe(viewModel: ChainAddressSelectorViewModel) {
         observeBrowserEvents(viewModel)
 
-        viewModel.newAddressFlow.observe { addressFormatAddress.text = it }
-        viewModel.legacyAddressFlow.observe { addressFormatAddressLegacy.text = it }
+        viewModel.newAddressFlow.observe { binder.addressFormatAddress.text = it }
+        viewModel.legacyAddressFlow.observe { binder.addressFormatAddressLegacy.text = it }
     }
 
     private fun getDescriptionSpannableText(): CharSequence {

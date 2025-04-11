@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ReferendumFullDetailsPayload(

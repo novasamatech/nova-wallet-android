@@ -1,15 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_manage_assets.view.balanceListAssetTitle
-import kotlinx.android.synthetic.main.item_manage_assets.view.balanceListManage
-import kotlinx.android.synthetic.main.item_manage_assets.view.balanceListSearch
+import io.novafoundation.nova.feature_assets.databinding.ItemManageAssetsBinding
 
 class ManageAssetsAdapter(private val handler: Handler) : RecyclerView.Adapter<ManageAssetsHolder>() {
 
@@ -30,7 +26,8 @@ class ManageAssetsAdapter(private val handler: Handler) : RecyclerView.Adapter<M
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageAssetsHolder {
-        return ManageAssetsHolder(parent.inflateChild(viewType), handler)
+        val binder = ItemManageAssetsBinding.inflate(parent.inflater(), parent, false)
+        return ManageAssetsHolder(binder, handler)
     }
 
     override fun onBindViewHolder(holder: ManageAssetsHolder, position: Int) {
@@ -47,16 +44,16 @@ class ManageAssetsAdapter(private val handler: Handler) : RecyclerView.Adapter<M
 }
 
 class ManageAssetsHolder(
-    override val containerView: View,
+    private val binder: ItemManageAssetsBinding,
     handler: ManageAssetsAdapter.Handler,
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : RecyclerView.ViewHolder(binder.root) {
 
     companion object : WithViewType {
         override val viewType: Int = R.layout.item_manage_assets
     }
 
     init {
-        with(containerView) {
+        with(binder) {
             balanceListManage.setOnClickListener { handler.manageClicked() }
             balanceListSearch.setOnClickListener { handler.searchClicked() }
             balanceListAssetTitle.setOnClickListener { handler.assetViewModeClicked() }
@@ -64,6 +61,6 @@ class ManageAssetsHolder(
     }
 
     fun bind(assetViewModeModel: AssetViewModeModel?) {
-        assetViewModeModel?.let { itemView.balanceListAssetTitle.switchTextTo(assetViewModeModel) }
+        assetViewModeModel?.let { binder.balanceListAssetTitle.switchTextTo(assetViewModeModel) }
     }
 }

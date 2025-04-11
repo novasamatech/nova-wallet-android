@@ -3,7 +3,8 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.de
 import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_account_api.databinding.ItemDelegatedAccountGroupBinding
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountDiffCallback
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountGroupViewHolderFactory
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.CommonAccountsAdapter
@@ -27,11 +28,6 @@ class DelegatedAccountsAdapter(
 private class DelegatedAccountsGroupFactory : AccountGroupViewHolderFactory {
 
     override fun create(parent: ViewGroup): GroupedListHolder {
-        return AccountTitleHolder(
-            parent.inflateChild(
-                R.layout.item_delegated_account_group,
-                false
-            )
-        )
+        return AccountTitleHolder(ItemDelegatedAccountGroupBinding.inflate(parent.inflater(), parent, false))
     }
 }

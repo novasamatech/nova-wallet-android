@@ -1,20 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemListDefaultBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.list.model.PendingPayoutModel
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementDescriptionLeft
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementDescriptionRight
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementTitleLeft
-import kotlinx.android.synthetic.main.item_list_default.view.itemListElementTitleRight
+
 import kotlin.time.ExperimentalTime
 
 class PayoutAdapter(
@@ -26,9 +22,7 @@ class PayoutAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PayoutViewHolder {
-        val view = parent.inflateChild(R.layout.item_list_default)
-
-        return PayoutViewHolder(view)
+        return PayoutViewHolder(ItemListDefaultBinding.inflate(parent.inflater(), parent, false))
     }
 
     @ExperimentalTime
@@ -50,14 +44,14 @@ private class PayoutModelDiffCallback : DiffUtil.ItemCallback<PendingPayoutModel
     }
 }
 
-class PayoutViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+class PayoutViewHolder(private val binder: ItemListDefaultBinding) : RecyclerView.ViewHolder(binder.root) {
 
     @ExperimentalTime
-    fun bind(payout: PendingPayoutModel, itemHandler: PayoutAdapter.ItemHandler) = with(containerView) {
+    fun bind(payout: PendingPayoutModel, itemHandler: PayoutAdapter.ItemHandler) = with(binder) {
         with(payout) {
             itemListElementDescriptionLeft.startTimer(timeLeft, createdAt) {
-                it.text = context.getText(R.string.staking_payout_expired)
-                it.setTextColor(context.getColor(R.color.text_negative))
+                it.text = binder.root.context.getText(R.string.staking_payout_expired)
+                it.setTextColor(binder.root.context.getColor(R.color.text_negative))
             }
 
             itemListElementTitleLeft.text = validatorTitle
@@ -66,6 +60,6 @@ class PayoutViewHolder(override val containerView: View) : RecyclerView.ViewHold
             itemListElementDescriptionLeft.setTextColorRes(daysLeftColor)
         }
 
-        setOnClickListener { itemHandler.payoutClicked(bindingAdapterPosition) }
+        binder.root.setOnClickListener { itemHandler.payoutClicked(bindingAdapterPosition) }
     }
 }

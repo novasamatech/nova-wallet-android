@@ -1,13 +1,10 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.list
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.item_delegations_sort_and_filter.view.itemDelegateListFilters
-import kotlinx.android.synthetic.main.item_delegations_sort_and_filter.view.itemDelegateListSorting
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_governance_impl.databinding.ItemDelegationsSortAndFilterBinding
 
 class DelegateSortAndFilterAdapter(
     private val handler: Handler
@@ -23,9 +20,7 @@ class DelegateSortAndFilterAdapter(
     private var filteringValue: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DelegationSortAndFilterHolder {
-        val containerView = parent.inflateChild(R.layout.item_delegations_sort_and_filter)
-
-        return DelegationSortAndFilterHolder(containerView, handler)
+        return DelegationSortAndFilterHolder(ItemDelegationsSortAndFilterBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun getItemCount(): Int {
@@ -48,12 +43,12 @@ class DelegateSortAndFilterAdapter(
 }
 
 class DelegationSortAndFilterHolder(
-    containerView: View,
+    private val binder: ItemDelegationsSortAndFilterBinding,
     handler: DelegateSortAndFilterAdapter.Handler
-) : ViewHolder(containerView) {
+) : ViewHolder(binder.root) {
 
     init {
-        with(containerView) {
+        with(binder) {
             itemDelegateListSorting.setOnClickListener {
                 handler.sortingClicked()
             }
@@ -64,7 +59,7 @@ class DelegationSortAndFilterHolder(
     }
 
     fun bind(sortingValue: String?, filteringValue: String?) {
-        with(itemView) {
+        with(binder) {
             itemDelegateListSorting.setValueDisplay(sortingValue)
             itemDelegateListFilters.setValueDisplay(filteringValue)
         }

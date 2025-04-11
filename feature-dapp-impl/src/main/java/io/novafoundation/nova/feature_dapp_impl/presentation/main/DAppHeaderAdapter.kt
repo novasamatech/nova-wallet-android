@@ -5,17 +5,12 @@ import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
-import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappHeaderBinding
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
-import kotlinx.android.synthetic.main.item_dapp_header.view.categorizedDappsCategoriesShimmering
-import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainManage
-import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSearch
-import kotlinx.android.synthetic.main.item_dapp_header.view.dappMainSelectedWallet
-import kotlinx.android.synthetic.main.item_dapp_header.view.mainDappCategories
 
 class DAppHeaderAdapter(
     val imageLoader: ImageLoader,
@@ -44,7 +39,7 @@ class DAppHeaderAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
         return HeaderHolder(
             imageLoader,
-            parent.inflateChild(R.layout.item_dapp_header),
+            ItemDappHeaderBinding.inflate(parent.inflater(), parent, false),
             headerHandler,
             categoriesHandler
         )
@@ -94,19 +89,19 @@ class DAppHeaderAdapter(
 }
 
 class HeaderHolder(
-    imageLoader: ImageLoader,
-    view: View,
+    private val imageLoader: ImageLoader,
+    private val binder: ItemDappHeaderBinding,
     headerHandler: DAppHeaderAdapter.Handler,
     categoriesHandler: DappCategoriesAdapter.Handler
-) : RecyclerView.ViewHolder(view) {
+) : RecyclerView.ViewHolder(binder.root) {
 
     private val categoriesAdapter = DappCategoriesAdapter(imageLoader, categoriesHandler)
 
     init {
-        view.dappMainSelectedWallet.setOnClickListener { headerHandler.onWalletClick() }
-        view.dappMainSearch.setOnClickListener { headerHandler.onSearchClick() }
-        view.dappMainManage.setOnClickListener { headerHandler.onManageClick() }
-        view.mainDappCategories.adapter = categoriesAdapter
+        binder.dappMainSelectedWallet.setOnClickListener { headerHandler.onWalletClick() }
+        binder.dappMainSearch.setOnClickListener { headerHandler.onSearchClick() }
+        binder.dappMainManage.setOnClickListener { headerHandler.onManageClick() }
+        binder.mainDappCategories.adapter = categoriesAdapter
     }
 
     fun bind(
@@ -120,17 +115,17 @@ class HeaderHolder(
         bindCategoriesShimmering(showCategoriesShimmering)
     }
 
-    fun bindWallet(walletModel: SelectedWalletModel?) = with(itemView) {
+    fun bindWallet(walletModel: SelectedWalletModel?) = with(binder) {
         walletModel?.let { dappMainSelectedWallet.setModel(walletModel) }
     }
 
-    fun bindCategories(categoriesState: List<DAppCategoryModel>) = with(itemView) {
+    fun bindCategories(categoriesState: List<DAppCategoryModel>) = with(binder) {
         categoriesAdapter.submitList(categoriesState)
     }
 
     fun bindCategoriesShimmering(showCategoriesShimmering: Boolean) = with(itemView) {
-        categorizedDappsCategoriesShimmering.setVisible(showCategoriesShimmering, falseState = View.INVISIBLE)
-        mainDappCategories.isInvisible = showCategoriesShimmering
+        binder.categorizedDappsCategoriesShimmering.setVisible(showCategoriesShimmering, falseState = View.INVISIBLE)
+        binder.mainDappCategories.isInvisible = showCategoriesShimmering
     }
 }
 

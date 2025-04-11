@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.start
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_ledger_impl.R
-import kotlinx.android.synthetic.main.item_import_ledger_instruction.view.startImportLedgerInstruction
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_ledger_impl.databinding.ItemImportLedgerInstructionBinding
 
 class LedgerGuideItem(
     val number: Int,
@@ -17,7 +15,7 @@ class LedgerGuideItem(
 class StartImportLedgerInstructionAdapter : ListAdapter<LedgerGuideItem, LedgerInstructionViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LedgerInstructionViewHolder {
-        return LedgerInstructionViewHolder(parent.inflateChild(R.layout.item_import_ledger_instruction))
+        return LedgerInstructionViewHolder(ItemImportLedgerInstructionBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: LedgerInstructionViewHolder, position: Int) {
@@ -35,9 +33,9 @@ private object DiffCallback : DiffUtil.ItemCallback<LedgerGuideItem>() {
     }
 }
 
-class LedgerInstructionViewHolder(itemView: View) : ViewHolder(itemView) {
+class LedgerInstructionViewHolder(private val binder: ItemImportLedgerInstructionBinding) : ViewHolder(binder.root) {
     fun bind(instruction: LedgerGuideItem) {
-        itemView.startImportLedgerInstruction.setStepNumber(instruction.number)
-        itemView.startImportLedgerInstruction.setStepText(instruction.text)
+        binder.startImportLedgerInstruction.setStepNumber(instruction.number)
+        binder.startImportLedgerInstruction.setStepText(instruction.text)
     }
 }

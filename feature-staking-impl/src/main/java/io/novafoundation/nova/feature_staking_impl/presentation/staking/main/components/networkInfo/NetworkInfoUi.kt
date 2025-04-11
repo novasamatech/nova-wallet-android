@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.main.co
 
 import io.novafoundation.nova.common.base.BaseFragment
 
-fun BaseFragment<*>.setupNetworkInfoComponent(component: NetworkInfoComponent, view: NetworkInfoView) {
+fun BaseFragment<*, *>.setupNetworkInfoComponent(component: NetworkInfoComponent, view: NetworkInfoView) {
     // state
     component.state.observe { networkInfoState ->
         view.setState(networkInfoState)

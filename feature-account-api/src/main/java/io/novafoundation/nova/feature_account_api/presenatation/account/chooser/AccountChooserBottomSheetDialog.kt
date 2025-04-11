@@ -2,18 +2,15 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.chooser
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
-import io.novafoundation.nova.feature_account_api.R
-import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChooserAddress
-import kotlinx.android.synthetic.main.item_account_chooser.view.itemAccountChooserCheck
+import io.novafoundation.nova.feature_account_api.databinding.ItemAccountChooserBinding
 
 class AccountChooserBottomSheetDialog(
     context: Context,
@@ -36,11 +33,11 @@ class AccountChooserBottomSheetDialog(
     }
 
     override fun holderCreator(): HolderCreator<AddressModel> = { parent ->
-        AddressModelHolder(parent.inflateChild(R.layout.item_account_chooser))
+        AddressModelHolder(ItemAccountChooserBinding.inflate(parent.inflater(), parent, false))
     }
 }
 
-private class AddressModelHolder(parent: View) : DynamicListSheetAdapter.Holder<AddressModel>(parent) {
+private class AddressModelHolder(private val binder: ItemAccountChooserBinding) : DynamicListSheetAdapter.Holder<AddressModel>(binder.root) {
 
     override fun bind(
         item: AddressModel,
@@ -50,8 +47,8 @@ private class AddressModelHolder(parent: View) : DynamicListSheetAdapter.Holder<
         super.bind(item, isSelected, handler)
 
         with(itemView) {
-            itemAccountChooserAddress.setAddressModel(item)
-            itemAccountChooserCheck.isChecked = isSelected
+            binder.itemAccountChooserAddress.setAddressModel(item)
+            binder.itemAccountChooserCheck.isChecked = isSelected
         }
     }
 }

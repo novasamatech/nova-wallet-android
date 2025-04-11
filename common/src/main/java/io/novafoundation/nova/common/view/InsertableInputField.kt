@@ -4,23 +4,21 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewInsertableInputFieldBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getInputBackground
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputField
-import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputFieldAction
-import kotlinx.android.synthetic.main.view_insertable_input_field.view.actionInputFieldClear
 
 class InsertableInputField @JvmOverloads constructor(
     context: Context,
@@ -28,16 +26,16 @@ class InsertableInputField @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
+    private val binder = ViewInsertableInputFieldBinding.inflate(inflater(), this)
+
     private var clipboardManager: ClipboardManager? = getClipboardManager()
 
     val content: EditText
-        get() = actionInputField
+        get() = binder.actionInputField
 
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
-
-        View.inflate(context, R.layout.view_insertable_input_field, this)
 
         setAddStatesFromChildren(true)
 
@@ -49,11 +47,11 @@ class InsertableInputField @JvmOverloads constructor(
             updateButtonsVisibility(it)
         }
 
-        actionInputFieldAction.setOnClickListener {
+        binder.actionInputFieldAction.setOnClickListener {
             paste()
         }
 
-        actionInputFieldClear.setOnClickListener { content.text = null }
+        binder.actionInputFieldClear.setOnClickListener { content.text = null }
 
         updateButtonsVisibility(content.text)
     }
@@ -63,8 +61,8 @@ class InsertableInputField @JvmOverloads constructor(
         if (enabled) {
             updateButtonsVisibility(content.text)
         } else {
-            actionInputFieldAction.makeGone()
-            actionInputFieldClear.makeGone()
+            binder.actionInputFieldAction.makeGone()
+            binder.actionInputFieldClear.makeGone()
         }
 
         content.isEnabled = enabled
@@ -75,14 +73,14 @@ class InsertableInputField @JvmOverloads constructor(
         val clipboardIsNotEmpty = !TextUtils.isEmpty(clipboardValue)
         val textIsEmpty = TextUtils.isEmpty(text)
 
-        actionInputFieldClear.isGone = textIsEmpty
-        actionInputFieldAction.isVisible = textIsEmpty && clipboardIsNotEmpty
+        binder.actionInputFieldClear.isGone = textIsEmpty
+        binder.actionInputFieldAction.isVisible = textIsEmpty && clipboardIsNotEmpty
     }
 
     private fun setBackgrounds() = with(context) {
         background = context.getInputBackground()
 
-        actionInputFieldAction.background = buttonBackground()
+        binder.actionInputFieldAction.background = buttonBackground()
     }
 
     private fun paste() {

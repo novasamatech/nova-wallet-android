@@ -1,21 +1,17 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentImportParitySignerScanBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySignerScan
-import kotlinx.android.synthetic.main.fragment_import_parity_signer_scan.scanImportParitySignerScanToolbar
 
-class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerViewModel>() {
+class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerViewModel, FragmentImportParitySignerScanBinding>() {
 
     companion object {
 
@@ -28,9 +24,7 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_import_parity_signer_scan, container, false)
-    }
+    override fun createBinding() = FragmentImportParitySignerScanBinding.inflate(layoutInflater)
 
     override fun inject() {
         FeatureUtils.getFeature<AccountFeatureComponent>(requireContext(), AccountFeatureApi::class.java)
@@ -42,12 +36,12 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
     override fun initViews() {
         super.initViews()
 
-        scanImportParitySignerScanToolbar.applyStatusBarInsets()
-        scanImportParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.scanImportParitySignerScanToolbar.applyStatusBarInsets()
+        binder.scanImportParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        scanImportParitySignerScan.setTitle(viewModel.title)
+        binder.scanImportParitySignerScan.setTitle(viewModel.title)
     }
 
     override val scanView: ScanView
-        get() = scanImportParitySignerScan
+        get() = binder.scanImportParitySignerScan
 }

@@ -2,31 +2,32 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.section.SectionView
 import io.novafoundation.nova.feature_wallet_api.R
-import kotlinx.android.synthetic.main.section_price.view.sectionPriceFiat
-import kotlinx.android.synthetic.main.section_price.view.sectionPriceToken
-import kotlinx.android.synthetic.main.section_price.view.sectionTitle
+import io.novafoundation.nova.feature_wallet_api.databinding.SectionPriceBinding
 
 class PriceSectionView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : SectionView(R.layout.section_price, context, attrs, defStyleAttr) {
+) : SectionView(context, attrs, defStyleAttr) {
+
+    private val binder = SectionPriceBinding.inflate(inflater(), this)
 
     init {
         attrs?.let(::applyAttrs)
     }
 
     fun setPrice(token: CharSequence, fiat: CharSequence?) {
-        sectionPriceToken.text = token
-        sectionPriceFiat.setTextOrHide(fiat)
+        binder.sectionPriceToken.text = token
+        binder.sectionPriceFiat.setTextOrHide(fiat)
     }
 
     fun setTitle(title: String) {
-        sectionTitle.text = title
+        binder.sectionTitle.text = title
     }
 
     private fun applyAttrs(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.PriceSectionView) {

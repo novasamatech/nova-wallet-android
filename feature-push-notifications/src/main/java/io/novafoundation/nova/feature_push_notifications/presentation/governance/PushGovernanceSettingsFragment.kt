@@ -1,27 +1,24 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.governance
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.observe
-import io.novafoundation.nova.feature_push_notifications.R
+import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushGovernanceSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.adapter.PushGovernanceRVItem
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.adapter.PushGovernanceSettingsAdapter
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceList
-import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceProgress
-import kotlinx.android.synthetic.main.fragment_push_governance_settings.pushGovernanceToolbar
 
-class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewModel>(), PushGovernanceSettingsAdapter.ItemHandler {
+class PushGovernanceSettingsFragment :
+    BaseFragment<PushGovernanceSettingsViewModel, FragmentPushGovernanceSettingsBinding>(),
+    PushGovernanceSettingsAdapter.ItemHandler {
 
     companion object {
         private const val KEY_REQUEST = "KEY_REQUEST"
@@ -33,6 +30,8 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
         }
     }
 
+    override fun createBinding() = FragmentPushGovernanceSettingsBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
@@ -40,17 +39,13 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
         PushGovernanceSettingsAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_push_governance_settings, container, false)
-    }
-
     override fun initViews() {
-        pushGovernanceToolbar.applyStatusBarInsets()
-        pushGovernanceToolbar.setHomeButtonListener { viewModel.backClicked() }
-        pushGovernanceToolbar.setRightActionClickListener { viewModel.clearClicked() }
+        binder.pushGovernanceToolbar.applyStatusBarInsets()
+        binder.pushGovernanceToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.pushGovernanceToolbar.setRightActionClickListener { viewModel.clearClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        pushGovernanceList.adapter = adapter
+        binder.pushGovernanceList.adapter = adapter
     }
 
     override fun inject() {
@@ -62,12 +57,12 @@ class PushGovernanceSettingsFragment : BaseFragment<PushGovernanceSettingsViewMo
 
     override fun subscribe(viewModel: PushGovernanceSettingsViewModel) {
         viewModel.clearButtonEnabledFlow.observe {
-            pushGovernanceToolbar.setRightActionEnabled(it)
+            binder.pushGovernanceToolbar.setRightActionEnabled(it)
         }
 
         viewModel.governanceSettingsList.observe {
-            pushGovernanceList.isVisible = it is ExtendedLoadingState.Loaded
-            pushGovernanceProgress.isVisible = it is ExtendedLoadingState.Loading
+            binder.pushGovernanceList.isVisible = it is ExtendedLoadingState.Loaded
+            binder.pushGovernanceProgress.isVisible = it is ExtendedLoadingState.Loading
 
             if (it is ExtendedLoadingState.Loaded) {
                 adapter.submitList(it.data)

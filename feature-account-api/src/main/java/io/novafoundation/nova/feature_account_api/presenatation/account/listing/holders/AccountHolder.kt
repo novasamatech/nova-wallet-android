@@ -13,18 +13,14 @@ import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_account_api.R
+import io.novafoundation.nova.feature_account_api.databinding.ItemAccountBinding
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
-import kotlinx.android.synthetic.main.item_account.view.itemAccountArrow
-import kotlinx.android.synthetic.main.item_account.view.itemAccountCheckBox
-import kotlinx.android.synthetic.main.item_account.view.itemAccountRadioButton
-import kotlinx.android.synthetic.main.item_account.view.itemAccountContainer
-import kotlinx.android.synthetic.main.item_account.view.itemAccountDelete
-import kotlinx.android.synthetic.main.item_account.view.itemAccountIcon
-import kotlinx.android.synthetic.main.item_account.view.itemAccountSubtitle
-import kotlinx.android.synthetic.main.item_account.view.itemAccountTitle
-import kotlinx.android.synthetic.main.item_account.view.itemChainIcon
 
-class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes private val chainBorderColor: Int) : GroupedListHolder(view) {
+class AccountHolder(
+    private val binder: ItemAccountBinding,
+    private val imageLoader: ImageLoader,
+    @ColorRes private val chainBorderColor: Int
+) : GroupedListHolder(binder.root) {
 
     interface AccountItemHandler {
 
@@ -45,15 +41,15 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
             disableTransitionType(LayoutTransition.APPEARING)
         }
 
-        containerView.itemAccountContainer.layoutTransition = lt
-        containerView.itemChainIcon.backgroundTintList = containerView.context.getColorStateList(chainBorderColor)
+        binder.itemAccountContainer.layoutTransition = lt
+        binder.itemChainIcon.backgroundTintList = containerView.context.getColorStateList(chainBorderColor)
     }
 
     fun bind(
         mode: Mode,
         accountModel: AccountUi,
         handler: AccountItemHandler?,
-    ) = with(containerView) {
+    ) = with(binder) {
         bindName(accountModel)
         bindSubtitle(accountModel)
         bindMode(mode, accountModel, handler)
@@ -72,19 +68,19 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
     }
 
     fun bindName(accountModel: AccountUi) {
-        containerView.itemAccountTitle.text = accountModel.title
+        binder.itemAccountTitle.text = accountModel.title
     }
 
     fun bindSubtitle(accountModel: AccountUi) {
-        containerView.itemAccountSubtitle.setTextOrHide(accountModel.subtitle)
-        containerView.itemAccountSubtitle.setDrawableStart(accountModel.subtitleIconRes, paddingInDp = 4)
+        binder.itemAccountSubtitle.setTextOrHide(accountModel.subtitle)
+        binder.itemAccountSubtitle.setDrawableStart(accountModel.subtitleIconRes, paddingInDp = 4)
     }
 
     fun bindMode(
         mode: Mode,
         accountModel: AccountUi,
         handler: AccountItemHandler?,
-    ) = with(containerView) {
+    ) = with(binder) {
         when (mode) {
             Mode.VIEW -> {
                 itemAccountArrow.visibility = View.GONE
@@ -94,7 +90,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
 
                 itemAccountDelete.setOnClickListener(null)
 
-                setOnClickListener(null)
+                root.setOnClickListener(null)
             }
 
             Mode.SELECT_MULTIPLE -> {
@@ -107,7 +103,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
 
                 itemAccountRadioButton.visibility = View.GONE
 
-                setOnClickListener { handler?.itemClicked(accountModel) }
+                root.setOnClickListener { handler?.itemClicked(accountModel) }
             }
 
             Mode.SELECT -> {
@@ -119,7 +115,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
                 itemAccountRadioButton.visibility = View.GONE
                 itemAccountCheckBox.visibility = View.GONE
 
-                setOnClickListener { handler?.itemClicked(accountModel) }
+                root.setOnClickListener { handler?.itemClicked(accountModel) }
             }
 
             Mode.EDIT -> {
@@ -133,7 +129,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
                 itemAccountRadioButton.visibility = View.GONE
                 itemAccountCheckBox.visibility = View.GONE
 
-                setOnClickListener(null)
+                root.setOnClickListener(null)
             }
 
             Mode.SWITCH -> {
@@ -146,7 +142,7 @@ class AccountHolder(view: View, private val imageLoader: ImageLoader, @ColorRes 
 
                 itemAccountCheckBox.visibility = View.GONE
 
-                setOnClickListener { handler?.itemClicked(accountModel) }
+                root.setOnClickListener { handler?.itemClicked(accountModel) }
             }
         }
     }

@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isGone
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -12,7 +9,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyBarMargin
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceDetailBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupButSellActionButton
@@ -23,21 +20,11 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.history.sh
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailActions
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailBack
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContainer
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenIcon
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailTokenName
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsBalances
-import kotlinx.android.synthetic.main.fragment_balance_detail.transfersContainer
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailContent
-import kotlinx.android.synthetic.main.fragment_balance_detail.balanceDetailsChain
-import kotlinx.android.synthetic.main.fragment_balance_detail.priceChartView
 
 private const val KEY_TOKEN = "KEY_TOKEN"
 
-class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
+class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalanceDetailBinding>() {
 
     companion object {
 
@@ -48,51 +35,45 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
     }
 
+    override fun createBinding() = FragmentBalanceDetailBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_balance_detail, container, false)
-    }
 
     override fun initViews() {
         hideKeyboard()
 
-        balanceDetailBack.applyBarMargin()
+        binder.balanceDetailBack.applyBarMargin()
 
-        transfersContainer.initializeBehavior(anchorView = balanceDetailContent)
+        binder.transfersContainer.initializeBehavior(anchorView = binder.balanceDetailContent)
 
-        transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
+        binder.transfersContainer.setScrollingListener(viewModel::transactionsScrolled)
 
-        transfersContainer.setSlidingStateListener(::setRefreshEnabled)
+        binder.transfersContainer.setSlidingStateListener(::setRefreshEnabled)
 
-        transfersContainer.setTransactionClickListener(viewModel::transactionClicked)
+        binder.transfersContainer.setTransactionClickListener(viewModel::transactionClicked)
 
-        transfersContainer.setFilterClickListener { viewModel.filterClicked() }
+        binder.transfersContainer.setFilterClickListener { viewModel.filterClicked() }
 
-        balanceDetailContainer.setOnRefreshListener {
+        binder.balanceDetailContainer.setOnRefreshListener {
             viewModel.sync()
         }
 
-        balanceDetailBack.setOnClickListener { viewModel.backClicked() }
+        binder.balanceDetailBack.setOnClickListener { viewModel.backClicked() }
 
-        balanceDetailActions.send.setOnClickListener {
+        binder.balanceDetailActions.send.setOnClickListener {
             viewModel.sendClicked()
         }
 
-        balanceDetailActions.swap.setOnClickListener {
+        binder.balanceDetailActions.swap.setOnClickListener {
             viewModel.swapClicked()
         }
 
-        balanceDetailActions.receive.setOnClickListener {
+        binder.balanceDetailActions.receive.setOnClickListener {
             viewModel.receiveClicked()
         }
 
-        balanceDetailsBalances.locked.setOnClickListener {
+        binder.balanceDetailsBalances.locked.setOnClickListener {
             viewModel.lockedInfoClicked()
         }
     }
@@ -111,49 +92,49 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
 
     override fun subscribe(viewModel: BalanceDetailViewModel) {
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
-        setupButSellActionButton(viewModel.buySellSelectorMixin, balanceDetailActions.buySell)
+        setupButSellActionButton(viewModel.buySellSelectorMixin, binder.balanceDetailActions.buySell)
 
-        viewModel.state.observe(transfersContainer::showState)
+        viewModel.state.observe(binder.transfersContainer::showState)
 
         viewModel.assetDetailsModel.observe { asset ->
-            balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)
-            balanceDetailTokenName.text = asset.token.configuration.symbol.value
+            binder.balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)
+            binder.balanceDetailTokenName.text = asset.token.configuration.symbol.value
 
-            balanceDetailsBalances.setTotalAmount(asset.total)
-            balanceDetailsBalances.transferable.showAmount(asset.transferable)
-            balanceDetailsBalances.locked.showAmount(asset.locked)
+            binder.balanceDetailsBalances.setTotalAmount(asset.total)
+            binder.balanceDetailsBalances.transferable.showAmount(asset.transferable)
+            binder.balanceDetailsBalances.locked.showAmount(asset.locked)
         }
 
         viewModel.supportExpandableBalanceDetails.observe {
-            balanceDetailsBalances.showBalanceDetails(it)
+            binder.balanceDetailsBalances.showBalanceDetails(it)
         }
 
         viewModel.priceChartFormatters.observe {
-            priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
+            binder.priceChartView.setTextInjectors(it.price, it.priceChange, it.date)
         }
 
         viewModel.priceChartTitle.observe {
-            priceChartView.setTitle(it)
+            binder.priceChartView.setTitle(it)
         }
 
         viewModel.priceChartModels.observe {
             if (it == null) {
-                priceChartView.isGone = true
+                binder.priceChartView.isGone = true
                 return@observe
             }
 
-            priceChartView.setCharts(it)
+            binder.priceChartView.setCharts(it)
         }
 
         viewModel.hideRefreshEvent.observeEvent {
-            balanceDetailContainer.isRefreshing = false
+            binder.balanceDetailContainer.isRefreshing = false
         }
 
         viewModel.showLockedDetailsEvent.observeEvent(::showLockedDetails)
 
-        viewModel.sendEnabled.observe(balanceDetailActions.send::setEnabled)
+        viewModel.sendEnabled.observe(binder.balanceDetailActions.send::setEnabled)
 
-        viewModel.swapButtonEnabled.observe(balanceDetailActions.swap::setEnabled)
+        viewModel.swapButtonEnabled.observe(binder.balanceDetailActions.swap::setEnabled)
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
             LedgerNotSupportedWarningBottomSheet(
@@ -164,13 +145,13 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel>() {
         }
 
         viewModel.chainUI.observe {
-            balanceDetailsChain.setChain(it)
+            binder.balanceDetailsChain.setChain(it)
         }
     }
 
     private fun setRefreshEnabled(bottomSheetState: Int) {
         val bottomSheetCollapsed = BottomSheetBehavior.STATE_COLLAPSED == bottomSheetState
-        balanceDetailContainer.isEnabled = bottomSheetCollapsed
+        binder.balanceDetailContainer.isEnabled = bottomSheetCollapsed
     }
 
     private fun showLockedDetails(model: BalanceLocksModel) {

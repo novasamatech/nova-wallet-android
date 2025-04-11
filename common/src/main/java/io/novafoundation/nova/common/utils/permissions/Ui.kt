@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker.Permissi
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker.PermissionDeniedLevel.CAN_ASK_AGAIN
 import io.novafoundation.nova.common.view.dialog.warningDialog
 
-fun BaseFragment<*>.setupPermissionAsker(component: PermissionsAsker) {
+fun BaseFragment<*, *>.setupPermissionAsker(component: PermissionsAsker) {
     component.showPermissionsDenied.awaitableActionLiveData.observeEvent {
         val level = it.payload
 

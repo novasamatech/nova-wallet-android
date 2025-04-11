@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textWithDescriptionItem
 import io.novafoundation.nova.feature_account_api.R
@@ -13,7 +14,7 @@ class ImportTypeChooserBottomSheet(
     context: Context,
     private val onChosen: (SecretType) -> Unit,
     private val allowedSources: Set<SecretType>
-) : FixedListBottomSheet(context) {
+) : FixedListBottomSheet<BottomSheeetFixedListBinding>(context, viewConfiguration = ViewConfiguration.default(context)) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

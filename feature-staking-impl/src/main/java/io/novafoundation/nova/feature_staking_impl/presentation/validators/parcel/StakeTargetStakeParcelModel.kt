@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.parc
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.utils.orZero
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.math.BigInteger
 

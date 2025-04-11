@@ -4,23 +4,19 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.ViewClickGestureDetector
 import io.novafoundation.nova.common.utils.indexOfOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.mapToSet
-import io.novafoundation.nova.feature_banners_api.R
+import io.novafoundation.nova.feature_banners_api.databinding.ViewPagerBannerBinding
 import io.novafoundation.nova.feature_banners_api.presentation.BannerPageModel
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.ContentSwitchingController
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.getContentSwitchingController
 import io.novafoundation.nova.feature_banners_api.presentation.view.switcher.getImageSwitchingController
-import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerBackground
-import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerClose
-import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerContent
-import kotlinx.android.synthetic.main.view_pager_banner.view.pagerBannerIndicators
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,6 +30,8 @@ class BannerPagerView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), BannerPagerScrollController.ScrollCallback {
+
+    private val binder = ViewPagerBannerBinding.inflate(inflater(), this)
 
     private val scrollInterpolator = DecelerateInterpolator()
 
@@ -73,15 +71,13 @@ class BannerPagerView @JvmOverloads constructor(
     }
 
     val isClosable: Boolean
-        get() = pagerBannerClose.isVisible
+        get() = binder.pagerBannerClose.isVisible
 
     init {
-        View.inflate(context, R.layout.view_pager_banner, this)
+        contentController.attachToParent(binder.pagerBannerContent)
+        backgroundSwitchingController.attachToParent(binder.pagerBannerBackground)
 
-        contentController.attachToParent(pagerBannerContent)
-        backgroundSwitchingController.attachToParent(pagerBannerBackground)
-
-        pagerBannerClose.setOnClickListener { closeCurrentPage() }
+        binder.pagerBannerClose.setOnClickListener { closeCurrentPage() }
     }
 
     fun setBanners(banners: List<BannerPageModel>) {
@@ -91,7 +87,7 @@ class BannerPagerView @JvmOverloads constructor(
 
         this.pages.clear()
         this.pages.addAll(banners)
-        pagerBannerIndicators.setPagesSize(pages.size)
+        binder.pagerBannerIndicators.setPagesSize(pages.size)
 
         contentController.setPayloads(pages.map { ContentSwitchingController.Payload(it.title, it.subtitle, it.image) })
         backgroundSwitchingController.setPayloads(pages.map { it.background })
@@ -103,7 +99,7 @@ class BannerPagerView @JvmOverloads constructor(
     }
 
     fun setClosable(closable: Boolean) {
-        pagerBannerClose.isVisible = closable
+        binder.pagerBannerClose.isVisible = closable
     }
 
     fun closeCurrentPage() {
@@ -126,9 +122,9 @@ class BannerPagerView @JvmOverloads constructor(
             closeAnimator.setFloatValues(0f, 1f)
             closeAnimator.addUpdateListener {
                 if (isLastPageAfterClose) {
-                    pagerBannerIndicators.alpha = 1f - it.animatedFraction
+                    binder.pagerBannerIndicators.alpha = 1f - it.animatedFraction
                 } else {
-                    pagerBannerIndicators.setCloseAnimationProgress(it.animatedFraction, currentPage, nextPage)
+                    binder.pagerBannerIndicators.setCloseAnimationProgress(it.animatedFraction, currentPage, nextPage)
                 }
 
                 contentController.setAnimationState(it.animatedFraction, currentPage, nextPage)
@@ -152,8 +148,8 @@ class BannerPagerView @JvmOverloads constructor(
         backgroundSwitchingController.removePageAt(index)
         val closedPage = pages.removeAt(index)
         currentPage = index.wrapPage()
-        pagerBannerIndicators.setPagesSize(pages.size)
-        pagerBannerIndicators.selectIndicatorInstantly(currentPage)
+        binder.pagerBannerIndicators.setPagesSize(pages.size)
+        binder.pagerBannerIndicators.selectIndicatorInstantly(currentPage)
         contentController.showPageImmediately(currentPage)
         backgroundSwitchingController.showPageImmediately(currentPage)
 
@@ -169,7 +165,7 @@ class BannerPagerView @JvmOverloads constructor(
 
         val nextPage = (currentPage + toPage.pageOffset).wrapPage()
 
-        pagerBannerIndicators.setAnimationProgress(pageOffset.absoluteValue, currentPage, nextPage)
+        binder.pagerBannerIndicators.setAnimationProgress(pageOffset.absoluteValue, currentPage, nextPage)
 
         contentController.setAnimationState(pageOffset, currentPage, nextPage)
         backgroundSwitchingController.setAnimationState(pageOffset, currentPage, nextPage)
@@ -217,7 +213,7 @@ class BannerPagerView @JvmOverloads constructor(
         contentController.showPageImmediately(index)
         backgroundSwitchingController.showPageImmediately(index)
 
-        pagerBannerIndicators.selectIndicatorInstantly(index)
+        binder.pagerBannerIndicators.selectIndicatorInstantly(index)
     }
 
     private fun rerunAutoSwipe() {

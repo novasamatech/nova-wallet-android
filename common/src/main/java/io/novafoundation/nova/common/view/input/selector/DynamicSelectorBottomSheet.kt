@@ -2,10 +2,9 @@ package io.novafoundation.nova.common.view.input.selector
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.databinding.ItemListSelectorBinding
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -13,9 +12,6 @@ import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
-import kotlinx.android.synthetic.main.bottom_sheet_dynamic_list.dynamicListSheetSubtitle
-import kotlinx.android.synthetic.main.item_list_selector.view.itemSelectorIcon
-import kotlinx.android.synthetic.main.item_list_selector.view.itemSelectorTitle
 
 class DynamicSelectorBottomSheet(
     context: Context,
@@ -45,15 +41,15 @@ class DynamicSelectorBottomSheet(
             setTitle(payload.titleRes)
         }
 
-        dynamicListSheetSubtitle.setTextOrHide(payload.subtitle)
+        binder.dynamicListSheetSubtitle.setTextOrHide(payload.subtitle)
     }
 
     override fun holderCreator(): HolderCreator<ListSelectorMixin.Item> = { parentView ->
-        SelectorViewHolder(parentView.inflateChild(R.layout.item_list_selector))
+        SelectorViewHolder(ItemListSelectorBinding.inflate(parentView.inflater(), parentView, false))
     }
 }
 
-private class SelectorViewHolder(containerView: View) : DynamicListSheetAdapter.Holder<ListSelectorMixin.Item>(containerView) {
+private class SelectorViewHolder(private val binder: ItemListSelectorBinding) : DynamicListSheetAdapter.Holder<ListSelectorMixin.Item>(binder.root) {
 
     override fun bind(
         item: ListSelectorMixin.Item,
@@ -63,10 +59,10 @@ private class SelectorViewHolder(containerView: View) : DynamicListSheetAdapter.
         super.bind(item, isSelected, handler)
 
         with(containerView) {
-            itemSelectorIcon.setImageResource(item.iconRes)
-            itemSelectorIcon.setImageTintRes(item.iconTintRes)
-            itemSelectorTitle.setText(item.titleRes)
-            itemSelectorTitle.setTextColorRes(item.titleColorRes)
+            binder.itemSelectorIcon.setImageResource(item.iconRes)
+            binder.itemSelectorIcon.setImageTintRes(item.iconTintRes)
+            binder.itemSelectorTitle.setText(item.titleRes)
+            binder.itemSelectorTitle.setTextColorRes(item.titleColorRes)
         }
     }
 }

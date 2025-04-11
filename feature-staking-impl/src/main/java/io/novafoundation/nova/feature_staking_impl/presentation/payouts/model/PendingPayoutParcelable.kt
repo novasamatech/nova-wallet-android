@@ -4,7 +4,7 @@ import android.os.Parcelable
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
 @Parcelize

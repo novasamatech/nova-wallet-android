@@ -1,10 +1,13 @@
 package io.novafoundation.nova.common.utils
 
+import android.os.Parcelable
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.parcelize.Parcelize
 
 @JvmInline
-value class Precision(val value: Int)
+@Parcelize
+value class Precision(val value: Int) : Parcelable
 
 fun Int.asPrecision() = Precision(this)
 
