@@ -29,13 +29,26 @@ fun SemiUnboundedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): Stri
     }
 }
 
-fun BigDecimal.formatTokenAmount(chainAsset: Chain.Asset, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
-    return formatTokenAmount(chainAsset.symbol, roundingMode)
+fun BigDecimal.formatTokenAmount(
+    chainAsset: Chain.Asset,
+    roundingMode: RoundingMode = RoundingMode.FLOOR,
+    includeAssetTicker: Boolean = true
+): String {
+    return formatTokenAmount(chainAsset.symbol, roundingMode, includeAssetTicker)
 }
 
-fun BigDecimal.formatTokenAmount(tokenSymbol: String, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
-    return formatTokenAmount(tokenSymbol.asTokenSymbol(), roundingMode)
+fun BigDecimal.formatTokenAmount(
+    tokenSymbol: String,
+    roundingMode: RoundingMode = RoundingMode.FLOOR,
+    includeAssetTicker: Boolean = true
+): String {
+    return formatTokenAmount(
+        tokenSymbol.asTokenSymbol(),
+        roundingMode,
+        includeAssetTicker
+    )
 }
+
 fun BigDecimal.formatTokenChange(chainAsset: Chain.Asset, isIncome: Boolean): String {
     val withoutSign = formatTokenAmount(chainAsset)
     val sign = if (isIncome) '+' else '-'

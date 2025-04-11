@@ -38,7 +38,8 @@ fun mapAssetToAssetModel(
         amount = mapAmountToAmountModel(
             amount = balance.amount,
             asset = asset,
-            includeAssetTicker = false
+            includeAssetTicker = false,
+            formatTokenAmount = false
         ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size)
     )
 }
