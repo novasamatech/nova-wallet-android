@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s\'da eklenen maksimum proxy (%s) limitine ulaştınız. Yeni eklemeler yapabilmek için proxy\'leri kaldırın.</string>
     <string name="add_proxy_maximum_reached_error_title">Maksimum proxy sayısına ulaşıldı</string>
     <string name="added_networks_empty_placeholder">Eklenen özel ağlar\nburada görünecek</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Renkli</string>
     <string name="appearance_title">Görünüm</string>
     <string name="appearance_token_assets_title">token simgeleri</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Yedekleme</string>
     <string name="backup_title">Yedekleme</string>
+    <string name="banxa_provider_description">Doğrudan ve etkili KYC süreci</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
     <string name="browser_tabs_close_all">Hepsini Kapat</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
+    <string name="buy_order_completed_message">Satın alma başlatıldı! Lütfen 60 dakikaya kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
     <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
+    <string name="buy_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alınmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
+    <string name="buy_token_not_supported_title">Bu token satın alma özelliği tarafından desteklenmiyor</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
     <string name="chain_network_management_enabling">Bağlantıyı etkinleştir</string>
     <string name="change_cloud_backup_password_subtitle">Cüzdanlarınızı bulut yedeklemesinden kurtarmak için kullanılacak bir parola girin. Bu parolanın gelecekte kurtarılamayacağını unutmayın, bu nedenle onu hatırladığınızdan emin olun!</string>
@@ -758,6 +763,7 @@
     <string name="fee_not_yet_loaded_message">Lütfen ücret hesaplanana kadar bekleyin</string>
     <string name="fee_not_yet_loaded_title">Ücret hesaplama işlemi sürüyor</string>
     <string name="fragment_assets_nova_card">Banka Kartını Yönet</string>
+    <string name="fragment_sell_token_title">%s tokenınıza satış</string>
     <string name="fragment_set_staking_proxy_title">Staking için %s delegasyonu ekle</string>
     <string name="fragment_swap_main_settings_details_title">Takas detayları</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
@@ -865,6 +871,7 @@
     <string name="manual_backup_select_wallet_header">Yedeklemek için bir cüzdan seçin</string>
     <string name="manual_backup_warning_subtitle">Lütfen yedeğinizi görüntülemeden önce aşağıdakileri dikkatlice okuyun</string>
     <string name="manual_backup_warning_title">Parolanızı kimseyle paylaşmayın!</string>
+    <string name="mercurio_provider_description">3.95% kadar ücretlerle en iyi fiyat</string>
     <string name="mnemonic_card_reveal_subtitle">Kimsenin ekranınızı göremediğinden emin olun\nve ekran görüntüsü almayın</string>
     <string name="mnemonic_card_title">Lütfen %s kimseyle paylaşmayın</string>
     <string name="mnemonic_card_title_highlight">paylaşmayın</string>
@@ -1182,6 +1189,10 @@
     <string name="select_network_title">Ağ seç</string>
     <string name="select_tracks_for">İçin şarkıları seçin</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
+    <string name="sell_network_flow_title">%s satışı için ağı seçin</string>
+    <string name="sell_order_completed_message">Satış başlatıldı! Lütfen 60 dakikaya kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
+    <string name="sell_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satılmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
+    <string name="sell_token_not_supported_title">Bu token satış özelliği tarafından desteklenmiyor</string>
     <string name="send_address_hint">Adres veya w3n</string>
     <string name="send_network_flow_title">Gönderme için ağ seçin %s</string>
     <string name="send_recipient_system_account_message">Alıcı, bir sistem hesabıdır. Bir şirket veya birey tarafından kontrol edilmez.\nBu transferi gerçekleştirmek istediğinize emin misiniz?</string>
@@ -1660,6 +1671,11 @@
     <string name="tabbar_wallet_title">Cüzdan</string>
     <string name="today">Bugün</string>
     <string name="token_price_info_provider_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
+    <string name="trade_provider_list_buy_title">%s tokenını satın almak için bir sağlayıcı seçin</string>
+    <string name="trade_provider_list_footer">Ödeme yöntemleri, ücretler ve limitler sağlayıcıya göre farklılık gösterir.\nSizin için en iyi seçeneği bulmak için teklifleri karşılaştırın.</string>
+    <string name="trade_provider_list_sell_title">%s tokenının satışını yapmak için bir sağlayıcı seçin</string>
+    <string name="trade_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alma veya satılmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
+    <string name="trade_token_not_supported_title">Bu token alış/satış özelliği tarafından desteklenmiyor</string>
     <string name="transaction_details_copy_hash">Hash\'i kopyala</string>
     <string name="transaction_details_extrinsic_fee">Ücret</string>
     <string name="transaction_details_from">Gönderen</string>
@@ -1673,6 +1689,8 @@
     <string name="transaction_status_failed">Başarısız</string>
     <string name="transaction_status_pending">Beklemede</string>
     <string name="transactions_notification_channel_name">İşlem Bildirim Kanalı</string>
+    <string name="transak_provider_buy_description">Sadece $5 ile kripto satın al</string>
+    <string name="transak_provider_sell_description">Sadece $10 ile kripto sat</string>
     <string name="transfer_history_income_from">%s tarafından</string>
     <string name="transfer_history_send_to">Alıcı: %s</string>
     <string name="transfer_title">Transfer</string>
@@ -1710,10 +1728,14 @@
     <string name="waiting_top_up_card_description">Bu işlem 5 dakika kadar sürebilir.\nBu pencere otomatik olarak kapatılacaktır.</string>
     <string name="waiting_top_up_card_timer">Tahmini %s</string>
     <string name="wallet_asset_buy">Satın al</string>
+    <string name="wallet_asset_buy_sell">Al/Sat</string>
+    <string name="wallet_asset_buy_tokens">Token al</string>
     <string name="wallet_asset_buy_with">ile Satın al</string>
     <string name="wallet_asset_receive">Al</string>
     <string name="wallet_asset_receive_token">%s al</string>
     <string name="wallet_asset_receive_token_subtitle">Bu adrese yalnızca %1$s token ve %2$s ağındaki tokenleri gönderin, aksi takdirde paranızı kaybedebilirsiniz</string>
+    <string name="wallet_asset_sell">Sat</string>
+    <string name="wallet_asset_sell_tokens">Token sat</string>
     <string name="wallet_asset_send">Gönder</string>
     <string name="wallet_asset_swap">Takas et</string>
     <string name="wallet_assets">Varlıklar</string>
