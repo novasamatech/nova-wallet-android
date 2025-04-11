@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.titleAndButton
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -538,6 +539,7 @@ class ReferendumDetailsViewModel(
 
     private suspend fun showErrorAndCloseScreen() {
         val confirmationInfo = ConfirmationDialogInfo.titleAndButton(
+            resourceManager,
             title = R.string.referendim_details_not_found_title,
             button = R.string.common_ok,
         )

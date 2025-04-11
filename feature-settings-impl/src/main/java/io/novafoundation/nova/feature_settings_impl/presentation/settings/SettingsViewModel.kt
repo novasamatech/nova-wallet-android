@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.fromRes
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -165,9 +166,12 @@ class SettingsViewModel(
         launch {
             if (!twoFactorVerificationService.isEnabled()) {
                 confirmationAwaitableAction.awaitAction(
-                    ConfirmationDialogInfo(
+                    ConfirmationDialogInfo.fromRes(
+                        resourceManager,
                         R.string.settings_pin_code_verification_confirmation_title,
-                        R.string.settings_pin_code_verification_confirmation_message
+                        R.string.settings_pin_code_verification_confirmation_message,
+                        R.string.common_enable,
+                        R.string.common_cancel
                     )
                 )
             }
@@ -180,9 +184,12 @@ class SettingsViewModel(
         launch {
             if (!safeModeService.isSafeModeEnabled()) {
                 confirmationAwaitableAction.awaitAction(
-                    ConfirmationDialogInfo(
+                    ConfirmationDialogInfo.fromRes(
+                        resourceManager,
                         R.string.settings_safe_mode_confirmation_title,
-                        R.string.settings_safe_mode_confirmation_message
+                        R.string.settings_safe_mode_confirmation_message,
+                        R.string.common_enable,
+                        R.string.common_cancel
                     )
                 )
             }

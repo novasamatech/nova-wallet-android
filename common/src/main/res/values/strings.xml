@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+<!--
+    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
+    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+-->
+
+    <string name="trade_provider_open_confirmation_title">Continue in browser?</string>
+    <string name="trade_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+
     <string name="buy_token_not_supported_title">This token is not supported by the buy feature</string>
     <string name="buy_token_not_supported_message">None of our providers currently support the buying of this token. Please choose a different token, a different network, or check back later.</string>
 
@@ -892,9 +900,6 @@
 
     <string name="assets_crowdloan_unlock_banner_title">Boost your DOT 🚀</string>
     <string name="assets_crowdloan_unlock_banner_description">Received your DOT back from crowdloans? Start staking your DOT today to get the maximum possible rewards!</string>
-
-    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
-    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
 
     <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
 

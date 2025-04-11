@@ -189,7 +189,7 @@ class BackupSettingsViewModel(
 
     fun applyBackupDestructiveChanges(cloudBackupDiff: CloudBackupDiff, cloudBackup: CloudBackup) {
         launch {
-            neutralConfirmationAwaitableAction.awaitBackupDestructiveChangesConfirmation()
+            neutralConfirmationAwaitableAction.awaitBackupDestructiveChangesConfirmation(resourceManager)
 
             _isSyncing.value = true
 
@@ -372,7 +372,7 @@ class BackupSettingsViewModel(
 
     private fun confirmCloudBackupDelete() {
         launch {
-            negativeConfirmationAwaitableAction.awaitDeleteBackupConfirmation()
+            negativeConfirmationAwaitableAction.awaitDeleteBackupConfirmation(resourceManager)
 
             progressDialogMixin.startProgress(R.string.deleting_backup_progress) {
                 runDeleteBackup()
