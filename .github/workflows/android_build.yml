@@ -139,17 +139,6 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
-      - name: 🧹 Clean Gradle & Android build cache and install NDK
-        run: |
-          echo "🧹 Cleaning Android build cache..."
-          rm -rf ~/.android/build-cache/
-
-          echo "📦 Installing Android NDK 26.1.10909125..."
-          yes | sdkmanager --install "ndk;26.1.10909125"
-
-          echo "🧼 Running gradlew clean..."
-          ./gradlew clean --no-daemon
-
       - name: 📂 Set up DEV Google Services
         uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
