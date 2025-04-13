@@ -138,15 +138,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ inputs.branch }}
-          
-      - name: 🧹 Clean Gradle & Android cache
-        run: |
-          echo "Cleaning ~/.gradle and Android build-cache..."
-          rm -rf ~/.gradle/caches/
-          rm -rf ~/.gradle/daemon/
-          rm -rf ~/.gradle/native/
-          rm -rf ~/.android/build-cache/
-          ./gradlew clean --no-daemon
 
       - name: 📂 Set up DEV Google Services
         uses: davidSchuppa/base64Secret-toFile-action@v3
