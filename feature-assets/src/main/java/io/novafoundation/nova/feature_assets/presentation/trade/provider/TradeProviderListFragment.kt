@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.trade.provider
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.ViewSpace
@@ -55,6 +56,7 @@ class TradeProviderListFragment : BaseFragment<TradeProviderListViewModel, Fragm
     }
 
     override fun subscribe(viewModel: TradeProviderListViewModel) {
+        setupConfirmationDialog(R.style.AccentAlertDialogTheme, viewModel.confirmationAwaitableAction)
         viewModel.titleFlow.observe { titleAdapter.setText(it) }
         viewModel.providerModels.observe { providersAdapter.submitList(it) }
     }
