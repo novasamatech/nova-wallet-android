@@ -97,6 +97,7 @@ class CustomChainFactory(
             symbol = payload.tokenSymbol.asTokenSymbol(),
             precision = assetDecimals,
             buyProviders = prefilledUtilityAsset?.buyProviders.orEmpty(),
+            sellProviders = prefilledUtilityAsset?.sellProviders.orEmpty(),
             staking = prefilledUtilityAsset?.staking.orEmpty(),
             type = assetType,
             source = Chain.Asset.Source.MANUAL,

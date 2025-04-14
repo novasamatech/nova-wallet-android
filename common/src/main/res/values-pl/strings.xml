@@ -179,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Osiągnąłeś limit %s dodanych proxy w %s. Usuń proxy, aby dodać nowe.</string>
     <string name="add_proxy_maximum_reached_error_title">Osiągnięto maksymalną liczbę proxy</string>
     <string name="added_networks_empty_placeholder">Dodane niestandardowe sieci\npojawią się tutaj</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Kolorowe</string>
     <string name="appearance_title">Wygląd</string>
     <string name="appearance_token_assets_title">ikony tokenów</string>
@@ -246,12 +247,16 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Kopia zapasowa</string>
     <string name="backup_title">Kopia zapasowa</string>
+    <string name="banxa_provider_description">Prosty i efektywny proces KYC</string>
     <string name="biometric_auth_title">Autoryzacja biometryczna</string>
     <string name="browser_tabs_close_all">Zamknij wszystkie</string>
     <string name="buy_completed">Zakup zainicjowany! Proszę czekać do 60 minut. Możesz śledzić status na e-mail.</string>
     <string name="buy_network_flow_title">Wybierz sieć do kupna %s</string>
+    <string name="buy_order_completed_message">Zakup zainicjowany! Proszę czekać do 60 minut. Możesz śledzić status w e-mailu.</string>
     <string name="buy_provider_open_confirmation_message">Aby kontynuować zakup, zostaniesz przekierowany z aplikacji Nova Wallet na %s</string>
     <string name="buy_provider_open_confirmation_title">Kontynuować w przeglądarce?</string>
+    <string name="buy_token_not_supported_message">Żaden z naszych dostawców obecnie nie obsługuje zakupu tego tokena. Proszę wybrać inny token, inną sieć lub sprawdzić później.</string>
+    <string name="buy_token_not_supported_title">Ten token nie jest obsługiwany przez funkcję zakupu</string>
     <string name="chain_network_management_auto_balance">Automatyczne równoważenie węzłów</string>
     <string name="chain_network_management_enabling">Włącz połączenie</string>
     <string name="change_cloud_backup_password_subtitle">Wprowadź hasło, które będzie używane do odzyskania portfeli z kopii zapasowej w chmurze. Tego hasła nie można będzie odzyskać w przyszłości, więc pamiętaj, aby je zapamiętać!</string>
@@ -770,6 +775,7 @@
     <string name="fee_not_yet_loaded_message">Proszę czekać, aż prowizja zostanie obliczona</string>
     <string name="fee_not_yet_loaded_title">Trwa obliczanie prowizji</string>
     <string name="fragment_assets_nova_card">Zarządzaj kartą debetową</string>
+    <string name="fragment_sell_token_title">Sprzedaj token %s</string>
     <string name="fragment_set_staking_proxy_title">Dodaj delegację dla %s staking</string>
     <string name="fragment_swap_main_settings_details_title">Szczegóły zamiany</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
@@ -879,6 +885,7 @@
     <string name="manual_backup_select_wallet_header">Wybierz portfel do backupu</string>
     <string name="manual_backup_warning_subtitle">Proszę dokładnie przeczytać przed wyświetleniem swojego backupu</string>
     <string name="manual_backup_warning_title">Nie udostępniaj swojej frazy kluczowej!</string>
+    <string name="mercurio_provider_description">Najlepsza cena z opłatami do 3,95%</string>
     <string name="mnemonic_card_reveal_subtitle">Upewnij się, że nikt nie widzi twojego ekranu\ni nie rób zrzutów ekranu</string>
     <string name="mnemonic_card_title">Proszę %s nikomu</string>
     <string name="mnemonic_card_title_highlight">nie udostępniaj</string>
@@ -1200,6 +1207,10 @@
     <string name="select_network_title">Wybierz sieć</string>
     <string name="select_tracks_for">Wybierz trasy dla</string>
     <string name="selected_tracks_quantity" formatted="false">%d z %d</string>
+    <string name="sell_network_flow_title">Wybierz sieć do sprzedaży %s</string>
+    <string name="sell_order_completed_message">Sprzedaż zainicjowana! Proszę czekać do 60 minut. Możesz śledzić status w e-mailu.</string>
+    <string name="sell_token_not_supported_message">Żaden z naszych dostawców obecnie nie obsługuje sprzedaży tego tokena. Proszę wybrać inny token, inną sieć lub sprawdzić później.</string>
+    <string name="sell_token_not_supported_title">Ten token nie jest obsługiwany przez funkcję sprzedaży</string>
     <string name="send_address_hint">Adres lub w3n</string>
     <string name="send_network_flow_title">Wybierz sieć do wysyłki %s</string>
     <string name="send_recipient_system_account_message">Odbiorca jest kontem systemowym. Nie jest kontrolowany przez żadną firmę ani osobę prywatną.\nCzy na pewno chcesz wykonać ten transfer?</string>
@@ -1684,6 +1695,11 @@
     <string name="tabbar_wallet_title">Portfel</string>
     <string name="today">Dziś</string>
     <string name="token_price_info_provider_label">Link Coingecko do informacji o cenach (Opcjonalnie)</string>
+    <string name="trade_provider_list_buy_title">Wybierz dostawcę do zakupu %s tokena</string>
+    <string name="trade_provider_list_footer">Metody płatności, opłaty i limity różnią się w zależności od dostawcy.\nPorównaj ich oferty, aby znaleźć najlepszą opcję dla siebie.</string>
+    <string name="trade_provider_list_sell_title">Wybierz dostawcę do sprzedaży %s tokena</string>
+    <string name="trade_token_not_supported_message">Żaden z naszych dostawców obecnie nie obsługuje zakupu ani sprzedaży tego tokena. Proszę wybrać inny token, inną sieć lub sprawdzić później.</string>
+    <string name="trade_token_not_supported_title">Ten token nie jest obsługiwany przez funkcję kupna/sprzedaży</string>
     <string name="transaction_details_copy_hash">Kopiuj hash</string>
     <string name="transaction_details_extrinsic_fee">Opłata</string>
     <string name="transaction_details_from">Od</string>
@@ -1697,6 +1713,8 @@
     <string name="transaction_status_failed">Niepowodzenie</string>
     <string name="transaction_status_pending">Oczekujące</string>
     <string name="transactions_notification_channel_name">Kanał Powiadomień o Transakcjach</string>
+    <string name="transak_provider_buy_description">Kup kryptowaluty już od $5</string>
+    <string name="transak_provider_sell_description">Sprzedaj kryptowaluty już od $10</string>
     <string name="transfer_history_income_from">Od: %s</string>
     <string name="transfer_history_send_to">Do: %s</string>
     <string name="transfer_title">Przelew</string>
@@ -1734,10 +1752,14 @@
     <string name="waiting_top_up_card_description">Może to potrwać do 5 minut.\nTo okno zostanie zamknięte automatycznie.</string>
     <string name="waiting_top_up_card_timer">Szacowany czas %s</string>
     <string name="wallet_asset_buy">Kup</string>
+    <string name="wallet_asset_buy_sell">Kup/Sprzedaj</string>
+    <string name="wallet_asset_buy_tokens">Kup tokeny</string>
     <string name="wallet_asset_buy_with">Kup za</string>
     <string name="wallet_asset_receive">Otrzymaj</string>
     <string name="wallet_asset_receive_token">Otrzymaj %s</string>
     <string name="wallet_asset_receive_token_subtitle">Wysyłaj tylko token %1$s i tokeny w sieci %2$s na ten adres, w przeciwnym razie możesz stracić swoje środki</string>
+    <string name="wallet_asset_sell">Sprzedaj</string>
+    <string name="wallet_asset_sell_tokens">Sprzedaj tokeny</string>
     <string name="wallet_asset_send">Wyślij</string>
     <string name="wallet_asset_swap">Wymiana</string>
     <string name="wallet_assets">Aktywa</string>
