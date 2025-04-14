@@ -49,7 +49,8 @@ class WatchOnlyAddAccountRepository(
             position = accountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.WATCH_ONLY,
             status = MetaAccountLocal.Status.ACTIVE,
-            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+            typeExtras = null
         )
 
         val metaId = accountDao.insertMetaAccount(metaAccount)

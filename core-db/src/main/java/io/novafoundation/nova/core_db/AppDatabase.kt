@@ -156,7 +156,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 67,
+    version = 68,
     entities = [
         AccountLocal::class,
         NodeLocal::class,

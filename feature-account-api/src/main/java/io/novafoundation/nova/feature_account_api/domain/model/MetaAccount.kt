@@ -49,7 +49,8 @@ interface LightMetaAccount {
         LEDGER_LEGACY,
         LEDGER,
         POLKADOT_VAULT,
-        PROXIED
+        PROXIED,
+        MULTISIG
     }
 
     enum class Status {
@@ -113,6 +114,15 @@ interface MetaAccount : LightMetaAccount {
 interface ProxiedMetaAccount : MetaAccount {
 
     val proxy: ProxyAccount
+}
+
+interface MultisigMetaAccount : MetaAccount {
+
+    val signatoryMetaId: Long
+
+    val otherSignatories: List<AccountIdKey>
+
+    val threshold: Int
 }
 
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
@@ -190,7 +200,8 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.LEDGER,
         LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-        LightMetaAccount.Type.PROXIED -> false
+        LightMetaAccount.Type.PROXIED,
+        LightMetaAccount.Type.MULTISIG -> false
     }
 }
 

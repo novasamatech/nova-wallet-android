@@ -1,21 +1,26 @@
 package io.novafoundation.nova.feature_account_impl.data.mappers
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.filterNotNull
+import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MultisigTypeExtras
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.GenericLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.LegacyLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.PolkadotVaultMetaAccount
+import io.novafoundation.nova.feature_account_impl.domain.account.model.RealMultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.RealProxiedMetaAccount
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class AccountMappers(
-    private val ledgerMigrationTracker: LedgerMigrationTracker
+    private val ledgerMigrationTracker: LedgerMigrationTracker,
+    private val gson: Gson,
 ) {
 
     suspend fun mapMetaAccountsLocalToMetaAccounts(joinedMetaAccountInfo: List<JoinedMetaAccountInfo>): List<MetaAccount> {
@@ -125,8 +130,25 @@ class AccountMappers(
                         ethereumPublicKey = ethereumPublicKey,
                         isSelected = isSelected,
                         name = name,
-                        type = type,
                         status = mapMetaAccountStateFromLocal(status)
+                    )
+                }
+
+                LightMetaAccount.Type.MULTISIG -> {
+                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(typeExtras!!)
+
+                    RealMultisigMetaAccount(
+                        id = id,
+                        globallyUniqueId = globallyUniqueId,
+                        substrateAccountId = substrateAccountId,
+                        ethereumAddress = ethereumAddress,
+                        ethereumPublicKey = ethereumPublicKey,
+                        isSelected = isSelected,
+                        name = name,
+                        status = mapMetaAccountStateFromLocal(status),
+                        signatoryMetaId = multisigTypeExtras.signatoryMetaId,
+                        otherSignatories = multisigTypeExtras.otherSignatories,
+                        threshold = multisigTypeExtras.threshold
                     )
                 }
             }
@@ -162,6 +184,7 @@ class AccountMappers(
             MetaAccountLocal.Type.LEDGER_GENERIC -> LightMetaAccount.Type.LEDGER
             MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
             MetaAccountLocal.Type.PROXIED -> LightMetaAccount.Type.PROXIED
+            MetaAccountLocal.Type.MULTISIG -> LightMetaAccount.Type.MULTISIG
         }
     }
 

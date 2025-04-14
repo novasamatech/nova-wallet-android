@@ -108,6 +108,7 @@ fun mapMetaAccountTypeToLocal(local: LightMetaAccount.Type): MetaAccountLocal.Ty
         LightMetaAccount.Type.LEDGER -> MetaAccountLocal.Type.LEDGER_GENERIC
         LightMetaAccount.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
         LightMetaAccount.Type.PROXIED -> MetaAccountLocal.Type.PROXIED
+        LightMetaAccount.Type.MULTISIG -> MetaAccountLocal.Type.MULTISIG
     }
 }
 

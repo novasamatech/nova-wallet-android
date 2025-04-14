@@ -368,7 +368,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
-            MetaAccountLocal.Type.PROXIED -> baseSecrets.getSubstrateBackupSecrets()
+            MetaAccountLocal.Type.PROXIED,
+            MetaAccountLocal.Type.MULTISIG-> baseSecrets.getSubstrateBackupSecrets()
         }
     }
 
@@ -394,7 +395,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
-            MetaAccountLocal.Type.PROXIED -> emptyList()
+            MetaAccountLocal.Type.PROXIED,
+            MetaAccountLocal.Type.MULTISIG -> emptyList()
         }
     }
 
@@ -535,7 +537,8 @@ class RealLocalAccountsCloudBackupFacade(
             parentMetaId = null,
             isSelected = isSelected,
             position = accountPosition,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            typeExtras = null
         ).also {
             if (localIdOverwrite != null) {
                 it.id = localIdOverwrite
@@ -572,7 +575,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.LEDGER -> CloudBackup.WalletPublicInfo.Type.LEDGER
             MetaAccountLocal.Type.LEDGER_GENERIC -> CloudBackup.WalletPublicInfo.Type.LEDGER_GENERIC
             MetaAccountLocal.Type.POLKADOT_VAULT -> CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT
-            MetaAccountLocal.Type.PROXIED -> null
+
+            MetaAccountLocal.Type.PROXIED, MetaAccountLocal.Type.MULTISIG  -> null
         }
     }
 

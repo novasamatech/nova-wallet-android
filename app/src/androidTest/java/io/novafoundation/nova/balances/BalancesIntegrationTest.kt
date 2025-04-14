@@ -146,7 +146,8 @@ class BalancesIntegrationTest(
     private fun createTestMetaAccount(): MetaAccount {
         val metaAccount = DefaultMetaAccount(
             id = 0,
-            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+           globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+typeExtras = null,
             substratePublicKey = testAccount.fromHex(),
             substrateCryptoType = CryptoType.SR25519,
             substrateAccountId = testAccount.fromHex(),

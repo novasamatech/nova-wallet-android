@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
@@ -45,16 +46,18 @@ class AccountDetailsModule {
         proxyFormatter: ProxyFormatter,
         interactor: WalletDetailsInteractor,
         appLinksProvider: AppLinksProvider,
-        ledgerMigrationTracker: LedgerMigrationTracker
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        multisigFormatter: MultisigFormatter,
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
-            polkadotVaultVariantConfigProvider,
-            resourceManager,
-            accountFormatterFactory,
-            proxyFormatter,
-            interactor,
-            appLinksProvider,
-            ledgerMigrationTracker
+            polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
+            resourceManager = resourceManager,
+            accountFormatterFactory = accountFormatterFactory,
+            proxyFormatter = proxyFormatter,
+            multisigFormatter = multisigFormatter,
+            interactor = interactor,
+            appLinksProvider = appLinksProvider,
+            ledgerMigrationTracker = ledgerMigrationTracker
         )
     }
 

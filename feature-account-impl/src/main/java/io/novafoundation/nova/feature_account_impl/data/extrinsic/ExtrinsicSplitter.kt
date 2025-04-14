@@ -9,7 +9,9 @@ import io.novafoundation.nova.common.utils.min
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomTransactionExtensions
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.binding.BlockWeightLimits
 import io.novafoundation.nova.runtime.network.binding.PerDispatchClassWeight
 import io.novafoundation.nova.runtime.network.binding.total
@@ -42,6 +44,8 @@ typealias SplitCalls = List<List<GenericCall.Instance>>
 interface ExtrinsicSplitter {
 
     suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls
+
+    suspend fun estimateCallWeight(signer: NovaSigner, call: GenericCall.Instance, chain: Chain): WeightV2
 }
 
 private typealias CallWeightsByType = Map<String, Deferred<WeightV2>>
@@ -52,7 +56,8 @@ private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 internal class RealExtrinsicSplitter @Inject constructor(
     private val rpcCalls: RpcCalls,
     private val blockLimitsRepository: BlockLimitsRepository,
-    private val signingContextFactory: SigningContext.Factory
+    private val signingContextFactory: SigningContext.Factory,
+    private val chainRegistry: ChainRegistry,
 ) : ExtrinsicSplitter {
 
     override suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
@@ -65,6 +70,12 @@ internal class RealExtrinsicSplitter @Inject constructor(
         val signerLimit = signer.maxCallsPerTransaction()
 
         callBuilder.splitCallsWith(weightByCallId, extrinsicLimit, signerLimit)
+    }
+
+    override suspend fun estimateCallWeight(signer: NovaSigner, call: GenericCall.Instance, chain: Chain): WeightV2 {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        val fakeExtrinsic = wrapInFakeExtrinsic(signer, call, runtime, chain)
+        return rpcCalls.getExtrinsicFee(chain, fakeExtrinsic).weight
     }
 
     private fun determineExtrinsicLimit(blockLimits: BlockWeightLimits, lastBlockWeight: PerDispatchClassWeight): WeightV2 {

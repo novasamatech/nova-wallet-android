@@ -42,7 +42,8 @@ class RealSecretsMetaAccountLocalFactory : SecretsMetaAccountLocalFactory {
             position = accountSortPosition,
             type = MetaAccountLocal.Type.SECRETS,
             status = MetaAccountLocal.Status.ACTIVE,
-            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
+           globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+typeExtras = null
         )
     }
 }

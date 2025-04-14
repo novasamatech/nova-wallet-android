@@ -145,6 +145,7 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.ExtrinsicSplit
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureModule.BindsModule
 import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.SigningContextFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -345,9 +346,10 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAccountMappers(
-        ledgerMigrationTracker: LedgerMigrationTracker
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        gson: Gson
     ): AccountMappers {
-        return AccountMappers(ledgerMigrationTracker)
+        return AccountMappers(ledgerMigrationTracker, gson)
     }
 
     @Provides
@@ -568,8 +570,15 @@ class AccountFeatureModule {
         walletUseCase: WalletUiUseCase,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         proxyFormatter: ProxyFormatter,
+        multisigFormatter: MultisigFormatter,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-    ) = MetaAccountWithBalanceListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, accountTypePresentationMapper, proxyFormatter)
+    ) = MetaAccountWithBalanceListingMixinFactory(
+        walletUseCase,
+        metaAccountGroupingInteractor,
+        accountTypePresentationMapper,
+        multisigFormatter,
+        proxyFormatter
+    )
 
     @Provides
     @FeatureScope

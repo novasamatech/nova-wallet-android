@@ -8,22 +8,4 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Dic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 
-fun ExtrinsicBuilder.wrapCallsIntoProxy(
-    proxiedAccountId: AccountId,
-    proxyType: ProxyType,
-) {
-    val call = getWrappedCall()
 
-    val proxyCall = runtime.composeCall(
-        moduleName = Modules.PROXY,
-        callName = "proxy",
-        arguments = mapOf(
-            "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
-            "force_proxy_type" to DictEnum.Entry(proxyType.name, null),
-            "call" to call
-        )
-    )
-
-    resetCalls()
-    call(proxyCall)
-}

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -21,6 +22,7 @@ class MetaAccountWithBalanceListingMixinFactory(
     private val walletUiUseCase: WalletUiUseCase,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+    private val multisigFormatter: MultisigFormatter,
     private val proxyFormatter: ProxyFormatter,
 ) {
 
@@ -36,7 +38,8 @@ class MetaAccountWithBalanceListingMixinFactory(
             metaAccountSelectedFlow = metaAccountSelectedFlow,
             accountTypePresentationMapper = accountTypePresentationMapper,
             proxyFormatter = proxyFormatter,
-            showUpdatedMetaAccountsBadge = showUpdatedMetaAccountsBadge
+            showUpdatedMetaAccountsBadge = showUpdatedMetaAccountsBadge,
+            multisigFormatter = multisigFormatter
         )
     }
 }
@@ -47,9 +50,10 @@ private class MetaAccountWithBalanceListingMixin(
     private val metaAccountSelectedFlow: Flow<SelectedMetaAccountState>,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val proxyFormatter: ProxyFormatter,
+    private val multisigFormatter: MultisigFormatter,
     private val showUpdatedMetaAccountsBadge: Boolean,
     coroutineScope: CoroutineScope,
-) : MetaAccountListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
+) : MetaAccountListingMixin, CoroutineScope by coroutineScope {
 
     override val metaAccountsFlow = combine(
         metaAccountGroupingInteractor.metaAccountsWithTotalBalanceFlow(),
@@ -81,13 +85,16 @@ private class MetaAccountWithBalanceListingMixin(
     private fun MetaAccountListingItem.chainIcon(): Icon? {
         return when (this) {
             is MetaAccountListingItem.Proxied -> proxyChain.iconOrFallback()
-            is MetaAccountListingItem.TotalBalance -> null
+
+            is MetaAccountListingItem.TotalBalance,
+            is MetaAccountListingItem.Multisig -> null
         }
     }
 
     private suspend fun MetaAccountListingItem.formatSubtitle(): CharSequence = when (this) {
         is MetaAccountListingItem.Proxied -> formatSubtitle()
         is MetaAccountListingItem.TotalBalance -> formatSubtitle()
+        is MetaAccountListingItem.Multisig -> formatSubtitle()
     }
 
     private suspend fun MetaAccountListingItem.Proxied.formatSubtitle(): CharSequence {
@@ -96,6 +103,10 @@ private class MetaAccountWithBalanceListingMixin(
             proxyFormatter.makeAccountDrawable(proxyMetaAccount),
             metaAccount.proxy
         )
+    }
+
+    private suspend fun MetaAccountListingItem.Multisig.formatSubtitle(): CharSequence {
+        return multisigFormatter.formatSignatorySubtitle(signatory)
     }
 
     private fun MetaAccountListingItem.TotalBalance.formatSubtitle(): String {
@@ -111,7 +122,8 @@ private class MetaAccountWithBalanceListingMixin(
             LightMetaAccount.Type.LEDGER,
             LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-            LightMetaAccount.Type.PROXIED -> false
+            LightMetaAccount.Type.PROXIED,
+            LightMetaAccount.Type.MULTISIG -> false
         }
     }
 }

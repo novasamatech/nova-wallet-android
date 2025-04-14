@@ -178,14 +178,14 @@ class RealProxySyncService(
     private suspend fun addProxiedAccount(
         chainId: ChainId,
         node: NestedProxiesGraphConstructor.Node,
-        metaId: Long,
+        proxyMetaId: Long,
         identities: Map<AccountIdKey, Identity?>
     ) = proxiedAddAccountRepository.addAccountWithSingleChange(
         ProxiedAddAccountRepository.Payload(
             chainId = chainId,
             proxiedAccountId = node.accountId.value,
             proxyType = node.permissionType,
-            proxyMetaId = metaId,
+            proxyMetaId = proxyMetaId,
             identity = identities[node.accountId]
         )
     )
@@ -228,11 +228,5 @@ class RealProxySyncService(
         val alreadyDeactivatedMetaIdsInCache = accountDao.getMetaAccountIdsByStatus(MetaAccountLocal.Status.DEACTIVATED)
 
         return deactivated - alreadyDeactivatedMetaIdsInCache.toSet()
-    }
-
-    private suspend fun List<Long>.takeNotYetDeactivatedMetaAccounts(): List<Long> {
-        val alreadyDeactivatedMetaAccountIds = accountDao.getMetaAccountIdsByStatus(MetaAccountLocal.Status.DEACTIVATED)
-
-        return this - alreadyDeactivatedMetaAccountIds.toSet()
     }
 }

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_multisig">Multisig</string>
+    <string name="multisig_wallet_details_info_warning">This account is a multisig:</string>
+    <string name="multisig_signatory">Signatory:</string>
 
     <string name="buy_token_not_supported_title">This token is not supported by the buy feature</string>
     <string name="buy_token_not_supported_message">None of our providers currently support the buying of this token. Please choose a different token, a different network, or check back later.</string>

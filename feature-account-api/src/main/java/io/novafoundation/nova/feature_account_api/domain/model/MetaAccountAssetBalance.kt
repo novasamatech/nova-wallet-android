@@ -34,6 +34,14 @@ sealed interface MetaAccountListingItem {
         override val hasUpdates: Boolean
     ) : MetaAccountListingItem
 
+    class Multisig(
+        val signatory: MetaAccount,
+        override val totalBalance: BigDecimal,
+        override val currency: Currency,
+        override val metaAccount: MultisigMetaAccount,
+        override val hasUpdates: Boolean
+    ) : MetaAccountListingItem
+
     class TotalBalance(
         override val totalBalance: BigDecimal,
         override val currency: Currency,

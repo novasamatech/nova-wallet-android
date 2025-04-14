@@ -9,7 +9,8 @@ fun MetaAccount.isAllowedToSyncProxy(shouldSyncWatchOnly: Boolean): Boolean {
         LightMetaAccount.Type.PARITY_SIGNER,
         LightMetaAccount.Type.LEDGER_LEGACY,
         LightMetaAccount.Type.LEDGER,
-        LightMetaAccount.Type.POLKADOT_VAULT -> true
+        LightMetaAccount.Type.POLKADOT_VAULT,
+        LightMetaAccount.Type.MULTISIG -> true
 
         LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnly
 

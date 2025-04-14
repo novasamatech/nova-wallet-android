@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.novafoundation.nova.core.model.CryptoType
+import io.novafoundation.nova.core_db.model.common.SerializedJson
 import java.util.UUID
 
 /*
@@ -32,7 +33,8 @@ class MetaAccountLocal(
     val type: Type,
     @ColumnInfo(defaultValue = "ACTIVE")
     val status: Status,
-    val globallyUniqueId: String
+    val globallyUniqueId: String,
+    val typeExtras: SerializedJson?
 ) {
 
     enum class Status {
@@ -73,7 +75,8 @@ class MetaAccountLocal(
         LEDGER,
         LEDGER_GENERIC,
         POLKADOT_VAULT,
-        PROXIED
+        PROXIED,
+        MULTISIG
     }
 }
 

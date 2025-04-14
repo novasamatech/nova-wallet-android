@@ -1,11 +1,18 @@
 package io.novafoundation.nova.common.address
 
+import io.novafoundation.nova.common.utils.HexString
+import io.novafoundation.nova.common.utils.compareTo
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
-class AccountIdKey(val value: AccountId) {
+class AccountIdKey(val value: AccountId): Comparable<AccountIdKey> {
 
     companion object;
+
+    override fun compareTo(other: AccountIdKey): Int {
+        return value.compareTo(other.value)
+    };
 
     override fun equals(other: Any?): Boolean {
         return this === other || other is AccountIdKey && this.value contentEquals other.value
@@ -20,6 +27,10 @@ fun AccountId.intoKey() = AccountIdKey(this)
 
 fun AccountIdKey.toHex(): String {
     return value.toHexString()
+}
+
+fun AccountIdKey.Companion.fromHex(src: HexString): Result<AccountIdKey> {
+    return kotlin.runCatching { src.fromHex().intoKey() }
 }
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))

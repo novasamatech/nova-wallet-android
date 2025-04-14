@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountListingItem
+import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
@@ -134,6 +135,18 @@ class MetaAccountGroupingInteractorImpl(
                 )
             }
 
+            metaAccount is MultisigMetaAccount -> {
+                val signatoryMetaAccount = allMetaAccounts.firstOrNull { it.id == metaAccount.signatoryMetaId } ?: return null
+
+                MetaAccountListingItem.Multisig(
+                    signatory = signatoryMetaAccount,
+                    metaAccount = metaAccount,
+                    hasUpdates = hasUpdates,
+                    totalBalance = totalBalance,
+                    currency = selectedCurrency
+                )
+            }
+
             else -> {
                 MetaAccountListingItem.TotalBalance(
                     totalBalance = totalBalance,
@@ -154,6 +167,7 @@ class MetaAccountGroupingInteractorImpl(
                     LightMetaAccount.Type.POLKADOT_VAULT,
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.PROXIED,
+                    LightMetaAccount.Type.MULTISIG,
                     LightMetaAccount.Type.LEDGER,
                     LightMetaAccount.Type.LEDGER_LEGACY -> true
 
