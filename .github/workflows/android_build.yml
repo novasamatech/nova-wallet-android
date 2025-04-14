@@ -132,7 +132,7 @@ jobs:
   build-app:
     name: Build app and test
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - name: Checkout particualr branch
         uses: actions/checkout@v2
