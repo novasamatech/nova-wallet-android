@@ -90,7 +90,7 @@ private class DelegatedMetaAccountUpdatesListingMixin(
         proxiedWithProxy: ProxiedAndProxyMetaAccount,
         isEnabled: Boolean
     ): CharSequence {
-        val proxy = proxiedWithProxy.proxied.proxy ?: return proxiedWithProxy.proxiedAddress() // fallback
+        val proxy = proxiedWithProxy.proxied.proxy
         val proxyIcon = proxyFormatter.makeAccountDrawable(proxiedWithProxy.proxy)
         return proxyFormatter.mapProxyMetaAccountSubtitle(
             proxiedWithProxy.proxy.name,

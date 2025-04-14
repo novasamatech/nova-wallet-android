@@ -5,12 +5,12 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySignerFactory
-import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
 
 internal class RealSignerProvider(
     private val secretsSignerFactory: SecretsSignerFactory,

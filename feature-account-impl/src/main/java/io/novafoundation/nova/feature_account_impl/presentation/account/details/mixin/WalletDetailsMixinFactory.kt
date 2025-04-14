@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
@@ -69,7 +70,7 @@ class WalletDetailsMixinFactory(
                 accountFormatterFactory = accountFormatterFactory,
                 interactor = interactor,
                 proxyFormatter = proxyFormatter,
-                metaAccount = metaAccount
+                metaAccount = metaAccount as ProxiedMetaAccount
             )
         }
     }
