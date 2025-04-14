@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.domain.account.model
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.substrateFrom
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -23,7 +22,6 @@ open class DefaultMetaAccount(
     override val name: String,
     override val type: LightMetaAccount.Type,
     override val status: LightMetaAccount.Status,
-    override val proxy: ProxyAccount?,
     override val chainAccounts: Map<ChainId, MetaAccount.ChainAccount>
 ) : MetaAccount {
 

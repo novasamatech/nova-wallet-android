@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.AlertView
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
@@ -28,15 +28,15 @@ class ProxiedWalletDetailsMixin(
     private val accountFormatterFactory: AccountFormatterFactory,
     private val interactor: WalletDetailsInteractor,
     private val proxyFormatter: ProxyFormatter,
-    metaAccount: MetaAccount
+    metaAccount: ProxiedMetaAccount
 ) : WalletDetailsMixin(metaAccount) {
     private val accountFormatter = accountFormatterFactory.create(baseAccountTitleFormatter(resourceManager))
 
     override val availableAccountActions: Flow<Set<AccountAction>> = flowOf { emptySet() }
 
     override val typeAlert: Flow<AlertModel?> = flowOf {
-        val proxyAccount = metaAccount.proxy ?: return@flowOf null
-        val proxyMetaAccount = interactor.getMetaAccount(proxyAccount.metaId)
+        val proxyAccount = metaAccount.proxy
+        val proxyMetaAccount = interactor.getMetaAccount(proxyAccount.proxyMetaId)
 
         val proxyAccountWithIcon = proxyFormatter.mapProxyMetaAccount(proxyMetaAccount.name, proxyFormatter.makeAccountDrawable(proxyMetaAccount))
         AlertModel(

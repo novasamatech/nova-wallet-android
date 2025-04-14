@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultM
 import io.novafoundation.nova.feature_account_impl.domain.account.model.GenericLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.LegacyLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.PolkadotVaultMetaAccount
-import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
+import io.novafoundation.nova.feature_account_impl.domain.account.model.RealProxiedMetaAccount
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -43,10 +43,6 @@ class AccountMappers(
             }
         ).filterNotNull()
 
-        val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
-            mapProxyAccountFromLocal(it)
-        }
-
         return with(joinedMetaAccountInfo.metaAccount) {
             when (val type = mapMetaAccountTypeFromLocal(type)) {
                 LightMetaAccount.Type.SECRETS,
@@ -54,7 +50,6 @@ class AccountMappers(
                     id = id,
                     globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
-                    proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
                     substrateCryptoType = substrateCryptoType,
                     substrateAccountId = substrateAccountId,
@@ -71,7 +66,6 @@ class AccountMappers(
                     id = id,
                     globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
-                    proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
                     substrateCryptoType = substrateCryptoType,
                     substrateAccountId = substrateAccountId,
@@ -87,7 +81,6 @@ class AccountMappers(
                     id = id,
                     globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
-                    proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
                     substrateCryptoType = substrateCryptoType,
                     substrateAccountId = substrateAccountId,
@@ -104,7 +97,6 @@ class AccountMappers(
                     id = id,
                     globallyUniqueId = globallyUniqueId,
                     chainAccounts = chainAccounts,
-                    proxy = proxyAccount,
                     substratePublicKey = substratePublicKey,
                     substrateCryptoType = substrateCryptoType,
                     substrateAccountId = substrateAccountId,
@@ -116,21 +108,27 @@ class AccountMappers(
                     status = mapMetaAccountStateFromLocal(status)
                 )
 
-                LightMetaAccount.Type.PROXIED -> ProxiedMetaAccount(
-                    id = id,
-                    globallyUniqueId = globallyUniqueId,
-                    chainAccounts = chainAccounts,
-                    proxy = proxyAccount,
-                    substratePublicKey = substratePublicKey,
-                    substrateCryptoType = substrateCryptoType,
-                    substrateAccountId = substrateAccountId,
-                    ethereumAddress = ethereumAddress,
-                    ethereumPublicKey = ethereumPublicKey,
-                    isSelected = isSelected,
-                    name = name,
-                    type = type,
-                    status = mapMetaAccountStateFromLocal(status)
-                )
+                LightMetaAccount.Type.PROXIED -> {
+                    val proxyAccount = joinedMetaAccountInfo.proxyAccountLocal?.let {
+                        mapProxyAccountFromLocal(it)
+                    }
+
+                    RealProxiedMetaAccount(
+                        id = id,
+                        globallyUniqueId = globallyUniqueId,
+                        chainAccounts = chainAccounts,
+                        proxy = proxyAccount!!,
+                        substratePublicKey = substratePublicKey,
+                        substrateCryptoType = substrateCryptoType,
+                        substrateAccountId = substrateAccountId,
+                        ethereumAddress = ethereumAddress,
+                        ethereumPublicKey = ethereumPublicKey,
+                        isSelected = isSelected,
+                        name = name,
+                        type = type,
+                        status = mapMetaAccountStateFromLocal(status)
+                    )
+                }
             }
         }
     }

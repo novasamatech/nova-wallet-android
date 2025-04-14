@@ -9,17 +9,17 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
-import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -41,7 +41,6 @@ class ProxiedSignerFactory @Inject constructor(
 
     fun create(metaAccount: ProxiedMetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
         return ProxiedSigner(
-            proxiedMetaAccount = metaAccount,
             chainRegistry = chainRegistry,
             accountRepository = accountRepository,
             signerProvider = signerProvider,
@@ -50,13 +49,13 @@ class ProxiedSignerFactory @Inject constructor(
             proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus,
             isRootProxied = isRoot,
             proxyCallFilterFactory = proxyCallFilterFactory,
-            metaAccount = metaAccount
+            proxiedMetaAccount = metaAccount
         )
     }
 }
 
 class ProxiedSigner(
-    private val proxiedMetaAccount: MetaAccount,
+    private val proxiedMetaAccount: ProxiedMetaAccount,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
@@ -65,8 +64,9 @@ class ProxiedSigner(
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
     private val isRootProxied: Boolean,
     private val proxyCallFilterFactory: ProxyCallFilterFactory,
-    override val metaAccount: MetaAccount
 ) : NovaSigner {
+
+    override val metaAccount = proxiedMetaAccount
 
     private val proxyMetaAccount = SingleValueCache {
         computeProxyMetaAccount()
@@ -184,7 +184,7 @@ class ProxiedSigner(
 
     private suspend fun computeProxyMetaAccount(): MetaAccount {
         val proxyAccount = proxiedMetaAccount.proxy ?: throw IllegalStateException("Proxy account is not found")
-        return accountRepository.getMetaAccount(proxyAccount.metaId)
+        return accountRepository.getMetaAccount(proxyAccount.proxyMetaId)
     }
 
     private suspend fun notEnoughPermission(proxyMetaAccount: MetaAccount, availableProxyTypes: List<ProxyType>): Nothing {
