@@ -35,30 +35,30 @@ class TradeProviderListViewModel(
 
     private val tradeMixin = tradeMixinFactory.create(viewModelScope)
 
-    private val tradeFlow = payload.type.toTradeFlow()
+    private val tradeType = payload.type.toTradeFlow()
 
     private val chainAssetFlow = flowOf { chainRegistry.asset(payload.chainId, payload.assetId) }
         .shareInBackground()
 
     val titleFlow = chainAssetFlow.map {
-        when (tradeFlow) {
+        when (tradeType) {
             TradeTokenRegistry.TradeType.BUY -> resourceManager.getString(R.string.trade_provider_list_buy_title, it.symbol.value)
             TradeTokenRegistry.TradeType.SELL -> resourceManager.getString(R.string.trade_provider_list_sell_title, it.symbol.value)
         }
     }
 
     private val providers = chainAssetFlow.map {
-        tradeMixin.providersFor(it, tradeFlow)
+        tradeMixin.providersFor(it, tradeType)
     }.shareInBackground()
 
     val providerModels = providers.mapList { provider ->
-        val paymentMethods = provider.getPaymentMethods(tradeFlow).map { it.toModel() }
+        val paymentMethods = provider.getPaymentMethods(tradeType).map { it.toModel() }
         TradeProviderRvItem(
             provider.id,
             provider.officialUrl,
             provider.logoRes,
             paymentMethods,
-            resourceManager.getString(provider.descriptionRes)
+            resourceManager.getString(provider.getDescriptionRes(tradeType))
         )
     }
 
@@ -97,7 +97,7 @@ class TradeProviderListViewModel(
                 TradeWebPayload(
                     AssetPayload(chainAsset.chainId, chainAsset.id),
                     item.providerId,
-                    tradeFlow.toModel(),
+                    tradeType.toModel(),
                     payload.onSuccessfulTradeStrategyType
                 )
             )

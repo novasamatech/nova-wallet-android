@@ -25,8 +25,10 @@
     <string name="sell_network_flow_title">Select network for selling %s</string>
 
     <string name="mercurio_provider_description">Best price with fees up to 3.95%</string>
-    <string name="transak_provider_description">Buy crypto starting from just $5</string>
+    <string name="transak_provider_buy_description">Buy crypto starting from just $5</string>
     <string name="banxa_provider_description">Straightforward and efficient KYC process</string>
+
+    <string name="transak_provider_sell_description">Sell crypto starting from just $10</string>
 
     <string name="wallet_asset_sell">Sell</string>
 
