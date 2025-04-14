@@ -23,8 +23,6 @@ class BanxaProvider(
     override val officialUrl: String = "banxa.com"
     override val logoRes: Int = R.drawable.ic_banxa_provider_logo
 
-    override val supportedFlows = setOf(TradeTokenRegistry.TradeType.BUY)
-
     override fun getDescriptionRes(tradeType: TradeTokenRegistry.TradeType): Int {
         return R.string.banxa_provider_description
     }
