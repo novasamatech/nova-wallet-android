@@ -63,9 +63,9 @@ class CompoundLedgerDiscoveryService(
     private fun stopDiscovery(delegate: LedgerDeviceDiscoveryServiceDelegate) {
         val method = delegate.method
 
-        discoveringSubscribersTracker.removeSubscriber(method)
+        val subscriberRemoved = discoveringSubscribersTracker.removeSubscriber(method)
 
-        if (discoveringSubscribersTracker.noSubscribers(method)) {
+        if (subscriberRemoved && discoveringSubscribersTracker.noSubscribers(method)) {
             getDelegate(method).stopDiscovery()
         }
     }
@@ -106,9 +106,13 @@ private class DiscoveringSubscribersTracker {
         emitNewEnabledValue()
     }
 
-    fun removeSubscriber(method: DiscoveryMethod) {
+    /**
+     * Reduces subscriber counter by 1
+     * @return true if counter was reduced. False if counter was already zero
+     */
+    fun removeSubscriber(method: DiscoveryMethod): Boolean {
         val subscribers = subscribersByMethod.getValue(method)
-        if (subscribers == 0) return
+        if (subscribers == 0) return false
 
         val newSubscribers = subscribers - 1
         if (newSubscribers == 0) {
@@ -118,6 +122,7 @@ private class DiscoveringSubscribersTracker {
         }
 
         emitNewEnabledValue()
+        return true
     }
 
     fun noSubscribers(method: DiscoveryMethod): Boolean {
