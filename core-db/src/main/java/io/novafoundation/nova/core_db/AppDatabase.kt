@@ -87,6 +87,7 @@ import io.novafoundation.nova.core_db.migrations.AddStakingTypeToTotalRewards_44
 import io.novafoundation.nova.core_db.migrations.AddSwapOption_48_49
 import io.novafoundation.nova.core_db.migrations.AddTransactionVersionToRuntime_50_51
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
+import io.novafoundation.nova.core_db.migrations.AddTypeExtrasToMetaAccount_67_68
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
@@ -257,6 +258,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
                     .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67)
+                    .addMigrations(AddTypeExtrasToMetaAccount_67_68)
                     .build()
             }
             return instance!!
