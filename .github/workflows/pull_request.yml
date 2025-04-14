@@ -6,9 +6,9 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/android_build.yml
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
     with:
       branch: ${{github.head_ref}}
-      gradlew-command: assembleDevelop --no-daemon --profile --stacktrace --debug
+      gradlew-command: assembleDevelop
       build-debug-tests: true
     secrets: inherit
