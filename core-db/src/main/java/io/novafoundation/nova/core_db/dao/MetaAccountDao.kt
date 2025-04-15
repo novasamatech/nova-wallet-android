@@ -92,7 +92,7 @@ interface MetaAccountDao {
     }
 
     @Transaction
-    suspend fun withTransaction(action: suspend () -> Unit) {
+    suspend fun runInTransaction(action: suspend () -> Unit) {
         action()
     }
 
@@ -255,6 +255,16 @@ interface MetaAccountDao {
 
     @Query("DELETE FROM meta_accounts WHERE status = :status ")
     fun removeMetaAccountsByStatus(status: MetaAccountLocal.Status)
+}
+
+suspend inline fun <T : Any> MetaAccountDao.withTransaction(crossinline action: suspend () -> T): T {
+    var result: T? = null
+
+    runInTransaction {
+        result = action()
+    }
+
+    return result!!
 }
 
 class MetaAccountWithBalanceLocal(

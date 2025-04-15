@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.mappers
 
+import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.fromJson
@@ -26,7 +27,7 @@ class AccountMappers(
     suspend fun mapMetaAccountsLocalToMetaAccounts(joinedMetaAccountInfo: List<JoinedMetaAccountInfo>): List<MetaAccount> {
         val supportedGenericLedgerChains = ledgerMigrationTracker.supportedChainIdsByGenericApp()
 
-        return joinedMetaAccountInfo.map {
+        return joinedMetaAccountInfo.mapNotNull {
             mapMetaAccountLocalToMetaAccount(it) { supportedGenericLedgerChains }
         }
     }
@@ -34,13 +35,13 @@ class AccountMappers(
     suspend fun mapMetaAccountLocalToMetaAccount(joinedMetaAccountInfo: JoinedMetaAccountInfo): MetaAccount {
         return mapMetaAccountLocalToMetaAccount(joinedMetaAccountInfo) {
             ledgerMigrationTracker.supportedChainIdsByGenericApp()
-        }
+        }!!
     }
 
-    private inline fun mapMetaAccountLocalToMetaAccount(
+    private suspend fun mapMetaAccountLocalToMetaAccount(
         joinedMetaAccountInfo: JoinedMetaAccountInfo,
-        supportedGenericLedgerChains: () -> Set<ChainId>
-    ): MetaAccount {
+        supportedGenericLedgerChains: suspend () -> Set<ChainId>
+    ): MetaAccount? {
         val chainAccounts = joinedMetaAccountInfo.chainAccounts.associateBy(
             keySelector = ChainAccountLocal::chainId,
             valueTransform = {
@@ -122,7 +123,10 @@ class AccountMappers(
                         id = id,
                         globallyUniqueId = globallyUniqueId,
                         chainAccounts = chainAccounts,
-                        proxy = proxyAccount!!,
+                        proxy = proxyAccount ?: run {
+                            Log.e("Proxy", "Null proxy account for proxied ${id} (${name})")
+                            return null
+                        },
                         substratePublicKey = substratePublicKey,
                         substrateCryptoType = substrateCryptoType,
                         substrateAccountId = substrateAccountId,
@@ -135,7 +139,7 @@ class AccountMappers(
                 }
 
                 LightMetaAccount.Type.MULTISIG -> {
-                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(typeExtras!!)
+                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(requireNotNull(typeExtras) { "typeExtras is null: ${id}"})
 
                     RealMultisigMetaAccount(
                         id = id,
@@ -146,7 +150,7 @@ class AccountMappers(
                         isSelected = isSelected,
                         name = name,
                         status = mapMetaAccountStateFromLocal(status),
-                        signatoryMetaId = multisigTypeExtras.signatoryMetaId,
+                        signatoryMetaId = requireNotNull(parentMetaId) { "parentMetaId is null: ${id}" },
                         otherSignatories = multisigTypeExtras.otherSignatories,
                         threshold = multisigTypeExtras.threshold
                     )

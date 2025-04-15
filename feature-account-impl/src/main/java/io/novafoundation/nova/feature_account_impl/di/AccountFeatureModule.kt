@@ -49,6 +49,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -67,8 +68,10 @@ import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
 import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicServiceFactory
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
@@ -86,10 +89,13 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Re
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.SecretsMetaAccountLocalFactory
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.SigningContextFactory
+import io.novafoundation.nova.feature_account_impl.di.AccountFeatureModule.BindsModule
 import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
 import io.novafoundation.nova.feature_account_impl.di.modules.CloudBackupModule
 import io.novafoundation.nova.feature_account_impl.di.modules.CustomFeeModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
+import io.novafoundation.nova.feature_account_impl.di.modules.MultisigModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
@@ -116,12 +122,12 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Star
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
@@ -141,11 +147,6 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.ExtrinsicSplitter
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
-import io.novafoundation.nova.feature_account_impl.di.AccountFeatureModule.BindsModule
-import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.SigningContextFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -169,6 +170,7 @@ import javax.inject.Named
         AddAccountsModule::class,
         CloudBackupModule::class,
         CustomFeeModule::class,
+        MultisigModule::class,
         BindsModule::class
     ]
 )

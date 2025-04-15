@@ -6,7 +6,7 @@ import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
-class AccountIdKey(val value: AccountId): Comparable<AccountIdKey> {
+class AccountIdKey(val value: AccountId) : Comparable<AccountIdKey> {
 
     companion object;
 
@@ -25,13 +25,22 @@ class AccountIdKey(val value: AccountId): Comparable<AccountIdKey> {
 
 fun AccountId.intoKey() = AccountIdKey(this)
 
-fun AccountIdKey.toHex(): String {
+fun AccountIdKey.toHex(): HexString {
     return value.toHexString()
 }
 
-fun AccountIdKey.Companion.fromHex(src: HexString): Result<AccountIdKey> {
-    return kotlin.runCatching { src.fromHex().intoKey() }
+fun AccountIdKey.toHexWithPrefix(): HexString {
+    return value.toHexString(withPrefix = true)
 }
+
+fun AccountIdKey.Companion.fromHex(src: HexString): Result<AccountIdKey> {
+    return runCatching { src.fromHex().intoKey() }
+}
+
+fun AccountIdKey.Companion.fromHexOrNull(src: HexString): AccountIdKey? {
+    return fromHex(src).getOrNull()
+}
+
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))
 fun <T> Map<AccountIdKey, T>.getValue(key: AccountId) = getValue(AccountIdKey(key))

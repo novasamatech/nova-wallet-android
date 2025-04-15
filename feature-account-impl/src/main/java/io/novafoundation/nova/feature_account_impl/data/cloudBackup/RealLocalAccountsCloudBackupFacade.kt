@@ -111,7 +111,7 @@ class RealLocalAccountsCloudBackupFacade(
         val metaAccountsByUuid = getAllBackupableAccounts().associateBy { it.metaAccount.globallyUniqueId }
 
         val changesEvent = buildChangesEvent {
-            accountDao.withTransaction {
+            accountDao.runInTransaction {
                 addAll(applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid))
                 addAll(applyLocalAddition(localChangesToApply.added, cloudVersion))
                 addAll(

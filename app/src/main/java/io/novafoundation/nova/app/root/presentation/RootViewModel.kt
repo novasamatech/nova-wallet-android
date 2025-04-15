@@ -78,7 +78,7 @@ class RootViewModel(
 
         checkForUpdates()
 
-        syncProxies()
+        syncDelegatedAccounts()
 
         syncCurrencies()
 
@@ -135,8 +135,12 @@ class RootViewModel(
         launch { currencyInteractor.syncCurrencies() }
     }
 
-    private fun syncProxies() {
+    private fun syncDelegatedAccounts() {
         interactor.syncProxies()
+            .inBackground()
+            .launchIn(rootScope)
+
+        interactor.syncMultisigs()
             .inBackground()
             .launchIn(rootScope)
     }

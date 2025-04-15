@@ -159,6 +159,10 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
             ExternalApi.ReferendumSummary(externalApiLocal.url)
         }
 
+        ApiType.MULTISIG -> {
+            ExternalApi.Multisig(externalApiLocal.url)
+        }
+
         ApiType.UNKNOWN -> null
     }
 }.getOrNull()

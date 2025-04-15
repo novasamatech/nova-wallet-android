@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.domain
 
 import io.novafoundation.nova.core.updater.Updater
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigSyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
@@ -12,7 +13,8 @@ class RootInteractor(
     private val updateSystem: BalancesUpdateSystem,
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
-    private val proxySyncService: ProxySyncService
+    private val proxySyncService: ProxySyncService,
+    private val multisigSyncService: MultisigSyncService,
 ) {
 
     fun runBalancesUpdate(): Flow<Updater.SideEffect> = updateSystem.start()
@@ -35,5 +37,9 @@ class RootInteractor(
         return proxySyncService.proxySyncTrigger().mapLatest {
             proxySyncService.startSyncingSuspend()
         }
+    }
+
+    fun syncMultisigs(): Flow<*> {
+        return multisigSyncService.automaticSync()
     }
 }

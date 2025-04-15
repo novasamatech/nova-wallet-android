@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -123,6 +124,8 @@ interface AccountFeatureDependencies {
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
 
     val blockLimitsRepository: BlockLimitsRepository
+
+    val networkApiCreator: NetworkApiCreator
 
     fun appLinksProvider(): AppLinksProvider
 

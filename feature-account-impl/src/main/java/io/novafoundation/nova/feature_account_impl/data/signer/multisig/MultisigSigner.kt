@@ -7,23 +7,14 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.getChainIdOrThrow
-import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
-import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
-import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.ExtrinsicSplitter
-import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
-import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
-import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -50,6 +41,9 @@ class MultisigSignerFactory @Inject constructor(
     }
 }
 
+// TODO multisig:
+// 1. do not create history elements (e.g. transfers) for delayed operations. This could be done by introducing immediate / delayed call execution separation
+// 2. support threshold 1 multisigs
 class MultisigSigner(
     private val multisigAccount: MultisigMetaAccount,
     private val chainRegistry: ChainRegistry,
@@ -115,12 +109,12 @@ class MultisigSigner(
     // Wrap without verifying proxy permissions and hardcode proxy type
     // to speed up fee calculation
     context(ExtrinsicBuilder)
-    private suspend fun wrapCallsInProxyForFee() {
+    private fun wrapCallsInProxyForFee() {
         wrapCallsInAsMulti(maxWeight = WeightV2.zero())
     }
 
     context(ExtrinsicBuilder)
-    private suspend fun wrapCallsInAsMulti(maxWeight: WeightV2) {
+    private fun wrapCallsInAsMulti(maxWeight: WeightV2) {
         val call = getWrappedCall()
 
         val multisigCall = runtime.composeCall(
@@ -128,7 +122,7 @@ class MultisigSigner(
             callName = "as_multi",
             arguments = mapOf(
                 "threshold" to multisigAccount.threshold.toBigInteger(),
-                "other_signatories" to multisigAccount.otherSignatories.sorted(),
+                "other_signatories" to multisigAccount.otherSignatories.sorted().map { it.value },
                 "maybe_timepoint" to null,
                 "call" to call,
                 "max_weight" to maxWeight.toEncodableInstance()

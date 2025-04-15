@@ -190,6 +190,10 @@ inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }
 
+inline fun <reified T: Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
+    return externalApis.any { it is T }
+}
+
 const val UTILITY_ASSET_ID = 0
 
 val Chain.Asset.isUtilityAsset: Boolean

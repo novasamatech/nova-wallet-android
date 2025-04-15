@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigSyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -73,6 +74,10 @@ interface RootDependencies {
 
     val browserTabExternalRepository: BrowserTabExternalRepository
 
+    val proxySyncService: ProxySyncService
+
+    val multisigSyncService: MultisigSyncService
+
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
     fun contributionsInteractor(): ContributionsInteractor
@@ -102,8 +107,6 @@ interface RootDependencies {
     fun safeModeService(): SafeModeService
 
     fun rootScope(): RootScope
-
-    fun proxySyncService(): ProxySyncService
 
     fun governanceStateUpdater(): MutableGovernanceState
 

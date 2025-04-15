@@ -229,4 +229,20 @@ class RealProxySyncService(
 
         return deactivated - alreadyDeactivatedMetaIdsInCache.toSet()
     }
+
+    private fun MetaAccount.isAllowedToSyncProxy(shouldSyncWatchOnly: Boolean): Boolean {
+        return when (type) {
+            LightMetaAccount.Type.SECRETS,
+            LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER_LEGACY,
+            LightMetaAccount.Type.LEDGER,
+            LightMetaAccount.Type.POLKADOT_VAULT,
+
+            LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnly
+
+            // TODO multisig: sync proxies for multisigs
+            LightMetaAccount.Type.MULTISIG,
+            LightMetaAccount.Type.PROXIED -> false
+        }
+    }
 }
