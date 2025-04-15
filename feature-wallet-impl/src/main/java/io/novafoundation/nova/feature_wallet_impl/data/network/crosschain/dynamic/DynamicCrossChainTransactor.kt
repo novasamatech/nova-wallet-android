@@ -21,7 +21,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -54,7 +54,7 @@ class DynamicCrossChainTransactor @Inject constructor(
             composeCall(
                 moduleName = metadata.xcmPalletName(),
                 callName = "transfer_assets",
-                args = mapOf(
+                arguments = mapOf(
                     "dest" to configuration.destinationChainLocationOnOrigin().versionedXcm().toEncodableInstance(),
                     "beneficiary" to transfer.beneficiaryLocation().versionedXcm().toEncodableInstance(),
                     "assets" to MultiAssets(multiAsset).versionedXcm().toEncodableInstance(),

@@ -36,7 +36,7 @@ class StatemineAssetIssuer(
         return runtimeSnapshot.composeCall(
             moduleName = assetType.palletNameOrDefault(),
             callName = "mint",
-            args = mapOf(
+            arguments = mapOf(
                 "id" to assetType.prepareIdForEncoding(runtimeSnapshot),
                 "beneficiary" to AddressInstanceConstructor.constructInstance(runtimeSnapshot.typeRegistry, destination.value),
                 "amount" to amount

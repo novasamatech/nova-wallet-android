@@ -33,7 +33,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.extensions.toHexString
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getAccountIdOrThrow
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -71,7 +72,7 @@ class ShowSignParitySignerViewModel(
 
     val chain = flowOf {
         val signPayload = signSharedState.getOrThrow()
-        val chainId = signPayload.extrinsic.genesisHash.toHexString()
+        val chainId = signPayload.inheritedImplication.getGenesisHashOrThrow().toHexString()
 
         chainRegistry.getChain(chainId)
     }.shareInBackground()
@@ -87,7 +88,7 @@ class ShowSignParitySignerViewModel(
     val qrCodeSequence = selectedSigningMode.mapLatest {
         val signPayload = signSharedState.getOrThrow()
 
-        val frames = interactor.qrCodeContent(signPayload.extrinsic, it).frames
+        val frames = interactor.qrCodeContent(signPayload.inheritedImplication, it).frames
 
         frames.map { qrCodeGenerator.generateQrBitmap(it) }.cycleMultiple()
     }.shareInBackground()
@@ -95,11 +96,11 @@ class ShowSignParitySignerViewModel(
     val addressModel = chain.map { chain ->
         val signPayload = signSharedState.getOrThrow()
 
-        addressIconGenerator.createAccountAddressModel(chain, signPayload.extrinsic.accountId, addressDisplayUseCase)
+        addressIconGenerator.createAccountAddressModel(chain, signPayload.inheritedImplication.getAccountIdOrThrow(), addressDisplayUseCase)
     }.shareInBackground()
 
     val validityPeriod = flowOf {
-        extrinsicValidityUseCase.extrinsicValidityPeriod(signSharedState.getOrThrow().extrinsic)
+        extrinsicValidityUseCase.extrinsicValidityPeriod(signSharedState.getOrThrow().inheritedImplication)
     }.shareInBackground()
 
     val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_title, payload.polkadotVaultVariant)

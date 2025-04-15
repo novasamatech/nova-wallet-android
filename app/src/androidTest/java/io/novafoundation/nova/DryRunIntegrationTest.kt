@@ -63,7 +63,7 @@ class DryRunIntegrationTest : BaseIntegrationTest() {
         val call = polkadotRuntime.composeCall(
             moduleName =  polkadotRuntime.metadata.xcmPalletName(),
             callName = "limited_teleport_assets",
-            args = mapOf(
+            arguments = mapOf(
                 "dest" to pahVersionedLocation.toEncodableInstance(),
                 "beneficiary" to beneficiary.versionedXcm(xcmVersion).toEncodableInstance(),
                 "assets" to MultiAssets(assets).versionedXcm(xcmVersion).toEncodableInstance(),

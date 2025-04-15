@@ -94,7 +94,7 @@ fun FeeLoaderMixin.Factory.create(tokenUseCase: TokenUseCase) = create(tokenUseC
 fun <I> FeeLoaderMixin.Presentation.connectWith(
     inputSource: Flow<I>,
     scope: CoroutineScope,
-    feeConstructor: suspend Token.(input: I) -> Fee,
+    feeConstructor: suspend Token.(input: I) -> Fee?,
     onRetryCancelled: () -> Unit = {}
 ) {
     inputSource.onEach { input ->

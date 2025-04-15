@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.My
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.delegationAmountTo
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.rewards.MythosClaimPendingRewardsUseCase
 import io.novafoundation.nova.runtime.state.chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import javax.inject.Inject
 
 interface UnbondMythosStakingInteractor {
