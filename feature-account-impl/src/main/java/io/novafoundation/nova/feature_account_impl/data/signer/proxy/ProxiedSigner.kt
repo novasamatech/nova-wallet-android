@@ -11,9 +11,11 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
@@ -82,6 +84,11 @@ class ProxiedSigner(
 
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
         return delegateSigner().submissionSignerAccountId(chain)
+    }
+
+    override suspend fun callExecutionType(): CallExecutionType {
+        val selfExecutionType = CallExecutionType.IMMEDIATE
+        return delegateSigner().callExecutionType().intersect(selfExecutionType)
     }
 
     context(ExtrinsicBuilder)

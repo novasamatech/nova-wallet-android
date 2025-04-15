@@ -7,9 +7,11 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.getChainIdOrThrow
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
@@ -44,6 +46,8 @@ class MultisigSignerFactory @Inject constructor(
 // TODO multisig:
 // 1. do not create history elements (e.g. transfers) for delayed operations. This could be done by introducing immediate / delayed call execution separation
 // 2. support threshold 1 multisigs
+// 3. certain operations cannot execute multisig (in general - CallExecutionType.DELAYED). We should add corresponding checks and validations
+// Example: 1 click swaps
 class MultisigSigner(
     private val multisigAccount: MultisigMetaAccount,
     private val chainRegistry: ChainRegistry,
@@ -63,6 +67,11 @@ class MultisigSigner(
         signerProvider.nestedSignerFor(signatoryMetaAccount())
     }
 
+    override suspend fun callExecutionType(): CallExecutionType {
+        val selfExecutionType = CallExecutionType.DELAYED
+        return delegateSigner().callExecutionType().intersect(selfExecutionType)
+    }
+
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
         return delegateSigner().submissionSignerAccountId(chain)
     }
@@ -74,6 +83,8 @@ class MultisigSigner(
         delegateSigner().setSignerDataForSubmission(context)
 
         // TODO multisig: implement acknowledge and validation
+        // 1. Balance is enough
+        // 2. There is no pending mst with this exact call
 //        if (isRootSigner) {
 //            acknowledgeProxyOperation(signatoryMetaAccount())
 //            validateExtrinsic(context.chain)
@@ -106,8 +117,6 @@ class MultisigSigner(
         return wrapCallsInAsMulti(maxWeight = weight)
     }
 
-    // Wrap without verifying proxy permissions and hardcode proxy type
-    // to speed up fee calculation
     context(ExtrinsicBuilder)
     private fun wrapCallsInProxyForFee() {
         wrapCallsInAsMulti(maxWeight = WeightV2.zero())

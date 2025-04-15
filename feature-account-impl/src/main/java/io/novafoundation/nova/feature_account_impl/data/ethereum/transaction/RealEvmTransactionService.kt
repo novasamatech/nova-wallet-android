@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
@@ -104,7 +105,13 @@ internal class RealEvmTransactionService(
 
         val txHash = web3Api.sendTransaction(toSubmit)
 
-        ExtrinsicSubmission(hash = txHash, submissionOrigin = SubmissionOrigin.singleOrigin(submittingAccountId))
+        ExtrinsicSubmission(
+            hash = txHash,
+            submissionOrigin = SubmissionOrigin.singleOrigin(submittingAccountId),
+            // Well, actually some smart-contracts might be "delayed", e.g. Gnosis Multisigs
+            // But we don't care at this point since this service is used for internal app txs only, basically just for the transfers
+            callExecutionType = CallExecutionType.IMMEDIATE
+        )
     }
 
     private suspend fun signTransaction(txForSign: RawTransaction, metaAccount: MetaAccount, chain: Chain): String {

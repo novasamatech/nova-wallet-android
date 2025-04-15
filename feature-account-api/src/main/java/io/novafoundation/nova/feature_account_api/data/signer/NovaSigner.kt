@@ -9,6 +9,12 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
 interface NovaSigner : Signer {
 
     /**
+     * Determines execution type of the actual call (e.g. transfer)
+     * Implementation node: signers that delegate signing to nested signers should intersect their execution type with the nested one
+     */
+    suspend fun callExecutionType(): CallExecutionType
+
+    /**
      * Meta account this signer was created for
      * This is the same value that was passed to [SignerProvider.rootSignerFor] or [SignerProvider.nestedSignerFor]
      */
