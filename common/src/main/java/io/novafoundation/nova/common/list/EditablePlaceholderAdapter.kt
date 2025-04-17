@@ -1,15 +1,12 @@
 package io.novafoundation.nova.common.list
 
-import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ItemPlaceholderBinding
 import io.novafoundation.nova.common.utils.ViewSpace
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.PlaceholderModel
-import kotlinx.android.synthetic.main.item_placeholder.view.itemPlaceholder
 
 class EditablePlaceholderAdapter(
     private var model: PlaceholderModel? = null,
@@ -18,7 +15,7 @@ class EditablePlaceholderAdapter(
 ) : SingleItemAdapter<EditableStubHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableStubHolder {
-        return EditableStubHolder(parent.inflateChild(R.layout.item_placeholder))
+        return EditableStubHolder(ItemPlaceholderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: EditableStubHolder, position: Int) {
@@ -47,11 +44,11 @@ class EditablePlaceholderAdapter(
     }
 }
 
-class EditableStubHolder(view: View) : RecyclerView.ViewHolder(view) {
+class EditableStubHolder(private val binder: ItemPlaceholderBinding) : BaseViewHolder(binder.root) {
 
     fun bind(model: PlaceholderModel?, padding: ViewSpace?, clickListener: OnClickListener?) {
-        model?.let { itemView.itemPlaceholder.setModel(model) }
-        itemView.itemPlaceholder.setButtonClickListener(clickListener)
-        padding?.let { itemView.updatePadding(it) }
+        model?.let { binder.itemPlaceholder.setModel(model) }
+        binder.itemPlaceholder.setButtonClickListener(clickListener)
+        padding?.let { binder.root.updatePadding(it) }
     }
 }

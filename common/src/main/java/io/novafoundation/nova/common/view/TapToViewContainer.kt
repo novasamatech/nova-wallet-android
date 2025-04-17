@@ -14,15 +14,14 @@ import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewTapToViewContainerBinding
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getParcelableCompat
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewContainer
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewHiddenContent
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewSbutitle
-import kotlinx.android.synthetic.main.view_tap_to_view_container.view.tapToViewTitle
+
 import kotlin.math.roundToInt
 
 private const val SUPER_STATE = "super_state"
@@ -33,6 +32,8 @@ open class TapToViewContainer @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
+
+    private val binder = ViewTapToViewContainerBinding.inflate(inflater(), this)
 
     private var onShowContentClicked: OnClickListener? = null
 
@@ -47,13 +48,12 @@ open class TapToViewContainer @JvmOverloads constructor(
     }
 
     init {
-        inflate(context, R.layout.view_tap_to_view_container, this)
         layoutTransition = LayoutTransition() // To animate this layout size change and children visibility
 
-        tapToViewContainer.setOnClickListener {
+        binder.tapToViewContainer.setOnClickListener {
             isContentVisible = true
             onShowContentClicked?.onClick(this)
-            tapToViewContainer.visibility = GONE
+            binder.tapToViewContainer.visibility = GONE
             requestLayout()
         }
 
@@ -82,8 +82,8 @@ open class TapToViewContainer @JvmOverloads constructor(
      * Measure the height of the tap to view container background based on the its background aspect ratio
      */
     private fun measureTapToViewContainerBackground(width: Int): Int {
-        val tapToViewBackgroundHeight = tapToViewContainer.background?.intrinsicHeight ?: 0
-        val tabToViewBackgroundWidth = tapToViewContainer.background?.intrinsicWidth ?: 0
+        val tapToViewBackgroundHeight = binder.tapToViewContainer.background?.intrinsicHeight ?: 0
+        val tabToViewBackgroundWidth = binder.tapToViewContainer.background?.intrinsicWidth ?: 0
         val height = tapToViewBackgroundHeight * (width.toFloat() / tabToViewBackgroundWidth.toFloat())
         return height.roundToInt()
     }
@@ -102,7 +102,7 @@ open class TapToViewContainer @JvmOverloads constructor(
         if (child.id == R.id.tapToViewContainer || child.id == R.id.tapToViewHiddenContent) {
             super.addView(child, params)
         } else {
-            tapToViewHiddenContent.addView(child, params)
+            binder.tapToViewHiddenContent.addView(child, params)
         }
     }
 
@@ -120,7 +120,7 @@ open class TapToViewContainer @JvmOverloads constructor(
             super.onRestoreInstanceState(state.getParcelableCompat<Parcelable>(SUPER_STATE))
 
             isContentVisible = state.getBoolean(REVEAL_CONTAINER_VISIBILITY)
-            tapToViewContainer.isVisible = !isContentVisible
+            binder.tapToViewContainer.isVisible = !isContentVisible
         } else {
             super.onRestoreInstanceState(state)
         }
@@ -133,15 +133,15 @@ open class TapToViewContainer @JvmOverloads constructor(
     }
 
     fun setTitleOrHide(title: String?) {
-        tapToViewTitle.setTextOrHide(title)
+        binder.tapToViewTitle.setTextOrHide(title)
     }
 
     fun setSubtitleOrHide(subtitle: String?) {
-        tapToViewSbutitle.setTextOrHide(subtitle)
+        binder.tapToViewSbutitle.setTextOrHide(subtitle)
     }
 
     fun setTapToViewBackground(@DrawableRes background: Int) {
-        tapToViewContainer.setBackgroundResource(background)
+        binder.tapToViewContainer.setBackgroundResource(background)
         requestLayout()
     }
 
@@ -152,7 +152,7 @@ open class TapToViewContainer @JvmOverloads constructor(
 
     fun showContent(show: Boolean) {
         isContentVisible = show
-        tapToViewContainer.isVisible = !show
+        binder.tapToViewContainer.isVisible = !show
         requestLayout()
     }
 

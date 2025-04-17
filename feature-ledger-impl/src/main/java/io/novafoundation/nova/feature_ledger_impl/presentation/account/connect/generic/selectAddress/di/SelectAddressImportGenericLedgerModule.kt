@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
@@ -29,6 +31,13 @@ class SelectAddressImportGenericLedgerModule {
     ): LedgerMessageFormatter = factory.createGeneric()
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
     @ViewModelKey(SelectAddressImportGenericLedgerViewModel::class)
     fun provideViewModel(
@@ -38,7 +47,7 @@ class SelectAddressImportGenericLedgerModule {
         resourceManager: ResourceManager,
         payload: SelectLedgerAddressPayload,
         chainRegistry: ChainRegistry,
-        messageFormatter: LedgerMessageFormatter
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectAddressImportGenericLedgerViewModel(
             router = router,
@@ -47,7 +56,7 @@ class SelectAddressImportGenericLedgerModule {
             resourceManager = resourceManager,
             payload = payload,
             chainRegistry = chainRegistry,
-            messageFormatter = messageFormatter
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 

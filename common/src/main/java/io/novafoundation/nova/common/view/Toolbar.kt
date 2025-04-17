@@ -15,22 +15,15 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewToolbarBinding
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
-import kotlinx.android.synthetic.main.view_toolbar.view.backImg
-import kotlinx.android.synthetic.main.view_toolbar.view.rightActionContainer
-import kotlinx.android.synthetic.main.view_toolbar.view.rightImg
-import kotlinx.android.synthetic.main.view_toolbar.view.rightText
-import kotlinx.android.synthetic.main.view_toolbar.view.titleTv
-import kotlinx.android.synthetic.main.view_toolbar.view.toolbarContainer
-import kotlinx.android.synthetic.main.view_toolbar.view.toolbarCustomActions
-import kotlinx.android.synthetic.main.view_toolbar.view.toolbarDivider
-import kotlinx.android.synthetic.main.view_toolbar.view.toolbarProgress
 
 class Toolbar @JvmOverloads constructor(
     context: Context,
@@ -38,15 +31,15 @@ class Toolbar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    private val binder = ViewToolbarBinding.inflate(inflater(), this, true)
+
     val rightActionText: TextView
-        get() = rightText
+        get() = binder.rightText
 
     val titleView: TextView
-        get() = titleTv
+        get() = binder.titleTv
 
     init {
-        View.inflate(context, R.layout.view_toolbar, this)
-
         applyAttributes(attrs)
     }
 
@@ -70,73 +63,73 @@ class Toolbar @JvmOverloads constructor(
             setHomeButtonVisibility(homeButtonVisible)
 
             val dividerVisible = typedArray.getBoolean(R.styleable.Toolbar_dividerVisible, true)
-            toolbarDivider.setVisible(dividerVisible)
+            binder.toolbarDivider.setVisible(dividerVisible)
 
             val backgroundAttrDrawable = typedArray.getDrawable(R.styleable.Toolbar_contentBackground) ?: ColorDrawable(
                 context.getColor(R.color.secondary_screen_background)
             )
-            toolbarContainer.background = backgroundAttrDrawable
+            binder.toolbarContainer.background = backgroundAttrDrawable
 
             val textAppearance = typedArray.getResourceIdOrNull(R.styleable.Toolbar_titleTextAppearance)
-            textAppearance?.let(titleTv::setTextAppearance)
+            textAppearance?.let(binder.titleTv::setTextAppearance)
 
             typedArray.recycle()
         }
     }
 
     fun setHomeButtonIcon(icon: Drawable) {
-        backImg.setImageDrawable(icon)
+        binder.backImg.setImageDrawable(icon)
     }
 
     fun setTextRight(action: String) {
-        rightImg.makeGone()
+        binder.rightImg.makeGone()
 
-        rightText.makeVisible()
-        rightText.text = action
+        binder.rightText.makeVisible()
+        binder.rightText.text = action
     }
 
     fun setRightIconVisible(visible: Boolean) {
-        rightImg.setVisible(visible)
+        binder.rightImg.setVisible(visible)
     }
 
     fun showProgress(visible: Boolean) {
-        toolbarProgress.setVisible(visible)
-        rightActionContainer.setVisible(!visible)
+        binder.toolbarProgress.setVisible(visible)
+        binder.rightActionContainer.setVisible(!visible)
     }
 
     fun setTitleIcon(drawable: Drawable?) {
-        titleTv.compoundDrawablePadding = 8.dp(context)
-        titleTv.setCompoundDrawables(drawable, null, null, null)
+        binder.titleTv.compoundDrawablePadding = 8.dp(context)
+        binder.titleTv.setCompoundDrawables(drawable, null, null, null)
     }
 
     fun setTitle(title: CharSequence?) {
-        titleTv.text = title
+        binder.titleTv.text = title
     }
 
     fun setTitle(@StringRes titleRes: Int) {
-        titleTv.setText(titleRes)
+        binder.titleTv.setText(titleRes)
     }
 
     fun showHomeButton() {
-        backImg.makeVisible()
+        binder.backImg.makeVisible()
     }
 
     fun hideHomeButton() {
-        backImg.makeGone()
+        binder.backImg.makeGone()
     }
 
     fun setHomeButtonListener(listener: (View) -> Unit) {
-        backImg.setOnClickListener(listener)
+        binder.backImg.setOnClickListener(listener)
     }
 
     fun hideRightAction() {
-        rightImg.makeGone()
-        rightText.makeGone()
+        binder.rightImg.makeGone()
+        binder.rightText.makeGone()
     }
 
     fun setRightActionTint(@ColorRes colorRes: Int) {
-        rightImg.setImageTintRes(colorRes)
-        rightText.setTextColorRes(colorRes)
+        binder.rightImg.setImageTintRes(colorRes)
+        binder.rightText.setTextColorRes(colorRes)
     }
 
     fun setRightIconRes(@DrawableRes iconRes: Int) {
@@ -145,19 +138,19 @@ class Toolbar @JvmOverloads constructor(
     }
 
     fun setRightIconDrawable(assetIconDrawable: Drawable) {
-        rightText.makeGone()
+        binder.rightText.makeGone()
 
-        rightImg.makeVisible()
-        rightImg.setImageDrawable(assetIconDrawable)
+        binder.rightImg.makeVisible()
+        binder.rightImg.setImageDrawable(assetIconDrawable)
     }
 
     fun setRightActionClickListener(listener: (View) -> Unit) {
-        rightImg.setOnClickListener(listener)
-        rightText.setOnClickListener(listener)
+        binder.rightImg.setOnClickListener(listener)
+        binder.rightText.setOnClickListener(listener)
     }
 
     fun setHomeButtonVisibility(visible: Boolean) {
-        backImg.visibility = if (visible) View.VISIBLE else View.GONE
+        binder.backImg.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     fun addCustomAction(@DrawableRes icon: Int, onClick: OnClickListener): ImageView {
@@ -167,7 +160,7 @@ class Toolbar @JvmOverloads constructor(
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
                 val verticalMargin = 16.dp(context)
 
-                val endMarginDp = if (this@Toolbar.toolbarCustomActions.childCount == 0) 16 else 10
+                val endMarginDp = if (binder.toolbarCustomActions.childCount == 0) 16 else 10
                 val endMargin = endMarginDp.dp(context)
 
                 val startMargin = 10.dp(context)
@@ -178,14 +171,14 @@ class Toolbar @JvmOverloads constructor(
             setOnClickListener(onClick)
         }
 
-        toolbarCustomActions.makeVisible()
-        toolbarCustomActions.addView(actionView, 0)
+        binder.toolbarCustomActions.makeVisible()
+        binder.toolbarCustomActions.addView(actionView, 0)
 
         return actionView
     }
 
     fun setRightActionEnabled(enabled: Boolean) {
-        rightImg.isEnabled = enabled
-        rightText.isEnabled = enabled
+        binder.rightImg.isEnabled = enabled
+        binder.rightText.isEnabled = enabled
     }
 }

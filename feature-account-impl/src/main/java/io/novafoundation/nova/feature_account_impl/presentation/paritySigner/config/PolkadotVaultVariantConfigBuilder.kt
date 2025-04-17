@@ -41,6 +41,8 @@ interface PolkadotVaultVariantConfigBuilder {
     interface SignBuilder {
 
         var troubleShootingLink: String
+
+        var supportsProofSigning: Boolean
     }
 
     interface CommonBuilder {
@@ -145,15 +147,21 @@ private class RealInstructionsBuilder(
 private class RealSignBuilder : SignBuilder {
 
     private var _troubleShootingLink: String? = null
-
     override var troubleShootingLink: String
         get() = requireNotNull(_troubleShootingLink)
         set(value) {
             _troubleShootingLink = value
         }
 
+    private var _supportsProofSigning: Boolean? = null
+    override var supportsProofSigning: Boolean
+        get() = requireNotNull(_supportsProofSigning)
+        set(value) {
+            _supportsProofSigning = value
+        }
+
     fun build(): Sign {
-        return Sign(troubleShootingLink)
+        return Sign(troubleShootingLink, supportsProofSigning)
     }
 }
 

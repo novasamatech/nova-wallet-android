@@ -25,12 +25,12 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
-import io.novafoundation.nova.feature_buy_api.domain.BuyTokenRegistry
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixinUi
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -106,6 +106,8 @@ interface SwapFeatureDependencies {
 
     val hydraDxQuotingFactory: HydraDxQuoting.Factory
 
+    val hydrationPriceConversionFallback: HydrationPriceConversionFallback
+
     val runtimeCallsApi: MultiChainRuntimeCallsApi
 
     val assetUseCase: ArbitraryAssetUseCase
@@ -118,11 +120,9 @@ interface SwapFeatureDependencies {
 
     val crossChainTransfersRepository: CrossChainTransfersRepository
 
-    val buyTokenRegistry: BuyTokenRegistry
+    val buyTokenRegistry: TradeTokenRegistry
 
-    val buyMixinFactory: BuyMixin.Factory
-
-    val buyMixinUi: BuyMixinUi
+    val tradeMixinFactory: TradeMixin.Factory
 
     val crossChainTransfersUseCase: CrossChainTransfersUseCase
 

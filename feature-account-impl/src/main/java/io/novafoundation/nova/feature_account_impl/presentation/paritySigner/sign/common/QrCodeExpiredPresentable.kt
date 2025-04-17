@@ -75,7 +75,7 @@ private class RealQrCodeExpiredPresentable(
     }
 }
 
-fun BaseFragment<*>.setupQrCodeExpiration(
+fun BaseFragment<*, *>.setupQrCodeExpiration(
     validityPeriodFlow: Flow<ValidityPeriod>,
     qrCodeExpiredPresentable: QrCodeExpiredPresentable,
     timerView: TextView,

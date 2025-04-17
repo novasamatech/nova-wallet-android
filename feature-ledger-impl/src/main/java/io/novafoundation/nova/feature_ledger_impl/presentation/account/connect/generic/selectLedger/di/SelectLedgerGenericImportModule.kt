@@ -16,9 +16,13 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericImportViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectLedger.SelectLedgerGenericPayload
 
 @Module(includes = [ViewModelModule::class])
 class SelectLedgerGenericImportModule {
@@ -26,13 +30,19 @@ class SelectLedgerGenericImportModule {
     @Provides
     fun providePermissionAsker(
         permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment,
-        router: LedgerRouter
-    ) = permissionsAskerFactory.createReturnable(fragment, router)
+        fragment: Fragment
+    ) = permissionsAskerFactory.create(fragment)
 
     @Provides
     @ScreenScope
     fun provideMessageFormatter(factory: LedgerMessageFormatterFactory): LedgerMessageFormatter = factory.createGeneric()
+
+    @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
 
     @Provides
     @IntoMap
@@ -44,7 +54,10 @@ class SelectLedgerGenericImportModule {
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        messageFormatter: LedgerMessageFormatter
+        messageFormatter: LedgerMessageFormatter,
+        payload: SelectLedgerGenericPayload,
+        deviceMapperFactory: LedgerDeviceFormatter,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
         return SelectLedgerGenericImportViewModel(
             discoveryService = discoveryService,
@@ -53,7 +66,10 @@ class SelectLedgerGenericImportModule {
             locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
-            messageFormatter = messageFormatter
+            messageFormatter = messageFormatter,
+            deviceMapperFactory = deviceMapperFactory,
+            messageCommandFormatter = messageCommandFormatter,
+            payload = payload
         )
     }
 

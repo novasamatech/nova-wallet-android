@@ -22,6 +22,10 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_crowdloan_api'
+
+    packagingOptions {
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
 }
 
 dependencies {

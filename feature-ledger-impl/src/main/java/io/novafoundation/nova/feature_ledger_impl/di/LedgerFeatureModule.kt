@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.RealLedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.SingleSheetLedgerMessagePresentable
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp.LegacySubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
@@ -150,4 +152,17 @@ class LedgerFeatureModule {
             assetSourceRegistry = assetSourceRegistry
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideLedgerDeviceMapper(resourceManager: ResourceManager): LedgerDeviceFormatter {
+        return LedgerDeviceFormatter(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMessageCommandFormatterFactory(
+        resourceManager: ResourceManager,
+        deviceMapper: LedgerDeviceFormatter
+    ) = MessageCommandFormatterFactory(resourceManager, deviceMapper)
 }

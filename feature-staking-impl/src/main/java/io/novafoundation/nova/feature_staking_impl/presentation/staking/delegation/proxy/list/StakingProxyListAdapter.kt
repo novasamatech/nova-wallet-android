@@ -1,20 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list
 
-import android.view.View
 import android.view.ViewGroup
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemProxyBinding
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemProxyGroupBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyGroupRvItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.list.model.StakingProxyRvItem
-import kotlinx.android.synthetic.main.item_proxy.view.itemStakingProxyAccountTitle
-import kotlinx.android.synthetic.main.item_proxy.view.itemStakingProxyChainIcon
-import kotlinx.android.synthetic.main.item_proxy.view.itemStakingProxyIcon
-import kotlinx.android.synthetic.main.item_proxy_group.view.itemProxyGroup
 
 class StakingProxyListAdapter(
     private val handler: Handler,
@@ -26,13 +22,11 @@ class StakingProxyListAdapter(
     }
 
     override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
-        val view = parent.inflateChild(R.layout.item_proxy_group)
-        return StakingProxyGroupHolder(view)
+        return StakingProxyGroupHolder(ItemProxyGroupBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-        val view = parent.inflateChild(R.layout.item_proxy)
-        return StakingProxyHolder(handler, imageLoader, view)
+        return StakingProxyHolder(handler, imageLoader, ItemProxyBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun bindGroup(holder: GroupedListHolder, group: StakingProxyGroupRvItem) {
@@ -66,10 +60,10 @@ private class DiffCallback : BaseGroupedDiffCallback<StakingProxyGroupRvItem, St
 }
 
 class StakingProxyGroupHolder(
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemProxyGroupBinding,
+) : GroupedListHolder(binder.root) {
 
-    fun bind(item: StakingProxyGroupRvItem) = with(containerView) {
+    fun bind(item: StakingProxyGroupRvItem) = with(binder) {
         itemProxyGroup.text = item.text
     }
 }
@@ -77,11 +71,11 @@ class StakingProxyGroupHolder(
 class StakingProxyHolder(
     private val eventHandler: StakingProxyListAdapter.Handler,
     private val imageLoader: ImageLoader,
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemProxyBinding,
+) : GroupedListHolder(binder.root) {
 
-    fun bind(item: StakingProxyRvItem) = with(containerView) {
-        setOnClickListener { eventHandler.onProxyClick(item) }
+    fun bind(item: StakingProxyRvItem) = with(binder) {
+        root.setOnClickListener { eventHandler.onProxyClick(item) }
         itemStakingProxyIcon.setImageDrawable(item.accountIcon)
         itemStakingProxyChainIcon.loadChainIcon(item.chainIconUrl, imageLoader)
         itemStakingProxyAccountTitle.text = item.accountTitle

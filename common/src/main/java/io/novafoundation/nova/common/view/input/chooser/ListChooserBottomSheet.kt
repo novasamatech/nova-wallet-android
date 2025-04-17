@@ -2,18 +2,15 @@ package io.novafoundation.nova.common.view.input.chooser
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.databinding.ItemListChooserBinding
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListSheetAdapter
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.HolderCreator
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin.Model
-import kotlinx.android.synthetic.main.item_list_chooser.view.itemListChooserCheck
-import kotlinx.android.synthetic.main.item_list_chooser.view.itemListChooserLabel
 
 class ListChooserBottomSheet<T>(
     context: Context,
@@ -41,11 +38,11 @@ class ListChooserBottomSheet<T>(
     }
 
     override fun holderCreator(): HolderCreator<Model<T>> = { parentView ->
-        ListChooserViewHolder(parentView.inflateChild(R.layout.item_list_chooser))
+        ListChooserViewHolder(ItemListChooserBinding.inflate(parentView.inflater(), parentView, false))
     }
 }
 
-private class ListChooserViewHolder<T>(containerView: View) : DynamicListSheetAdapter.Holder<Model<T>>(containerView) {
+private class ListChooserViewHolder<T>(private val binder: ItemListChooserBinding) : DynamicListSheetAdapter.Holder<Model<T>>(binder.root) {
 
     override fun bind(
         item: Model<T>,
@@ -55,8 +52,8 @@ private class ListChooserViewHolder<T>(containerView: View) : DynamicListSheetAd
         super.bind(item, isSelected, handler)
 
         with(containerView) {
-            itemListChooserLabel.text = item.display
-            itemListChooserCheck.isChecked = isSelected
+            binder.itemListChooserLabel.text = item.display
+            binder.itemListChooserCheck.isChecked = isSelected
         }
     }
 }

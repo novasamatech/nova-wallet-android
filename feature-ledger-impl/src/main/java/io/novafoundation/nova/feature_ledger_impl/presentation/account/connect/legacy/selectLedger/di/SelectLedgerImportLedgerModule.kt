@@ -17,10 +17,13 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerImportViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyImportViewModel
 
 @Module(includes = [ViewModelModule::class])
 class SelectLedgerImportLedgerModule {
@@ -28,32 +31,40 @@ class SelectLedgerImportLedgerModule {
     @Provides
     fun providePermissionAsker(
         permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment,
-        router: LedgerRouter
-    ) = permissionsAskerFactory.createReturnable(fragment, router)
+        fragment: Fragment
+    ) = permissionsAskerFactory.create(fragment)
 
     @Provides
     @ScreenScope
     fun provideMessageFormatter(
-        selectLedgerPayload: SelectLedgerPayload,
+        selectLedgerPayload: SelectLedgerLegacyPayload,
         factory: LedgerMessageFormatterFactory,
     ): LedgerMessageFormatter = factory.createLegacy(selectLedgerPayload.chainId, showAlerts = false)
 
     @Provides
+    @ScreenScope
+    fun provideMessageCommandFormatter(
+        messageFormatter: LedgerMessageFormatter,
+        messageCommandFormatterFactory: MessageCommandFormatterFactory
+    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
+
+    @Provides
     @IntoMap
-    @ViewModelKey(SelectLedgerImportViewModel::class)
+    @ViewModelKey(SelectLedgerLegacyImportViewModel::class)
     fun provideViewModel(
         migrationUseCase: LedgerMigrationUseCase,
-        selectLedgerPayload: SelectLedgerPayload,
+        selectLedgerPayload: SelectLedgerLegacyPayload,
         discoveryService: LedgerDeviceDiscoveryService,
         permissionsAsker: PermissionsAsker.Presentation,
         bluetoothManager: BluetoothManager,
         locationManager: LocationManager,
         router: LedgerRouter,
         resourceManager: ResourceManager,
-        messageFormatter: LedgerMessageFormatter
+        messageFormatter: LedgerMessageFormatter,
+        deviceMapperFactory: LedgerDeviceFormatter,
+        messageCommandFormatter: MessageCommandFormatter
     ): ViewModel {
-        return SelectLedgerImportViewModel(
+        return SelectLedgerLegacyImportViewModel(
             migrationUseCase = migrationUseCase,
             selectLedgerPayload = selectLedgerPayload,
             discoveryService = discoveryService,
@@ -62,12 +73,14 @@ class SelectLedgerImportLedgerModule {
             locationManager = locationManager,
             router = router,
             resourceManager = resourceManager,
-            messageFormatter = messageFormatter
+            messageFormatter = messageFormatter,
+            ledgerDeviceFormatter = deviceMapperFactory,
+            messageCommandFormatter = messageCommandFormatter
         )
     }
 
     @Provides
-    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): SelectLedgerImportViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(SelectLedgerImportViewModel::class.java)
+    fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): SelectLedgerLegacyImportViewModel {
+        return ViewModelProvider(fragment, viewModelFactory).get(SelectLedgerLegacyImportViewModel::class.java)
     }
 }

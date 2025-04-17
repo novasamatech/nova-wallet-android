@@ -24,7 +24,7 @@ class RealWebViewPermissionAsker(
             val permissions = mapPermissionRequest(request)
 
             if (permissions.isNotEmpty()) {
-                val result = permissionsAsker.requirePermissionsOrExit(*permissions)
+                val result = permissionsAsker.requirePermissions(*permissions)
 
                 if (result) {
                     request.grant(request.resources)

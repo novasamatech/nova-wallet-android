@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadotアプリがインストールされています</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで%s</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">ポルカドットアプリを開く</string>
+    <string name="account_ledger_generic_item_subtitle">フレックス、スタックス、ナノ X、ナノ S プラス</string>
+    <string name="account_ledger_generic_item_title">Ledger (一般的な Polkadot アプリ)</string>
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
-    <string name="account_ledger_import_start_guide">Ledgerの公式Bluetooth接続ガイド</string>
+    <string name="account_ledger_import_start_guide">Ledger 接続ガイド</string>
     <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使ってLedgerデバイスに%sを確実にしてください</string>
     <string name="account_ledger_import_start_step_1_highlighted">ネットワークアプリがインストールされている</string>
     <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">Bluetoothと位置情報へのアクセスを許可</string>
     <string name="account_ledger_import_start_step_4">%s を選択する。</string>
     <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
-    <string name="account_ledger_import_start_title">Ledger Nano Xを接続</string>
+    <string name="account_ledger_import_start_step_otg">%s を電話の設定で</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">OTGを有効にする</string>
+    <string name="account_ledger_import_start_title">Ledger を接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migrationアプリは近い将来使用できなくなります。新しいLedgerアプリにアカウントを移行して資金を失わないようにしてください。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot 専用水玉アプリ)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger レガシー</string>
+    <string name="account_ledger_select_device_all_description">LedgerをBluetoothで使用する場合は、両方のデバイスでBluetoothを有効にし、NovaにBluetoothおよび位置情報の権限を付与してください。USBの場合は、電話の設定でOTGを有効にしてください。</string>
     <string name="account_ledger_select_device_description">電話の設定とLedgerデバイスでBluetoothを有効にしてください。Ledgerデバイスを解除し、%sアプリを開いてください。</string>
     <string name="account_ledger_select_device_title">Ledgerデバイスを選択</string>
+    <string name="account_ledger_select_device_usb_description">Ledgerデバイスを有効にしてください。Ledgerデバイスをアンロックし、%s アプリを開いてください。</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21または24単語のフレーズ</string>
     <string name="account_needed_message">このネットワークにはアカウントがありません。アカウントを作成するか、インポートすることができます。</string>
     <string name="account_needed_title">アカウントが必要です</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%sは任意のメッセージの署名をサポートしていません — トランザクションのみをサポートします</string>
     <string name="account_parity_signer_not_supported_title">署名はサポートされていません</string>
     <string name="account_parity_signer_scan_from">%sからQRコードをスキャン</string>
-    <string name="account_parity_signer_scan_with">%sでQRコードをスキャン</string>
+    <string name="account_parity_signer_show_mode_legacy">レガシー</string>
+    <string name="account_parity_signer_show_mode_new">新しい (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">%sにエラーがあります</string>
     <string name="account_parity_signer_sign_qr_code_expired">QRコードの有効期限が切れました</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">セキュリティ上の理由から、生成された操作は%s間のみ有効です。\n新しいQRコードを生成し、%sで署名してください</string>
@@ -173,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%sで追加できるプロキシの上限に達しました。新しいものを追加するためには既存のプロキシを削除してください。</string>
     <string name="add_proxy_maximum_reached_error_title">プロキシの最大数に達しました</string>
     <string name="added_networks_empty_placeholder">追加されたカスタムネットワーク\nここに表示されます</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">カラー</string>
     <string name="appearance_title">外観</string>
     <string name="appearance_token_assets_title">トークンアイコン</string>
@@ -240,12 +247,16 @@
     <string name="backup_settings_title">Googleドライブ</string>
     <string name="backup_settings_toolbar_title">バックアップ</string>
     <string name="backup_title">バックアップ</string>
+    <string name="banxa_provider_description">簡単で効率的なKYCプロセス</string>
     <string name="biometric_auth_title">生体認証</string>
     <string name="browser_tabs_close_all">すべて閉じる</string>
     <string name="buy_completed">購入が開始されました！ 最大60分お待ちください。メールでステータスを追跡できます。</string>
     <string name="buy_network_flow_title">購入するネットワークを選択 %s</string>
+    <string name="buy_order_completed_message">購入が開始されました！60分までお待ちください。ステータスはメールで確認できます。</string>
     <string name="buy_provider_open_confirmation_message">購入を続行するために、Nova Walletアプリから%sにリダイレクトされます。</string>
     <string name="buy_provider_open_confirmation_title">ブラウザで続行しますか？</string>
+    <string name="buy_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの購入をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
+    <string name="buy_token_not_supported_title">このトークンは購入機能でサポートされていません</string>
     <string name="chain_network_management_auto_balance">自動バランスノード</string>
     <string name="chain_network_management_enabling">接続を有効にする</string>
     <string name="change_cloud_backup_password_subtitle">クラウドバックアップからウォレットを復元するために使用するパスワードを入力してください。このパスワードは将来的に復元できないため、必ず覚えておいてください！</string>
@@ -746,6 +757,7 @@
     <string name="fee_not_yet_loaded_message">手数料が計算されるまでお待ちください</string>
     <string name="fee_not_yet_loaded_title">手数料の計算中</string>
     <string name="fragment_assets_nova_card">デビットカードを管理</string>
+    <string name="fragment_sell_token_title">%s トークンを売却</string>
     <string name="fragment_set_staking_proxy_title">%s Stakingのデリゲーションを追加</string>
     <string name="fragment_swap_main_settings_details_title">スワップの詳細</string>
     <string name="fragment_swap_main_settings_max_button">最大:</string>
@@ -799,12 +811,17 @@
     <string name="json_export_btn">JSONファイルをエクスポート</string>
     <string name="language_title">言語</string>
     <string name="ledger_chain_not_supported">Ledgerは〜をサポートしていません</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">ナノ X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">操作はデバイスによってキャンセルされました。Ledgerがロック解除されていることを確認してください。</string>
     <string name="ledger_error_app_cancelled_title">操作がキャンセルされました</string>
     <string name="ledger_error_app_not_launched_message">Ledgerデバイスで〜アプリを開いてください</string>
     <string name="ledger_error_app_not_launched_title">〜アプリが起動されていません</string>
     <string name="ledger_error_general_message">デバイスでエラーが発生して操作が完了しました。後でもう一度お試しください。</string>
     <string name="ledger_error_general_title">Ledger操作失敗</string>
+    <string name="ledger_hold_to_sign">%s の確認ボタンを長押しして取引を承認</string>
     <string name="ledger_import_select_address_load_more">アカウントをもっと読み込む</string>
     <string name="ledger_review_approve_title">レビューして承認</string>
     <string name="ledger_sign_approve_message">トランザクションを承認するために両方のボタンを押してください</string>
@@ -817,7 +834,8 @@
     <string name="ledger_sign_transaction_validity_format">トランザクションは%s有効です</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledgerはこのトランザクションをサポートしていません。</string>
     <string name="ledger_sign_tx_not_supported_title">トランザクションがサポートされていません</string>
-    <string name="ledger_verify_address_subtitle">アドレスを承認するには、%sの両方のボタンを押してください</string>
+    <string name="ledger_verify_address_message_both_buttons">%s の両方のボタンを押してアドレスを承認</string>
+    <string name="ledger_verify_address_message_confirm_button">%s の確認ボタンを押してアドレスを承認</string>
     <string name="ledger_wallet_details_description">このウォレットはLedgerとペアリングされています。Novaは望む操作を形成する手助けをし、Ledgerを使用してそれらを署名するよう求められます</string>
     <string name="ledher_import_select_address_title">ウォレットに追加するアカウントを選択</string>
     <string name="loading_network_info">ネットワーク情報を読み込み中...</string>
@@ -846,6 +864,7 @@
     <string name="manual_backup_select_wallet_header">バックアップするウォレットを選択</string>
     <string name="manual_backup_warning_subtitle">バックアップを表示する前に以下をよくお読みください</string>
     <string name="manual_backup_warning_title">パスフレーズを共有しないでください！</string>
+    <string name="mercurio_provider_description">手数料最大3.95%で最良の価格</string>
     <string name="mnemonic_card_reveal_subtitle">誰もあなたの画面を見れないようにし、スクリーンショットを撮らないでください</string>
     <string name="mnemonic_card_title">誰にも%sしないでください</string>
     <string name="mnemonic_card_title_highlight">共有しないでください</string>
@@ -1155,11 +1174,16 @@
     <string name="select_delegation_tracks_edit_title">デリゲーションを編集するトラックを選択</string>
     <string name="select_delegation_tracks_revoke_title">デリゲーションを取り消すトラックを選択</string>
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
+    <string name="select_ledger_grant_permissions">Bluetoothを有効にして権限を付与</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
     <string name="select_network_title">ネットワークを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
+    <string name="sell_network_flow_title">%s を売るためのネットワークを選択</string>
+    <string name="sell_order_completed_message">売却が開始されました！60分までお待ちください。ステータスはメールで確認できます。</string>
+    <string name="sell_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの売却をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
+    <string name="sell_token_not_supported_title">このトークンは売却機能でサポートされていません</string>
     <string name="send_address_hint">アドレスまたはw3n</string>
     <string name="send_network_flow_title">送信するネットワークを選択 %s</string>
     <string name="send_recipient_system_account_message">受信者はシステムアカウントです。どの会社や個人にも管理されていません。\nそれでもこの転送を実行してもよろしいですか？</string>
@@ -1501,6 +1525,8 @@
     <string name="start_create_wallet_name_your_wallet">ウォレットに名前を付けてください</string>
     <string name="start_create_wallet_set_wallet_name_explanation">これはあなたにしか見えず、後で編集することができます。</string>
     <string name="start_create_wallet_your_wallet_is_ready">あなたのウォレットは準備ができました</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">あなたのバランスには%sによってロックされたトークンがあります。続行するには、%s未満または%s以上を入力してください。別の金額をStakeするには、%sロックを解除する必要があります。</string>
     <string name="start_staking_cant_stake_amount">指定された金額をStakeすることはできません</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">選択済み: %d (最大 %d)</string>
@@ -1633,6 +1659,11 @@
     <string name="tabbar_wallet_title">ウォレット</string>
     <string name="today">今日</string>
     <string name="token_price_info_provider_label">価格情報のためのCoingeckoリンク（オプション）</string>
+    <string name="trade_provider_list_buy_title">%s トークンを買うためのプロバイダーを選択</string>
+    <string name="trade_provider_list_footer">プロバイダーによって支払い方法、手数料、制限が異なります。\nそれらの見積もりを比較して最適なオプションを見つけてください。</string>
+    <string name="trade_provider_list_sell_title">%s トークンを売るためのプロバイダーを選択</string>
+    <string name="trade_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの購入または売却をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
+    <string name="trade_token_not_supported_title">このトークンは購入/売却機能でサポートされていません</string>
     <string name="transaction_details_copy_hash">ハッシュをコピー</string>
     <string name="transaction_details_extrinsic_fee">手数料</string>
     <string name="transaction_details_from">送信元</string>
@@ -1646,6 +1677,8 @@
     <string name="transaction_status_failed">失敗</string>
     <string name="transaction_status_pending">保留中</string>
     <string name="transactions_notification_channel_name">トランザクション通知チャネル</string>
+    <string name="transak_provider_buy_description">わずか$5からクリプトを購入</string>
+    <string name="transak_provider_sell_description">わずか$10からクリプトを売る</string>
     <string name="transfer_history_income_from">送信元: %s</string>
     <string name="transfer_history_send_to">送信先: %s</string>
     <string name="transfer_title">送金</string>
@@ -1683,10 +1716,14 @@
     <string name="waiting_top_up_card_description">最大で5分かかる場合があります。\nこのウィンドウは自動的に閉じられます。</string>
     <string name="waiting_top_up_card_timer">推定%s</string>
     <string name="wallet_asset_buy">購入</string>
+    <string name="wallet_asset_buy_sell">購入/売却</string>
+    <string name="wallet_asset_buy_tokens">トークンを購入</string>
     <string name="wallet_asset_buy_with">で購入</string>
     <string name="wallet_asset_receive">受け取る</string>
     <string name="wallet_asset_receive_token">受け取る %s</string>
     <string name="wallet_asset_receive_token_subtitle">送信するのは%1$sトークンと%2$sネットワークのトークンのみ可能です、それ以外の場合、資金を失う可能性があります</string>
+    <string name="wallet_asset_sell">販売</string>
+    <string name="wallet_asset_sell_tokens">トークンを販売</string>
     <string name="wallet_asset_send">送信</string>
     <string name="wallet_asset_swap">スワップ</string>
     <string name="wallet_assets">資産</string>

@@ -9,7 +9,7 @@ enum class ParitySignerUOSContentCode(override val value: Byte) : UOS.UOSPrelude
 
 enum class ParitySignerUOSPayloadCode(override val value: Byte) : UOS.UOSPreludeValue {
 
-    TRANSACTION(0x02),
+    TRANSACTION(0x02), TRANSACTION_WITH_PROOF(0x06)
 }
 
 fun CryptoType.paritySignerUOSCryptoType(): UOS.UOSPreludeValue {

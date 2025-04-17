@@ -1,35 +1,26 @@
 package io.novafoundation.nova.feature_account_impl.presentation.language
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageModel
-import kotlinx.android.synthetic.main.fragment_languages.languagesList
-import kotlinx.android.synthetic.main.fragment_languages.novaToolbar
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentLanguagesBinding
 
-class LanguagesFragment : BaseFragment<LanguagesViewModel>(), LanguagesAdapter.LanguagesItemHandler {
+class LanguagesFragment : BaseFragment<LanguagesViewModel, FragmentLanguagesBinding>(), LanguagesAdapter.LanguagesItemHandler {
+
+    override fun createBinding() = FragmentLanguagesBinding.inflate(layoutInflater)
 
     private lateinit var adapter: LanguagesAdapter
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_languages, container, false)
 
     override fun initViews() {
         adapter = LanguagesAdapter(this)
 
-        languagesList.setHasFixedSize(true)
-        languagesList.adapter = adapter
+        binder.languagesList.setHasFixedSize(true)
+        binder.languagesList.adapter = adapter
 
-        novaToolbar.setHomeButtonListener {
+        binder.novaToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
     }
@@ -50,7 +41,7 @@ class LanguagesFragment : BaseFragment<LanguagesViewModel>(), LanguagesAdapter.L
         viewModel.selectedLanguageLiveData.observe(adapter::updateSelectedLanguage)
 
         viewModel.languageChangedEvent.observeEvent {
-            (activity as BaseActivity<*>).changeLanguage()
+            (activity as BaseActivity<*, *>).changeLanguage()
         }
     }
 

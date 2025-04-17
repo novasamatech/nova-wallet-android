@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
-import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
@@ -19,16 +18,15 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.sign.SignLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerViewModel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
-import io.novafoundation.nova.runtime.extrinsic.closeToExpire
-import io.novafoundation.nova.runtime.extrinsic.remainingTime
+import io.novafoundation.nova.runtime.extrinsic.ended
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -46,14 +44,16 @@ class SignLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val signPayloadState: SigningSharedState,
     private val extrinsicValidityUseCase: ExtrinsicValidityUseCase,
-    private val request: SignInterScreenCommunicator.Request,
     private val responder: SignInterScreenResponder,
     private val interactor: SignLedgerInteractor,
     private val messageFormatter: LedgerMessageFormatter,
+    private val messageCommandFormatter: MessageCommandFormatter,
+    private val payload: SignLedgerPayload,
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
-    locationManager: LocationManager
+    locationManager: LocationManager,
+    ledgerDeviceFormatter: LedgerDeviceFormatter,
 ) : SelectLedgerViewModel(
     discoveryService = discoveryService,
     permissionsAsker = permissionsAsker,
@@ -61,7 +61,10 @@ class SignLedgerViewModel(
     locationManager = locationManager,
     router = router,
     resourceManager = resourceManager,
-    messageFormatter = messageFormatter
+    messageFormatter = messageFormatter,
+    ledgerDeviceFormatter = ledgerDeviceFormatter,
+    messageCommandFormatter = messageCommandFormatter,
+    payload = payload
 ) {
 
     private val validityPeriod = flowOf {
@@ -76,19 +79,15 @@ class SignLedgerViewModel(
         exit()
     }
 
-    init {
-        listenExpire()
-    }
-
     override suspend fun handleLedgerError(reason: Throwable, device: LedgerDevice) {
         if (fatalErrorDetected.value) return
 
         when {
             reason is SubstrateLedgerApplicationError.Response && reason.response == INVALID_DATA -> {
-                handleInvalidData(reason.errorMessage)
+                handleInvalidData(reason.errorMessage, device)
             }
 
-            reason is InvalidSignatureError -> handleInvalidSignature()
+            reason is InvalidSignatureError -> handleInvalidSignature(device)
 
             else -> super.handleLedgerError(reason, device)
         }
@@ -96,19 +95,19 @@ class SignLedgerViewModel(
 
     override suspend fun verifyConnection(device: LedgerDevice) {
         val validityPeriod = validityPeriod.first()
+
+        if (validityPeriod.ended()) {
+            timerExpired(device)
+            return
+        }
+
         val signState = signPayloadState.getOrThrow()
 
-        ledgerMessageCommands.value = LedgerMessageCommand.Show.Info(
-            title = resourceManager.getString(R.string.ledger_review_approve_title),
-            subtitle = resourceManager.getString(R.string.ledger_sign_approve_message, device.name),
-            onCancel = ::bottomSheetClosed,
-            alert = messageFormatter.alertForKind(LedgerMessageFormatter.MessageKind.OTHER),
-            footer = LedgerMessageCommand.Footer.Timer(
-                timerValue = validityPeriod.period,
-                closeToExpire = { validityPeriod.closeToExpire() },
-                timerFinished = { },
-                messageFormat = R.string.ledger_sign_transaction_validity_format
-            )
+        ledgerMessageCommands.value = messageCommandFormatter.signCommand(
+            validityPeriod,
+            device,
+            onTimeFinished = { timerExpired(device) },
+            ::bottomSheetClosed
         ).event()
 
         val signingMetaAccount = signState.metaAccount
@@ -125,7 +124,7 @@ class SignLedgerViewModel(
         val signature = signingJob!!.await()
 
         if (interactor.verifySignature(signState, signature)) {
-            responder.respond(request.signed(signature))
+            responder.respond(payload.request.signed(signature))
             hideBottomSheet()
             router.finishSignFlow()
         } else {
@@ -133,21 +132,15 @@ class SignLedgerViewModel(
         }
     }
 
-    private fun listenExpire() = launch {
-        val remainingTime = validityPeriod.first().remainingTime()
-        delay(remainingTime)
-
-        timerExpired()
-    }
-
-    private suspend fun handleInvalidSignature() {
+    private suspend fun handleInvalidSignature(ledgerDevice: LedgerDevice) {
         showFatalError(
             title = resourceManager.getString(R.string.common_signature_invalid),
             subtitle = resourceManager.getString(R.string.ledger_sign_signature_invalid_message),
+            ledgerDevice = ledgerDevice
         )
     }
 
-    private suspend fun handleInvalidData(invalidDataMessage: String?) {
+    private suspend fun handleInvalidData(invalidDataMessage: String?, ledgerDevice: LedgerDevice) {
         val errorTitle: String
         val errorMessage: String
 
@@ -156,48 +149,48 @@ class SignLedgerViewModel(
                 errorTitle = resourceManager.getString(R.string.ledger_sign_tx_not_supported_title)
                 errorMessage = resourceManager.getString(R.string.ledger_sign_tx_not_supported_subtitle)
             }
+
             InvalidDataError.METADATA_OUTDATED -> {
                 errorTitle = resourceManager.getString(R.string.ledger_sign_metadata_outdated_title)
                 errorMessage = resourceManager.getString(R.string.ledger_sign_metadata_outdated_subtitle, messageFormatter.appName())
             }
+
             null -> {
                 errorTitle = resourceManager.getString(R.string.ledger_error_general_title)
                 errorMessage = invalidDataMessage ?: resourceManager.getString(R.string.ledger_error_general_message)
             }
         }
 
-        showFatalError(errorTitle, errorMessage)
+        showFatalError(errorTitle, errorMessage, ledgerDevice)
     }
 
-    private suspend fun timerExpired() {
+    private fun timerExpired(ledgerDevice: LedgerDevice) {
         signingJob?.cancel()
+        launch {
+            val period = validityPeriod.first().period.millis.milliseconds
+            val periodFormatted = resourceManager.formatDuration(period, estimated = false)
 
-        val period = validityPeriod.first().period.millis.milliseconds
-        val periodFormatted = resourceManager.formatDuration(period, estimated = false)
-
-        showFatalError(
-            title = resourceManager.getString(R.string.ledger_sign_transaction_expired_title),
-            subtitle = resourceManager.getString(R.string.ledger_sign_transaction_expired_message, periodFormatted),
-        )
+            showFatalError(
+                ledgerDevice = ledgerDevice,
+                title = resourceManager.getString(R.string.ledger_sign_transaction_expired_title),
+                subtitle = resourceManager.getString(R.string.ledger_sign_transaction_expired_message, periodFormatted),
+            )
+        }
     }
 
     private suspend fun showFatalError(
         title: String,
         subtitle: String,
+        ledgerDevice: LedgerDevice
     ) {
         fatalErrorDetected.value = true
 
-        ledgerMessageCommands.value = LedgerMessageCommand.Show.Error.FatalError(
-            title = title,
-            subtitle = subtitle,
-            alert = messageFormatter.alertForKind(LedgerMessageFormatter.MessageKind.OTHER),
-            onConfirm = ::errorAcknowledged
-        ).event()
+        ledgerMessageCommands.value = messageCommandFormatter.fatalErrorCommand(title, subtitle, ledgerDevice, ::bottomSheetClosed, ::errorAcknowledged).event()
     }
 
     private fun bottomSheetClosed() {
         signingJob?.cancel()
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
     }
 
     private fun errorAcknowledged() {
@@ -207,12 +200,12 @@ class SignLedgerViewModel(
     }
 
     private fun exit() {
-        responder.respond(request.cancelled())
+        responder.respond(payload.request.cancelled())
         router.finishSignFlow()
     }
 
     private fun hideBottomSheet() {
-        ledgerMessageCommands.value = LedgerMessageCommand.Hide.event()
+        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
     }
 
     private fun matchInvalidDataMessage(message: String?): InvalidDataError? {

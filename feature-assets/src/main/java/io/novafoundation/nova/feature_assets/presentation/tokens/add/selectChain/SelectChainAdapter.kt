@@ -1,18 +1,15 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
-import io.novafoundation.nova.feature_assets.R
-import kotlinx.android.synthetic.main.item_select_chain.view.itemSelectChainIcon
-import kotlinx.android.synthetic.main.item_select_chain.view.itemSelectChainName
+import io.novafoundation.nova.feature_assets.databinding.ItemSelectChainBinding
 
 class SelectChainAdapter(
     private val imageLoader: ImageLoader,
@@ -26,7 +23,7 @@ class SelectChainAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectChainHolder {
         return SelectChainHolder(
-            containerView = parent.inflateChild(R.layout.item_select_chain),
+            binder = ItemSelectChainBinding.inflate(parent.inflater(), parent, false),
             itemHandler = handler,
             imageLoader = imageLoader
         )
@@ -38,24 +35,24 @@ class SelectChainAdapter(
 }
 
 class SelectChainHolder(
-    containerView: View,
+    private val binder: ItemSelectChainBinding,
     private val itemHandler: SelectChainAdapter.ItemHandler,
     private val imageLoader: ImageLoader,
-) : BaseViewHolder(containerView) {
+) : BaseViewHolder(binder.root) {
 
     init {
-        containerView.setOnClickListener {
+        binder.root.setOnClickListener {
             itemHandler.itemClicked(bindingAdapterPosition)
         }
     }
 
-    fun bind(item: ChainUi) = with(containerView) {
+    fun bind(item: ChainUi) = with(binder) {
         itemSelectChainIcon.loadChainIcon(item.icon, imageLoader)
         itemSelectChainName.text = item.name
     }
 
     override fun unbind() {
-        containerView.itemSelectChainIcon.clear()
+        binder.itemSelectChainIcon.clear()
     }
 }
 

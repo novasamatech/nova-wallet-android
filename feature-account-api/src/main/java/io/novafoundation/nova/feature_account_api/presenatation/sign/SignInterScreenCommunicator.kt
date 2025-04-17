@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.navigation.InterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Request
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator.Response
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import java.util.UUID

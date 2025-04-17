@@ -8,13 +8,13 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewGenericTableCellBinding
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_generic_table_cell.view.genericTableCellTitle
-import kotlinx.android.synthetic.main.view_generic_table_cell.view.genericTableCellValueProgress
 
 open class GenericTableCellView<V : View> @JvmOverloads constructor(
     context: Context,
@@ -22,6 +22,8 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
     defStyle: Int = 0,
     defStyleRes: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle, defStyleRes), TableItem {
+
+    private val binder = ViewGenericTableCellBinding.inflate(inflater(), this)
 
     protected lateinit var valueView: V
 
@@ -32,8 +34,6 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
 
     init {
         minHeight = 44.dp
-
-        View.inflate(context, R.layout.view_generic_table_cell, this)
 
         setBackgroundResource(R.drawable.bg_primary_list_item)
 
@@ -66,20 +66,20 @@ open class GenericTableCellView<V : View> @JvmOverloads constructor(
     }
 
     fun showProgress(showProgress: Boolean) {
-        genericTableCellValueProgress.setVisible(showProgress)
+        binder.genericTableCellValueProgress.setVisible(showProgress)
         valueView.setVisible(!showProgress)
     }
 
     fun setTitle(title: String?) {
-        genericTableCellTitle.text = title
+        binder.genericTableCellTitle.text = title
     }
 
     fun setTitle(@StringRes titleRes: Int) {
-        genericTableCellTitle.setText(titleRes)
+        binder.genericTableCellTitle.setText(titleRes)
     }
 
     fun setTitleIconEnd(@DrawableRes icon: Int?) {
-        genericTableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4)
+        binder.genericTableCellTitle.setDrawableEnd(icon, widthInDp = 16, paddingInDp = 4)
     }
 
     @JvmName("setValueContentView")

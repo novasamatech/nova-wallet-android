@@ -27,11 +27,13 @@ class SingleSheetLedgerMessagePresentable : LedgerMessagePresentable {
                 bottomSheet?.receiveCommand(command)
                 bottomSheet?.show()
             }
+
             bottomSheet != null && command is LedgerMessageCommand.Show -> {
                 bottomSheet?.container?.stateChangeTransition {
                     bottomSheet?.receiveCommand(command)
                 }
             }
+
             else -> {
                 bottomSheet?.receiveCommand(command)
                 bottomSheet = null
@@ -53,7 +55,7 @@ class SingleSheetLedgerMessagePresentable : LedgerMessagePresentable {
 }
 
 fun <F, V> F.setupLedgerMessages(presentable: LedgerMessagePresentable)
-    where F : BaseFragment<V>, V : LedgerMessageCommands {
+    where F : BaseFragment<V, *>, V : LedgerMessageCommands {
     viewModel.ledgerMessageCommands.observeEvent {
         presentable.presentCommand(it, requireContext())
     }

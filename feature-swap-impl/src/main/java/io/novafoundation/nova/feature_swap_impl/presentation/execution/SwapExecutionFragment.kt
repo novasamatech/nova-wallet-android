@@ -1,11 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution
 
-import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.TextSwitcher
 import android.widget.TextView
@@ -23,56 +19,35 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapExecutionBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionActionButton
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionAssets
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionContainer
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionDetails
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionNetworkFee
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionPriceDifference
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionRate
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionRoute
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionSlippage
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionStepContainer
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionStepLabel
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionStepShimmer
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionSubtitleSwitcher
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionTimer
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionTitleSwitcher
-import kotlinx.android.synthetic.main.fragment_swap_execution.swapExecutionToolbar
 
-class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
+class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapExecutionBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_swap_execution, container, false)
-    }
+    override fun createBinding() = FragmentSwapExecutionBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        swapExecutionContainer.applyStatusBarInsets()
+        binder.swapExecutionContainer.applyStatusBarInsets()
 
-        swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
-        swapExecutionPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
-        swapExecutionSlippage.setOnClickListener { viewModel.slippageClicked() }
-        swapExecutionNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
-        swapExecutionRoute.setOnClickListener { viewModel.routeClicked() }
+        binder.swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
+        binder.swapExecutionPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
+        binder.swapExecutionSlippage.setOnClickListener { viewModel.slippageClicked() }
+        binder.swapExecutionNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
+        binder.swapExecutionRoute.setOnClickListener { viewModel.routeClicked() }
 
-        swapExecutionDetails.collapseImmediate()
+        binder.swapExecutionDetails.collapseImmediate()
 
         onBackPressed { /* suppress back presses */ }
 
-        swapExecutionTitleSwitcher.applyTitleFactory()
-        swapExecutionSubtitleSwitcher.applySubtitleFactory()
+        binder.swapExecutionTitleSwitcher.applyTitleFactory()
+        binder.swapExecutionSubtitleSwitcher.applySubtitleFactory()
 
-        swapExecutionTitleSwitcher.applyAnimators()
-        swapExecutionSubtitleSwitcher.applyAnimators()
+        binder.swapExecutionTitleSwitcher.applyAnimators()
+        binder.swapExecutionSubtitleSwitcher.applyAnimators()
 
-        swapExecutionToolbar.setHomeButtonVisibility(false)
+        binder.swapExecutionToolbar.setHomeButtonVisibility(false)
     }
 
     override fun inject() {
@@ -87,14 +62,14 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
 
         viewModel.swapProgressModel.observe(::setSwapProgress)
 
-        viewModel.feeMixin.setupFeeLoading(swapExecutionNetworkFee)
+        viewModel.feeMixin.setupFeeLoading(binder.swapExecutionNetworkFee)
 
         viewModel.confirmationDetailsFlow.observe {
-            swapExecutionAssets.setModel(it.assets)
-            swapExecutionRate.showValue(it.rate)
-            swapExecutionPriceDifference.showValueOrHide(it.priceDifference)
-            swapExecutionSlippage.showValue(it.slippage)
-            swapExecutionRoute.setSwapRouteModel(it.swapRouteModel)
+            binder.swapExecutionAssets.setModel(it.assets)
+            binder.swapExecutionRate.showValue(it.rate)
+            binder.swapExecutionPriceDifference.showValueOrHide(it.priceDifference)
+            binder.swapExecutionSlippage.showValue(it.slippage)
+            binder.swapExecutionRoute.setSwapRouteModel(it.swapRouteModel)
         }
     }
 
@@ -107,52 +82,52 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel>() {
     }
 
     private fun setSwapCompleted(model: SwapProgressModel.Completed) {
-        swapExecutionTimer.setState(ExecutionTimerView.State.Success)
+        binder.swapExecutionTimer.setState(ExecutionTimerView.State.Success)
 
-        swapExecutionTitleSwitcher.setText(getString(R.string.common_completed), colorRes = R.color.text_positive)
-        swapExecutionSubtitleSwitcher.setText(model.at, colorRes = R.color.text_secondary)
+        binder.swapExecutionTitleSwitcher.setText(getString(R.string.common_completed), colorRes = R.color.text_positive)
+        binder.swapExecutionSubtitleSwitcher.setText(model.at, colorRes = R.color.text_secondary)
 
-        swapExecutionStepLabel.text = model.operationsLabel
-        swapExecutionStepLabel.setTextColorRes(R.color.text_secondary)
+        binder.swapExecutionStepLabel.text = model.operationsLabel
+        binder.swapExecutionStepLabel.setTextColorRes(R.color.text_secondary)
 
-        swapExecutionStepShimmer.hideShimmer()
-        swapExecutionStepContainer.background = requireContext().getBlockDrawable()
+        binder.swapExecutionStepShimmer.hideShimmer()
+        binder.swapExecutionStepContainer.background = requireContext().getBlockDrawable()
 
-        swapExecutionActionButton.makeVisible()
-        swapExecutionActionButton.setText(R.string.common_done)
-        swapExecutionActionButton.setOnClickListener { viewModel.doneClicked() }
+        binder.swapExecutionActionButton.makeVisible()
+        binder.swapExecutionActionButton.setText(R.string.common_done)
+        binder.swapExecutionActionButton.setOnClickListener { viewModel.doneClicked() }
     }
 
     private fun setSwapFailed(model: SwapProgressModel.Failed) {
-        swapExecutionTimer.setState(ExecutionTimerView.State.Error)
+        binder.swapExecutionTimer.setState(ExecutionTimerView.State.Error)
 
-        swapExecutionTitleSwitcher.setText(getString(R.string.common_failed), colorRes = R.color.text_negative)
-        swapExecutionSubtitleSwitcher.setText(model.at, colorRes = R.color.text_secondary)
+        binder.swapExecutionTitleSwitcher.setText(getString(R.string.common_failed), colorRes = R.color.text_negative)
+        binder.swapExecutionSubtitleSwitcher.setText(model.at, colorRes = R.color.text_secondary)
 
-        swapExecutionStepLabel.text = model.reason
-        swapExecutionStepLabel.setTextColorRes(R.color.text_primary)
+        binder.swapExecutionStepLabel.text = model.reason
+        binder.swapExecutionStepLabel.setTextColorRes(R.color.text_primary)
 
-        swapExecutionStepShimmer.hideShimmer()
-        swapExecutionStepContainer.background = requireContext().getRoundedCornerDrawable(R.color.error_block_background)
+        binder.swapExecutionStepShimmer.hideShimmer()
+        binder.swapExecutionStepContainer.background = requireContext().getRoundedCornerDrawable(R.color.error_block_background)
 
-        swapExecutionActionButton.makeVisible()
-        swapExecutionActionButton.setText(R.string.common_try_again)
-        swapExecutionActionButton.setOnClickListener { viewModel.retryClicked() }
+        binder.swapExecutionActionButton.makeVisible()
+        binder.swapExecutionActionButton.setText(R.string.common_try_again)
+        binder.swapExecutionActionButton.setOnClickListener { viewModel.retryClicked() }
     }
 
     private fun setSwapInProgress(model: SwapProgressModel.InProgress) {
-        swapExecutionTimer.setState(ExecutionTimerView.State.CountdownTimer(model.remainingTime))
+        binder.swapExecutionTimer.setState(ExecutionTimerView.State.CountdownTimer(model.remainingTime))
 
-        swapExecutionTitleSwitcher.setCurrentText(getString(R.string.common_do_not_close_app), colorRes = R.color.text_primary)
-        swapExecutionSubtitleSwitcher.setCurrentText(model.stepDescription, colorRes = R.color.button_text_accent)
+        binder.swapExecutionTitleSwitcher.setCurrentText(getString(R.string.common_do_not_close_app), colorRes = R.color.text_primary)
+        binder.swapExecutionSubtitleSwitcher.setCurrentText(model.stepDescription, colorRes = R.color.button_text_accent)
 
-        swapExecutionStepLabel.text = model.operationsLabel
-        swapExecutionStepLabel.setTextColorRes(R.color.text_secondary)
+        binder.swapExecutionStepLabel.text = model.operationsLabel
+        binder.swapExecutionStepLabel.setTextColorRes(R.color.text_secondary)
 
-        swapExecutionStepShimmer.showShimmer(true)
-        swapExecutionStepContainer.background = requireContext().getBlockDrawable()
+        binder.swapExecutionStepShimmer.showShimmer(true)
+        binder.swapExecutionStepContainer.background = requireContext().getBlockDrawable()
 
-        swapExecutionActionButton.makeGone()
+        binder.swapExecutionActionButton.makeGone()
     }
 
     private fun TextSwitcher.applyTitleFactory() {

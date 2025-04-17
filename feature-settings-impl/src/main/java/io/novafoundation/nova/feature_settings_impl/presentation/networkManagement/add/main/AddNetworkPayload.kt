@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import android.os.Parcelable
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.util.ChainParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class AddNetworkPayload(

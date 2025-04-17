@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.ConcatAdapter
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -17,6 +14,7 @@ import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
 import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.BalanceBreakdownBottomSheet
@@ -25,6 +23,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensItemAnimator
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
@@ -35,18 +34,18 @@ import io.novafoundation.nova.feature_banners_api.presentation.BannerHolder
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
 import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.android.synthetic.main.fragment_balance_list.balanceListAssets
-import kotlinx.android.synthetic.main.fragment_balance_list.walletContainer
 import javax.inject.Inject
 
 class BalanceListFragment :
-    BaseFragment<BalanceListViewModel>(),
+    BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler,
     ManageAssetsAdapter.Handler {
 
+    override fun createBinding() = FragmentBalanceListBinding.inflate(layoutInflater)
+
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     private var balanceBreakdownBottomSheet: BalanceBreakdownBottomSheet? = null
 
@@ -65,7 +64,7 @@ class BalanceListFragment :
     private val emptyAssetsPlaceholder by lazy(LazyThreadSafetyMode.NONE) {
         EditablePlaceholderAdapter(
             model = getAssetsPlaceholderModel(),
-            clickListener = { buyClicked() }
+            clickListener = { buySellClicked() }
         )
     }
 
@@ -77,16 +76,8 @@ class BalanceListFragment :
         ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_balance_list, container, false)
-    }
-
     override fun initViews() {
-        balanceListAssets.applyInsetter {
+        binder.balanceListAssets.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -96,14 +87,14 @@ class BalanceListFragment :
 
         setupRecyclerView()
 
-        walletContainer.setOnRefreshListener {
+        binder.walletContainer.setOnRefreshListener {
             viewModel.fullSync()
         }
     }
 
     private fun setupRecyclerView() {
-        balanceListAssets.setHasFixedSize(true)
-        balanceListAssets.adapter = adapter
+        binder.balanceListAssets.setHasFixedSize(true)
+        binder.balanceListAssets.adapter = adapter
 
         setupAssetsDecorationForRecyclerView()
         setupRecyclerViewSpacing()
@@ -120,13 +111,15 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
+        setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
+
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
-            balanceListAssets.invalidateItemDecorations()
+            binder.balanceListAssets.invalidateItemDecorations()
         }
 
         viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                balanceListAssets?.invalidateItemDecorations()
+                binder.balanceListAssets?.invalidateItemDecorations()
             }
         }
 
@@ -137,7 +130,7 @@ class BalanceListFragment :
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
 
         viewModel.hideRefreshEvent.observeEvent {
-            walletContainer.isRefreshing = false
+            binder.walletContainer.isRefreshing = false
         }
 
         viewModel.balanceBreakdownFlow.observe {
@@ -177,7 +170,7 @@ class BalanceListFragment :
         if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
             viewModel.assetClicked(tokenGroup.groupType.asset)
         } else {
-            val itemAnimator = balanceListAssets.itemAnimator as AssetTokensItemAnimator
+            val itemAnimator = binder.balanceListAssets.itemAnimator as AssetTokensItemAnimator
             itemAnimator.prepareForAnimation()
 
             viewModel.assetListMixin.expandToken(tokenGroup)
@@ -216,8 +209,8 @@ class BalanceListFragment :
         viewModel.receiveClicked()
     }
 
-    override fun buyClicked() {
-        viewModel.buyClicked()
+    override fun buySellClicked() {
+        viewModel.buySellClicked()
     }
 
     override fun novaCardClick() {
@@ -233,7 +226,7 @@ class BalanceListFragment :
     }
 
     private fun setupRecyclerViewSpacing() {
-        balanceListAssets.addSpaceItemDecoration {
+        binder.balanceListAssets.addSpaceItemDecoration {
             add(SpaceBetween(AssetsHeaderHolder, BannerHolder, spaceDp = 4))
             add(SpaceBetween(BannerHolder, ManageAssetsHolder, spaceDp = 4))
             add(SpaceBetween(AssetsHeaderHolder, ManageAssetsHolder, spaceDp = 24))
@@ -242,12 +235,12 @@ class BalanceListFragment :
 
     private fun setupAssetsDecorationForRecyclerView() {
         val animationSettings = ExpandableAnimationSettings.createForAssets()
-        val animator = ExpandableAnimator(balanceListAssets, animationSettings, assetsAdapter)
+        val animator = ExpandableAnimator(binder.balanceListAssets, animationSettings, assetsAdapter)
 
-        AssetBaseDecoration.applyDefaultTo(balanceListAssets, assetsAdapter)
+        AssetBaseDecoration.applyDefaultTo(binder.balanceListAssets, assetsAdapter)
 
-        balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
-        balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
+        binder.balanceListAssets.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        binder.balanceListAssets.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
     }
 
     private fun getAssetsPlaceholderModel() = PlaceholderModel(

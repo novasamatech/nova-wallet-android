@@ -9,19 +9,16 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewLabeledTextBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getDrawableCompat
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getCornersStateDrawable
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextAction
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextIcon
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextLabel
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextPrimaryIcon
-import kotlinx.android.synthetic.main.view_labeled_text.view.labeledTextText
 
 class LabeledTextView @JvmOverloads constructor(
     context: Context,
@@ -29,9 +26,9 @@ class LabeledTextView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.view_labeled_text, this)
+    private val binder = ViewLabeledTextBinding.inflate(inflater(), this)
 
+    init {
         minHeight = 48.dp
         setPadding(0, 8.dp, 0, 8.dp)
 
@@ -45,10 +42,10 @@ class LabeledTextView @JvmOverloads constructor(
     private var singleLine: Boolean = true
 
     val textIconView: ImageView
-        get() = labeledTextIcon
+        get() = binder.labeledTextIcon
 
     val primaryIcon: ImageView
-        get() = labeledTextPrimaryIcon
+        get() = binder.labeledTextPrimaryIcon
 
     private fun applyAttributes(attrs: AttributeSet?) {
         attrs?.let {
@@ -64,10 +61,10 @@ class LabeledTextView @JvmOverloads constructor(
             setMessageColor(messageColor)
 
             val messageStyle = typedArray.getResourceIdOrNull(R.styleable.LabeledTextView_messageStyle)
-            messageStyle?.let(labeledTextText::setTextAppearance)
+            messageStyle?.let(binder.labeledTextText::setTextAppearance)
 
             val labelStyle = typedArray.getResourceIdOrNull(R.styleable.LabeledTextView_labelStyle)
-            labelStyle?.let(labeledTextLabel::setTextAppearance)
+            labelStyle?.let(binder.labeledTextLabel::setTextAppearance)
 
             val textIcon = typedArray.getDrawable(R.styleable.LabeledTextView_textIcon)
             textIcon?.let(::setTextIcon)
@@ -79,20 +76,20 @@ class LabeledTextView @JvmOverloads constructor(
             setActionIcon(actionIcon)
 
             singleLine = typedArray.getBoolean(R.styleable.LabeledTextView_android_singleLine, true)
-            labeledTextText.isSingleLine = singleLine
+            binder.labeledTextText.isSingleLine = singleLine
 
             typedArray.recycle()
         }
     }
 
     private fun setMessageColor(messageColor: Int) {
-        labeledTextText.setTextColor(messageColor)
+        binder.labeledTextText.setTextColor(messageColor)
     }
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
 
-        labeledTextAction.setVisible(enabled)
+        binder.labeledTextAction.setVisible(enabled)
     }
 
     fun setLabel(label: String) {
@@ -100,26 +97,26 @@ class LabeledTextView @JvmOverloads constructor(
     }
 
     fun setLabelOrHide(label: String?) {
-        labeledTextLabel.setTextOrHide(label)
+        binder.labeledTextLabel.setTextOrHide(label)
     }
 
     fun setActionIcon(icon: Drawable?) {
-        labeledTextAction.setImageDrawable(icon)
+        binder.labeledTextAction.setImageDrawable(icon)
 
-        labeledTextAction.setVisible(icon != null)
+        binder.labeledTextAction.setVisible(icon != null)
     }
 
     fun setMessage(@StringRes messageRes: Int) = setMessage(context.getString(messageRes))
 
     fun setMessage(text: String?) {
-        labeledTextText.text = text
+        binder.labeledTextText.text = text
     }
 
     fun setTextIcon(@DrawableRes iconRes: Int) = setTextIcon(context.getDrawableCompat(iconRes))
 
     fun setTextIcon(icon: Drawable) {
-        labeledTextIcon.makeVisible()
-        labeledTextIcon.setImageDrawable(icon)
+        binder.labeledTextIcon.makeVisible()
+        binder.labeledTextIcon.setImageDrawable(icon)
     }
 
     fun setPrimaryIcon(icon: Drawable) {
@@ -128,7 +125,7 @@ class LabeledTextView @JvmOverloads constructor(
     }
 
     fun setActionClickListener(listener: (View) -> Unit) {
-        labeledTextAction.setOnClickListener(listener)
+        binder.labeledTextAction.setOnClickListener(listener)
     }
 
     fun setWholeClickListener(listener: (View) -> Unit) {

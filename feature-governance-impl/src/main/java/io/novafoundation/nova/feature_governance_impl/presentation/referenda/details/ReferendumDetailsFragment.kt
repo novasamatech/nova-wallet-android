@@ -2,10 +2,8 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.de
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -24,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendumDetailsBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.share.setupReferendumSharing
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.ReferendumCallModel
@@ -31,28 +30,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ReferendumDetailsModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.ShortenedTextModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.model.applyTo
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsContainer
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDappList
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsDescription
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsNumber
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsProgress
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsProposer
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsReadMore
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsRequestedAmount
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsRequestedAmountContainer
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsRequestedAmountFiat
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsScrollView
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsTimeline
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsTitle
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsToolbar
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsToolbarChips
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsTrack
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsVotingStatus
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumDetailsYourVote
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumFullDetails
-import kotlinx.android.synthetic.main.fragment_referendum_details.referendumTimelineContainer
 
-class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), WithContextExtensions {
+class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel, FragmentReferendumDetailsBinding>(), WithContextExtensions {
 
     companion object {
         private const val KEY_PAYLOAD = "payload"
@@ -64,62 +43,56 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
         }
     }
 
+    override fun createBinding() = FragmentReferendumDetailsBinding.inflate(layoutInflater)
+
     override val providedContext: Context
         get() = requireContext()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_referendum_details, container, false)
-    }
-
     override fun initViews() {
-        referendumDetailsContainer.applyStatusBarInsets()
+        binder.referendumDetailsContainer.applyStatusBarInsets()
 
-        referendumDetailsToolbar.setHomeButtonListener {
+        binder.referendumDetailsToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }
 
-        referendumDetailsToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
+        binder.referendumDetailsToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
 
-        referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.block_background)
-        referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
+        binder.referendumDetailsRequestedAmountContainer.background = getRoundedCornerDrawable(R.color.block_background)
+        binder.referendumDetailsTrack.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
-        referendumDetailsNumber.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
+        binder.referendumDetailsNumber.background = getRoundedCornerDrawable(R.color.chips_background, cornerSizeDp = 8)
             .withRippleMask(getRippleMask(cornerSizeDp = 8))
-        referendumFullDetails.background = getRoundedCornerDrawable(R.color.block_background)
+        binder.referendumFullDetails.background = getRoundedCornerDrawable(R.color.block_background)
             .withRippleMask()
-        referendumTimelineContainer.background = getRoundedCornerDrawable(R.color.block_background)
+        binder.referendumTimelineContainer.background = getRoundedCornerDrawable(R.color.block_background)
 
-        referendumDetailsReadMore.setOnClickListener {
+        binder.referendumDetailsReadMore.setOnClickListener {
             viewModel.readMoreClicked()
         }
 
-        referendumDetailsVotingStatus.setPositiveVotersClickListener {
+        binder.referendumDetailsVotingStatus.setPositiveVotersClickListener {
             viewModel.positiveVotesClicked()
         }
 
-        referendumDetailsVotingStatus.setNegativeVotersClickListener {
+        binder.referendumDetailsVotingStatus.setNegativeVotersClickListener {
             viewModel.negativeVotesClicked()
         }
 
-        referendumDetailsVotingStatus.setAbstainVotersClickListener {
+        binder.referendumDetailsVotingStatus.setAbstainVotersClickListener {
             viewModel.abstainVotesClicked()
         }
 
-        referendumDetailsDappList.onDAppClicked(viewModel::dAppClicked)
+        binder.referendumDetailsDappList.onDAppClicked(viewModel::dAppClicked)
 
-        referendumFullDetails.setOnClickListener {
+        binder.referendumFullDetails.setOnClickListener {
             viewModel.fullDetailsClicked()
         }
 
-        referendumDetailsVotingStatus.setStartVoteOnClickListener {
+        binder.referendumDetailsVotingStatus.setStartVoteOnClickListener {
             viewModel.voteClicked()
         }
 
-        referendumDetailsProposer.setOnClickListener {
+        binder.referendumDetailsProposer.setOnClickListener {
             viewModel.proposerClicked()
         }
     }
@@ -142,41 +115,41 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
 
         viewModel.referendumDetailsModelFlow.observeWhenVisible { loadingState ->
             setContentVisible(loadingState.isLoaded())
-            referendumDetailsProgress.isVisible = loadingState.isLoading()
+            binder.referendumDetailsProgress.isVisible = loadingState.isLoading()
             loadingState.dataOrNull?.let { setReferendumState(it) }
         }
 
-        viewModel.proposerAddressModel.observeWhenVisible(referendumDetailsProposer::setAddressOrHide)
+        viewModel.proposerAddressModel.observeWhenVisible(binder.referendumDetailsProposer::setAddressOrHide)
 
         viewModel.referendumCallModelFlow.observeWhenVisible(::setReferendumCall)
 
-        viewModel.referendumDApps.observeWhenVisible(referendumDetailsDappList::setDAppsOrHide)
+        viewModel.referendumDApps.observeWhenVisible(binder.referendumDetailsDappList::setDAppsOrHide)
 
-        viewModel.voteButtonState.observeWhenVisible(referendumDetailsVotingStatus::setVoteButtonState)
+        viewModel.voteButtonState.observeWhenVisible(binder.referendumDetailsVotingStatus::setVoteButtonState)
 
-        viewModel.showFullDetails.observeWhenVisible(referendumFullDetails::setVisible)
+        viewModel.showFullDetails.observeWhenVisible(binder.referendumFullDetails::setVisible)
     }
 
     private fun setReferendumState(model: ReferendumDetailsModel) {
-        referendumDetailsTrack.setReferendumTrackModel(model.track)
-        referendumDetailsNumber.setText(model.number)
+        binder.referendumDetailsTrack.setReferendumTrackModel(model.track)
+        binder.referendumDetailsNumber.setText(model.number)
 
-        referendumDetailsTitle.text = model.title
+        binder.referendumDetailsTitle.text = model.title
         setDescription(model.description)
 
-        referendumDetailsYourVote.setModel(model.yourVote)
+        binder.referendumDetailsYourVote.setModel(model.yourVote)
 
-        referendumDetailsVotingStatus.letOrHide(model.statusModel) {
-            referendumDetailsVotingStatus.setStatus(it)
+        binder.referendumDetailsVotingStatus.letOrHide(model.statusModel) {
+            binder.referendumDetailsVotingStatus.setStatus(it)
         }
-        referendumDetailsVotingStatus.setTimeEstimation(model.timeEstimation)
-        referendumDetailsVotingStatus.setVotingModel(model.voting)
-        referendumDetailsVotingStatus.setPositiveVoters(model.ayeVoters)
-        referendumDetailsVotingStatus.setNegativeVoters(model.nayVoters)
-        referendumDetailsVotingStatus.setAbstainVoters(model.abstainVoters)
+        binder.referendumDetailsVotingStatus.setTimeEstimation(model.timeEstimation)
+        binder.referendumDetailsVotingStatus.setVotingModel(model.voting)
+        binder.referendumDetailsVotingStatus.setPositiveVoters(model.ayeVoters)
+        binder.referendumDetailsVotingStatus.setNegativeVoters(model.nayVoters)
+        binder.referendumDetailsVotingStatus.setAbstainVoters(model.abstainVoters)
 
-        referendumTimelineContainer.letOrHide(model.timeline) {
-            referendumDetailsTimeline.setTimeline(it)
+        binder.referendumTimelineContainer.letOrHide(model.timeline) {
+            binder.referendumDetailsTimeline.setTimeline(it)
         }
     }
 
@@ -184,23 +157,23 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel>(), Wi
     private fun setReferendumCall(model: ReferendumCallModel?) {
         when (model) {
             is ReferendumCallModel.GovernanceRequest -> {
-                referendumDetailsRequestedAmountContainer.makeVisible()
-                referendumDetailsRequestedAmount.text = model.amount.token
-                referendumDetailsRequestedAmountFiat.text = model.amount.fiat
+                binder.referendumDetailsRequestedAmountContainer.makeVisible()
+                binder.referendumDetailsRequestedAmount.text = model.amount.token
+                binder.referendumDetailsRequestedAmountFiat.text = model.amount.fiat
             }
 
             null -> {
-                referendumDetailsRequestedAmountContainer.makeGone()
+                binder.referendumDetailsRequestedAmountContainer.makeGone()
             }
         }
     }
 
     private fun setContentVisible(visible: Boolean) {
-        referendumDetailsToolbarChips.setVisible(visible)
-        referendumDetailsScrollView.setVisible(visible)
+        binder.referendumDetailsToolbarChips.setVisible(visible)
+        binder.referendumDetailsScrollView.setVisible(visible)
     }
 
     private fun setDescription(model: ShortenedTextModel?) {
-        model.applyTo(referendumDetailsDescription, referendumDetailsReadMore, viewModel.markwon)
+        model.applyTo(binder.referendumDetailsDescription, binder.referendumDetailsReadMore, viewModel.markwon)
     }
 }

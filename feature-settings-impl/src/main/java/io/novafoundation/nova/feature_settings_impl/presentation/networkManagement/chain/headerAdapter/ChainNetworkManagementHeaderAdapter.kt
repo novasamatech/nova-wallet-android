@@ -1,18 +1,13 @@
 package io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.chain.headerAdapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.SingleItemAdapter
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
-import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementAutoBalance
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementEnable
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementIcon
-import kotlinx.android.synthetic.main.item_chan_network_management_header.view.chainNetworkManagementTitle
+import io.novafoundation.nova.feature_settings_impl.databinding.ItemChanNetworkManagementHeaderBinding
 
 class ChainNetworkManagementHeaderAdapter(
     private val imageLoader: ImageLoader,
@@ -33,7 +28,7 @@ class ChainNetworkManagementHeaderAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChainNetworkManagementHeaderViewHolder {
         return ChainNetworkManagementHeaderViewHolder(
-            parent.inflateChild(R.layout.item_chan_network_management_header),
+            ItemChanNetworkManagementHeaderBinding.inflate(parent.inflater(), parent, false),
             imageLoader,
             itemHandler
         )
@@ -64,20 +59,20 @@ class ChainNetworkManagementHeaderAdapter(
 }
 
 class ChainNetworkManagementHeaderViewHolder(
-    view: View,
+    private val binder: ItemChanNetworkManagementHeaderBinding,
     private val imageLoader: ImageLoader,
     private val itemHandler: ChainNetworkManagementHeaderAdapter.ItemHandler
-) : RecyclerView.ViewHolder(view) {
+) : RecyclerView.ViewHolder(binder.root) {
 
     init {
-        with(view) {
+        with(binder) {
             chainNetworkManagementEnable.setOnClickListener { itemHandler.chainEnableClicked() }
             chainNetworkManagementAutoBalance.setOnClickListener { itemHandler.autoBalanceClicked() }
         }
     }
 
     fun bind(chainUi: ChainUi, chainEnabled: Boolean, autoBalanceEnabled: Boolean, networkCanBeDisabled: Boolean) {
-        with(itemView) {
+        with(binder) {
             chainNetworkManagementIcon.loadChainIcon(chainUi.icon, imageLoader)
             chainNetworkManagementTitle.text = chainUi.name
 

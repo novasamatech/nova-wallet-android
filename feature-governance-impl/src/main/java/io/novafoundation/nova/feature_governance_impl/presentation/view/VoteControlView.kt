@@ -3,12 +3,9 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
-import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_vote_control.view.setupReferendumVoteAbstain
-import kotlinx.android.synthetic.main.view_vote_control.view.setupReferendumVoteAye
-import kotlinx.android.synthetic.main.view_vote_control.view.setupReferendumVoteNay
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewVoteControlBinding
 
 class VoteControlView @JvmOverloads constructor(
     context: Context,
@@ -16,12 +13,13 @@ class VoteControlView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
-    val nayButton get() = setupReferendumVoteNay
-    val abstainButton get() = setupReferendumVoteAbstain
-    val ayeButton get() = setupReferendumVoteAye
+    private val binder = ViewVoteControlBinding.inflate(inflater(), this)
+
+    val nayButton get() = binder.setupReferendumVoteNay
+    val abstainButton get() = binder.setupReferendumVoteAbstain
+    val ayeButton get() = binder.setupReferendumVoteAye
 
     init {
-        View.inflate(context, R.layout.view_vote_control, this)
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_HORIZONTAL
     }

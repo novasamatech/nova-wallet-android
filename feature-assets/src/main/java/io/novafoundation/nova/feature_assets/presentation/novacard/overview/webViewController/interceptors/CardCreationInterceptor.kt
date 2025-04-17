@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.overview.web
 import android.webkit.WebResourceRequest
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
+import io.novafoundation.nova.common.utils.webView.makeRequestBlocking
+import io.novafoundation.nova.common.utils.webView.toOkHttpRequestBuilder
 import okhttp3.OkHttpClient
 
 class CardCreationInterceptorFactory(
@@ -18,7 +21,7 @@ class CardCreationInterceptor(
     private val okHttpClient: OkHttpClient,
     private val gson: Gson,
     private val onCardCreatedListener: Callback
-) : NovaCardInterceptor {
+) : WebViewRequestInterceptor {
 
     interface Callback {
 

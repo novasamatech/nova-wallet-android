@@ -3,19 +3,17 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ButtonLargeBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getColorFromAttr
 import io.novafoundation.nova.common.utils.getEnum
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableFromColors
-import kotlinx.android.synthetic.main.button_large.view.buttonLargeIcon
-import kotlinx.android.synthetic.main.button_large.view.buttonLargeSubtitle
-import kotlinx.android.synthetic.main.button_large.view.buttonLargeTitle
 
 class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     context: Context,
@@ -23,9 +21,9 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.button_large, this)
+    private val binder = ButtonLargeBinding.inflate(inflater(), this)
 
+    init {
         minHeight = 52.dp
 
         attrs?.let(::applyAttributes)
@@ -51,15 +49,15 @@ class ButtonLarge @kotlin.jvm.JvmOverloads constructor(
     }
 
     private fun setTitle(title: String?) {
-        buttonLargeTitle.text = title
+        binder.buttonLargeTitle.text = title
     }
 
     private fun setSubtitle(subtitle: String?) {
-        buttonLargeSubtitle.setTextOrHide(subtitle)
+        binder.buttonLargeSubtitle.setTextOrHide(subtitle)
     }
 
     private fun setIcon(icon: Drawable?) {
-        buttonLargeIcon.setImageDrawable(icon)
+        binder.buttonLargeIcon.setImageDrawable(icon)
     }
 
     private fun setStyle(style: Style) = with(context) {

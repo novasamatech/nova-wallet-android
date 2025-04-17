@@ -5,18 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.databinding.ItemRouteSwapBinding
+import io.novafoundation.nova.feature_swap_impl.databinding.ItemRouteTransferBinding
 import io.novafoundation.nova.feature_swap_impl.presentation.route.model.SwapRouteItemModel
-import kotlinx.android.synthetic.main.item_route_swap.view.itemRouteSwapAmountFrom
-import kotlinx.android.synthetic.main.item_route_swap.view.itemRouteSwapAmountTo
-import kotlinx.android.synthetic.main.item_route_swap.view.itemRouteSwapChain
-import kotlinx.android.synthetic.main.item_route_swap.view.itemRouteSwapFee
-import kotlinx.android.synthetic.main.item_route_transfer.view.itemRouteTransferAmount
-import kotlinx.android.synthetic.main.item_route_transfer.view.itemRouteTransferFee
-import kotlinx.android.synthetic.main.item_route_transfer.view.itemRouteTransferFrom
-import kotlinx.android.synthetic.main.item_route_transfer.view.itemRouteTransferTo
 
 class SwapRouteAdapter : BaseListAdapter<SwapRouteItemModel, SwapRouteViewHolder>(SwapRouteDiffCallback()) {
 
@@ -29,8 +23,8 @@ class SwapRouteAdapter : BaseListAdapter<SwapRouteItemModel, SwapRouteViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwapRouteViewHolder {
         return when (viewType) {
-            R.layout.item_route_swap -> SwapRouteSwapViewHolder(parent)
-            R.layout.item_route_transfer -> SwapRouteTransferViewHolder(parent)
+            R.layout.item_route_swap -> SwapRouteSwapViewHolder(ItemRouteSwapBinding.inflate(parent.inflater(), parent, false))
+            R.layout.item_route_transfer -> SwapRouteTransferViewHolder(ItemRouteTransferBinding.inflate(parent.inflater(), parent, false))
             else -> error("Unknown viewType: $viewType")
         }
     }
@@ -52,9 +46,9 @@ sealed class SwapRouteViewHolder(itemView: View) : BaseViewHolder(itemView) {
     }
 }
 
-class SwapRouteTransferViewHolder(parentView: ViewGroup) : SwapRouteViewHolder(parentView.inflateChild(R.layout.item_route_transfer)) {
+class SwapRouteTransferViewHolder(private val binder: ItemRouteTransferBinding) : SwapRouteViewHolder(binder.root) {
 
-    fun bind(model: SwapRouteItemModel.Transfer) = with(containerView) {
+    fun bind(model: SwapRouteItemModel.Transfer) = with(binder) {
         itemRouteTransferAmount.setModel(model.amount)
         itemRouteTransferFee.text = model.fee
         itemRouteTransferFrom.text = model.originChainName
@@ -64,9 +58,9 @@ class SwapRouteTransferViewHolder(parentView: ViewGroup) : SwapRouteViewHolder(p
     override fun unbind() {}
 }
 
-class SwapRouteSwapViewHolder(parentView: ViewGroup) : SwapRouteViewHolder(parentView.inflateChild(R.layout.item_route_swap)) {
+class SwapRouteSwapViewHolder(private val binder: ItemRouteSwapBinding) : SwapRouteViewHolder(binder.root) {
 
-    fun bind(model: SwapRouteItemModel.Swap) = with(containerView) {
+    fun bind(model: SwapRouteItemModel.Swap) = with(binder) {
         itemRouteSwapAmountFrom.setModel(model.amountFrom)
         itemRouteSwapAmountTo.setModel(model.amountTo)
         itemRouteSwapFee.text = model.fee

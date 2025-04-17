@@ -1,5 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+<!--
+    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
+    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+-->
+
+    <string name="trade_provider_open_confirmation_title">Continue in browser?</string>
+    <string name="trade_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+
+    <string name="buy_token_not_supported_title">This token is not supported by the buy feature</string>
+    <string name="buy_token_not_supported_message">None of our providers currently support the buying of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="sell_token_not_supported_title">This token is not supported by the sell feature</string>
+    <string name="sell_token_not_supported_message">None of our providers currently support the selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="trade_token_not_supported_title">This token is not supported by the buy/sell feature</string>
+    <string name="trade_token_not_supported_message">None of our providers currently support the buying or selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="buy_order_completed_message">Purchase initiated! Please wait up to 60 minutes. You can track status on the email.</string>
+    <string name="sell_order_completed_message">Sale initiated! Please wait up to 60 minutes. You can track status on the email.</string>
+
+    <string name="fragment_sell_token_title">Sell %s token</string>
+    <string name="sell_network_flow_title">Select network for selling %s</string>
+
+    <string name="mercurio_provider_description">Best price with fees up to 3.95%</string>
+    <string name="transak_provider_buy_description">Buy crypto starting from just $5</string>
+    <string name="banxa_provider_description">Straightforward and efficient KYC process</string>
+
+    <string name="transak_provider_sell_description">Sell crypto starting from just $10</string>
+
+    <string name="wallet_asset_sell">Sell</string>
+
+    <string name="additional_payment_methods">+%d</string>
+
+    <string name="trade_provider_list_buy_title">Select a provider to buy %s token</string>
+
+    <string name="trade_provider_list_sell_title">Select a provider to sell %s token</string>
+
+    <string name="trade_provider_list_footer">Payment methods, fees and limits differ by provider.\nCompare their quotes to find the best option for you.</string>
+
+    <string name="wallet_asset_sell_tokens">Sell tokens</string>
+    <string name="wallet_asset_buy_tokens">Buy tokens</string>
+
+    <string name="wallet_asset_buy_sell">Buy/Sell</string>
+
+
+    <string name="account_ledger_import_start_step_otg">%s in your phone settings</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Enable OTG</string>
+
+    <string name="select_ledger_grant_permissions">Enable Bluetooth &amp; Grant Permissions</string>
+
+    <string name="ledger_verify_address_message_both_buttons">Press both buttons on your %s to approve the address</string>
+    <string name="ledger_verify_address_message_confirm_button">Press confirm button on your %s to approve the address</string>
+    <string name="ledger_hold_to_sign">Hold confirm button on your %s to approve the transaction</string>
+
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+
+    <string name="account_ledger_select_device_all_description">If using a Ledger via Bluetooth, enable Bluetooth on both devices and grant Nova Bluetooth and location permissions. For USB, enable OTG in your phone settings.</string>
+    <string name="account_ledger_select_device_usb_description">Please, enable Ledger device. Unlock your Ledger device and open the %s app.</string>
+
+    <string name="account_ledger_import_start_guide">Ledger Connection Guide</string>
+
+    <string name="account_ledger_import_start_title">Connect Ledger</string>
+
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
+
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+
+    <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string>
+
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_parity_signer_show_mode_legacy">Legacy</string>
+    <string name="account_parity_signer_show_mode_new">New (Vault v7+)</string>
+
     <string name="unified_address_title">New Unified Address</string>
     <string name="unified_address_subtitle">Some exchanges may still require the legacy format\nfor operations while they update. %s</string>
     <string name="unified_address_format_new_badge">new format</string>
@@ -150,8 +228,6 @@
     <string name="referenda_swipe_gov_banner_subtitle">Swipe to vote on referenda with AI summaries. Fast &amp; easy!</string>
     <string name="referenda_swipe_gov_banner_chip">%d referenda</string>
 
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>
-
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot app is installed</string>
 
     <string name="account_ledger_generic_import_start_step_2_highlighted">Open the Polkadot app</string>
@@ -216,8 +292,6 @@
 
     <string name="account_ledger_legacy_warning_title">New Ledger app has been released</string>
     <string name="account_ledger_legacy_warning_message">To sign operations and migrate your accounts to the new Generic Ledger app install and open Migration app. Legacy Old and Migration Ledger apps will not be supported in the future.</string>
-
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
 
     <string name="account_ledger_nano_x">Ledger Nano X</string>
 
@@ -829,9 +903,6 @@
     <string name="assets_crowdloan_unlock_banner_title">Boost your DOT 🚀</string>
     <string name="assets_crowdloan_unlock_banner_description">Received your DOT back from crowdloans? Start staking your DOT today to get the maximum possible rewards!</string>
 
-    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
-    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
-
     <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
 
     <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
@@ -986,7 +1057,6 @@
     <string name="account_parity_signer_sign_title">Sign with %s</string>
     <string name="account_parity_signer_import_preview_description">Following accounts have been successfully read from %s</string>
     <string name="account_parity_signer_scan_from">Scan the QR code from the %s</string>
-    <string name="account_parity_signer_scan_with">Scan the QR code with the %s</string>
     <string name="account_parity_signer_import_start_title">Add wallet from %s</string>
     <string name="account_details_parity_signer_alert">This wallet is paired with %1$s. Nova will help you to form any operations you want, and you will be requested to sign them using %1$s</string>
     <string name="account_details_parity_signer_not_supported">Not supported by %s</string>
@@ -1546,8 +1616,6 @@
 
     <string name="common_ledger">Ledger</string>
 
-    <string name="ledger_verify_address_subtitle">Press both buttons on your %s to approve address</string>
-
     <string name="ledger_import_select_address_load_more">Load more accounts</string>
     <string name="ledher_import_select_address_title">Select account to add to wallet</string>
 
@@ -1572,9 +1640,6 @@
     <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
     <string name="account_select_hardware_wallet">Select hardware wallet</string>
-
-    <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>
-    <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
     <string name="common_total">Total</string>
 

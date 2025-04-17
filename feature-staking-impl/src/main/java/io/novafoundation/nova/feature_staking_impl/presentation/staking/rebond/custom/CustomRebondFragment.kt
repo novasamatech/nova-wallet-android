@@ -1,9 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.custom
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -11,34 +7,22 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentRebondCustomBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondAmount
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondContinue
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondFee
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondHints
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondToolbar
-import kotlinx.android.synthetic.main.fragment_rebond_custom.rebondTransferable
 
-class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
+class CustomRebondFragment : BaseFragment<CustomRebondViewModel, FragmentRebondCustomBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_rebond_custom, container, false)
-    }
+    override fun createBinding() = FragmentRebondCustomBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        rebondToolbar.applyStatusBarInsets()
+        binder.rebondToolbar.applyStatusBarInsets()
 
-        rebondToolbar.setHomeButtonListener { viewModel.backClicked() }
-        rebondContinue.prepareForProgress(viewLifecycleOwner)
-        rebondContinue.setOnClickListener { viewModel.confirmClicked() }
+        binder.rebondToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.rebondContinue.prepareForProgress(viewLifecycleOwner)
+        binder.rebondContinue.setOnClickListener { viewModel.confirmClicked() }
     }
 
     override fun inject() {
@@ -53,12 +37,12 @@ class CustomRebondFragment : BaseFragment<CustomRebondViewModel>() {
 
     override fun subscribe(viewModel: CustomRebondViewModel) {
         observeValidations(viewModel)
-        observeHints(viewModel.hintsMixin, rebondHints)
-        setupAmountChooser(viewModel.amountChooserMixin, rebondAmount)
-        setupFeeLoading(viewModel.originFeeMixin, rebondFee)
+        observeHints(viewModel.hintsMixin, binder.rebondHints)
+        setupAmountChooser(viewModel.amountChooserMixin, binder.rebondAmount)
+        setupFeeLoading(viewModel.originFeeMixin, binder.rebondFee)
 
-        viewModel.transferableFlow.observe(rebondTransferable::showAmount)
+        viewModel.transferableFlow.observe(binder.rebondTransferable::showAmount)
 
-        viewModel.showNextProgress.observe(rebondContinue::setProgressState)
+        viewModel.showNextProgress.observe(binder.rebondContinue::setProgressState)
     }
 }

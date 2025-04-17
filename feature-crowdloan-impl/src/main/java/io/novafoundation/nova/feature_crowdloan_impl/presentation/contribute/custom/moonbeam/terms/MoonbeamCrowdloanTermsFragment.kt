@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+
 import coil.ImageLoader
 import coil.load
 import dev.chrisbanes.insetter.applyInsetter
@@ -16,23 +14,19 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.FragmentMoonbeamTermsBinding
 import io.novafoundation.nova.feature_crowdloan_impl.di.CrowdloanFeatureComponent
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsCheckbox
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsConfirm
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsContainer
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsFee
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsLink
-import kotlinx.android.synthetic.main.fragment_moonbeam_terms.moonbeamTermsToolbar
+
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
-class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewModel>() {
+class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewModel, FragmentMoonbeamTermsBinding>() {
 
     @Inject
-    protected lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     companion object {
 
@@ -41,12 +35,10 @@ class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewMo
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_moonbeam_terms, container, false)
-    }
+    override fun createBinding() = FragmentMoonbeamTermsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        moonbeamTermsContainer.applyInsetter {
+        binder.moonbeamTermsContainer.applyInsetter {
             type(statusBars = true) {
                 padding()
             }
@@ -54,12 +46,12 @@ class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewMo
             consume(true)
         }
 
-        moonbeamTermsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.moonbeamTermsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        moonbeamTermsConfirm.prepareForProgress(viewLifecycleOwner)
-        moonbeamTermsConfirm.setOnClickListener { viewModel.submitClicked() }
+        binder.moonbeamTermsConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.moonbeamTermsConfirm.setOnClickListener { viewModel.submitClicked() }
 
-        moonbeamTermsLink.setOnClickListener { viewModel.termsLinkClicked() }
+        binder.moonbeamTermsLink.setOnClickListener { viewModel.termsLinkClicked() }
     }
 
     override fun inject() {
@@ -73,25 +65,26 @@ class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewMo
     }
 
     override fun subscribe(viewModel: MoonbeamCrowdloanTermsViewModel) {
-        setupFeeLoading(viewModel, moonbeamTermsFee)
+        setupFeeLoading(viewModel, binder.moonbeamTermsFee)
         observeBrowserEvents(viewModel)
         observeValidations(viewModel)
 
-        moonbeamTermsLink.title.text = viewModel.termsLinkContent.title
-        moonbeamTermsLink.icon.load(viewModel.termsLinkContent.iconUrl, imageLoader)
+        binder.moonbeamTermsLink.title.text = viewModel.termsLinkContent.title
+        binder.moonbeamTermsLink.icon.load(viewModel.termsLinkContent.iconUrl, imageLoader)
 
-        moonbeamTermsCheckbox.bindTo(viewModel.termsCheckedFlow, viewLifecycleOwner.lifecycleScope)
+        binder.moonbeamTermsCheckbox.bindTo(viewModel.termsCheckedFlow, viewLifecycleOwner.lifecycleScope)
 
         viewModel.submitButtonState.observe {
             when (it) {
-                is SubmitActionState.Loading -> moonbeamTermsConfirm.setState(ButtonState.PROGRESS)
+                is SubmitActionState.Loading -> binder.moonbeamTermsConfirm.setState(ButtonState.PROGRESS)
                 is SubmitActionState.Unavailable -> {
-                    moonbeamTermsConfirm.setState(ButtonState.DISABLED)
-                    moonbeamTermsConfirm.text = it.reason
+                    binder.moonbeamTermsConfirm.setState(ButtonState.DISABLED)
+                    binder.moonbeamTermsConfirm.text = it.reason
                 }
+
                 is SubmitActionState.Available -> {
-                    moonbeamTermsConfirm.setState(ButtonState.NORMAL)
-                    moonbeamTermsConfirm.setText(R.string.common_apply)
+                    binder.moonbeamTermsConfirm.setState(ButtonState.NORMAL)
+                    binder.moonbeamTermsConfirm.setText(R.string.common_apply)
                 }
             }
         }

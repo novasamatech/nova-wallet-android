@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.model
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.utils.removeHexPrefix
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MetamaskChain(

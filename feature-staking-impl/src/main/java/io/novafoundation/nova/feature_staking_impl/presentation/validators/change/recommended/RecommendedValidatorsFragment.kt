@@ -1,48 +1,34 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.recommended
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentRecommendedValidatorsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.StakeTargetAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.ValidatorStakeTargetModel
-import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsAccounts
-import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsContent
-import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsList
-import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsNext
-import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsProgress
-import kotlinx.android.synthetic.main.fragment_recommended_validators.recommendedValidatorsToolbar
 
-class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewModel>(), StakeTargetAdapter.ItemHandler<Validator> {
+class RecommendedValidatorsFragment :
+    BaseFragment<RecommendedValidatorsViewModel, FragmentRecommendedValidatorsBinding>(),
+    StakeTargetAdapter.ItemHandler<Validator> {
+
+    override fun createBinding() = FragmentRecommendedValidatorsBinding.inflate(layoutInflater)
 
     val adapter by lazy(LazyThreadSafetyMode.NONE) {
         StakeTargetAdapter(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_recommended_validators, container, false)
-    }
-
     override fun initViews() {
-        recommendedValidatorsList.adapter = adapter
+        binder.recommendedValidatorsList.adapter = adapter
 
-        recommendedValidatorsList.setHasFixedSize(true)
+        binder.recommendedValidatorsList.setHasFixedSize(true)
 
-        recommendedValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.recommendedValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
-        recommendedValidatorsNext.setOnClickListener {
+        binder.recommendedValidatorsNext.setOnClickListener {
             viewModel.nextClicked()
         }
     }
@@ -61,11 +47,11 @@ class RecommendedValidatorsFragment : BaseFragment<RecommendedValidatorsViewMode
         viewModel.recommendedValidatorModels.observe {
             adapter.submitList(it)
 
-            recommendedValidatorsProgress.setVisible(false)
-            recommendedValidatorsContent.setVisible(true)
+            binder.recommendedValidatorsProgress.setVisible(false)
+            binder.recommendedValidatorsContent.setVisible(true)
         }
 
-        viewModel.selectedTitle.observe(recommendedValidatorsAccounts::setText)
+        viewModel.selectedTitle.observe(binder.recommendedValidatorsAccounts::setText)
     }
 
     override fun stakeTargetInfoClicked(validatorModel: ValidatorStakeTargetModel) {

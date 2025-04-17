@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ParitySignerAccountPayload(

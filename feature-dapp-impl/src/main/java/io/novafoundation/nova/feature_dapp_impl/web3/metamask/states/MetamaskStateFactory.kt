@@ -20,9 +20,11 @@ class MetamaskStateFactory(
 
     fun default(
         hostApi: Web3StateMachineHost,
-        chain: MetamaskChain = MetamaskChain.ETHEREUM,
+        chain: MetamaskChain? = null,
         selectedAddress: String? = null
     ): DefaultMetamaskState {
+        val usedChain = chain ?: interactor.getDefaultMetamaskChain()
+
         return DefaultMetamaskState(
             interactor = interactor,
             commonInteractor = commonInteractor,
@@ -31,7 +33,7 @@ class MetamaskStateFactory(
             web3Session = web3Session,
             walletUiUseCase = walletUiUseCase,
             hostApi = hostApi,
-            chain = chain,
+            chain = usedChain,
             selectedAccountAddress = selectedAddress,
             stateFactory = this
         )

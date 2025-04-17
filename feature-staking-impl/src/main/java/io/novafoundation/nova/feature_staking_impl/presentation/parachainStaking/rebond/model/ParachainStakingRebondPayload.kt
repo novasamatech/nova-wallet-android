@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import android.os.Parcelable
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ParachainStakingRebondPayload(

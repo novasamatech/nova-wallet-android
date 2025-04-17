@@ -4,8 +4,14 @@ import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import io.novafoundation.nova.common.utils.inflateChild
-import io.novafoundation.nova.feature_account_impl.R
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupChainBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupCryptoTypeBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupJsonBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupMnemonicBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupSeedBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupSubtitleBinding
+import io.novafoundation.nova.feature_account_impl.databinding.ItemManualBackupTitleBinding
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupChainRvItem
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupChainViewHolder
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.adapter.viewHolders.ManualBackupCryptoTypeRvItem
@@ -37,13 +43,31 @@ class ManualBackupSecretsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManualBackupSecretsViewHolder {
         return when (viewType) {
-            TITLE_VIEW_TYPE -> ManualBackupTitleViewHolder(parent.inflateChild(R.layout.item_manual_backup_title))
-            SUBTITLE_VIEW_TYPE -> ManualBackupSubtitleViewHolder(parent.inflateChild(R.layout.item_manual_backup_subtitle))
-            CHAIN_VIEW_TYPE -> ManualBackupChainViewHolder(parent.inflateChild(R.layout.item_manual_backup_chain))
-            MNEMONIC_VIEW_TYPE -> ManualBackupMnemonicViewHolder(parent.inflateChild(R.layout.item_manual_backup_mnemonic), itemHandler)
-            SEED_VIEW_TYPE -> ManualBackupSeedViewHolder(parent.inflateChild(R.layout.item_manual_backup_seed), itemHandler)
-            JSON_VIEW_TYPE -> ManualBackupJsonViewHolder(parent.inflateChild(R.layout.item_manual_backup_json), itemHandler)
-            CRYPTO_TYPE_VIEW_TYPE -> ManualBackupCryptoTypeViewHolder(parent.inflateChild(R.layout.item_manual_backup_crypto_type))
+            TITLE_VIEW_TYPE -> ManualBackupTitleViewHolder(ItemManualBackupTitleBinding.inflate(parent.inflater(), parent, false))
+
+            SUBTITLE_VIEW_TYPE -> ManualBackupSubtitleViewHolder(ItemManualBackupSubtitleBinding.inflate(parent.inflater(), parent, false))
+
+            CHAIN_VIEW_TYPE -> ManualBackupChainViewHolder(
+                ItemManualBackupChainBinding.inflate(parent.inflater(), parent, false)
+            )
+
+            MNEMONIC_VIEW_TYPE -> ManualBackupMnemonicViewHolder(
+                ItemManualBackupMnemonicBinding.inflate(parent.inflater(), parent, false),
+                itemHandler
+            )
+
+            SEED_VIEW_TYPE -> ManualBackupSeedViewHolder(
+                ItemManualBackupSeedBinding.inflate(parent.inflater(), parent, false),
+                itemHandler
+            )
+
+            JSON_VIEW_TYPE -> ManualBackupJsonViewHolder(
+                ItemManualBackupJsonBinding.inflate(parent.inflater(), parent, false),
+                itemHandler
+            )
+
+            CRYPTO_TYPE_VIEW_TYPE -> ManualBackupCryptoTypeViewHolder(ItemManualBackupCryptoTypeBinding.inflate(parent.inflater(), parent, false))
+
             else -> throw IllegalArgumentException("Unknown view type")
         }
     }

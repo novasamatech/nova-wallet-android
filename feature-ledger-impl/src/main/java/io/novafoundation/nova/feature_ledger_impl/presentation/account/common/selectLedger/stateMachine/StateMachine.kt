@@ -1,37 +1,51 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.stateMachine
 
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
+import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryRequirement
 
 sealed class SideEffect {
 
-    object EnableBluetooth : SideEffect()
+    data class RequestPermissions(val requirements: List<DiscoveryRequirement>, val shouldExitUponDenial: Boolean) : SideEffect()
 
-    object EnableLocation : SideEffect()
+    data class RequestSatisfyRequirement(val requirements: List<DiscoveryRequirement>) : SideEffect()
 
-    class PresentLedgerFailure(val reason: Throwable, val device: LedgerDevice) : SideEffect()
+    data class PresentLedgerFailure(val reason: Throwable, val device: LedgerDevice) : SideEffect()
 
-    class VerifyConnection(val device: LedgerDevice) : SideEffect()
+    data class VerifyConnection(val device: LedgerDevice) : SideEffect()
 
-    object StartDiscovery : SideEffect()
+    data class StartDiscovery(val methods: Set<DiscoveryMethods.Method>) : SideEffect()
+
+    data class StopDiscovery(val methods: Set<DiscoveryMethods.Method>) : SideEffect()
 }
 
 sealed class SelectLedgerEvent {
 
-    class DiscoveredDevicesListChanged(val newDevices: List<LedgerDevice>) : SelectLedgerEvent()
+    data class DiscoveryRequirementSatisfied(val requirement: DiscoveryRequirement) : SelectLedgerEvent()
 
-    object BluetoothEnabled : SelectLedgerEvent()
+    data class DiscoveryRequirementMissing(val requirement: DiscoveryRequirement) : SelectLedgerEvent()
 
-    object BluetoothDisabled : SelectLedgerEvent()
+    object PermissionsGranted : SelectLedgerEvent() {
+        override fun toString(): String {
+            return "PermissionsGranted"
+        }
+    }
 
-    object LocationEnabled : SelectLedgerEvent()
+    object AvailabilityRequestsAllowed : SelectLedgerEvent() {
+        override fun toString(): String {
+            return "AvailabilityRequestsAllowed"
+        }
+    }
 
-    object LocationDisabled : SelectLedgerEvent()
+    data class DiscoveredDevicesListChanged(val newDevices: List<LedgerDevice>) : SelectLedgerEvent()
 
-    class DeviceChosen(val device: LedgerDevice) : SelectLedgerEvent()
+    data class DeviceChosen(val device: LedgerDevice) : SelectLedgerEvent()
 
-    class VerificationFailed(val reason: Throwable) : SelectLedgerEvent()
+    data class VerificationFailed(val reason: Throwable) : SelectLedgerEvent()
 
-    object ConnectionVerified : SelectLedgerEvent()
-
-    object PermissionsGranted : SelectLedgerEvent()
+    object ConnectionVerified : SelectLedgerEvent() {
+        override fun toString(): String {
+            return "ConnectionVerified"
+        }
+    }
 }

@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.claimRewards
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -13,33 +10,22 @@ import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentNominationPoolsClaimRewardsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
-import kotlinx.android.synthetic.main.fragment_nomination_pools_claim_rewards.nominationPoolsClaimRewardRestakeSwitch
-import kotlinx.android.synthetic.main.fragment_nomination_pools_claim_rewards.nominationPoolsClaimRewardsAmount
-import kotlinx.android.synthetic.main.fragment_nomination_pools_claim_rewards.nominationPoolsClaimRewardsConfirm
-import kotlinx.android.synthetic.main.fragment_nomination_pools_claim_rewards.nominationPoolsClaimRewardsExtrinsicInformation
-import kotlinx.android.synthetic.main.fragment_nomination_pools_claim_rewards.nominationPoolsClaimRewardsToolbar
 
-class NominationPoolsClaimRewardsFragment : BaseFragment<NominationPoolsClaimRewardsViewModel>() {
+class NominationPoolsClaimRewardsFragment : BaseFragment<NominationPoolsClaimRewardsViewModel, FragmentNominationPoolsClaimRewardsBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_nomination_pools_claim_rewards, container, false)
-    }
+    override fun createBinding() = FragmentNominationPoolsClaimRewardsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        nominationPoolsClaimRewardsToolbar.applyStatusBarInsets()
+        binder.nominationPoolsClaimRewardsToolbar.applyStatusBarInsets()
 
-        nominationPoolsClaimRewardsExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
+        binder.nominationPoolsClaimRewardsExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
-        nominationPoolsClaimRewardsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        nominationPoolsClaimRewardsConfirm.prepareForProgress(viewLifecycleOwner)
-        nominationPoolsClaimRewardsConfirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.nominationPoolsClaimRewardsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.nominationPoolsClaimRewardsConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.nominationPoolsClaimRewardsConfirm.setOnClickListener { viewModel.confirmClicked() }
     }
 
     override fun inject() {
@@ -55,15 +41,15 @@ class NominationPoolsClaimRewardsFragment : BaseFragment<NominationPoolsClaimRew
     override fun subscribe(viewModel: NominationPoolsClaimRewardsViewModel) {
         observeValidations(viewModel)
         setupExternalActions(viewModel)
-        setupFeeLoading(viewModel.feeLoaderMixin, nominationPoolsClaimRewardsExtrinsicInformation.fee)
+        setupFeeLoading(viewModel.feeLoaderMixin, binder.nominationPoolsClaimRewardsExtrinsicInformation.fee)
 
-        viewModel.showNextProgress.observe(nominationPoolsClaimRewardsConfirm::setProgressState)
+        viewModel.showNextProgress.observe(binder.nominationPoolsClaimRewardsConfirm::setProgressState)
 
-        viewModel.pendingRewardsAmountModel.observe(nominationPoolsClaimRewardsAmount::setAmount)
+        viewModel.pendingRewardsAmountModel.observe(binder.nominationPoolsClaimRewardsAmount::setAmount)
 
-        viewModel.walletUiFlow.observe(nominationPoolsClaimRewardsExtrinsicInformation::setWallet)
-        viewModel.originAddressModelFlow.observe(nominationPoolsClaimRewardsExtrinsicInformation::setAccount)
+        viewModel.walletUiFlow.observe(binder.nominationPoolsClaimRewardsExtrinsicInformation::setWallet)
+        viewModel.originAddressModelFlow.observe(binder.nominationPoolsClaimRewardsExtrinsicInformation::setAccount)
 
-        nominationPoolsClaimRewardRestakeSwitch.field.bindTo(viewModel.shouldRestakeInput, viewLifecycleOwner.lifecycleScope)
+        binder.nominationPoolsClaimRewardRestakeSwitch.field.bindTo(viewModel.shouldRestakeInput, viewLifecycleOwner.lifecycleScope)
     }
 }

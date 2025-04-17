@@ -2,9 +2,12 @@ package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
@@ -18,10 +21,10 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
-import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
+
 import javax.inject.Inject
 
-class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
+class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var rootNavigationHolder: RootNavigationHolder
@@ -31,6 +34,10 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var contextManager: ContextManager
+
+    override fun createBinding(): ActivityRootBinding {
+        return ActivityRootBinding.inflate(LayoutInflater.from(this))
+    }
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -59,7 +66,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
         contextManager.attachActivity(this)
 
-        rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
+        binder.rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
             view.updatePadding(top = insets.systemWindowInsetTop)
 
             insets
@@ -76,10 +83,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
         contextManager.detachActivity()
         rootNavigationHolder.detach()
-    }
-
-    override fun layoutResource(): Int {
-        return R.layout.activity_root
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -107,7 +110,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         observeActionBottomSheet(viewModel)
 
         viewModel.showConnectingBarLiveData.observe(this) { show ->
-            rootNetworkBar.setVisible(show)
+            binder.rootNetworkBar.setVisible(show)
         }
 
         viewModel.messageLiveData.observe(

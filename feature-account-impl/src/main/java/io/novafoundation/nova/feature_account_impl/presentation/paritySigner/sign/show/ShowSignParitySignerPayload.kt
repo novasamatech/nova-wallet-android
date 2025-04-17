@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.si
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ShowSignParitySignerPayload(

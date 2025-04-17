@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">l\'app Polkadot sia installata</string>
     <string name="account_ledger_generic_import_start_step_2">%s sul tuo dispositivo Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Apri l\'app Polkadot</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (App Polkadot Generico)</string>
     <string name="account_ledger_import_fill_description">Assicurati che l\'app di rete sia installata sul tuo dispositivo Ledger utilizzando l\'app Ledger Live. Apri l\'app di rete sul tuo dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Aggiungi almeno un account</string>
     <string name="account_ledger_import_fill_title">Aggiungi account al tuo portafoglio</string>
-    <string name="account_ledger_import_start_guide">Guida ufficiale alla connessione Bluetooth di Ledger</string>
+    <string name="account_ledger_import_start_guide">Guida alla Connessione Ledger</string>
     <string name="account_ledger_import_start_step_1">Assicurati che l\'app di %s sul tuo dispositivo Ledger utilizzando l\'app Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">l\'app Network è installata</string>
     <string name="account_ledger_import_start_step_2">%s sul tuo dispositivo Ledger</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">accedere a Bluetooth e Posizione</string>
     <string name="account_ledger_import_start_step_4">%s da aggiungere al portafoglio</string>
     <string name="account_ledger_import_start_step_4_highlighted">Seleziona account</string>
-    <string name="account_ledger_import_start_title">Collega Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s nelle impostazioni del tuo telefono</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Abilita OTG</string>
+    <string name="account_ledger_import_start_title">Connetti Ledger</string>
     <string name="account_ledger_legacy_warning_message">Per firmare operazioni e migrare i tuoi account alla nuova app Generic Ledger, installa e apri l\'app Migration. Le app Ledger Legacy e Migration non saranno supportate in futuro.</string>
     <string name="account_ledger_legacy_warning_title">È stata rilasciata una nuova app Ledger</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">L\'app Migration sarà non più disponibile nel prossimo futuro. Usala per migrare i tuoi account alla nuova app Ledger per evitare di perdere i tuoi fondi.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (applicazione Generic Polkadot)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Se utilizzi un Ledger via Bluetooth, abilita il Bluetooth su entrambi i dispositivi e concedi i permessi di Bluetooth e posizione a Nova. Per l\'USB, abilita OTG nelle impostazioni del tuo telefono.</string>
     <string name="account_ledger_select_device_description">Si prega di abilitare Bluetooth nelle impostazioni del telefono e sul dispositivo Ledger. Sblocca il tuo dispositivo Ledger e apri l\'app %s.</string>
     <string name="account_ledger_select_device_title">Seleziona il tuo dispositivo Ledger</string>
+    <string name="account_ledger_select_device_usb_description">Per favore, abilita il dispositivo Ledger. Sblocca il tuo dispositivo Ledger e apri l\'app %s.</string>
     <string name="account_mnmonic_length_variants">Frase di 12, 15, 18, 21 o 24 parole</string>
     <string name="account_needed_message">Non hai un account per questa rete, puoi creare o importare un account.</string>
     <string name="account_needed_title">Account necessario</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s non supporta la firma di messaggi arbitrari — solo transazioni</string>
     <string name="account_parity_signer_not_supported_title">La firma non è supportata</string>
     <string name="account_parity_signer_scan_from">Scansiona il codice QR da %s</string>
-    <string name="account_parity_signer_scan_with">Scansiona il codice QR con il %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Legacy</string>
+    <string name="account_parity_signer_show_mode_new">Nuovo (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">Ho un errore in %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Il codice QR è scaduto</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Per motivi di sicurezza le operazioni generate sono valide solo per %s.\nGenera un nuovo codice QR e firmalo con %s</string>
@@ -173,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Hai raggiunto il limite di %s proxy aggiunti in %s. Rimuovi i proxy per aggiungerne di nuovi</string>
     <string name="add_proxy_maximum_reached_error_title">Limite massimo di proxy raggiunto</string>
     <string name="added_networks_empty_placeholder">Le reti personalizzate aggiunte\nappariranno qui</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Colorato</string>
     <string name="appearance_title">Aspetto</string>
     <string name="appearance_token_assets_title">icone dei token</string>
@@ -240,12 +247,16 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Backup</string>
     <string name="backup_title">Backup</string>
+    <string name="banxa_provider_description">Processo KYC semplice ed efficiente</string>
     <string name="biometric_auth_title">Autenticazione biometrica</string>
     <string name="browser_tabs_close_all">Chiudi tutto</string>
     <string name="buy_completed">Acquisto iniziato! Attendi fino a 60 minuti. Puoi controllare lo stato sulla email.</string>
     <string name="buy_network_flow_title">Seleziona la rete per l\'acquisto di %s</string>
+    <string name="buy_order_completed_message">Acquisto avviato! Attendere fino a 60 minuti. Puoi monitorare lo stato tramite email.</string>
     <string name="buy_provider_open_confirmation_message">Per continuare l\'acquisto sarai reindirizzato dall\'app Nova Wallet a %s</string>
     <string name="buy_provider_open_confirmation_title">Continuare nel browser?</string>
+    <string name="buy_token_not_supported_message">Nessuno dei nostri fornitori supporta attualmente l\'acquisto di questo token. Scegli un token diverso, una rete diversa o riprova più tardi.</string>
+    <string name="buy_token_not_supported_title">Questo token non è supportato dalla funzionalità di acquisto</string>
     <string name="chain_network_management_auto_balance">Bilanciamento automatico dei nodi</string>
     <string name="chain_network_management_enabling">Abilita connessione</string>
     <string name="change_cloud_backup_password_subtitle">Inserisci una password che verrà utilizzata per recuperare i tuoi portafogli dal backup su cloud. Questa password non può essere recuperata in futuro, quindi assicurati di ricordarla!</string>
@@ -752,6 +763,7 @@
     <string name="fee_not_yet_loaded_message">Attendere fino al calcolo della commissione</string>
     <string name="fee_not_yet_loaded_title">Il calcolo della commissione è in corso</string>
     <string name="fragment_assets_nova_card">Gestisci Carta di Debito</string>
+    <string name="fragment_sell_token_title">Vendi token %s</string>
     <string name="fragment_set_staking_proxy_title">Aggiungi delega per lo staking di %s</string>
     <string name="fragment_swap_main_settings_details_title">Dettagli dello swap</string>
     <string name="fragment_swap_main_settings_max_button">Massimo:</string>
@@ -806,12 +818,17 @@
     <string name="json_export_btn">Esporta file JSON</string>
     <string name="language_title">Lingua</string>
     <string name="ledger_chain_not_supported">Ledger non supporta %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">L\'operazione è stata annullata dal dispositivo. Assicurati di aver sbloccato il tuo Ledger.</string>
     <string name="ledger_error_app_cancelled_title">Operazione annullata</string>
     <string name="ledger_error_app_not_launched_message">Apri l\'applicazione %s sul tuo dispositivo Ledger</string>
     <string name="ledger_error_app_not_launched_title">Applicazione %s non avviata</string>
     <string name="ledger_error_general_message">Operazione completata con errore sul dispositivo. Per favore, riprova più tardi.</string>
     <string name="ledger_error_general_title">Operazione Ledger fallita</string>
+    <string name="ledger_hold_to_sign">Tieni premuto il pulsante di conferma sul tuo %s per approvare la transazione</string>
     <string name="ledger_import_select_address_load_more">Carica più account</string>
     <string name="ledger_review_approve_title">Revisione e Approvazione</string>
     <string name="ledger_sign_approve_message">Premi entrambi i pulsanti sul tuo %s per approvare la transazione</string>
@@ -824,7 +841,8 @@
     <string name="ledger_sign_transaction_validity_format">La transazione è valida per %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger non supporta questa transazione.</string>
     <string name="ledger_sign_tx_not_supported_title">La transazione non è supportata</string>
-    <string name="ledger_verify_address_subtitle">Premi entrambi i pulsanti sul tuo %s per approvare l\'indirizzo</string>
+    <string name="ledger_verify_address_message_both_buttons">Premi entrambi i pulsanti sul tuo %s per approvare l\'indirizzo</string>
+    <string name="ledger_verify_address_message_confirm_button">Premi il pulsante di conferma sul tuo %s per approvare l\'indirizzo</string>
     <string name="ledger_wallet_details_description">Questo portafoglio è abbinato a Ledger. Nova ti aiuterà a effettuare qualsiasi operazione desideri e ti verrà richiesto di firmarle usando Ledger</string>
     <string name="ledher_import_select_address_title">Seleziona l\'account da aggiungere al portafoglio</string>
     <string name="loading_network_info">Caricamento informazioni della rete...</string>
@@ -853,6 +871,7 @@
     <string name="manual_backup_select_wallet_header">Seleziona un portafoglio per il backup</string>
     <string name="manual_backup_warning_subtitle">Si prega di leggere attentamente quanto segue prima di visualizzare il backup</string>
     <string name="manual_backup_warning_title">Non condividere la tua frase segreta!</string>
+    <string name="mercurio_provider_description">Miglior prezzo con commissioni fino al 3,95%</string>
     <string name="mnemonic_card_reveal_subtitle">Assicurati che nessuno possa vedere il tuo schermo\ne non fare screenshot</string>
     <string name="mnemonic_card_title">Per favore %s nessuno</string>
     <string name="mnemonic_card_title_highlight">non condividere con</string>
@@ -1164,11 +1183,16 @@
     <string name="select_delegation_tracks_edit_title">Seleziona le tracce da modificare per la delega</string>
     <string name="select_delegation_tracks_revoke_title">Seleziona le tracce per revocare la tua delega</string>
     <string name="select_delegation_tracks_unavailable_tracks">Tracce non disponibili</string>
+    <string name="select_ledger_grant_permissions">Abilita Bluetooth &amp; Concedi Permessi</string>
     <string name="select_ledger_location_enable_request_message">Nova ha bisogno che la posizione sia attivata per poter effettuare la scansione Bluetooth per trovare il tuo dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Si prega di abilitare la geolocalizzazione nelle impostazioni del dispositivo</string>
     <string name="select_network_title">Seleziona rete</string>
     <string name="select_tracks_for">Seleziona brani per</string>
     <string name="selected_tracks_quantity" formatted="false">%d di %d</string>
+    <string name="sell_network_flow_title">Seleziona la rete per vendere %s</string>
+    <string name="sell_order_completed_message">Vendita avviata! Attendi fino a 60 minuti. Puoi monitorare lo stato tramite email.</string>
+    <string name="sell_token_not_supported_message">Nessuno dei nostri fornitori supporta attualmente la vendita di questo token. Scegli un token diverso, una rete diversa o riprova più tardi.</string>
+    <string name="sell_token_not_supported_title">Questo token non è supportato dalla funzionalità di vendita</string>
     <string name="send_address_hint">Indirizzo o w3n</string>
     <string name="send_network_flow_title">Seleziona la rete per inviare %s</string>
     <string name="send_recipient_system_account_message">Il destinatario è un conto di sistema. Non è controllato da alcuna azienda o individuo.\nSei sicuro di voler comunque effettuare questo trasferimento?</string>
@@ -1512,6 +1536,8 @@
     <string name="start_create_wallet_name_your_wallet">Dai un nome al tuo wallet</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Questo sarà visibile solo a te e potrai modificarlo in seguito.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Il tuo wallet è pronto</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Hai bloccato token sul tuo saldo a causa di %s. Per continuare, dovresti inserire meno di %s o più di %s. Per bloccare un\'altra quantità, dovresti rimuovere i tuoi blocchi %s.</string>
     <string name="start_staking_cant_stake_amount">Non puoi bloccare l\'importo specificato</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Selezionato: %d (massimo %d)</string>
@@ -1645,6 +1671,11 @@
     <string name="tabbar_wallet_title">Portafoglio</string>
     <string name="today">Oggi</string>
     <string name="token_price_info_provider_label">Collegamento Coingecko per informazioni sul prezzo (opzionale)</string>
+    <string name="trade_provider_list_buy_title">Seleziona un fornitore per acquistare il token %s</string>
+    <string name="trade_provider_list_footer">Metodi di pagamento, commissioni e limiti variano a seconda del fornitore.\nConfronta le loro offerte per trovare l\'opzione migliore per te.</string>
+    <string name="trade_provider_list_sell_title">Seleziona un fornitore per vendere il token %s</string>
+    <string name="trade_token_not_supported_message">Nessuno dei nostri fornitori supporta attualmente l\'acquisto o la vendita di questo token. Scegli un token diverso, una rete diversa o riprova più tardi.</string>
+    <string name="trade_token_not_supported_title">Questo token non è supportato dalla funzionalità di acquisto/vendita</string>
     <string name="transaction_details_copy_hash">Copia hash</string>
     <string name="transaction_details_extrinsic_fee">Commissione</string>
     <string name="transaction_details_from">Da</string>
@@ -1658,6 +1689,8 @@
     <string name="transaction_status_failed">Fallito</string>
     <string name="transaction_status_pending">In sospeso</string>
     <string name="transactions_notification_channel_name">Canale di Notifica Transazioni</string>
+    <string name="transak_provider_buy_description">Acquista criptovaluta a partire da soli $5</string>
+    <string name="transak_provider_sell_description">Vendi criptovaluta a partire da soli $10</string>
     <string name="transfer_history_income_from">Da: %s</string>
     <string name="transfer_history_send_to">A: %s</string>
     <string name="transfer_title">Trasferimento</string>
@@ -1695,10 +1728,14 @@
     <string name="waiting_top_up_card_description">Può richiedere fino a 5 minuti.\nQuesta finestra si chiuderà automaticamente.</string>
     <string name="waiting_top_up_card_timer">Stimato %s</string>
     <string name="wallet_asset_buy">Acquista</string>
+    <string name="wallet_asset_buy_sell">Acquista/Vendi</string>
+    <string name="wallet_asset_buy_tokens">Acquista token</string>
     <string name="wallet_asset_buy_with">Acquista con</string>
     <string name="wallet_asset_receive">Ricevi</string>
     <string name="wallet_asset_receive_token">Ricevi %s</string>
     <string name="wallet_asset_receive_token_subtitle">Invia solo token %1$s e token nella rete %2$s a questo indirizzo, altrimenti potresti perdere i tuoi fondi</string>
+    <string name="wallet_asset_sell">Vendi</string>
+    <string name="wallet_asset_sell_tokens">Vendi token</string>
     <string name="wallet_asset_send">Invia</string>
     <string name="wallet_asset_swap">Scambia</string>
     <string name="wallet_assets">Asset</string>

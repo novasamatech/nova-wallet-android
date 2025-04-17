@@ -3,24 +3,28 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.overview.web
 import android.net.Uri
 import android.webkit.WebView
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.utils.webView.BaseWebChromeClient
+import io.novafoundation.nova.common.utils.webView.BaseWebChromeClientFactory
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClient
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.model.CardSetupConfig
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.NovaCardInterceptor
+import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
 import kotlinx.coroutines.CoroutineScope
 
 class NovaCardWebViewControllerFactory(
-    private val novaCardWebViewClientFactory: NovaCardWebViewClientFactory,
-    private val novaCardWebChromeClientFactory: NovaCardWebChromeClientFactory,
+    private val interceptingWebViewClientFactory: InterceptingWebViewClientFactory,
+    private val novaCardWebChromeClientFactory: BaseWebChromeClientFactory,
     private val appLinksProvider: AppLinksProvider,
     private val widgetId: String
 ) {
 
     fun create(
-        interceptors: List<NovaCardInterceptor>,
+        interceptors: List<WebViewRequestInterceptor>,
         setupConfig: CardSetupConfig,
         scope: CoroutineScope,
     ): NovaCardWebViewController {
         return NovaCardWebViewController(
-            novaCardWebViewClient = novaCardWebViewClientFactory.create(interceptors),
+            interceptingWebViewClient = interceptingWebViewClientFactory.create(interceptors),
             novaCardWebChromeClient = novaCardWebChromeClientFactory.create(scope),
             appLinksProvider = appLinksProvider,
             setupConfig = setupConfig,
@@ -30,8 +34,8 @@ class NovaCardWebViewControllerFactory(
 }
 
 class NovaCardWebViewController(
-    private val novaCardWebViewClient: NovaCardWebViewClient,
-    private val novaCardWebChromeClient: NovaCardWebChromeClient,
+    private val interceptingWebViewClient: InterceptingWebViewClient,
+    private val novaCardWebChromeClient: BaseWebChromeClient,
     private val appLinksProvider: AppLinksProvider,
     private val setupConfig: CardSetupConfig,
     private val widgetId: String
@@ -47,7 +51,7 @@ class NovaCardWebViewController(
             displayZoomControls = false
         }
 
-        webView.webViewClient = novaCardWebViewClient
+        webView.webViewClient = interceptingWebViewClient
         webView.webChromeClient = novaCardWebChromeClient
 
         val uri = Uri.parse(appLinksProvider.novaCardWidgetUrl).buildUpon()

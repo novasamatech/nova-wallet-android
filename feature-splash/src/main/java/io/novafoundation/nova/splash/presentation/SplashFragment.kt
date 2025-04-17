@@ -1,27 +1,17 @@
 package io.novafoundation.nova.splash.presentation
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.splash.R
+import io.novafoundation.nova.splash.databinding.FragmentSplashBinding
 import io.novafoundation.nova.splash.di.SplashFeatureApi
 import io.novafoundation.nova.splash.di.SplashFeatureComponent
 import javax.inject.Inject
 
-class SplashFragment : BaseFragment<SplashViewModel>() {
+class SplashFragment : BaseFragment<SplashViewModel, FragmentSplashBinding>() {
+
+    override fun createBinding() = FragmentSplashBinding.inflate(layoutInflater)
 
     @Inject lateinit var splashViewModel: SplashViewModel
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_splash, container, false)
-    }
 
     override fun initViews() {
     }

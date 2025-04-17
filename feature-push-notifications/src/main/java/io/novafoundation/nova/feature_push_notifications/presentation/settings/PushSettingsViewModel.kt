@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.fromRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.utils.flowOf
@@ -111,7 +112,8 @@ class PushSettingsViewModel(
         launch {
             if (pushSettingsWasChangedState.first()) {
                 closeConfirmationAction.awaitAction(
-                    ConfirmationDialogInfo(
+                    ConfirmationDialogInfo.fromRes(
+                        resourceManager,
                         R.string.common_confirmation_title,
                         R.string.common_close_confirmation_message,
                         R.string.common_close,
@@ -139,7 +141,7 @@ class PushSettingsViewModel(
     fun enableSwitcherClicked() {
         launch {
             if (!pushEnabledState.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
+                val isPermissionsGranted = permissionsAsker.requirePermissions(Manifest.permission.POST_NOTIFICATIONS)
 
                 if (!isPermissionsGranted) {
                     return@launch

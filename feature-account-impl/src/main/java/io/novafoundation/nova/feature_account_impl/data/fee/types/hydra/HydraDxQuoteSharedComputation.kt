@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.types.hydra
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.SharedComputation
 import io.novafoundation.nova.common.data.memory.SharedFlowCache
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.graph.Graph
@@ -27,7 +28,7 @@ class HydraDxQuoteSharedComputation(
     private val pathQuoterFactory: PathQuoter.Factory,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val chainStateRepository: ChainStateRepository,
-) {
+) : SharedComputation(computationalCache) {
 
     suspend fun getQuoter(
         chain: Chain,

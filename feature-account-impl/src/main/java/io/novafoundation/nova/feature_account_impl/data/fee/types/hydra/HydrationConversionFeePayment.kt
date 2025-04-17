@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quote
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -22,6 +23,7 @@ internal class HydrationConversionFeePayment(
     private val chainRegistry: ChainRegistry,
     private val hydrationFeeInjector: HydrationFeeInjector,
     private val hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
+    private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
     private val accountRepository: AccountRepository,
     private val coroutineScope: CoroutineScope
 ) : FeePayment {
@@ -41,15 +43,20 @@ internal class HydrationConversionFeePayment(
         val fromAsset = chain.commissionAsset
 
         val quoter = hydraDxQuoteSharedComputation.getQuoter(chain, accountId, coroutineScope)
-        val quote = quoter.findBestPath(
-            chainAssetIn = fromAsset,
-            chainAssetOut = paymentAsset,
-            amount = nativeFee.amount,
-            swapDirection = SwapDirection.SPECIFIED_IN
-        )
+
+        val convertedAmount = runCatching {
+            quoter.findBestPath(
+                chainAssetIn = fromAsset,
+                chainAssetOut = paymentAsset,
+                amount = nativeFee.amount,
+                swapDirection = SwapDirection.SPECIFIED_IN
+            ).bestPath.quote
+        }
+            .recoverCatching { hydrationPriceConversionFallback.convertNativeAmount(nativeFee.amount, paymentAsset) }
+            .getOrThrow()
 
         return SubstrateFee(
-            amount = quote.bestPath.quote,
+            amount = convertedAmount,
             submissionOrigin = nativeFee.submissionOrigin,
             asset = paymentAsset
         )

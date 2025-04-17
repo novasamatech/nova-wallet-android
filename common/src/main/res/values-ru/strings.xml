@@ -70,10 +70,12 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot приложение установлено</string>
     <string name="account_ledger_generic_import_start_step_2">%s на своем устройстве Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Откройте Polkadot приложение</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string>
     <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
     <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
     <string name="account_ledger_import_fill_title">Добавьте аккаунты в Ваш кошелёк</string>
-    <string name="account_ledger_import_start_guide">Инструкция по подключению Ledger</string>
+    <string name="account_ledger_import_start_guide">Руководство по подключению Ledger</string>
     <string name="account_ledger_import_start_step_1">Удостоверьтесь, что %s на Ваше устройство Ledger, используя приложение Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">приложение Сети установлено</string>
     <string name="account_ledger_import_start_step_2">%s на Вашем Ledger устройстве</string>
@@ -82,17 +84,20 @@
     <string name="account_ledger_import_start_step_3_highlighted">доступ к Bluetooth и Гео-локации</string>
     <string name="account_ledger_import_start_step_4">%s для добавления в кошелёк</string>
     <string name="account_ledger_import_start_step_4_highlighted">Выберите аккаунт</string>
-    <string name="account_ledger_import_start_title">Подключите Ledger Nano X</string>
+    <string name="account_ledger_import_start_step_otg">%s в настройках вашего телефона</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Включите OTG</string>
+    <string name="account_ledger_import_start_title">Подключите Ledger</string>
     <string name="account_ledger_legacy_warning_message">Чтобы подписать операции и перенести свои учетные записи в новое приложение Generic Ledger, установите и откройте приложение Migration. Приложения Ledger (Legacy) и Migration Ledger не будут поддерживаться в будущем.</string>
     <string name="account_ledger_legacy_warning_title">Выпущено новое приложение Ledger</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration приложение в ближайшее время будет недоступно. Используйте его для переноса своих учетных записей в новое приложение Ledger, чтобы не потерять свои средства.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot приложение)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+    <string name="account_ledger_select_device_all_description">Если вы используете Ledger через Bluetooth, включите Bluetooth на обоих устройствах и предоставьте Nova разрешения на использование Bluetooth и местоположения. Для USB включите OTG в настройках вашего телефона.</string>
     <string name="account_ledger_select_device_description">Пожалуйста, включите Bluetooth в настройках телефона. Разблокируйте Ledger устройство и откройте %s приложение.</string>
     <string name="account_ledger_select_device_title">Выберите устройство Ledger</string>
+    <string name="account_ledger_select_device_usb_description">Пожалуйста, активируйте устройство Ledger. Разблокируйте ваше устройство Ledger и откройте приложение %s.</string>
     <string name="account_mnmonic_length_variants">фраза длиной 12, 15, 18, 21 или 24 слова</string>
     <string name="account_needed_message">У вас нет учетной записи в этой сети, вы можете создать или импортировать учетную запись.</string>
     <string name="account_needed_title">Необходим аккаунт</string>
@@ -113,7 +118,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s не поддерживает подписание произвольных сообщений — только транзакции</string>
     <string name="account_parity_signer_not_supported_title">Подписание не поддерживается</string>
     <string name="account_parity_signer_scan_from">Отсканируйте QR-код из %s</string>
-    <string name="account_parity_signer_scan_with">Отсканируйте QR-код с помощью %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Устаревший</string>
+    <string name="account_parity_signer_show_mode_new">Новый (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">У меня ошибка в %s</string>
     <string name="account_parity_signer_sign_qr_code_expired">Срок действия QR-кода истек</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">В целях безопасности сгенерированные операции действительны только в течение %s.\nПожалуйста, сгенерируйте новый QR-код и подпишите его с помощью %s</string>
@@ -173,6 +179,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Вы достигли лимита добавленных прокси (%s) в %s . Удалите прокси, чтобы добавить новые.</string>
     <string name="add_proxy_maximum_reached_error_title">Достигнуто максимальное количество прокси</string>
     <string name="added_networks_empty_placeholder">Добавленные пользовательские сети\nпоявятся здесь</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Цветной</string>
     <string name="appearance_title">Внешний вид</string>
     <string name="appearance_token_assets_title">иконки токенов</string>
@@ -240,12 +247,16 @@
     <string name="backup_settings_title">Google Диск</string>
     <string name="backup_settings_toolbar_title">Бэкап</string>
     <string name="backup_title">Бэкап</string>
+    <string name="banxa_provider_description">Простой и эффективный процесс KYC</string>
     <string name="biometric_auth_title">Биометрия</string>
     <string name="browser_tabs_close_all">Закрыть все</string>
     <string name="buy_completed">Покупка совершена! Ожидайте до 60 минут. Вы можете отслеживать статус по электронной почте.</string>
     <string name="buy_network_flow_title">Выберите сеть для покупки %s</string>
+    <string name="buy_order_completed_message">Покупка инициирована! Пожалуйста, подождите до 60 минут. Вы можете отслеживать статус по email.</string>
     <string name="buy_provider_open_confirmation_message">Для продолжения покупки вы будете перенаправлены из приложения Nova Wallet на сайт %s</string>
     <string name="buy_provider_open_confirmation_title">Продолжить в браузере?</string>
+    <string name="buy_token_not_supported_message">Ни один из наших провайдеров в настоящее время не поддерживает покупку этого токена. Пожалуйста, выберите другой токен, другую сеть или попробуйте позже.</string>
+    <string name="buy_token_not_supported_title">Этот токен не поддерживается функцией покупки</string>
     <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
     <string name="chain_network_management_enabling">Включить подключение</string>
     <string name="change_cloud_backup_password_subtitle">Введите пароль, который будет использоваться для восстановления ваших кошельков из облачного бэкапа. Этот пароль нельзя будет восстановить в будущем, поэтому обязательно запомните его!</string>
@@ -764,6 +775,7 @@
     <string name="fee_not_yet_loaded_message">Подождите, пока будет рассчитана комиссия</string>
     <string name="fee_not_yet_loaded_title">Расчет комиссии в процессе</string>
     <string name="fragment_assets_nova_card">Управление картой</string>
+    <string name="fragment_sell_token_title">Продать токен %s</string>
     <string name="fragment_set_staking_proxy_title">Добавить делегацию для %s стекинга</string>
     <string name="fragment_swap_main_settings_details_title">Детали обмена</string>
     <string name="fragment_swap_main_settings_max_button">Макс:</string>
@@ -820,12 +832,17 @@
     <string name="json_export_btn">Экспортировать JSON-файл</string>
     <string name="language_title">Язык</string>
     <string name="ledger_chain_not_supported">Ledger не поддерживает %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">Операция была отменена устройством. Удостоверьтесь, что Ledger разблокирован.</string>
     <string name="ledger_error_app_cancelled_title">Операция отменена</string>
     <string name="ledger_error_app_not_launched_message">Откройте %s приложение на вашем Ledger устройстве</string>
     <string name="ledger_error_app_not_launched_title">%s приложение не запущено</string>
     <string name="ledger_error_general_message">Операция завершилась ошибкой на устройстве. Пожалуйста, попробуйте позже.</string>
     <string name="ledger_error_general_title">Ошибка Ledger</string>
+    <string name="ledger_hold_to_sign">Удерживайте кнопку подтверждения на вашем %s для одобрения транзакции</string>
     <string name="ledger_import_select_address_load_more">Загрузить больше аккаунтов</string>
     <string name="ledger_review_approve_title">Проверьте и Подтвердите</string>
     <string name="ledger_sign_approve_message">Нажмите обе кнопки на Вашем %s для подтверждения транзакции</string>
@@ -838,7 +855,8 @@
     <string name="ledger_sign_transaction_validity_format">Транзакция валидна %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger не поддерживает данную транзакцию.</string>
     <string name="ledger_sign_tx_not_supported_title">Транзакция не поддерживается</string>
-    <string name="ledger_verify_address_subtitle">Нажмите обе кнопки на Вашем %s для подтверждения адреса</string>
+    <string name="ledger_verify_address_message_both_buttons">Нажмите обе кнопки на вашем %s для одобрения адреса</string>
+    <string name="ledger_verify_address_message_confirm_button">Нажмите кнопку подтверждения на вашем %s для одобрения адреса</string>
     <string name="ledger_wallet_details_description">Этот кошелёк добавлен из Ledger устройства. Nova Wallet поможет создать любую операцию, и вам будет необходимо подписать ее с помощью Ledger устройства</string>
     <string name="ledher_import_select_address_title">Выберите аккаунт для добавления в кошелёк</string>
     <string name="loading_network_info">Загрузка информации о сети...</string>
@@ -867,6 +885,7 @@
     <string name="manual_backup_select_wallet_header">Выберите кошелёк для бэкапа</string>
     <string name="manual_backup_warning_subtitle">Пожалуйста, внимательно прочитайте следующее перед просмотром своего бэкапа</string>
     <string name="manual_backup_warning_title">Не сообщайте свою секретную фразу!</string>
+    <string name="mercurio_provider_description">Лучшая цена с комиссиями до 3.95%</string>
     <string name="mnemonic_card_reveal_subtitle">Убедитесь, что никто не видит ваш экран,\nи не делайте скриншотов</string>
     <string name="mnemonic_card_title">Пожалуйста %s ни с кем</string>
     <string name="mnemonic_card_title_highlight">не делитесь</string>
@@ -1182,11 +1201,16 @@
     <string name="select_delegation_tracks_edit_title">Выберите треки для изменения делегации</string>
     <string name="select_delegation_tracks_revoke_title">Выберите треки для отмены делегации</string>
     <string name="select_delegation_tracks_unavailable_tracks">Недоступные треки</string>
+    <string name="select_ledger_grant_permissions">Включите Bluetooth и предоставьте разрешения</string>
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
     <string name="select_network_title">Выберите сеть</string>
     <string name="select_tracks_for">Выберите треки для</string>
     <string name="selected_tracks_quantity" formatted="false">%d из %d</string>
+    <string name="sell_network_flow_title">Выберите сеть для продажи %s</string>
+    <string name="sell_order_completed_message">Продажа инициирована! Пожалуйста, подождите до 60 минут. Вы можете отслеживать статус по email.</string>
+    <string name="sell_token_not_supported_message">Ни один из наших провайдеров в настоящее время не поддерживает продажу этого токена. Пожалуйста, выберите другой токен, другую сеть или попробуйте позже.</string>
+    <string name="sell_token_not_supported_title">Этот токен не поддерживается функцией продажи</string>
     <string name="send_address_hint">Адрес или w3n</string>
     <string name="send_network_flow_title">Выберите сеть для отправки %s</string>
     <string name="send_recipient_system_account_message">Получатель является системным аккаунтом. Этот аккаунт не контролируется какой-либо компанией или частным лицом. \nВы уверены, что все еще хотите выполнить данный перевод?</string>
@@ -1534,6 +1558,8 @@
     <string name="start_create_wallet_name_your_wallet">Назовите свой кошелёк</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Оно будет видно только вам и может быть изменено позже.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Ваш кошелёк готов</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Вы заблокировали токены на своем балансе используя %s. Чтобы продолжить, вам следует ввести меньше %s или больше %s. Чтобы поставить еще одну сумму, вам следует разблокировать токены из %s.</string>
     <string name="start_staking_cant_stake_amount">Вы не можете застейкать указанную сумму</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Выбрано: %d (макс. %d)</string>
@@ -1669,6 +1695,11 @@
     <string name="tabbar_wallet_title">Кошелёк</string>
     <string name="today">Сегодня</string>
     <string name="token_price_info_provider_label">Ссылка Coingecko для курса валют (необязательно)</string>
+    <string name="trade_provider_list_buy_title">Выберите провайдера для покупки токена %s</string>
+    <string name="trade_provider_list_footer">Методы оплаты, комиссии и лимиты различаются в зависимости от провайдера.\nСравните их предложения, чтобы найти лучший вариант для вас.</string>
+    <string name="trade_provider_list_sell_title">Выберите провайдера для продажи токена %s</string>
+    <string name="trade_token_not_supported_message">Ни один из наших провайдеров в настоящее время не поддерживает покупку или продажу этого токена. Пожалуйста, выберите другой токен, другую сеть или попробуйте позже.</string>
+    <string name="trade_token_not_supported_title">Этот токен не поддерживается функцией покупки/продажи</string>
     <string name="transaction_details_copy_hash">Копировать хеш</string>
     <string name="transaction_details_extrinsic_fee">Комиссия</string>
     <string name="transaction_details_from">От</string>
@@ -1682,6 +1713,8 @@
     <string name="transaction_status_failed">Ошибка</string>
     <string name="transaction_status_pending">В ожидании</string>
     <string name="transactions_notification_channel_name">Канал уведомлений о транзакциях</string>
+    <string name="transak_provider_buy_description">Купите криптовалюту начиная с $5</string>
+    <string name="transak_provider_sell_description">Продайте криптовалюту начиная с $10</string>
     <string name="transfer_history_income_from">От: %s</string>
     <string name="transfer_history_send_to">Кому: %s</string>
     <string name="transfer_title">Перевод</string>
@@ -1719,10 +1752,14 @@
     <string name="waiting_top_up_card_description">Это может занять до 5 минут.\nЭто окно закроется автоматически.</string>
     <string name="waiting_top_up_card_timer">Примерно %s</string>
     <string name="wallet_asset_buy">Купить</string>
+    <string name="wallet_asset_buy_sell">Купить/Продать</string>
+    <string name="wallet_asset_buy_tokens">Купить токены</string>
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>
     <string name="wallet_asset_receive_token">Получить %s</string>
     <string name="wallet_asset_receive_token_subtitle">Отправляйте только токен %1$s и токены в сети %2$s на этот адрес, иначе вы можете потерять свои средства</string>
+    <string name="wallet_asset_sell">Продать</string>
+    <string name="wallet_asset_sell_tokens">Продать токены</string>
     <string name="wallet_asset_send">Перевести</string>
     <string name="wallet_asset_swap">Обменять</string>
     <string name="wallet_assets">Активы</string>

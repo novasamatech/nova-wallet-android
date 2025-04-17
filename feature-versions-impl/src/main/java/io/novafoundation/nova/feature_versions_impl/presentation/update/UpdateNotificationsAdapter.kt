@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_versions_impl.presentation.update
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -8,18 +7,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_versions_impl.R
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationDate
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationDescription
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationLatest
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationSeverity
-import kotlinx.android.synthetic.main.item_update_notification.view.itemNotificationVersion
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationAlertSubtitle
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationAlertTitle
-import kotlinx.android.synthetic.main.item_update_notification_header.view.itemUpdateNotificationBanner
+import io.novafoundation.nova.feature_versions_impl.databinding.ItemUpdateNotificationBinding
+import io.novafoundation.nova.feature_versions_impl.databinding.ItemUpdateNotificationHeaderBinding
+import io.novafoundation.nova.feature_versions_impl.databinding.ItemUpdateNotificationSeeAllBinding
 
 class UpdateNotificationsAdapter(private val seeAllClickedListener: SeeAllClickedListener) : ListAdapter<Any, ViewHolder>(
     DiffCallback
@@ -37,9 +31,9 @@ class UpdateNotificationsAdapter(private val seeAllClickedListener: SeeAllClicke
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            TYPE_HEADER -> UpdateNotificationBannerHolder(parent.inflateChild(R.layout.item_update_notification_header))
-            TYPE_VERSION -> UpdateNotificationHolder(parent.inflateChild(R.layout.item_update_notification))
-            TYPE_SEE_ALL -> SeeAllButtonHolder(parent.inflateChild(R.layout.item_update_notification_see_all), seeAllClickedListener)
+            TYPE_HEADER -> UpdateNotificationBannerHolder(ItemUpdateNotificationHeaderBinding.inflate(parent.inflater(), parent, false))
+            TYPE_VERSION -> UpdateNotificationHolder(ItemUpdateNotificationBinding.inflate(parent.inflater(), parent, false))
+            TYPE_SEE_ALL -> SeeAllButtonHolder(ItemUpdateNotificationSeeAllBinding.inflate(parent.inflater(), parent, false), seeAllClickedListener)
             else -> throw IllegalStateException()
         }
     }
@@ -73,39 +67,42 @@ private object DiffCallback : DiffUtil.ItemCallback<Any>() {
     }
 }
 
-class UpdateNotificationBannerHolder(view: View) : GroupedListHolder(view) {
+class UpdateNotificationBannerHolder(private val binder: ItemUpdateNotificationHeaderBinding) : GroupedListHolder(binder.root) {
 
     fun bind(item: UpdateNotificationBannerModel) {
-        itemView.itemUpdateNotificationBanner.setImage(item.iconRes)
-        itemView.itemUpdateNotificationBanner.setBannerBackground(item.backgroundRes)
-        itemView.itemUpdateNotificationAlertTitle.text = item.title
-        itemView.itemUpdateNotificationAlertSubtitle.text = item.message
+        binder.itemUpdateNotificationBanner.setImage(item.iconRes)
+        binder.itemUpdateNotificationBanner.setBannerBackground(item.backgroundRes)
+        binder.itemUpdateNotificationAlertTitle.text = item.title
+        binder.itemUpdateNotificationAlertSubtitle.text = item.message
     }
 }
 
-class UpdateNotificationHolder(view: View) : GroupedListHolder(view) {
+class UpdateNotificationHolder(private val binder: ItemUpdateNotificationBinding) : GroupedListHolder(binder.root) {
 
     init {
-        itemView.itemNotificationLatest.background = view.context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 6)
+        binder.itemNotificationLatest.background = binder.root.context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 6)
     }
 
     fun bind(item: UpdateNotificationModel) {
-        itemView.itemNotificationVersion.text = itemView.context.getString(R.string.update_notification_item_version, item.version)
-        itemView.itemNotificationDescription.text = item.changelog
+        binder.itemNotificationVersion.text = itemView.context.getString(R.string.update_notification_item_version, item.version)
+        binder.itemNotificationDescription.text = item.changelog
 
-        itemView.itemNotificationSeverity.isGone = item.severity == null
-        itemView.itemNotificationSeverity.text = item.severity
-        item.severityColorRes?.let { itemView.itemNotificationSeverity.setTextColorRes(it) }
-        item.severityBackgroundRes?.let { itemView.itemNotificationSeverity.background = itemView.context.getRoundedCornerDrawable(it, cornerSizeInDp = 6) }
+        binder.itemNotificationSeverity.isGone = item.severity == null
+        binder.itemNotificationSeverity.text = item.severity
+        item.severityColorRes?.let { binder.itemNotificationSeverity.setTextColorRes(it) }
+        item.severityBackgroundRes?.let { binder.itemNotificationSeverity.background = itemView.context.getRoundedCornerDrawable(it, cornerSizeInDp = 6) }
 
-        itemView.itemNotificationLatest.isVisible = item.isLatestUpdate
-        itemView.itemNotificationDate.text = item.date
+        binder.itemNotificationLatest.isVisible = item.isLatestUpdate
+        binder.itemNotificationDate.text = item.date
     }
 }
 
-class SeeAllButtonHolder(view: View, seeAllClickedListener: UpdateNotificationsAdapter.SeeAllClickedListener) : GroupedListHolder(view) {
+class SeeAllButtonHolder(
+    private val binder: ItemUpdateNotificationSeeAllBinding,
+    seeAllClickedListener: UpdateNotificationsAdapter.SeeAllClickedListener
+) : GroupedListHolder(binder.root) {
 
     init {
-        view.setOnClickListener { seeAllClickedListener.onSeeAllClicked() }
+        binder.root.setOnClickListener { seeAllClickedListener.onSeeAllClicked() }
     }
 }

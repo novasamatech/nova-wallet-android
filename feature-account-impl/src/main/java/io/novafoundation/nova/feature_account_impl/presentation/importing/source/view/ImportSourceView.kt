@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.annotation.LayoutRes
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
@@ -17,7 +16,6 @@ class ImportAccountNameViews(
 )
 
 abstract class ImportSourceView<S : ImportSource> @JvmOverloads constructor(
-    @LayoutRes layoutId: Int,
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -26,8 +24,6 @@ abstract class ImportSourceView<S : ImportSource> @JvmOverloads constructor(
     protected abstract val nameInputViews: ImportAccountNameViews
 
     init {
-        View.inflate(context, layoutId, this)
-
         orientation = VERTICAL
     }
 

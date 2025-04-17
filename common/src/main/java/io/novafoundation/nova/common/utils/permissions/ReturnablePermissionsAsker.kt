@@ -1,5 +1,7 @@
 package io.novafoundation.nova.common.utils.permissions
 
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.florent37.runtimepermission.kotlin.PermissionException
 import com.github.florent37.runtimepermission.kotlin.coroutines.experimental.askPermission
@@ -30,7 +32,7 @@ private open class BasePermissionsAsker(
 
     override val showPermissionsDenied = actionAwaitableMixinFactory.create<PermissionDeniedLevel, PermissionDeniedAction>()
 
-    override suspend fun requirePermissionsOrExit(vararg permissions: Permission): Boolean {
+    override suspend fun requirePermissions(vararg permissions: Permission): Boolean {
         try {
             fragment.askPermission(*permissions)
 
@@ -50,9 +52,15 @@ private open class BasePermissionsAsker(
         }
     }
 
+    override fun checkPermissions(vararg permissions: Permission): Boolean {
+        return permissions.all {
+            ContextCompat.checkSelfPermission(fragment.requireContext(), it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
     protected suspend fun onRetry(e: PermissionException, vararg permissions: Permission): Boolean {
         if (e.hasDenied()) {
-            return requirePermissionsOrExit(*permissions)
+            return requirePermissions(*permissions)
         }
 
         if (e.hasForeverDenied()) {

@@ -1,16 +1,14 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.common.holders
 
-import android.view.View
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.feature_assets.databinding.ItemNetworkAssetGroupBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkGroupUi
-import kotlinx.android.synthetic.main.item_network_asset_group.view.itemAssetGroupBalance
-import kotlinx.android.synthetic.main.item_network_asset_group.view.itemAssetGroupChain
 
 class NetworkAssetGroupViewHolder(
-    containerView: View,
-) : GroupedListHolder(containerView) {
+    private val binder: ItemNetworkAssetGroupBinding,
+) : GroupedListHolder(binder.root) {
 
-    fun bind(assetGroup: NetworkGroupUi) = with(containerView) {
+    fun bind(assetGroup: NetworkGroupUi) = with(binder) {
         itemAssetGroupChain.setChain(assetGroup.chainUi)
         itemAssetGroupBalance.text = assetGroup.groupBalanceFiat
     }

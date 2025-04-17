@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list
 
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
@@ -9,7 +10,7 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListAdapter
 import kotlinx.coroutines.flow.Flow
 
-abstract class BaseReferendaListFragment<V : BaseViewModel> : BaseFragment<V>(), ReferendaListAdapter.Handler {
+abstract class BaseReferendaListFragment<V : BaseViewModel, B : ViewBinding> : BaseFragment<V, B>(), ReferendaListAdapter.Handler {
 
     protected open val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.item_referenda_shimmering) }
     protected open val placeholderAdapter by lazy(LazyThreadSafetyMode.NONE) { EditablePlaceholderAdapter() }

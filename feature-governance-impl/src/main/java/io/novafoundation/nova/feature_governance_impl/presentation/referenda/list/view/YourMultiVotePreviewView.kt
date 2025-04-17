@@ -2,18 +2,17 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.li
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewYourVotePreviewBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourMultiVotePreviewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.model.YourVotePreviewModel
-import kotlinx.android.synthetic.main.view_your_vote_preview.view.itemReferendumYourVoteDetails
-import kotlinx.android.synthetic.main.view_your_vote_preview.view.itemReferendumYourVoteType
+
 import kotlin.math.max
 
 private const val MAX_SUPPORTED_VOTE_TYPES = 3
@@ -71,14 +70,15 @@ class YourVotePreviewView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
+    private val binder = ViewYourVotePreviewBinding.inflate(inflater(), this)
+
     init {
-        View.inflate(context, R.layout.view_your_vote_preview, this)
         setPadding(0, 12.dp, 0, 0)
     }
 
     fun setModel(maybeModel: YourVotePreviewModel?) = letOrHide(maybeModel) { model ->
-        itemReferendumYourVoteType.text = model.voteDirection.text
-        itemReferendumYourVoteType.setTextColorRes(model.voteDirection.textColor)
-        itemReferendumYourVoteDetails.text = model.details
+        binder.itemReferendumYourVoteType.text = model.voteDirection.text
+        binder.itemReferendumYourVoteType.setTextColorRes(model.voteDirection.textColor)
+        binder.itemReferendumYourVoteDetails.text = model.details
     }
 }

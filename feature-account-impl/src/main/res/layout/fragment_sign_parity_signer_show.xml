@@ -1,60 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/signParitySignerShowToolbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/account_parity_signer_sign_title" />
 
     <io.novafoundation.nova.common.view.LabeledTextView
-        style="@style/Widget.Nova.WalletWithAddress"
         android:id="@+id/signParitySignerShowAddress"
-        android:layout_width="match_parent"
+        style="@style/Widget.Nova.WalletWithAddress"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:actionIcon="@drawable/ic_more_horizontal"
-        android:layout_marginEnd="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signParitySignerShowToolbar" />
 
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="63" />
-
-    <TextView
-        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="26dp"
-        android:layout_marginEnd="26dp"
-        android:gravity="center_horizontal"
-        android:textColor="@color/text_primary"
-        android:id="@+id/signParitySignerSignLabel"
-        android:layout_gravity="center_horizontal"
-        tools:text="@string/account_parity_signer_scan_with" />
+    <io.novafoundation.nova.common.view.SegmentedTabLayout
+        android:id="@+id/signParitySignerShowMode"
+        style="@style/SegmentedTab"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="48dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signParitySignerShowAddress" />
 
     <io.novafoundation.nova.common.view.SlideShowView
         android:id="@+id/signParitySignerShowQr"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="280"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginStart="48dp"
         android:layout_marginTop="24dp"
-        android:padding="8dp"
+        android:layout_marginEnd="48dp"
         android:adjustViewBounds="true"
+        android:padding="8dp"
         android:scaleType="centerInside"
-        tools:background="@color/qr_code_background"
-        tools:layout_width="315dp" />
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signParitySignerShowMode"
+        app:layout_goneMarginTop="32dp"
+        tools:background="@color/qr_code_background" />
 
     <TextView
         android:id="@+id/signParitySignerShowTimer"
@@ -62,31 +64,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="24dp"
         android:layout_marginTop="24dp"
         android:textColor="@color/text_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signParitySignerShowQr"
         tools:text="QR code is valid for 5 min 39 sec" />
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="43" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/signParitySignerShowHaveError"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="@string/account_parity_signer_sign_have_error"
-        app:appearance="secondary" />
+        app:appearance="secondary"
+        app:layout_constraintBottom_toTopOf="@+id/signParitySignerShowContinue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/signParitySignerShowContinue"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/common_continue" />
-</LinearLayout>
+        android:text="@string/common_continue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

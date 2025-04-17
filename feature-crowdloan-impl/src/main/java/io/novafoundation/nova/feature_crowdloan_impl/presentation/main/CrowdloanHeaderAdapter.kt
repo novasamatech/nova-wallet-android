@@ -1,26 +1,17 @@
 package io.novafoundation.nova.feature_crowdloan_impl.presentation.main
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_crowdloan_impl.R
+import io.novafoundation.nova.feature_crowdloan_impl.databinding.ItemCrowdloanHeaderBinding
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.statefull.StatefulCrowdloanMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAbout
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanAssetSelector
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanMainDescription
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedContainer
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedFiat
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedShimmering
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributedValue
-import kotlinx.android.synthetic.main.item_crowdloan_header.view.crowdloanTotalContributionsCount
 
 class CrowdloanHeaderAdapter(
     private val imageLoader: ImageLoader,
@@ -39,7 +30,7 @@ class CrowdloanHeaderAdapter(
     private var aboutDescription: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeaderHolder {
-        return HeaderHolder(imageLoader, parent.inflateChild(R.layout.item_crowdloan_header), handler)
+        return HeaderHolder(imageLoader, ItemCrowdloanHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
@@ -87,18 +78,18 @@ private enum class Payload {
 
 class HeaderHolder(
     private val imageLoader: ImageLoader,
-    view: View,
+    private val binder: ItemCrowdloanHeaderBinding,
     handler: CrowdloanHeaderAdapter.Handler
-) : RecyclerView.ViewHolder(view) {
+) : RecyclerView.ViewHolder(binder.root) {
 
     init {
-        itemView.crowdloanAssetSelector.setOnClickListener { handler.onClickAssetSelector() }
-        itemView.crowdloanTotalContributedContainer.setOnClickListener { handler.onClickContributionsInfo() }
+        binder.crowdloanAssetSelector.setOnClickListener { handler.onClickAssetSelector() }
+        binder.crowdloanTotalContributedContainer.setOnClickListener { handler.onClickContributionsInfo() }
 
-        with(itemView) {
-            crowdloanAbout.background = context.getBlockDrawable()
-            crowdloanTotalContributedContainer.background = context.addRipple(context.getBlockDrawable())
-            crowdloanTotalContributedShimmering.background = context.getBlockDrawable()
+        with(binder) {
+            crowdloanAbout.background = binder.root.context.getBlockDrawable()
+            crowdloanTotalContributedContainer.background = binder.root.context.addRipple(binder.root.context.getBlockDrawable())
+            crowdloanTotalContributedShimmering.background = binder.root.context.getBlockDrawable()
         }
     }
 
@@ -108,10 +99,10 @@ class HeaderHolder(
     }
 
     fun bindAsset(assetModel: AssetSelectorModel?) {
-        assetModel?.let { itemView.crowdloanAssetSelector.setState(imageLoader, assetModel) }
+        assetModel?.let { binder.crowdloanAssetSelector.setState(imageLoader, assetModel) }
     }
 
-    fun bindContributionsInfo(contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo?, showShimmering: Boolean) = with(itemView) {
+    fun bindContributionsInfo(contributionsInfo: StatefulCrowdloanMixin.ContributionsInfo?, showShimmering: Boolean) = with(binder) {
         crowdloanTotalContributedShimmering.isVisible = showShimmering
         crowdloanAbout.isGone = showShimmering
         crowdloanTotalContributedContainer.isGone = showShimmering
@@ -126,6 +117,6 @@ class HeaderHolder(
     }
 
     fun bindAbout(about: String?) {
-        itemView.crowdloanMainDescription.text = about
+        binder.crowdloanMainDescription.text = about
     }
 }

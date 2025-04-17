@@ -38,6 +38,10 @@ class DefaultFeeSigner(
         return signer.signRaw(payload)
     }
 
+    override suspend fun maxCallsPerTransaction(): Int? {
+        return null
+    }
+
     override suspend fun actualFeeSignerId(chain: Chain): AccountId {
         return requestedFeeSignerId(chain)
     }

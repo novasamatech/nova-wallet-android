@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.add
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.AdvancedEncryptionModel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ImportAccountPayload(

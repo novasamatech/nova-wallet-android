@@ -31,6 +31,7 @@ class EvmErc20AssetSyncServiceTest {
     private val contractAddress = "0xc748673057861a797275CD8A068AbB95A902e8de"
     private val assetId = chainAssetIdOfErc20Token(contractAddress)
     private val buyProviders = mapOf("transak" to mapOf("network" to "ETHEREUM"))
+    private val sellProviders = mapOf("transak" to mapOf("network" to "ETHEREUM"))
 
     private val REMOTE_ASSET = EVMAssetRemote(
         symbol = "USDT",
@@ -39,7 +40,7 @@ class EvmErc20AssetSyncServiceTest {
         name = "USDT",
         icon = "https://url.com",
         instances = listOf(
-            EVMInstanceRemote(chainId, contractAddress, buyProviders)
+            EVMInstanceRemote(chainId, contractAddress, buyProviders, sellProviders)
         )
     )
 
@@ -157,7 +158,7 @@ class EvmErc20AssetSyncServiceTest {
         runBlocking {
             localHasChains(chainId)
             localReturnsERC20(emptyList())
-            remoteReturns(listOf(REMOTE_ASSET.copy(instances = listOf(EVMInstanceRemote("changedChainId", contractAddress, buyProviders)))))
+            remoteReturns(listOf(REMOTE_ASSET.copy(instances = listOf(EVMInstanceRemote("changedChainId", contractAddress, buyProviders, sellProviders)))))
 
             evmAssetSyncService.syncUp()
 

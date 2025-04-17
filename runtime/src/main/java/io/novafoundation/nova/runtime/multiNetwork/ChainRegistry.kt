@@ -387,6 +387,9 @@ fun ChainRegistry.enabledChainsFlow() = currentChains
 
 suspend fun ChainRegistry.enabledChains() = enabledChainsFlow().first()
 
+suspend fun ChainRegistry.disabledChains() = currentChains.filterList { it.isDisabled }
+    .first()
+
 fun ChainRegistry.enabledChainByIdFlow() = enabledChainsFlow().map { chains -> chains.associateBy { it.id } }
 
 suspend fun ChainRegistry.enabledChainById() = ChainsById(enabledChainByIdFlow().first())
