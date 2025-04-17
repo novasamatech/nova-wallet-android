@@ -81,16 +81,10 @@ class TopUpAddressViewModel(
 
     val feeMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
 
-    private val maxActionProvider = maxActionProviderFactory.create(
-        viewModelScope = viewModelScope,
-        assetInFlow = assetFlow,
-        feeLoaderMixin = feeMixin,
-    )
-
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        maxActionProvider = maxActionProvider
+        maxActionProvider = null
     )
 
     val titleFlow = flowOf { payload.screenTitle }
