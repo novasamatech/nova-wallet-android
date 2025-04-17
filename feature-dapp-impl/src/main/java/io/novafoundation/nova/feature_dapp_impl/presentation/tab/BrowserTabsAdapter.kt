@@ -66,12 +66,18 @@ class BrowserTabViewHolder(
     fun bind(item: BrowserTabRvItem) = with(binder) {
         browserTabCard.setOnClickListener { itemHandler.tabClicked(item, browserTabScreenshot) }
         browserTabClose.setOnClickListener { itemHandler.tabCloseClicked(item) }
-        browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
-        browserTabFavicon.loadOrHide(item.tabFaviconPath?.asFile(), imageLoader)
         browserTabSiteName.text = item.tabName
 
+        browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
         screenshotImageMonitor.setPathOrStopWatching(item.tabScreenshotPath)
-        tabIconImageMonitor.setPathOrStopWatching(item.tabFaviconPath)
+
+        if (item.knownDappIconUrl != null) {
+            browserTabFavicon.load(item.knownDappIconUrl, imageLoader)
+            tabIconImageMonitor.stopMonitoring()
+        } else {
+            browserTabFavicon.loadOrHide(item.tabFaviconPath?.asFile(), imageLoader)
+            tabIconImageMonitor.setPathOrStopWatching(item.tabFaviconPath)
+        }
     }
 
     override fun unbind() {

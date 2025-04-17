@@ -29,6 +29,7 @@ class BrowserTabsViewModel(
             BrowserTabRvItem(
                 tabId = it.id,
                 tabName = it.pageSnapshot.pageName ?: Urls.domainOf(it.currentUrl),
+                knownDappIconUrl = it.knownDAppMetadata?.iconLink,
                 tabFaviconPath = it.pageSnapshot.pageIconPath,
                 tabScreenshotPath = it.pageSnapshot.pagePicturePath
             )
