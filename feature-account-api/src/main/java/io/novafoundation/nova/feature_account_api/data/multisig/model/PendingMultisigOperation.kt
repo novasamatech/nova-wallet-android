@@ -9,6 +9,7 @@ class PendingMultisigOperation(
     val call: GenericCall.Instance?,
     val callHash: CallHash,
     val chain: Chain,
+    val timePoint: MultisigTimePoint,
     val approvals: List<AccountIdKey>,
     val depositor: AccountIdKey,
     val signatory: AccountIdKey,

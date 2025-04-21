@@ -1,0 +1,63 @@
+package io.novafoundation.nova.feature_account_impl.presentation.multisig.operations
+
+import coil.ImageLoader
+import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.onLoaded
+import io.novafoundation.nova.common.domain.onNotLoaded
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_impl.databinding.FragmentMultisigPendingOperationsBinding
+import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
+import io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.model.PendingMultisigOperationModel
+import javax.inject.Inject
+
+class MultisigPendingOperationsFragment :
+    BaseFragment<MultisigPendingOperationsViewModel, FragmentMultisigPendingOperationsBinding>(),
+    MultisigPendingOperationsAdapter.ItemHandler {
+
+    override fun createBinding() = FragmentMultisigPendingOperationsBinding.inflate(layoutInflater)
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
+    private val adapter: MultisigPendingOperationsAdapter by lazy(LazyThreadSafetyMode.NONE) { MultisigPendingOperationsAdapter(this) }
+
+    override fun initViews() {
+        binder.multisigPendingOperationsList.setHasFixedSize(true)
+        binder.multisigPendingOperationsList.adapter = adapter
+
+        binder.multisigPendingOperationsToolbar.applyStatusBarInsets()
+        binder.multisigPendingOperationsToolbar.setHomeButtonListener { viewModel.backClicked() }
+    }
+
+    override fun inject() {
+        FeatureUtils.getFeature<AccountFeatureComponent>(
+            requireContext(),
+            AccountFeatureApi::class.java
+        )
+            .multisigPendingOperations()
+            .create(this)
+            .inject(this)
+    }
+
+    override fun subscribe(viewModel: MultisigPendingOperationsViewModel) {
+        viewModel.pendingOperationsFlow.observe {
+            it.onLoaded { data ->
+                binder.multisigPendingOperationsProgress.makeGone()
+                binder.multisigPendingOperationsList.makeVisible()
+                adapter.submitList(data)
+            }.onNotLoaded {
+                binder.multisigPendingOperationsProgress.makeVisible()
+                binder.multisigPendingOperationsList.makeGone()
+            }
+        }
+    }
+
+
+    override fun itemClicked(model: PendingMultisigOperationModel) {
+        viewModel.operationClicked(model)
+    }
+}

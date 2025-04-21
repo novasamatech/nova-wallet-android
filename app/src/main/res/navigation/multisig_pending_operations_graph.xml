@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/multisig_pending_operations_graph"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/multisigPendingOperationsFragment">
+
+    <fragment
+        tools:layout="@layout/fragment_multisig_pending_operations"
+        android:id="@+id/multisigPendingOperationsFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.MultisigPendingOperationsFragment"
+        android:label="MultisigPendingOperationsFragment" />
+</navigation>

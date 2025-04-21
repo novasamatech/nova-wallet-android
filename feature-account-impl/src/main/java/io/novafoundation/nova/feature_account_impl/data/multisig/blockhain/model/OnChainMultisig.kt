@@ -10,6 +10,7 @@ class OnChainMultisig(
     val callHash: CallHash,
     val approvals: List<AccountIdKey>,
     val depositor: AccountIdKey,
+    val timePoint: OnChainMultisigTimePoint,
 ) {
 
     companion object {
@@ -20,7 +21,8 @@ class OnChainMultisig(
             return OnChainMultisig(
                 callHash = callHash,
                 approvals = bindList(struct["approvals"], ::bindAccountIdKey),
-                depositor = bindAccountIdKey(struct["depositor"])
+                depositor = bindAccountIdKey(struct["depositor"]),
+                timePoint = OnChainMultisigTimePoint.bind(struct["when"])
             )
         }
     }
