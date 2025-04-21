@@ -143,6 +143,7 @@ class MultisigOperationDetailsViewModel(
             .onFailure(::showError)
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                // TODO multisig: if it was the last operation, go back to the main screen
                 router.back()
             }
 

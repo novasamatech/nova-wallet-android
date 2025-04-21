@@ -153,6 +153,8 @@ internal class RealMultisigChainPendingOperationsSyncer(
         }
     }
 
+    // TODO multisig: fetch call-data from the block and note it in repository
+    // So we can display call data immediately after in-app submission, before indexer has picked it up
     private fun startDetectingNewPendingCallHashesFromEvents(accountId: AccountIdKey) {
         eventsRepository.subscribeEventRecords(chain.id).map { eventRecords ->
             val newCallHashes = eventRecords.events().findOurNewMultisigs(accountId)
