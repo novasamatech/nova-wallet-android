@@ -161,6 +161,7 @@ fun mapRemoteAssetToLocal(
         type = assetRemote.type,
         source = AssetSourceLocal.DEFAULT,
         buyProviders = gson.toJson(assetRemote.buyProviders),
+        sellProviders = gson.toJson(assetRemote.sellProviders),
         typeExtras = gson.toJson(assetRemote.typeExtras),
         icon = assetRemote.icon,
         enabled = isEnabled

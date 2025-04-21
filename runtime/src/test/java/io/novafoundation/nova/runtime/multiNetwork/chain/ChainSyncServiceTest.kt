@@ -55,7 +55,8 @@ class ChainSyncServiceTest {
                 type = null,
                 typeExtras = null,
                 icon = null,
-                buyProviders = emptyMap()
+                buyProviders = emptyMap(),
+                sellProviders = emptyMap()
             )
         ),
         nodes = listOf(

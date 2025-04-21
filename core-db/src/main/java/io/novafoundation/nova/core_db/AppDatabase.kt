@@ -80,6 +80,7 @@ import io.novafoundation.nova.core_db.migrations.AddPoolIdToOperations_46_47
 import io.novafoundation.nova.core_db.migrations.AddProxyAccount_54_55
 import io.novafoundation.nova.core_db.migrations.AddRewardAccountToStakingDashboard_43_44
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
+import io.novafoundation.nova.core_db.migrations.AddSellProviders_67_68
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
@@ -156,7 +157,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 67,
+    version = 68,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -256,7 +257,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
-                    .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67)
+                    .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
                     .build()
             }
             return instance!!

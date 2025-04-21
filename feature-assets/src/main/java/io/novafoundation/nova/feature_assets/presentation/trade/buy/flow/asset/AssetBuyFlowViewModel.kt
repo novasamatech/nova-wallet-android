@@ -43,7 +43,7 @@ class AssetBuyFlowViewModel(
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
-        return interactor.tradeAssetSearch(query, externalBalancesFlow, TradeTokenRegistry.TradeType.SELL)
+        return interactor.tradeAssetSearch(query, externalBalancesFlow, TradeTokenRegistry.TradeType.BUY)
     }
 
     override fun assetClicked(asset: Chain.Asset) {

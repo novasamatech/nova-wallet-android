@@ -69,8 +69,8 @@ fun Context.getInputBackground() = getCornersStateDrawable(
     idleDrawable = getRoundedCornerDrawable(R.color.input_background),
     disabledDrawable = getRoundedCornerDrawableFromColors(
         fillColor = getColor(R.color.input_background),
-        strokeColor = getColor(R.color.container_border),
-        strokeSizeInDp = 1f
+        strokeColor = null,
+        strokeSizeInDp = 0f
     )
 )
 
