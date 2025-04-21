@@ -24,6 +24,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -225,6 +226,11 @@ fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) 
 context(RuntimeContext)
 fun Module.numberConstant(name: String) = numberConstant(name, runtime)
 
+context(RuntimeContext)
+fun <D> RuntimeType<*, D>.fromHex(value: HexString): D {
+    return fromHex(runtime, value)
+}
+
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
 fun Constant.asNumber(runtimeSnapshot: RuntimeSnapshot) = bindNumberConstant(this, runtimeSnapshot)
@@ -241,6 +247,8 @@ fun RuntimeMetadata.voterListOrNull() = firstExistingModuleOrNull(Modules.VOTER_
 fun RuntimeMetadata.voterListName(): String = requireNotNull(voterListOrNull()).name
 
 fun RuntimeMetadata.system() = module(Modules.SYSTEM)
+
+fun RuntimeMetadata.multisig() = module(Modules.MULTISIG)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 

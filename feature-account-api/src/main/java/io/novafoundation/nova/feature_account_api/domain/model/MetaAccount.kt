@@ -120,6 +120,8 @@ interface MultisigMetaAccount : MetaAccount {
 
     val signatoryMetaId: Long
 
+    val signatoryAccountId: AccountIdKey
+
     val otherSignatories: List<AccountIdKey>
 
     val threshold: Int

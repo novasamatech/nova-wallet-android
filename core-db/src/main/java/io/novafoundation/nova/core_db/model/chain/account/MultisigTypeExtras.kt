@@ -16,7 +16,8 @@ import java.lang.reflect.Type
 class MultisigTypeExtras(
     @JsonAdapter(AccountIdKeyListAdapter::class)
     val otherSignatories: List<AccountIdKey>,
-    val threshold: Int
+    val threshold: Int,
+    val signatoryAccountId: AccountIdKey
 )
 
 private class AccountIdSerializer : JsonSerializer<AccountIdKey>, JsonDeserializer<AccountIdKey> {

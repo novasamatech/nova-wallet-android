@@ -81,6 +81,6 @@ fun List<GenericEvent.Instance>.hasEvent(module: String, event: String): Boolean
     return any { it.instanceOf(module, event) }
 }
 
-fun List<GenericEvent.Instance>.findAllOfType(module: String, event: String): List<GenericEvent.Instance> {
+fun List<GenericEvent.Instance>.findEvents(module: String, event: String): List<GenericEvent.Instance> {
     return filter { it.instanceOf(module, event) }
 }

@@ -15,6 +15,7 @@ class RealMultisigMetaAccount(
     name: String,
     status: LightMetaAccount.Status,
     override val signatoryMetaId: Long,
+    override val signatoryAccountId: AccountIdKey,
     override val otherSignatories: List<AccountIdKey>,
     override val threshold: Int
 ) : DefaultMetaAccount(

@@ -41,6 +41,10 @@ fun AccountIdKey.Companion.fromHexOrNull(src: HexString): AccountIdKey? {
     return fromHex(src).getOrNull()
 }
 
+fun AccountIdKey.Companion.fromHexOrThrow(src: HexString): AccountIdKey {
+    return fromHex(src).getOrThrow()
+}
+
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))
 fun <T> Map<AccountIdKey, T>.getValue(key: AccountId) = getValue(AccountIdKey(key))

@@ -72,7 +72,7 @@ class RealMultisigAddAccountRepository @Inject constructor(
     }
 
     private fun AccountPayload.typeExtras(): String {
-        val extras = MultisigTypeExtras(otherSignatories, threshold)
+        val extras = MultisigTypeExtras(otherSignatories, threshold, signatoryAccountId)
         return gson.toJson(extras)
     }
 }

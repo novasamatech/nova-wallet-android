@@ -44,7 +44,6 @@ class MultisigSignerFactory @Inject constructor(
 }
 
 // TODO multisig:
-// 1. do not create history elements (e.g. transfers) for delayed operations. This could be done by introducing immediate / delayed call execution separation
 // 2. support threshold 1 multisigs
 // 3. certain operations cannot execute multisig (in general - CallExecutionType.DELAYED). We should add corresponding checks and validations
 // Example: 1 click swaps

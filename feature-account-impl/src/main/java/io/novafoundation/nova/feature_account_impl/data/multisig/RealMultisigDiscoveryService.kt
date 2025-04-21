@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.mutableMultiListMapOf
 import io.novafoundation.nova.common.utils.put
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigSyncService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDiscoveryService
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.collectAddedIds
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.multisig.MultisigAddAccountRepository
@@ -48,25 +48,25 @@ MetaAccountGroupingInteractor.updatedProxieds
 7. Sync multisigs for proxies
  */
 @FeatureScope
-internal class RealMultisigSyncService @Inject constructor(
+internal class RealMultisigDiscoveryService @Inject constructor(
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val multisigSyncRepository: MultisigSyncRepository,
+    private val multisigRepository: MultisigRepository,
     private val addMultisigRepository: MultisigAddAccountRepository,
     private val rootScope: RootScope,
     @OnChainIdentity private val identityProvider: IdentityProvider,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-) : MultisigSyncService {
+) : MultisigDiscoveryService {
 
     private val shouldSyncWatchOnlyMultisigs: Boolean = BuildConfig.DEBUG
 
-    override fun startManualSync() {
+    override fun startManualAccountDiscoverySync() {
         rootScope.launch(Dispatchers.Default) {
             startSyncInternal()
         }
     }
 
-    override fun automaticSync(): Flow<*> {
+    override fun automaticAccountDiscoverySync(): Flow<*> {
         return flowOf {
             startSyncInternal()
         }
@@ -94,7 +94,7 @@ internal class RealMultisigSyncService @Inject constructor(
         val availableAccountIds = availableAccounts.mapToSet { it.requireAccountIdIn(chain).intoKey() }
 
         val oldMultisigs = getExistingMultisigs()
-        val multisigs = multisigSyncRepository.finsMultisigAccounts(chain, availableAccountIds)
+        val multisigs = multisigRepository.findMultisigAccounts(chain, availableAccountIds)
 
         val multisigAccountIds = multisigs.map { it.accountId.value }
         val multisigsBySigner = associateMultisigsWithRequestedAccounts(multisigs, availableAccountIds)
@@ -158,14 +158,15 @@ internal class RealMultisigSyncService @Inject constructor(
         chain: Chain,
         multisig: DiscoveredMultisig,
         signatoryMetaId: Long,
-        signerAccountId: AccountIdKey,
+        signatoryAccountId: AccountIdKey,
         identity: Identity?
     ) = MultisigAddAccountRepository.AccountPayload(
         chain = chain,
         multisigAccountId = multisig.accountId,
-        otherSignatories = multisig.otherSignatories(signerAccountId),
+        otherSignatories = multisig.otherSignatories(signatoryAccountId),
         threshold = multisig.threshold,
         signatoryMetaId = signatoryMetaId,
+        signatoryAccountId = signatoryAccountId,
         identity = identity
     )
 
@@ -175,7 +176,7 @@ internal class RealMultisigSyncService @Inject constructor(
 
     private suspend fun getSupportedMultisigChains(): List<Chain> {
         return chainRegistry.enabledChains()
-            .filter { multisigSyncRepository.supportsMultisigSync(it) }
+            .filter { multisigRepository.supportsMultisigSync(it) }
     }
 
     private suspend fun getSyncableMetaAccounts(): List<MetaAccount> {

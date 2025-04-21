@@ -19,13 +19,21 @@ interface QueryableStorageEntry2<I1, I2, T : Any> {
     fun observe(argument1: I1, argument2: I2): Flow<T?>
 
     context(StorageQueryContext)
-    fun observe(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T>>
+    suspend fun observe(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T?>>
+
+    context(StorageQueryContext)
+    suspend fun keys(argument1: I1): List<Pair<I1, I2>>
 
     context(StorageQueryContext)
     suspend fun entriesRaw(keys: List<Pair<I1, I2>>): StorageEntries
 
     context(StorageQueryContext)
     suspend fun entries(keys: List<Pair<I1, I2>>): Map<Pair<I1, I2>, T>
+}
+
+context(StorageQueryContext)
+suspend fun <I1, I2, T: Any> QueryableStorageEntry2<I1, I2, T>.observeNotNull(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T>> {
+    return observe(keys).map { it.filterNotNull() }
 }
 
 internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
@@ -45,12 +53,12 @@ internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
     }
 
     context(StorageQueryContext)
-    override fun observe(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T>> {
+    override suspend fun observe(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T?>> {
         return storageEntry.observe(
             keysArguments = keys.toInternal(),
             keyExtractor = { components -> convertKeyFromInternal(components) },
             binding = { decoded, key -> decoded?.let { binding(it, key.first, key.second) } }
-        ).map { it.filterNotNull() }
+        )
     }
 
     context(StorageQueryContext)
@@ -67,15 +75,29 @@ internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
         ).filterNotNull()
     }
 
+    context(StorageQueryContext)
+    override suspend fun keys(argument1: I1): List<Pair<I1, I2>> {
+        return storageEntry.keys(convertKey1ToInternal(argument1))
+            .map { convertKeyFromInternal(it) }
+    }
+
     private fun List<Pair<I1, I2>>.toInternal(): List<List<Any?>> {
         return map(::convertKeyToInternal)
     }
 
-    private fun convertKeyToInternal(key: Pair<I1, I2>): List<Any?> {
-        val first = key1ToInternalConverter?.invoke(key.first) ?: key.first
-        val second = key2ToInternalConverter?.invoke(key.second) ?: key.second
+    private fun convertKey1ToInternal(key1: I1): Any? {
+        return key1ToInternalConverter?.invoke(key1) ?: key1
+    }
 
-        return listOf(first, second)
+    private fun convertKey2ToInternal(key2: I2): Any? {
+        return key2ToInternalConverter?.invoke(key2) ?: key2
+    }
+
+    private fun convertKeyToInternal(key: Pair<I1, I2>): List<Any?> {
+        return listOf(
+            convertKey1ToInternal(key.first),
+            convertKey2ToInternal(key.second)
+        )
     }
 
     private fun convertKeyFromInternal(componentHolder: ComponentHolder): Pair<I1, I2> {

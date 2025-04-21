@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -72,6 +73,7 @@ class AccountDataSourceImpl(
     private val selectedMetaAccountLocal = metaAccountDao.selectedMetaAccountInfoFlow()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
+    // TODO multisig: add distinct until changed so `selectedMetaAccountFlow` wont emit when something else in `meta_accounts` table changes
     private val selectedMetaAccountFlow = selectedMetaAccountLocal
         .filterNotNull()
         .map(accountMappers::mapMetaAccountLocalToMetaAccount)

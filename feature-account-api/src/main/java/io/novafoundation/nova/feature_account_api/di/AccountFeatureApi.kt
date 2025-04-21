@@ -9,7 +9,8 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigSyncService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDiscoveryService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -101,7 +102,9 @@ interface AccountFeatureApi {
 
     fun proxySyncService(): ProxySyncService
 
-    val multisigService: MultisigSyncService
+    val multisigDiscoveryService: MultisigDiscoveryService
+
+    val multisigPendingOperationsService: MultisigPendingOperationsService
 
     val legacyLedgerAddAccountRepository: LegacyLedgerAddAccountRepository
 

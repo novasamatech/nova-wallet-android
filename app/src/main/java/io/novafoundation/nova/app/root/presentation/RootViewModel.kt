@@ -143,6 +143,10 @@ class RootViewModel(
         interactor.syncMultisigs()
             .inBackground()
             .launchIn(rootScope)
+
+        interactor.syncPendingMultisigOperations()
+            .inBackground()
+            .launchIn(rootScope)
     }
 
     private fun handleUpdatesSideEffect(sideEffect: Updater.SideEffect) {

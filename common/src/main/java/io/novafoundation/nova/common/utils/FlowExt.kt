@@ -22,15 +22,18 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
@@ -146,6 +149,15 @@ inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) 
         val flowScope = CoroutineScope(coroutineContext)
 
         block(flowScope)
+    }
+}
+
+inline fun <T> parentCancellableFlowScope(crossinline block: suspend (scope: CoroutineScope) -> T): Flow<T> {
+    return flow {
+        val flowScope = CoroutineScope(coroutineContext)
+        emit(block(flowScope))
+
+        awaitCancellation()
     }
 }
 

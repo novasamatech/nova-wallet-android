@@ -16,7 +16,8 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigSyncService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDiscoveryService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -76,7 +77,9 @@ interface RootDependencies {
 
     val proxySyncService: ProxySyncService
 
-    val multisigSyncService: MultisigSyncService
+    val multisigDiscoveryService: MultisigDiscoveryService
+
+    val multisigPendingOperationsService: MultisigPendingOperationsService
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

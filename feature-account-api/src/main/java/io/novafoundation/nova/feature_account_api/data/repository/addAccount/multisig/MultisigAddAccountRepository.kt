@@ -18,6 +18,7 @@ interface MultisigAddAccountRepository : AddAccountRepository<Payload> {
         val otherSignatories: List<AccountIdKey>,
         val threshold: Int,
         val signatoryMetaId: Long,
+        val signatoryAccountId: AccountIdKey,
         val identity: Identity?
     )
 }
