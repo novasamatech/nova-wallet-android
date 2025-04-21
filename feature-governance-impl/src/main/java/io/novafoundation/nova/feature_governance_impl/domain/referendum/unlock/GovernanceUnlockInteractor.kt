@@ -97,10 +97,10 @@ class RealGovernanceUnlockInteractor(
         val governanceSelectedOption = selectedAssetState.selectedOption()
         val chain = governanceSelectedOption.assetWithChain.chain
 
-        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
+        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
             if (claimable == null) error("Nothing to claim")
 
-            executeUnlock(accountIdToUnlock = origin.executingAccount, governanceSelectedOption, claimable)
+            executeUnlock(accountIdToUnlock = buildingContext.submissionOrigin.executingAccount, governanceSelectedOption, claimable)
         }.awaitInBlock()
     }
 

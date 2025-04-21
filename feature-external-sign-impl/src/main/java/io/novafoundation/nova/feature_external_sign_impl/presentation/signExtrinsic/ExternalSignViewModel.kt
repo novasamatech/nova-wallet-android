@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDApp
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationPayload
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
@@ -42,7 +41,7 @@ import kotlinx.coroutines.withContext
 
 private typealias SigningError = String
 
-class ExternaSignViewModel(
+class ExternalSignViewModel(
     private val router: ExternalSignRouter,
     private val responder: ExternalSignResponder,
     private val interactor: ExternalSignInteractor,

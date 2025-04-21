@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.multisig.operations
+package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -9,9 +9,10 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_impl.databinding.FragmentMultisigPendingOperationsBinding
-import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
-import io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.model.PendingMultisigOperationModel
+import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigPendingOperationsBinding
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
 import javax.inject.Inject
 
 class MultisigPendingOperationsFragment :
@@ -34,9 +35,9 @@ class MultisigPendingOperationsFragment :
     }
 
     override fun inject() {
-        FeatureUtils.getFeature<AccountFeatureComponent>(
+        FeatureUtils.getFeature<MultisigOperationsFeatureComponent>(
             requireContext(),
-            AccountFeatureApi::class.java
+            MultisigOperationsFeatureApi::class.java
         )
             .multisigPendingOperations()
             .create(this)

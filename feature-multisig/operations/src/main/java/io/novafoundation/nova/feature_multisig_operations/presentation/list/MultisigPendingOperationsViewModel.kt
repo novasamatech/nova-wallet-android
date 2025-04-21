@@ -1,6 +1,5 @@
-package io.novafoundation.nova.feature_account_impl.presentation.multisig.operations
+package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
-import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -12,15 +11,17 @@ import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingO
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
-import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.model.PendingMultisigOperationModel
-import kotlinx.coroutines.flow.map
+import io.novafoundation.nova.feature_multisig_operations.R
+import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
 
 class MultisigPendingOperationsViewModel(
     discoveryService: MultisigPendingOperationsService,
-    private val router: AccountRouter,
+    private val router: MultisigOperationsRouter,
     private val resourceManager: ResourceManager,
+    private val operationFormatter: MultisigOperationFormatter,
 ) : BaseViewModel() {
 
     val pendingOperationsFlow = discoveryService.pendingOperations()
@@ -34,15 +35,16 @@ class MultisigPendingOperationsViewModel(
     }
 
     fun operationClicked(model: PendingMultisigOperationModel) {
-        showMessage("Todo")
+        val payload = MultisigOperationDetailsPayload(model.id)
+        router.openMultisigOperationDetails(payload)
     }
 
     private fun PendingMultisigOperation.toUi(): PendingMultisigOperationModel {
         return PendingMultisigOperationModel(
-            id = id(),
+            id = identifier,
             chain = mapChainToUi(chain),
             action = formatAction(),
-            operationTitle = formatTitle(),
+            operationTitle = operationFormatter.formatTitle(this),
             progress = formatProgress()
         )
     }
@@ -51,35 +53,17 @@ class MultisigPendingOperationsViewModel(
         return resourceManager.getString(R.string.multisig_operations_progress, approvals.size.format(), threshold.format())
     }
 
-    private fun PendingMultisigOperation.formatTitle(): String {
-        val call = call
-
-        return if (call != null) {
-            "${call.module.name}.${call.function.name}"
-        } else {
-            val hexHash = callHash.toHex()
-            val trimmedHash = hexHash.substring(0, 4) + "..." + hexHash.substring(hexHash.length - 4, hexHash.length)
-
-            resourceManager.getString(R.string.multisig_operations_unknown_calldata, trimmedHash)
-        }
-    }
-
-
     private fun PendingMultisigOperation.formatAction(): ColoredText {
         return when (userAction()) {
-            MultisigAction.CAN_APPROVE -> ColoredText(
+            is MultisigAction.CanApprove -> ColoredText(
                 text = resourceManager.getText(R.string.multisig_operations_pending_signature),
                 colorRes = R.color.button_text_accent
             )
 
-            MultisigAction.SIGNED, MultisigAction.CAN_REJECT -> ColoredText(
+            is MultisigAction.CanReject, MultisigAction.Signed -> ColoredText(
                 text = resourceManager.getText(R.string.multisig_operations_signed),
                 colorRes = R.color.text_secondary
             )
         }
-    }
-
-    private fun PendingMultisigOperation.id(): String {
-        return "${chain.id}.${callHash.toHex()}.${timePoint.height}.${timePoint.extrinsicIndex}"
     }
 }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.multisig.operations
+package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -8,13 +8,15 @@ import io.novafoundation.nova.common.presentation.setColoredText
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.databinding.ItemMultisigPendingOperationBinding
-import io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.model.PendingMultisigOperationModel
+import io.novafoundation.nova.feature_multisig_operations.R
+import io.novafoundation.nova.feature_multisig_operations.databinding.ItemMultisigPendingOperationBinding
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
 
 class MultisigPendingOperationsAdapter(
     private val handler: ItemHandler
-) : BaseListAdapter<PendingMultisigOperationModel, MultisigPendingOperationHolder>(PendingMultisigOperationDiffCallback()) {
+) : BaseListAdapter<PendingMultisigOperationModel, MultisigPendingOperationHolder>(
+    PendingMultisigOperationDiffCallback()
+) {
 
     interface ItemHandler {
 

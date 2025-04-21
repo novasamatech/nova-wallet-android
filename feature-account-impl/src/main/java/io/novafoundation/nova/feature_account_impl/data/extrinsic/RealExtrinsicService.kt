@@ -13,8 +13,10 @@ import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.common.utils.takeWhileInclusive
 import io.novafoundation.nova.common.utils.tip
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicBuildingContext
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService.SubmissionOptions
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
@@ -250,8 +252,9 @@ class RealExtrinsicService(
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val submissionOrigin = signer.submissionOrigin(chain)
+        val buildingContext = ExtrinsicBuildingContext(submissionOrigin, signer, chain)
 
-        val callBuilder = SimpleCallBuilder(runtime).apply { formExtrinsic(submissionOrigin) }
+        val callBuilder = SimpleCallBuilder(runtime).apply { formExtrinsic(buildingContext) }
         val splitCalls = extrinsicSplitter.split(signer, callBuilder, chain)
 
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)
@@ -320,7 +323,8 @@ class RealExtrinsicService(
         )
 
         // Add upstream calls
-        extrinsicBuilder.formExtrinsic(submissionOrigin)
+        val buildingContext = ExtrinsicBuildingContext(submissionOrigin, signer, chain)
+        extrinsicBuilder.formExtrinsic(buildingContext)
 
         // Setup fees
         val feePaymentProvider = feePaymentProviderRegistry.providerFor(chain.id)

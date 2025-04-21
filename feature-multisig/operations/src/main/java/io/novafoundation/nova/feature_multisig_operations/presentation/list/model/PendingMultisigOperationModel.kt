@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.model
+package io.novafoundation.nova.feature_multisig_operations.presentation.list.model
 
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi

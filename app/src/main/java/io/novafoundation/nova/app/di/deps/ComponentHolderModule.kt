@@ -42,6 +42,8 @@ import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_core.LedgerCoreHolder
 import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_ledger_impl.di.LedgerFeatureHolder
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureHolder
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
@@ -279,4 +281,10 @@ interface ComponentHolderModule {
     @ClassKey(XcmFeatureApi::class)
     @IntoMap
     fun provideXcmFeatureHolder(holder: XcmFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(MultisigOperationsFeatureApi::class)
+    @IntoMap
+    fun provideMultisigOperationsFeatureHolder(holder: MultisigOperationsFeatureHolder): FeatureApiHolder
 }

@@ -17,13 +17,19 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
-typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: SubmissionOrigin) -> Unit
-typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: SubmissionOrigin) -> Unit
+typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(context: ExtrinsicBuildingContext) -> Unit
+typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(context: ExtrinsicBuildingContext) -> Unit
 
 class ExtrinsicSubmission(
     val hash: String,
     val submissionOrigin: SubmissionOrigin,
     val callExecutionType: CallExecutionType,
+)
+
+class ExtrinsicBuildingContext(
+    val submissionOrigin: SubmissionOrigin,
+    val signer: NovaSigner,
+    val chain: Chain
 )
 
 private val DEFAULT_BATCH_MODE = BatchMode.BATCH_ALL

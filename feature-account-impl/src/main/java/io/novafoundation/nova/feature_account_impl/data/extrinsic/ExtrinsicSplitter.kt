@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.common.utils.min
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SplitCalls
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomTransactionExtensions
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
@@ -39,14 +41,6 @@ import kotlinx.coroutines.coroutineScope
 import java.math.BigInteger
 import javax.inject.Inject
 
-typealias SplitCalls = List<List<GenericCall.Instance>>
-
-interface ExtrinsicSplitter {
-
-    suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls
-
-    suspend fun estimateCallWeight(signer: NovaSigner, call: GenericCall.Instance, chain: Chain): WeightV2
-}
 
 private typealias CallWeightsByType = Map<String, Deferred<WeightV2>>
 

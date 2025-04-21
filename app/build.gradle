@@ -280,6 +280,8 @@ dependencies {
 
     implementation project(":feature-xcm:impl")
 
+    implementation project(":feature-multisig:operations")
+
     implementation project(':test-shared')
 
     implementation kotlinDep

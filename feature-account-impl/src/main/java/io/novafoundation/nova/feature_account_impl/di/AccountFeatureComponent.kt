@@ -44,7 +44,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.war
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.di.SelectWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup.di.BackupMnemonicComponent
 import io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm.di.ConfirmMnemonicComponent
-import io.novafoundation.nova.feature_account_impl.presentation.multisig.operations.di.MultisigPendingOperationsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.add.di.AddNodeComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.details.di.NodeDetailsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.node.list.di.NodesComponent
@@ -154,10 +153,6 @@ interface AccountFeatureComponent : AccountFeatureApi {
     fun manualBackupSelectAccount(): ManualBackupSelectAccountComponent.Factory
 
     fun manualBackupAdvancedSecrets(): ManualBackupAdvancedSecretsComponent.Factory
-
-    // Multisigs
-
-    fun multisigPendingOperations(): MultisigPendingOperationsComponent.Factory
 
     @Component.Factory
     interface Factory {

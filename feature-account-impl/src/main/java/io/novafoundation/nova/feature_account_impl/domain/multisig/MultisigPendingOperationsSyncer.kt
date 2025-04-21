@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.shareInBackground
-import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigTimePoint
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
@@ -19,7 +18,6 @@ import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_api.domain.multisig.bindCallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
-import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisigTimePoint
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.events
@@ -139,15 +137,12 @@ internal class RealMultisigChainPendingOperationsSyncer(
             callHash = onChainMultisig.callHash,
             chain = chain,
             approvals = onChainMultisig.approvals,
-            signatory = multisig.signatoryAccountId,
+            signatoryAccountId = multisig.signatoryAccountId,
+            signatoryMetaId = multisig.signatoryMetaId,
             threshold = multisig.threshold,
             depositor = onChainMultisig.depositor,
-            timePoint = onChainMultisig.timePoint.toDomain()
+            timePoint = onChainMultisig.timePoint
         )
-    }
-
-    private fun OnChainMultisigTimePoint.toDomain(): MultisigTimePoint {
-        return MultisigTimePoint(height, extrinsicIndex)
     }
 
     private suspend fun loadInitialHashes(accountId: AccountIdKey) {

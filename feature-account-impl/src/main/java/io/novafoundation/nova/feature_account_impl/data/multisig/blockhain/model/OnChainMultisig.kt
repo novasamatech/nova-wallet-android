@@ -4,13 +4,14 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigTimePoint
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 
 class OnChainMultisig(
     val callHash: CallHash,
     val approvals: List<AccountIdKey>,
     val depositor: AccountIdKey,
-    val timePoint: OnChainMultisigTimePoint,
+    val timePoint: MultisigTimePoint,
 ) {
 
     companion object {
@@ -22,7 +23,7 @@ class OnChainMultisig(
                 callHash = callHash,
                 approvals = bindList(struct["approvals"], ::bindAccountIdKey),
                 depositor = bindAccountIdKey(struct["depositor"]),
-                timePoint = OnChainMultisigTimePoint.bind(struct["when"])
+                timePoint = MultisigTimePoint.bind(struct["when"])
             )
         }
     }

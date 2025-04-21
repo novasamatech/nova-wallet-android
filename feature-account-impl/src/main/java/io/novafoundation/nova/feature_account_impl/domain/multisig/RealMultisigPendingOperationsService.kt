@@ -5,10 +5,12 @@ import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.data.memory.SharedComputation
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.combine
+import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.parentCancellableFlowScope
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperationId
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
@@ -46,6 +48,11 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     context(ComputationalScope)
     override fun pendingOperations(): Flow<List<PendingMultisigOperation>> {
        return getCachedSyncer().flatMapLatest { it.pendingOperations }
+    }
+
+    context(ComputationalScope)
+    override fun pendingOperationFlow(id: PendingMultisigOperationId): Flow<PendingMultisigOperation?> {
+        return pendingOperations().map { it.findById(id) }
     }
 
     context(ComputationalScope)

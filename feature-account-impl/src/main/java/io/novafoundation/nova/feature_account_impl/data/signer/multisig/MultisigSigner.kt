@@ -4,9 +4,8 @@ import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.composeCall
-import io.novafoundation.nova.common.utils.getChainIdOrThrow
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigAsMulti
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
@@ -15,7 +14,6 @@ import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -44,8 +42,8 @@ class MultisigSignerFactory @Inject constructor(
 }
 
 // TODO multisig:
-// 2. support threshold 1 multisigs
-// 3. certain operations cannot execute multisig (in general - CallExecutionType.DELAYED). We should add corresponding checks and validations
+// 1. support threshold 1 multisigs (including weight estimation upon submission)
+// 2. certain operations cannot execute multisig (in general - CallExecutionType.DELAYED). We should add corresponding checks and validations
 // Example: 1 click swaps
 class MultisigSigner(
     private val multisigAccount: MultisigMetaAccount,
@@ -107,13 +105,9 @@ class MultisigSigner(
     }
 
     context(ExtrinsicBuilder)
-    private suspend fun wrapCallsInAsMultiForSubmission() {
-        val chainId = getChainIdOrThrow()
-        val chain = chainRegistry.getChain(chainId)
-        val call = getWrappedCall()
-        val weight = extrinsicSplitter.estimateCallWeight(delegateSigner(), call, chain)
-
-        return wrapCallsInAsMulti(maxWeight = weight)
+    private fun wrapCallsInAsMultiForSubmission() {
+        // We do not calculate precise max_weight as it is only needed for the final approval
+        return wrapCallsInAsMulti(maxWeight = WeightV2.zero())
     }
 
     context(ExtrinsicBuilder)
@@ -125,16 +119,12 @@ class MultisigSigner(
     private fun wrapCallsInAsMulti(maxWeight: WeightV2) {
         val call = getWrappedCall()
 
-        val multisigCall = runtime.composeCall(
-            moduleName = Modules.MULTISIG,
-            callName = "as_multi",
-            arguments = mapOf(
-                "threshold" to multisigAccount.threshold.toBigInteger(),
-                "other_signatories" to multisigAccount.otherSignatories.sorted().map { it.value },
-                "maybe_timepoint" to null,
-                "call" to call,
-                "max_weight" to maxWeight.toEncodableInstance()
-            )
+        val multisigCall = runtime.composeMultisigAsMulti(
+            threshold = multisigAccount.threshold,
+            otherSignatories =  multisigAccount.otherSignatories,
+            maybeTimePoint = null,
+            call = call,
+            maxWeight = maxWeight
         )
 
         resetCalls()

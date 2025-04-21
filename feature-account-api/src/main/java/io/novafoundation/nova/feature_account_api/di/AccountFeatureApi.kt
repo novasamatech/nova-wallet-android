@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccounts
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
@@ -79,6 +80,8 @@ interface AccountFeatureApi {
     fun syncWalletsBackupPasswordCommunicator(): SyncWalletsBackupPasswordCommunicator
 
     fun copyAddressMixin(): CopyAddressMixin
+
+    val extrinsicSplitter: ExtrinsicSplitter
 
     val addressInputMixinFactory: AddressInputMixinFactory
 
