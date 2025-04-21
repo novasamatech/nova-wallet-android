@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
@@ -31,14 +32,16 @@ class TradeProviderListModule {
         tradeMixinFactory: TradeMixin.Factory,
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
-        router: AssetsRouter
+        router: AssetsRouter,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return TradeProviderListViewModel(
             payload = payload,
             tradeMixinFactory = tradeMixinFactory,
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
-            router = router
+            router = router,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 }

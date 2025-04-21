@@ -73,7 +73,7 @@ abstract class EnterCloudBackupPasswordViewModel(
 
     internal fun confirmCloudBackupDelete() {
         launch {
-            confirmationAwaitableAction.awaitDeleteBackupConfirmation()
+            confirmationAwaitableAction.awaitDeleteBackupConfirmation(resourceManager)
 
             interactor.deleteCloudBackup()
                 .onSuccess { router.back() }

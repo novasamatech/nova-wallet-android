@@ -12,8 +12,8 @@ typealias StringTemplate = String
 
 typealias ExplorerTemplateExtractor = (Chain.Explorer) -> StringTemplate?
 
-typealias BuyProviderId = String
-typealias BuyProviderArguments = Map<String, Any?>
+typealias TradeProviderId = String
+typealias TradeProviderArguments = Map<String, Any?>
 
 data class FullChainAssetId(val chainId: ChainId, val assetId: ChainAssetId) {
 
@@ -76,7 +76,8 @@ data class Chain(
         val chainId: ChainId,
         val symbol: TokenSymbol,
         val precision: Precision,
-        val buyProviders: Map<BuyProviderId, BuyProviderArguments>,
+        val buyProviders: Map<TradeProviderId, TradeProviderArguments>,
+        val sellProviders: Map<TradeProviderId, TradeProviderArguments>,
         val staking: List<StakingType>,
         val type: Type,
         val source: Source,

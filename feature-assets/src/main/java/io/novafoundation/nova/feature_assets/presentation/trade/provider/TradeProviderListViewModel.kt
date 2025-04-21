@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_assets.presentation.trade.provider
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapList
@@ -24,34 +27,38 @@ class TradeProviderListViewModel(
     private val tradeMixinFactory: TradeMixin.Factory,
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
-    private val router: AssetsRouter
+    private val router: AssetsRouter,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
 ) : BaseViewModel() {
+
+    val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
     private val tradeMixin = tradeMixinFactory.create(viewModelScope)
 
-    private val tradeFlow = payload.type.toTradeFlow()
+    private val tradeType = payload.type.toTradeFlow()
 
     private val chainAssetFlow = flowOf { chainRegistry.asset(payload.chainId, payload.assetId) }
         .shareInBackground()
 
     val titleFlow = chainAssetFlow.map {
-        when (tradeFlow) {
+        when (tradeType) {
             TradeTokenRegistry.TradeType.BUY -> resourceManager.getString(R.string.trade_provider_list_buy_title, it.symbol.value)
             TradeTokenRegistry.TradeType.SELL -> resourceManager.getString(R.string.trade_provider_list_sell_title, it.symbol.value)
         }
     }
 
     private val providers = chainAssetFlow.map {
-        tradeMixin.providersFor(it, tradeFlow)
+        tradeMixin.providersFor(it, tradeType)
     }.shareInBackground()
 
     val providerModels = providers.mapList { provider ->
-        val paymentMethods = provider.getPaymentMethods(tradeFlow).map { it.toModel() }
+        val paymentMethods = provider.getPaymentMethods(tradeType).map { it.toModel() }
         TradeProviderRvItem(
             provider.id,
+            provider.officialUrl,
             provider.logoRes,
             paymentMethods,
-            resourceManager.getString(provider.descriptionRes)
+            resourceManager.getString(provider.getDescriptionRes(tradeType))
         )
     }
 
@@ -82,16 +89,29 @@ class TradeProviderListViewModel(
 
     fun onProviderClicked(item: TradeProviderRvItem) {
         launch {
+            awaitConfirmation(item)
+
             val chainAsset = chainAssetFlow.first()
 
             router.openTradeWebInterface(
                 TradeWebPayload(
                     AssetPayload(chainAsset.chainId, chainAsset.id),
                     item.providerId,
-                    tradeFlow.toModel(),
+                    tradeType.toModel(),
                     payload.onSuccessfulTradeStrategyType
                 )
             )
         }
+    }
+
+    private suspend fun awaitConfirmation(item: TradeProviderRvItem) {
+        confirmationAwaitableAction.awaitAction(
+            ConfirmationDialogInfo(
+                resourceManager.getString(R.string.trade_provider_open_confirmation_title),
+                resourceManager.getString(R.string.trade_provider_open_confirmation_message, item.providerLink),
+                resourceManager.getString(R.string.common_continue),
+                resourceManager.getString(R.string.common_cancel)
+            )
+        )
     }
 }

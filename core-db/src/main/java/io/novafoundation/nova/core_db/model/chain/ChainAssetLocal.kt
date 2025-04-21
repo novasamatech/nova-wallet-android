@@ -35,6 +35,7 @@ data class ChainAssetLocal(
     @ColumnInfo(defaultValue = SOURCE_DEFAULT)
     val source: AssetSourceLocal,
     val buyProviders: String?,
+    val sellProviders: String?,
     val typeExtras: String?,
     @ColumnInfo(defaultValue = ENABLED_DEFAULT_STR)
     val enabled: Boolean,

@@ -84,6 +84,7 @@ class RealAddTokensInteractor(
             symbol = customErc20Token.symbol.asTokenSymbol(),
             precision = customErc20Token.decimals.asPrecision(),
             buyProviders = emptyMap(),
+            sellProviders = emptyMap(),
             staking = emptyList(),
             type = Chain.Asset.Type.EvmErc20(customErc20Token.contract),
             source = Chain.Asset.Source.MANUAL,
