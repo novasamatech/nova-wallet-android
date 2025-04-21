@@ -105,9 +105,9 @@ internal class RealMultisigDiscoveryService @Inject constructor(
         metaAccountsUpdatesRegistry.addMetaIds(createdIds)
         createdIds
     }.onFailure {
-        Log.e(LOG_TAG, "Failed to sync proxy delegators in chain ${chain.name}", it)
+        Log.e(LOG_TAG, "Failed to sync multisigs in chain ${chain.name}", it)
     }.onSuccess {
-        Log.d(LOG_TAG, "Finished syncing proxies for ${chain.name}. Added ${it.size} accounts")
+        Log.d(LOG_TAG, "Finished syncing multisigs for ${chain.name}. Added ${it.size} accounts")
     }
 
     private fun associateMultisigsWithRequestedAccounts(

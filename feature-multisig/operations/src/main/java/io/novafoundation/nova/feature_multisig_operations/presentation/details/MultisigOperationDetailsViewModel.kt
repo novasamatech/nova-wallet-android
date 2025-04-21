@@ -137,6 +137,8 @@ class MultisigOperationDetailsViewModel(
     }
 
     private fun sendTransaction() = launch {
+        showNextProgress.value = true
+
         interactor.performAction(operationFlow.first())
             .onFailure(::showError)
             .onSuccess {

@@ -174,11 +174,13 @@ internal class RealMultisigChainPendingOperationsSyncer(
         ourAccountId: AccountIdKey
     ): CallHash? {
         return runCatching {
-            val (_, _, multisigRaw, callHashRaw) = newMultisigEvent.arguments
+            val (_, multisigRaw, callHashRaw) = newMultisigEvent.arguments
             val multisig = bindAccountIdKey(multisigRaw)
             val callHash = bindCallHash(callHashRaw)
 
             callHash.takeIf { multisig == ourAccountId }
-        }.getOrNull()
+        }
+            .onFailure { Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to parse new NewMultisig event", it)  }
+            .getOrNull()
     }
 }

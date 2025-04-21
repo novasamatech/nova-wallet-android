@@ -42,7 +42,7 @@ fun RuntimeSnapshot.composeMultisigCancelAsMulti(
         arguments = mapOf(
             "threshold" to threshold.toBigInteger(),
             "other_signatories" to otherSignatories.sorted().map { it.value },
-            "maybe_timepoint" to maybeTimePoint.toEncodableInstance(),
+            "timepoint" to maybeTimePoint.toEncodableInstance(),
             "call_hash" to callHash.value
         )
     )

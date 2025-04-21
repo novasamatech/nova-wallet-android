@@ -11,7 +11,7 @@
     <string name="multisig_operations_pending_signature">Pending signature</string>
     <string name="multisig_operations_signed">Signed</string>
 
-    <string name="multisig_operations_unknown_calldata">[Unknown operation] ($s)</string>
+    <string name="multisig_operations_unknown_calldata">[Unknown operation] (%s)</string>
 
     <string name="account_multisig">Multisig</string>
     <string name="multisig_wallet_details_info_warning">This account is a multisig:</string>

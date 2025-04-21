@@ -29,7 +29,6 @@ class MultisigPendingOperationsViewModel(
         .withSafeLoading()
         .shareInBackground()
 
-
     fun backClicked() {
         router.back()
     }

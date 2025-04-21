@@ -99,9 +99,6 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     }
 
     private suspend fun performReject(operation: PendingMultisigOperation): Result<Unit> {
-        val call = operation.call
-        requireNotNull(call) { "Call data not found" }
-
         return extrinsicService.submitExtrinsicAndAwaitExecution(
             chain = operation.chain,
             origin = TransactionOrigin.WalletWithId(operation.signatoryMetaId)
