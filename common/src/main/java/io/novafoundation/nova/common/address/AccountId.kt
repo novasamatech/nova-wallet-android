@@ -12,7 +12,7 @@ class AccountIdKey(val value: AccountId) : Comparable<AccountIdKey> {
 
     override fun compareTo(other: AccountIdKey): Int {
         return value.compareTo(other.value)
-    };
+    }
 
     override fun equals(other: Any?): Boolean {
         return this === other || other is AccountIdKey && this.value contentEquals other.value
@@ -44,7 +44,6 @@ fun AccountIdKey.Companion.fromHexOrNull(src: HexString): AccountIdKey? {
 fun AccountIdKey.Companion.fromHexOrThrow(src: HexString): AccountIdKey {
     return fromHex(src).getOrThrow()
 }
-
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))
 fun <T> Map<AccountIdKey, T>.getValue(key: AccountId) = getValue(AccountIdKey(key))

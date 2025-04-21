@@ -207,7 +207,7 @@ data class Chain(
 
         data class ReferendumSummary(override val url: String) : ExternalApi()
 
-        data class Multisig(override val url: String): ExternalApi()
+        data class Multisig(override val url: String) : ExternalApi()
     }
 
     enum class Governance {

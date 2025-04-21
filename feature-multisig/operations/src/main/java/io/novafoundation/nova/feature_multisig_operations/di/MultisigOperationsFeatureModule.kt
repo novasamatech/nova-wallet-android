@@ -1,4 +1,4 @@
-package  io.novafoundation.nova.feature_multisig_operations.di
+package io.novafoundation.nova.feature_multisig_operations.di
 
 import dagger.Binds
 import dagger.Module

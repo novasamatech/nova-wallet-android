@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.domain.manualBackup
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG

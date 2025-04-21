@@ -17,7 +17,7 @@ class PendingMultisigOperation(
     val signatoryAccountId: AccountIdKey,
     val signatoryMetaId: Long,
     val threshold: Int,
-) : Identifiable{
+) : Identifiable {
 
     override val identifier: PendingMultisigOperationId = "${chain.id}.${callHash.toHex()}.${timePoint.height}.${timePoint.extrinsicIndex}"
 
@@ -28,7 +28,7 @@ class PendingMultisigOperation(
             callHash
         }
 
-        return "Call: $callFormatted, Chain: ${chain.name}, Approvals: ${approvals.size}/${threshold}, User action: ${userAction()}"
+        return "Call: $callFormatted, Chain: ${chain.name}, Approvals: ${approvals.size}/$threshold, User action: ${userAction()}"
     }
 
     companion object

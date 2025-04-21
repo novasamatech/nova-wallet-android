@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationDetailsBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi

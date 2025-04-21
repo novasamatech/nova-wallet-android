@@ -15,7 +15,7 @@ interface MultisigOperationFormatter {
 @FeatureScope
 class RealMultisigOperationFormatter @Inject constructor(
     private val resourceManager: ResourceManager,
-): MultisigOperationFormatter {
+) : MultisigOperationFormatter {
 
     override fun formatTitle(operation: PendingMultisigOperation): String {
         val call = operation.call

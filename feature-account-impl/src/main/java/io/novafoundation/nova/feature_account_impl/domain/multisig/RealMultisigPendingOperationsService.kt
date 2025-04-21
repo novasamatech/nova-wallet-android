@@ -47,7 +47,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
 
     context(ComputationalScope)
     override fun pendingOperations(): Flow<List<PendingMultisigOperation>> {
-       return getCachedSyncer().flatMapLatest { it.pendingOperations }
+        return getCachedSyncer().flatMapLatest { it.pendingOperations }
     }
 
     context(ComputationalScope)

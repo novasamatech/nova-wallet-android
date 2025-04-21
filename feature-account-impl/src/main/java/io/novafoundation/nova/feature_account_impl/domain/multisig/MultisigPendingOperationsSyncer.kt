@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.domain.multisig
 
-
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.LazyAsyncMultiCache
@@ -180,7 +179,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
 
             callHash.takeIf { multisig == ourAccountId }
         }
-            .onFailure { Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to parse new NewMultisig event", it)  }
+            .onFailure { Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to parse new NewMultisig event", it) }
             .getOrNull()
     }
 }

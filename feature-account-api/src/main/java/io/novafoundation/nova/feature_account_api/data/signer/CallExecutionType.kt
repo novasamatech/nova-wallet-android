@@ -25,7 +25,7 @@ fun CallExecutionType.isImmediate(): Boolean {
     return this == IMMEDIATE
 }
 
-fun CallExecutionType.intersect(other: CallExecutionType) : CallExecutionType {
+fun CallExecutionType.intersect(other: CallExecutionType): CallExecutionType {
     return if (isImmediate() && other.isImmediate()) {
         IMMEDIATE
     } else {

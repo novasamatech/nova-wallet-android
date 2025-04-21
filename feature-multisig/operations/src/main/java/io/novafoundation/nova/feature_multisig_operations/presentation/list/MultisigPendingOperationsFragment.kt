@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.domain.onNotLoaded
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigPendingOperationsBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
@@ -56,7 +55,6 @@ class MultisigPendingOperationsFragment :
             }
         }
     }
-
 
     override fun itemClicked(model: PendingMultisigOperationModel) {
         viewModel.operationClicked(model)

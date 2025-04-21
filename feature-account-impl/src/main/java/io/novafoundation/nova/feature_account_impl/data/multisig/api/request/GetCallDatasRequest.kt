@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 
 class GetCallDatasRequest(
     callHashes: List<CallHash>
-): SubQueryFilters {
+) : SubQueryFilters {
 
     @Transient
     private val callHashesHex = callHashes.map { it.toHexWithPrefix() }

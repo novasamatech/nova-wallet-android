@@ -343,6 +343,6 @@ class BalanceListViewModel(
     }
 
     fun pendingOperationsClicked() {
-       router.openPendingMultisigOperations()
+        router.openPendingMultisigOperations()
     }
 }

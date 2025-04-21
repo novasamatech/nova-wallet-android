@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.appendSpace
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import javax.inject.Inject

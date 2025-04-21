@@ -41,7 +41,6 @@ import kotlinx.coroutines.coroutineScope
 import java.math.BigInteger
 import javax.inject.Inject
 
-
 private typealias CallWeightsByType = Map<String, Deferred<WeightV2>>
 
 private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8

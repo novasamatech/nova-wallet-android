@@ -42,8 +42,8 @@ class RealLegacyLedgerAddAccountRepository(
             position = accountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.LEDGER,
             status = MetaAccountLocal.Status.ACTIVE,
-           globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
-typeExtras = null
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+            typeExtras = null
         )
 
         val metaId = accountDao.insertMetaAndChainAccounts(metaAccount) { metaId ->

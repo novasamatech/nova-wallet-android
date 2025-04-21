@@ -124,7 +124,7 @@ class AccountMappers(
                         globallyUniqueId = globallyUniqueId,
                         chainAccounts = chainAccounts,
                         proxy = proxyAccount ?: run {
-                            Log.e("Proxy", "Null proxy account for proxied ${id} (${name})")
+                            Log.e("Proxy", "Null proxy account for proxied $id ($name)")
                             return null
                         },
                         substratePublicKey = substratePublicKey,
@@ -139,7 +139,7 @@ class AccountMappers(
                 }
 
                 LightMetaAccount.Type.MULTISIG -> {
-                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(requireNotNull(typeExtras) { "typeExtras is null: ${id}"})
+                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(requireNotNull(typeExtras) { "typeExtras is null: $id" })
 
                     RealMultisigMetaAccount(
                         id = id,
@@ -150,7 +150,7 @@ class AccountMappers(
                         isSelected = isSelected,
                         name = name,
                         status = mapMetaAccountStateFromLocal(status),
-                        signatoryMetaId = requireNotNull(parentMetaId) { "parentMetaId is null: ${id}" },
+                        signatoryMetaId = requireNotNull(parentMetaId) { "parentMetaId is null: $id" },
                         otherSignatories = multisigTypeExtras.otherSignatories,
                         threshold = multisigTypeExtras.threshold,
                         signatoryAccountId = multisigTypeExtras.signatoryAccountId

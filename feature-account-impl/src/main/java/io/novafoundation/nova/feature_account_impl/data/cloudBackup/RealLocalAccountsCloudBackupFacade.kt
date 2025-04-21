@@ -369,7 +369,7 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
             MetaAccountLocal.Type.PROXIED,
-            MetaAccountLocal.Type.MULTISIG-> baseSecrets.getSubstrateBackupSecrets()
+            MetaAccountLocal.Type.MULTISIG -> baseSecrets.getSubstrateBackupSecrets()
         }
     }
 
@@ -576,7 +576,7 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.LEDGER_GENERIC -> CloudBackup.WalletPublicInfo.Type.LEDGER_GENERIC
             MetaAccountLocal.Type.POLKADOT_VAULT -> CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT
 
-            MetaAccountLocal.Type.PROXIED, MetaAccountLocal.Type.MULTISIG  -> null
+            MetaAccountLocal.Type.PROXIED, MetaAccountLocal.Type.MULTISIG -> null
         }
     }
 

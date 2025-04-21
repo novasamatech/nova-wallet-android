@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
 import io.novafoundation.nova.common.list.toListWithHeaders
-import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.shareInBackground

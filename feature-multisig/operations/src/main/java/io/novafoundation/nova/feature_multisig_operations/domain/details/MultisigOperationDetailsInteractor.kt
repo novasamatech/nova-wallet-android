@@ -40,7 +40,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 ) : MultisigOperationDetailsInteractor {
 
     override fun callDetails(call: GenericCall.Instance): String {
-       return extrinsicGson.toJson(call)
+        return extrinsicGson.toJson(call)
     }
 
     override suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee? {

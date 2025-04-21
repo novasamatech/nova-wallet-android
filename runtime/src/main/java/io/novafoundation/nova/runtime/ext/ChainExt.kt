@@ -190,7 +190,7 @@ inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }
 
-inline fun <reified T: Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
+inline fun <reified T : Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
     return externalApis.any { it is T }
 }
 

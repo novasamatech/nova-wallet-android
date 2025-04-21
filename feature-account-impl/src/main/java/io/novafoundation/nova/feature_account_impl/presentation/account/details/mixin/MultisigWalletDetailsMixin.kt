@@ -4,7 +4,6 @@ import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.appendSpace
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.utils.flowOfAll

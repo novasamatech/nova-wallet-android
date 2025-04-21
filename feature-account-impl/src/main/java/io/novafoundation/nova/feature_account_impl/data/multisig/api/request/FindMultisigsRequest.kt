@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 
 class FindMultisigsRequest(
     accountIds: Set<AccountIdKey>
-): SubQueryFilters {
+) : SubQueryFilters {
     @Transient
     private val accountIdsHex = accountIds.map { it.toHexWithPrefix() }
 

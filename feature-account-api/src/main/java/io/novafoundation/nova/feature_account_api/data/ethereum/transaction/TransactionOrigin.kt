@@ -11,7 +11,7 @@ sealed class TransactionOrigin {
 
     class Wallet(val metaAccount: MetaAccount) : TransactionOrigin()
 
-    class WalletWithId(val metaId: Long): TransactionOrigin()
+    class WalletWithId(val metaId: Long) : TransactionOrigin()
 }
 
 fun AccountId.intoOrigin(): TransactionOrigin = TransactionOrigin.WalletWithAccount(this)

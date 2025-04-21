@@ -29,7 +29,6 @@ fun RuntimeSnapshot.composeMultisigAsMulti(
     )
 }
 
-
 fun RuntimeSnapshot.composeMultisigCancelAsMulti(
     threshold: Int,
     otherSignatories: List<AccountIdKey>,

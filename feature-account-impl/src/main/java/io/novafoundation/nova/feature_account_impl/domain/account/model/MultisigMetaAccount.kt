@@ -31,7 +31,8 @@ class RealMultisigMetaAccount(
     type = LightMetaAccount.Type.MULTISIG,
     status = status,
     chainAccounts = emptyMap(),
-), MultisigMetaAccount {
+),
+    MultisigMetaAccount {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {
         // User cannot manually add accounts to multisig meta account

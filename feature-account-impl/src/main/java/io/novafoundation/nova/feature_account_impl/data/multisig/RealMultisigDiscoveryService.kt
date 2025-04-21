@@ -86,7 +86,8 @@ internal class RealMultisigDiscoveryService @Inject constructor(
     }
 
     private suspend fun syncChainProxies(
-        chain: Chain, allMetaAccounts: List<MetaAccount>
+        chain: Chain,
+        allMetaAccounts: List<MetaAccount>
     ) = runCatching {
         Log.d(LOG_TAG, "Started syncing multisigs for ${chain.name}")
 

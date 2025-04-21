@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.ViewPendingOperationsCountBinding
 
-
 class PendingOperationsCountView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -24,20 +23,20 @@ class PendingOperationsCountView @JvmOverloads constructor(
         background = addRipple(getRoundedCornerDrawable(R.color.block_background))
     }
 
-   fun setPendingOperationsCount(model: PendingOperationsCountModel) {
-       when(model) {
-           PendingOperationsCountModel.Gone -> makeGone()
-           is PendingOperationsCountModel.Visible -> {
-               makeVisible()
-               binding.pendingOperationsCountCounter.text = model.countLabel
-           }
-       }
-   }
+    fun setPendingOperationsCount(model: PendingOperationsCountModel) {
+        when (model) {
+            PendingOperationsCountModel.Gone -> makeGone()
+            is PendingOperationsCountModel.Visible -> {
+                makeVisible()
+                binding.pendingOperationsCountCounter.text = model.countLabel
+            }
+        }
+    }
 }
 
 sealed class PendingOperationsCountModel {
 
     data object Gone : PendingOperationsCountModel()
 
-    class Visible(val countLabel: String): PendingOperationsCountModel()
+    class Visible(val countLabel: String) : PendingOperationsCountModel()
 }

@@ -32,7 +32,7 @@ interface QueryableStorageEntry2<I1, I2, T : Any> {
 }
 
 context(StorageQueryContext)
-suspend fun <I1, I2, T: Any> QueryableStorageEntry2<I1, I2, T>.observeNotNull(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T>> {
+suspend fun <I1, I2, T : Any> QueryableStorageEntry2<I1, I2, T>.observeNotNull(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T>> {
     return observe(keys).map { it.filterNotNull() }
 }
 

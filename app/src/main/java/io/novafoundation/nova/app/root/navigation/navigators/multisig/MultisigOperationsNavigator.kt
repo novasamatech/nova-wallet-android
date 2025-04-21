@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigO
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsFragment
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
 
-class MultisigOperationsNavigator(navigationHoldersRegistry: NavigationHoldersRegistry): BaseNavigator(navigationHoldersRegistry), MultisigOperationsRouter {
+class MultisigOperationsNavigator(navigationHoldersRegistry: NavigationHoldersRegistry) : BaseNavigator(navigationHoldersRegistry), MultisigOperationsRouter {
 
     override fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload) {
         navigationBuilder().action(R.id.action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment)
