@@ -5,12 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
@@ -26,10 +30,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.PendingOperationsCountModel
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.assetsSource
@@ -42,6 +46,7 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
@@ -59,12 +64,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
-@OptIn(ExperimentalTime::class)
 class BalanceListViewModel(
     private val promotionBannersMixinFactory: PromotionBannersMixinFactory,
     private val bannerSourceFactory: BannersSourceFactory,
@@ -79,7 +81,8 @@ class BalanceListViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetListMixinFactory: AssetListMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+    private val multisigPendingOperationsService: MultisigPendingOperationsService,
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -177,6 +180,11 @@ class BalanceListViewModel(
             AssetViewMode.TOKENS -> AssetViewModeModel(R.drawable.ic_asset_view_tokens, R.string.asset_view_tokens)
         }
     }.distinctUntilChanged()
+
+    val pendingOperationsCountModel = multisigPendingOperationsService.pendingOperationsCount()
+        .withSafeLoading()
+        .map { it.formatPendingOperationsCount() }
+        .shareInBackground()
 
     init {
         selectedCurrency
@@ -302,6 +310,14 @@ class BalanceListViewModel(
         }
     }
 
+    private fun ExtendedLoadingState<Int>.formatPendingOperationsCount(): PendingOperationsCountModel {
+        return when (val count = dataOrNull) {
+            null, 0 -> PendingOperationsCountModel.Gone
+
+            else -> PendingOperationsCountModel.Visible(count.format())
+        }
+    }
+
     fun sendClicked() {
         router.openSendFlow()
     }
@@ -324,5 +340,9 @@ class BalanceListViewModel(
 
     fun switchViewMode() {
         launch { assetListMixin.switchViewMode() }
+    }
+
+    fun pendingOperationsClicked() {
+        router.openPendingMultisigOperations()
     }
 }

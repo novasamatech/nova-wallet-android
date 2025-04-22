@@ -4,26 +4,32 @@ import android.util.Log
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.getChainIdOrThrow
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
-import io.novafoundation.nova.feature_account_impl.domain.account.model.ProxiedMetaAccount
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
@@ -41,32 +47,32 @@ class ProxiedSignerFactory @Inject constructor(
 
     fun create(metaAccount: ProxiedMetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
         return ProxiedSigner(
-            proxiedMetaAccount = metaAccount,
             chainRegistry = chainRegistry,
             accountRepository = accountRepository,
             signerProvider = signerProvider,
             proxySigningPresenter = proxySigningPresenter,
             getProxyRepository = getProxyRepository,
             proxyExtrinsicValidationEventBus = proxyExtrinsicValidationEventBus,
-            isRootProxied = isRoot,
+            isRootSigner = isRoot,
             proxyCallFilterFactory = proxyCallFilterFactory,
-            metaAccount = metaAccount
+            proxiedMetaAccount = metaAccount
         )
     }
 }
 
 class ProxiedSigner(
-    private val proxiedMetaAccount: MetaAccount,
+    private val proxiedMetaAccount: ProxiedMetaAccount,
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
     private val proxySigningPresenter: ProxySigningPresenter,
     private val getProxyRepository: GetProxyRepository,
     private val proxyExtrinsicValidationEventBus: ProxyExtrinsicValidationRequestBus,
-    private val isRootProxied: Boolean,
+    private val isRootSigner: Boolean,
     private val proxyCallFilterFactory: ProxyCallFilterFactory,
-    override val metaAccount: MetaAccount
 ) : NovaSigner {
+
+    override val metaAccount = proxiedMetaAccount
 
     private val proxyMetaAccount = SingleValueCache {
         computeProxyMetaAccount()
@@ -80,6 +86,11 @@ class ProxiedSigner(
         return delegateSigner().submissionSignerAccountId(chain)
     }
 
+    override suspend fun callExecutionType(): CallExecutionType {
+        val selfExecutionType = CallExecutionType.IMMEDIATE
+        return delegateSigner().callExecutionType().intersect(selfExecutionType)
+    }
+
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForSubmission(context: SigningContext) {
         wrapCallsInProxyForSubmission()
@@ -88,7 +99,7 @@ class ProxiedSigner(
 
         delegateSigner().setSignerDataForSubmission(context)
 
-        if (isRootProxied) {
+        if (isRootSigner) {
             acknowledgeProxyOperation(proxyMetaAccount())
             validateExtrinsic(context.chain)
         }
@@ -175,6 +186,27 @@ class ProxiedSigner(
         )
     }
 
+    context(ExtrinsicBuilder)
+    private fun wrapCallsIntoProxy(
+        proxiedAccountId: AccountId,
+        proxyType: ProxyType,
+    ) {
+        val call = getWrappedCall()
+
+        val proxyCall = runtime.composeCall(
+            moduleName = Modules.PROXY,
+            callName = "proxy",
+            arguments = mapOf(
+                "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
+                "force_proxy_type" to DictEnum.Entry(proxyType.name, null),
+                "call" to call
+            )
+        )
+
+        resetCalls()
+        call(proxyCall)
+    }
+
     private suspend fun acknowledgeProxyOperation(proxyMetaAccount: MetaAccount) {
         val resume = proxySigningPresenter.acknowledgeProxyOperation(proxiedMetaAccount, proxyMetaAccount)
         if (!resume) {
@@ -183,8 +215,8 @@ class ProxiedSigner(
     }
 
     private suspend fun computeProxyMetaAccount(): MetaAccount {
-        val proxyAccount = proxiedMetaAccount.proxy ?: throw IllegalStateException("Proxy account is not found")
-        return accountRepository.getMetaAccount(proxyAccount.metaId)
+        val proxyAccount = proxiedMetaAccount.proxy
+        return accountRepository.getMetaAccount(proxyAccount.proxyMetaId)
     }
 
     private suspend fun notEnoughPermission(proxyMetaAccount: MetaAccount, availableProxyTypes: List<ProxyType>): Nothing {

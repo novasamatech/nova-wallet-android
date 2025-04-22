@@ -41,3 +41,22 @@ fun List<AddAccountResult>.batchIfNeeded(): AddAccountResult {
         else -> AddAccountResult.Batch(updatesThatHadEffect)
     }
 }
+
+fun AddAccountResult.visit(
+    onAdd: (AddAccountResult.AccountAdded) -> Unit
+) {
+    when (this) {
+        is AddAccountResult.AccountAdded -> onAdd(this)
+        is AddAccountResult.AccountChanged -> Unit
+        is AddAccountResult.Batch -> updates.onEach { it.visit(onAdd) }
+        AddAccountResult.NoOp -> Unit
+    }
+}
+
+fun AddAccountResult.collectAddedIds(): List<Long> {
+    return buildList {
+        visit {
+            add(it.metaId)
+        }
+    }
+}

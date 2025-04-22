@@ -108,4 +108,6 @@ interface AssetsRouter {
     fun openTradeWebInterface(payload: TradeWebPayload)
 
     fun finishTopUp()
+
+    fun openPendingMultisigOperations()
 }

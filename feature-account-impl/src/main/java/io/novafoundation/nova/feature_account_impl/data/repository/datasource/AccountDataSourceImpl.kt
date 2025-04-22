@@ -72,6 +72,7 @@ class AccountDataSourceImpl(
     private val selectedMetaAccountLocal = metaAccountDao.selectedMetaAccountInfoFlow()
         .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
 
+    // TODO multisig: add distinct until changed so `selectedMetaAccountFlow` wont emit when something else in `meta_accounts` table changes
     private val selectedMetaAccountFlow = selectedMetaAccountLocal
         .filterNotNull()
         .map(accountMappers::mapMetaAccountLocalToMetaAccount)

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.signer
 
 import android.util.Log
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -29,6 +30,12 @@ private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
 abstract class LeafSigner(
     override val metaAccount: MetaAccount,
 ) : NovaSigner, GeneralTransactionSigner {
+
+    // All leaf signers are immediate atm so we implement it here to reduce boilerplate
+    // Feel free to move it down if some leaf signer is actually immediate
+    override suspend fun callExecutionType(): CallExecutionType {
+        return CallExecutionType.IMMEDIATE
+    }
 
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForSubmission(context: SigningContext) {

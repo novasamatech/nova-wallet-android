@@ -54,6 +54,8 @@ class RealMetaAccountTypePresentationMapper(
             LightMetaAccount.Type.LEDGER -> resourceManager.getString(R.string.common_ledger)
 
             LightMetaAccount.Type.PROXIED -> resourceManager.getString(R.string.account_proxieds)
+
+            LightMetaAccount.Type.MULTISIG -> resourceManager.getString(R.string.account_multisig)
         }
 
         return if (icon != null && label != null) {
@@ -88,6 +90,9 @@ class RealMetaAccountTypePresentationMapper(
 
             LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger.asTintedIcon(canApplyOwnTint = true)
             LightMetaAccount.Type.PROXIED -> R.drawable.ic_proxy.asTintedIcon(canApplyOwnTint = true)
+
+            // TODO multisig: replace ic_multisig with actual icon
+            LightMetaAccount.Type.MULTISIG -> R.drawable.ic_multisig.asTintedIcon(canApplyOwnTint = true)
         }
     }
 }

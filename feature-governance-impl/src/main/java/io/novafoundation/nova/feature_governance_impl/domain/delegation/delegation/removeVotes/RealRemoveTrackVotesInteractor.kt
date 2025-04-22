@@ -40,8 +40,8 @@ class RealRemoveTrackVotesInteractor(
     override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<ExtrinsicStatus.InBlock> = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()
 
-        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
-            governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountIdToRemoveVotes = origin.executingAccount)
+        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
+            governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountIdToRemoveVotes = buildingContext.submissionOrigin.executingAccount)
         }.awaitInBlock()
     }
 

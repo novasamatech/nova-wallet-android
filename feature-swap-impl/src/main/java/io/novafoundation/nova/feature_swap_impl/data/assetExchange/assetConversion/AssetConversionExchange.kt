@@ -293,9 +293,9 @@ private class AssetConversionExchange(
                 submissionOptions = ExtrinsicService.SubmissionOptions(
                     feePaymentCurrency = transactionArgs.feePaymentCurrency
                 )
-            ) { submissionOrigin ->
+            ) { buildingContext ->
                 // Send swapped funds to the executingAccount since it the account doing the swap
-                executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.executingAccount)
+                executeSwap(swapLimit = args.actualSwapLimit, sendTo = buildingContext.submissionOrigin.executingAccount)
             }.requireOk().mapCatching {
                 SwapExecutionCorrection(
                     actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()

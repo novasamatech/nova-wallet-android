@@ -55,6 +55,8 @@
 
     <include app:graph="@navigation/mnemonic_nav_graph" />
 
+    <include app:graph="@navigation/multisig_pending_operations_graph" />
+
     <action
         android:id="@+id/action_returnToMainScreen"
         app:destination="@id/mainFragment"
@@ -586,6 +588,14 @@
         <action
             android:id="@+id/action_mainFragment_to_swapFlow"
             app:destination="@id/select_swap_token_nav_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_mainFragment_to_multisigPendingOperationsFlow"
+            app:destination="@id/multisig_pending_operations_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"

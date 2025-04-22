@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.domain.account.model
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
@@ -19,7 +18,6 @@ class PolkadotVaultMetaAccount(
     name: String,
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
-    proxy: ProxyAccount?,
     chainAccounts: Map<ChainId, MetaAccount.ChainAccount>
 ) : DefaultMetaAccount(
     id = id,
@@ -34,7 +32,6 @@ class PolkadotVaultMetaAccount(
     type = type,
     status = status,
     chainAccounts = chainAccounts,
-    proxy = proxy
 ) {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {

@@ -42,6 +42,10 @@ fun MetaAccountChangesEventBus.SingleUpdateEvent.takeMetaIdUnlessTypeIs(exceptio
     return metaId.takeUnless { metaAccountType == exceptionType }
 }
 
+fun MetaAccountChangesEventBus.SingleUpdateEvent.takeMetaIdIfTypeMatches(matcher: (LightMetaAccount.Type) -> Boolean): Long? {
+    return metaId.takeUnless { matcher(metaAccountType) }
+}
+
 inline fun buildChangesEvent(builder: MutableList<Event>.() -> Unit): Event? {
     val allEvents = buildList(builder)
 

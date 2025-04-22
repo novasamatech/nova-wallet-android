@@ -178,14 +178,14 @@ class RealProxySyncService(
     private suspend fun addProxiedAccount(
         chainId: ChainId,
         node: NestedProxiesGraphConstructor.Node,
-        metaId: Long,
+        proxyMetaId: Long,
         identities: Map<AccountIdKey, Identity?>
     ) = proxiedAddAccountRepository.addAccountWithSingleChange(
         ProxiedAddAccountRepository.Payload(
             chainId = chainId,
             proxiedAccountId = node.accountId.value,
             proxyType = node.permissionType,
-            proxyMetaId = metaId,
+            proxyMetaId = proxyMetaId,
             identity = identities[node.accountId]
         )
     )
@@ -230,9 +230,19 @@ class RealProxySyncService(
         return deactivated - alreadyDeactivatedMetaIdsInCache.toSet()
     }
 
-    private suspend fun List<Long>.takeNotYetDeactivatedMetaAccounts(): List<Long> {
-        val alreadyDeactivatedMetaAccountIds = accountDao.getMetaAccountIdsByStatus(MetaAccountLocal.Status.DEACTIVATED)
+    private fun MetaAccount.isAllowedToSyncProxy(shouldSyncWatchOnly: Boolean): Boolean {
+        return when (type) {
+            LightMetaAccount.Type.SECRETS,
+            LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.LEDGER_LEGACY,
+            LightMetaAccount.Type.LEDGER,
+            LightMetaAccount.Type.POLKADOT_VAULT,
 
-        return this - alreadyDeactivatedMetaAccountIds.toSet()
+            LightMetaAccount.Type.WATCH_ONLY -> shouldSyncWatchOnly
+
+            // TODO multisig: sync proxies for multisigs
+            LightMetaAccount.Type.MULTISIG,
+            LightMetaAccount.Type.PROXIED -> false
+        }
     }
 }

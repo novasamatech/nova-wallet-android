@@ -7,9 +7,8 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtensi
 
 object CustomTransactionExtensions {
 
-    context(ExtrinsicBuilder)
-    fun applyDefaultValues() {
-        defaultValues().forEach(::setTransactionExtension)
+    fun applyDefaultValues(builder: ExtrinsicBuilder) {
+        defaultValues().forEach(builder::setTransactionExtension)
     }
 
     fun defaultValues(): List<TransactionExtension> {

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.Extri
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
@@ -16,10 +17,20 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
-typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(origin: SubmissionOrigin) -> Unit
-typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(origin: SubmissionOrigin) -> Unit
+typealias FormExtrinsicWithOrigin = suspend ExtrinsicBuilder.(context: ExtrinsicBuildingContext) -> Unit
+typealias FormMultiExtrinsicWithOrigin = suspend CallBuilder.(context: ExtrinsicBuildingContext) -> Unit
 
-class ExtrinsicSubmission(val hash: String, val submissionOrigin: SubmissionOrigin)
+class ExtrinsicSubmission(
+    val hash: String,
+    val submissionOrigin: SubmissionOrigin,
+    val callExecutionType: CallExecutionType,
+)
+
+class ExtrinsicBuildingContext(
+    val submissionOrigin: SubmissionOrigin,
+    val signer: NovaSigner,
+    val chain: Chain
+)
 
 private val DEFAULT_BATCH_MODE = BatchMode.BATCH_ALL
 

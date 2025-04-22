@@ -124,7 +124,6 @@ class MetadataShortenerTest : BaseIntegrationTest() {
             isSelected = true,
             name = "test",
             type = LightMetaAccount.Type.SECRETS,
-            proxy = null,
             chainAccounts = emptyMap(),
             status = LightMetaAccount.Status.ACTIVE
         )

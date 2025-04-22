@@ -49,7 +49,8 @@ interface LightMetaAccount {
         LEDGER_LEGACY,
         LEDGER,
         POLKADOT_VAULT,
-        PROXIED
+        PROXIED,
+        MULTISIG
     }
 
     enum class Status {
@@ -85,9 +86,6 @@ fun LightMetaAccount(
 
 interface MetaAccount : LightMetaAccount {
 
-    // TODO we can now subclass MetaAccount and have this field only in subclass
-    val proxy: ProxyAccount?
-
     // TODO this should not be exposed as its a implementation detail
     // We should rather use something like
     // fun iterateAccounts(): Iterable<(AccountId, ChainId?, MultiChainEncryption?)>
@@ -111,6 +109,22 @@ interface MetaAccount : LightMetaAccount {
     fun publicKeyIn(chain: Chain): ByteArray?
 
     fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption?
+}
+
+interface ProxiedMetaAccount : MetaAccount {
+
+    val proxy: ProxyAccount
+}
+
+interface MultisigMetaAccount : MetaAccount {
+
+    val signatoryMetaId: Long
+
+    val signatoryAccountId: AccountIdKey
+
+    val otherSignatories: List<AccountIdKey>
+
+    val threshold: Int
 }
 
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
@@ -188,7 +202,8 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.LEDGER,
         LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-        LightMetaAccount.Type.PROXIED -> false
+        LightMetaAccount.Type.PROXIED,
+        LightMetaAccount.Type.MULTISIG -> false
     }
 }
 

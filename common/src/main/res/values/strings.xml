@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="multisig_operation_details_call_data_not_found">Call-data not found</string>
+
+    <string name="multisig_operation_details_approve">Approve</string>
+    <string name="multisig_operation_details_approve_and_execute">Approve &amp; Execute</string>
+    <string name="multisig_operation_details_reject">Reject</string>
+
+    <string name="multisig_operations_progress">%s of %s Signed</string>
+
+    <string name="multisig_operations_pending_signature">Pending signature</string>
+    <string name="multisig_operations_signed">Signed</string>
+
+    <string name="multisig_operations_unknown_calldata">[Unknown operation] (%s)</string>
+
+    <string name="account_multisig">Multisig</string>
+    <string name="multisig_wallet_details_info_warning">This account is a multisig:</string>
+    <string name="multisig_signatory">Signatory:</string>
+
+    <string name="multisig_pending_operations">Pending operations</string>
 
 <!--
     <string name="buy_provider_open_confirmation_title">Continue in browser?</string>

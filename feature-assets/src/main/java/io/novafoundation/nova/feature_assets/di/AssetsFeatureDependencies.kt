@@ -34,6 +34,7 @@ import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -207,6 +208,8 @@ interface AssetsFeatureDependencies {
     val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
 
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
+
+    val multisigPendingOperationsService: MultisigPendingOperationsService
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

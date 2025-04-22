@@ -153,12 +153,9 @@ class BalanceListFragment :
             balanceBreakdownBottomSheet?.show()
         }
 
-        viewModel.walletConnectAccountSessionsUI.observe {
-            headerAdapter.setWalletConnectModel(it)
-        }
-
+        viewModel.walletConnectAccountSessionsUI.observe(headerAdapter::setWalletConnectModel)
+        viewModel.pendingOperationsCountModel.observe(headerAdapter::setPendingOperationsCountModel)
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
-
         viewModel.assetViewModeModelFlow.observe { manageAssetsAdapter.setAssetViewModeModel(it) }
     }
 
@@ -215,6 +212,10 @@ class BalanceListFragment :
 
     override fun novaCardClick() {
         viewModel.novaCardClicked()
+    }
+
+    override fun pendingOperationsClicked() {
+        viewModel.pendingOperationsClicked()
     }
 
     override fun assetViewModeClicked() {

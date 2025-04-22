@@ -25,7 +25,7 @@ object LocalAccountsMocker {
 
         var metaAccountCounter = allJoinedMetaAccountInfo.size
 
-        whenever(dao.withTransaction(any())).then { invocation ->
+        whenever(dao.runInTransaction(any())).then { invocation ->
             val txAction = invocation.arguments.first() as suspend () -> Unit
 
             runBlocking { txAction() }
