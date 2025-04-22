@@ -1,10 +1,8 @@
 package io.novafoundation.nova.runtime.multiNetwork.runtime.repository
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import java.math.BigInteger
@@ -38,14 +36,6 @@ fun ExtrinsicWithEvents.isSuccess(): Boolean {
     }
 
     return status == ExtrinsicStatus.SUCCESS
-}
-
-fun Extrinsic.Instance.signer(): AccountId {
-    val accountIdentifier = requireNotNull(signature?.accountIdentifier) {
-        "Extrinsic is unsigned"
-    }
-
-    return bindAccountIdentifier(accountIdentifier)
 }
 
 fun List<GenericEvent.Instance>.nativeFee(): BigInteger? {

@@ -11,10 +11,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.isSuccess
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.signer
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 
 internal class RealExtrinsicWalk(
@@ -39,7 +39,7 @@ internal class RealExtrinsicWalk(
             call = source.extrinsic.call,
             success = source.isSuccess(),
             events = source.events,
-            origin = source.extrinsic.signer()
+            origin = source.extrinsic.signer() ?: error("Unsigned extrinsic")
         )
 
         nestedVisit(runtime, visitor, rootVisit, depth = 0)

@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.CustomContributeSubmitter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.referral.DefaultReferralCodePayload
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import java.math.BigDecimal
 
 class AstarContributeSubmitter(

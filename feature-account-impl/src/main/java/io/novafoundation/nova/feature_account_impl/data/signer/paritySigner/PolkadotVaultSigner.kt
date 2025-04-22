@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner
 
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -10,17 +11,20 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.polkadot
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.SeparateFlowSigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import javax.inject.Inject
 
-class PolkadotVaultVariantSignerFactory(
+@FeatureScope
+class PolkadotVaultVariantSignerFactory @Inject constructor(
     private val signingSharedState: SigningSharedState,
     private val signFlowRequester: PolkadotVaultVariantSignCommunicator,
     private val resourceManager: ResourceManager,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-    private val messageSigningNotSupported: SigningNotSupportedPresentable
+    private val messageSigningNotSupported: SigningNotSupportedPresentable,
 ) {
 
     fun createPolkadotVault(metaAccount: MetaAccount): PolkadotVaultSigner {
@@ -30,7 +34,7 @@ class PolkadotVaultVariantSignerFactory(
             signFlowRequester = signFlowRequester,
             resourceManager = resourceManager,
             polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
-            messageSigningNotSupported = messageSigningNotSupported
+            messageSigningNotSupported = messageSigningNotSupported,
         )
     }
 
@@ -41,7 +45,7 @@ class PolkadotVaultVariantSignerFactory(
             signFlowRequester = signFlowRequester,
             resourceManager = resourceManager,
             polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
-            messageSigningNotSupported = messageSigningNotSupported
+            messageSigningNotSupported = messageSigningNotSupported,
         )
     }
 }
@@ -53,13 +57,13 @@ abstract class PolkadotVaultVariantSigner(
     private val resourceManager: ResourceManager,
     private val variant: PolkadotVaultVariant,
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-    private val messageSigningNotSupported: SigningNotSupportedPresentable
+    private val messageSigningNotSupported: SigningNotSupportedPresentable,
 ) : SeparateFlowSigner(signingSharedState, signFlowRequester, metaAccount) {
 
-    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
+    override suspend fun signInheritedImplication(inheritedImplication: InheritedImplication, accountId: AccountId): SignatureWrapper {
         signFlowRequester.setUsedVariant(variant)
 
-        return super.signExtrinsic(payloadExtrinsic)
+        return super.signInheritedImplication(inheritedImplication, accountId)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
@@ -73,6 +77,10 @@ abstract class PolkadotVaultVariantSigner(
         )
 
         throw SigningCancelledException()
+    }
+
+    override suspend fun maxCallsPerTransaction(): Int? {
+        return null
     }
 }
 
@@ -90,7 +98,7 @@ class ParitySignerSigner(
     resourceManager = resourceManager,
     variant = PolkadotVaultVariant.PARITY_SIGNER,
     polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
-    messageSigningNotSupported = messageSigningNotSupported
+    messageSigningNotSupported = messageSigningNotSupported,
 )
 
 class PolkadotVaultSigner(
@@ -99,7 +107,7 @@ class PolkadotVaultSigner(
     signFlowRequester: PolkadotVaultVariantSignCommunicator,
     resourceManager: ResourceManager,
     polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
-    messageSigningNotSupported: SigningNotSupportedPresentable
+    messageSigningNotSupported: SigningNotSupportedPresentable,
 ) : PolkadotVaultVariantSigner(
     signingSharedState = signingSharedState,
     metaAccount = metaAccount,
@@ -107,5 +115,5 @@ class PolkadotVaultSigner(
     resourceManager = resourceManager,
     variant = PolkadotVaultVariant.POLKADOT_VAULT,
     polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
-    messageSigningNotSupported = messageSigningNotSupported
+    messageSigningNotSupported = messageSigningNotSupported,
 )

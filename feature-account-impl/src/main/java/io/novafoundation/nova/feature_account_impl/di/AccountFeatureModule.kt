@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.di
 
 import com.google.gson.Gson
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -36,6 +37,7 @@ import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
@@ -139,7 +141,10 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
-import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
+import io.novafoundation.nova.feature_account_impl.di.AccountFeatureModule.BindsModule
+import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.SigningContextFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -162,10 +167,21 @@ import javax.inject.Named
         AdvancedEncryptionStoreModule::class,
         AddAccountsModule::class,
         CloudBackupModule::class,
-        CustomFeeModule::class
+        CustomFeeModule::class,
+        BindsModule::class
     ]
 )
 class AccountFeatureModule {
+
+    @Module
+    internal interface BindsModule {
+
+        @Binds
+        fun bindExtrinsicSplitter(real: RealExtrinsicSplitter): ExtrinsicSplitter
+
+        @Binds
+        fun bindSigningContextFactory(real: SigningContextFactory): SigningContext.Factory
+    }
 
     @Provides
     @FeatureScope
@@ -193,6 +209,7 @@ class AccountFeatureModule {
         extrinsicSplitter: ExtrinsicSplitter,
         feePaymentProviderRegistry: FeePaymentProviderRegistry,
         eventsRepository: EventsRepository,
+        signingContextFactory: SigningContext.Factory
     ): ExtrinsicService.Factory = RealExtrinsicServiceFactory(
         rpcCalls,
         chainRegistry,
@@ -201,7 +218,8 @@ class AccountFeatureModule {
         signerProvider,
         extrinsicSplitter,
         eventsRepository,
-        feePaymentProviderRegistry
+        feePaymentProviderRegistry,
+        signingContextFactory
     )
 
     @Provides
@@ -215,6 +233,7 @@ class AccountFeatureModule {
         extrinsicSplitter: ExtrinsicSplitter,
         feePaymentProviderRegistry: FeePaymentProviderRegistry,
         eventsRepository: EventsRepository,
+        signingContextFactory: SigningContext.Factory,
     ): ExtrinsicService = RealExtrinsicService(
         rpcCalls,
         chainRegistry,
@@ -224,6 +243,7 @@ class AccountFeatureModule {
         extrinsicSplitter,
         feePaymentProviderRegistry,
         eventsRepository,
+        signingContextFactory,
         coroutineScope = null
     )
 

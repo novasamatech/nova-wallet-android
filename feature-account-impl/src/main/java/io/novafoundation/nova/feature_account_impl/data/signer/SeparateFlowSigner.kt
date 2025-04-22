@@ -8,19 +8,23 @@ import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterSc
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenRequester
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignatureWrapper
 import io.novafoundation.nova.feature_account_api.presenatation.sign.awaitConfirmation
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 abstract class SeparateFlowSigner(
     private val signingSharedState: SigningSharedState,
     private val signFlowRequester: SignInterScreenRequester,
-    private val metaAccount: MetaAccount
+    metaAccount: MetaAccount,
 ) : LeafSigner(metaAccount) {
 
-    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
-        val payload = SeparateFlowSignerState(payloadExtrinsic, metaAccount)
+    override suspend fun signInheritedImplication(
+        inheritedImplication: InheritedImplication,
+        accountId: AccountId
+    ): SignatureWrapper {
+        val payload = SeparateFlowSignerState(inheritedImplication, metaAccount)
 
         signingSharedState.set(payload)
 
@@ -33,10 +37,7 @@ abstract class SeparateFlowSigner(
         }
 
         if (result is SignInterScreenCommunicator.Response.Signed) {
-            return SignedExtrinsic(
-                payloadExtrinsic,
-                SignatureWrapper(result.signature)
-            )
+            return SignatureWrapper(result.signature)
         } else {
             throw SigningCancelledException()
         }

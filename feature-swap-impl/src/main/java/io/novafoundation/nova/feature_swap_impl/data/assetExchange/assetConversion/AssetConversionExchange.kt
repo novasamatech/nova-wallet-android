@@ -57,7 +57,8 @@ import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map

@@ -14,15 +14,12 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.encodeDerivationPath
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.parseAccountResponse
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
 
 abstract class NewSubstrateLedgerApplication(
     private val transport: LedgerTransport,
-    private val chainRegistry: ChainRegistry,
     private val metadataShortenerService: MetadataShortenerService
 ) : SubstrateLedgerApplication {
 
@@ -62,7 +59,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: SignerPayloadExtrinsic
+        payload: InheritedImplication
     ): SignatureWrapper {
         val chunks = prepareExtrinsicChunks(metaId, chainId, payload)
 
@@ -89,9 +86,9 @@ abstract class NewSubstrateLedgerApplication(
     private suspend fun prepareExtrinsicChunks(
         metaId: Long,
         chainId: ChainId,
-        payload: SignerPayloadExtrinsic
+        payload: InheritedImplication
     ): List<ByteArray> {
-        val payloadBytes = payload.encodedSignaturePayload(hashBigPayloads = false)
+        val payloadBytes = payload.encoded()
 
         val derivationPath = getDerivationPath(metaId, chainId)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)

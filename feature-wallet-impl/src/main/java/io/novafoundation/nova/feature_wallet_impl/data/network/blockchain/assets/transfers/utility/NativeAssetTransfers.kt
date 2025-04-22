@@ -20,7 +20,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey

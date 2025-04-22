@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novasama.substrate_sdk_android.extensions.fromHex
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
