@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -11,7 +10,7 @@ interface PageCallback {
 
     fun onPageStarted(webView: WebView, url: String, favicon: Bitmap?)
 
-    fun handleBrowserIntent(intent: Intent)
+    fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean
 
     fun onPageChanged(webView: WebView, url: String?, title: String?)
 }
@@ -32,11 +31,7 @@ class Web3WebViewClient(
     private var desktopModeChanged = false
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        val url = request.url
-
-        if (url.scheme != "http" && url.scheme != "https") {
-            val tel = Intent(Intent.ACTION_VIEW, url)
-            pageCallback.handleBrowserIntent(tel)
+        if (pageCallback.shouldOverrideUrlLoading(view, request)) {
             return true
         }
 

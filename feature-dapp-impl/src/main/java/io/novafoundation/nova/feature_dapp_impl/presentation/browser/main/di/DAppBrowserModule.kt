@@ -9,7 +9,10 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
@@ -26,6 +29,10 @@ import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.web3.states.ExtensionStoreFactory
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
+import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
+import io.novafoundation.nova.common.utils.webView.interceptors.CompoundWebViewRequestInterceptor
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.interceptors.WalletConnectPairingInterceptor
+import io.novafoundation.nova.feature_dapp_impl.web3.webview.interceptors.Web3FallbackInterceptor
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -63,6 +70,19 @@ class DAppBrowserModule {
         fragment: Fragment,
         webViewPermissionAskerFactory: WebViewPermissionAskerFactory
     ) = webViewPermissionAskerFactory.create(fragment)
+
+    @Provides
+    @ScreenScope
+    fun provideWebViewClientInterceptor(
+        toastMessageManager: ToastMessageManager,
+        contextManager: ContextManager,
+        activityIntentProvider: ActivityIntentProvider
+    ): WebViewRequestInterceptor {
+        return CompoundWebViewRequestInterceptor(
+            WalletConnectPairingInterceptor(contextManager, activityIntentProvider),
+            Web3FallbackInterceptor(toastMessageManager, contextManager)
+        )
+    }
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): DAppBrowserViewModel {
