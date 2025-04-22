@@ -81,11 +81,11 @@ internal class RealMultisigDiscoveryService @Inject constructor(
         Log.d(LOG_TAG, "Starting syncing multisig in ${supportedProxyChains.size} chains")
 
         supportedProxyChains.forEach { chain ->
-            syncChainProxies(chain, metaAccounts)
+            syncChainMultisigs(chain, metaAccounts)
         }
     }
 
-    private suspend fun syncChainProxies(
+    private suspend fun syncChainMultisigs(
         chain: Chain,
         allMetaAccounts: List<MetaAccount>
     ) = runCatching {
