@@ -51,6 +51,20 @@ private val dateTimeFormatISO_8601_NoMs by lazy { SimpleDateFormat(DATE_ISO_8601
 private val defaultAbbreviationFormatter = FixedPrecisionFormatter(ABBREVIATED_SCALE)
 private val defaultFullFormatter = FixedPrecisionFormatter(MIN_SCALE)
 
+private val zeroAbbreviation = NumberAbbreviation(
+    threshold = BigDecimal.ZERO,
+    divisor = BigDecimal.ONE,
+    suffix = "",
+    formatter = DynamicPrecisionFormatter(minScale = MIN_SCALE, minPrecision = TOKEN_MIN_PRECISION)
+)
+
+private val oneAbbreviation = NumberAbbreviation(
+    threshold = BigDecimal.ONE,
+    divisor = BigDecimal.ONE,
+    suffix = "",
+    formatter = defaultFullFormatter
+)
+
 private val thousandAbbreviation = NumberAbbreviation(
     threshold = BigDecimal("1E+3"),
     divisor = BigDecimal.ONE,
@@ -80,6 +94,7 @@ private val trillionAbbreviation = NumberAbbreviation(
 )
 
 private val defaultNumberFormatter = defaultNumberFormatter()
+private val fullAmountAbbreviationFormatter = fullAmountAbbreviationFormatter()
 
 fun BigDecimal.toStripTrailingZerosString(): String {
     return stripTrailingZeros().toPlainString()
@@ -87,6 +102,10 @@ fun BigDecimal.toStripTrailingZerosString(): String {
 
 fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return defaultNumberFormatter.format(this, roundingMode)
+}
+
+fun BigDecimal.formatWithFullAmount(): String {
+    return fullAmountAbbreviationFormatter.format(this)
 }
 
 fun Int.format(): String {
@@ -204,20 +223,18 @@ fun CharSequence.toAmountWithFraction(): AmountWithFraction {
 
 fun patternWith(precision: Int) = "$DECIMAL_PATTERN_BASE${"#".repeat(precision)}"
 
+fun fullAmountAbbreviationFormatter() = CompoundNumberFormatter(
+    abbreviations = listOf(
+        zeroAbbreviation,
+        oneAbbreviation,
+        thousandAbbreviation
+    )
+)
+
 fun defaultNumberFormatter() = CompoundNumberFormatter(
     abbreviations = listOf(
-        NumberAbbreviation(
-            threshold = BigDecimal.ZERO,
-            divisor = BigDecimal.ONE,
-            suffix = "",
-            formatter = DynamicPrecisionFormatter(minScale = MIN_SCALE, minPrecision = TOKEN_MIN_PRECISION)
-        ),
-        NumberAbbreviation(
-            threshold = BigDecimal.ONE,
-            divisor = BigDecimal.ONE,
-            suffix = "",
-            formatter = defaultFullFormatter
-        ),
+        zeroAbbreviation,
+        oneAbbreviation,
         thousandAbbreviation,
         millionAbbreviation,
         billionAbbreviation,
