@@ -9,6 +9,9 @@ import coil.clear
 import coil.load
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.ImageMonitor
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.loadOrHide
 import io.novafoundation.nova.common.utils.setPathOrStopWatching
@@ -71,12 +74,12 @@ class BrowserTabViewHolder(
         browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
         screenshotImageMonitor.setPathOrStopWatching(item.tabScreenshotPath)
 
-        if (item.knownDappIconUrl != null) {
-            browserTabFavicon.load(item.knownDappIconUrl, imageLoader)
-            tabIconImageMonitor.stopMonitoring()
+        browserTabFavicon.setIconOrMakeGone(item.icon, imageLoader)
+
+        if (item.icon is Icon.FromFile) {
+            tabIconImageMonitor.setPathOrStopWatching(item.icon.data.absolutePath)
         } else {
-            browserTabFavicon.loadOrHide(item.tabFaviconPath?.asFile(), imageLoader)
-            tabIconImageMonitor.setPathOrStopWatching(item.tabFaviconPath)
+            tabIconImageMonitor.stopMonitoring()
         }
     }
 
