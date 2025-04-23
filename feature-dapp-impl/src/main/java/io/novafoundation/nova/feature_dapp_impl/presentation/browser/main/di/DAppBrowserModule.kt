@@ -9,7 +9,6 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
@@ -34,6 +33,7 @@ import io.novafoundation.nova.common.utils.webView.interceptors.CompoundWebViewR
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.interceptors.WalletConnectPairingInterceptor
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.interceptors.Web3FallbackInterceptor
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -76,10 +76,10 @@ class DAppBrowserModule {
     fun provideWebViewClientInterceptor(
         toastMessageManager: ToastMessageManager,
         contextManager: ContextManager,
-        activityIntentProvider: ActivityIntentProvider
+        walletConnectService: WalletConnectService
     ): WebViewRequestInterceptor {
         return CompoundWebViewRequestInterceptor(
-            WalletConnectPairingInterceptor(contextManager, activityIntentProvider),
+            WalletConnectPairingInterceptor(walletConnectService),
             Web3FallbackInterceptor(toastMessageManager, contextManager)
         )
     }
