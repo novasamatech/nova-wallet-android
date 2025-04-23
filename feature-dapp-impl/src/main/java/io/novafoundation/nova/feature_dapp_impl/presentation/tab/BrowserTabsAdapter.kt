@@ -10,10 +10,8 @@ import coil.load
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.ImageMonitor
 import io.novafoundation.nova.common.utils.images.Icon
-import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.common.utils.loadOrHide
 import io.novafoundation.nova.common.utils.setPathOrStopWatching
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemBrowserTabBinding
 import java.io.File
