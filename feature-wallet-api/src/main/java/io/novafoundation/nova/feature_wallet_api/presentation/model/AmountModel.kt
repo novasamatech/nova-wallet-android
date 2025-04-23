@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.model
 
 import androidx.annotation.DimenRes
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.formatWithoutAbbreviation
+import io.novafoundation.nova.common.utils.formatting.formatWithFullAmount
 import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -75,7 +75,7 @@ fun mapAmountToAmountModel(
             amount.format(roundingMode)
         }
     } else {
-        val unformattedAmount = amount.formatWithoutAbbreviation()
+        val unformattedAmount = amount.formatWithFullAmount()
 
         if (includeAssetTicker) {
             unformattedAmount.withTokenSymbol(token.configuration.symbol)
