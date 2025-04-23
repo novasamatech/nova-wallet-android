@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.di.modules.web3
 
 import com.google.gson.Gson
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -9,6 +10,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_dapp_impl.BuildConfig
+import io.novafoundation.nova.feature_dapp_impl.data.repository.DefaultMetamaskChainRepository
+import io.novafoundation.nova.feature_dapp_impl.data.repository.RealDefaultMetamaskChainRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.metamask.MetamaskInteractor
 import io.novafoundation.nova.feature_dapp_impl.web3.metamask.di.Metamask
@@ -22,8 +25,15 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewScriptInject
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewWeb3JavaScriptInterface
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module
+@Module(includes = [MetamaskModule.BindsModule::class])
 class MetamaskModule {
+
+    @Module
+    interface BindsModule {
+
+        @Binds
+        fun bindDefaultMetamaskChainRepository(implementation: RealDefaultMetamaskChainRepository): DefaultMetamaskChainRepository
+    }
 
     @Provides
     @Metamask
@@ -67,8 +77,9 @@ class MetamaskModule {
     @FeatureScope
     fun provideInteractor(
         accountRepository: AccountRepository,
-        chainRegistry: ChainRegistry
-    ) = MetamaskInteractor(accountRepository, chainRegistry)
+        chainRegistry: ChainRegistry,
+        defaultMetamaskChainRepository: DefaultMetamaskChainRepository,
+    ) = MetamaskInteractor(accountRepository, chainRegistry, defaultMetamaskChainRepository)
 
     @Provides
     @FeatureScope

@@ -25,13 +25,11 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setBlockedAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +46,6 @@ class TopUpAddressViewModel(
     private val payload: TopUpAddressPayload,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    private val maxActionProviderFactory: MaxActionProviderFactory,
     private val responder: TopUpAddressResponder,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -81,16 +78,10 @@ class TopUpAddressViewModel(
 
     val feeMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
 
-    private val maxActionProvider = maxActionProviderFactory.create(
-        viewModelScope = viewModelScope,
-        assetInFlow = assetFlow,
-        feeLoaderMixin = feeMixin,
-    )
-
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,
         assetFlow = assetFlow,
-        maxActionProvider = maxActionProvider
+        maxActionProvider = null
     )
 
     val titleFlow = flowOf { payload.screenTitle }
@@ -105,7 +96,7 @@ class TopUpAddressViewModel(
 
     init {
         addressInputMixin.setAddress(payload.address)
-        amountChooserMixin.setAmount(payload.amount)
+        amountChooserMixin.setBlockedAmount(payload.amount)
 
         setupFees()
     }
