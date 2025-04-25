@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.sel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -47,6 +48,7 @@ class StakingFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .proxyFeatureApi(getFeature(ProxyFeatureApi::class.java))
             .dAppFeatureApi(getFeature(DAppFeatureApi::class.java))
+            .walletConnectFeatureApi(getFeature(WalletConnectFeatureApi::class.java))
             .build()
 
         return DaggerStakingFeatureComponent.factory()

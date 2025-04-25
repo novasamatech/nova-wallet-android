@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <ImageView
+        android:id="@+id/walletAppBarWalletConnect"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_circle_button_ripple"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_wallet_connect_scan"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/walletAppBarWalletContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/walletAppBarSettings"
+        app:layout_constraintStart_toEndOf="@+id/walletAppBarWalletConnect"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/walletAppBarSelectedWallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="8dp">
+
+            <ImageView
+                android:id="@+id/walletAppBarSelectedWalletTypeIcon"
+                android:layout_width="24dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/chips_background_8"
+                android:padding="3dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_watch_only"
+                app:tint="@color/chip_icon" />
+
+            <TextView
+                android:id="@+id/walletAppBarSelectedWalletName"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Callout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                app:drawableEndCompat="@drawable/ic_chevron_down"
+                app:drawableTint="@color/icon_secondary"
+                tools:text="✨👍✨ Day7 ✨👍✨" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/walletAppBarSettings"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginVertical="4dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_circle_button_ripple"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_settings_outline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/chip_icon" />
+
+</merge>

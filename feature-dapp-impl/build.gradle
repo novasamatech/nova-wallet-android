@@ -72,6 +72,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-external-sign-api')
     implementation project(':feature-banners-api')
+    implementation project(":feature-wallet-connect-api")
     implementation project(':runtime')
 
     implementation kotlinDep

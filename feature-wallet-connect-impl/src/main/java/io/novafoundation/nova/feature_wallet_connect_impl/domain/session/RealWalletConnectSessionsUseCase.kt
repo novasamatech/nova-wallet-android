@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 internal class RealWalletConnectSessionsUseCase(

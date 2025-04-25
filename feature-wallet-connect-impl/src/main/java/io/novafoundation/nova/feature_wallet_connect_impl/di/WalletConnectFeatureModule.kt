@@ -11,10 +11,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTypedMessageParser
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
+import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.InMemoryWalletConnectSessionRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.RealWalletConnectPairingRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectPairingRepository
@@ -26,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.request
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.WalletConnectRequest
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm.EvmWalletConnectRequestFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.polkadot.PolkadotWalletConnectRequestFactory
+import io.novafoundation.nova.feature_wallet_connect_impl.presentation.mixin.RealWalletConnectSessionsMixinFactory
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.service.RealWalletConnectService
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.ApproveSessionCommunicator
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.RealWalletConnectSessionMapper
@@ -119,5 +123,15 @@ class WalletConnectFeatureModule {
         sessionRepository: WalletConnectSessionRepository
     ): WalletConnectSessionsUseCase {
         return RealWalletConnectSessionsUseCase(pairingRepository, sessionRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideWalletConnectSessionsMixinFactory(
+        walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
+        router: WalletConnectRouter,
+        selectedAccountUseCase: SelectedAccountUseCase
+    ): WalletConnectSessionsMixinFactory {
+        return RealWalletConnectSessionsMixinFactory(walletConnectSessionsUseCase, router, selectedAccountUseCase)
     }
 }

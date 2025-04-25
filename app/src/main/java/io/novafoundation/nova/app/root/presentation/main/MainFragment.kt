@@ -6,7 +6,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.FragmentMainBinding
 import io.novafoundation.nova.app.root.di.RootApi
@@ -17,7 +16,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.blur.SweetBlur
 import io.novafoundation.nova.common.utils.setBackgroundColorRes
 import io.novafoundation.nova.common.utils.updatePadding
-
 import javax.inject.Inject
 
 class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {

@@ -87,6 +87,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -207,6 +208,8 @@ interface AssetsFeatureDependencies {
     val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
 
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
+
+    val walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

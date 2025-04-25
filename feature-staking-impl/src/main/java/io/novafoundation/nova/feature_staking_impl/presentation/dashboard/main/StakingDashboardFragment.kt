@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.domain.onNotLoaded
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
+import io.novafoundation.nova.common.view.bindWithRecyclerView
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStakingDashboardBinding
@@ -16,19 +17,16 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHasStakeAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHeaderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
 
 class StakingDashboardFragment :
     BaseFragment<StakingDashboardViewModel, FragmentStakingDashboardBinding>(),
     DashboardHasStakeAdapter.Handler,
     DashboardNoStakeAdapter.Handler,
-    DashboardHeaderAdapter.Handler,
     MoreStakingOptionsAdapter.Handler {
 
     override fun createBinding() = FragmentStakingDashboardBinding.inflate(layoutInflater)
 
-    private val headerAdapter = DashboardHeaderAdapter(this)
     private val hasStakeLoadingAdapter = DashboardLoadingAdapter(initialNumberOfItems = 1, layout = R.layout.item_dashboard_has_stake_loading)
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_no_stake_header)
@@ -47,11 +45,10 @@ class StakingDashboardFragment :
     }
 
     override fun initViews() {
-        binder.stakingDashboardContent.applyStatusBarInsets()
+        binder.stakingDashboardAppBar.applyStatusBarInsets()
         binder.stakingDashboardContent.setHasFixedSize(true)
 
         binder.stakingDashboardContent.adapter = ConcatAdapter(
-            headerAdapter,
             hasStakeLoadingAdapter,
             hasStakeAdapter,
             sectionAdapter,
@@ -59,6 +56,11 @@ class StakingDashboardFragment :
             noStakeAdapter,
             moreStakingOptionsAdapter
         )
+
+        binder.stakingDashboardAppBar.onWalletClick { viewModel.avatarClicked() }
+        binder.stakingDashboardAppBar.onWalletConnectClick { viewModel.walletConnectClicked() }
+        binder.stakingDashboardAppBar.onSettingsClick { }
+        binder.stakingDashboardAppBar.bindWithRecyclerView(binder.stakingDashboardContent, R.drawable.bg_wallet_app_bar)
 
         binder.stakingDashboardContent.itemAnimator = null
     }
@@ -77,7 +79,13 @@ class StakingDashboardFragment :
             }
         }
 
-        viewModel.walletUi.observe(headerAdapter::setSelectedWallet)
+        viewModel.walletUi.observe {
+            binder.stakingDashboardAppBar.setSelectedWallet(it.typeIcon?.icon, it.name)
+        }
+
+        viewModel.walletConnectAccountSessions.observe {
+            binder.stakingDashboardAppBar.setWalletConnectActive(it.hasConnections)
+        }
 
         viewModel.scrollToTopEvent.observeEvent {
             binder.stakingDashboardContent.scrollToPosition(0)
@@ -90,10 +98,6 @@ class StakingDashboardFragment :
 
     override fun onNoStakeItemClicked(index: Int) {
         viewModel.onNoStakeItemClicked(index)
-    }
-
-    override fun avatarClicked() {
-        viewModel.avatarClicked()
     }
 
     override fun onMoreOptionsClicked() {

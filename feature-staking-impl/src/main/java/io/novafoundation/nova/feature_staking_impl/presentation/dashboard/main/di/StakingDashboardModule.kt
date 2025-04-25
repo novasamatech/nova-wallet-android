@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakin
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 
 @Module(includes = [ViewModelModule::class, ComponentsModule::class])
 class StakingDashboardModule {
@@ -36,6 +37,7 @@ class StakingDashboardModule {
         stakingSharedState: StakingSharedState,
         presentationMapper: StakingDashboardPresentationMapper,
         startMultiStakingRouter: StartMultiStakingRouter,
+        walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory,
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -47,6 +49,7 @@ class StakingDashboardModule {
             stakingSharedState = stakingSharedState,
             presentationMapper = presentationMapper,
             startMultiStakingRouter = startMultiStakingRouter,
+            walletConnectSessionsMixinFactory = walletConnectSessionsMixinFactory
         )
     }
 

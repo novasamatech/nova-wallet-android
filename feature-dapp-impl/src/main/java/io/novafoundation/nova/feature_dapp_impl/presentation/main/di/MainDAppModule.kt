@@ -8,7 +8,6 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
@@ -16,6 +15,7 @@ import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSou
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.MainDAppViewModel
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 
 @Module(includes = [ViewModelModule::class])
 class MainDAppModule {
@@ -32,17 +32,17 @@ class MainDAppModule {
         promotionBannersMixinFactory: PromotionBannersMixinFactory,
         bannerSourceFactory: BannersSourceFactory,
         selectedAccountUseCase: SelectedAccountUseCase,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: DAppRouter,
         dappInteractor: DappInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory,
     ): ViewModel {
         return MainDAppViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
             bannerSourceFactory = bannerSourceFactory,
             router = router,
             selectedAccountUseCase = selectedAccountUseCase,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            walletConnectSessionsMixinFactory = walletConnectSessionsMixinFactory,
             dappInteractor = dappInteractor,
             resourceManager = resourceManager
         )

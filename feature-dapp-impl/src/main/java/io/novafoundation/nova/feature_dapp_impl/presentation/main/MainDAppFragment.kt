@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
 import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
+import io.novafoundation.nova.common.view.bindWithRecyclerView
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
 import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -45,10 +46,15 @@ class MainDAppFragment :
     private val dappCategoriesListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoryListAdapter(this) }
 
     override fun initViews() {
-        binder.dappRecyclerViewCatalog.applyStatusBarInsets()
+        binder.dappAppBar.applyStatusBarInsets()
         binder.dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, bannerAdapter, favoritesAdapter, dappsShimmering, dappCategoriesListAdapter)
         binder.dappRecyclerViewCatalog.itemAnimator = null
         setupRecyclerViewSpacing()
+
+        binder.dappAppBar.onWalletClick { viewModel.accountIconClicked() }
+        binder.dappAppBar.onWalletConnectClick { viewModel.walletConnectClicked() }
+        binder.dappAppBar.onSettingsClick { }
+        binder.dappAppBar.bindWithRecyclerView(binder.dappRecyclerViewCatalog, R.drawable.bg_wallet_app_bar)
     }
 
     override fun inject() {
@@ -64,7 +70,13 @@ class MainDAppFragment :
             binder.dappRecyclerViewCatalog?.invalidateItemDecorations()
         }
 
-        viewModel.selectedWalletFlow.observe(headerAdapter::setWallet)
+        viewModel.selectedWalletFlow.observe {
+            binder.dappAppBar.setSelectedWallet(it.typeIcon?.icon, it.name)
+        }
+
+        viewModel.walletConnectAccountSessions.observe {
+            binder.dappAppBar.setWalletConnectActive(it.hasConnections)
+        }
 
         viewModel.shownDAppsStateFlow.observe { state ->
             when (state) {
@@ -101,10 +113,6 @@ class MainDAppFragment :
 
     override fun onDAppClicked(item: DappModel) {
         viewModel.dappClicked(item)
-    }
-
-    override fun onWalletClick() {
-        viewModel.accountIconClicked()
     }
 
     override fun onSearchClick() {

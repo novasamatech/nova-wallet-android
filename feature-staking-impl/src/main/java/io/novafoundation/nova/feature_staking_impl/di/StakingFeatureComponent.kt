@@ -99,6 +99,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.di.CurrentValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.di.ValidatorDetailsComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -299,7 +300,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             AccountFeatureApi::class,
             ProxyFeatureApi::class,
             WalletFeatureApi::class,
-            DAppFeatureApi::class
+            DAppFeatureApi::class,
+            WalletConnectFeatureApi::class
         ]
     )
     interface StakingFeatureDependenciesComponent : StakingFeatureDependencies

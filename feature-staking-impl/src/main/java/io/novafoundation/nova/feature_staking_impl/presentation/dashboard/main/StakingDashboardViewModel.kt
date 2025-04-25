@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -47,6 +48,7 @@ class StakingDashboardViewModel(
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
+    private val walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory,
     private val dashboardUpdatePeriod: Duration = 200.milliseconds
 ) : BaseViewModel() {
 
@@ -62,6 +64,10 @@ class StakingDashboardViewModel(
         .throttleLast(dashboardUpdatePeriod)
         .map { dashboardLoading -> dashboardLoading.map(::mapDashboardToUi) }
         .shareInBackground()
+
+    private val walletConnectSessionsMixin = walletConnectSessionsMixinFactory.create(this)
+
+    val walletConnectAccountSessions = walletConnectSessionsMixin.getActiveSessionsForSelectedAccount()
 
     init {
         stakingDashboardUpdateSystem.start()
@@ -169,5 +175,9 @@ class StakingDashboardViewModel(
         )
 
         router.openChainStakingMain()
+    }
+
+    fun walletConnectClicked() {
+        walletConnectSessionsMixin.onWalletConnectClick()
     }
 }
