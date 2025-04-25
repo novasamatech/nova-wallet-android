@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 
 typealias OnTabSelected = (index: Int) -> Unit
 
-private val DEFAULT_BACKGROUND_TINT = R.color.segmented_background
+private val DEFAULT_BACKGROUND_TINT = R.color.android_app_nav_bar_background
 
 class TabsView @JvmOverloads constructor(
     context: Context,
