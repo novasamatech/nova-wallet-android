@@ -47,7 +47,6 @@ class StartParachainStakingFlowModule {
     @FeatureScope
     fun provideInteractor(
         extrinsicService: ExtrinsicService,
-        chainRegistry: ChainRegistry,
         singleAssetSharedState: StakingSharedState,
         stakingConstantsRepository: ParachainStakingConstantsRepository,
         delegatorStateRepository: DelegatorStateRepository,
@@ -55,7 +54,6 @@ class StartParachainStakingFlowModule {
         accountRepository: AccountRepository,
     ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(
         extrinsicService = extrinsicService,
-        chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
         stakingConstantsRepository = stakingConstantsRepository,
         delegatorStateRepository = delegatorStateRepository,
