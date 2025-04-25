@@ -17,14 +17,14 @@ class Web3FallbackInterceptor(
         val url = request.url
 
         if (url.scheme != "http" && url.scheme != "https") {
-            runIntent(url)
+            startIntent(url)
             return true
         }
 
         return false
     }
 
-    private fun runIntent(url: Uri) {
+    private fun startIntent(url: Uri) {
         try {
             val intent = Intent(Intent.ACTION_VIEW, url)
             contextManager.getActivity()?.startActivity(intent)
