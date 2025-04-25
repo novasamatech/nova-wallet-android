@@ -170,9 +170,8 @@ class RealBrowserTabService(
 
     private fun deferredSyncKnownDAppMetadata(tabId: String, url: String) {
         launch {
-            getKnownDappMetadata(url)?.let {
-                browserTabInternalRepository.changeKnownDAppMetadata(tabId, it.iconLink)
-            }
+            val knownDAppMetadata = getKnownDappMetadata(url)
+            browserTabInternalRepository.changeKnownDAppMetadata(tabId, knownDAppMetadata?.iconLink)
         }
     }
 
