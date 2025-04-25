@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -31,6 +32,7 @@ class DAppFeatureHolder @Inject constructor(
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .bannersFeatureApi(getFeature(BannersFeatureApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
+            .walletConnectFeatureApi(getFeature(WalletConnectFeatureApi::class.java))
             .build()
 
         return DaggerDAppFeatureComponent.factory()
