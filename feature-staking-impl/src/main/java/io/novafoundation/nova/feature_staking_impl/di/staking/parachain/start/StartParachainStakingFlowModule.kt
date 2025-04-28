@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.NoPendingRevokeValidationFactory
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.parachainStakingStart
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module
 class StartParachainStakingFlowModule {
@@ -46,6 +47,7 @@ class StartParachainStakingFlowModule {
     @FeatureScope
     fun provideInteractor(
         extrinsicService: ExtrinsicService,
+        chainRegistry: ChainRegistry,
         singleAssetSharedState: StakingSharedState,
         stakingConstantsRepository: ParachainStakingConstantsRepository,
         delegatorStateRepository: DelegatorStateRepository,
@@ -53,6 +55,7 @@ class StartParachainStakingFlowModule {
         accountRepository: AccountRepository,
     ): StartParachainStakingInteractor = RealStartParachainStakingInteractor(
         extrinsicService = extrinsicService,
+        chainRegistry = chainRegistry,
         singleAssetSharedState = singleAssetSharedState,
         stakingConstantsRepository = stakingConstantsRepository,
         delegatorStateRepository = delegatorStateRepository,
