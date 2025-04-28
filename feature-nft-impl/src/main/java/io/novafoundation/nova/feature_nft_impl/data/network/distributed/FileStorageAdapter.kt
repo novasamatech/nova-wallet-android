@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_nft_impl.data.network.distributed
 
-enum class FileStorage(val prefix: String, val defaultHttpsGateway: String?) {
-    IPFS("ipfs://ipfs/", "https://image.w.kodadot.xyz/ipfs/"),
-    HTTPS("https://", null),
-    HTTP("http://", null);
+enum class FileStorage(val prefix: String, val additionalPaths: List<String>, val defaultHttpsGateway: String?) {
+    IPFS("ipfs://", listOf("ipfs/"), "https://image.w.kodadot.xyz/ipfs/"),
+    HTTPS("https://", emptyList(), null),
+    HTTP("http://", emptyList(), null);
 
     init {
         validateHttpsGateway(defaultHttpsGateway)
@@ -29,7 +29,10 @@ object FileStorageAdapter {
 
         validateHttpsGateway(gateway)
 
-        val path = distributedStorageLink.removePrefix(distributedStorage.prefix)
+        var path = distributedStorageLink.removePrefix(distributedStorage.prefix)
+        distributedStorage.additionalPaths.forEach {
+            path = path.removePrefix(it)
+        }
 
         return "$gateway$path"
     }

@@ -17,8 +17,8 @@ abstract class NftDao {
     @Query("SELECT * FROM nfts WHERE metaId = :metaId")
     abstract fun nftsFlow(metaId: Long): Flow<List<NftLocal>>
 
-    @Query("SELECT * FROM nfts WHERE metaId = :metaId AND type = :type")
-    abstract suspend fun getNfts(metaId: Long, type: NftLocal.Type): List<NftLocal>
+    @Query("SELECT * FROM nfts WHERE metaId = :metaId AND type = :type AND chainId = :chainId")
+    abstract suspend fun getNfts(chainId: String, metaId: Long, type: NftLocal.Type): List<NftLocal>
 
     @Delete
     protected abstract suspend fun deleteNfts(nfts: List<NftLocal>)
@@ -41,11 +41,12 @@ abstract class NftDao {
     @Transaction
     open suspend fun insertNftsDiff(
         nftType: NftLocal.Type,
+        chainId: String,
         metaId: Long,
         newNfts: List<NftLocal>,
         forceOverwrite: Boolean
     ) {
-        val oldNfts = getNfts(metaId, nftType)
+        val oldNfts = getNfts(chainId, metaId, nftType)
 
         val diff = CollectionDiffer.findDiff(newNfts, oldNfts, forceUseNewItems = forceOverwrite)
 

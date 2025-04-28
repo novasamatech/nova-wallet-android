@@ -15,6 +15,7 @@ fun mapNftTypeLocalToTypeKey(
     NftLocal.Type.RMRK1 -> Nft.Type.Key.RMRKV1
     NftLocal.Type.RMRK2 -> Nft.Type.Key.RMRKV2
     NftLocal.Type.PDC20 -> Nft.Type.Key.PDC20
+    NftLocal.Type.KODADOT -> Nft.Type.Key.KODADOT
 }
 
 fun nftIssuance(
@@ -71,6 +72,7 @@ fun mapNftLocalToNft(
         NftLocal.Type.RMRK1 -> Nft.Type.Rmrk1
         NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2
         NftLocal.Type.PDC20 -> Nft.Type.Pdc20
+        NftLocal.Type.KODADOT -> Nft.Type.Kodadot
     }
 
     val details = if (nftLocal.wholeDetailsLoaded) {

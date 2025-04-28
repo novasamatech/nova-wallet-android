@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.source
 
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.kodadot.KodadotProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.pdc20.Pdc20Provider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.RmrkV1NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
@@ -13,17 +14,20 @@ class NftProvidersRegistry(
     private val rmrkV1NftProvider: RmrkV1NftProvider,
     private val rmrkV2NftProvider: RmrkV2NftProvider,
     private val pdc20Provider: Pdc20Provider,
+    private val kodadotProvider: KodadotProvider
 ) {
 
-    private val statemineProviders = listOf(uniquesNftProvider)
+    private val kusamaAssetHubProviders = listOf(uniquesNftProvider, kodadotProvider)
     private val kusamaProviders = listOf(rmrkV1NftProvider, rmrkV2NftProvider)
     private val polkadotProviders = listOf(pdc20Provider)
+    private val polkadotAssetHubProviders = listOf(kodadotProvider)
 
     fun get(chain: Chain): List<NftProvider> {
         return when (chain.id) {
-            Chain.Geneses.STATEMINE -> statemineProviders
+            Chain.Geneses.KUSAMA_ASSET_HUB -> kusamaAssetHubProviders
             Chain.Geneses.KUSAMA -> kusamaProviders
             Chain.Geneses.POLKADOT -> polkadotProviders
+            Chain.Geneses.POLKADOT_ASSET_HUB -> polkadotAssetHubProviders
             else -> emptyList()
         }
     }
@@ -38,6 +42,7 @@ class NftProvidersRegistry(
             Nft.Type.Key.RMRKV2 -> rmrkV2NftProvider
             Nft.Type.Key.UNIQUES -> uniquesNftProvider
             Nft.Type.Key.PDC20 -> pdc20Provider
+            Nft.Type.Key.KODADOT -> kodadotProvider
         }
     }
 }
