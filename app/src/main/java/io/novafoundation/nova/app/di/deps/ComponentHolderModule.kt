@@ -46,6 +46,8 @@ import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.di.NftFeatureHolder
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.di.OnboardingFeatureHolder
+import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
+import io.novafoundation.nova.feature_pay_impl.di.PayFeatureHolder
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_proxy_impl.di.ProxyFeatureHolder
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
@@ -279,4 +281,10 @@ interface ComponentHolderModule {
     @ClassKey(XcmFeatureApi::class)
     @IntoMap
     fun provideXcmFeatureHolder(holder: XcmFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(PayFeatureApi::class)
+    @IntoMap
+    fun providePayFeature(onboardingFeatureHolder: PayFeatureHolder): FeatureApiHolder
 }

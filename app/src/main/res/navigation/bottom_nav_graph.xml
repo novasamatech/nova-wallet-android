@@ -6,10 +6,10 @@
     app:startDestination="@id/walletFragment">
 
     <fragment
-        android:id="@+id/profileFragment"
-        tools:layout="@layout/fragment_settings"
-        android:name="io.novafoundation.nova.feature_settings_impl.presentation.settings.SettingsFragment"
-        android:label="ProfileFragment" />
+        android:id="@+id/payFragment"
+        tools:layout="@layout/fragment_pay_main"
+        android:name="io.novafoundation.nova.feature_pay_impl.presentation.main.PayMainFragment"
+        android:label="PayMainFragment" />
 
     <fragment
         android:id="@+id/voteFragment"

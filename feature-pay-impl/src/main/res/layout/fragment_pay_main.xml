@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/voteContainer"
+    android:id="@+id/payContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/drawable_background_image"
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.WalletAppBarView
-        android:id="@+id/voteAppBar"
+        android:id="@+id/payAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <io.novafoundation.nova.common.view.SegmentedTabLayout
-        android:id="@+id/voteTabs"
+        android:id="@+id/payTabs"
         style="@style/SegmentedTab"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -21,7 +21,7 @@
         android:layout_marginBottom="8dp" />
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/voteViewPager"
+        android:id="@+id/payViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
