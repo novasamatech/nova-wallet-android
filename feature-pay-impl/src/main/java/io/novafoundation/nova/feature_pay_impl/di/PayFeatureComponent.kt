@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.main.di.PayMainComponent
-import io.novafoundation.nova.feature_pay_impl.presentation.main.di.PayMainModule
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 
 @Component(
