@@ -3,17 +3,20 @@ package io.novafoundation.nova.feature_pay_impl.presentation.main
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.novafoundation.nova.feature_pay_impl.R
-import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.ShopFragment
 
-class PayPagerAdapter(private val fragment: Fragment, private val router: PayRouter) : FragmentStateAdapter(fragment) {
+class PayPagerAdapter(private val fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int {
         return 2
     }
 
     override fun createFragment(position: Int): Fragment {
-        // TODO
-        return Fragment()
+        return when (position) {
+            0 -> Fragment()
+            1 -> ShopFragment()
+            else -> throw IllegalArgumentException("Invalid position")
+        }
     }
 
     fun getPageTitle(position: Int): CharSequence {
