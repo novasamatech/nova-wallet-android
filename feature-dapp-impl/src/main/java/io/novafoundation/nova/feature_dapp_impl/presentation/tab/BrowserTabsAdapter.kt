@@ -9,8 +9,9 @@ import coil.clear
 import coil.load
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.ImageMonitor
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.setIconOrMakeGone
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.common.utils.loadOrHide
 import io.novafoundation.nova.common.utils.setPathOrStopWatching
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemBrowserTabBinding
 import java.io.File
@@ -66,12 +67,18 @@ class BrowserTabViewHolder(
     fun bind(item: BrowserTabRvItem) = with(binder) {
         browserTabCard.setOnClickListener { itemHandler.tabClicked(item, browserTabScreenshot) }
         browserTabClose.setOnClickListener { itemHandler.tabCloseClicked(item) }
-        browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
-        browserTabFavicon.loadOrHide(item.tabFaviconPath?.asFile(), imageLoader)
         browserTabSiteName.text = item.tabName
 
+        browserTabScreenshot.load(item.tabScreenshotPath?.asFile(), imageLoader)
         screenshotImageMonitor.setPathOrStopWatching(item.tabScreenshotPath)
-        tabIconImageMonitor.setPathOrStopWatching(item.tabFaviconPath)
+
+        browserTabFavicon.setIconOrMakeGone(item.icon, imageLoader)
+
+        if (item.icon is Icon.FromFile) {
+            tabIconImageMonitor.setPathOrStopWatching(item.icon.data.absolutePath)
+        } else {
+            tabIconImageMonitor.stopMonitoring()
+        }
     }
 
     override fun unbind() {

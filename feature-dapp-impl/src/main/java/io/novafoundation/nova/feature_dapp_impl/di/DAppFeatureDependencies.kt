@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.coroutines.RootScope
@@ -108,4 +109,6 @@ interface DAppFeatureDependencies {
     fun dappAuthorizationDao(): DappAuthorizationDao
 
     fun browserHostSettingsDao(): BrowserHostSettingsDao
+
+    fun toastMessageManager(): ToastMessageManager
 }

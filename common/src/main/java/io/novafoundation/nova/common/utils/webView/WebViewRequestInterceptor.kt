@@ -9,7 +9,7 @@ import okhttp3.Response
 interface WebViewRequestInterceptor {
 
     /**
-     * @return Make a request and return WebResourceResponse if the request was intercepted otherwise null
+     * @return Intercept a request and return WebResourceResponse if the true was intercepted otherwise false
      */
     fun intercept(request: WebResourceRequest): Boolean
 }
