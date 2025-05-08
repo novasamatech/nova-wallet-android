@@ -11,8 +11,6 @@ import io.novafoundation.nova.common.utils.NetworkStateService
 import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_pay_impl.BuildConfig
-import io.novafoundation.nova.feature_pay_impl.data.RealShopRepository
-import io.novafoundation.nova.feature_pay_impl.data.ShopRepository
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RaiseAuthInterceptor
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RaiseAuthRepository
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RaiseEndpoints
@@ -119,14 +117,9 @@ class PayFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideShopRepository(): ShopRepository = RealShopRepository()
-
-    @Provides
-    @FeatureScope
     fun provideShopInteractor(
-        repository: ShopRepository,
         accountRepository: AccountRepository
-    ) = ShopInteractor(repository, accountRepository)
+    ) = ShopInteractor(accountRepository)
 
     @Provides
     @FeatureScope

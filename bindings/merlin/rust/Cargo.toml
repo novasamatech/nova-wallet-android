@@ -3,7 +3,7 @@ authors = ['Novasama Technologies']
 edition = '2021'
 license = 'Apache 2.0'
 name = "merlin"
-repository = 'https://github.com/novasamatech/polkadot-app-android'
+repository = 'https://github.com/novasamatech/nova-wallet-android'
 version = "0.1.0"
 
 [dependencies]
