@@ -9,6 +9,9 @@ import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.deriveSeed32
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
+import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory.AccountSource
+import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory.SecretsError
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
@@ -24,32 +27,15 @@ import io.novasama.substrate_sdk_android.scale.Schema
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AccountSecretsFactory(
+class RealAccountSecretsFactory(
     private val jsonSeedDecoder: JsonSeedDecoder
-) {
+) : AccountSecretsFactory {
 
-    sealed class AccountSource {
-        class Mnemonic(val cryptoType: CryptoType, val mnemonic: String) : AccountSource()
-
-        class Seed(val cryptoType: CryptoType, val seed: String) : AccountSource()
-
-        class Json(val json: String, val password: String) : AccountSource()
-    }
-
-    sealed class SecretsError : Exception() {
-
-        class NotValidEthereumCryptoType : SecretsError()
-
-        class NotValidSubstrateCryptoType : SecretsError()
-    }
-
-    data class Result<S : Schema<S>>(val secrets: EncodableStruct<S>, val cryptoType: CryptoType)
-
-    suspend fun chainAccountSecrets(
+    override suspend fun chainAccountSecrets(
         derivationPath: String?,
         accountSource: AccountSource,
         isEthereum: Boolean,
-    ): Result<ChainAccountSecrets> = withContext(Dispatchers.Default) {
+    ): AccountSecretsFactory.Result<ChainAccountSecrets> = withContext(Dispatchers.Default) {
         val mnemonicWords = accountSource.castOrNull<AccountSource.Mnemonic>()?.mnemonic
         val entropy = mnemonicWords?.let(MnemonicCreator::fromWords)?.entropy
         val decodedDerivationPath = decodeDerivationPath(derivationPath, ethereum = isEthereum)
@@ -99,14 +85,14 @@ class AccountSecretsFactory(
             derivationPath = derivationPath,
         )
 
-        Result(secrets = secrets, cryptoType = mapEncryptionToCryptoType(encryptionType))
+        AccountSecretsFactory.Result(secrets = secrets, cryptoType = mapEncryptionToCryptoType(encryptionType))
     }
 
-    suspend fun metaAccountSecrets(
+    override suspend fun metaAccountSecrets(
         substrateDerivationPath: String?,
         ethereumDerivationPath: String?,
         accountSource: AccountSource,
-    ): Result<MetaAccountSecrets> = withContext(Dispatchers.Default) {
+    ): AccountSecretsFactory.Result<MetaAccountSecrets> = withContext(Dispatchers.Default) {
         val (substrateSecrets, substrateCryptoType) = chainAccountSecrets(
             derivationPath = substrateDerivationPath,
             accountSource = accountSource,
@@ -130,7 +116,7 @@ class AccountSecretsFactory(
             ethereumDerivationPath = ethereumDerivationPath
         )
 
-        Result(secrets = secrets, cryptoType = substrateCryptoType)
+        AccountSecretsFactory.Result(secrets = secrets, cryptoType = substrateCryptoType)
     }
 
     private fun deriveSeed(mnemonic: String, password: String?, ethereum: Boolean): SeedFactory.Result {

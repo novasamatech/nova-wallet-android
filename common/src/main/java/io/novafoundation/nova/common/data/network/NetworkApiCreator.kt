@@ -14,13 +14,22 @@ class NetworkApiCreator(
         service: Class<T>,
         customBaseUrl: String = baseUrl
     ): T {
+        return create(service, customBaseUrl, okHttpClient)
+    }
+
+    fun <T> create(
+        service: Class<T>,
+        baseUrl: String,
+        okHttpClient: OkHttpClient
+    ): T {
         val retrofit = Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(customBaseUrl)
+            .baseUrl(baseUrl)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         return retrofit.create(service)
     }
+
 }

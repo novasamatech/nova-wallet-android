@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.cloudBackup.applyNonDestr
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.SecretsMetaAccountLocalFactory
-import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.domain.cloudBackup.createPassword.model.PasswordErrors
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.domain.fetchAndDecryptExistingBackupWithSavedPassword

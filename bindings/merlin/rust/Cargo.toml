@@ -1,0 +1,21 @@
+[package]
+authors = ['Novasama Technologies']
+edition = '2021'
+license = 'Apache 2.0'
+name = "merlin"
+repository = 'https://github.com/novasamatech/polkadot-app-android'
+version = "0.1.0"
+
+[dependencies]
+merlin = "=3.0.0"
+jni = { version = "0.17.0", default-features = false }
+schnorrkel = { version="0.10.0" }
+
+[profile.release]
+strip = true
+lto = true
+opt-level = "s"
+
+[lib]
+name = "merlin_crypto_java"
+crate_type = ["cdylib"]
