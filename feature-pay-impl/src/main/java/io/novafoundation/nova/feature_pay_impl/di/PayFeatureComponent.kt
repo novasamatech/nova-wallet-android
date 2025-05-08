@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.main.di.PayMainComponent
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.di.ShopComponent
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
     dependencies = [
@@ -38,6 +39,7 @@ interface PayFeatureComponent : PayFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
+            RuntimeApi::class,
             AccountFeatureApi::class,
             WalletConnectFeatureApi::class
         ]

@@ -43,3 +43,12 @@ fun PageOffset.requirePageNumber(): PageOffset.Loadable.PageNumber {
 
     return this
 }
+
+fun PageOffset.getPageNumberOrThrow(): Int {
+    return when (this) {
+        PageOffset.FullData -> 0
+        PageOffset.Loadable.FirstPage -> 0
+        is PageOffset.Loadable.PageNumber -> page
+        is PageOffset.Loadable.Cursor -> throw IllegalStateException()
+    }
+}

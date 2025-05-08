@@ -14,12 +14,18 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "RAISE_CLIENT_ID", readStringSecret("RAISE_CLIENT_ID_TEST")
+        buildConfigField "String", "RAISE_SECRET", readStringSecret("RAISE_SECRET_TEST")
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "RAISE_CLIENT_ID", readStringSecret("RAISE_CLIENT_ID")
+            buildConfigField "String", "RAISE_SECRET", readStringSecret("RAISE_SECRET")
         }
     }
 
@@ -40,7 +46,9 @@ android {
 
 dependencies {
     implementation project(':common')
+    implementation project(':runtime')
     implementation project(':feature-pay-api')
+    implementation project(':bindings:merlin')
     implementation project(":feature-wallet-connect-api")
     implementation project(":feature-account-api")
 

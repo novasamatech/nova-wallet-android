@@ -694,3 +694,15 @@ fun Int.collectionIndexOrNull(): Int? {
 fun <T> Set<T>.hasIntersectionWith(other: Set<T>): Boolean {
     return this.any { it in other }
 }
+
+@OptIn(ExperimentalContracts::class)
+inline fun <R, T : R> Result<T>.flatRecover(transform: (exception: Throwable) -> Result<R>): Result<R> {
+    contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+    }
+
+    return when (val exception = exceptionOrNull()) {
+        null -> this
+        else -> transform(exception)
+    }
+}

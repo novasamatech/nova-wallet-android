@@ -63,8 +63,10 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.CopyValueMixin
+import io.novafoundation.nova.common.utils.NetworkStateService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
+import io.novafoundation.nova.common.utils.RealNetworkStateService
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
@@ -400,4 +402,8 @@ class CommonModule {
         toastMessageManager,
         resourceManager
     )
+
+    @Provides
+    @ApplicationScope
+    fun provideNetworkStateService(context: Context): NetworkStateService = RealNetworkStateService(context)
 }
