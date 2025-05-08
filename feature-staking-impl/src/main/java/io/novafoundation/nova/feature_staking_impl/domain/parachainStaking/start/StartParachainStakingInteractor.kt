@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 
-import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
@@ -16,15 +15,9 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
-import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
-import io.novasama.substrate_sdk_android.runtime.metadata.call
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -41,7 +34,6 @@ interface StartParachainStakingInteractor {
 class RealStartParachainStakingInteractor(
     private val accountRepository: AccountRepository,
     private val extrinsicService: ExtrinsicService,
-    private val chainRegistry: ChainRegistry,
     private val singleAssetSharedState: AnySelectedAssetOptionSharedState,
     private val stakingConstantsRepository: ParachainStakingConstantsRepository,
     private val delegatorStateRepository: DelegatorStateRepository,
@@ -111,15 +103,4 @@ class RealStartParachainStakingInteractor(
     }
 
     private fun fakeDelegationCount() = BigInteger.TEN
-
-    private suspend fun fakeCollatorId(chainId: ChainId): AccountId {
-        val runtime = chainRegistry.getRuntime(chainId)
-        val callMetadata = runtime.metadata.parachainStaking().call("delegate")
-        val candidateIdType = callMetadata.arguments.first().type?.skipAliases()!!
-        require(candidateIdType is FixedByteArray) {
-            "accountId is not FixedByteArray but ${candidateIdType::class.simpleName}"
-        }
-
-        return ByteArray(candidateIdType.length)
-    }
 }
