@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -72,6 +73,8 @@ interface DAppFeatureDependencies {
     val preferences: Preferences
 
     val walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory
+
+    val walletConnectService: WalletConnectService
 
     fun currencyRepository(): CurrencyRepository
 
