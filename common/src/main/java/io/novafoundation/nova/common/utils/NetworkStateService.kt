@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 interface NetworkStateService {
     val isNetworkAvailable: StateFlow<Boolean>
@@ -42,15 +41,18 @@ class RealNetworkStateService(context: Context) : NetworkStateService {
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
 
-        connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                _isNetworkAvailable.value = true
-            }
+        connectivityManager.registerNetworkCallback(
+            networkRequest,
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    _isNetworkAvailable.value = true
+                }
 
-            override fun onLost(network: Network) {
-                _isNetworkAvailable.value = false
+                override fun onLost(network: Network) {
+                    _isNetworkAvailable.value = false
+                }
             }
-        })
+        )
     }
 
     private fun isNetworkAvailable(): Boolean {

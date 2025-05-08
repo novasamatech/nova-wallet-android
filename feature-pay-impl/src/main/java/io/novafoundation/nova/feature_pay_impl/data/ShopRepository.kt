@@ -1,8 +1,5 @@
 package io.novafoundation.nova.feature_pay_impl.data
 
-interface ShopRepository {
-}
+interface ShopRepository
 
-class RealShopRepository : ShopRepository {
-
-}
+class RealShopRepository : ShopRepository

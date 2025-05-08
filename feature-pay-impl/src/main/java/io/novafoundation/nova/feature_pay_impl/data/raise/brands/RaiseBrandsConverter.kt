@@ -17,7 +17,6 @@ class RealRaiseBrandsConverter(
     private val raiseAmountConverter: RaiseAmountConverter,
 ) : RaiseBrandsConverter {
 
-
     companion object {
 
         private const val RAISE_PERCENT_PRECISION = 2

@@ -31,5 +31,4 @@ class NetworkApiCreator(
 
         return retrofit.create(service)
     }
-
 }

@@ -21,5 +21,4 @@ class ShopViewModel(
             shopBrandsInteractorUseCase.invoke()
         }
     }
-
 }

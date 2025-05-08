@@ -17,7 +17,7 @@ fun RaiseAmountConverter.convertFromApiCurrency(apiAmount: Long): BigDecimal {
     return convertFromApiAmount(apiAmount, precision = 2)
 }
 
-class RealRaiseAmountConverter(): RaiseAmountConverter {
+class RealRaiseAmountConverter() : RaiseAmountConverter {
 
     override fun convertToApiAmount(domainAmount: BigDecimal, precision: Int): Long {
         return domainAmount.scaleByPowerOfTen(precision).toLong()

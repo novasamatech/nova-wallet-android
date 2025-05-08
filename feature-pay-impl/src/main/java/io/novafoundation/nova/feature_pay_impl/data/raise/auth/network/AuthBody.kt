@@ -12,7 +12,7 @@ class FirstTimeNonceRequestAttributes(
 )
 
 class SecondTimeNonceRequestAttributes(
-   val action: String
+    val action: String
 )
 
 class NonceResponseAttributes(

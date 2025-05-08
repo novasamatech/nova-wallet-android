@@ -50,7 +50,6 @@ class RaiseAuthInterceptor(
         val token = synchronized(client) {
             var token = raiseAuthRepository.getJwtToken(selectedMetaAccount.id)
             if (token == null || token.hasExpired()) {
-
                 refreshToken(selectedMetaAccount, token)
                     .onSuccess {
                         token = it
@@ -72,10 +71,10 @@ class RaiseAuthInterceptor(
 
         if (code == 401 || code == 403) {
             val currentToken = synchronized(client) {
-                //perform all 401 in sync blocks, to avoid multiply token updates
+                // perform all 401 in sync blocks, to avoid multiply token updates
                 var currentToken = raiseAuthRepository.getJwtToken(selectedMetaAccount.id)
 
-                //compare current token with token that was stored before, if it was not updated - do update
+                // compare current token with token that was stored before, if it was not updated - do update
                 if (currentToken == token) {
                     refreshToken(selectedMetaAccount, currentToken)
                         .onSuccess {

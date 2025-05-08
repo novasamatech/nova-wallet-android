@@ -5,7 +5,6 @@ import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 
-
 fun Keypair.toStruct(): EncodableStruct<KeyPairSchema> {
     return KeyPairSchema { keypair ->
         keypair[PublicKey] = publicKey

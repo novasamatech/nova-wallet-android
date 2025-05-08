@@ -36,7 +36,6 @@ import java.util.concurrent.TimeUnit
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
 
 const val TIMEOUT_SECONDS = 20L
 

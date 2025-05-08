@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.px
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import kotlin.math.roundToInt
 
 private const val BASE_ICON_PADDING_DP = 6
 
