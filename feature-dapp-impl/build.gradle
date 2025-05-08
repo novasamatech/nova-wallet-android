@@ -68,6 +68,7 @@ dependencies {
     implementation project(':feature-onboarding-api')
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
+    implementation project(':feature-wallet-connect-api')
     implementation project(':feature-dapp-api')
     implementation project(':feature-currency-api')
     implementation project(':feature-external-sign-api')
