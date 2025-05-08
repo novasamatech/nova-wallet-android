@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="shop_unavailable_wallet_title">Unavailable with this wallet</string>
+    <string name="shop_unavailable_wallet_subtitle">To access the Polkadot Pay, please switch to a wallet secured by a secret. You can also create a new wallet or import an existing one.</string>
+    <string name="polkadot_pay_common">polkadot pay</string>
     <string name="pay_title">Pay</string>
     <string name="pay_tab_spend">Spend</string>
     <string name="pay_tab_shop">Shop</string>

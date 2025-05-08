@@ -133,6 +133,7 @@
     <color name="indicator_inactive">#29FFFFFF</color>
     <color name="pull_indicator">#29FFFFFF</color>
     <color name="shimmering_indicator">#A3FFFFFF</color>
+    <color name="shimmering_indicator_background">#29FFFFFF</color>
     <color name="nay_indicator">#E53450</color>
     <color name="aye_indicator">#2FC864</color>
     <color name="progress_bar_indicator">#2AB0F2</color>

@@ -20,7 +20,7 @@ class PayMainFragment : BaseFragment<PayMainViewModel, FragmentPayMainBinding>()
     override fun initViews() {
         binder.payContainer.applyStatusBarInsets()
 
-        val adapter = PayPagerAdapter(this, router)
+        val adapter = PayPagerAdapter(this)
         binder.payViewPager.adapter = adapter
         binder.payTabs.setupWithViewPager2(binder.payViewPager, adapter::getPageTitle)
 
