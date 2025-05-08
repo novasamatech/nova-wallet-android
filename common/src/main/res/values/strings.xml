@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="pay_title">Pay</string>
+    <string name="pay_tab_spend">Spend</string>
+    <string name="pay_tab_shop">Shop</string>
+
 <!--
     <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
     <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>

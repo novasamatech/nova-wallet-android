@@ -30,6 +30,7 @@ import io.novafoundation.nova.splash.SplashRouter
         GovernanceNavigationModule::class,
         WalletConnectNavigationModule::class,
         VoteNavigationModule::class,
+        PayNavigationModule::class,
         VersionsNavigationModule::class,
         ExternalSignNavigationModule::class,
         SettingsNavigationModule::class,

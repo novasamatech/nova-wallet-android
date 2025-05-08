@@ -17,10 +17,10 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/dAppsFragment"
+        android:id="@+id/payFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_dapps"
-        android:title="@string/dapp_dapps"
+        android:icon="@drawable/bottom_pay"
+        android:title="@string/pay_title"
         app:showAsAction="ifRoom" />
 
     <item
@@ -31,9 +31,10 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/profileFragment"
+        android:id="@+id/dAppsFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_settings"
-        android:title="@string/profile_settings_title"
+        android:icon="@drawable/bottom_dapps"
+        android:title="@string/dapp_dapps"
         app:showAsAction="ifRoom" />
+
 </menu>
