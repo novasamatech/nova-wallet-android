@@ -6,38 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/dappMainTitle"
-        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="25dp"
-        android:includeFontPadding="false"
-        android:text="@string/dapp_dapps"
-        android:textColor="@color/text_primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <io.novafoundation.nova.feature_account_api.view.SelectedWalletView
-        android:id="@+id/dappMainSelectedWallet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <io.novafoundation.nova.feature_dapp_impl.presentation.main.view.TapToSearchView
         android:id="@+id/dappMainSearch"
         android:layout_width="0dp"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="4dp"
         app:layout_constraintEnd_toStartOf="@id/dappMainManage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dappMainTitle" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <io.novafoundation.nova.common.view.IconButton
         android:id="@+id/dappMainManage"

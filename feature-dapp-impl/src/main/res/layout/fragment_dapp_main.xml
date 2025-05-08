@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/dappRecyclerViewCatalog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/drawable_background_image"
-    android:clipToPadding="false"
-    android:overScrollMode="never"
-    android:paddingBottom="84dp"
-    android:scrollbars="none"
-    app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed" />
+    android:background="@drawable/drawable_background_image">
+
+    <io.novafoundation.nova.common.view.WalletAppBarView
+        android:id="@+id/dappAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dappRecyclerViewCatalog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="84dp"
+        android:scrollbars="none"
+        app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dappAppBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

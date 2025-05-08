@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 import io.novafoundation.nova.feature_vote.presentation.vote.di.VoteComponent
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 
 @Component(
     dependencies = [
@@ -33,7 +34,8 @@ interface VoteFeatureComponent : VoteFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
-            AccountFeatureApi::class
+            AccountFeatureApi::class,
+            WalletConnectFeatureApi::class
         ]
     )
     interface VoteFeatureDependenciesComponent : VoteFeatureDependencies

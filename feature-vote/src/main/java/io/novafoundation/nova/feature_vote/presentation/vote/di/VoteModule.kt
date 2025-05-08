@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_vote.presentation.VoteRouter
 import io.novafoundation.nova.feature_vote.presentation.vote.VoteViewModel
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 
 @Module(includes = [ViewModelModule::class])
 class VoteModule {
@@ -25,11 +26,13 @@ class VoteModule {
     @ViewModelKey(VoteViewModel::class)
     fun provideViewModel(
         voteRouter: VoteRouter,
-        selectedAccountUseCase: SelectedAccountUseCase
+        selectedAccountUseCase: SelectedAccountUseCase,
+        walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory
     ): ViewModel {
         return VoteViewModel(
             router = voteRouter,
-            selectedAccountUseCase = selectedAccountUseCase
+            selectedAccountUseCase = selectedAccountUseCase,
+            walletConnectSessionsMixinFactory = walletConnectSessionsMixinFactory
         )
     }
 }

@@ -44,14 +44,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormat
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
-import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -60,7 +59,6 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
@@ -79,7 +77,8 @@ class BalanceListViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetListMixinFactory: AssetListMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+    private val walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -158,14 +157,9 @@ class BalanceListViewModel(
     }
         .shareInBackground()
 
-    private val walletConnectAccountSessionCount = selectedMetaAccount.flatMapLatest {
-        walletConnectSessionsUseCase.activeSessionsNumberFlow(it)
-    }
-        .shareInBackground()
+    private val walletConnectSessionsMixin = walletConnectSessionsMixinFactory.create(this)
 
-    val walletConnectAccountSessionsUI = walletConnectAccountSessionCount
-        .map(::mapNumberOfActiveSessionsToUi)
-        .shareInBackground()
+    val walletConnectAccountSessions = walletConnectSessionsMixin.getActiveSessionsForSelectedAccount()
 
     val filtersIndicatorIcon = isFiltersEnabledFlow
         .map { if (it) R.drawable.ic_chip_filter_indicator else R.drawable.ic_chip_filter }
@@ -236,14 +230,7 @@ class BalanceListViewModel(
     }
 
     fun walletConnectClicked() {
-        launch {
-            if (walletConnectAccountSessionCount.first() > 0) {
-                val metaAccount = selectedMetaAccount.first()
-                router.openWalletConnectSessions(metaAccount.id)
-            } else {
-                router.openWalletConnectScan()
-            }
-        }
+        walletConnectSessionsMixin.onWalletConnectClick()
     }
 
     fun balanceBreakdownClicked() {
@@ -324,5 +311,8 @@ class BalanceListViewModel(
 
     fun switchViewMode() {
         launch { assetListMixin.switchViewMode() }
+    }
+
+    fun settingsClicked() {
     }
 }

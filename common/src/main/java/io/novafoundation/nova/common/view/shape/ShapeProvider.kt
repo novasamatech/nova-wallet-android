@@ -14,6 +14,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.utils.withRippleMask
 
 const val DEFAULT_CORNER_RADIUS = 12
 
@@ -92,6 +93,20 @@ fun Context.getDisabledDrawable(): Drawable = getRoundedCornerDrawable(fillColor
 fun Context.getIdleDrawable(): Drawable = getRoundedCornerDrawable(strokeColorRes = R.color.container_border)
 fun Context.getBlockDrawable(@ColorRes strokeColorRes: Int? = null): Drawable {
     return getRoundedCornerDrawable(fillColorRes = R.color.block_background, strokeColorRes = strokeColorRes)
+}
+
+fun Context.getRoundedCornerDrawableWithRipple(
+    @ColorRes fillColorRes: Int? = R.color.secondary_screen_background,
+    @ColorRes strokeColorRes: Int? = null,
+    @ColorRes rippleColor: Int = R.color.cell_background_pressed,
+    cornerSizeInDp: Int = DEFAULT_CORNER_RADIUS,
+    strokeSizeInDp: Float = 1.0f,
+): Drawable = run {
+    val fillColor = fillColorRes?.let(this::getColor)
+    val strokeColor = strokeColorRes?.let(this::getColor)
+
+    getRoundedCornerDrawableFromColors(fillColor, strokeColor, cornerSizeInDp, strokeSizeInDp)
+        .withRippleMask(getRippleMask(cornerSizeInDp))
 }
 
 fun Context.getRoundedCornerDrawable(

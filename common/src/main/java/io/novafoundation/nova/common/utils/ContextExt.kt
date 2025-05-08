@@ -163,6 +163,9 @@ fun Context.launchDeepLink(url: String) {
 context(View)
 fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRipple(this, mask)
 
+context(Context)
+fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = addRipple(this, mask)
+
 context(View)
 val Int.dp: Int
     get() = dp(this@View.context)

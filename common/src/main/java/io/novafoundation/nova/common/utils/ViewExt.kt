@@ -26,6 +26,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.getColorOrThrow
+import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -414,4 +415,8 @@ fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharS
 
 fun View.bounds(): Rect {
     return Rect(0, 0, width, height)
+}
+
+fun ViewGroup.letChildrenDuplicateParentState(duplicate: Boolean) {
+    children.forEach { it.isDuplicateParentStateEnabled = duplicate }
 }

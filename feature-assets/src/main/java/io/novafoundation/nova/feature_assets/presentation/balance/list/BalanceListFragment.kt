@@ -3,16 +3,17 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
 import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.common.view.PlaceholderModel
+import io.novafoundation.nova.common.view.bindWithRecyclerView
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceListBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -77,19 +78,20 @@ class BalanceListFragment :
     }
 
     override fun initViews() {
-        binder.balanceListAssets.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
+        binder.balanceListAppBar.applyStatusBarInsets()
 
         hideKeyboard()
 
         setupRecyclerView()
 
+        binder.balanceListAppBar.onWalletClick { viewModel.avatarClicked() }
+        binder.balanceListAppBar.onWalletConnectClick { viewModel.walletConnectClicked() }
+        binder.balanceListAppBar.onSettingsClick { viewModel.settingsClicked() }
         binder.walletContainer.setOnRefreshListener {
             viewModel.fullSync()
         }
+
+        binder.balanceListAppBar.bindWithRecyclerView(binder.balanceListAssets, R.drawable.bg_wallet_app_bar)
     }
 
     private fun setupRecyclerView() {
@@ -113,6 +115,14 @@ class BalanceListFragment :
     override fun subscribe(viewModel: BalanceListViewModel) {
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
 
+        viewModel.selectedWalletModelFlow.observe {
+            binder.balanceListAppBar.setSelectedWallet(it.typeIcon?.icon, it.name)
+        }
+
+        viewModel.walletConnectAccountSessions.observe {
+            binder.balanceListAppBar.setWalletConnectActive(it.hasConnections)
+        }
+
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
             binder.balanceListAssets.invalidateItemDecorations()
         }
@@ -124,7 +134,6 @@ class BalanceListFragment :
         }
 
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
-        viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
         viewModel.shouldShowPlaceholderFlow.observe(emptyAssetsPlaceholder::show)
         viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
@@ -151,10 +160,6 @@ class BalanceListFragment :
                 balanceBreakdownBottomSheet?.setBalanceBreakdown(totalBalanceBreakdown)
             }
             balanceBreakdownBottomSheet?.show()
-        }
-
-        viewModel.walletConnectAccountSessionsUI.observe {
-            headerAdapter.setWalletConnectModel(it)
         }
 
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)

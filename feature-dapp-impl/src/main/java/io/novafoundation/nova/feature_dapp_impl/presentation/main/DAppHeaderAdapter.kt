@@ -7,9 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_dapp_impl.databinding.ItemDappHeaderBinding
-import io.novafoundation.nova.feature_dapp_impl.presentation.common.DappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryModel
 
 class DAppHeaderAdapter(
@@ -18,20 +16,14 @@ class DAppHeaderAdapter(
     val categoriesHandler: DappCategoriesAdapter.Handler
 ) : RecyclerView.Adapter<HeaderHolder>() {
 
-    private var walletModel: SelectedWalletModel? = null
     private var categories: List<DAppCategoryModel> = emptyList()
-    private var favoritesDApps: List<DappModel> = emptyList()
     private var showCategoriesShimmering: Boolean = false
 
     interface Handler {
 
-        fun onWalletClick()
-
         fun onSearchClick()
 
         fun onManageClick()
-
-        fun onManageFavoritesClick()
 
         fun onCategoryClicked(id: String)
     }
@@ -47,9 +39,7 @@ class DAppHeaderAdapter(
 
     override fun onBindViewHolder(holder: HeaderHolder, position: Int) {
         holder.bind(
-            walletModel,
             categories,
-            favoritesDApps,
             showCategoriesShimmering
         )
     }
@@ -60,7 +50,6 @@ class DAppHeaderAdapter(
         } else {
             payloads.filterIsInstance<Payload>().forEach {
                 when (it) {
-                    Payload.WALLET -> holder.bindWallet(walletModel)
                     Payload.CATEGORIES -> holder.bindCategories(categories)
                     Payload.CATEGORIES_SHIMMERING -> holder.bindCategoriesShimmering(showCategoriesShimmering)
                 }
@@ -70,11 +59,6 @@ class DAppHeaderAdapter(
 
     override fun getItemCount(): Int {
         return 1
-    }
-
-    fun setWallet(walletModel: SelectedWalletModel) {
-        this.walletModel = walletModel
-        notifyItemChanged(0, Payload.WALLET)
     }
 
     fun setCategories(categories: List<DAppCategoryModel>) {
@@ -98,25 +82,17 @@ class HeaderHolder(
     private val categoriesAdapter = DappCategoriesAdapter(imageLoader, categoriesHandler)
 
     init {
-        binder.dappMainSelectedWallet.setOnClickListener { headerHandler.onWalletClick() }
         binder.dappMainSearch.setOnClickListener { headerHandler.onSearchClick() }
         binder.dappMainManage.setOnClickListener { headerHandler.onManageClick() }
         binder.mainDappCategories.adapter = categoriesAdapter
     }
 
     fun bind(
-        walletModel: SelectedWalletModel?,
         categoriesState: List<DAppCategoryModel>,
-        favoritesDApps: List<DappModel>,
         showCategoriesShimmering: Boolean
     ) {
-        bindWallet(walletModel)
         bindCategories(categoriesState)
         bindCategoriesShimmering(showCategoriesShimmering)
-    }
-
-    fun bindWallet(walletModel: SelectedWalletModel?) = with(binder) {
-        walletModel?.let { dappMainSelectedWallet.setModel(walletModel) }
     }
 
     fun bindCategories(categoriesState: List<DAppCategoryModel>) = with(binder) {
@@ -130,5 +106,5 @@ class HeaderHolder(
 }
 
 private enum class Payload {
-    WALLET, CATEGORIES, CATEGORIES_SHIMMERING
+    CATEGORIES, CATEGORIES_SHIMMERING
 }

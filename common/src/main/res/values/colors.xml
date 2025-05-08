@@ -22,7 +22,7 @@
     <color name="text_secondary_on_content">#8F000000</color>
     <color name="text_on_cloud_backup_button">#05081C</color>
     <color name="button_text">#E0FFFFFF</color>
-    <color name="chip_text">#A3FFFFFF</color>
+    <color name="chip_text">#7AFFFFFF</color>
     <color name="button_text_inactive">#52FFFFFF</color>
     <color name="hint_text">#52FFFFFF</color>
     <color name="button_text_accent">#1F78FF</color>
@@ -78,11 +78,12 @@
     <color name="chip_on_card_background">#443679</color>
     <color name="container_background">#1A999EC7</color>
     <color name="token_container_background">#3D08090E</color>
-    <color name="segmented_background">#5208090E</color>
+    <color name="android_app_nav_bar_background">#5208090E</color>
     <color name="segmented_background_on_black">#1A999EC7</color>
     <color name="cloud_backup_button_background">#FFFFFF</color>
     <color name="selected_dapp_category">#E0FFFFFF</color>
     <color name="android_history_background">#1E223C</color>
+    <color name="android_top_bar_background">#1E223C</color>
 
     <color name="segmented_tab_active">#3D999EC7</color>
     <color name="switch_background">#3D999EC7</color>

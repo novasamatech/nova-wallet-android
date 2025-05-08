@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRep
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 
 @Module(includes = [ViewModelModule::class])
 class BalanceListModule {
@@ -90,7 +91,8 @@ class BalanceListModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetListMixinFactory: AssetListMixinFactory,
         amountFormatter: AmountFormatter,
-        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+        walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -106,7 +108,8 @@ class BalanceListModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
             amountFormatter = amountFormatter,
-            buySellSelectorMixinFactory = buySellSelectorMixinFactory
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory,
+            walletConnectSessionsMixinFactory = walletConnectSessionsMixinFactory
         )
     }
 

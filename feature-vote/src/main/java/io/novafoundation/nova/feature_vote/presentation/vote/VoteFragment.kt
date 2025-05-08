@@ -24,7 +24,9 @@ class VoteFragment : BaseFragment<VoteViewModel, FragmentVoteBinding>() {
         binder.voteViewPager.adapter = adapter
         binder.voteTabs.setupWithViewPager2(binder.voteViewPager, adapter::getPageTitle)
 
-        binder.voteAvatar.setOnClickListener { viewModel.avatarClicked() }
+        binder.voteAppBar.onWalletClick { viewModel.avatarClicked() }
+        binder.voteAppBar.onWalletConnectClick { viewModel.walletConnectClicked() }
+        binder.voteAppBar.onSettingsClick { }
     }
 
     override fun inject() {
@@ -35,6 +37,12 @@ class VoteFragment : BaseFragment<VoteViewModel, FragmentVoteBinding>() {
     }
 
     override fun subscribe(viewModel: VoteViewModel) {
-        viewModel.selectedWalletModel.observe(binder.voteAvatar::setModel)
+        viewModel.selectedWalletModel.observe {
+            binder.voteAppBar.setSelectedWallet(it.typeIcon?.icon, it.name)
+        }
+
+        viewModel.walletConnectAccountSessions.observe {
+            binder.voteAppBar.setWalletConnectActive(it.hasConnections)
+        }
     }
 }

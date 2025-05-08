@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation project(':common')
     implementation project(':feature-account-api')
+    implementation project(':feature-wallet-connect-api')
 
     implementation kotlinDep
 

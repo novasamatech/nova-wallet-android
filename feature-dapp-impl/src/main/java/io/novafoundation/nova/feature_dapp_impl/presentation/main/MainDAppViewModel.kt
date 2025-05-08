@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -22,6 +21,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategory
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDAppCatalogToDAppCategoryModels
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapFavoriteDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -31,9 +31,9 @@ class MainDAppViewModel(
     private val bannerSourceFactory: BannersSourceFactory,
     private val router: DAppRouter,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val dappInteractor: DappInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val walletConnectSessionsMixinFactory: WalletConnectSessionsMixinFactory,
 ) : BaseViewModel(), Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -76,8 +76,16 @@ class MainDAppViewModel(
         .withLoading()
         .share()
 
+    private val walletConnectSessionsMixin = walletConnectSessionsMixinFactory.create(this)
+
+    val walletConnectAccountSessions = walletConnectSessionsMixin.getActiveSessionsForSelectedAccount()
+
     init {
         syncDApps()
+    }
+
+    fun walletConnectClicked() {
+        walletConnectSessionsMixin.onWalletConnectClick()
     }
 
     fun openCategory(categoryId: String) {
