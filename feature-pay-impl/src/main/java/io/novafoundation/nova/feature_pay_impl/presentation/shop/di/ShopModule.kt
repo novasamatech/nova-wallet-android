@@ -8,12 +8,9 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
-import io.novafoundation.nova.feature_pay_impl.presentation.main.PayMainViewModel
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.ShopViewModel
-import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 
 @Module(includes = [ViewModelModule::class])
 class ShopModule {

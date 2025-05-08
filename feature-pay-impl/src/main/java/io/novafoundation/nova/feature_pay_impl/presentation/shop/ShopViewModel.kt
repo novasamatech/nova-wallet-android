@@ -12,5 +12,4 @@ class ShopViewModel(
 
     val isWalletAvailableFlow: Flow<Boolean> = shopInteractor.observeAccountAvailableForShopping()
         .shareInBackground()
-
 }
