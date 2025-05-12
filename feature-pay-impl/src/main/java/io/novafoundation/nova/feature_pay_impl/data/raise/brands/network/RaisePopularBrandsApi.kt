@@ -8,5 +8,4 @@ interface RaisePopularBrandsApi {
 
     @GET(BuildConfig.POPULAR_BRANDS_URL)
     suspend fun getPopularBrands(): List<PopularBrandRemote>
-
 }

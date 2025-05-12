@@ -26,6 +26,6 @@ class EmptyProgressState<T>(query: String) : PaginatedListState<T>(query) {
     }
 
     override fun toString(): String {
-        return "EmptyProgressState(query=${query})"
+        return "EmptyProgressState(query=$query)"
     }
 }

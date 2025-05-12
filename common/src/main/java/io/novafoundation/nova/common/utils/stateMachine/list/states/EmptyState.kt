@@ -3,11 +3,11 @@ package io.novafoundation.nova.common.utils.stateMachine.list.states
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateTransition
 
-class EmptyState<T>(query: String): PaginatedListState<T>(query) {
+class EmptyState<T>(query: String) : PaginatedListState<T>(query) {
 
     context(PaginatedListStateTransition<T>)
     override suspend fun performTransition(event: PaginatedListStateMachine.Event<T>) {
-        when(event) {
+        when (event) {
             is PaginatedListStateMachine.Event.NewPage -> Unit
             is PaginatedListStateMachine.Event.PageError -> Unit
             is PaginatedListStateMachine.Event.Scrolled -> Unit
@@ -16,6 +16,6 @@ class EmptyState<T>(query: String): PaginatedListState<T>(query) {
     }
 
     override fun toString(): String {
-        return "EmptyState(query=${query})"
+        return "EmptyState(query=$query)"
     }
 }

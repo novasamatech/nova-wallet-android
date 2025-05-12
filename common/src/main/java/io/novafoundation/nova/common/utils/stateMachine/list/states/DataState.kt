@@ -29,11 +29,10 @@ class DataState<T>(
     }
 
     override fun toString(): String {
-        return "DataState(query=${query}, nextPageOffset=${nextPageOffset}, dataSize=${data.size})"
+        return "DataState(query=$query, nextPageOffset=$nextPageOffset, dataSize=${data.size})"
     }
 
     private fun shouldStartNextPageFetching(currentIndex: Int, listSize: Int): Boolean {
         return currentIndex >= listSize - scrollOffset
     }
 }
-

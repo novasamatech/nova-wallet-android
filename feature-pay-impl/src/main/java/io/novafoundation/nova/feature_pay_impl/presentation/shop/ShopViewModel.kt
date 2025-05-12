@@ -7,12 +7,10 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.mapList
-import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.formatting.formatPercents
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine.Event.Companion.TriggerInitialLoading
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine.SideEffect
@@ -27,11 +25,8 @@ import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.S
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 sealed interface BrandsListState {

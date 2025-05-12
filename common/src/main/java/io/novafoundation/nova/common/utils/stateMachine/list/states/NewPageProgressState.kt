@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.model.hasNext
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateTransition
 
-
 class NewPageProgressState<T>(
     query: String,
     private val nextPageOffset: PageOffset.Loadable,
@@ -40,7 +39,6 @@ class NewPageProgressState<T>(
     }
 
     override fun toString(): String {
-        return "NewPageProgressState(query=${query}, nextPageOffset=${nextPageOffset}, dataSize=${data.size})"
+        return "NewPageProgressState(query=$query, nextPageOffset=$nextPageOffset, dataSize=${data.size})"
     }
 }
-

@@ -11,4 +11,3 @@ interface ShopBrandsRepository {
 
     suspend fun getPopularBrands(): Result<List<RaisePopularBrand>>
 }
-

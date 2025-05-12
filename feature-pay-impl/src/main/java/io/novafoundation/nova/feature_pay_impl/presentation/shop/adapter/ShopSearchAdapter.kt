@@ -22,7 +22,6 @@ class ShopSearchAdapter(private val handler: Handler) : SingleItemAdapter<ShopSe
     )
 }
 
-
 class ShopSearchViewHolder(
     private val binder: ItemBrandsSearchBinding,
     private val listener: ShopSearchAdapter.Handler
@@ -32,6 +31,3 @@ class ShopSearchViewHolder(
         binder.shopSearchIcon.setOnClickListener { listener.onSearchClick() }
     }
 }
-
-
-

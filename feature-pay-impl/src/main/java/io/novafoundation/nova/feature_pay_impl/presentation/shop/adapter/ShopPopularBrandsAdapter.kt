@@ -44,7 +44,6 @@ class ShopPopularBrandsAdapter(private val handler: Handler) : SingleItemAdapter
     )
 }
 
-
 class ShopPopularBrandsViewHolder(binding: ItemPopularBrandsBinding, private val handler: ShopPopularBrandsAdapter.Handler) :
     RecyclerView.ViewHolder(binding.root), ShopPopularBrandAdapter.Handler {
 
@@ -113,4 +112,3 @@ private class RaisePopularBrandCallback : DiffUtil.ItemCallback<ShopPopularBrand
         return oldItem == newItem
     }
 }
-

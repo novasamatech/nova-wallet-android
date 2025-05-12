@@ -15,10 +15,8 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.R
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseListBody
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.toPageOffset
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val BRANDS_PAGE_SIZE = 50

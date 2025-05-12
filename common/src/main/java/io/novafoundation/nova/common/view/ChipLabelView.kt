@@ -70,7 +70,6 @@ class ChipLabelView @JvmOverloads constructor(
             setDrawableEnd(it, widthInDp = 16, paddingInDp = iconEndPadding.px(context), tint = endIconTint)
         }
 
-
         val backgroundTintRes = typedArray.getResourceIdOrNull(R.styleable.ChipLabelView_android_backgroundTint)
         background = context.getRoundedCornerDrawable(backgroundTintRes ?: R.color.chips_background, cornerSizeInDp = 8)
 

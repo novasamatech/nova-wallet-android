@@ -55,7 +55,6 @@ fun PageOffset.getPageNumberOrThrow(): Int {
     }
 }
 
-
 @OptIn(ExperimentalContracts::class)
 fun PageOffset.hasNext(): Boolean {
     contract {

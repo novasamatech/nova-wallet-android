@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
-import kotlinx.coroutines.launch
 
 class MainViewModel(
     updateNotificationsInteractor: UpdateNotificationsInteractor,

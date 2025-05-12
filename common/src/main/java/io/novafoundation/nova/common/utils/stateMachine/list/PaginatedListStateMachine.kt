@@ -44,7 +44,7 @@ object PaginatedListStateMachine {
 fun <T> PaginatedListStateMachine(
     coroutineScope: CoroutineScope,
     initialQuery: String = "",
-) : StateMachine<PaginatedListState<T>, PaginatedListStateMachine.SideEffect, PaginatedListStateMachine.Event<T>> {
+): StateMachine<PaginatedListState<T>, PaginatedListStateMachine.SideEffect, PaginatedListStateMachine.Event<T>> {
     return StateMachine(initialState = EmptyProgressState(query = initialQuery), coroutineScope)
 }
 
