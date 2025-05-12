@@ -65,6 +65,11 @@ class WalletAppBarView @JvmOverloads constructor(
     }
 }
 
+/**
+ * On page change looking for a recycler view to bind background with it.
+ * Cancel previous recycler view listener if it exists.
+ * If page doesn't contains any recycler view just make background invisible with fade animation
+ */
 fun View.bindWithViewPager2(
     viewPager2: ViewPager2,
     onScrollDrawableRes: Int,
