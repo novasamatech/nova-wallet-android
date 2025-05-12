@@ -21,7 +21,7 @@ import io.novafoundation.nova.common.utils.stateMachine.list.toLoading
 import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
-import io.novafoundation.nova.feature_pay_api.domain.model.RaiseBrand
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
 import kotlinx.coroutines.flow.Flow
@@ -57,9 +57,6 @@ class ShopViewModel(
 
     private val listStateMachine = PaginatedListStateMachine<RaiseBrand>(viewModelScope)
 
-    private val sideEffects = listStateMachine.sideEffects.receiveAsFlow()
-        .shareInBackground()
-
     private val brandListStateFlow = listStateMachine.state
         .toLoading()
         .shareInBackground()
@@ -82,15 +79,15 @@ class ShopViewModel(
         .shareInBackground()
 
     init {
-        listStateMachine.sideEffects.receiveAsFlow().mapLatest {
-            when (it) {
-                is SideEffect.LoadPage -> loadPage(it)
-                is SideEffect.PresentError -> presentError()
-                SideEffect.LastPageReached -> isLastPageReached.value = true
+        launch {
+            for (effect in listStateMachine.sideEffects) {
+                when (effect) {
+                    is SideEffect.LoadPage -> loadPage(effect)
+                    is SideEffect.PresentError -> presentError()
+                    SideEffect.LastPageReached -> isLastPageReached.value = true
+                }
             }
         }
-            .inBackground()
-            .launchIn(viewModelScope)
 
         listStateMachine.onEvent(TriggerInitialLoading())
     }

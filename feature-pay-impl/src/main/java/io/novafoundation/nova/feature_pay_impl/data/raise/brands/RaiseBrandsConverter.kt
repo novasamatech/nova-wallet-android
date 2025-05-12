@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_pay_impl.data.raise.brands
 
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
-import io.novafoundation.nova.feature_pay_api.domain.model.RaiseBrandPrimaryMetadata
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrandPrimaryMetadata
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.RaiseBrandRemote
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.RaiseBrandResponse
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseAmountConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.convertFromApiCurrency
-import io.novafoundation.nova.feature_pay_api.domain.model.RaiseBrand
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
 
 interface RaiseBrandsConverter {
 

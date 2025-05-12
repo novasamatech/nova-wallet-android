@@ -28,7 +28,7 @@ class NewPageProgressState<T>(
                     emitState(newState)
                 }
 
-                else -> fullDataLoaded(query, event)
+                else -> fullDataLoaded(query, data + event.newPage)
             }
 
             is PaginatedListStateMachine.Event.PageError -> handlePageError(event, DataState(query, data, nextPageOffset))

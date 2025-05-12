@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RealRaise
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage.RaiseAuthStorage
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage.RealRaiseAuthStorage
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RealShopBrandsRepository
-import io.novafoundation.nova.feature_pay_api.data.ShopBrandsRepository
+import io.novafoundation.nova.feature_pay_impl.data.ShopBrandsRepository
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaiseBrandsApi
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.RealShopBrandsInteractor
@@ -31,7 +31,6 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseAmountConv
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseDateConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseAmountConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseDateConverter
-import io.novafoundation.nova.feature_pay_api.domain.ShopPrefetchUseCase
 import java.util.concurrent.TimeUnit
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -151,11 +150,5 @@ class PayFeatureModule {
     @FeatureScope
     fun provideShopBrandsInteractorUseCase(brandsRepository: ShopBrandsRepository): ShopBrandsInteractor {
         return RealShopBrandsInteractor(brandsRepository)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideShopPrefetchUseCase(brandsRepository: ShopBrandsRepository): ShopPrefetchUseCase {
-        return ShopPrefetchUseCase(brandsRepository)
     }
 }

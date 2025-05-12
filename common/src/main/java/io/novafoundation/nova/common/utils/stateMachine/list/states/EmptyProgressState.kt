@@ -14,7 +14,7 @@ class EmptyProgressState<T>(query: String) : PaginatedListState<T>(query) {
                 event.newPage.isEmpty() -> emitState(EmptyState(query))
                 event.newPage.nextOffset.hasNext() -> emitState(DataState(query, event.newPage, event.newPage.nextOffset))
 
-                else -> fullDataLoaded(query, event)
+                else -> fullDataLoaded(query, event.newPage)
             }
 
             is PaginatedListStateMachine.Event.PageError -> handlePageError(event, EmptyState(query))

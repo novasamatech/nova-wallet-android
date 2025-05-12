@@ -56,6 +56,7 @@ class ShopFragment : BaseFragment<ShopViewModel, FragmentShopBinding>(), ShopPop
 
     override fun initViews() {
         binder.shopList.adapter = adapter
+        binder.shopList.itemAnimator = null
 
         binder.shopList.setHasFixedSize(true)
         binder.shopList.onScrollPositionChanged(viewModel::onScrolled)
@@ -81,7 +82,7 @@ class ShopFragment : BaseFragment<ShopViewModel, FragmentShopBinding>(), ShopPop
 
             headerAdapter.show(showBrands)
             searchAdapter.show(showBrands)
-            shopPaginationLoadingAdapter.show(showBrands)
+            shopPaginationLoadingAdapter.show(showBrands && !showLoading)
             headerAdapter.showShimmering(showLoading)
             shimmeringAdapter.show(showLoading)
             brandsAdapter.submitList(it.getBrandsOrNull())

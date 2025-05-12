@@ -6,9 +6,9 @@ import io.novafoundation.nova.common.data.model.getPageNumberOrThrow
 import io.novafoundation.nova.common.utils.NetworkStateService
 import io.novafoundation.nova.common.utils.recoverWithDispatcher
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
-import io.novafoundation.nova.feature_pay_api.data.ShopBrandsRepository
-import io.novafoundation.nova.feature_pay_api.domain.model.RaiseBrand
-import io.novafoundation.nova.feature_pay_api.domain.model.RaisePopularBrand
+import io.novafoundation.nova.feature_pay_impl.data.ShopBrandsRepository
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaisePopularBrand
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaiseBrandsApi
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaisePopularBrandsApi
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.RaiseBrandResponse
@@ -31,19 +31,7 @@ class RealShopBrandsRepository(
     private val raiseBrandsConverter: RaiseBrandsConverter
 ) : ShopBrandsRepository {
 
-    private val firstPageBrands: MutableSharedFlow<DataPage<RaiseBrand>> = singleReplaySharedFlow()
     private val popularBrands: MutableSharedFlow<List<RaisePopularBrand>> = singleReplaySharedFlow()
-
-    override suspend fun prefetch() {
-        coroutineScope {
-            launch { prefetchFirstPage() }
-        }
-    }
-
-    private suspend fun prefetchFirstPage() {
-        fetchBrands(EMPTY_QUERY, PageOffset.Loadable.FirstPage)
-            .onSuccess { firstPageBrands.emit(it) }
-    }
 
     private suspend fun prefetchPopularBrands() {
         runCatching {
@@ -64,12 +52,7 @@ class RealShopBrandsRepository(
         }
     }
 
-    override suspend fun getBrands(query: String, pageOffset: PageOffset.Loadable) =
-        if (pageOffset is PageOffset.Loadable.FirstPage && query == EMPTY_QUERY) {
-            Result.success(firstPageBrands.first())
-        } else {
-            fetchBrands(query, pageOffset)
-        }
+    override suspend fun getBrands(query: String, pageOffset: PageOffset.Loadable) = fetchBrands(query, pageOffset)
 
     override suspend fun getPopularBrands() = Result.success(popularBrands.first())
 
