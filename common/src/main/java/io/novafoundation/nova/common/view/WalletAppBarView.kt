@@ -71,6 +71,7 @@ fun View.bindWithViewPager2(
     offscreenPageLimit: Int = 2
 ) {
     val drawable = ResourcesCompat.getDrawable(resources, onScrollDrawableRes, context.theme) ?: return
+    drawable.alpha = 0
 
     viewPager2.offscreenPageLimit = offscreenPageLimit
 
@@ -80,7 +81,7 @@ fun View.bindWithViewPager2(
         val pageRecyclerView = it.firstViewInstanceInHierarchy<RecyclerView>()
         oldRecyclerView?.unbindListener()
         if (pageRecyclerView != null) {
-            this.bindWithRecyclerView(pageRecyclerView, drawable)
+            this.bindWithRecyclerViewInternal(pageRecyclerView, drawable)
         } else {
             this.unbindBackground(drawable)
         }
@@ -91,12 +92,12 @@ fun View.bindWithViewPager2(
 
 fun View.bindWithRecyclerView(recyclerView: RecyclerView, onScrollDrawableRes: Int) {
     val drawable = ResourcesCompat.getDrawable(resources, onScrollDrawableRes, context.theme) ?: return
-    bindWithRecyclerView(recyclerView, drawable)
-}
-
-fun View.bindWithRecyclerView(recyclerView: RecyclerView, drawable: Drawable) {
     drawable.alpha = 0
 
+    bindWithRecyclerViewInternal(recyclerView, drawable)
+}
+
+private fun View.bindWithRecyclerViewInternal(recyclerView: RecyclerView, drawable: Drawable) {
     var oldCanScrollVertically = recyclerView.canScrollVertically(-1)
     animateBackground(drawable, oldCanScrollVertically)
 
