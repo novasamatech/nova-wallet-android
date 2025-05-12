@@ -37,44 +37,37 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="32dp"
         android:alpha="0.6">
 
-        <include layout="@layout/item_shop_placeholder" />
+        <include layout="@layout/item_brand_shimmering" />
 
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
         android:alpha="0.4">
 
-        <include layout="@layout/item_shop_placeholder" />
+        <include layout="@layout/item_brand_shimmering" />
 
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
         android:alpha="0.24">
 
-        <include layout="@layout/item_shop_placeholder" />
+        <include layout="@layout/item_brand_shimmering" />
 
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
         android:alpha="0.1">
 
-        <include layout="@layout/item_shop_placeholder" />
+        <include layout="@layout/item_brand_shimmering" />
 
     </FrameLayout>
 

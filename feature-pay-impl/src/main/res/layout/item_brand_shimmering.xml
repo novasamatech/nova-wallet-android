@@ -4,6 +4,8 @@
     android:id="@+id/shopList"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="16dp"
     android:background="@drawable/bg_shimmering_container"
     android:gravity="center_horizontal"
     android:orientation="vertical">

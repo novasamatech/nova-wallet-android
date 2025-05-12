@@ -17,6 +17,7 @@ android {
 
         buildConfigField "String", "RAISE_CLIENT_ID", readStringSecret("RAISE_CLIENT_ID_TEST")
         buildConfigField "String", "RAISE_SECRET", readStringSecret("RAISE_SECRET_TEST")
+        buildConfigField "String", "POPULAR_BRANDS_URL", "\"http://stub\""
     }
 
     buildTypes {
@@ -26,6 +27,7 @@ android {
 
             buildConfigField "String", "RAISE_CLIENT_ID", readStringSecret("RAISE_CLIENT_ID")
             buildConfigField "String", "RAISE_SECRET", readStringSecret("RAISE_SECRET")
+            buildConfigField "String", "POPULAR_BRANDS_URL", "\"http://stub\""
         }
     }
 

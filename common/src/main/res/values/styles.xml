@@ -654,6 +654,11 @@
         <item name="tabSelectedTextColor">@color/text_primary</item>
         <item name="tabTextAppearance">@style/SegmentedTab.Tab</item>
         <item name="tabTextColor">@color/text_secondary</item>
+        <item name="android:background">@color/segmented_background_on_black</item>
+    </style>
+
+    <style name="SegmentedTab.OnLight" parent="SegmentedTab">
+        <item name="android:background">@color/segmented_background</item>
     </style>
 
     <style name="SegmentedTab.Tab" parent="TextAppearance.NovaFoundation.Regular.Footnote">

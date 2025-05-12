@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.domain.brand.model
+package io.novafoundation.nova.feature_pay_api.domain.model
 
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Identifiable

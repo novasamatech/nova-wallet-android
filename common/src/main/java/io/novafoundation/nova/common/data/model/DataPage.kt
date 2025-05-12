@@ -1,6 +1,8 @@
 package io.novafoundation.nova.common.data.model
 
 import io.novafoundation.nova.common.utils.castOrNull
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 data class DataPage<T>(
     val nextOffset: PageOffset,
@@ -51,4 +53,14 @@ fun PageOffset.getPageNumberOrThrow(): Int {
         is PageOffset.Loadable.PageNumber -> page
         is PageOffset.Loadable.Cursor -> throw IllegalStateException()
     }
+}
+
+
+@OptIn(ExperimentalContracts::class)
+fun PageOffset.hasNext(): Boolean {
+    contract {
+        returns(true) implies (this@hasNext is PageOffset.Loadable)
+    }
+
+    return this is PageOffset.Loadable
 }

@@ -43,7 +43,6 @@ class ChipLabelView @JvmOverloads constructor(
     private var iconEndPadding: Float = 0f
 
     init {
-        background = context.getRoundedCornerDrawable(R.color.chips_background, cornerSizeInDp = 8)
         gravity = Gravity.CENTER_VERTICAL
 
         applyAttrs(context, attrs)
@@ -70,6 +69,10 @@ class ChipLabelView @JvmOverloads constructor(
         typedArray.getResourceIdOrNull(R.styleable.ChipLabelView_iconEnd)?.let {
             setDrawableEnd(it, widthInDp = 16, paddingInDp = iconEndPadding.px(context), tint = endIconTint)
         }
+
+
+        val backgroundTintRes = typedArray.getResourceIdOrNull(R.styleable.ChipLabelView_android_backgroundTint)
+        background = context.getRoundedCornerDrawable(backgroundTintRes ?: R.color.chips_background, cornerSizeInDp = 8)
 
         typedArray.recycle()
     }
