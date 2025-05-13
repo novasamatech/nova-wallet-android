@@ -45,11 +45,13 @@ class PayFeatureModule {
     fun provideRaiseAuthStorage(
         secretStoreV2: SecretStoreV2,
         encryptedPreferences: EncryptedPreferences,
+        chainRegistry: ChainRegistry,
         gson: Gson,
     ): RaiseAuthStorage {
         return RealRaiseAuthStorage(
             secretStoreV2,
             encryptedPreferences,
+            chainRegistry,
             gson
         )
     }

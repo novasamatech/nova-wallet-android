@@ -46,9 +46,9 @@ private class AddressModelHolder(private val binder: ItemAccountChooserBinding) 
     ) {
         super.bind(item, isSelected, handler)
 
-        with(itemView) {
-            binder.itemAccountChooserAddress.setAddressModel(item)
-            binder.itemAccountChooserCheck.isChecked = isSelected
+        with(binder) {
+            itemAccountChooserAddress.setAddressModel(item)
+            itemAccountChooserCheck.isChecked = isSelected
         }
     }
 }
