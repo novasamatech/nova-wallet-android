@@ -58,7 +58,7 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     fun setPreviews(previews: List<NftPreviewUi>?) {
-        setVisible(previews != null && previews.isNotEmpty())
+        setVisible(!previews.isNullOrEmpty())
         val shouldShowLoading = previews == null || previews.all { it is LoadingState.Loading }
 
         if (shouldShowLoading) {
