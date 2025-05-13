@@ -6,11 +6,14 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Urls
+import io.novafoundation.nova.common.utils.images.asFileIcon
+import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTab
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -26,13 +29,15 @@ class BrowserTabsViewModel(
     val tabsFlow = browserTabService.tabStateFlow
         .map { it.tabs }
         .mapList {
-            BrowserTabRvItem(
-                tabId = it.id,
-                tabName = it.pageSnapshot.pageName ?: Urls.domainOf(it.currentUrl),
-                tabFaviconPath = it.pageSnapshot.pageIconPath,
-                tabScreenshotPath = it.pageSnapshot.pagePicturePath
-            )
+            mapBrowserTab(it)
         }.shareInBackground()
+
+    private fun mapBrowserTab(it: BrowserTab) = BrowserTabRvItem(
+        tabId = it.id,
+        tabName = it.pageSnapshot.pageName ?: Urls.domainOf(it.currentUrl),
+        icon = it.knownDAppMetadata?.iconLink?.asUrlIcon() ?: it.pageSnapshot.pageIconPath?.asFileIcon(),
+        tabScreenshotPath = it.pageSnapshot.pagePicturePath
+    )
 
     fun openTab(tab: BrowserTabRvItem, extras: FragmentNavigator.Extras) = launch {
         router.openDAppBrowser(DAppBrowserPayload.Tab(tab.tabId), extras)

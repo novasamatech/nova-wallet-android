@@ -1,14 +1,13 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.View
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.SharedElementCallback
 import androidx.core.os.bundleOf
@@ -38,6 +37,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
+import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import javax.inject.Inject
 
@@ -67,6 +67,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
     @Inject
     lateinit var permissionAsker: WebViewPermissionAsker
+
+    @Inject
+    lateinit var webViewRequestInterceptor: WebViewRequestInterceptor
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -305,13 +308,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         compoundWeb3Injector.injectForPage(webView, viewModel.extensionsStore)
     }
 
-    override fun handleBrowserIntent(intent: Intent) {
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(requireContext(), R.string.common_no_app_to_handle_intent, Toast.LENGTH_LONG)
-                .show()
-        }
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        return webViewRequestInterceptor.intercept(request)
     }
 
     override fun onPageChanged(webView: WebView, url: String?, title: String?) {

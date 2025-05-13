@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.utils.WalletConnectUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -17,13 +18,7 @@ class WalletConnectPairDeeplinkHandler(
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
 
     override suspend fun matches(data: Uri): Boolean {
-        val newLinkMatch = data.scheme == "novawallet" && data.host == "wc"
-        val oldLinkMatch = data.scheme == "wc"
-        val linkMatch = newLinkMatch || oldLinkMatch
-
-        val isPairing = "symKey" in data.toString()
-
-        return linkMatch && isPairing
+        return WalletConnectUtils.isWalletConnectPairingLink(data)
     }
 
     override suspend fun handleDeepLink(data: Uri) {
