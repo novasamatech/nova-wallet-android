@@ -59,7 +59,7 @@ class KodadotProvider(
                 name = nftRemote.name,
                 label = nftRemote.sn,
                 media = nftRemote.image?.adoptFileStorageLinkToHttps(),
-                issuanceType = NftLocal.IssuanceType.LIMITED,
+                issuanceType = nftRemote.collection?.max?.let { NftLocal.IssuanceType.LIMITED } ?: NftLocal.IssuanceType.UNLIMITED,
                 issuanceTotal = nftRemote.collection?.max?.let { BigInteger(it) },
                 issuanceMyAmount = null,
                 price = nftRemote.price?.let { BigInteger(it) },
