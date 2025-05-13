@@ -420,3 +420,13 @@ fun View.bounds(): Rect {
 fun ViewGroup.letChildrenDuplicateParentState(duplicate: Boolean) {
     children.forEach { it.isDuplicateParentStateEnabled = duplicate }
 }
+
+fun View.traverseViews(action: (View) -> Unit) {
+    action(this)
+
+    if (this is ViewGroup) {
+        for (i in 0 until this.childCount) {
+            this.getChildAt(i).traverseViews(action)
+        }
+    }
+}

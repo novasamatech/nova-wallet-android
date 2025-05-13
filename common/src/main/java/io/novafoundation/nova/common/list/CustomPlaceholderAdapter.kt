@@ -6,7 +6,7 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflateChild
 
-class CustomPlaceholderAdapter(@LayoutRes val layoutId: Int) : SingleItemAdapter<StubHolder>() {
+open class CustomPlaceholderAdapter(@LayoutRes val layoutId: Int) : SingleItemAdapter<StubHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StubHolder {
         return StubHolder(parent.inflateChild(layoutId))
