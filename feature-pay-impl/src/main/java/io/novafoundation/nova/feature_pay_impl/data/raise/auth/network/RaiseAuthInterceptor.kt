@@ -48,7 +48,7 @@ class RaiseAuthInterceptor(
         val selectedMetaAccount = runBlocking { accountRepository.getSelectedMetaAccount() }
 
         val token = synchronized(client) {
-            var token = raiseAuthRepository.getJwtToken(selectedMetaAccount.id)
+            var token = raiseAuthRepository.getJwtToken(selectedMetaAccount)
             if (token == null || token.hasExpired()) {
                 refreshToken(selectedMetaAccount, token)
                     .onSuccess {
@@ -72,7 +72,7 @@ class RaiseAuthInterceptor(
         if (code == 401 || code == 403) {
             val currentToken = synchronized(client) {
                 // perform all 401 in sync blocks, to avoid multiply token updates
-                var currentToken = raiseAuthRepository.getJwtToken(selectedMetaAccount.id)
+                var currentToken = raiseAuthRepository.getJwtToken(selectedMetaAccount)
 
                 // compare current token with token that was stored before, if it was not updated - do update
                 if (currentToken == token) {
@@ -101,13 +101,13 @@ class RaiseAuthInterceptor(
 
     private fun refreshToken(metaAccount: MetaAccount, currentJwtToken: RaiseAuthToken?): Result<RaiseAuthToken> {
         return runCatching {
-            val publicKey = raiseAuthRepository.getChallengePublicKey(metaAccount.id)
+            val publicKey = raiseAuthRepository.getChallengePublicKey(metaAccount)
             val walletAddress = runBlocking { metaAccount.requireAddressIn(chainRegistry.polkadot()) }
 
             val nonce = getNonce(currentJwtToken, walletAddress, publicKey)
-            val signedNonce = raiseAuthRepository.signChallenge(metaAccount.id, nonce)
+            val signedNonce = raiseAuthRepository.signChallenge(metaAccount, nonce)
             validateVerification(signedNonce, walletAddress).also {
-                raiseAuthRepository.saveJwtToken(metaAccount.id, it)
+                raiseAuthRepository.saveJwtToken(metaAccount, it)
             }
         }
     }

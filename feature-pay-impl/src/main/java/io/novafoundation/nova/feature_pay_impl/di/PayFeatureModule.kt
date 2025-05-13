@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.NetworkStateService
-import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_pay_impl.BuildConfig
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RaiseAuthInterceptor
@@ -43,13 +42,11 @@ class PayFeatureModule {
     @Provides
     @FeatureScope
     fun provideRaiseAuthStorage(
-        accountSecretsFactory: AccountSecretsFactory,
         secretStoreV2: SecretStoreV2,
         encryptedPreferences: EncryptedPreferences,
         gson: Gson,
     ): RaiseAuthStorage {
         return RealRaiseAuthStorage(
-            accountSecretsFactory,
             secretStoreV2,
             encryptedPreferences,
             gson
