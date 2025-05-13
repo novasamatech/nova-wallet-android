@@ -3,18 +3,15 @@ package io.novafoundation.nova.feature_pay_impl.presentation.shop
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.mapList
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine
-import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine.Event.Companion.TriggerInitialLoading
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine.SideEffect
 import io.novafoundation.nova.common.utils.stateMachine.list.dataOrNull
+import io.novafoundation.nova.common.utils.stateMachine.list.states.NewPageProgressState
 import io.novafoundation.nova.common.utils.stateMachine.list.toLoading
 import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
@@ -23,25 +20,10 @@ import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-
-sealed interface BrandsListState {
-
-    data object UnavailableWallet : BrandsListState
-
-    class Brands(val brands: ExtendedLoadingState<List<ShopBrandRVItem>>) : BrandsListState
-
-    fun getBrandsOrNull(): List<ShopBrandRVItem>? {
-        return when (this) {
-            is Brands -> brands.dataOrNull
-            UnavailableWallet -> null
-        }
-    }
-}
 
 class ShopViewModel(
     private val router: PayRouter,
@@ -59,7 +41,8 @@ class ShopViewModel(
     private val isWalletAvailableFlow: Flow<Boolean> = shopInteractor.observeAccountAvailableForShopping()
         .shareInBackground()
 
-    val isLastPageReached = MutableStateFlow(false)
+    val isNewPageLoading = listStateMachine.state
+        .map { it is NewPageProgressState }
 
     val brandsListState = combine(brandListStateFlow, isWalletAvailableFlow) { brands, isWalletAwailable ->
         when {
@@ -79,12 +62,9 @@ class ShopViewModel(
                 when (effect) {
                     is SideEffect.LoadPage -> loadPage(effect)
                     is SideEffect.PresentError -> presentError()
-                    SideEffect.LastPageReached -> isLastPageReached.value = true
                 }
             }
         }
-
-        listStateMachine.onEvent(TriggerInitialLoading())
     }
 
     private fun RaiseBrand.toUi(): ShopBrandRVItem {

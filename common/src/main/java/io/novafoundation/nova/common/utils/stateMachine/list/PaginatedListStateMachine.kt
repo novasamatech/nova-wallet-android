@@ -11,14 +11,6 @@ object PaginatedListStateMachine {
 
     sealed class Event<out T> {
 
-        companion object {
-
-            fun TriggerInitialLoading(): Event<Nothing> {
-                // We can introduce a separate state but its not necessary now and changing the query will have similar effect
-                return QueryChanged(newQuery = "")
-            }
-        }
-
         class Scrolled(val currentItemIndex: Int) : Event<Nothing>()
 
         data class NewPage<T>(val newPage: DataPage<T>, val usedQuery: String = "") : Event<T>()
@@ -36,8 +28,6 @@ object PaginatedListStateMachine {
         ) : SideEffect()
 
         data class PresentError(val error: Throwable) : SideEffect()
-
-        data object LastPageReached : SideEffect()
     }
 }
 

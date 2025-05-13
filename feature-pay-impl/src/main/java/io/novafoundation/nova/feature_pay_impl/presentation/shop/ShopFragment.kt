@@ -93,7 +93,7 @@ class ShopFragment :
 
         viewModel.maxCashback.observe(headerAdapter::setHeaderText)
 
-        viewModel.isLastPageReached.observe { shopPaginationLoadingAdapter.setInvisible(it) }
+        viewModel.isNewPageLoading.observe { shopPaginationLoadingAdapter.setInvisible(!it) }
     }
 
     override fun onPopularBrandClick(brandModel: ShopBrandRVItem) {
