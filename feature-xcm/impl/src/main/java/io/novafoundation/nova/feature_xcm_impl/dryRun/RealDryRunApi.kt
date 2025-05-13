@@ -77,7 +77,7 @@ class RealDryRunApi @Inject constructor(
                 arguments = mapOf(
                     "origin" to originCaller.toEncodableInstance(),
                     "call" to call,
-                    "xcm_results_version" to xcmResultsVersion.version.toBigInteger()
+                    "result_xcms_version" to xcmResultsVersion.version.toBigInteger()
                 ),
                 returnBinding = {
                     runtime.provideContext {
