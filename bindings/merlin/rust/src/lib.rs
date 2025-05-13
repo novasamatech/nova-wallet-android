@@ -80,32 +80,3 @@ fn create_secret(secret: &[u8]) -> JniResult<SecretKey> {
             JniError::from_kind(ErrorKind::Msg("Provided private key is invalid.".to_string()))),
     }
 }
-
-// pub fn decode_hex(s: &str) -> Result<Vec<u8>, ParseIntError> {
-//     (0..s.len())
-//         .step_by(2)
-//         .map(|i| u8::from_str_radix(&s[i..i + 2], 16))
-//         .collect()
-// }
-
-// pub fn encode_hex(bytes: &[u8]) -> String {
-//     let mut s = String::with_capacity(bytes.len() * 2);
-//     for &b in bytes {
-//         write!(&mut s, "{:02x}", b).unwrap();
-//     }
-//     s
-// }
-
-// fn main() {
-//     let private = decode_hex("f71e44679a623658cdcc28847f7328b92d516087534c50c7cc11e824ed9d6e0ff71e44679a623658cdcc28847f7328b92d516087534c50c7cc11e824ed9d6e0f").expect("Cant fail");
-//     let private = SecretKey::from_bytes(&private).expect("Cant fail");
-//     let public = private.to_public();
-
-//     let nonce = decode_hex("2e7857995eedb9ffc3f6930cfea9765dbe712a667e4158b17f7a11ae4a39351b").expect("Cant fail");
-
-//     let mut transcript = Transcript::new(b"raise-auth");
-//     transcript.append_message(b"challenge-nonce", &nonce);
-
-//     let signature = private.sign(transcript, &public);
-//     println!("{}", encode_hex(signature.to_bytes().as_slice()));
-// }

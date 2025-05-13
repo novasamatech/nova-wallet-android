@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_api.data.secrets
+package io.novafoundation.nova.feature_account_impl.data.secrets
 
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets

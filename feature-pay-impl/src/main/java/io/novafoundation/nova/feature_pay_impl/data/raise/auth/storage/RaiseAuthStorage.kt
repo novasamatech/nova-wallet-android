@@ -2,31 +2,27 @@ package io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.secrets.v2.KeyPairSchema
-import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
-import io.novafoundation.nova.common.data.secrets.v2.seed
-import io.novafoundation.nova.common.data.secrets.v2.substrateKeypair
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.toStruct
-import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_api.data.secrets.keypair
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
-import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import io.novasama.substrate_sdk_android.scale.toHexString
 import kotlinx.coroutines.runBlocking
 
 interface RaiseAuthStorage {
 
-    fun getChallengeKeypair(metaId: Long): Sr25519Keypair
+    fun getChallengeKeypair(metaAccount: MetaAccount): Sr25519Keypair
 
-    fun getJwtToken(metaId: Long): RaiseAuthToken?
+    fun getJwtToken(metaAccount: MetaAccount): RaiseAuthToken?
 
-    fun saveJwtToken(metaId: Long, token: RaiseAuthToken)
+    fun saveJwtToken(metaAccount: MetaAccount, token: RaiseAuthToken)
 }
 
 class RealRaiseAuthStorage(
-    private val accountSecretsFactory: AccountSecretsFactory,
     private val secretStoreV2: SecretStoreV2,
     private val encryptedPreferences: EncryptedPreferences,
     private val gson: Gson,
@@ -34,34 +30,32 @@ class RealRaiseAuthStorage(
 
     companion object {
 
-        private const val RAISE_AUTH_DERIVATION_PATH = "//raise//auth"
-
         private const val KEYPAIR_KEY = "RaiseAuthStorage.ChallengeKeypair:"
         private const val JWT_TOKEN_KEY = "RaiseAuthStorage.JwtToken:"
     }
 
-    override fun getChallengeKeypair(metaId: Long): Sr25519Keypair {
+    override fun getChallengeKeypair(metaAccount: MetaAccount): Sr25519Keypair {
         return synchronized(this) {
-            if (encryptedPreferences.hasKey(getKeypairKey(metaId))) {
-                getKeypairOrThrow(metaId)
+            if (encryptedPreferences.hasKey(getKeypairKey(metaAccount.id))) {
+                getKeypairOrThrow(metaAccount)
             } else {
-                generateKeypair(metaId).also(::saveKeypair)
+                generateKeypair(metaAccount).also(::saveKeypair)
             }
         }
     }
 
-    override fun getJwtToken(metaId: Long): RaiseAuthToken? {
-        val raw = encryptedPreferences.getDecryptedString(getTokenKey(metaId)) ?: return null
+    override fun getJwtToken(metaAccount: MetaAccount): RaiseAuthToken? {
+        val raw = encryptedPreferences.getDecryptedString(getTokenKey(metaAccount.id)) ?: return null
         return gson.fromJson(raw, RaiseAuthToken::class.java)
     }
 
-    override fun saveJwtToken(metaId: Long, token: RaiseAuthToken) {
+    override fun saveJwtToken(metaAccount: MetaAccount, token: RaiseAuthToken) {
         val raw = gson.toJson(token)
-        encryptedPreferences.putEncryptedString(getTokenKey(metaId), raw)
+        encryptedPreferences.putEncryptedString(getTokenKey(metaAccount.id), raw)
     }
 
-    private fun getKeypairOrThrow(metaId: Long): Sr25519Keypair {
-        val raw = requireNotNull(encryptedPreferences.getDecryptedString(getKeypairKey(metaId)))
+    private fun getKeypairOrThrow(metaAccount: MetaAccount): Sr25519Keypair {
+        val raw = requireNotNull(encryptedPreferences.getDecryptedString(getKeypairKey(metaAccount.id)))
         return KeyPairSchema.read(raw).toSr25519Keypair()
     }
 
@@ -70,24 +64,12 @@ class RealRaiseAuthStorage(
         encryptedPreferences.putEncryptedString(KEYPAIR_KEY, raw)
     }
 
-    private fun generateKeypair(metaId: Long): Sr25519Keypair {
+    private fun generateKeypair(metaAccount: MetaAccount): Sr25519Keypair {
         return runBlocking {
-            val secrets = secretStoreV2.getMetaAccountSecrets(metaId) ?: throw IllegalStateException()
+            val secrets = secretStoreV2.getMetaAccountSecrets(metaAccount.id) ?: throw IllegalStateException("No secrets for MetaAccount")
 
-            secrets.toRaiseValidKeypair()
+            secrets.keypair(false) as Sr25519Keypair
         }
-    }
-
-    private suspend fun EncodableStruct<MetaAccountSecrets>.toRaiseValidKeypair(): Sr25519Keypair {
-        val seed = seed ?: throw IllegalStateException()
-
-        val raiseValidSecrets = accountSecretsFactory.metaAccountSecrets(
-            substrateDerivationPath = RAISE_AUTH_DERIVATION_PATH,
-            ethereumDerivationPath = null,
-            accountSource = AccountSecretsFactory.AccountSource.Seed(CryptoType.SR25519, seed.toHexString())
-        )
-
-        return raiseValidSecrets.secrets.substrateKeypair.toSr25519Keypair()
     }
 
     private fun getTokenKey(metaId: Long) = JWT_TOKEN_KEY + metaId

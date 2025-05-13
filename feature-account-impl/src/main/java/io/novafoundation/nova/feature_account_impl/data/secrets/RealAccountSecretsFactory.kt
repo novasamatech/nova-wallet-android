@@ -8,9 +8,8 @@ import io.novafoundation.nova.common.data.secrets.v2.mapKeypairStructToKeypair
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.deriveSeed32
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
-import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
-import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory.AccountSource
-import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory.SecretsError
+import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory.AccountSource
+import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory.SecretsError
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder

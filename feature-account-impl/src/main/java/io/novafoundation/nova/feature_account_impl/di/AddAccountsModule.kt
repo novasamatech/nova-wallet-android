@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.se
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
-import io.novafoundation.nova.feature_account_api.data.secrets.AccountSecretsFactory
+import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 
