@@ -291,6 +291,7 @@
         <attr name="iconEnd" format="reference" />
         <attr name="iconEndTint" format="color" />
         <attr name="iconEndPadding" format="dimension" />
+        <attr name="android:backgroundTint" />
     </declare-styleable>
 
     <declare-styleable name="ParallaxCardView_Layout">

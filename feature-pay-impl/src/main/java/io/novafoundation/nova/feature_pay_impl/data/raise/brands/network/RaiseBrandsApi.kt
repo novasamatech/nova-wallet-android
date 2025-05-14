@@ -11,7 +11,9 @@ interface RaiseBrandsApi {
     suspend fun getBrands(
         @Query("query") query: String,
         @Query("page[size]") pageSize: Int,
-        @Query("page[number]") pageNumber: Int
+        @Query("page[number]") pageNumber: Int,
+        @Query("sort[field]") sortField: String = "popularity",
+        @Query("sort[order]") sortOrder: String = "DESC",
     ): RaiseListBody<RaiseBrandResponse>
 
     @GET("brands")

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
+import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -61,6 +62,7 @@ class RootFeatureHolder @Inject constructor(
             .pushNotificationsFeatureApi(getFeature(PushNotificationsFeatureApi::class.java))
             .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .ledgerFeatureApi(getFeature(LedgerFeatureApi::class.java))
+            .payFeatureApi(getFeature(PayFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()

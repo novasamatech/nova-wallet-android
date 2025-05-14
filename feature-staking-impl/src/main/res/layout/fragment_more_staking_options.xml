@@ -19,7 +19,6 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:paddingBottom="64dp"
         android:id="@+id/moreStakingOptionsContent"
         android:layout_weight="1" />
 </LinearLayout>

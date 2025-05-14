@@ -26,7 +26,6 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:paddingBottom="64dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="2"
             tools:listitem="@layout/item_network_asset" />

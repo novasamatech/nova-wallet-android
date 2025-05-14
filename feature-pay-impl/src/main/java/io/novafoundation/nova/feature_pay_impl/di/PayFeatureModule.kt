@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RealRaise
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage.RaiseAuthStorage
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage.RealRaiseAuthStorage
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RealShopBrandsRepository
-import io.novafoundation.nova.feature_pay_impl.data.raise.brands.ShopBrandsRepository
+import io.novafoundation.nova.feature_pay_impl.data.ShopBrandsRepository
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaiseBrandsApi
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.RealShopBrandsInteractor
@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RaiseBrandsConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RealRaiseBrandsConverter
+import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaisePopularBrandsApi
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseAmountConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseDateConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseAmountConverter
@@ -62,6 +63,14 @@ class PayFeatureModule {
         networkApiCreator: NetworkApiCreator,
     ): RaiseBrandsApi {
         return networkApiCreator.create(RaiseBrandsApi::class.java, RaiseEndpoints.BASE_URL, okHttpClient)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideRaisePopularBrandsApi(
+        networkApiCreator: NetworkApiCreator,
+    ): RaisePopularBrandsApi {
+        return networkApiCreator.create(RaisePopularBrandsApi::class.java)
     }
 
     @Provides
@@ -124,11 +133,13 @@ class PayFeatureModule {
     @FeatureScope
     fun provideShopBrandsRepository(
         raiseBrandsApi: RaiseBrandsApi,
+        raisePopularBrandsApi: RaisePopularBrandsApi,
         networkStateService: NetworkStateService,
         raiseBrandsConverter: RaiseBrandsConverter
     ): ShopBrandsRepository {
         return RealShopBrandsRepository(
             raiseBrandsApi,
+            raisePopularBrandsApi,
             networkStateService,
             raiseBrandsConverter
         )

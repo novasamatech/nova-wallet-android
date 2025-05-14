@@ -430,3 +430,20 @@ fun View.traverseViews(action: (View) -> Unit) {
         }
     }
 }
+
+inline fun <reified T> View.firstViewInstanceInHierarchy(): T? {
+    return firstViewInHierarchy { it is T } as? T
+}
+
+fun View.firstViewInHierarchy(action: (View) -> Boolean): View? {
+    if (action(this)) return this
+
+    if (this is ViewGroup) {
+        for (i in 0 until this.childCount) {
+            val foundedView = this.getChildAt(i).firstViewInHierarchy(action)
+            if (foundedView != null) return foundedView
+        }
+    }
+
+    return null
+}

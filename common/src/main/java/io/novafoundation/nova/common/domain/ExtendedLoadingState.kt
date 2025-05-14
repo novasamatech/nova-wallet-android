@@ -37,6 +37,10 @@ fun <T> Flow<ExtendedLoadingState<T>>.filterLoaded(): Flow<T> {
     }
 }
 
+inline fun <T, R> ExtendedLoadingState<List<T>>.mapList(mapper: (T) -> R): ExtendedLoadingState<List<R>> {
+    return map { list -> list.map { mapper(it) } }
+}
+
 inline fun <T, R> ExtendedLoadingState<T>.map(mapper: (T) -> R): ExtendedLoadingState<R> {
     return when (this) {
         is ExtendedLoadingState.Loading -> this

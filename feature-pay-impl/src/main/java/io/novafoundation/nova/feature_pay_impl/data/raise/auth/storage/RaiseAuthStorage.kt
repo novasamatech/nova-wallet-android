@@ -6,15 +6,12 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.toStruct
-import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import io.novafoundation.nova.feature_account_api.data.secrets.generateSr25119Keypair
 import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.ext.polkadot
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.scale.EncodableStruct

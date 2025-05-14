@@ -1,22 +1,71 @@
 package io.novafoundation.nova.feature_pay_impl.presentation.shop
 
 import androidx.recyclerview.widget.ConcatAdapter
+import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.list.StubItemsAdapter
+import io.novafoundation.nova.common.utils.onScrollPositionChanged
 import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
+import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.databinding.FragmentShopBinding
 import io.novafoundation.nova.feature_pay_impl.di.PayFeatureComponent
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopBrandsAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopHeaderAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopPaginationLoadingAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopPopularBrandsAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopSearchAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopUnavailableAccountPlaceholderAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
+import javax.inject.Inject
 
-class ShopFragment : BaseFragment<ShopViewModel, FragmentShopBinding>() {
+class ShopFragment :
+    BaseFragment<ShopViewModel, FragmentShopBinding>(),
+    ShopPopularBrandsAdapter.Handler,
+    ShopSearchAdapter.Handler,
+    ShopBrandsAdapter.Handler {
 
     override fun createBinding() = FragmentShopBinding.inflate(layoutInflater)
 
+    @Inject
+    lateinit var imageLoader: ImageLoader
+
+    private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopHeaderAdapter() }
+
+    private val popularBrandsAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopPopularBrandsAdapter(this) }
+
+    private val searchAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopSearchAdapter(this) }
+
+    private val brandsAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopBrandsAdapter(imageLoader, this) }
+
+    private val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { StubItemsAdapter(10, R.layout.item_brand_shimmering) }
+
+    private val shopPaginationLoadingAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopPaginationLoadingAdapter() }
+
     private val unavailableWalletAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopUnavailableAccountPlaceholderAdapter() }
 
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(unavailableWalletAdapter) }
+    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+        ConcatAdapter(
+            headerAdapter,
+            popularBrandsAdapter,
+            searchAdapter,
+            brandsAdapter,
+            shimmeringAdapter,
+            shopPaginationLoadingAdapter,
+            unavailableWalletAdapter
+        )
+    }
 
     override fun initViews() {
         binder.shopList.adapter = adapter
+        binder.shopList.itemAnimator = null
+
+        binder.shopList.setHasFixedSize(true)
+        binder.shopList.onScrollPositionChanged(viewModel::onScrolled)
+
+        // TODO: awaits for design approve
+        popularBrandsAdapter.show(false)
     }
 
     override fun inject() {
@@ -27,8 +76,35 @@ class ShopFragment : BaseFragment<ShopViewModel, FragmentShopBinding>() {
     }
 
     override fun subscribe(viewModel: ShopViewModel) {
-        viewModel.isWalletAvailableFlow.observe {
-            unavailableWalletAdapter.show(!it)
+        viewModel.brandsListState.observe {
+            val showUnavailableWalletCase = it is BrandsListState.UnavailableWallet
+            val showBrands = it is BrandsListState.Brands
+            val showLoading = it is BrandsListState.Brands && it.brands.isLoading
+
+            unavailableWalletAdapter.show(showUnavailableWalletCase)
+
+            headerAdapter.show(showBrands)
+            searchAdapter.show(showBrands)
+            shopPaginationLoadingAdapter.show(showBrands && !showLoading)
+            headerAdapter.showShimmering(showLoading)
+            shimmeringAdapter.show(showLoading)
+            brandsAdapter.submitList(it.getBrandsOrNull())
         }
+
+        viewModel.maxCashback.observe(headerAdapter::setHeaderText)
+
+        viewModel.isNewPageLoading.observe { shopPaginationLoadingAdapter.setInvisible(!it) }
+    }
+
+    override fun onPopularBrandClick(brandModel: ShopBrandRVItem) {
+        viewModel.brandClicked(brandModel)
+    }
+
+    override fun onSearchClick() {
+        showMessage("Not implemented")
+    }
+
+    override fun onBrandClick(brandModel: ShopBrandRVItem) {
+        viewModel.brandClicked(brandModel)
     }
 }

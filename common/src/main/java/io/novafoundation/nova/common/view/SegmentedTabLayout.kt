@@ -24,8 +24,6 @@ class SegmentedTabLayout @JvmOverloads constructor(
     val clipPath = Path()
 
     init {
-        setBackgroundResource(R.color.segmented_background_on_black)
-
         applyAttrs(attrs)
     }
 

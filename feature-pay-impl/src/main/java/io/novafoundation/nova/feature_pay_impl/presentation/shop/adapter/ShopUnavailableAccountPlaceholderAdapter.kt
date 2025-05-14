@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter
 
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.setBackgroundTintRes
 import io.novafoundation.nova.common.utils.traverseViews
 import io.novafoundation.nova.feature_pay_impl.R
 
-class ShopUnavailableAccountPlaceholderAdapter : CustomPlaceholderAdapter(R.layout.fragment_shop_placeholder) {
+class ShopUnavailableAccountPlaceholderAdapter : CustomPlaceholderAdapter(R.layout.item_shop_unavailable_state) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StubHolder {
         val holder = super.onCreateViewHolder(parent, viewType)
