@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.common.toPageOffset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 private const val BRANDS_PAGE_SIZE = 50
@@ -29,6 +31,9 @@ class RealShopBrandsRepository(
     private val raiseBrandsConverter: RaiseBrandsConverter
 ) : ShopBrandsRepository {
 
+    private val cachingPageMutex = Mutex()
+
+    private val firstPageBrands: MutableSharedFlow<DataPage<RaiseBrand>> = singleReplaySharedFlow()
     private val popularBrands: MutableSharedFlow<List<RaisePopularBrand>> = singleReplaySharedFlow()
 
     private suspend fun prefetchPopularBrands() {
@@ -50,7 +55,13 @@ class RealShopBrandsRepository(
         }
     }
 
-    override suspend fun getBrands(query: String, pageOffset: PageOffset.Loadable) = fetchBrands(query, pageOffset)
+    override suspend fun getBrands(query: String, pageOffset: PageOffset.Loadable): Result<DataPage<RaiseBrand>> {
+        return if (query.isBlank() && pageOffset is PageOffset.Loadable.FirstPage) {
+            getCachedFirstPage()
+        } else {
+            fetchBrands(query, pageOffset)
+        }
+    }
 
     override suspend fun getPopularBrands() = Result.success(popularBrands.first())
 
@@ -67,5 +78,16 @@ class RealShopBrandsRepository(
         val items = data.mapNotNull(raiseBrandsConverter::convertBrandResponseToBrand)
 
         return DataPage(offset, items)
+    }
+
+    private suspend fun getCachedFirstPage(): Result<DataPage<RaiseBrand>> {
+        return cachingPageMutex.withLock {
+            if (firstPageBrands.replayCache.isEmpty()) {
+                fetchBrands("", PageOffset.Loadable.FirstPage)
+                    .onSuccess { firstPageBrands.emit(it) }
+            } else {
+                Result.success(firstPageBrands.first())
+            }
+        }
     }
 }
