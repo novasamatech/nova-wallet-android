@@ -1,21 +1,16 @@
 package io.novafoundation.nova.feature_pay_impl.domain
 
-import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.substrateMultiChainEncryption
-import io.novafoundation.nova.feature_pay_impl.data.ShopRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ShopInteractor(
-    private val shopRepository: ShopRepository,
     private val accountRepository: AccountRepository
 ) {
 
     fun observeAccountAvailableForShopping(): Flow<Boolean> {
         return accountRepository.selectedMetaAccountFlow().map {
-            it.type == LightMetaAccount.Type.SECRETS && it.substrateCryptoType == CryptoType.SR25519
+            it.isValidForShopApi()
         }
     }
 }

@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
+import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.ShopViewModel
 
@@ -20,11 +21,13 @@ class ShopModule {
     @ViewModelKey(ShopViewModel::class)
     fun provideViewModel(
         router: PayRouter,
-        shopInteractor: ShopInteractor
+        shopInteractor: ShopInteractor,
+        shopBrandsInteractor: ShopBrandsInteractor
     ): ViewModel {
         return ShopViewModel(
             router,
-            shopInteractor
+            shopInteractor,
+            shopBrandsInteractor
         )
     }
 

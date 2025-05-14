@@ -120,6 +120,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.Se
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
+import io.novafoundation.nova.feature_account_impl.data.secrets.RealAccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
@@ -438,7 +439,7 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountSecretsFactory(
         jsonSeedDecoder: JsonSeedDecoder
-    ) = AccountSecretsFactory(jsonSeedDecoder)
+    ): AccountSecretsFactory = RealAccountSecretsFactory(jsonSeedDecoder)
 
     @Provides
     @FeatureScope
