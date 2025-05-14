@@ -10,6 +10,7 @@
         android:id="@+id/shopSearchToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/shop_search_hint"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView

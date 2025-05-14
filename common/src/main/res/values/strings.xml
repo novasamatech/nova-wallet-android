@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="shop_search_hint">Search by brands and stores</string>
+    
     <string name="shop_pagination_loading_text">Searching for merchants...</string>
     <string name="shop_item_cashback">cashback</string>
     <string name="shop_brands_search_title">Merchants</string>
