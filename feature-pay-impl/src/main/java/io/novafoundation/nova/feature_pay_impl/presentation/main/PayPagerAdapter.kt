@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_pay_impl.presentation.main
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import io.novafoundation.nova.feature_pay_impl.R
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.ShopFragment
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.ShopFragment
 
 class PayPagerAdapter(private val fragment: Fragment) : FragmentStateAdapter(fragment) {
 

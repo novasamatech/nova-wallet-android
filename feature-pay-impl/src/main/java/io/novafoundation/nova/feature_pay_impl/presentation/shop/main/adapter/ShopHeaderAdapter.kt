@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter
 
 import android.view.ViewGroup
 import androidx.core.view.isVisible

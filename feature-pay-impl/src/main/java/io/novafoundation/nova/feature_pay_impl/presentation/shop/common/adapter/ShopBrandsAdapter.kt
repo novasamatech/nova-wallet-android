@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.common.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableWithRipple
 import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.databinding.ItemBrandBinding
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopBrandRVItem
 
 class ShopBrandsAdapter(
     private val imageLoader: ImageLoader,

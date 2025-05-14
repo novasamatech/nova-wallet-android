@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.pay.PayNavigator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -12,5 +13,6 @@ class PayNavigationModule {
 
     @Provides
     @ApplicationScope
-    fun provideVoteRouter(navigator: Navigator): PayRouter = PayNavigator(navigator)
+    fun provideVoteRouter(navigationHoldersRegistry: NavigationHoldersRegistry, navigator: Navigator): PayRouter =
+        PayNavigator(navigationHoldersRegistry, navigator)
 }

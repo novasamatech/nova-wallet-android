@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_pay_impl.presentation
 
-interface PayRouter {
+import io.novafoundation.nova.common.navigation.ReturnableRouter
+
+interface PayRouter : ReturnableRouter {
     fun openSwitchWallet()
+
+    fun openShopSearch()
 }

@@ -1,10 +1,10 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.main
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.BrandsListState.Brands
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.BrandsListState.UnavailableWallet
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.BrandsListState.Brands
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.BrandsListState.UnavailableWallet
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopBrandRVItem
 
 sealed interface BrandsListState {
 
