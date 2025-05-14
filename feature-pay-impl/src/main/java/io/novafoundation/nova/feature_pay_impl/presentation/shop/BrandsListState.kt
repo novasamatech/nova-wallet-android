@@ -11,9 +11,7 @@ sealed interface BrandsListState {
     data object UnavailableWallet : BrandsListState
 
     class Brands(val brands: ExtendedLoadingState<List<ShopBrandRVItem>>) : BrandsListState
-
 }
-
 
 fun BrandsListState.getBrandsOrNull(): List<ShopBrandRVItem>? {
     return when (this) {
