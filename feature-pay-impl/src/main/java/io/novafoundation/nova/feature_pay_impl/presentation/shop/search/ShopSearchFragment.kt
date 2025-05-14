@@ -57,6 +57,7 @@ class ShopSearchFragment :
 
         binder.shopSearchToolbar.cancel.setOnClickListener { viewModel.backClicked() }
 
+        binder.shopSearchToolbar.searchInput.requestFocus()
         binder.shopSearchToolbar.searchInput.showSoftKeyboard()
     }
 
