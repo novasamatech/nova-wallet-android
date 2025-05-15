@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.stateMachine.list.dataOrNull
 import io.novafoundation.nova.feature_pay_impl.R
-import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.model.ShopBrand
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 
 class ShopViewModel(
     private val router: PayRouter,
-    private val shopInteractor: ShopInteractor,
     private val resourceManager: ResourceManager,
     private val paginationMixinFactory: BrandsPaginationMixinFactory,
     private val shopBrandsInteractor: ShopBrandsInteractor,
@@ -32,7 +30,7 @@ class ShopViewModel(
 
     val paginationMixin = paginationMixinFactory.create(this)
 
-    private val isWalletAvailableFlow: Flow<Boolean> = shopInteractor.observeAccountAvailableForShopping()
+    private val isWalletAvailableFlow: Flow<Boolean> = shopBrandsInteractor.observeAccountAvailableForShopping()
         .shareInBackground()
 
     val brandsListState = combine(paginationMixin.itemsFlow, isWalletAvailableFlow) { brands, isWalletAwailable ->

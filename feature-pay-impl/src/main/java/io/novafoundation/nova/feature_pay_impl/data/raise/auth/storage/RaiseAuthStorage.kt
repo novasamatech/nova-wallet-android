@@ -2,16 +2,13 @@ package io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.secrets.v2.KeyPairSchema
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.toStruct
 import io.novafoundation.nova.feature_account_api.data.secrets.generateSr25119Keypair
-import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.runtime.ext.polkadot
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_pay_impl.domain.common.ShopAccountSeedAccessPolicy
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519Keypair
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
@@ -28,9 +25,8 @@ interface RaiseAuthStorage {
 }
 
 class RealRaiseAuthStorage(
-    private val secretStoreV2: SecretStoreV2,
+    private val shopAccountSeedAccessPolicy: ShopAccountSeedAccessPolicy,
     private val encryptedPreferences: EncryptedPreferences,
-    private val chainRegistry: ChainRegistry,
     private val gson: Gson,
 ) : RaiseAuthStorage {
 
@@ -74,8 +70,7 @@ class RealRaiseAuthStorage(
 
     private fun generateKeypair(metaAccount: MetaAccount): Sr25519Keypair {
         return runBlocking {
-            val secrets = secretStoreV2.getAccountSecrets(metaAccount, chainRegistry.polkadot())
-            val seed = secrets.seed() ?: error("No seed found for meta account ${metaAccount.name}")
+            val seed = shopAccountSeedAccessPolicy.getSeedFor(metaAccount) ?: error("No seed found for meta account ${metaAccount.name}")
 
             SubstrateKeypairFactory.generateSr25119Keypair(seed, RAISE_AUTH_DERIVATION_PATH)
         }

@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage.RealRaise
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RealShopBrandsRepository
 import io.novafoundation.nova.feature_pay_impl.data.ShopBrandsRepository
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaiseBrandsApi
-import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.RealShopBrandsInteractor
 import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -39,6 +38,8 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseCurren
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseDateConverter
 import io.novafoundation.nova.feature_pay_impl.domain.cards.RealShopCardsUseCase
 import io.novafoundation.nova.feature_pay_impl.domain.cards.ShopCardsUseCase
+import io.novafoundation.nova.feature_pay_impl.domain.common.RealShopAccountSeedAccessPolicy
+import io.novafoundation.nova.feature_pay_impl.domain.common.ShopAccountSeedAccessPolicy
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.BrandsPaginationMixinFactory
 import java.util.concurrent.TimeUnit
 import okhttp3.ConnectionPool
@@ -52,16 +53,23 @@ class PayFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideRaiseAuthStorage(
+    fun provideShopAccountSeedAccessPolicy(
         secretStoreV2: SecretStoreV2,
+        chainRegistry: ChainRegistry
+    ): ShopAccountSeedAccessPolicy {
+        return RealShopAccountSeedAccessPolicy(secretStoreV2, chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideRaiseAuthStorage(
+        shopAccountSeedAccessPolicy: ShopAccountSeedAccessPolicy,
         encryptedPreferences: EncryptedPreferences,
-        chainRegistry: ChainRegistry,
         gson: Gson,
     ): RaiseAuthStorage {
         return RealRaiseAuthStorage(
-            secretStoreV2,
+            shopAccountSeedAccessPolicy,
             encryptedPreferences,
-            chainRegistry,
             gson
         )
     }
@@ -148,12 +156,6 @@ class PayFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideShopInteractor(
-        accountRepository: AccountRepository
-    ) = ShopInteractor(accountRepository)
-
-    @Provides
-    @FeatureScope
     fun provideShopBrandsRepository(
         raiseBrandsApi: RaiseBrandsApi,
         raisePopularBrandsApi: RaisePopularBrandsApi,
@@ -198,9 +200,11 @@ class PayFeatureModule {
     @FeatureScope
     fun provideShopBrandsInteractorUseCase(
         brandsRepository: ShopBrandsRepository,
-        shopBrandsUseCase: ShopCardsUseCase
+        shopBrandsUseCase: ShopCardsUseCase,
+        accountRepository: AccountRepository,
+        shopAccountSeedAccessPolicy: ShopAccountSeedAccessPolicy
     ): ShopBrandsInteractor {
-        return RealShopBrandsInteractor(brandsRepository, shopBrandsUseCase)
+        return RealShopBrandsInteractor(brandsRepository, shopBrandsUseCase, accountRepository, shopAccountSeedAccessPolicy)
     }
 
     @Provides
