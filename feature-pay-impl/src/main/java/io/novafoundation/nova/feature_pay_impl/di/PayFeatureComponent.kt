@@ -5,6 +5,7 @@ import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.main.di.PayMainComponent
@@ -44,7 +45,8 @@ interface PayFeatureComponent : PayFeatureApi {
             CommonApi::class,
             RuntimeApi::class,
             AccountFeatureApi::class,
-            WalletConnectFeatureApi::class
+            WalletConnectFeatureApi::class,
+            CurrencyFeatureApi::class
         ]
     )
     interface PayFeatureDependenciesComponent : PayFeatureDependencies

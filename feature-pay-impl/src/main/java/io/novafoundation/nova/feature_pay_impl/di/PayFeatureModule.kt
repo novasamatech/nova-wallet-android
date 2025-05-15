@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.NetworkStateService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_pay_impl.BuildConfig
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RaiseAuthInterceptor
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.network.RaiseAuthRepository
@@ -27,10 +28,17 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RaiseBrandsConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.RealRaiseBrandsConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.RaisePopularBrandsApi
+import io.novafoundation.nova.feature_pay_impl.data.raise.cards.RealShopCardsRepository
+import io.novafoundation.nova.feature_pay_impl.data.raise.cards.ShopCardsRepository
+import io.novafoundation.nova.feature_pay_impl.data.raise.cards.network.RaiseCardsApi
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseAmountConverter
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseCurrencyConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseDateConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseAmountConverter
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseCurrencyConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseDateConverter
+import io.novafoundation.nova.feature_pay_impl.domain.cards.RealShopCardsUseCase
+import io.novafoundation.nova.feature_pay_impl.domain.cards.ShopCardsUseCase
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.BrandsPaginationMixinFactory
 import java.util.concurrent.TimeUnit
 import okhttp3.ConnectionPool
@@ -65,6 +73,15 @@ class PayFeatureModule {
         networkApiCreator: NetworkApiCreator,
     ): RaiseBrandsApi {
         return networkApiCreator.create(RaiseBrandsApi::class.java, RaiseEndpoints.BASE_URL, okHttpClient)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideRaiseCardsApi(
+        okHttpClient: OkHttpClient,
+        networkApiCreator: NetworkApiCreator,
+    ): RaiseCardsApi {
+        return networkApiCreator.create(RaiseCardsApi::class.java, RaiseEndpoints.BASE_URL, okHttpClient)
     }
 
     @Provides
@@ -119,6 +136,10 @@ class PayFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideRaiseCurrencyConverter(currencyRepository: CurrencyRepository): RaiseCurrencyConverter = RealRaiseCurrencyConverter(currencyRepository)
+
+    @Provides
+    @FeatureScope
     fun provideRaiseBrandsConverter(raiseAmountConverter: RaiseAmountConverter): RaiseBrandsConverter = RealRaiseBrandsConverter(raiseAmountConverter)
 
     @Provides
@@ -149,8 +170,38 @@ class PayFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideShopBrandsInteractorUseCase(brandsRepository: ShopBrandsRepository): ShopBrandsInteractor {
-        return RealShopBrandsInteractor(brandsRepository)
+    fun provideShopCardsRepository(
+        cardsApi: RaiseCardsApi,
+        raiseAmountConverter: RaiseAmountConverter,
+        raiseCurrencyConverter: RaiseCurrencyConverter,
+        raiseBrandsConverter: RaiseBrandsConverter,
+        raiseDateConverter: RaiseDateConverter,
+        networkStateService: NetworkStateService,
+    ): ShopCardsRepository {
+        return RealShopCardsRepository(
+            cardsApi,
+            raiseAmountConverter,
+            raiseCurrencyConverter,
+            raiseBrandsConverter,
+            raiseDateConverter,
+            networkStateService
+        )
+    }
+
+
+    @Provides
+    @FeatureScope
+    fun provideShopCardsUseCase(shopCardsRepository: ShopCardsRepository): ShopCardsUseCase {
+        return RealShopCardsUseCase(shopCardsRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideShopBrandsInteractorUseCase(
+        brandsRepository: ShopBrandsRepository,
+        shopBrandsUseCase: ShopCardsUseCase
+    ): ShopBrandsInteractor {
+        return RealShopBrandsInteractor(brandsRepository, shopBrandsUseCase)
     }
 
     @Provides

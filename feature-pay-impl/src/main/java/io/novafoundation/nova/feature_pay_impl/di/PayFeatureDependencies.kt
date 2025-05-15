@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.NetworkStateService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mixin.WalletConnectSessionsMixinFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -35,4 +36,6 @@ interface PayFeatureDependencies {
     val imageLoader: ImageLoader
 
     val resourceManager: ResourceManager
+
+    val currencyRepository: CurrencyRepository
 }

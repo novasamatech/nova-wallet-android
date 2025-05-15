@@ -8,7 +8,8 @@ import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.common.utils.stateMachine.list.dataOrNull
 import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
-import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
+import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.ShopBrand
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.BrandsPaginationMixinFactory
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.toUi
@@ -25,7 +26,8 @@ class ShopViewModel(
     private val router: PayRouter,
     private val shopInteractor: ShopInteractor,
     private val resourceManager: ResourceManager,
-    private val paginationMixinFactory: BrandsPaginationMixinFactory
+    private val paginationMixinFactory: BrandsPaginationMixinFactory,
+    private val shopBrandsInteractor: ShopBrandsInteractor,
 ) : BaseViewModel() {
 
     val paginationMixin = paginationMixinFactory.create(this)
@@ -41,12 +43,24 @@ class ShopViewModel(
     }
 
     val maxCashback = paginationMixin.stateFlow
-        .mapNotNull { listState -> listState.dataOrNull?.maxOfOrNull(RaiseBrand::cashback) }
+        .mapNotNull { listState -> listState.dataOrNull?.maxOfOrNull(ShopBrand::cashback) }
         .map(::formatTitle)
         .shareInBackground()
 
+    val purchasedCardsState = shopBrandsInteractor.purchasedCards()
+        .map {
+            when {
+                it.isEmpty() -> PurchasedCardsState.Empty
+                else -> PurchasedCardsState.Content(it.size)
+            }
+        }
+
     init {
         paginationMixin.init()
+
+        launch {
+            shopBrandsInteractor.syncPurchasedCards()
+        }
 
         paginationMixin.errorFlow
             .onEach { showMessage(it) }
@@ -63,6 +77,10 @@ class ShopViewModel(
 
     fun brandClicked(brandModel: ShopBrandRVItem) = launch {
         showMessage("Not implemented")
+    }
+
+    fun purchasesClicked() {
+
     }
 
     private fun formatTitle(maxCashback: Fraction): String {

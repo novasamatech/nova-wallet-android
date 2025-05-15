@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_pay_impl.data.raise.brands.network
 
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.RaiseBrandResponse
-import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseListBody
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.network.RaiseListBody
 import retrofit2.http.GET
 import retrofit2.http.Query
 

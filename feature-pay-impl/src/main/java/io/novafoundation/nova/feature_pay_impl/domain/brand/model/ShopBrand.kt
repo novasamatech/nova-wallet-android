@@ -4,8 +4,8 @@ import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Identifiable
 import java.math.BigDecimal
 
-class RaiseBrand(
-    val primaryMetadata: RaiseBrandPrimaryMetadata,
+class ShopBrand(
+    val primaryMetadata: ShopBrandPrimaryMetadata,
     val description: String,
     val terms: String,
     val cashback: Fraction,

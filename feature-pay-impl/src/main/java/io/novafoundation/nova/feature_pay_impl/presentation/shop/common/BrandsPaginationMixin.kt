@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateM
 import io.novafoundation.nova.common.utils.stateMachine.list.PaginatedListStateMachine.SideEffect
 import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
-import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.ShopBrand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ class BrandsPaginationMixin(
     private val shopBrandsInteractor: ShopBrandsInteractor,
     private val resourceManager: ResourceManager,
     coroutineScope: CoroutineScope
-) : PaginationMixin<RaiseBrand>(coroutineScope) {
+) : PaginationMixin<ShopBrand>(coroutineScope) {
 
     val errorFlow = MutableSharedFlow<String>()
 
