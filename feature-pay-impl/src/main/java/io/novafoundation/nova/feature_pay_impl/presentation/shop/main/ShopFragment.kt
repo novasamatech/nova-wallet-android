@@ -50,6 +50,7 @@ class ShopFragment : BaseFragment<ShopViewModel, FragmentShopBinding>(),
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         ConcatAdapter(
             headerAdapter,
+            shopPurchasesAdapter,
             popularBrandsAdapter,
             searchAdapter,
             brandsAdapter,

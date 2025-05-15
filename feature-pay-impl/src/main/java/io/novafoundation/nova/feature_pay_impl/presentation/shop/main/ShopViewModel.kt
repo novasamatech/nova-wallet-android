@@ -80,7 +80,7 @@ class ShopViewModel(
     }
 
     fun purchasesClicked() {
-
+        showMessage("Not implemented")
     }
 
     private fun formatTitle(maxCashback: Fraction): String {
