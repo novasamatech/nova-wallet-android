@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop.di
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.main.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -10,9 +10,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_pay_impl.domain.ShopInteractor
-import io.novafoundation.nova.feature_pay_impl.domain.brand.ShopBrandsInteractor
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.ShopViewModel
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.BrandsPaginationMixinFactory
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.ShopViewModel
 
 @Module(includes = [ViewModelModule::class])
 class ShopModule {
@@ -23,14 +23,14 @@ class ShopModule {
     fun provideViewModel(
         router: PayRouter,
         shopInteractor: ShopInteractor,
-        shopBrandsInteractor: ShopBrandsInteractor,
+        brandsPaginationMixinFactory: BrandsPaginationMixinFactory,
         resourceManager: ResourceManager
     ): ViewModel {
         return ShopViewModel(
             router,
             shopInteractor,
-            shopBrandsInteractor,
-            resourceManager
+            resourceManager,
+            brandsPaginationMixinFactory
         )
     }
 

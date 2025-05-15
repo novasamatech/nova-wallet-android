@@ -8,7 +8,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
 import io.novafoundation.nova.feature_pay_impl.presentation.PayRouter
 import io.novafoundation.nova.feature_pay_impl.presentation.main.di.PayMainComponent
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.di.ShopComponent
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.di.ShopComponent
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.search.di.ShopSearchComponent
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -26,6 +27,8 @@ interface PayFeatureComponent : PayFeatureApi {
     fun mainPayComponentFactory(): PayMainComponent.Factory
 
     fun shopComponentFactory(): ShopComponent.Factory
+
+    fun shopSearchComponentFactory(): ShopSearchComponent.Factory
 
     @Component.Factory
     interface Factory {

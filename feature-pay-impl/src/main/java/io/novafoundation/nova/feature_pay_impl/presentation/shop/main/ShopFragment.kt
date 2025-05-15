@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.main
 
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
@@ -11,13 +11,13 @@ import io.novafoundation.nova.feature_pay_api.di.PayFeatureApi
 import io.novafoundation.nova.feature_pay_impl.R
 import io.novafoundation.nova.feature_pay_impl.databinding.FragmentShopBinding
 import io.novafoundation.nova.feature_pay_impl.di.PayFeatureComponent
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopBrandsAdapter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopHeaderAdapter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopPaginationLoadingAdapter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopPopularBrandsAdapter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopSearchAdapter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.ShopUnavailableAccountPlaceholderAdapter
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.adapter.ShopBrandsAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopHeaderAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.adapter.ShopPaginationLoadingAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopPopularBrandsAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopSearchAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopUnavailableAccountPlaceholderAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopBrandRVItem
 import javax.inject.Inject
 
 class ShopFragment :
@@ -93,7 +93,7 @@ class ShopFragment :
 
         viewModel.maxCashback.observe(headerAdapter::setHeaderText)
 
-        viewModel.isNewPageLoading.observe { shopPaginationLoadingAdapter.setInvisible(!it) }
+        viewModel.paginationMixin.isNewPageLoading.observe { shopPaginationLoadingAdapter.setInvisible(!it) }
     }
 
     override fun onPopularBrandClick(brandModel: ShopBrandRVItem) {
@@ -101,7 +101,7 @@ class ShopFragment :
     }
 
     override fun onSearchClick() {
-        showMessage("Not implemented")
+        viewModel.onSearchClick()
     }
 
     override fun onBrandClick(brandModel: ShopBrandRVItem) {

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter
+package io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -10,8 +10,8 @@ import io.novafoundation.nova.common.list.SingleItemAdapter
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_pay_impl.databinding.ItemPopularBrandBinding
 import io.novafoundation.nova.feature_pay_impl.databinding.ItemPopularBrandsBinding
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopBrandRVItem
-import io.novafoundation.nova.feature_pay_impl.presentation.shop.adapter.items.ShopPopularBrandRVItem
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopBrandRVItem
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopPopularBrandRVItem
 
 class ShopPopularBrandsAdapter(private val handler: Handler) : SingleItemAdapter<ShopPopularBrandsViewHolder>() {
 
@@ -65,7 +65,9 @@ class ShopPopularBrandsViewHolder(binding: ItemPopularBrandsBinding, private val
     }
 }
 
-class ShopPopularBrandAdapter(private val handler: Handler) : ListAdapter<ShopPopularBrandRVItem, ShopPopularBrandViewHolder>(RaisePopularBrandCallback()) {
+class ShopPopularBrandAdapter(private val handler: Handler) : ListAdapter<ShopPopularBrandRVItem, ShopPopularBrandViewHolder>(
+    RaisePopularBrandCallback()
+) {
 
     interface Handler {
 

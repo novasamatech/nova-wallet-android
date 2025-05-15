@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.NetworkStateService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_pay_impl.BuildConfig
@@ -30,6 +31,7 @@ import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseAmountConv
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseDateConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseAmountConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RealRaiseDateConverter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.BrandsPaginationMixinFactory
 import java.util.concurrent.TimeUnit
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -150,4 +152,11 @@ class PayFeatureModule {
     fun provideShopBrandsInteractorUseCase(brandsRepository: ShopBrandsRepository): ShopBrandsInteractor {
         return RealShopBrandsInteractor(brandsRepository)
     }
+
+    @Provides
+    @FeatureScope
+    fun providePaginationMixinFactory(
+        shopBrandsInteractor: ShopBrandsInteractor,
+        resourceManager: ResourceManager
+    ) = BrandsPaginationMixinFactory(shopBrandsInteractor, resourceManager)
 }
