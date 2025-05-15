@@ -1,16 +1,16 @@
 package io.novafoundation.nova.feature_pay_impl.data.raise.brands
 
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
-import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrandPrimaryMetadata
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.ShopBrandPrimaryMetadata
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.RaiseBrandRemote
 import io.novafoundation.nova.feature_pay_impl.data.raise.brands.network.model.RaiseBrandResponse
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseAmountConverter
 import io.novafoundation.nova.feature_pay_impl.data.raise.common.convertFromApiCurrency
-import io.novafoundation.nova.feature_pay_impl.domain.brand.model.RaiseBrand
+import io.novafoundation.nova.feature_pay_impl.domain.brand.model.ShopBrand
 
 interface RaiseBrandsConverter {
 
-    fun convertBrandResponseToBrand(response: RaiseBrandResponse): RaiseBrand?
+    fun convertBrandResponseToBrand(response: RaiseBrandResponse): ShopBrand?
 }
 
 class RealRaiseBrandsConverter(
@@ -22,10 +22,10 @@ class RealRaiseBrandsConverter(
         private const val RAISE_PERCENT_PRECISION = 2
     }
 
-    override fun convertBrandResponseToBrand(response: RaiseBrandResponse): RaiseBrand? {
-        return RaiseBrand(
+    override fun convertBrandResponseToBrand(response: RaiseBrandResponse): ShopBrand? {
+        return ShopBrand(
             id = response.id,
-            primaryMetadata = RaiseBrandPrimaryMetadata(
+            primaryMetadata = ShopBrandPrimaryMetadata(
                 iconUrl = response.attributes.iconUrl,
                 name = response.attributes.name,
             ),
@@ -38,11 +38,11 @@ class RealRaiseBrandsConverter(
         )
     }
 
-    private fun RaiseBrandRemote.TransactionConfig.toPaymentLimits(): RaiseBrand.PaymentLimits? {
+    private fun RaiseBrandRemote.TransactionConfig.toPaymentLimits(): ShopBrand.PaymentLimits? {
         // TODO we don't supported fixedLoad yet as our amount input component is not suitable for that
         if (variableLoad == null) return null
 
-        return RaiseBrand.PaymentLimits(
+        return ShopBrand.PaymentLimits(
             minimumFiat = raiseAmountConverter.convertFromApiCurrency(variableLoad.minAmount),
             maximumFiat = raiseAmountConverter.convertFromApiCurrency(variableLoad.maxAmount)
         )

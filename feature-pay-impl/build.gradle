@@ -53,6 +53,8 @@ dependencies {
     implementation project(':bindings:merlin')
     implementation project(":feature-wallet-connect-api")
     implementation project(":feature-account-api")
+    implementation project(":feature-currency-api")
+    implementation project(":feature-wallet-api")
 
     implementation kotlinDep
 

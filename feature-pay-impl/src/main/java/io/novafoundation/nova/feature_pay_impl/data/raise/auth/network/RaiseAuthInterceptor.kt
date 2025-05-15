@@ -8,9 +8,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_pay_impl.BuildConfig
 import io.novafoundation.nova.feature_pay_impl.data.raise.auth.storage.RaiseAuthToken
-import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseBody
-import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseSingleData
-import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseSingleObjectBody
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.network.RaiseBody
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.network.RaiseSingleData
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.network.RaiseSingleObjectBody
 import io.novafoundation.nova.runtime.ext.polkadot
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.extensions.fromHex

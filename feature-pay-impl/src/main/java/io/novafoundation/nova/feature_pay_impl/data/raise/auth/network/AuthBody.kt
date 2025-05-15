@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_pay_impl.data.raise.auth.network
 
 import com.google.gson.annotations.SerializedName
-import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseBody
-import io.novafoundation.nova.feature_pay_impl.data.raise.common.RaiseSingleData
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.network.RaiseBody
+import io.novafoundation.nova.feature_pay_impl.data.raise.common.network.RaiseSingleData
 
 typealias AuthBody<ATTRS> = RaiseBody<RaiseSingleData<ATTRS>>
 

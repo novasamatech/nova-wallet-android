@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_pay_impl.data.raise.common
+package io.novafoundation.nova.feature_pay_impl.data.raise.common.network
 
 import com.google.gson.annotations.SerializedName
 import io.novafoundation.nova.common.data.model.PageOffset

@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.adapter.
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopHeaderAdapter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.common.adapter.ShopPaginationLoadingAdapter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopPopularBrandsAdapter
+import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopPurchasesAdapter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopSearchAdapter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.ShopUnavailableAccountPlaceholderAdapter
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopBrandRVItem
@@ -24,7 +25,8 @@ class ShopFragment :
     BaseFragment<ShopViewModel, FragmentShopBinding>(),
     ShopPopularBrandsAdapter.Handler,
     ShopSearchAdapter.Handler,
-    ShopBrandsAdapter.Handler {
+    ShopBrandsAdapter.Handler,
+    ShopPurchasesAdapter.Handler {
 
     override fun createBinding() = FragmentShopBinding.inflate(layoutInflater)
 
@@ -32,6 +34,8 @@ class ShopFragment :
     lateinit var imageLoader: ImageLoader
 
     private val headerAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopHeaderAdapter() }
+
+    private val shopPurchasesAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopPurchasesAdapter(this) }
 
     private val popularBrandsAdapter by lazy(LazyThreadSafetyMode.NONE) { ShopPopularBrandsAdapter(this) }
 
@@ -48,6 +52,7 @@ class ShopFragment :
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
         ConcatAdapter(
             headerAdapter,
+            shopPurchasesAdapter,
             popularBrandsAdapter,
             searchAdapter,
             brandsAdapter,
@@ -94,6 +99,16 @@ class ShopFragment :
         viewModel.maxCashback.observe(headerAdapter::setHeaderText)
 
         viewModel.paginationMixin.isNewPageLoading.observe { shopPaginationLoadingAdapter.setInvisible(!it) }
+
+        viewModel.purchasedCardsState.observe {
+            when (it) {
+                PurchasedCardsState.Empty -> shopPurchasesAdapter.show(false)
+                is PurchasedCardsState.Content -> {
+                    shopPurchasesAdapter.show(true)
+                    shopPurchasesAdapter.setPurchasesQuantity(it.quantity)
+                }
+            }
+        }
     }
 
     override fun onPopularBrandClick(brandModel: ShopBrandRVItem) {
@@ -106,5 +121,9 @@ class ShopFragment :
 
     override fun onBrandClick(brandModel: ShopBrandRVItem) {
         viewModel.brandClicked(brandModel)
+    }
+
+    override fun onPurchasesClick() {
+        viewModel.purchasesClicked()
     }
 }

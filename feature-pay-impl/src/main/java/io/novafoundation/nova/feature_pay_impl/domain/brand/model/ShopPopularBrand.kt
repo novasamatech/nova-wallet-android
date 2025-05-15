@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_pay_impl.domain.brand.model
 
 import io.novafoundation.nova.common.utils.Identifiable
 
-data class RaisePopularBrand(
-    val raiseBrand: RaiseBrand,
+data class ShopPopularBrand(
+    val shopBrand: ShopBrand,
     val name: String
 ) : Identifiable {
-    override val identifier: String = raiseBrand.id
+    override val identifier: String = shopBrand.id
 }

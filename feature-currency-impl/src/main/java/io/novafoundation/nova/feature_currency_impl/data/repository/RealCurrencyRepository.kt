@@ -24,6 +24,11 @@ class RealCurrencyRepository(
         currencyDao.updateCurrencies(resultCurrencies)
     }
 
+    override suspend fun getCurrencies(): List<Currency> {
+        return currencyDao.getCurrencies()
+            .map { mapCurrencyFromLocal(it) }
+    }
+
     override fun observeCurrencies(): Flow<List<Currency>> {
         return currencyDao.observeCurrencies()
             .map { currencyList -> currencyList.map { mapCurrencyFromLocal(it) } }
