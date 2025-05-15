@@ -188,7 +188,6 @@ class PayFeatureModule {
         )
     }
 
-
     @Provides
     @FeatureScope
     fun provideShopCardsUseCase(shopCardsRepository: ShopCardsRepository): ShopCardsUseCase {

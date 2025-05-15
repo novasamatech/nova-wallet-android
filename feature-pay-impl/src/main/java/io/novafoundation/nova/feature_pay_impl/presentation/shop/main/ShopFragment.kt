@@ -21,10 +21,12 @@ import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.Sh
 import io.novafoundation.nova.feature_pay_impl.presentation.shop.main.adapter.items.ShopBrandRVItem
 import javax.inject.Inject
 
-class ShopFragment : BaseFragment<ShopViewModel, FragmentShopBinding>(),
+class ShopFragment :
+    BaseFragment<ShopViewModel, FragmentShopBinding>(),
     ShopPopularBrandsAdapter.Handler,
     ShopSearchAdapter.Handler,
-    ShopBrandsAdapter.Handler, ShopPurchasesAdapter.Handler {
+    ShopBrandsAdapter.Handler,
+    ShopPurchasesAdapter.Handler {
 
     override fun createBinding() = FragmentShopBinding.inflate(layoutInflater)
 

@@ -11,4 +11,3 @@ class RaiseCardData(
     val attributes: RaiseCardRemote,
     val id: String
 )
-
