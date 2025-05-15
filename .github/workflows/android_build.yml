@@ -87,6 +87,11 @@ on:
       CI_PRODUCTION_GOOGLE_SERVICES:
         required: true
 
+      RAISE_CLIENT_ID_TEST:
+        required: true
+      RAISE_SECRET_TEST:
+        required: true
+
 env:
   ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
   ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
@@ -123,6 +128,9 @@ env:
   CI_PRODUCTION_GOOGLE_SERVICES_FILE: ${{ secrets.CI_PRODUCTION_GOOGLE_SERVICES }}
 
   POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
+
+  RAISE_CLIENT_ID_TEST: ${{ secrets.RAISE_CLIENT_ID_TEST }}
+  RAISE_SECRET_TEST: ${{ secrets.RAISE_SECRET_TEST }}
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}
