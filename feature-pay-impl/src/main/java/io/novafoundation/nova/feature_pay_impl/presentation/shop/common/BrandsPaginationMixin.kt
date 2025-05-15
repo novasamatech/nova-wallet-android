@@ -38,7 +38,7 @@ class BrandsPaginationMixin(
             .onSuccess { dataPage ->
                 listStateMachine.onEvent(PaginatedListStateMachine.Event.NewPage(dataPage, event.query))
             }.onFailure {
-                Log.e(LOG_TAG, "Failed to load Raise brands")
+                Log.e(LOG_TAG, "Failed to load Raise brands", it)
                 listStateMachine.onEvent(PaginatedListStateMachine.Event.PageError(it))
             }
     }
