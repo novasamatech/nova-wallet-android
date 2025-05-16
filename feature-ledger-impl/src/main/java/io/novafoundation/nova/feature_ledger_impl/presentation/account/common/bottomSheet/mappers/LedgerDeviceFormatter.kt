@@ -7,17 +7,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 
 class LedgerDeviceFormatter(private val resourceManager: ResourceManager) {
 
-    fun mapName(device: LedgerDevice): String = createDelegate(device).getName()
-
-    fun mapApproveImage(device: LedgerDevice): LedgerMessageCommand.Graphics = createDelegate(device).getApproveImage()
-
-    fun mapErrorImage(device: LedgerDevice): LedgerMessageCommand.Graphics = createDelegate(device).getErrorImage()
-
-    fun mapSignImage(device: LedgerDevice): LedgerMessageCommand.Graphics = createDelegate(device).getSignImage()
-
-    fun mapReviewAddressMessage(device: LedgerDevice): String = createDelegate(device).getReviewAddressMessage()
-
-    fun mapSignMessage(device: LedgerDevice): String = createDelegate(device).getSignMessage()
+    fun formatName(device: LedgerDevice): String = createDelegate(device).getName()
 
     fun createDelegate(device: LedgerDevice): LedgerDeviceMapperDelegate {
         return when (device.deviceType) {
@@ -25,6 +15,7 @@ class LedgerDeviceFormatter(private val resourceManager: ResourceManager) {
             LedgerDeviceType.FLEX -> LedgerFlexMapperDelegate(resourceManager, device)
             LedgerDeviceType.NANO_X -> LedgerNanoXUIMapperDelegate(resourceManager, device)
             LedgerDeviceType.NANO_S_PLUS -> LedgerNanoSPlusMapperDelegate(resourceManager, device)
+            LedgerDeviceType.NANO_S -> LedgerNanoSMapperDelegate(resourceManager, device)
         }
     }
 }

@@ -240,7 +240,7 @@ abstract class SelectLedgerViewModel(
         return devices.map {
             SelectLedgerModel(
                 id = it.id,
-                name = ledgerDeviceFormatter.mapName(it),
+                name = ledgerDeviceFormatter.formatName(it),
                 isConnecting = it.id == connectingTo?.id
             )
         }
