@@ -162,7 +162,7 @@ abstract class SelectAddressLedgerViewModel(
                     .onSuccess {
                         loadedAccounts.value = loadedAccounts.value.added(it)
                     }.onFailure {
-                        Log.d("Ledger", "Error", it)
+                        Log.e("Ledger", "Failed to load Ledger account", it)
                         handleLedgerError(it, device.first()) { loadNewAccount() }
                     }
             }

@@ -45,7 +45,7 @@ class LegacySubstrateLedgerApplication(
             device = device
         )
 
-        Log.w("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
+        Log.d("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
 
         return SubstrateLedgerAppCommon.parseAccountResponse(rawResponse, derivationPath)
     }

@@ -53,7 +53,7 @@ abstract class NewSubstrateLedgerApplication(
             device = device
         )
 
-        Log.w("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
+        Log.d("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
 
         return parseAccountResponse(rawResponse, derivationPath)
     }

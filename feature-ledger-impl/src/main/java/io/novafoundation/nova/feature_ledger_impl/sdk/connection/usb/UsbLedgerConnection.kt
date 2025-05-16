@@ -1,39 +1,39 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.connection.usb
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.hardware.usb.UsbConstants
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
-import android.os.Build
 import android.util.Log
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.LedgerConnection
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.awaitConnected
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.BaseLedgerConnection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class UsbLedgerConnection(
     private val appContext: Context,
     private val device: UsbDevice,
-    private val coroutineScope: CoroutineScope,
-) : BaseLedgerConnection() {
+    coroutineScope: CoroutineScope
+) : BaseLedgerConnection(), CoroutineScope by coroutineScope {
 
     companion object {
 
         const val ACTION_USB_PERMISSION = "io.novafoundation.nova.USB_PERMISSION"
 
-        const val LONG_POLLING_INTERVAL = 300L
+        val PERMISSIONS_GRANTED_SIGNAL = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     }
 
     override val type: LedgerConnection.Type = LedgerConnection.Type.USB
@@ -51,6 +51,12 @@ class UsbLedgerConnection(
 
     override val channel: Short = 1
 
+    init {
+        PERMISSIONS_GRANTED_SIGNAL
+            .onEach { onPermissionGranted() }
+            .launchIn(coroutineScope)
+    }
+
     override suspend fun mtu(): Int {
         return 64
     }
@@ -64,12 +70,12 @@ class UsbLedgerConnection(
         }
 
         for (chunk in chunks) {
-            Log.w("Ledger", "Attempting to send chunk of size ${chunk.size} over usb")
+            Log.d("Ledger", "Attempting to send chunk of size ${chunk.size} over usb")
             val result = connection.bulkTransfer(endpoint, chunk, chunk.size, 10000)
             if (result < 0) {
-                Log.w("Ledger", "Failed to send bytes over usb: $result")
+                Log.e("Ledger", "Failed to send bytes over usb: $result")
             } else {
-                Log.w("Ledger", "Successfully sent $result bytes to Ledger")
+                Log.d("Ledger", "Successfully sent $result bytes to Ledger")
             }
         }
 
@@ -81,39 +87,31 @@ class UsbLedgerConnection(
 
             when {
                 result > 0 -> {
-                    Log.w("Ledger", "Read non empty bytes from usb: ${responseBuffer.joinToString()}")
+                    Log.d("Ledger", "Read non empty bytes from usb: ${responseBuffer.joinToString()}")
                     receiveChannel.trySend(responseBuffer.copyOf(result))
                     somethingRead = true
                 }
                 somethingRead -> {
-                    Log.w("Ledger", "Read empty bytes, stopping polling")
+                    Log.d("Ledger", "Read empty bytes, stopping polling")
                     break
                 }
                 else -> {
                     delay(50)
-                    Log.w("Ledger", "Read empty bytes, waiting for at least one response packet")
+                    Log.d("Ledger", "Read empty bytes, waiting for at least one response packet")
                 }
             }
         }
     }
 
     override suspend fun connect(): Result<Unit> = runCatching {
-        val permissionIntent = PendingIntent.getBroadcast(appContext, 0, Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE)
-        val filter = IntentFilter(ACTION_USB_PERMISSION)
-        val receiver = UsbPermissionReceiver()
-        appContext.registerReceiverCompact(receiver, filter)
+        val intent = Intent(ACTION_USB_PERMISSION).apply {
+            setClass(appContext, UsbPermissionReceiver::class.java)
+        }
+
+        val permissionIntent = PendingIntent.getBroadcast(appContext, 0, intent, PendingIntent.FLAG_MUTABLE)
         usbManager.requestPermission(device, permissionIntent)
 
         awaitConnected()
-    }
-
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
-    private fun Context.registerReceiverCompact(receiver: BroadcastReceiver, filter: IntentFilter) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(receiver, filter)
-        }
     }
 
     private fun onPermissionGranted() {
@@ -125,7 +123,7 @@ class UsbLedgerConnection(
             throw Exception("Failed to claim interface")
         }
 
-        Log.w("Ledger", "Endpoints count: ${usbIntf.endpointCount}")
+        Log.d("Ledger", "Endpoints count: ${usbIntf.endpointCount}")
         for (i in 0 until usbIntf.endpointCount) {
             val tmpEndpoint: UsbEndpoint = usbIntf.getEndpoint(i)
             if (tmpEndpoint.direction == UsbConstants.USB_DIR_IN) {
@@ -146,16 +144,16 @@ class UsbLedgerConnection(
         isActive.value = true
     }
 
-    private inner class UsbPermissionReceiver : BroadcastReceiver() {
+    class UsbPermissionReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == ACTION_USB_PERMISSION) {
                 synchronized(this) {
                     val granted: Boolean = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
+
                     if (granted) {
-                        onPermissionGranted()
+                        PERMISSIONS_GRANTED_SIGNAL.tryEmit(Unit)
                     }
-                    context?.unregisterReceiver(this)
                 }
             }
         }
