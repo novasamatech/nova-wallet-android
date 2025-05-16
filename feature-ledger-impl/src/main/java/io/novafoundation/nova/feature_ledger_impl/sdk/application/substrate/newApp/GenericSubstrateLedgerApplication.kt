@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.new
 
 import io.novafoundation.nova.common.utils.GENERIC_ADDRESS_PREFIX
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplicationError
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
@@ -37,6 +39,13 @@ class GenericSubstrateLedgerApplication(
 
     override val cla: UByte = CLA
 
+    companion object {
+
+        const val CLA: UByte = 0xf9u
+
+        private const val EVM_PUBLIC_KEY_LENGTH = 33
+    }
+
     suspend fun getUniversalSubstrateAccount(
         device: LedgerDevice,
         accountIndex: Int,
@@ -68,25 +77,28 @@ class GenericSubstrateLedgerApplication(
         val encodedDerivationPath = encodeDerivationPath(derivationPath)
         val payload = encodedDerivationPath
 
-        // TODO handle not upgraded generic app response
+        return try {
+            val rawResponse = transport.send(
+                cla = cla,
+                ins = Instruction.GET_ADDRESS.code,
+                p1 = displayVerificationDialog.code,
+                p2 = CryptoScheme.ECDSA.code,
+                data = payload,
+                device = device
+            )
 
-        val rawResponse = transport.send(
-            cla = cla,
-            ins = Instruction.GET_ADDRESS.code,
-            p1 = displayVerificationDialog.code,
-            p2 = CryptoScheme.ECDSA.code,
-            data = payload,
-            device = device
-        )
-
-        return parseEvmAccountResponse(rawResponse)
+            parseEvmAccountResponse(rawResponse)
+        } catch (e: SubstrateLedgerApplicationError.Response) {
+            if (e.isLedgerNotUpdatedToSupportEvm()) {
+                null
+            } else {
+                throw e
+            }
+        }
     }
 
-    companion object {
-
-        const val CLA: UByte = 0xf9u
-
-        private const val EVM_PUBLIC_KEY_LENGTH = 33
+    private fun SubstrateLedgerApplicationError.Response.isLedgerNotUpdatedToSupportEvm(): Boolean {
+        return response == LedgerApplicationResponse.WRONG_LENGTH
     }
 
 

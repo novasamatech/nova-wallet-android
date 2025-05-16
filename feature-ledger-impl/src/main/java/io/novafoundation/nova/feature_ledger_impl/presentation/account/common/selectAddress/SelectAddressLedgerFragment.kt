@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
@@ -61,6 +64,8 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
         viewModel.loadedAccountModels.observe(addressesAdapter::submitList)
 
         viewModel.chainUi.observe(binder.ledgerSelectAddressChain::setChain)
+
+        viewModel.alertFlow.observe(binder.ledgerSelectAddressAlert::setModelOrHide)
 
         setupLedgerMessages(ledgerMessagePresentable)
     }

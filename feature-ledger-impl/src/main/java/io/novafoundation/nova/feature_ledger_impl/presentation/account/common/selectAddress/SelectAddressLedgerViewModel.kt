@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withFlagSet
+import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
@@ -34,8 +35,10 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,7 +64,7 @@ abstract class SelectAddressLedgerViewModel(
     private val substratePreviewChain by lazyAsync { chainRegistry.getChain(payload.substrateChainId) }
 
     private val loadingAccount = MutableStateFlow(false)
-    private val loadedAccounts: MutableStateFlow<List<LedgerAccount>> = MutableStateFlow(emptyList())
+    protected val loadedAccounts: MutableStateFlow<List<LedgerAccount>> = MutableStateFlow(emptyList())
 
     private var verifyAddressJob: Job? = null
 
@@ -78,6 +81,9 @@ abstract class SelectAddressLedgerViewModel(
             DescriptiveButtonState.Enabled(resourceManager.getString(R.string.ledger_import_select_address_load_more))
         }
     }.shareInBackground()
+
+    protected val _alertFlow = MutableStateFlow<AlertModel?>(null)
+    val alertFlow: Flow<AlertModel?> = _alertFlow
 
     val device = flowOf {
         interactor.getDevice(payload.deviceId)

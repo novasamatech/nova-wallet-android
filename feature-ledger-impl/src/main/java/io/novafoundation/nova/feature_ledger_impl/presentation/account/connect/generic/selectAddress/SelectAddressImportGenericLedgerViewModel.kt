@@ -2,7 +2,10 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
+import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -13,6 +16,9 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.g
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toParcel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class SelectAddressImportGenericLedgerViewModel(
@@ -20,7 +26,7 @@ class SelectAddressImportGenericLedgerViewModel(
     private val payload: SelectLedgerAddressPayload,
     interactor: SelectAddressLedgerInteractor,
     addressIconGenerator: AddressIconGenerator,
-    resourceManager: ResourceManager,
+    private val resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
     messageCommandFormatter: MessageCommandFormatter,
 ) : SelectAddressLedgerViewModel(
@@ -37,6 +43,15 @@ class SelectAddressImportGenericLedgerViewModel(
 
     override val needToVerifyAccount = false
 
+    init {
+        loadedAccounts.onEach { accounts ->
+            val needsUpdateToSupportEvm = accounts.any { it.evm == null }
+            val model = createAlertModel(needsUpdateToSupportEvm)
+            _alertFlow.emit(model)
+        }
+            .launchIn(this)
+    }
+
     override fun onAccountVerified(account: LedgerAccount) {
         launch {
             val payload = PreviewImportGenericLedgerPayload(
@@ -48,5 +63,15 @@ class SelectAddressImportGenericLedgerViewModel(
 
             router.openPreviewLedgerAccountsGeneric(payload)
         }
+    }
+
+    private fun createAlertModel(needsUpdateToSupportEvm: Boolean): AlertModel? {
+        if (!needsUpdateToSupportEvm) return null
+
+        return AlertModel(
+            style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
+            message = resourceManager.getString(R.string.ledger_select_address_update_for_evm_title),
+            subMessage = resourceManager.getString(R.string.ledger_select_address_update_for_evm_message)
+        )
     }
 }

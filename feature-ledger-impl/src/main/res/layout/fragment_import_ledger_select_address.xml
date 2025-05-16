@@ -30,6 +30,14 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp" />
 
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/ledgerSelectAddressAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ledgerSelectAddressContent"
         android:layout_width="match_parent"
