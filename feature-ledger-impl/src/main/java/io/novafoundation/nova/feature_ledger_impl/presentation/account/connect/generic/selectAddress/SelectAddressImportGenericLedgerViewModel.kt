@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toGenericParcel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toParcel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.launch
@@ -40,7 +41,8 @@ class SelectAddressImportGenericLedgerViewModel(
         launch {
             val payload = PreviewImportGenericLedgerPayload(
                 accountIndex = account.index,
-                account = account.substrate.toGenericParcel(),
+                substrateAccount = account.substrate.toGenericParcel(),
+                evmAccount = account.evm?.toParcel(),
                 deviceId = payload.deviceId
             )
 

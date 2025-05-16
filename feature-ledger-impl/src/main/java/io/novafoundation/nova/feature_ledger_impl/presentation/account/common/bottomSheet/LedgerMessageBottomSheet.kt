@@ -6,6 +6,7 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import io.novafoundation.nova.common.utils.formatting.TimerValue
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.AlertModel
@@ -77,6 +78,17 @@ sealed class LedgerMessageCommand {
         ) : Footer()
 
         class Value(val value: String) : Footer()
+
+        class Columns(
+            val first: Column,
+            val second: Column
+        ) : Footer() {
+
+            class Column(
+                val label: String,
+                val value: String
+            )
+        }
     }
 
     class Graphics(@DrawableRes val ledgerImageRes: Int)
@@ -128,6 +140,9 @@ class LedgerMessageBottomSheet(
     }
 
     private fun showFooter(footer: LedgerMessageCommand.Footer) {
+        binder.ledgerMessageFooterMessage.setVisible(footer !is LedgerMessageCommand.Footer.Columns)
+        binder.ledgerMessageFooterColumns.setVisible(footer is LedgerMessageCommand.Footer.Columns)
+
         when (footer) {
             is LedgerMessageCommand.Footer.Value -> {
                 binder.ledgerMessageFooterMessage.text = footer.value
@@ -144,6 +159,14 @@ class LedgerMessageBottomSheet(
                     },
                     onFinish = { footer.timerFinished() }
                 )
+            }
+
+            is LedgerMessageCommand.Footer.Columns -> {
+                binder.ledgerMessageFooterTitle1.text = footer.first.label
+                binder.ledgerMessageFooterMessage1.text = footer.first.value
+
+                binder.ledgerMessageFooterTitle2.text = footer.second.label
+                binder.ledgerMessageFooterMessage2.text = footer.second.value
             }
         }
     }

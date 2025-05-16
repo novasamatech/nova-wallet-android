@@ -6,7 +6,9 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDeviceOrThrow
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
-import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
+import io.novafoundation.nova.runtime.ext.defaultComparator
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -14,7 +16,10 @@ interface PreviewImportGenericLedgerInteractor {
 
     suspend fun getDevice(deviceId: String): LedgerDevice
 
-    suspend fun availableChainAccounts(addressFromLedger: String): List<ChainAccountPreview>
+    suspend fun availableChainAccounts(
+        substrateAccountId: AccountId,
+        evmAccountId: AccountId?,
+    ): List<ChainAccountPreview>
 
     suspend fun verifyAddressOnLedger(accountIndex: Int, deviceId: String): Result<Unit>
 }
@@ -29,22 +34,33 @@ class RealPreviewImportGenericLedgerInteractor(
         return ledgerDiscoveryService.findDeviceOrThrow(deviceId)
     }
 
-    override suspend fun availableChainAccounts(addressFromLedger: String): List<ChainAccountPreview> {
-        val accountId = addressFromLedger.toAccountId()
-
-        return ledgerMigrationTracker.supportedChainsByGenericApp().map { chain ->
-            ChainAccountPreview(
-                chain = chain,
-                accountId = accountId
-            )
-        }
+    override suspend fun availableChainAccounts(
+        substrateAccountId: AccountId,
+        evmAccountId: AccountId?,
+    ): List<ChainAccountPreview> {
+        return ledgerMigrationTracker.supportedChainsByGenericApp()
+            .sortedWith(Chain.defaultComparator())
+            .mapNotNull { chain ->
+                if (chain.isEthereumBased) {
+                    ChainAccountPreview(
+                        chain = chain,
+                        accountId = evmAccountId ?: return@mapNotNull null
+                    )
+                } else {
+                    ChainAccountPreview(
+                        chain = chain,
+                        accountId = substrateAccountId
+                    )
+                }
+            }
     }
 
     override suspend fun verifyAddressOnLedger(accountIndex: Int, deviceId: String): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val device = ledgerDiscoveryService.findDeviceOrThrow(deviceId)
 
-            genericSubstrateLedgerApplication.getUniversalAccount(device, accountIndex, confirmAddress = true)
+            genericSubstrateLedgerApplication.getUniversalSubstrateAccount(device, accountIndex, confirmAddress = true)
+            genericSubstrateLedgerApplication.getEvmAccount(device, accountIndex, confirmAddress = true)
 
             Unit
         }

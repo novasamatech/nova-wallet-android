@@ -6,17 +6,17 @@ import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class LedgerGenericAccountParcel(
+class LedgerGenericSubstrateAccountParcel(
     val address: String,
     val publicKey: ByteArray,
     val encryptionType: EncryptionType,
     val derivationPath: String,
 ) : Parcelable
 
-fun LedgerSubstrateAccount.toGenericParcel(): LedgerGenericAccountParcel {
-    return LedgerGenericAccountParcel(address, publicKey, encryptionType, derivationPath)
+fun LedgerSubstrateAccount.toGenericParcel(): LedgerGenericSubstrateAccountParcel {
+    return LedgerGenericSubstrateAccountParcel(address, publicKey, encryptionType, derivationPath)
 }
 
-fun LedgerGenericAccountParcel.toDomain(): LedgerSubstrateAccount {
+fun LedgerGenericSubstrateAccountParcel.toDomain(): LedgerSubstrateAccount {
     return LedgerSubstrateAccount(address, publicKey, encryptionType, derivationPath)
 }

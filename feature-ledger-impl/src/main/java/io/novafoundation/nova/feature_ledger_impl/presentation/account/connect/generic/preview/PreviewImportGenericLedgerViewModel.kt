@@ -18,6 +18,9 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
+import io.novasama.substrate_sdk_android.extensions.toAddress
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +47,12 @@ class PreviewImportGenericLedgerViewModel(
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
-    override val chainAccountProjections = flowOf { interactor.availableChainAccounts(payload.account.address) }
+    override val chainAccountProjections = flowOf {
+        interactor.availableChainAccounts(
+            substrateAccountId = payload.substrateAccount.address.toAccountId(),
+            evmAccountId = payload.evmAccount?.accountId
+        )
+    }
         .defaultFormat()
         .shareInBackground()
 
@@ -69,7 +77,8 @@ class PreviewImportGenericLedgerViewModel(
         val device = device.first()
 
         ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
-            address = payload.account.address,
+            substrateAddress = payload.substrateAccount.address,
+            evmAddress = payload.evmAccount?.accountId?.asEthereumAccountId()?.toAddress()?.value,
             device = device,
             onCancel = ::verifyAddressCancelled,
         ).event()
@@ -92,7 +101,7 @@ class PreviewImportGenericLedgerViewModel(
     }
 
     private fun onAccountVerified() {
-        val nextPayload = FinishImportGenericLedgerPayload(payload.account)
+        val nextPayload = FinishImportGenericLedgerPayload(payload.substrateAccount, payload.evmAccount)
         router.openFinishImportLedgerGeneric(nextPayload)
     }
 

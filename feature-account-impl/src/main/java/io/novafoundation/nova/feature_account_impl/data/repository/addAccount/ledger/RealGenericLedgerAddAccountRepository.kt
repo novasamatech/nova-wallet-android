@@ -27,11 +27,11 @@ class RealGenericLedgerAddAccountRepository(
 
     private suspend fun addNewWallet(payload: Payload.NewWallet): AddAccountResult {
         val metaAccount = MetaAccountLocal(
-            substratePublicKey = payload.universalAccount.publicKey,
-            substrateCryptoType = mapEncryptionToCryptoType(payload.universalAccount.encryptionType),
-            substrateAccountId = payload.universalAccount.address.toAccountId(),
-            ethereumPublicKey = null,
-            ethereumAddress = null,
+            substratePublicKey = payload.substrateAccount.publicKey,
+            substrateCryptoType = mapEncryptionToCryptoType(payload.substrateAccount.encryptionType),
+            substrateAccountId = payload.substrateAccount.address.toAccountId(),
+            ethereumPublicKey = payload.evmAccount?.publicKey,
+            ethereumAddress = payload.evmAccount?.accountId,
             name = payload.name,
             parentMetaId = null,
             isSelected = false,
@@ -43,7 +43,7 @@ class RealGenericLedgerAddAccountRepository(
 
         val metaId = accountDao.insertMetaAccount(metaAccount)
         val derivationPathKey = LedgerDerivationPath.genericDerivationPathSecretKey()
-        secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, payload.universalAccount.derivationPath)
+        secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, payload.substrateAccount.derivationPath)
 
         return AddAccountResult.AccountAdded(metaId, LightMetaAccount.Type.LEDGER)
     }

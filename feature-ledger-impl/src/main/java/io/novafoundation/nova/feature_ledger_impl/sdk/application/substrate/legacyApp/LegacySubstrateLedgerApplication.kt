@@ -48,7 +48,7 @@ class LegacySubstrateLedgerApplication(
         return SubstrateLedgerAppCommon.parseSubstrateAccountResponse(rawResponse, derivationPath)
     }
 
-    override suspend fun getEvmAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int, confirmAddress: Boolean): LedgerEvmAccount? {
+    override suspend fun getEvmAccount(device: LedgerDevice, accountIndex: Int, confirmAddress: Boolean): LedgerEvmAccount? {
         return null
     }
 

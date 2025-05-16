@@ -53,6 +53,9 @@ class SelectLedgerHolder(
         viewBinding.root.background = with(containerView.context) {
             addRipple(getRoundedCornerDrawable(R.color.block_background))
         }
+
+        viewBinding.itemLedgerAccountSubstrate.isEnabled = false
+        viewBinding.itemLedgerAccountEvm.isEnabled = false
     }
 
     fun bind(model: LedgerAccountModel) = with(viewBinding) {
@@ -62,6 +65,7 @@ class SelectLedgerHolder(
         itemLedgerAccountIcon.setImageDrawable(model.substrate.image)
 
         itemLedgerAccountSubstrate.showAddress(model.substrate)
+
 
         if (model.evm != null) {
             itemLedgerAccountEvm.valuePrimary.setTextColorRes(R.color.text_primary)

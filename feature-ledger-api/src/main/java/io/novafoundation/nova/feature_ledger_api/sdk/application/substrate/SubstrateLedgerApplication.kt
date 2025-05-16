@@ -16,7 +16,6 @@ interface SubstrateLedgerApplication {
 
     suspend fun getEvmAccount(
         device: LedgerDevice,
-        chainId: ChainId,
         accountIndex: Int,
         confirmAddress: Boolean
     ): LedgerEvmAccount?

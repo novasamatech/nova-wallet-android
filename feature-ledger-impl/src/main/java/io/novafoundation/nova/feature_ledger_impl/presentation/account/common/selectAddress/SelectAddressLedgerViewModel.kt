@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressFormat
-import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -21,7 +20,7 @@ import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.address
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
@@ -32,7 +31,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -122,7 +120,8 @@ abstract class SelectAddressLedgerViewModel(
         val device = device.first()
 
         ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
-            address = account.substrate.address,
+            substrateAddress = account.substrate.address,
+            evmAddress = account.evm?.address(),
             device = device,
             onCancel = ::verifyAddressCancelled,
         ).event()

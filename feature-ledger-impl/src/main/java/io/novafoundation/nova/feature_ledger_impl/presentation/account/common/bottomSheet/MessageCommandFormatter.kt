@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer.Columns.Column
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
@@ -145,11 +146,29 @@ class MessageCommandFormatter(
     }
 
     fun reviewAddressCommand(
-        address: String,
+        substrateAddress: String,
+        evmAddress: String?,
         device: LedgerDevice,
         onCancel: () -> Unit,
     ): LedgerMessageCommand {
         val deviceMapper = deviceMapper.createDelegate(device)
+
+        val footer = if (evmAddress == null) {
+            LedgerMessageCommand.Footer.Value(
+                value = substrateAddress.toTwoLinesAddress(),
+            )
+        } else {
+            LedgerMessageCommand.Footer.Columns(
+                first = Column(
+                    label = resourceManager.getString(R.string.common_substrate_address),
+                    value = substrateAddress
+                ),
+                second = Column(
+                    label = resourceManager.getString(R.string.common_evm_address),
+                    value = evmAddress
+                )
+            )
+        }
 
         return LedgerMessageCommand.Show.Info(
             title = resourceManager.getString(R.string.ledger_review_approve_title),
@@ -157,9 +176,7 @@ class MessageCommandFormatter(
             onCancel = onCancel,
             alert = null,
             graphics = deviceMapper.getApproveImage(),
-            footer = LedgerMessageCommand.Footer.Value(
-                value = address.toTwoLinesAddress(),
-            )
+            footer = footer
         )
     }
 

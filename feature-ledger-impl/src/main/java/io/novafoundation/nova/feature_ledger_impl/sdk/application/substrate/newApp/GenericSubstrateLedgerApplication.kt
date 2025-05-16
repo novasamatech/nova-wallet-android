@@ -37,7 +37,7 @@ class GenericSubstrateLedgerApplication(
 
     override val cla: UByte = CLA
 
-    suspend fun getUniversalAccount(
+    suspend fun getUniversalSubstrateAccount(
         device: LedgerDevice,
         accountIndex: Int,
         confirmAddress: Boolean
@@ -59,13 +59,12 @@ class GenericSubstrateLedgerApplication(
 
     override suspend fun getEvmAccount(
         device: LedgerDevice,
-        chainId: ChainId,
         accountIndex: Int,
         confirmAddress: Boolean
     ): LedgerEvmAccount? {
         val displayVerificationDialog = DisplayVerificationDialog.fromBoolean(confirmAddress)
 
-        val derivationPath = getDerivationPath(chainId, accountIndex)
+        val derivationPath = buildDerivationPath(universalConfig.coin, accountIndex)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)
         val payload = encodedDerivationPath
 
@@ -80,7 +79,7 @@ class GenericSubstrateLedgerApplication(
             device = device
         )
 
-        return parseEvmAccountResponse(rawResponse, derivationPath)
+        return parseEvmAccountResponse(rawResponse)
     }
 
     companion object {
@@ -91,7 +90,7 @@ class GenericSubstrateLedgerApplication(
     }
 
 
-    private fun parseEvmAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerEvmAccount {
+    private fun parseEvmAccountResponse(raw: ByteArray): LedgerEvmAccount {
         val dataWithoutResponseCode = processResponseCode(raw)
 
         val publicKey = dataWithoutResponseCode.copyBytes(0, EVM_PUBLIC_KEY_LENGTH)
@@ -102,7 +101,6 @@ class GenericSubstrateLedgerApplication(
         return LedgerEvmAccount(
             publicKey = publicKey,
             accountId = publicKey.asEthereumPublicKey().toAccountId().value,
-            derivationPath = requestDerivationPath
         )
     }
 }

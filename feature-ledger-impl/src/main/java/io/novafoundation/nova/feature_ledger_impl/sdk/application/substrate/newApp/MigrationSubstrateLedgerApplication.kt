@@ -37,7 +37,7 @@ class MigrationSubstrateLedgerApplication(
         return ledgerRepository.getChainAccountDerivationPath(metaId, chainId)
     }
 
-    override suspend fun getEvmAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int, confirmAddress: Boolean): LedgerEvmAccount? {
+    override suspend fun getEvmAccount(device: LedgerDevice, accountIndex: Int, confirmAddress: Boolean): LedgerEvmAccount? {
         return null
     }
 }

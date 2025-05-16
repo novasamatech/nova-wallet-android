@@ -7,11 +7,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.findDeviceOrThrow
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 
 class LedgerAccount(
     val index: Int,
@@ -23,7 +19,7 @@ interface SelectAddressLedgerInteractor {
 
     suspend fun getDevice(deviceId: String): LedgerDevice
 
-    suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<LedgerAccount>
+    suspend fun loadLedgerAccount(substrateChain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<LedgerAccount>
 
     suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<Unit>
 }
@@ -37,12 +33,12 @@ class RealSelectAddressLedgerInteractor(
         return ledgerDeviceDiscoveryService.findDeviceOrThrow(deviceId)
     }
 
-    override suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant) = runCatching {
+    override suspend fun loadLedgerAccount(substrateChain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant) = runCatching {
         val device = ledgerDeviceDiscoveryService.findDeviceOrThrow(deviceId)
-        val app = migrationUseCase.determineLedgerApp(chain.id, ledgerVariant)
+        val app = migrationUseCase.determineLedgerApp(substrateChain.id, ledgerVariant)
 
-        val substrateAccount = app.getSubstrateAccount(device, chain.id, accountIndex, confirmAddress = false)
-        val evmAccount = app.getEvmAccount(device, chain.id, accountIndex, confirmAddress = false)
+        val substrateAccount = app.getSubstrateAccount(device, substrateChain.id, accountIndex, confirmAddress = false)
+        val evmAccount = app.getEvmAccount(device, accountIndex, confirmAddress = false)
 
         LedgerAccount(accountIndex, substrateAccount, evmAccount)
     }
