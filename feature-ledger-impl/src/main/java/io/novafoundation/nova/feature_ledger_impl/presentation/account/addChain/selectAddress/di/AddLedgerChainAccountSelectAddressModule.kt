@@ -40,7 +40,7 @@ class AddLedgerChainAccountSelectAddressModule {
         screenPayload: AddLedgerChainAccountSelectAddressPayload
     ): SelectLedgerAddressPayload = SelectLedgerAddressPayload(
         deviceId = screenPayload.deviceId,
-        chainId = screenPayload.chainId
+        substrateChainId = screenPayload.chainId
     )
 
     @Provides

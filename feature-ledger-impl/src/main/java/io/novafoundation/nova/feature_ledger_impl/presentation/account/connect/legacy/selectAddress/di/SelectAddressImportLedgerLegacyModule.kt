@@ -30,7 +30,7 @@ class SelectAddressImportLedgerLegacyModule {
     fun provideMessageFormatter(
         screenPayload: SelectLedgerAddressPayload,
         factory: LedgerMessageFormatterFactory,
-    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.chainId, showAlerts = false)
+    ): LedgerMessageFormatter = factory.createLegacy(screenPayload.substrateChainId, showAlerts = false)
 
     @Provides
     @ScreenScope

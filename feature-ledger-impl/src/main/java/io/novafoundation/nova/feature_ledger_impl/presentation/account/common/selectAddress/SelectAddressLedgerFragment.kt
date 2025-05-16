@@ -13,12 +13,15 @@ import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerSelectAddressBinding
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list.LedgerAccountAdapter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list.LedgerSelectAddressLoadMoreAdapter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
 import javax.inject.Inject
 
 abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     BaseFragment<V, FragmentImportLedgerSelectAddressBinding>(),
-    AccountHolder.AccountItemHandler,
-    LedgerSelectAddressLoadMoreAdapter.Handler {
+    LedgerSelectAddressLoadMoreAdapter.Handler,
+    LedgerAccountAdapter.Handler {
 
     companion object {
 
@@ -33,12 +36,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     override fun createBinding() = FragmentImportLedgerSelectAddressBinding.inflate(layoutInflater)
 
     private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        AccountsAdapter(
-            this,
-            imageLoader,
-            chainBorderColor = R.color.secondary_screen_background,
-            AccountHolder.Mode.SELECT
-        )
+        LedgerAccountAdapter(this)
     }
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
@@ -67,11 +65,11 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
         setupLedgerMessages(ledgerMessagePresentable)
     }
 
-    override fun itemClicked(accountModel: AccountUi) {
-        viewModel.accountClicked(accountModel)
-    }
-
     override fun loadMoreClicked() {
         viewModel.loadMoreClicked()
+    }
+
+    override fun itemClicked(item: LedgerAccountModel) {
+        viewModel.accountClicked(item)
     }
 }

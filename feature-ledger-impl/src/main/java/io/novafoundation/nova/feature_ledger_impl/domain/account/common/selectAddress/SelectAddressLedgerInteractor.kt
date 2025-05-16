@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress
 
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
@@ -12,18 +13,17 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-class LedgerAccountWithBalance(
+class LedgerAccount(
     val index: Int,
-    val account: LedgerSubstrateAccount,
-    val balance: BigInteger,
-    val chainAsset: Chain.Asset
+    val substrate: LedgerSubstrateAccount,
+    val evm: LedgerEvmAccount?,
 )
 
 interface SelectAddressLedgerInteractor {
 
     suspend fun getDevice(deviceId: String): LedgerDevice
 
-    suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<LedgerAccountWithBalance>
+    suspend fun loadLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<LedgerAccount>
 
     suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<Unit>
 }
@@ -31,7 +31,6 @@ interface SelectAddressLedgerInteractor {
 class RealSelectAddressLedgerInteractor(
     private val migrationUseCase: LedgerMigrationUseCase,
     private val ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
-    private val assetSourceRegistry: AssetSourceRegistry,
 ) : SelectAddressLedgerInteractor {
 
     override suspend fun getDevice(deviceId: String): LedgerDevice {
@@ -42,22 +41,16 @@ class RealSelectAddressLedgerInteractor(
         val device = ledgerDeviceDiscoveryService.findDeviceOrThrow(deviceId)
         val app = migrationUseCase.determineLedgerApp(chain.id, ledgerVariant)
 
-        val ledgerAccount = app.getAccount(device, chain.id, accountIndex, confirmAddress = false)
+        val substrateAccount = app.getSubstrateAccount(device, chain.id, accountIndex, confirmAddress = false)
+        val evmAccount = app.getEvmAccount(device, chain.id, accountIndex, confirmAddress = false)
 
-        val utilityAsset = chain.utilityAsset
-
-        val accountId = chain.accountIdOf(ledgerAccount.publicKey)
-
-        val balanceSource = assetSourceRegistry.sourceFor(utilityAsset).balance
-        val balance = balanceSource.queryTotalBalance(chain, utilityAsset, accountId)
-
-        LedgerAccountWithBalance(accountIndex, ledgerAccount, balance, utilityAsset)
+        LedgerAccount(accountIndex, substrateAccount, evmAccount)
     }
 
     override suspend fun verifyLedgerAccount(chain: Chain, deviceId: String, accountIndex: Int, ledgerVariant: LedgerVariant): Result<Unit> = runCatching {
         val device = ledgerDeviceDiscoveryService.findDeviceOrThrow(deviceId)
         val app = migrationUseCase.determineLedgerApp(chain.id, ledgerVariant)
 
-        app.getAccount(device, chain.id, accountIndex, confirmAddress = true)
+        app.getSubstrateAccount(device, chain.id, accountIndex, confirmAddress = true)
     }
 }

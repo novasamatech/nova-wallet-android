@@ -2,6 +2,13 @@ package io.novafoundation.nova.common.address.format
 
 interface AddressFormat {
 
+    companion object {
+
+        fun evm(): AddressFormat {
+            return EthereumAddressFormat()
+        }
+    }
+
     @JvmInline
     value class PublicKey(val value: ByteArray)
 

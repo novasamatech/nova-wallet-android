@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list
 
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner

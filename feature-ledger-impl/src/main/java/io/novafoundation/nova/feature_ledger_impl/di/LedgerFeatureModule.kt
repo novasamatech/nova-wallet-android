@@ -144,12 +144,10 @@ class LedgerFeatureModule {
     fun provideSelectAddressInteractor(
         migrationUseCase: LedgerMigrationUseCase,
         ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
-        assetSourceRegistry: AssetSourceRegistry,
     ): SelectAddressLedgerInteractor {
         return RealSelectAddressLedgerInteractor(
             migrationUseCase = migrationUseCase,
             ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
-            assetSourceRegistry = assetSourceRegistry
         )
     }
 

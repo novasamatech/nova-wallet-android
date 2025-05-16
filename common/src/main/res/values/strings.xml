@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="ledger_select_address_not_found">Account not found</string>
 
+    <string name="ledger_select_address_account_label">Account %s</string>
     <string name="ledger_device_nano_s">Nano S</string>
 
     <!--

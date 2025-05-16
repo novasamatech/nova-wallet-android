@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
-import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
+import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
@@ -34,18 +34,18 @@ class SelectAddressImportLedgerLegacyViewModel(
 
     override val ledgerVariant: LedgerVariant = LedgerVariant.LEGACY
 
-    override fun onAccountVerified(account: LedgerAccountWithBalance) {
+    override fun onAccountVerified(account: LedgerAccount) {
         responder.respond(screenResponseFrom(account))
         router.returnToImportFillWallet()
     }
 
-    private fun screenResponseFrom(account: LedgerAccountWithBalance): LedgerChainAccount {
+    private fun screenResponseFrom(account: LedgerAccount): LedgerChainAccount {
         return LedgerChainAccount(
-            publicKey = account.account.publicKey,
-            address = account.account.address,
-            chainId = payload.chainId,
-            encryptionType = account.account.encryptionType,
-            derivationPath = account.account.derivationPath
+            publicKey = account.substrate.publicKey,
+            address = account.substrate.address,
+            chainId = payload.substrateChainId,
+            encryptionType = account.substrate.encryptionType,
+            derivationPath = account.substrate.derivationPath
         )
     }
 }

@@ -7,12 +7,19 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadE
 
 interface SubstrateLedgerApplication {
 
-    suspend fun getAccount(
+    suspend fun getSubstrateAccount(
         device: LedgerDevice,
         chainId: ChainId,
         accountIndex: Int,
         confirmAddress: Boolean
     ): LedgerSubstrateAccount
+
+    suspend fun getEvmAccount(
+        device: LedgerDevice,
+        chainId: ChainId,
+        accountIndex: Int,
+        confirmAddress: Boolean
+    ): LedgerEvmAccount?
 
     suspend fun getSignature(
         device: LedgerDevice,

@@ -20,7 +20,7 @@ object SubstrateLedgerAppCommon {
 
     const val CHUNK_SIZE = 250
 
-    private const val PUBLIC_KEY_LENGTH = 32
+    private const val SUBSTRATE_PUBLIC_KEY_LENGTH = 32
     private const val RESPONSE_CODE_LENGTH = 2
 
     enum class Instruction(val code: UByte) {
@@ -28,7 +28,7 @@ object SubstrateLedgerAppCommon {
     }
 
     enum class CryptoScheme(val code: UByte) {
-        ED25519(0x00u), SR25519(0x01u);
+        ED25519(0x00u), SR25519(0x01u), ECDSA(0x02u);
 
         companion object {
             fun fromCode(code: UByte): CryptoScheme {
@@ -62,13 +62,23 @@ object SubstrateLedgerAppCommon {
         }
     }
 
-    fun parseSignature(raw: ByteArray): SignatureWrapper {
+    fun parseMultiSignature(raw: ByteArray): SignatureWrapper {
         val cryptoSchemeByte = raw[0]
         val signature = raw.dropBytes(1)
+        val cryptoScheme = CryptoScheme.fromCode(cryptoSchemeByte.toUByte())
 
-        return when (CryptoScheme.fromCode(cryptoSchemeByte.toUByte())) {
+        return parseSignature(signature, cryptoScheme)
+    }
+
+    fun parseSignature(signature: ByteArray, cryptoScheme: CryptoScheme) : SignatureWrapper {
+        return when (cryptoScheme) {
             CryptoScheme.ED25519 -> SignatureWrapper.Ed25519(signature)
             CryptoScheme.SR25519 -> SignatureWrapper.Sr25519(signature)
+            CryptoScheme.ECDSA -> SignatureWrapper.Ecdsa(
+                r = signature.copyOfRange(0, 32),
+                s = signature.copyOfRange(32, 64),
+                v = signature.copyOfRange(64, 65)
+            )
         }
     }
 
@@ -78,15 +88,15 @@ object SubstrateLedgerAppCommon {
         return junctions.serializeInLedgerFormat()
     }
 
-    fun parseAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerSubstrateAccount {
+    fun parseSubstrateAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerSubstrateAccount {
         val dataWithoutResponseCode = processResponseCode(raw)
 
-        val publicKey = dataWithoutResponseCode.copyBytes(0, PUBLIC_KEY_LENGTH)
-        require(publicKey.size == PUBLIC_KEY_LENGTH) {
+        val publicKey = dataWithoutResponseCode.copyBytes(0, SUBSTRATE_PUBLIC_KEY_LENGTH)
+        require(publicKey.size == SUBSTRATE_PUBLIC_KEY_LENGTH) {
             "No public key"
         }
 
-        val accountAddressData = dataWithoutResponseCode.dropBytes(PUBLIC_KEY_LENGTH)
+        val accountAddressData = dataWithoutResponseCode.dropBytes(SUBSTRATE_PUBLIC_KEY_LENGTH)
         val address = accountAddressData.decodeToString()
 
         require(address.isValidSS58Address()) {
@@ -145,6 +155,7 @@ object SubstrateLedgerAppCommon {
         return when (cryptoScheme) {
             CryptoScheme.ED25519 -> EncryptionType.ED25519
             CryptoScheme.SR25519 -> EncryptionType.SR25519
+            CryptoScheme.ECDSA -> EncryptionType.ECDSA
         }
     }
 }

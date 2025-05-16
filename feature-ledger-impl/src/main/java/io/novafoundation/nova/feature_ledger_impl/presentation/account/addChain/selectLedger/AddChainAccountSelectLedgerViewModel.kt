@@ -50,7 +50,7 @@ class AddChainAccountSelectLedgerViewModel(
         val app = migrationUseCase.determineAppForLegacyAccount(addAccountPayload.chainId)
 
         // ensure that address loads successfully
-        app.getAccount(device, addAccountPayload.chainId, accountIndex = 0, confirmAddress = false)
+        app.getSubstrateAccount(device, addAccountPayload.chainId, accountIndex = 0, confirmAddress = false)
 
         val payload = AddLedgerChainAccountSelectAddressPayload(addAccountPayload.chainId, addAccountPayload.metaId, device.id)
         router.openAddChainAccountSelectAddress(payload)

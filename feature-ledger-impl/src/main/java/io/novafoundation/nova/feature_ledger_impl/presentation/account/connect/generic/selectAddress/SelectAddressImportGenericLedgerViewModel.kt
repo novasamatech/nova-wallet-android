@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
-import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccountWithBalance
+import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
@@ -36,11 +36,11 @@ class SelectAddressImportGenericLedgerViewModel(
 
     override val needToVerifyAccount = false
 
-    override fun onAccountVerified(account: LedgerAccountWithBalance) {
+    override fun onAccountVerified(account: LedgerAccount) {
         launch {
             val payload = PreviewImportGenericLedgerPayload(
                 accountIndex = account.index,
-                account = account.account.toGenericParcel(),
+                account = account.substrate.toGenericParcel(),
                 deviceId = payload.deviceId
             )
 

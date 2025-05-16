@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.CHUNK_SIZE
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.defaultCryptoScheme
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.encodeDerivationPath
-import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.parseAccountResponse
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.parseSubstrateAccountResponse
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -34,7 +34,7 @@ abstract class NewSubstrateLedgerApplication(
 
     abstract suspend fun getAddressPrefix(chainId: ChainId): Short
 
-    override suspend fun getAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int, confirmAddress: Boolean): LedgerSubstrateAccount {
+    override suspend fun getSubstrateAccount(device: LedgerDevice, chainId: ChainId, accountIndex: Int, confirmAddress: Boolean): LedgerSubstrateAccount {
         val displayVerificationDialog = SubstrateLedgerAppCommon.DisplayVerificationDialog.fromBoolean(confirmAddress)
 
         val derivationPath = getDerivationPath(chainId, accountIndex)
@@ -53,9 +53,7 @@ abstract class NewSubstrateLedgerApplication(
             device = device
         )
 
-        Log.d("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
-
-        return parseAccountResponse(rawResponse, derivationPath)
+        return parseSubstrateAccountResponse(rawResponse, derivationPath)
     }
 
     override suspend fun getSignature(
@@ -83,7 +81,7 @@ abstract class NewSubstrateLedgerApplication(
 
         val signatureWithType = results.last()
 
-        return SubstrateLedgerAppCommon.parseSignature(signatureWithType)
+        return SubstrateLedgerAppCommon.parseMultiSignature(signatureWithType)
     }
 
     private suspend fun prepareExtrinsicChunks(

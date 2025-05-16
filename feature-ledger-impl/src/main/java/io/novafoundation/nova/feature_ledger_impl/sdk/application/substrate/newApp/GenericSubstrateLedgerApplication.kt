@@ -2,21 +2,31 @@ package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.new
 
 import io.novafoundation.nova.common.utils.GENERIC_ADDRESS_PREFIX
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
+import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.CryptoScheme
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.DisplayVerificationDialog
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.Instruction
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.buildDerivationPath
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.encodeDerivationPath
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.getConfig
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.processResponseCode
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.encrypt.json.copyBytes
+import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
+import io.novasama.substrate_sdk_android.extensions.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 
 class GenericSubstrateLedgerApplication(
-    transport: LedgerTransport,
+    private val transport: LedgerTransport,
     chainRegistry: ChainRegistry,
     metadataShortenerService: MetadataShortenerService,
     private val ledgerRepository: LedgerRepository,
@@ -32,7 +42,7 @@ class GenericSubstrateLedgerApplication(
         accountIndex: Int,
         confirmAddress: Boolean
     ): LedgerSubstrateAccount {
-        return getAccount(device, Chain.Geneses.POLKADOT, accountIndex = accountIndex, confirmAddress)
+        return getSubstrateAccount(device, Chain.Geneses.POLKADOT, accountIndex = accountIndex, confirmAddress)
     }
 
     override suspend fun getDerivationPath(chainId: ChainId, accountIndex: Int): String {
@@ -47,8 +57,52 @@ class GenericSubstrateLedgerApplication(
         return SS58Encoder.GENERIC_ADDRESS_PREFIX
     }
 
+    override suspend fun getEvmAccount(
+        device: LedgerDevice,
+        chainId: ChainId,
+        accountIndex: Int,
+        confirmAddress: Boolean
+    ): LedgerEvmAccount? {
+        val displayVerificationDialog = DisplayVerificationDialog.fromBoolean(confirmAddress)
+
+        val derivationPath = getDerivationPath(chainId, accountIndex)
+        val encodedDerivationPath = encodeDerivationPath(derivationPath)
+        val payload = encodedDerivationPath
+
+        // TODO handle not upgraded generic app response
+
+        val rawResponse = transport.send(
+            cla = cla,
+            ins = Instruction.GET_ADDRESS.code,
+            p1 = displayVerificationDialog.code,
+            p2 = CryptoScheme.ECDSA.code,
+            data = payload,
+            device = device
+        )
+
+        return parseEvmAccountResponse(rawResponse, derivationPath)
+    }
+
     companion object {
 
         const val CLA: UByte = 0xf9u
+
+        private const val EVM_PUBLIC_KEY_LENGTH = 33
+    }
+
+
+    private fun parseEvmAccountResponse(raw: ByteArray, requestDerivationPath: String): LedgerEvmAccount {
+        val dataWithoutResponseCode = processResponseCode(raw)
+
+        val publicKey = dataWithoutResponseCode.copyBytes(0, EVM_PUBLIC_KEY_LENGTH)
+        require(publicKey.size == EVM_PUBLIC_KEY_LENGTH) {
+            "No public key"
+        }
+
+        return LedgerEvmAccount(
+            publicKey = publicKey,
+            accountId = publicKey.asEthereumPublicKey().toAccountId().value,
+            derivationPath = requestDerivationPath
+        )
     }
 }
