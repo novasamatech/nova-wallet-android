@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate
 
 import android.util.Log
+import io.novafoundation.nova.common.utils.SignatureWrapperEcdsa
 import io.novafoundation.nova.common.utils.dropBytes
 import io.novafoundation.nova.common.utils.dropBytesLast
 import io.novafoundation.nova.common.utils.isValidSS58Address
@@ -74,11 +75,7 @@ object SubstrateLedgerAppCommon {
         return when (cryptoScheme) {
             CryptoScheme.ED25519 -> SignatureWrapper.Ed25519(signature)
             CryptoScheme.SR25519 -> SignatureWrapper.Sr25519(signature)
-            CryptoScheme.ECDSA -> SignatureWrapper.Ecdsa(
-                r = signature.copyOfRange(0, 32),
-                s = signature.copyOfRange(32, 64),
-                v = signature.copyOfRange(64, 65)
-            )
+            CryptoScheme.ECDSA -> SignatureWrapperEcdsa(signature)
         }
     }
 

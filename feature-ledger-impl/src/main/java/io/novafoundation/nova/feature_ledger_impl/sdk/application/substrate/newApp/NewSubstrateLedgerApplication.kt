@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.send
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.CHUNK_SIZE
+import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.CryptoScheme
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.defaultCryptoScheme
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.encodeDerivationPath
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.parseSubstrateAccountResponse
@@ -62,6 +63,42 @@ abstract class NewSubstrateLedgerApplication(
         chainId: ChainId,
         payload: SignerPayloadExtrinsic
     ): SignatureWrapper {
+        val chain = chainRegistry.getChain(chainId)
+
+        return if (chain.isEthereumBased) {
+            getEvmSignature(device, metaId, chainId, payload)
+        } else {
+            getSubstrateSignature(device, metaId, chainId, payload)
+        }
+    }
+
+    private suspend fun getSubstrateSignature(
+        device: LedgerDevice,
+        metaId: Long,
+        chainId: ChainId,
+        payload: SignerPayloadExtrinsic
+    ): SignatureWrapper {
+        val multiSignature = sendSignChunks(device, metaId, chainId, payload, defaultCryptoScheme())
+        return SubstrateLedgerAppCommon.parseMultiSignature(multiSignature)
+    }
+
+    private suspend fun getEvmSignature(
+        device: LedgerDevice,
+        metaId: Long,
+        chainId: ChainId,
+        payload: SignerPayloadExtrinsic
+    ): SignatureWrapper {
+        val signature = sendSignChunks(device, metaId, chainId, payload, CryptoScheme.ECDSA)
+        return SubstrateLedgerAppCommon.parseSignature(signature, CryptoScheme.ECDSA)
+    }
+
+    private suspend fun sendSignChunks(
+        device: LedgerDevice,
+        metaId: Long,
+        chainId: ChainId,
+        payload: SignerPayloadExtrinsic,
+        cryptoScheme: CryptoScheme
+    ): ByteArray {
         val chunks = prepareExtrinsicChunks(metaId, chainId, payload)
 
         val results = chunks.mapIndexed { index, chunk ->
@@ -71,7 +108,7 @@ abstract class NewSubstrateLedgerApplication(
                 cla = cla,
                 ins = SubstrateLedgerAppCommon.Instruction.SIGN.code,
                 p1 = chunkType.code,
-                p2 = defaultCryptoScheme().code,
+                p2 = cryptoScheme.code,
                 data = chunk,
                 device = device
             )
@@ -79,9 +116,7 @@ abstract class NewSubstrateLedgerApplication(
             SubstrateLedgerAppCommon.processResponseCode(rawResponse)
         }
 
-        val signatureWithType = results.last()
-
-        return SubstrateLedgerAppCommon.parseMultiSignature(signatureWithType)
+        return results.last()
     }
 
     private suspend fun prepareExtrinsicChunks(

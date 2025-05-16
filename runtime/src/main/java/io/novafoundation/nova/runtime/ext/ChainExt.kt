@@ -31,6 +31,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
+import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
 import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
 import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
@@ -567,3 +570,16 @@ fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
 }
 
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)
+
+fun SignatureVerifier.verifyMultiChain(
+    chain: Chain,
+    signature: SignatureWrapper,
+    message: ByteArray,
+    publicKey: ByteArray
+): Boolean {
+    return if (chain.isEthereumBased) {
+        verify(signature, Signer.MessageHashing.ETHEREUM, message, publicKey)
+    } else {
+        verify(signature, Signer.MessageHashing.SUBSTRATE, message, publicKey)
+    }
+}
