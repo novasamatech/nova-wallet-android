@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.ext
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
@@ -472,6 +473,9 @@ fun Chain.Asset.requireOrml(): Type.Orml {
 
     return type
 }
+
+val Chain.addressScheme: AddressScheme
+    get() = if (isEthereumBased) AddressScheme.EVM else AddressScheme.SUBSTRATE
 
 fun Chain.Asset.ormlOrNull(): Type.Orml? {
     return type as? Type.Orml

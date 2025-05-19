@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.Subst
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class LegacyLedgerWalletDetailsMixin(
     private val resourceManager: ResourceManager,
@@ -60,25 +62,22 @@ class LegacyLedgerWalletDetailsMixin(
         }
     }
 
-    override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> = flowOfAll {
+    override fun accountProjectionsFlow(): Flow<List<Any>> = flowOfAll {
         val ledgerSupportedChainIds = SubstrateApplicationConfig.all().mapToSet { it.chainId }
         val chains = interactor.getAllChains()
             .filter { it.id in ledgerSupportedChainIds }
+
         interactor.chainProjectionsFlow(
             metaAccount.id,
             chains,
             hasAccountComparator().withChainComparator()
-        )
-    }
+        ).map { accounts ->
+            val availableActions = availableAccountActions.first()
 
-    override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {
-        return null
-    }
-
-    override suspend fun mapAccount(accountInChain: AccountInChain): AccountInChainUi {
-        return accountFormatter.formatChainAccountProjection(
-            accountInChain,
-            availableAccountActions.first()
-        )
+            accounts.toListWithHeaders(
+                keyMapper = { _, _ -> null },
+                valueMapper = { chainAccount -> accountFormatter.formatChainAccountProjection(chainAccount, availableActions) }
+            )
+        }
     }
 }

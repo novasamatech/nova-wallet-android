@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_add_address">Add address</string>
+    <string name="account_substrate_accounts">Substrate Accounts</string>
+    <string name="account_evm_accounts">EVM Accounts</string>
+
     <string name="ledger_select_address_update_for_evm_title">Update Ledger Generic App</string>
     <string name="ledger_select_address_update_for_evm_message">Your Ledger device is using an outdated Generic app that doesn’t support EVM addresses. Update it via Ledger Live.</string>
 

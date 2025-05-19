@@ -1,25 +1,23 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin
 
-import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.common.list.headers.TextHeader
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.mapToAccountHeader
+import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.mapToAccountGroupUi
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class WatchOnlyWalletDetailsMixin(
     private val resourceManager: ResourceManager,
@@ -41,18 +39,15 @@ class WatchOnlyWalletDetailsMixin(
         )
     }
 
-    override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> = flowOfAll {
+    override fun accountProjectionsFlow(): Flow<List<Any>> = flowOfAll {
         interactor.chainProjectionsFlow(metaAccount.id, interactor.getAllChains(), hasAccountComparator().withChainComparator())
-    }
+            .map { accounts ->
+                val availableActions = availableAccountActions.first()
 
-    override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {
-        return from.mapToAccountHeader(resourceManager)
-    }
-
-    override suspend fun mapAccount(accountInChain: AccountInChain): AccountInChainUi {
-        return accountFormatter.formatChainAccountProjection(
-            accountInChain,
-            availableAccountActions.first()
-        )
+                accounts.toListWithHeaders(
+                    keyMapper = { from, _ -> from.mapToAccountGroupUi(resourceManager) },
+                    valueMapper = { chainAccount -> accountFormatter.formatChainAccountProjection(chainAccount, availableActions) }
+                )
+            }
     }
 }
