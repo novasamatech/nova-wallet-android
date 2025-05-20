@@ -71,7 +71,7 @@ object SubstrateLedgerAppCommon {
         return parseSignature(signature, cryptoScheme)
     }
 
-    fun parseSignature(signature: ByteArray, cryptoScheme: CryptoScheme) : SignatureWrapper {
+    fun parseSignature(signature: ByteArray, cryptoScheme: CryptoScheme): SignatureWrapper {
         return when (cryptoScheme) {
             CryptoScheme.ED25519 -> SignatureWrapper.Ed25519(signature)
             CryptoScheme.SR25519 -> SignatureWrapper.Sr25519(signature)

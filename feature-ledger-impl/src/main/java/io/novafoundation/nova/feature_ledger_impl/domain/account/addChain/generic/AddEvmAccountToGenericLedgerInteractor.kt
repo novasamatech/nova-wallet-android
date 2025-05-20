@@ -16,7 +16,7 @@ interface AddEvmAccountToGenericLedgerInteractor {
 @ScreenScope
 class RealAddEvmAccountToGenericLedgerInteractor @Inject constructor(
     private val genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository
-): AddEvmAccountToGenericLedgerInteractor {
+) : AddEvmAccountToGenericLedgerInteractor {
 
     override suspend fun addEvmAccount(metaId: Long, account: LedgerEvmAccount): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {

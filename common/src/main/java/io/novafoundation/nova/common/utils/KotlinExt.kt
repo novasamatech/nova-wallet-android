@@ -674,7 +674,8 @@ fun Calendar.resetDay() {
 
 inline fun CoroutineScope.launchUnit(
     context: CoroutineContext = EmptyCoroutineContext,
-    crossinline block: suspend CoroutineScope.() -> Unit) {
+    crossinline block: suspend CoroutineScope.() -> Unit
+) {
     launch(context) { block() }
 }
 

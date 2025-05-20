@@ -5,7 +5,6 @@ import android.util.Log
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.LedgerConnection
 import io.novafoundation.nova.feature_ledger_api.sdk.connection.awaitConnected
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.BaseLedgerConnection
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import no.nordicsemi.android.ble.callback.DataReceivedCallback

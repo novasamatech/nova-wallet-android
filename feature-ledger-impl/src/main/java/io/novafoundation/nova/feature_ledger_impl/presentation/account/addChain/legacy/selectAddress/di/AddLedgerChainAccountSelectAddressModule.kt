@@ -87,6 +87,7 @@ class AddLedgerChainAccountSelectAddressModule {
     @Provides
     fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): AddLedgerChainAccountSelectAddressViewModel {
         return ViewModelProvider(fragment, viewModelFactory).get(
-            AddLedgerChainAccountSelectAddressViewModel::class.java)
+            AddLedgerChainAccountSelectAddressViewModel::class.java
+        )
     }
 }

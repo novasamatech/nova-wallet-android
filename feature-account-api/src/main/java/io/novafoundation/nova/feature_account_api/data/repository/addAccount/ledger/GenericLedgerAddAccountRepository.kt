@@ -17,6 +17,6 @@ interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedger
         class AddEvmAccount(
             val metaId: Long,
             val evmAccount: LedgerEvmAccount
-        ): Payload
+        ) : Payload
     }
 }

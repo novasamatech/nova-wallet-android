@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectAddress
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.AlertModel
-import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
-import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -19,7 +16,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.g
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toParcel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch

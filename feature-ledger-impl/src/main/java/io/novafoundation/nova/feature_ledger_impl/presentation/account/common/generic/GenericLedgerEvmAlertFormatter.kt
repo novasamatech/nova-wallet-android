@@ -15,7 +15,7 @@ interface GenericLedgerEvmAlertFormatter {
 @FeatureScope
 class RealGenericLedgerEvmAlertFormatter @Inject constructor(
     private val resourceManager: ResourceManager,
-): GenericLedgerEvmAlertFormatter {
+) : GenericLedgerEvmAlertFormatter {
 
     override fun createUpdateAppToGetEvmAddressAlert(): AlertModel {
         return AlertModel(

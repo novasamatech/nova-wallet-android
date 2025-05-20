@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.format.AddressScheme
 
 sealed class AddressVerificationMode {
 
-    data object Disabled: AddressVerificationMode()
+    data object Disabled : AddressVerificationMode()
 
-    class Enabled(val addressSchemesToVerify: List<AddressScheme>): AddressVerificationMode()
+    class Enabled(val addressSchemesToVerify: List<AddressScheme>) : AddressVerificationMode()
 }

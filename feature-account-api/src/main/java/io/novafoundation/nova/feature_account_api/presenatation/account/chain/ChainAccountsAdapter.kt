@@ -3,13 +3,10 @@ package io.novafoundation.nova.feature_account_api.presenatation.account.chain
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import coil.ImageLoader
-import io.novafoundation.nova.common.databinding.ItemTextHeaderBinding
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.list.headers.TextHeaderHolder
 import io.novafoundation.nova.common.utils.castOrNull
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -83,7 +80,7 @@ class ChainAccountHolder(override val containerView: ItemChainAccount) : Grouped
 class ChainAccountGroupHolder(
     private val viewBinding: ItemChainAccountGroupBinding,
     private val handler: ChainAccountsAdapter.Handler,
-): GroupedListHolder(viewBinding.root) {
+) : GroupedListHolder(viewBinding.root) {
 
     fun bind(item: ChainAccountGroupUi) = with(viewBinding) {
         itemChainAccountGroupTitle.text = item.title

@@ -166,7 +166,6 @@ class MessageCommandFormatter(
                 second = columnFor(addresses.second())
             )
 
-
             else -> error("Too many addresses passed: ${addresses.size}")
         }
 

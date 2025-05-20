@@ -89,7 +89,6 @@ abstract class SelectAddressLedgerViewModel(
     protected val _alertFlow = MutableStateFlow<AlertModel?>(null)
     val alertFlow: Flow<AlertModel?> = _alertFlow
 
-
     val device = flowOf {
         interactor.getDevice(payload.deviceId)
     }

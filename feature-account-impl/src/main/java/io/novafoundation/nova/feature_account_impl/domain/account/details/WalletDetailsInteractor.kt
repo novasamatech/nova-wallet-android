@@ -120,7 +120,7 @@ private val From.ordering
     }
 
 private val AddressScheme.defaultOrdering
-    get() = when(this) {
+    get() = when (this) {
         AddressScheme.SUBSTRATE -> 0
         AddressScheme.EVM -> 1
     }

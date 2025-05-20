@@ -101,7 +101,6 @@ class GenericSubstrateLedgerApplication(
         return response == LedgerApplicationResponse.WRONG_LENGTH
     }
 
-
     private fun parseEvmAccountResponse(raw: ByteArray): LedgerEvmAccount {
         val dataWithoutResponseCode = processResponseCode(raw)
 

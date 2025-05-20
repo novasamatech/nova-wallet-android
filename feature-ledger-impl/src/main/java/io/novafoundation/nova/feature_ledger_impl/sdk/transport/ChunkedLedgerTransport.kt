@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.transport
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.bigEndianBytes
 import io.novafoundation.nova.common.utils.buildByteArray
 import io.novafoundation.nova.common.utils.dropBytes

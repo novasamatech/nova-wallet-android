@@ -2,20 +2,16 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.common.view.setExtraInfoAvailable
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.databinding.ItemLedgerAccountBinding
-import io.novafoundation.nova.feature_ledger_impl.databinding.ItemLedgerBinding
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.model.SelectLedgerModel
 
 class LedgerAccountAdapter(
     private val handler: Handler
@@ -65,7 +61,6 @@ class SelectLedgerHolder(
         itemLedgerAccountIcon.setImageDrawable(model.substrate.image)
 
         itemLedgerAccountSubstrate.showAddress(model.substrate)
-
 
         if (model.evm != null) {
             itemLedgerAccountEvm.valuePrimary.setTextColorRes(R.color.text_primary)
