@@ -25,7 +25,8 @@ abstract class BaseChainAccountsPreviewViewModel(
 
     open val subtitle: String? = null
 
-    abstract val chainAccountProjections: Flow<List<AccountInChainUi>>
+    // List<ChainAccountGroupUi | AccountInChainUi>
+    abstract val chainAccountProjections: Flow<List<Any?>>
 
     abstract val buttonState: Flow<DescriptiveButtonState>
 
@@ -41,11 +42,7 @@ abstract class BaseChainAccountsPreviewViewModel(
         externalActions.showAddressActions(item.address, chain)
     }
 
-    protected fun Flow<List<ChainAccountPreview>>.defaultFormat(): Flow<List<AccountInChainUi>> {
-        return mapList(::mapParitySignerAccountInChainToUi)
-    }
-
-    private suspend fun mapParitySignerAccountInChainToUi(account: ChainAccountPreview): AccountInChainUi = with(account) {
+    protected suspend fun mapChainAccountPreviewToUi(account: ChainAccountPreview): AccountInChainUi = with(account) {
         val address = chain.addressOf(accountId)
 
         val icon = iconGenerator.createAccountAddressModel(chain, accountId).image

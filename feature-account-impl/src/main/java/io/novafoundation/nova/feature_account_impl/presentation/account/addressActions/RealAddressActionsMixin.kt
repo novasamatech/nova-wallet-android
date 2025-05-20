@@ -4,14 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressFormat
 import io.novafoundation.nova.common.address.format.AddressScheme
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.view.ChipLabelModel
-import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin.Payload
@@ -25,7 +24,7 @@ import javax.inject.Inject
 class AddressActionsMixinFactory @Inject constructor(
     private val copyValueMixin: CopyValueMixin,
     private val iconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager
+    private val addressSchemeFormatter: AddressSchemeFormatter
 ) : AddressActionsMixin.Factory {
 
     override fun create(coroutineScope: CoroutineScope): Presentation {
@@ -33,7 +32,7 @@ class AddressActionsMixinFactory @Inject constructor(
             coroutineScope = coroutineScope,
             copyValueMixin = copyValueMixin,
             iconGenerator = iconGenerator,
-            resourceManager = resourceManager
+            addressSchemeFormatter = addressSchemeFormatter
         )
     }
 }
@@ -42,7 +41,7 @@ private class RealAddressActionsMixin(
     coroutineScope: CoroutineScope,
     private val copyValueMixin: CopyValueMixin,
     private val iconGenerator: AddressIconGenerator,
-    private val resourceManager: ResourceManager,
+    private val addressSchemeFormatter: AddressSchemeFormatter
 ) : Presentation, CoroutineScope by coroutineScope {
 
     override val showAddressActionsEvent = MutableLiveData<Event<Payload>>()
@@ -59,11 +58,7 @@ private class RealAddressActionsMixin(
     }
 
     private fun AddressScheme.addressLabel(): ChipLabelModel {
-        val label = when (this) {
-            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_substrate_address)
-            AddressScheme.EVM -> resourceManager.getString(R.string.common_evm_address)
-        }
-
+        val label = addressSchemeFormatter.addressLabel(this)
         return ChipLabelModel(label)
     }
 }

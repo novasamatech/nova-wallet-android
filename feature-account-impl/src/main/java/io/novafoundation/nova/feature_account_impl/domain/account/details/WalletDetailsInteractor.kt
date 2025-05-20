@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.details
 
 import io.novafoundation.nova.common.address.format.AddressScheme
+import io.novafoundation.nova.common.address.format.defaultOrdering
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.entropy
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
@@ -22,7 +23,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class WalletDetailsInteractor(
+class
+WalletDetailsInteractor(
     private val accountRepository: AccountRepository,
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
@@ -117,10 +119,4 @@ private val From.ordering
     get() = when (this) {
         From.CHAIN_ACCOUNT -> 0
         From.META_ACCOUNT -> 1
-    }
-
-private val AddressScheme.defaultOrdering
-    get() = when (this) {
-        AddressScheme.SUBSTRATE -> 0
-        AddressScheme.EVM -> 1
     }

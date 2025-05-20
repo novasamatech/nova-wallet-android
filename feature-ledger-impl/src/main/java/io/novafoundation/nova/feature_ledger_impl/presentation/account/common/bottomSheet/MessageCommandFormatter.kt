@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet
 
 import io.novafoundation.nova.common.address.format.AddressScheme
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.second
@@ -18,11 +19,12 @@ import io.novafoundation.nova.runtime.extrinsic.closeToExpire
 
 class MessageCommandFormatterFactory(
     private val resourceManager: ResourceManager,
-    private val deviceMapper: LedgerDeviceFormatter
+    private val deviceMapper: LedgerDeviceFormatter,
+    private val addressSchemeFormatter: AddressSchemeFormatter
 ) {
 
     fun create(messageFormatter: LedgerMessageFormatter): MessageCommandFormatter {
-        return MessageCommandFormatter(resourceManager, deviceMapper, messageFormatter)
+        return MessageCommandFormatter(resourceManager, deviceMapper, messageFormatter, addressSchemeFormatter)
     }
 }
 
@@ -30,6 +32,7 @@ class MessageCommandFormatter(
     private val resourceManager: ResourceManager,
     private val deviceMapper: LedgerDeviceFormatter,
     private val messageFormatter: LedgerMessageFormatter,
+    private val addressSchemeFormatter: AddressSchemeFormatter,
 ) {
 
     context(Browserable.Presentation)
@@ -189,11 +192,7 @@ class MessageCommandFormatter(
     }
 
     private fun rowFor(addressWithScheme: Pair<AddressScheme, String>): Column {
-        val label = when (addressWithScheme.first) {
-            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_substrate_address)
-            AddressScheme.EVM -> resourceManager.getString(R.string.common_evm_address)
-        }
-
+        val label = addressSchemeFormatter.addressLabel(addressWithScheme.first)
         return Column(label, addressWithScheme.second.toTwoLinesAddress())
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -83,4 +84,6 @@ interface LedgerFeatureDependencies {
     val externalActions: ExternalActions.Presentation
 
     val addressActionsMixinFactory: AddressActionsMixin.Factory
+
+    val addressSchemeFormatter: AddressSchemeFormatter
 }

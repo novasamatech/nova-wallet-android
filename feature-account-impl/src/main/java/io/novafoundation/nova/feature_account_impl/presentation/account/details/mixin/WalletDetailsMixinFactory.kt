@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin
 
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
@@ -19,6 +20,7 @@ class WalletDetailsMixinFactory(
     private val appLinksProvider: AppLinksProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val router: AccountRouter,
+    private val addressSchemeFormatter: AddressSchemeFormatter
 ) {
 
     suspend fun create(metaId: Long, host: WalletDetailsMixinHost): WalletDetailsMixin {
@@ -55,7 +57,8 @@ class WalletDetailsMixinFactory(
                 interactor = interactor,
                 ledgerMigrationTracker = ledgerMigrationTracker,
                 metaAccount = metaAccount,
-                router = router
+                router = router,
+                addressSchemeFormatter = addressSchemeFormatter
             )
 
             Type.PARITY_SIGNER,

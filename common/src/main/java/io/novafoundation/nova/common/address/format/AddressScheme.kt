@@ -11,3 +11,9 @@ enum class AddressScheme {
      */
     SUBSTRATE
 }
+
+val AddressScheme.defaultOrdering
+    get() = when (this) {
+        AddressScheme.SUBSTRATE -> 0
+        AddressScheme.EVM -> 1
+    }

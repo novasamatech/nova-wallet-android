@@ -3,11 +3,14 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressScheme
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.ChainAccountGroupUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview.BaseChainAccountsPreviewViewModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -38,7 +41,8 @@ class PreviewImportGenericLedgerViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
-    private val messageCommandFormatter: MessageCommandFormatter
+    private val messageCommandFormatter: MessageCommandFormatter,
+    private val addressSchemeFormatter: AddressSchemeFormatter,
 ) : BaseChainAccountsPreviewViewModel(
     iconGenerator = iconGenerator,
     externalActions = externalActions,
@@ -53,9 +57,11 @@ class PreviewImportGenericLedgerViewModel(
         interactor.availableChainAccounts(
             substrateAccountId = payload.substrateAccount.address.toAccountId(),
             evmAccountId = payload.evmAccount?.accountId
+        ).toListWithHeaders(
+            keyMapper = { scheme, _ -> formatGroupHeader(scheme) },
+            valueMapper = { account -> mapChainAccountPreviewToUi(account) }
         )
     }
-        .defaultFormat()
         .shareInBackground()
 
     override val buttonState: Flow<DescriptiveButtonState> = flowOf {
@@ -73,6 +79,14 @@ class PreviewImportGenericLedgerViewModel(
         verifyAddressJob = launch {
             verifyAccount()
         }
+    }
+
+    private fun formatGroupHeader(addressScheme: AddressScheme): ChainAccountGroupUi {
+        return ChainAccountGroupUi(
+            id = addressScheme.name,
+            title = addressSchemeFormatter.accountsLabel(addressScheme),
+            action = null
+        )
     }
 
     private suspend fun verifyAccount() {

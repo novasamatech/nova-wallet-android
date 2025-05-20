@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin
 
 import io.novafoundation.nova.common.address.format.AddressScheme
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -30,6 +31,7 @@ class GenericLedgerWalletDetailsMixin(
     private val interactor: WalletDetailsInteractor,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val router: AccountRouter,
+    private val addressSchemeFormatter: AddressSchemeFormatter,
     metaAccount: MetaAccount
 ) : WalletDetailsMixin(metaAccount) {
 
@@ -83,15 +85,8 @@ class GenericLedgerWalletDetailsMixin(
 
         return ChainAccountGroupUi(
             id = addressScheme.name,
-            title = addressScheme.uiTitle(),
+            title = addressSchemeFormatter.accountsLabel(addressScheme),
             action = action
         )
-    }
-
-    private fun AddressScheme.uiTitle(): String {
-        return when (this) {
-            AddressScheme.EVM -> resourceManager.getString(R.string.account_evm_accounts)
-            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.account_substrate_accounts)
-        }
     }
 }

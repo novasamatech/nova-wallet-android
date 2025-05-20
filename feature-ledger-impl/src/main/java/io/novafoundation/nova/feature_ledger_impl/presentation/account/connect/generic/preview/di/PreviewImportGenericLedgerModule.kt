@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -49,6 +50,7 @@ class PreviewImportGenericLedgerModule {
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
         @GenericLedger messageCommandFormatter: MessageCommandFormatter,
+        addressSchemeFormatter: AddressSchemeFormatter
     ): ViewModel {
         return PreviewImportGenericLedgerViewModel(
             interactor = interactor,
@@ -58,7 +60,8 @@ class PreviewImportGenericLedgerModule {
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             resourceManager = resourceManager,
-            messageCommandFormatter = messageCommandFormatter
+            messageCommandFormatter = messageCommandFormatter,
+            addressSchemeFormatter = addressSchemeFormatter
         )
     }
 

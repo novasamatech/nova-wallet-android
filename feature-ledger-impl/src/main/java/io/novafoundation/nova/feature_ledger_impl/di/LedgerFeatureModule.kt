@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -161,6 +162,7 @@ class LedgerFeatureModule {
     @FeatureScope
     fun provideMessageCommandFormatterFactory(
         resourceManager: ResourceManager,
-        deviceMapper: LedgerDeviceFormatter
-    ) = MessageCommandFormatterFactory(resourceManager, deviceMapper)
+        deviceMapper: LedgerDeviceFormatter,
+        addressSchemeFormatter: AddressSchemeFormatter
+    ) = MessageCommandFormatterFactory(resourceManager, deviceMapper, addressSchemeFormatter)
 }
