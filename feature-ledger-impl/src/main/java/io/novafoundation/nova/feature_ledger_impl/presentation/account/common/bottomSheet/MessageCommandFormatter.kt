@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer.Columns.Column
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer.Rows.Column
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
@@ -161,9 +161,9 @@ class MessageCommandFormatter(
                 value = addresses.single().second.toTwoLinesAddress(),
             )
 
-            2 -> LedgerMessageCommand.Footer.Columns(
-                first = columnFor(addresses.first()),
-                second = columnFor(addresses.second())
+            2 -> LedgerMessageCommand.Footer.Rows(
+                first = rowFor(addresses.first()),
+                second = rowFor(addresses.second())
             )
 
             else -> error("Too many addresses passed: ${addresses.size}")
@@ -188,13 +188,13 @@ class MessageCommandFormatter(
         return substring(0, middle) + "\n" + substring(middle)
     }
 
-    private fun columnFor(addressWithScheme: Pair<AddressScheme, String>): Column {
+    private fun rowFor(addressWithScheme: Pair<AddressScheme, String>): Column {
         val label = when (addressWithScheme.first) {
             AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_substrate_address)
             AddressScheme.EVM -> resourceManager.getString(R.string.common_evm_address)
         }
 
-        return Column(label, addressWithScheme.second)
+        return Column(label, addressWithScheme.second.toTwoLinesAddress())
     }
 }
 

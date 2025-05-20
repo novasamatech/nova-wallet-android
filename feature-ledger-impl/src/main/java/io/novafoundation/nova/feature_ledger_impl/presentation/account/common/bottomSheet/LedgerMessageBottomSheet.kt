@@ -78,7 +78,7 @@ sealed class LedgerMessageCommand {
 
         class Value(val value: String) : Footer()
 
-        class Columns(
+        class Rows(
             val first: Column,
             val second: Column
         ) : Footer() {
@@ -132,6 +132,7 @@ class LedgerMessageBottomSheet(
 
     private fun setupFooterVisibility(visible: Boolean) {
         binder.ledgerMessageFooterMessage.setVisible(visible)
+        binder.ledgerMessageFooterColumns.setVisible(visible)
 
         if (!visible) {
             binder.ledgerMessageFooterMessage.stopTimer()
@@ -139,8 +140,8 @@ class LedgerMessageBottomSheet(
     }
 
     private fun showFooter(footer: LedgerMessageCommand.Footer) {
-        binder.ledgerMessageFooterMessage.setVisible(footer !is LedgerMessageCommand.Footer.Columns)
-        binder.ledgerMessageFooterColumns.setVisible(footer is LedgerMessageCommand.Footer.Columns)
+        binder.ledgerMessageFooterMessage.setVisible(footer !is LedgerMessageCommand.Footer.Rows)
+        binder.ledgerMessageFooterColumns.setVisible(footer is LedgerMessageCommand.Footer.Rows)
 
         when (footer) {
             is LedgerMessageCommand.Footer.Value -> {
@@ -160,7 +161,7 @@ class LedgerMessageBottomSheet(
                 )
             }
 
-            is LedgerMessageCommand.Footer.Columns -> {
+            is LedgerMessageCommand.Footer.Rows -> {
                 binder.ledgerMessageFooterTitle1.text = footer.first.label
                 binder.ledgerMessageFooterMessage1.text = footer.first.value
 

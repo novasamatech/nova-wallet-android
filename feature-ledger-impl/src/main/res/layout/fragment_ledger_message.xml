@@ -70,61 +70,47 @@
         android:id="@+id/ledgerMessageFooterColumns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:baselineAligned="false"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:visibility="gone"
-        android:layout_marginBottom="16dp"
-        android:baselineAligned="false">
+        tools:visibility="visible">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/ledgerMessageFooterTitle1"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_marginTop="16dp"
+            tools:text="Title 1" />
 
-            <TextView
-                android:id="@+id/ledgerMessageFooterTitle1"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Title 1" />
-
-            <TextView
-                android:id="@+id/ledgerMessageFooterMessage1"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                tools:text="Message 1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/ledgerMessageFooterMessage1"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="4dp"
             android:gravity="center_horizontal"
-            android:orientation="vertical">
+            tools:text="Message 1" />
 
-            <TextView
-                android:id="@+id/ledgerMessageFooterTitle2"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Title 2" />
+        <TextView
+            android:id="@+id/ledgerMessageFooterTitle2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="Title 1" />
 
-            <TextView
-                android:id="@+id/ledgerMessageFooterMessage2"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                tools:text="Message 2" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/ledgerMessageFooterMessage2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            tools:text="Message 1" />
     </LinearLayout>
 
     <LinearLayout

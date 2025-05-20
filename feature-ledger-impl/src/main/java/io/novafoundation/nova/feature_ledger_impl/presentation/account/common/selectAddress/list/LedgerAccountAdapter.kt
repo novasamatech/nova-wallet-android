@@ -76,11 +76,12 @@ class SelectLedgerHolder(
             itemLedgerAccountEvm.setExtraInfoAvailable(true)
         } else {
             itemLedgerAccountEvm.valuePrimary.setTextColorRes(R.color.text_secondary)
-            itemLedgerAccountEvm.setPrimaryValueStartIcon(R.drawable.ic_warning_filled)
             itemLedgerAccountEvm.showValue(context.getString(R.string.ledger_select_address_not_found))
 
             itemLedgerAccountEvm.setOnClickListener(null)
             itemLedgerAccountEvm.setExtraInfoAvailable(false)
+
+            itemLedgerAccountEvm.setPrimaryValueStartIcon(R.drawable.ic_warning_filled)
         }
     }
 
