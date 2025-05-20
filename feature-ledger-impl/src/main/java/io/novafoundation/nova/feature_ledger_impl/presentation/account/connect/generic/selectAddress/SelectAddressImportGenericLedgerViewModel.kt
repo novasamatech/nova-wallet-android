@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -29,6 +30,7 @@ class SelectAddressImportGenericLedgerViewModel(
     private val evmUpdateFormatter: GenericLedgerEvmAlertFormatter,
     chainRegistry: ChainRegistry,
     messageCommandFormatter: MessageCommandFormatter,
+    addressActionsMixinFactory: AddressActionsMixin.Factory
 ) : SelectAddressLedgerViewModel(
     router = router,
     interactor = interactor,
@@ -36,7 +38,8 @@ class SelectAddressImportGenericLedgerViewModel(
     resourceManager = resourceManager,
     payload = payload,
     chainRegistry = chainRegistry,
-    messageCommandFormatter = messageCommandFormatter
+    messageCommandFormatter = messageCommandFormatter,
+    addressActionsMixinFactory = addressActionsMixinFactory
 ) {
 
     override val ledgerVariant: LedgerVariant = LedgerVariant.GENERIC

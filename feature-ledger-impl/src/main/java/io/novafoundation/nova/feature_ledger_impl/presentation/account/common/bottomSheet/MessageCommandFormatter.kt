@@ -190,8 +190,8 @@ class MessageCommandFormatter(
 
     private fun columnFor(addressWithScheme: Pair<AddressScheme, String>): Column {
         val label = when (addressWithScheme.first) {
-            AddressScheme.EVM -> resourceManager.getString(R.string.common_substrate_address)
-            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_evm_address)
+            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_substrate_address)
+            AddressScheme.EVM -> resourceManager.getString(R.string.common_evm_address)
         }
 
         return Column(label, addressWithScheme.second)

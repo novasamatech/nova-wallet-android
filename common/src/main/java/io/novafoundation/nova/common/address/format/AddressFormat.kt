@@ -2,10 +2,19 @@ package io.novafoundation.nova.common.address.format
 
 interface AddressFormat {
 
+    val scheme: AddressScheme
+
     companion object {
 
         fun evm(): AddressFormat {
             return EthereumAddressFormat()
+        }
+
+        fun defaultForScheme(scheme: AddressScheme): AddressFormat {
+            return when(scheme) {
+                AddressScheme.EVM -> EthereumAddressFormat()
+                AddressScheme.SUBSTRATE -> SubstrateAddressFormat.generic()
+            }
         }
     }
 

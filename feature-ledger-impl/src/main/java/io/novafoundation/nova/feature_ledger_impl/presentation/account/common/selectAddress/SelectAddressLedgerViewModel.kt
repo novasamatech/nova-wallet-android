@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.format.AddressFormat
 import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -22,6 +23,8 @@ import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.showAddressActions
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.address
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -53,7 +56,8 @@ abstract class SelectAddressLedgerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: SelectLedgerAddressPayload,
     private val chainRegistry: ChainRegistry,
-    private val messageCommandFormatter: MessageCommandFormatter
+    private val messageCommandFormatter: MessageCommandFormatter,
+    private val addressActionsMixinFactory: AddressActionsMixin.Factory
 ) : BaseViewModel(),
     LedgerMessageCommands,
     Browserable.Presentation by Browserable() {
@@ -93,6 +97,8 @@ abstract class SelectAddressLedgerViewModel(
         interactor.getDevice(payload.deviceId)
     }
 
+    val addressActionsMixin = addressActionsMixinFactory.create(this)
+
     init {
         loadNewAccount()
     }
@@ -124,6 +130,11 @@ abstract class SelectAddressLedgerViewModel(
     fun accountClicked(accountUi: LedgerAccountModel) {
         verifyAccount(accountUi.id)
     }
+
+    fun addressInfoClicked(addressModel: AddressModel, addressScheme: AddressScheme) {
+        addressActionsMixin.showAddressActions(addressModel.address, AddressFormat.defaultForScheme(addressScheme))
+    }
+
 
     private fun verifyAccount(id: Int) {
         verifyAddressJob?.cancel()

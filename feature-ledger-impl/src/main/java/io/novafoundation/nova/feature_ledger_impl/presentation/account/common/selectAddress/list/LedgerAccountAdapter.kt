@@ -2,10 +2,13 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.list.BaseListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.setExtraInfoAvailable
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -20,6 +23,8 @@ class LedgerAccountAdapter(
     interface Handler {
 
         fun itemClicked(item: LedgerAccountModel)
+
+        fun addressInfoClicked(addressModel: AddressModel, addressScheme: AddressScheme)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectLedgerHolder {
@@ -50,8 +55,7 @@ class SelectLedgerHolder(
             addRipple(getRoundedCornerDrawable(R.color.block_background))
         }
 
-        viewBinding.itemLedgerAccountSubstrate.isEnabled = false
-        viewBinding.itemLedgerAccountEvm.isEnabled = false
+        viewBinding.itemLedgerAccountSubstrate.setExtraInfoAvailable(true)
     }
 
     fun bind(model: LedgerAccountModel) = with(viewBinding) {
@@ -61,15 +65,23 @@ class SelectLedgerHolder(
         itemLedgerAccountIcon.setImageDrawable(model.substrate.image)
 
         itemLedgerAccountSubstrate.showAddress(model.substrate)
+        itemLedgerAccountSubstrate.setOnClickListener { eventHandler.addressInfoClicked(model.substrate, AddressScheme.SUBSTRATE) }
+
 
         if (model.evm != null) {
             itemLedgerAccountEvm.valuePrimary.setTextColorRes(R.color.text_primary)
             itemLedgerAccountEvm.setPrimaryValueStartIcon(null)
             itemLedgerAccountEvm.showAddress(model.evm)
+
+            itemLedgerAccountEvm.setOnClickListener { eventHandler.addressInfoClicked(model.evm, AddressScheme.EVM) }
+            itemLedgerAccountEvm.setExtraInfoAvailable(true)
         } else {
             itemLedgerAccountEvm.valuePrimary.setTextColorRes(R.color.text_secondary)
             itemLedgerAccountEvm.setPrimaryValueStartIcon(R.drawable.ic_warning_filled)
             itemLedgerAccountEvm.showValue(context.getString(R.string.ledger_select_address_not_found))
+
+            itemLedgerAccountEvm.setOnClickListener(null)
+            itemLedgerAccountEvm.setExtraInfoAvailable(false)
         }
     }
 

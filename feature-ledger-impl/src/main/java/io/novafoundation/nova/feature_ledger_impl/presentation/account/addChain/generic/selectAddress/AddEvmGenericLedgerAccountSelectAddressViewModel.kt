@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.generic.AddEvmAccountToGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
@@ -27,7 +28,8 @@ class AddEvmGenericLedgerAccountSelectAddressViewModel(
     resourceManager: ResourceManager,
     chainRegistry: ChainRegistry,
     selectLedgerAddressPayload: SelectLedgerAddressPayload,
-    messageCommandFormatter: MessageCommandFormatter
+    messageCommandFormatter: MessageCommandFormatter,
+    addressActionsMixinFactory: AddressActionsMixin.Factory
 ) : SelectAddressLedgerViewModel(
     router = router,
     interactor = selectAddressLedgerInteractor,
@@ -35,7 +37,8 @@ class AddEvmGenericLedgerAccountSelectAddressViewModel(
     resourceManager = resourceManager,
     payload = selectLedgerAddressPayload,
     chainRegistry = chainRegistry,
-    messageCommandFormatter = messageCommandFormatter
+    messageCommandFormatter = messageCommandFormatter,
+    addressActionsMixinFactory = addressActionsMixinFactory
 ) {
 
     override val ledgerVariant: LedgerVariant = LedgerVariant.GENERIC

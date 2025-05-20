@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.legacy.AddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.legacy.RealAddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
@@ -69,7 +70,8 @@ class AddLedgerChainAccountSelectAddressModule {
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
         selectLedgerAddressPayload: SelectLedgerAddressPayload,
-        messageCommandFormatter: MessageCommandFormatter
+        messageCommandFormatter: MessageCommandFormatter,
+        addressActionsMixinFactory: AddressActionsMixin.Factory
     ): ViewModel {
         return AddLedgerChainAccountSelectAddressViewModel(
             router = router,
@@ -80,7 +82,8 @@ class AddLedgerChainAccountSelectAddressModule {
             resourceManager = resourceManager,
             chainRegistry = chainRegistry,
             selectLedgerAddressPayload = selectLedgerAddressPayload,
-            messageCommandFormatter = messageCommandFormatter
+            messageCommandFormatter = messageCommandFormatter,
+            addressActionsMixinFactory = addressActionsMixinFactory
         )
     }
 

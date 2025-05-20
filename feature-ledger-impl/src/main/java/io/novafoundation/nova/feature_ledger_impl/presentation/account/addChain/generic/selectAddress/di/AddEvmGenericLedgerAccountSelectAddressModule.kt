@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_ledger_impl.di.annotations.GenericLedger
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.generic.AddEvmAccountToGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.generic.RealAddEvmAccountToGenericLedgerInteractor
@@ -49,6 +50,7 @@ class AddEvmGenericLedgerAccountSelectAddressModule {
         chainRegistry: ChainRegistry,
         @GenericLedger messageCommandFormatter: MessageCommandFormatter,
         evmAlertFormatter: GenericLedgerEvmAlertFormatter,
+        addressActionsMixinFactory: AddressActionsMixin.Factory
     ): ViewModel {
         val selectLedgerAddressPayload = SelectLedgerAddressPayload(payload.deviceId, substrateChainId = Chain.Geneses.POLKADOT)
 
@@ -62,7 +64,8 @@ class AddEvmGenericLedgerAccountSelectAddressModule {
             selectLedgerAddressPayload = selectLedgerAddressPayload,
             messageCommandFormatter = messageCommandFormatter,
             addAccountInteractor = addAccountInteractor,
-            evmAlertFormatter = evmAlertFormatter
+            evmAlertFormatter = evmAlertFormatter,
+            addressActionsMixinFactory = addressActionsMixinFactory
         )
     }
 

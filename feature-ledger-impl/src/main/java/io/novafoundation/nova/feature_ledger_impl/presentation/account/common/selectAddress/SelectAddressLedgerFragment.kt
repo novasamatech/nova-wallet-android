@@ -4,9 +4,12 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
+import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setModelOrHide
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.setupAddressActions
 import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerSelectAddressBinding
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
@@ -62,6 +65,8 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
         viewModel.alertFlow.observe(binder.ledgerSelectAddressAlert::setModelOrHide)
 
         setupLedgerMessages(ledgerMessagePresentable)
+
+        viewModel.addressActionsMixin.setupAddressActions()
     }
 
     override fun loadMoreClicked() {
@@ -70,5 +75,9 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
 
     override fun itemClicked(item: LedgerAccountModel) {
         viewModel.accountClicked(item)
+    }
+
+    override fun addressInfoClicked(addressModel: AddressModel, addressScheme: AddressScheme) {
+        viewModel.addressInfoClicked(addressModel, addressScheme)
     }
 }
