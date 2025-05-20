@@ -157,24 +157,33 @@ class MessageCommandFormatter(
     ): LedgerMessageCommand {
         val deviceMapper = deviceMapper.createDelegate(device)
 
-        val footer = when (addresses.size) {
+        val footer: LedgerMessageCommand.Footer
+        val subtitle: String
+
+         when (addresses.size) {
             0 -> error("At least one address should be not null")
 
-            1 -> LedgerMessageCommand.Footer.Value(
-                value = addresses.single().second.toTwoLinesAddress(),
-            )
+            1 -> {
+                footer = LedgerMessageCommand.Footer.Value(
+                    value = addresses.single().second.toTwoLinesAddress(),
+                )
+                subtitle = deviceMapper.getReviewAddressMessage()
+            }
 
-            2 -> LedgerMessageCommand.Footer.Rows(
-                first = rowFor(addresses.first()),
-                second = rowFor(addresses.second())
-            )
+            2 -> {
+                footer = LedgerMessageCommand.Footer.Rows(
+                    first = rowFor(addresses.first()),
+                    second = rowFor(addresses.second())
+                )
+                subtitle = deviceMapper.getReviewAddressesMessage()
+            }
 
             else -> error("Too many addresses passed: ${addresses.size}")
         }
 
         return LedgerMessageCommand.Show.Info(
             title = resourceManager.getString(R.string.ledger_review_approve_title),
-            subtitle = deviceMapper.getReviewAddressMessage(),
+            subtitle = subtitle,
             onCancel = onCancel,
             alert = null,
             graphics = deviceMapper.getApproveImage(),

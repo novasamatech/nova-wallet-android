@@ -32,5 +32,7 @@ interface LedgerDeviceMapperDelegate {
 
     fun getReviewAddressMessage(): String
 
+    fun getReviewAddressesMessage(): String
+
     fun getSignMessage(): String
 }

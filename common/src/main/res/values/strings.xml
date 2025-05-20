@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="ledger_verify_addresses_message_both_buttons">Press both buttons on your %s to approve the addresses</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Press confirm button on your %s to approve the addresses</string>
+
     <string name="account_add_address">Add address</string>
     <string name="account_substrate_accounts">Substrate Accounts</string>
     <string name="account_evm_accounts">EVM Accounts</string>
