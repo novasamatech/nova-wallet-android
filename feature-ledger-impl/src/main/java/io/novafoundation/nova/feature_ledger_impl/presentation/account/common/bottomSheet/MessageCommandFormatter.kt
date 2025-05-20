@@ -160,7 +160,7 @@ class MessageCommandFormatter(
         val footer: LedgerMessageCommand.Footer
         val subtitle: String
 
-         when (addresses.size) {
+        when (addresses.size) {
             0 -> error("At least one address should be not null")
 
             1 -> {

@@ -15,17 +15,17 @@ interface AddressSchemeFormatter {
 @ApplicationScope
 internal class RealAddressSchemeFormatter @Inject constructor(
     private val resourceManager: ResourceManager
-): AddressSchemeFormatter {
+) : AddressSchemeFormatter {
 
     override fun addressLabel(addressScheme: AddressScheme): String {
-       return when(addressScheme) {
-           AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_substrate_address)
-           AddressScheme.EVM -> resourceManager.getString(R.string.common_evm_address)
-       }
+        return when (addressScheme) {
+            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_substrate_address)
+            AddressScheme.EVM -> resourceManager.getString(R.string.common_evm_address)
+        }
     }
 
     override fun accountsLabel(addressScheme: AddressScheme): String {
-        return when(addressScheme) {
+        return when (addressScheme) {
             AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.account_substrate_accounts)
             AddressScheme.EVM -> resourceManager.getString(R.string.account_evm_accounts)
         }

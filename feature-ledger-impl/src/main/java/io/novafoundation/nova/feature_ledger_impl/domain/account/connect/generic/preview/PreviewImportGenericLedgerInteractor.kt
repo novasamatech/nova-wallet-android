@@ -45,7 +45,7 @@ class RealPreviewImportGenericLedgerInteractor(
         return ledgerMigrationTracker.supportedChainsByGenericApp()
             .groupBy(Chain::addressScheme)
             .mapValuesNotNull { (scheme, chains) ->
-                val accountId = when(scheme) {
+                val accountId = when (scheme) {
                     AddressScheme.EVM -> evmAccountId ?: return@mapValuesNotNull null
                     AddressScheme.SUBSTRATE -> substrateAccountId
                 }

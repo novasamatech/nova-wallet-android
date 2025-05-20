@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapLatest
 
 class PreviewImportParitySignerViewModel(
     private val interactor: PreviewImportParitySignerInteractor,

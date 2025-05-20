@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview.model.ChainAccountPreview
