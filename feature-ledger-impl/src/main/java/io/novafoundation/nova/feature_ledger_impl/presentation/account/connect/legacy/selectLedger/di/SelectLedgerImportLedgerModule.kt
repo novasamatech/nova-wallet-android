@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.di.modules.shared.PermissionAskerForFragmentModule
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -25,14 +26,8 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.fo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger.SelectLedgerLegacyImportViewModel
 
-@Module(includes = [ViewModelModule::class])
+@Module(includes = [ViewModelModule::class, PermissionAskerForFragmentModule::class])
 class SelectLedgerImportLedgerModule {
-
-    @Provides
-    fun providePermissionAsker(
-        permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment
-    ) = permissionsAskerFactory.create(fragment)
 
     @Provides
     @ScreenScope

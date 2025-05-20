@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.di
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -12,12 +12,12 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
-import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.AddLedgerChainAccountInteractor
-import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.RealAddLedgerChainAccountInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.legacy.AddLedgerChainAccountInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.legacy.RealAddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressViewModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.AddLedgerChainAccountSelectAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.AddLedgerChainAccountSelectAddressViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatterFactory
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
@@ -86,6 +86,7 @@ class AddLedgerChainAccountSelectAddressModule {
 
     @Provides
     fun provideViewModelCreator(fragment: Fragment, viewModelFactory: ViewModelProvider.Factory): AddLedgerChainAccountSelectAddressViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(AddLedgerChainAccountSelectAddressViewModel::class.java)
+        return ViewModelProvider(fragment, viewModelFactory).get(
+            AddLedgerChainAccountSelectAddressViewModel::class.java)
     }
 }

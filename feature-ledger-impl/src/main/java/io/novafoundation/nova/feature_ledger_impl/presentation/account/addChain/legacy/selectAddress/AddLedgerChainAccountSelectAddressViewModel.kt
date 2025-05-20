@@ -1,15 +1,17 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
-import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.AddLedgerChainAccountInteractor
+import io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.legacy.AddLedgerChainAccountInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.LedgerAccount
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.AddressVerificationMode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +38,8 @@ class AddLedgerChainAccountSelectAddressViewModel(
 ) {
 
     override val ledgerVariant: LedgerVariant = LedgerVariant.LEGACY
+
+    override val addressVerificationMode = AddressVerificationMode.Enabled(addressSchemesToVerify = listOf(AddressScheme.SUBSTRATE))
 
     override fun onAccountVerified(account: LedgerAccount) {
         launch {

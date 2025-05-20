@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.details.
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasChainAccount
@@ -31,6 +32,7 @@ class GenericLedgerWalletDetailsMixin(
     private val accountFormatterFactory: AccountFormatterFactory,
     private val interactor: WalletDetailsInteractor,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
+    private val router: AccountRouter,
     metaAccount: MetaAccount
 ) : WalletDetailsMixin(metaAccount) {
 
@@ -68,7 +70,7 @@ class GenericLedgerWalletDetailsMixin(
     }
 
     override suspend fun groupActionClicked(groupId: String) {
-        // TODO open add generic ledger address
+        router.openAddGenericEvmAddressSelectLedger(metaAccount.id)
     }
 
     private fun createGroupUi(addressScheme: AddressScheme, accounts: List<AccountInChain>): ChainAccountGroupUi {

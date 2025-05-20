@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
+import io.novafoundation.nova.feature_ledger_impl.di.annotations.GenericLedger
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.preview.PreviewImportGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.preview.RealPreviewImportGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
@@ -40,19 +41,6 @@ class PreviewImportGenericLedgerModule {
     }
 
     @Provides
-    @ScreenScope
-    fun provideMessageFormatter(
-        factory: LedgerMessageFormatterFactory,
-    ): LedgerMessageFormatter = factory.createGeneric()
-
-    @Provides
-    @ScreenScope
-    fun provideMessageCommandFormatter(
-        messageFormatter: LedgerMessageFormatter,
-        messageCommandFormatterFactory: MessageCommandFormatterFactory
-    ): MessageCommandFormatter = messageCommandFormatterFactory.create(messageFormatter)
-
-    @Provides
     @IntoMap
     @ViewModelKey(PreviewImportGenericLedgerViewModel::class)
     fun provideViewModel(
@@ -63,7 +51,7 @@ class PreviewImportGenericLedgerModule {
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        messageCommandFormatter: MessageCommandFormatter,
+        @GenericLedger messageCommandFormatter: MessageCommandFormatter,
     ): ViewModel {
         return PreviewImportGenericLedgerViewModel(
             interactor = interactor,

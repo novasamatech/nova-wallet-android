@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
@@ -10,8 +10,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.determineAppForLegacyAccount
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter

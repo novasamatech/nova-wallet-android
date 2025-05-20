@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet
 
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
@@ -146,28 +148,26 @@ class MessageCommandFormatter(
     }
 
     fun reviewAddressCommand(
-        substrateAddress: String,
-        evmAddress: String?,
+        addresses: List<Pair<AddressScheme, String>>,
         device: LedgerDevice,
         onCancel: () -> Unit,
     ): LedgerMessageCommand {
         val deviceMapper = deviceMapper.createDelegate(device)
 
-        val footer = if (evmAddress == null) {
-            LedgerMessageCommand.Footer.Value(
-                value = substrateAddress.toTwoLinesAddress(),
+        val footer = when (addresses.size) {
+            0 -> error("At least one address should be not null")
+
+            1 -> LedgerMessageCommand.Footer.Value(
+                value = addresses.single().second.toTwoLinesAddress(),
             )
-        } else {
-            LedgerMessageCommand.Footer.Columns(
-                first = Column(
-                    label = resourceManager.getString(R.string.common_substrate_address),
-                    value = substrateAddress
-                ),
-                second = Column(
-                    label = resourceManager.getString(R.string.common_evm_address),
-                    value = evmAddress
-                )
+
+            2 -> LedgerMessageCommand.Footer.Columns(
+                first = columnFor(addresses.first()),
+                second = columnFor(addresses.second())
             )
+
+
+            else -> error("Too many addresses passed: ${addresses.size}")
         }
 
         return LedgerMessageCommand.Show.Info(
@@ -188,4 +188,21 @@ class MessageCommandFormatter(
         val middle = length / 2
         return substring(0, middle) + "\n" + substring(middle)
     }
+
+    private fun columnFor(addressWithScheme: Pair<AddressScheme, String>): Column {
+        val label = when (addressWithScheme.first) {
+            AddressScheme.EVM -> resourceManager.getString(R.string.common_substrate_address)
+            AddressScheme.SUBSTRATE -> resourceManager.getString(R.string.common_evm_address)
+        }
+
+        return Column(label, addressWithScheme.second)
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun createLedgerReviewAddresses(
+    allowedAddressSchemes: List<AddressScheme>,
+    vararg allAddresses: Pair<AddressScheme, String?>
+): List<Pair<AddressScheme, String>> {
+    return allAddresses.filter { it.first in allowedAddressSchemes && it.second != null } as List<Pair<AddressScheme, String>>
 }

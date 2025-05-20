@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress
 
 import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils

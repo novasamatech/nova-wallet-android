@@ -61,6 +61,29 @@ class MetaAccountLocal(
         }
     }
 
+    // We do not use copy as we need explicitly set id
+    fun addEvmAccount(
+        ethereumPublicKey: ByteArray,
+        ethereumAddress: ByteArray,
+    ): MetaAccountLocal {
+        return MetaAccountLocal(
+            substratePublicKey = substratePublicKey,
+            substrateCryptoType = substrateCryptoType,
+            substrateAccountId = substrateAccountId,
+            ethereumPublicKey = ethereumPublicKey,
+            ethereumAddress = ethereumAddress,
+            name = name,
+            parentMetaId = parentMetaId,
+            isSelected = isSelected,
+            position = position,
+            type = type,
+            status = status,
+            globallyUniqueId = globallyUniqueId
+        ).also {
+            it.id = id
+        }
+    }
+
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 

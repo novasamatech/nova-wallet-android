@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectAddress.AddEvmGenericLedgerAccountSelectAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.AddLedgerChainAccountSelectAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
@@ -36,4 +38,6 @@ interface LedgerRouter : ReturnableRouter {
     fun openPreviewLedgerAccountsGeneric(payload: PreviewImportGenericLedgerPayload)
 
     fun openFinishImportLedgerGeneric(payload: FinishImportGenericLedgerPayload)
+
+    fun openAddGenericEvmAddressSelectAddress(payload: AddEvmGenericLedgerAccountSelectAddressPayload)
 }

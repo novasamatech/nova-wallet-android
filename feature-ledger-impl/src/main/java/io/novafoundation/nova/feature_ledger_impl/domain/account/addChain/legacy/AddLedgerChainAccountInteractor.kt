@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_ledger_impl.domain.account.addChain
+package io.novafoundation.nova.feature_ledger_impl.domain.account.addChain.legacy
 
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount

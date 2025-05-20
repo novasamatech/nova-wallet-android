@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressFormat
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -14,9 +15,9 @@ import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
@@ -30,15 +31,17 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.createLedgerReviewAddresses
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.AddressVerificationMode
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,13 +60,13 @@ abstract class SelectAddressLedgerViewModel(
 
     abstract val ledgerVariant: LedgerVariant
 
-    override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
+    abstract val addressVerificationMode: AddressVerificationMode
 
-    protected open val needToVerifyAccount = true
+    override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
     private val substratePreviewChain by lazyAsync { chainRegistry.getChain(payload.substrateChainId) }
 
-    private val loadingAccount = MutableStateFlow(false)
+    private val loadingState = MutableStateFlow(AccountLoadingState.CAN_LOAD)
     protected val loadedAccounts: MutableStateFlow<List<LedgerAccount>> = MutableStateFlow(emptyList())
 
     private var verifyAddressJob: Job? = null
@@ -74,16 +77,18 @@ abstract class SelectAddressLedgerViewModel(
     val chainUi = flowOf { mapChainToUi(substratePreviewChain()) }
         .shareInBackground()
 
-    val loadMoreState = loadingAccount.map { loading ->
-        if (loading) {
-            DescriptiveButtonState.Loading
-        } else {
-            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.ledger_import_select_address_load_more))
+    val loadMoreState = loadingState.map { loadingState ->
+        when (loadingState) {
+            AccountLoadingState.CAN_LOAD -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.ledger_import_select_address_load_more))
+
+            AccountLoadingState.LOADING -> DescriptiveButtonState.Loading
+            AccountLoadingState.NOTHING_TO_LOAD -> DescriptiveButtonState.Gone
         }
     }.shareInBackground()
 
     protected val _alertFlow = MutableStateFlow<AlertModel?>(null)
     val alertFlow: Flow<AlertModel?> = _alertFlow
+
 
     val device = flowOf {
         interactor.getDevice(payload.deviceId)
@@ -95,8 +100,20 @@ abstract class SelectAddressLedgerViewModel(
 
     abstract fun onAccountVerified(account: LedgerAccount)
 
+    /**
+     * Loads ledger account. Can return Success(null) to indicate there is nothing to load and "load more" button should be hidden
+     */
+    protected open suspend fun loadLedgerAccount(
+        substratePreviewChain: Chain,
+        deviceId: String,
+        accountIndex: Int,
+        ledgerVariant: LedgerVariant
+    ): Result<LedgerAccount?> {
+        return interactor.loadLedgerAccount(substratePreviewChain, deviceId, accountIndex, ledgerVariant)
+    }
+
     fun loadMoreClicked() {
-        if (loadingAccount.value) return
+        if (loadingState.value != AccountLoadingState.CAN_LOAD) return
 
         loadNewAccount()
     }
@@ -113,27 +130,31 @@ abstract class SelectAddressLedgerViewModel(
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
             val account = loadedAccounts.value.first { it.index == id }
+            val verificationMode = addressVerificationMode
 
-            if (needToVerifyAccount) {
-                verifyAccountInternal(account)
+            if (verificationMode is AddressVerificationMode.Enabled) {
+                verifyAccountInternal(account, verificationMode.addressSchemesToVerify)
             } else {
                 onAccountVerified(account)
             }
         }
     }
 
-    private suspend fun verifyAccountInternal(account: LedgerAccount) {
+    private suspend fun verifyAccountInternal(account: LedgerAccount, reviewAddressSchemes: List<AddressScheme>) {
         val device = device.first()
 
         ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
-            substrateAddress = account.substrate.address,
-            evmAddress = account.evm?.address(),
+            addresses = createLedgerReviewAddresses(
+                allowedAddressSchemes = reviewAddressSchemes,
+                AddressScheme.SUBSTRATE to account.substrate.address,
+                AddressScheme.EVM to account.evm?.address()
+            ),
             device = device,
             onCancel = ::verifyAddressCancelled,
         ).event()
 
         val result = withContext(Dispatchers.Default) {
-            interactor.verifyLedgerAccount(substratePreviewChain(), payload.deviceId, account.index, ledgerVariant)
+            interactor.verifyLedgerAccount(substratePreviewChain(), payload.deviceId, account.index, ledgerVariant, reviewAddressSchemes)
         }
 
         result.onFailure {
@@ -160,22 +181,25 @@ abstract class SelectAddressLedgerViewModel(
         verifyAddressJob = null
     }
 
-    private fun loadNewAccount() {
-        ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
+    private fun loadNewAccount(): Unit = launchUnit(Dispatchers.Default) {
+        ledgerMessageCommands.postValue(messageCommandFormatter.hideCommand().event())
 
-        launch(Dispatchers.Default) {
-            loadingAccount.withFlagSet {
-                val nextAccountIndex = loadedAccounts.value.size
+        loadingState.value = AccountLoadingState.LOADING
+        val nextAccountIndex = loadedAccounts.value.size
 
-                interactor.loadLedgerAccount(substratePreviewChain(), payload.deviceId, nextAccountIndex, ledgerVariant)
-                    .onSuccess {
-                        loadedAccounts.value = loadedAccounts.value.added(it)
-                    }.onFailure {
-                        Log.e("Ledger", "Failed to load Ledger account", it)
-                        handleLedgerError(it, device.first()) { loadNewAccount() }
-                    }
+        loadLedgerAccount(substratePreviewChain(), payload.deviceId, nextAccountIndex, ledgerVariant)
+            .onSuccess { newAccount ->
+                if (newAccount != null) {
+                    loadedAccounts.value = loadedAccounts.value.added(newAccount)
+                    loadingState.value = AccountLoadingState.CAN_LOAD
+                } else {
+                    loadingState.value = AccountLoadingState.NOTHING_TO_LOAD
+                }
+            }.onFailure {
+                Log.e("Ledger", "Failed to load Ledger account", it)
+                handleLedgerError(it, device.first()) { loadNewAccount() }
+                loadingState.value = AccountLoadingState.CAN_LOAD
             }
-        }
     }
 
     private suspend fun LedgerAccount.toUi(): LedgerAccountModel {
@@ -185,5 +209,9 @@ abstract class SelectAddressLedgerViewModel(
             substrate = addressIconGenerator.createAccountAddressModel(substratePreviewChain(), substrate.address),
             evm = evm?.let { addressIconGenerator.createAccountAddressModel(AddressFormat.evm(), it.accountId) }
         )
+    }
+
+    enum class AccountLoadingState {
+        CAN_LOAD, LOADING, NOTHING_TO_LOAD
     }
 }

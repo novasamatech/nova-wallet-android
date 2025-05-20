@@ -1,11 +1,11 @@
-package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.di
+package io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.di
 
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment
 
 @Subcomponent(
     modules = [

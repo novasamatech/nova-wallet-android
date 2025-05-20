@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -15,6 +16,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommands
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.createLedgerReviewAddresses
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.FinishImportGenericLedgerPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -42,8 +44,7 @@ class PreviewImportGenericLedgerViewModel(
     externalActions = externalActions,
     chainRegistry = chainRegistry,
     router = router
-),
-    LedgerMessageCommands {
+), LedgerMessageCommands {
 
     override val ledgerMessageCommands: MutableLiveData<Event<LedgerMessageCommand>> = MutableLiveData()
 
@@ -77,8 +78,11 @@ class PreviewImportGenericLedgerViewModel(
         val device = device.first()
 
         ledgerMessageCommands.value = messageCommandFormatter.reviewAddressCommand(
-            substrateAddress = payload.substrateAccount.address,
-            evmAddress = payload.evmAccount?.accountId?.asEthereumAccountId()?.toAddress()?.value,
+            addresses = createLedgerReviewAddresses(
+                allowedAddressSchemes = AddressScheme.entries,
+                AddressScheme.SUBSTRATE to payload.substrateAccount.address,
+                AddressScheme.EVM to payload.evmAccount?.accountId?.asEthereumAccountId()?.toAddress()?.value
+            ),
             device = device,
             onCancel = ::verifyAddressCancelled,
         ).event()

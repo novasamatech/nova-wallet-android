@@ -45,7 +45,8 @@ class AccountDetailsModule {
         proxyFormatter: ProxyFormatter,
         interactor: WalletDetailsInteractor,
         appLinksProvider: AppLinksProvider,
-        ledgerMigrationTracker: LedgerMigrationTracker
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        router: AccountRouter,
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
             polkadotVaultVariantConfigProvider,
@@ -54,7 +55,8 @@ class AccountDetailsModule {
             proxyFormatter,
             interactor,
             appLinksProvider,
-            ledgerMigrationTracker
+            ledgerMigrationTracker,
+            router
         )
     }
 

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectAddress
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
@@ -10,8 +11,10 @@ import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAd
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.generic.GenericLedgerEvmAlertFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectAddressLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.SelectLedgerAddressPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.AddressVerificationMode
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toGenericParcel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.common.payload.toParcel
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
@@ -27,6 +30,7 @@ class SelectAddressImportGenericLedgerViewModel(
     interactor: SelectAddressLedgerInteractor,
     addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
+    private val evmUpdateFormatter: GenericLedgerEvmAlertFormatter,
     chainRegistry: ChainRegistry,
     messageCommandFormatter: MessageCommandFormatter,
 ) : SelectAddressLedgerViewModel(
@@ -41,7 +45,7 @@ class SelectAddressImportGenericLedgerViewModel(
 
     override val ledgerVariant: LedgerVariant = LedgerVariant.GENERIC
 
-    override val needToVerifyAccount = false
+    override val addressVerificationMode = AddressVerificationMode.Disabled
 
     init {
         loadedAccounts.onEach { accounts ->
@@ -66,12 +70,10 @@ class SelectAddressImportGenericLedgerViewModel(
     }
 
     private fun createAlertModel(needsUpdateToSupportEvm: Boolean): AlertModel? {
-        if (!needsUpdateToSupportEvm) return null
-
-        return AlertModel(
-            style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
-            message = resourceManager.getString(R.string.ledger_select_address_update_for_evm_title),
-            subMessage = resourceManager.getString(R.string.ledger_select_address_update_for_evm_message)
-        )
+        return if (needsUpdateToSupportEvm) {
+            evmUpdateFormatter.createUpdateAppToGetEvmAddressAlert()
+        } else {
+            null
+        }
     }
 }

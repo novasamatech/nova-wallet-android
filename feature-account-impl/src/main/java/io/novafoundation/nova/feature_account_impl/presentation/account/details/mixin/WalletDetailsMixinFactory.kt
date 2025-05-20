@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
@@ -17,6 +18,7 @@ class WalletDetailsMixinFactory(
     private val interactor: WalletDetailsInteractor,
     private val appLinksProvider: AppLinksProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
+    private val router: AccountRouter,
 ) {
 
     suspend fun create(metaId: Long, host: WalletDetailsMixinHost): WalletDetailsMixin {
@@ -52,7 +54,8 @@ class WalletDetailsMixinFactory(
                 accountFormatterFactory = accountFormatterFactory,
                 interactor = interactor,
                 ledgerMigrationTracker = ledgerMigrationTracker,
-                metaAccount = metaAccount
+                metaAccount = metaAccount,
+                router = router
             )
 
             Type.PARITY_SIGNER,

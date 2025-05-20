@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.di.modules.shared.PermissionAskerForFragmentModule
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -34,7 +35,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.sign.Sign
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(includes = [ViewModelModule::class])
+@Module(includes = [ViewModelModule::class, PermissionAskerForFragmentModule::class])
 class SignLedgerModule {
 
     @Provides
@@ -48,13 +49,6 @@ class SignLedgerModule {
         usedVariant = signLedgerPayload.ledgerVariant,
         migrationUseCase = migrationUseCase,
     )
-
-    @Provides
-    @ScreenScope
-    fun providePermissionAsker(
-        permissionsAskerFactory: PermissionsAskerFactory,
-        fragment: Fragment
-    ) = permissionsAskerFactory.create(fragment)
 
     @Provides
     @ScreenScope
