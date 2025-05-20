@@ -67,7 +67,6 @@ class SelectLedgerHolder(
         itemLedgerAccountSubstrate.showAddress(model.substrate)
         itemLedgerAccountSubstrate.setOnClickListener { eventHandler.addressInfoClicked(model.substrate, AddressScheme.SUBSTRATE) }
 
-
         if (model.evm != null) {
             itemLedgerAccountEvm.valuePrimary.setTextColorRes(R.color.text_primary)
             itemLedgerAccountEvm.setPrimaryValueStartIcon(null)

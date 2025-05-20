@@ -11,7 +11,7 @@ interface AddressFormat {
         }
 
         fun defaultForScheme(scheme: AddressScheme): AddressFormat {
-            return when(scheme) {
+            return when (scheme) {
                 AddressScheme.EVM -> EthereumAddressFormat()
                 AddressScheme.SUBSTRATE -> SubstrateAddressFormat.generic()
             }

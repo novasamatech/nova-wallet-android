@@ -34,7 +34,7 @@ class SubstrateAddressFormat private constructor(
 
         addressPrefix?.let {
             require(addressPrefix == address.value.addressPrefix()) {
-                "Address prefix mismatch. Expected: ${addressPrefix}, Got: ${address.value}"
+                "Address prefix mismatch. Expected: $addressPrefix, Got: ${address.value}"
             }
         }
 

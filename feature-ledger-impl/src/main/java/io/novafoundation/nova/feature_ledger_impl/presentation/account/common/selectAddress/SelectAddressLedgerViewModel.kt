@@ -135,7 +135,6 @@ abstract class SelectAddressLedgerViewModel(
         addressActionsMixin.showAddressActions(addressModel.address, AddressFormat.defaultForScheme(addressScheme))
     }
 
-
     private fun verifyAccount(id: Int) {
         verifyAddressJob?.cancel()
         verifyAddressJob = launch {
