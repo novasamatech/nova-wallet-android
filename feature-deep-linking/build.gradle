@@ -48,6 +48,7 @@ dependencies {
     implementation project(':feature-buy-api')
     implementation project(':feature-wallet-connect-api')
     implementation project(':feature-deep-link-building')
+    implementation project(':feature-account-migration')
 
     implementation kotlinDep
 
