@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mapNotNullToSet
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.Hydration
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector.SetMode
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
@@ -560,6 +563,8 @@ private class HydraDxAssetExchange(
         }
 
         override suspend fun convertNativeFee(nativeFee: Fee): Fee {
+            Log.d("ReusableQuoteFeePayment", "Native fee: ${nativeFee.decimalAmount}")
+
             val args = ParentQuoterArgs(
                 chainAssetIn = customFeeAsset,
                 chainAssetOut = chain.utilityAsset,
@@ -568,11 +573,19 @@ private class HydraDxAssetExchange(
             )
 
             val quotedFee = runCatching { swapHost.quote(args) }
-                .recoverCatching { hydrationPriceConversionFallback.convertNativeAmount(nativeFee.amount, customFeeAsset) }
+                .recoverCatching {
+                    Log.w("ReusableQuoteFeePayment", "Failed to quote real price for ${customFeeAsset.symbol} on ${chain.name}, using fallback")
+
+                    hydrationPriceConversionFallback.convertNativeAmount(nativeFee.amount, customFeeAsset)
+                }
                 .getOrThrow()
+
+            Log.d("ReusableQuoteFeePayment", "Quoted fee: ${quotedFee.amountFromPlanks(customFeeAsset.precision)}")
 
             // Fees in non-native assets are especially volatile since conversion happens through swaps so we add some buffer to mitigate volatility
             val quotedFeeWithBuffer = quotedFee * FEE_QUOTE_BUFFER
+
+            Log.d("ReusableQuoteFeePayment", "Quoted fee with buffer: ${quotedFeeWithBuffer.amountFromPlanks(customFeeAsset.precision)}")
 
             return SubstrateFee(
                 amount = quotedFeeWithBuffer,
