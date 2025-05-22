@@ -12,6 +12,8 @@ import java.util.UUID
      - Foreign key for parentMetaId to remove proxy meta account automatically when proxied is deleted
      - Foreign key to ProxyAccountLocal to remove proxies meta accounts automatically when chain is deleted
  */
+// NB!: We intentionally do not make MetaAccountLocal a data-class since it is easy to misuse copy due to value of `id` is not being copied
+// All copy-like methods should be implemented explicitly, like `addEvmAccount`
 @Entity(
     tableName = MetaAccountLocal.TABLE_NAME,
     indices = [
@@ -19,8 +21,6 @@ import java.util.UUID
         Index(value = ["ethereumAddress"])
     ]
 )
-// NB!: We intentionally do not make MetaAccountLocal a data-class since it is easy to misuse copy due to value of `id` is not being copied
-// All copy-like methods should be implemented explicitly, like `addEvmAccount`
 class MetaAccountLocal(
     val substratePublicKey: ByteArray?,
     val substrateCryptoType: CryptoType?,
