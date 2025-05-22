@@ -53,3 +53,5 @@ include ':feature-xcm:impl'
 include ':feature-deep-link-building'
 include ':feature-banners-api'
 include ':feature-banners-impl'
+include ':feature-account-migration'
+

@@ -15,4 +15,6 @@ interface DeepLinkingRouter {
     fun openReferendum(payload: ReferendumDetailsPayload)
 
     fun openStakingDashboard()
+
+    fun openAccountMigrationPairing(scheme: String)
 }

@@ -83,7 +83,7 @@ interface RootComponent {
             WalletConnectFeatureApi::class,
             PushNotificationsFeatureApi::class,
             DeepLinkingFeatureApi::class,
-            LedgerFeatureApi::class,
+            LedgerFeatureApi::class
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies
