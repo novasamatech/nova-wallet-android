@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">La dirección EVM debe ser válida o estar vacía...</string>
     <string name="accoount_enter_substrate_address">Introduce una dirección de sustrato válida...</string>
     <string name="account_add_account">Agregar cuenta</string>
+    <string name="account_add_address">Agregar dirección</string>
     <string name="account_add_already_exists_message">La cuenta ya existe. Por favor, prueba con otra.</string>
     <string name="account_add_watch_only_description">Seguir cualquier cartera por su dirección</string>
     <string name="account_add_watch_wallet">Agregar cartera solo-lectura</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">Por favor, prueba con otra.</string>
     <string name="account_ethereum_crypto_type">Tipo de cripto par de claves Ethereum</string>
     <string name="account_ethereum_derivation_path">Ruta de derivación secreta de Ethereum</string>
+    <string name="account_evm_accounts">Cuentas EVM</string>
     <string name="account_export">Exportar cuenta</string>
     <string name="account_export_action">Exportar</string>
     <string name="account_export_existing">Importar existente</string>
@@ -75,7 +77,6 @@
     <string name="account_ledger_import_fill_description">Asegúrate de que la aplicación de Red está instalada en tu dispositivo Ledger usando la aplicación Ledger Live. Abre la aplicación de red en tu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Agrega al menos una cuenta</string>
     <string name="account_ledger_import_fill_title">Añade cuentas a tu cartera</string>
-    <string name="account_ledger_import_start_guide">Guía de Conexión Ledger</string>
     <string name="account_ledger_import_start_step_1">Asegúrate de que %s en tu dispositivo Ledger usando la aplicación Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">la aplicación de la Network está instalada</string>
     <string name="account_ledger_import_start_step_2">%s en su dispositivo Ledger</string>
@@ -86,14 +87,12 @@
     <string name="account_ledger_import_start_step_4_highlighted">Seleccionar cuenta</string>
     <string name="account_ledger_import_start_step_otg">%s en la configuración de tu teléfono</string>
     <string name="account_ledger_import_start_step_otg_highlighted">Habilitar OTG</string>
-    <string name="account_ledger_import_start_title">Conectar Ledger</string>
     <string name="account_ledger_legacy_warning_message">Para firmar operaciones y migrar tus cuentas a la nueva aplicación Generic Ledger, instala y abre la aplicación Migration. Las aplicaciones Legacy Old y Migration Ledger no serán compatibles en el futuro.</string>
     <string name="account_ledger_legacy_warning_title">Se ha lanzado una nueva aplicación Ledger</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">La aplicación Migration no estará disponible en un futuro cercano. Úsala para migrar tus cuentas a la nueva aplicación Ledger para evitar la pérdida de tus fondos.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
     <string name="account_ledger_select_device_all_description">Si usas un Ledger vía Bluetooth, activa Bluetooth en ambos dispositivos y concede permisos de Bluetooth y ubicación a Nova. Para USB, habilita OTG en la configuración de tu teléfono.</string>
     <string name="account_ledger_select_device_description">Por favor, activa el Bluetooth en la configuración de tu teléfono y en el dispositivo Ledger. Desbloquea tu dispositivo Ledger y abre la aplicación %s.</string>
     <string name="account_ledger_select_device_title">Selecciona tu dispositivo Ledger</string>
@@ -150,6 +149,7 @@
     <string name="account_select_secret_source">Seleccione su tipo de secreto</string>
     <string name="account_select_wallet">Seleccionar monedero</string>
     <string name="account_shared_secret">Cuentas con un secreto compartido</string>
+    <string name="account_substrate_accounts">Cuentas Substrate</string>
     <string name="account_substrate_crypto_type">Tipo de criptografía de par de claves Substrate</string>
     <string name="account_substrate_derivation_path">Ruta de derivación del secreto Substrate</string>
     <string name="account_wallet_nickname">Apodo del monedero</string>
@@ -253,8 +253,6 @@
     <string name="buy_completed">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
     <string name="buy_network_flow_title">Seleccionar red para comprar %s</string>
     <string name="buy_order_completed_message">¡Compra iniciada! Por favor, espere hasta 60 minutos. Puede seguir el estado en el correo electrónico.</string>
-    <string name="buy_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
-    <string name="buy_provider_open_confirmation_title">¿Continuar en el navegador?</string>
     <string name="buy_token_not_supported_message">Ninguno de nuestros proveedores actualmente soporta la compra de este token. Por favor elija un token diferente, una red diferente, o vuelva a verificar más tarde.</string>
     <string name="buy_token_not_supported_title">Este token no es compatible con la función de compra</string>
     <string name="chain_network_management_auto_balance">Equilibrar nodos automáticamente</string>
@@ -819,6 +817,7 @@
     <string name="language_title">Idioma</string>
     <string name="ledger_chain_not_supported">Ledger no soporta %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
     <string name="ledger_device_stax">Ledger Stax</string>
@@ -831,6 +830,10 @@
     <string name="ledger_hold_to_sign">Mantén presionado el botón de confirmar en tu %s para aprobar la transacción</string>
     <string name="ledger_import_select_address_load_more">Cargar más cuentas</string>
     <string name="ledger_review_approve_title">Revisar y Aprobar</string>
+    <string name="ledger_select_address_account_label">Cuenta %s</string>
+    <string name="ledger_select_address_not_found">Cuenta no encontrada</string>
+    <string name="ledger_select_address_update_for_evm_message">Tu dispositivo Ledger está usando una aplicación genérica desactualizada que no soporta direcciones EVM. Actualízala a través de Ledger Live.</string>
+    <string name="ledger_select_address_update_for_evm_title">Actualizar la aplicación genérica de Ledger</string>
     <string name="ledger_sign_approve_message">Pulse ambos botones en su %s para aprobar la transacción</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Por favor, actualice %s usando la aplicación Ledger Live</string>
     <string name="ledger_sign_metadata_outdated_title">Metadatos desactualizados</string>
@@ -843,6 +846,8 @@
     <string name="ledger_sign_tx_not_supported_title">Transacción no soportada</string>
     <string name="ledger_verify_address_message_both_buttons">Presiona ambos botones en tu %s para aprobar la dirección</string>
     <string name="ledger_verify_address_message_confirm_button">Presiona el botón de confirmar en tu %s para aprobar la dirección</string>
+    <string name="ledger_verify_addresses_message_both_buttons">Presiona ambos botones en tu %s para aprobar las direcciones</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Presiona el botón de confirmar en tu %s para aprobar las direcciones</string>
     <string name="ledger_wallet_details_description">Esta cartera está emparejada con Ledger. Nova te ayudará a formar cualquier operación que desees, y se te solicitará firmarlas usando un dispositivo Ledger</string>
     <string name="ledher_import_select_address_title">Selecciona una cuenta para agregar a la cartera</string>
     <string name="loading_network_info">Cargando información de la red...</string>
@@ -1674,6 +1679,8 @@
     <string name="trade_provider_list_buy_title">Seleccione un proveedor para comprar el token %s</string>
     <string name="trade_provider_list_footer">Los métodos de pago, tarifas y límites difieren según el proveedor.\nCompare sus cotizaciones para encontrar la mejor opción para usted.</string>
     <string name="trade_provider_list_sell_title">Seleccione un proveedor para vender el token %s</string>
+    <string name="trade_provider_open_confirmation_message">Para continuar la compra será redirigido desde la aplicación Nova Wallet a %s</string>
+    <string name="trade_provider_open_confirmation_title">¿Continuar en el navegador?</string>
     <string name="trade_token_not_supported_message">Ninguno de nuestros proveedores actualmente soporta la compra o venta de este token. Por favor elija un token diferente, una red diferente, o vuelva a verificar más tarde.</string>
     <string name="trade_token_not_supported_title">Este token no es compatible con la función de compra/venta</string>
     <string name="transaction_details_copy_hash">Copiar hash</string>

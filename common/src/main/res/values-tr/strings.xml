@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">EVM Adresi geçerli veya boş olmalı...</string>
     <string name="accoount_enter_substrate_address">Geçerli bir substrate adresi giriniz...</string>
     <string name="account_add_account">Hesap ekle</string>
+    <string name="account_add_address">Adres ekle</string>
     <string name="account_add_already_exists_message">Hesap zaten var. Lütfen başka bir tane deneyin.</string>
     <string name="account_add_watch_only_description">Herhangi bir cüzdanı adresi ile takip et</string>
     <string name="account_add_watch_wallet">Yalnızca-izleme cüzdanı ekle</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">Lütfen, başka bir tane deneyin.</string>
     <string name="account_ethereum_crypto_type">Ethereum anahtar çifti kripto tipi</string>
     <string name="account_ethereum_derivation_path">Ethereum gizli türetme yolu</string>
+    <string name="account_evm_accounts">EVM Hesapları</string>
     <string name="account_export">Hesabı dışa aktar</string>
     <string name="account_export_action">Dışa Aktar</string>
     <string name="account_export_existing">Mevcut olanı içe aktar</string>
@@ -75,7 +77,6 @@
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
-    <string name="account_ledger_import_start_guide">Ledger Bağlantı Rehberi</string>
     <string name="account_ledger_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınızda %s olduğundan emin olun</string>
     <string name="account_ledger_import_start_step_1_highlighted">ağ uygulaması yüklendi</string>
     <string name="account_ledger_import_start_step_2">Ledger cihazınızda %s</string>
@@ -86,14 +87,12 @@
     <string name="account_ledger_import_start_step_4_highlighted">Hesabı seçin</string>
     <string name="account_ledger_import_start_step_otg">%s telefon ayarlarında</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTG\'yi Etkinleştir</string>
-    <string name="account_ledger_import_start_title">Ledger’ı Bağla</string>
     <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
     <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
     <string name="account_ledger_select_device_all_description">Eğer Ledger kullanıyorsanız Bluetooth ile her iki cihazda da Bluetooth\'u etkinleştirin ve Nova\'ya Bluetooth ve konum izinleri verin. USB için, telefon ayarlarınızda OTG\'yi etkinleştirin.</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
@@ -150,6 +149,7 @@
     <string name="account_select_secret_source">Sırrınızın tipini seçin</string>
     <string name="account_select_wallet">Cüzdan seçin</string>
     <string name="account_shared_secret">Ortak sır ile hesaplar</string>
+    <string name="account_substrate_accounts">Substrate Hesapları</string>
     <string name="account_substrate_crypto_type">Substrate anahtar çifti kripto tipi</string>
     <string name="account_substrate_derivation_path">Substrate sır türetme yolu</string>
     <string name="account_wallet_nickname">Cüzdan adı</string>
@@ -253,8 +253,6 @@
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
     <string name="buy_order_completed_message">Satın alma başlatıldı! Lütfen 60 dakikaya kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
-    <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
-    <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
     <string name="buy_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alınmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
     <string name="buy_token_not_supported_title">Bu token satın alma özelliği tarafından desteklenmiyor</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
@@ -819,6 +817,7 @@
     <string name="language_title">Dil</string>
     <string name="ledger_chain_not_supported">Ledger %s desteklemiyor</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
     <string name="ledger_device_stax">Ledger Stax</string>
@@ -831,6 +830,10 @@
     <string name="ledger_hold_to_sign">İşlemi onaylamak için %s üzerinde onaylama düğmesini basılı tutun</string>
     <string name="ledger_import_select_address_load_more">Daha fazla hesap yükle</string>
     <string name="ledger_review_approve_title">İnceleyin ve Onaylayın</string>
+    <string name="ledger_select_address_account_label">Hesap %s</string>
+    <string name="ledger_select_address_not_found">Hesap bulunamadı</string>
+    <string name="ledger_select_address_update_for_evm_message">Ledger cihazınız, EVM adreslerini desteklemeyen eski bir Generic uygulaması kullanıyor. Onu Ledger Live üzerinden güncelleyin.</string>
+    <string name="ledger_select_address_update_for_evm_title">Ledger Generic Uygulamasını Güncelleyin</string>
     <string name="ledger_sign_approve_message">İşlemi onaylamak için %s üzerindeki her iki düğmeye basın</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Lütfen, %s uygulamasını Ledger Live kullanarak güncelleyin</string>
     <string name="ledger_sign_metadata_outdated_title">Metaveri güncelliğini yitirdi</string>
@@ -843,6 +846,8 @@
     <string name="ledger_sign_tx_not_supported_title">İşlem desteklenmiyor</string>
     <string name="ledger_verify_address_message_both_buttons">Adresi onaylamak için %s üzerindeki her iki düğmeye de basın</string>
     <string name="ledger_verify_address_message_confirm_button">Adresi onaylamak için %s üzerindeki onaylama düğmesine basın</string>
+    <string name="ledger_verify_addresses_message_both_buttons">%s üzerindeki her iki butona da basarak adresleri onaylayın</string>
+    <string name="ledger_verify_addresses_message_confirm_button">%s üzerindeki onay butonuna basarak adresleri onaylayın</string>
     <string name="ledger_wallet_details_description">Bu cüzdan Ledger ile eşleştirildi. Nova istediğiniz herhangi bir işlemi oluşturmanıza yardımcı olacak ve bunları Ledger kullanarak imzalamanız istenecektir.</string>
     <string name="ledher_import_select_address_title">Cüzdana eklemek için hesap seçin</string>
     <string name="loading_network_info">Ağ bilgisi yükleniyor...</string>
@@ -1674,6 +1679,8 @@
     <string name="trade_provider_list_buy_title">%s tokenını satın almak için bir sağlayıcı seçin</string>
     <string name="trade_provider_list_footer">Ödeme yöntemleri, ücretler ve limitler sağlayıcıya göre farklılık gösterir.\nSizin için en iyi seçeneği bulmak için teklifleri karşılaştırın.</string>
     <string name="trade_provider_list_sell_title">%s tokenının satışını yapmak için bir sağlayıcı seçin</string>
+    <string name="trade_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
+    <string name="trade_provider_open_confirmation_title">Tarayıcıda devam et?</string>
     <string name="trade_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alma veya satılmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
     <string name="trade_token_not_supported_title">Bu token alış/satış özelliği tarafından desteklenmiyor</string>
     <string name="transaction_details_copy_hash">Hash\'i kopyala</string>
