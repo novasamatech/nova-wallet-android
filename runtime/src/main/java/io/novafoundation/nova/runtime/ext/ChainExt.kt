@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.ext
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
@@ -31,6 +32,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
+import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
 import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
 import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
@@ -470,6 +474,9 @@ fun Chain.Asset.requireOrml(): Type.Orml {
     return type
 }
 
+val Chain.addressScheme: AddressScheme
+    get() = if (isEthereumBased) AddressScheme.EVM else AddressScheme.SUBSTRATE
+
 fun Chain.Asset.ormlOrNull(): Type.Orml? {
     return type as? Type.Orml
 }
@@ -567,3 +574,16 @@ fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
 }
 
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)
+
+fun SignatureVerifier.verifyMultiChain(
+    chain: Chain,
+    signature: SignatureWrapper,
+    message: ByteArray,
+    publicKey: ByteArray
+): Boolean {
+    return if (chain.isEthereumBased) {
+        verify(signature, Signer.MessageHashing.ETHEREUM, message, publicKey)
+    } else {
+        verify(signature, Signer.MessageHashing.SUBSTRATE, message, publicKey)
+    }
+}

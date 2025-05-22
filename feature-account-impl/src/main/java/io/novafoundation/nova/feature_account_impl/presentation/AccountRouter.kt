@@ -103,4 +103,6 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun closeChainAddressesSelector()
 
     fun finishApp()
+
+    fun openAddGenericEvmAddressSelectLedger(metaId: Long)
 }

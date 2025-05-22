@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="ledger_verify_addresses_message_both_buttons">Press both buttons on your %s to approve the addresses</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Press confirm button on your %s to approve the addresses</string>
 
-<!--
-    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
-    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
--->
+    <string name="account_add_address">Add address</string>
+    <string name="account_substrate_accounts">Substrate Accounts</string>
+    <string name="account_evm_accounts">EVM Accounts</string>
+
+    <string name="ledger_select_address_update_for_evm_title">Update Ledger Generic App</string>
+    <string name="ledger_select_address_update_for_evm_message">Your Ledger device is using an outdated Generic app that doesn’t support EVM addresses. Update it via Ledger Live.</string>
+
+    <string name="ledger_select_address_not_found">Account not found</string>
+
+    <string name="ledger_select_address_account_label">Account %s</string>
+    <string name="ledger_device_nano_s">Nano S</string>
+
+    <!--
+        <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
+        <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+    -->
 
     <string name="trade_provider_open_confirmation_title">Continue in browser?</string>
     <string name="trade_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>

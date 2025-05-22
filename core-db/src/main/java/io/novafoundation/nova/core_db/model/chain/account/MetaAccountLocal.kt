@@ -19,6 +19,8 @@ import java.util.UUID
         Index(value = ["ethereumAddress"])
     ]
 )
+// NB!: We intentionally do not make MetaAccountLocal a data-class since it is easy to misuse copy due to value of `id` is not being copied
+// All copy-like methods should be implemented explicitly, like `addEvmAccount`
 class MetaAccountLocal(
     val substratePublicKey: ByteArray?,
     val substrateCryptoType: CryptoType?,
@@ -58,6 +60,29 @@ class MetaAccountLocal(
 
         fun generateGloballyUniqueId(): String {
             return UUID.randomUUID().toString()
+        }
+    }
+
+    // We do not use copy as we need explicitly set id
+    fun addEvmAccount(
+        ethereumPublicKey: ByteArray,
+        ethereumAddress: ByteArray,
+    ): MetaAccountLocal {
+        return MetaAccountLocal(
+            substratePublicKey = substratePublicKey,
+            substrateCryptoType = substrateCryptoType,
+            substrateAccountId = substrateAccountId,
+            ethereumPublicKey = ethereumPublicKey,
+            ethereumAddress = ethereumAddress,
+            name = name,
+            parentMetaId = parentMetaId,
+            isSelected = isSelected,
+            position = position,
+            type = type,
+            status = status,
+            globallyUniqueId = globallyUniqueId
+        ).also {
+            it.id = id
         }
     }
 

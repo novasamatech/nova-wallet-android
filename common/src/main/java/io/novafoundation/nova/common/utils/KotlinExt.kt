@@ -672,8 +672,11 @@ fun Calendar.resetDay() {
     set(Calendar.MILLISECOND, 0)
 }
 
-inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
-    launch { block() }
+inline fun CoroutineScope.launchUnit(
+    context: CoroutineContext = EmptyCoroutineContext,
+    crossinline block: suspend CoroutineScope.() -> Unit
+) {
+    launch(context) { block() }
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }

@@ -4,6 +4,7 @@ import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
@@ -123,6 +124,8 @@ interface AccountFeatureDependencies {
     val metadataShortenerService: MetadataShortenerService
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
+
+    val addressSchemeFormatter: AddressSchemeFormatter
 
     fun appLinksProvider(): AppLinksProvider
 

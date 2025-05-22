@@ -55,6 +55,8 @@
 
     <include app:graph="@navigation/mnemonic_nav_graph" />
 
+    <include app:graph="@navigation/add_evm_account_generic_ledger_graph" />
+
     <action
         android:id="@+id/action_returnToMainScreen"
         app:destination="@id/mainFragment"
@@ -734,6 +736,14 @@
         <action
             android:id="@+id/action_accountDetailsFragment_to_addLedgerAccountGraph"
             app:destination="@id/add_ledger_chain_account_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_accountDetailsFragment_to_addEvmAccountGenericLedgerGraph"
+            app:destination="@id/add_evm_account_generic_ledger_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"

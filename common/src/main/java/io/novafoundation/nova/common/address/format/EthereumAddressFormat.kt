@@ -9,6 +9,8 @@ import io.novasama.substrate_sdk_android.extensions.toAddress
 
 class EthereumAddressFormat : AddressFormat {
 
+    override val scheme: AddressScheme = AddressScheme.EVM
+
     override fun addressOf(accountId: AddressFormat.AccountId): AddressFormat.Address {
         return accountId.value.asEthereumAccountId()
             .toAddress().value.asAddress()
