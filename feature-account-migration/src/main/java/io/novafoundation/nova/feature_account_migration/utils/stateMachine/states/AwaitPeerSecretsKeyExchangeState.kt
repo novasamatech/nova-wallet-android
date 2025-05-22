@@ -17,6 +17,11 @@ class AwaitPeerSecretsKeyExchangeState<T : ExchangePayload>(
                 emitSideEffect(KeyExchangeSideEffect.Receiver.PeerSecretsReceived(event.exchangePayload, event.encryptedSecrets, keyPair, event.peerPublicKey))
                 emitState(InitialKeyExchangeState())
             }
+
+            is KeyExchangeEvent.Receiver.AcceptKeyExchangeRequest -> {
+                emitSideEffect(KeyExchangeSideEffect.Receiver.AcceptKeyExchange(event.keyPair.public))
+                emitState(AwaitPeerSecretsKeyExchangeState(event.keyPair))
+            }
         }
     }
 }

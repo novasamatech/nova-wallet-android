@@ -10,6 +10,10 @@ class AwaitPeerAcceptKeyExchangeState<T : ExchangePayload> : KeyExchangeState<T>
     context(KeyExchangeTransition<T>)
     override suspend fun performTransition(event: KeyExchangeEvent<T>) {
         when (event) {
+            is KeyExchangeEvent.Sender.InitKeyExchange -> {
+                emitSideEffect(KeyExchangeSideEffect.Sender.RequestPeerAcceptKeyExchange)
+            }
+
             is KeyExchangeEvent.Sender.PeerAcceptedKeyExchange -> {
                 emitSideEffect(KeyExchangeSideEffect.Sender.SendEncryptedSecrets(event.peerPublicKey))
                 emitState(InitialKeyExchangeState())

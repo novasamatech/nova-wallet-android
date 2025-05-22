@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_account_migration.utils.stateMachine
 
-import io.novafoundation.nova.common.domain.stateMachine.base.StateMachine
+import io.novafoundation.nova.common.utils.stateMachine.StateMachine
 import io.novafoundation.nova.feature_account_migration.utils.stateMachine.events.KeyExchangeEvent
 import io.novafoundation.nova.feature_account_migration.utils.stateMachine.sideEffects.KeyExchangeSideEffect
 import io.novafoundation.nova.feature_account_migration.utils.stateMachine.states.InitialKeyExchangeState

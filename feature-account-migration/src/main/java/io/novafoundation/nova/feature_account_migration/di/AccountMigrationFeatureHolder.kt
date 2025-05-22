@@ -4,11 +4,13 @@ import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_account_migration.presentation.AccountMigrationRouter
 import javax.inject.Inject
 
 @ApplicationScope
 class AccountMigrationFeatureHolder @Inject constructor(
-    featureContainer: FeatureContainer
+    featureContainer: FeatureContainer,
+    private val router: AccountMigrationRouter
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -18,6 +20,6 @@ class AccountMigrationFeatureHolder @Inject constructor(
             .build()
 
         return DaggerAccountMigrationFeatureComponent.factory()
-            .create(featureDependencies)
+            .create(featureDependencies, router)
     }
 }

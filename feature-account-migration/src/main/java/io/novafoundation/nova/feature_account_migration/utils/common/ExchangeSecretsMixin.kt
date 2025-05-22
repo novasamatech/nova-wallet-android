@@ -10,8 +10,6 @@ import io.novafoundation.nova.feature_account_migration.utils.stateMachine.sideE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 interface ExchangeSecretsMixin<T : ExchangePayload> {
@@ -58,8 +56,11 @@ class RealExchangeSecretsMixin<T : ExchangePayload>(
     override val exchangeEvents = MutableSharedFlow<ExternalEvent<T>>()
 
     init {
-        stateMachine.sideEffects.onEach { handleSideEffect(it) }
-            .launchIn(coroutineScope)
+        launch {
+            for (sideEffect in stateMachine.sideEffects) {
+                handleSideEffect(sideEffect)
+            }
+        }
     }
 
     override fun startSharingSecrets() {
