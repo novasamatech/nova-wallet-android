@@ -19,6 +19,8 @@ import java.util.UUID
         Index(value = ["ethereumAddress"])
     ]
 )
+// NB!: We intentionally do not make MetaAccountLocal a data-class since it is easy to misuse copy due to value of `id` is not being copied
+// All copy-like methods should be implemented explicitly, like `addEvmAccount`
 class MetaAccountLocal(
     val substratePublicKey: ByteArray?,
     val substrateCryptoType: CryptoType?,

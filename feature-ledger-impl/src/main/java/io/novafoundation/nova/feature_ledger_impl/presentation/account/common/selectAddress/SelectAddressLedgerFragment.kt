@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list.LedgerAccountAdapter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list.LedgerSelectAddressLoadMoreAdapter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountRvItem
 import javax.inject.Inject
 
 abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
@@ -73,7 +73,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
         viewModel.loadMoreClicked()
     }
 
-    override fun itemClicked(item: LedgerAccountModel) {
+    override fun itemClicked(item: LedgerAccountRvItem) {
         viewModel.accountClicked(item)
     }
 

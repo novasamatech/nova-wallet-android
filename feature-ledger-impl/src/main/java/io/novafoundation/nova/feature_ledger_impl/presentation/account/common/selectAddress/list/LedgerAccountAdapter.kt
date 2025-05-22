@@ -14,15 +14,15 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_ledger_impl.R
 import io.novafoundation.nova.feature_ledger_impl.databinding.ItemLedgerAccountBinding
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountRvItem
 
 class LedgerAccountAdapter(
     private val handler: Handler
-) : BaseListAdapter<LedgerAccountModel, SelectLedgerHolder>(DiffCallback()) {
+) : BaseListAdapter<LedgerAccountRvItem, SelectLedgerHolder>(DiffCallback()) {
 
     interface Handler {
 
-        fun itemClicked(item: LedgerAccountModel)
+        fun itemClicked(item: LedgerAccountRvItem)
 
         fun addressInfoClicked(addressModel: AddressModel, addressScheme: AddressScheme)
     }
@@ -36,12 +36,12 @@ class LedgerAccountAdapter(
     }
 }
 
-private class DiffCallback : DiffUtil.ItemCallback<LedgerAccountModel>() {
-    override fun areItemsTheSame(oldItem: LedgerAccountModel, newItem: LedgerAccountModel): Boolean {
+private class DiffCallback : DiffUtil.ItemCallback<LedgerAccountRvItem>() {
+    override fun areItemsTheSame(oldItem: LedgerAccountRvItem, newItem: LedgerAccountRvItem): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: LedgerAccountModel, newItem: LedgerAccountModel): Boolean {
+    override fun areContentsTheSame(oldItem: LedgerAccountRvItem, newItem: LedgerAccountRvItem): Boolean {
         return oldItem == newItem
     }
 }
@@ -58,7 +58,7 @@ class SelectLedgerHolder(
         viewBinding.itemLedgerAccountSubstrate.setExtraInfoAvailable(true)
     }
 
-    fun bind(model: LedgerAccountModel) = with(viewBinding) {
+    fun bind(model: LedgerAccountRvItem) = with(viewBinding) {
         viewBinding.root.setOnClickListener { eventHandler.itemClicked(model) }
 
         itemLedgerAccountLabel.text = model.label

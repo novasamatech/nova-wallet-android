@@ -37,7 +37,7 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bo
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.createLedgerReviewAddresses
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.errors.handleLedgerError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.AddressVerificationMode
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountModel
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountRvItem
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
@@ -127,7 +127,7 @@ abstract class SelectAddressLedgerViewModel(
         router.back()
     }
 
-    fun accountClicked(accountUi: LedgerAccountModel) {
+    fun accountClicked(accountUi: LedgerAccountRvItem) {
         verifyAccount(accountUi.id)
     }
 
@@ -211,8 +211,8 @@ abstract class SelectAddressLedgerViewModel(
             }
     }
 
-    private suspend fun LedgerAccount.toUi(): LedgerAccountModel {
-        return LedgerAccountModel(
+    private suspend fun LedgerAccount.toUi(): LedgerAccountRvItem {
+        return LedgerAccountRvItem(
             id = index,
             label = resourceManager.getString(R.string.ledger_select_address_account_label, (index + 1).format()),
             substrate = addressIconGenerator.createAccountAddressModel(substratePreviewChain(), substrate.address),
