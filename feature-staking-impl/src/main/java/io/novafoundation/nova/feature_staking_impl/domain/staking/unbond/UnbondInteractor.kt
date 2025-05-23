@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.unbond
 
+import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
@@ -46,11 +48,13 @@ class UnbondInteractor(
         stashState: StakingState.Stash,
         currentBondedBalance: BigInteger,
         amount: BigInteger
-    ): Result<ExtrinsicSubmission> {
+    ): Result<Unit> {
         return withContext(Dispatchers.IO) {
-            extrinsicService.submitExtrinsic(stashState.chain, stashState.controllerTransactionOrigin()) {
+            extrinsicService.submitExtrinsicAndAwaitExecution(stashState.chain, stashState.controllerTransactionOrigin()) {
                 constructUnbondExtrinsic(stashState, currentBondedBalance, amount)
             }
+                .flattenDispatchFailure()
+                .coerceToUnit()
         }
     }
 
