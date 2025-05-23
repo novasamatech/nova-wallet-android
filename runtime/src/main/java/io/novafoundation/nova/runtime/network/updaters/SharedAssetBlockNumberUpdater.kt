@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.network.updaters
 
+import io.novafoundation.nova.common.data.holders.ChainIdHolder
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core.storage.StorageCache
@@ -12,9 +13,9 @@ import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 
 class SharedAssetBlockNumberUpdater(
     chainRegistry: ChainRegistry,
-    crowdloanSharedState: SelectedAssetOptionSharedState<*>,
+    chainIdHolder: ChainIdHolder,
     storageCache: StorageCache
-) : SingleStorageKeyUpdater<Unit>(GlobalScope, crowdloanSharedState, chainRegistry, storageCache) {
+) : SingleStorageKeyUpdater<Unit>(GlobalScope, chainIdHolder, chainRegistry, storageCache) {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
         return runtime.metadata.system().storage("Number").storageKey()

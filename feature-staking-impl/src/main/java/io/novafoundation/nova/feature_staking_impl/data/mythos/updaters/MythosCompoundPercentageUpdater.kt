@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.autoCompound
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
 import io.novafoundation.nova.runtime.state.chain
@@ -18,7 +19,7 @@ class MythosCompoundPercentageUpdater(
     chainRegistry: ChainRegistry,
     storageCache: StorageCache,
     scope: AccountUpdateScope,
-) : SingleStorageKeyUpdater<MetaAccount>(scope, stakingSharedState, chainRegistry, storageCache) {
+) : SingleStorageKeyUpdater<MetaAccount>(scope, stakingSharedState, chainRegistry, storageCache), StakingUpdater<MetaAccount> {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: MetaAccount): String? {
         return with(RuntimeContext(runtime)) {

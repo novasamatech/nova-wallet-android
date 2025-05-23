@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.CoroutineScope
@@ -53,7 +55,7 @@ class ValidatorProvider(
 
         val validatorPrefs = stakingRepository.getValidatorPrefs(chainId, validatorIdsToQueryPrefs)
         val identities = identityRepository.getIdentitiesFromIdsHex(chainId, requestedValidatorIds)
-        val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
+        val slashes = stakingRepository.getSlashes(chain, requestedValidatorIds)
 
         val rewardCalculator = rewardCalculatorFactory.create(stakingOption, electedValidatorExposures, validatorPrefs, scope)
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
@@ -81,7 +83,9 @@ class ValidatorProvider(
         }
     }
 
-    suspend fun getValidatorWithoutElectedInfo(chainId: ChainId, address: String): Validator {
+    suspend fun getValidatorWithoutElectedInfo(chain: Chain, address: String): Validator {
+        val chainId = chain.id
+
         val accountId = address.toHexAccountId()
 
         val accountIdBridged = listOf(accountId)
@@ -89,7 +93,7 @@ class ValidatorProvider(
         val prefs = stakingRepository.getValidatorPrefs(chainId, accountIdBridged)[accountId]
         val identity = identityRepository.getIdentitiesFromIdsHex(chainId, accountIdBridged)[accountId]
 
-        val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
+        val slashes = stakingRepository.getSlashes(chain, accountIdBridged)
 
         val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
 

@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.data.conversion.assethub.asset
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
@@ -295,7 +295,7 @@ private class AssetConversionExchange(
             ) { submissionOrigin ->
                 // Send swapped funds to the executingAccount since it the account doing the swap
                 executeSwap(swapLimit = args.actualSwapLimit, sendTo = submissionOrigin.executingAccount)
-            }.requireOk().mapCatching {
+            }.flattenDispatchFailure().mapCatching {
                 SwapExecutionCorrection(
                     actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
                 )

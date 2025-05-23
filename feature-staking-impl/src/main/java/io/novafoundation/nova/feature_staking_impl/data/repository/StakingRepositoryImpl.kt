@@ -53,6 +53,8 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.common.utils.metadata
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.activeEra
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -92,11 +94,9 @@ class StakingRepositoryImpl(
         return runtime.metadata.staking().numberConstant("SessionsPerEra", runtime) // How many sessions per era
     }
 
-    override suspend fun getActiveEraIndex(chainId: ChainId): EraIndex = localStorage.queryNonNull(
-        keyBuilder = { it.metadata.activeEraStorageKey() },
-        binding = ::bindActiveEra,
-        chainId = chainId
-    )
+    override suspend fun getActiveEraIndex(chainId: ChainId): EraIndex = localStorage.query(chainId) {
+        metadata.staking.activeEra.queryNonNull()
+    }
 
     override suspend fun getCurrentEraIndex(chainId: ChainId): EraIndex = localStorage.queryNonNull(
         keyBuilder = { it.metadata.staking().storage("CurrentEra").storageKey() },
@@ -195,10 +195,13 @@ class StakingRepositoryImpl(
         }
     }
 
-    override suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
-        remoteStorage.query(chainId) {
-            val activeEraIndex = getActiveEraIndex(chainId)
+    override suspend fun getSlashes(
+        stakingChain: Chain,
+        accountIdsHex: Collection<String>
+    ): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
+        val activeEra = getActiveEraIndex(stakingChain.id)
 
+        remoteStorage.query(stakingChain.timelineChainIdOrSelf()) {
             val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
             val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
 
@@ -208,7 +211,7 @@ class StakingRepositoryImpl(
                 binding = { decoded, _ ->
                     val span = decoded?.let { bindSlashingSpans(it) }
 
-                    isSlashed(span, activeEraIndex, slashDeferDuration)
+                    isSlashed(span, activeEra, slashDeferDuration)
                 }
             )
         }

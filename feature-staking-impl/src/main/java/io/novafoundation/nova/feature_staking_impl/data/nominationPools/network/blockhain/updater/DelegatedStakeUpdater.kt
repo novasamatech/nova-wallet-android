@@ -5,7 +5,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.base.NominationPoolUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
 import io.novafoundation.nova.runtime.state.chain
@@ -18,7 +18,7 @@ class DelegatedStakeUpdater(
     private val stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
-) : SingleStorageKeyUpdater<MetaAccount>(scope, stakingSharedState, chainRegistry, storageCache), NominationPoolUpdater<MetaAccount> {
+) : SingleStorageKeyUpdater<MetaAccount>(scope, stakingSharedState, chainRegistry, storageCache), StakingUpdater<MetaAccount> {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: MetaAccount): String? {
         val chain = stakingSharedState.chain()

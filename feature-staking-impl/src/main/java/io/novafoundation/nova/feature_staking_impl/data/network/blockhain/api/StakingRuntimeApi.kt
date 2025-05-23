@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
@@ -25,30 +26,30 @@ import java.math.BigInteger
 @JvmInline
 value class StakingRuntimeApi(override val module: Module) : QueryableModule
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val RuntimeMetadata.staking: StakingRuntimeApi
     get() = StakingRuntimeApi(staking())
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val StakingRuntimeApi.ledger: QueryableStorageEntry1<AccountId, StakingLedger>
     get() = storage1("Ledger", binding = { decoded, _ -> bindStakingLedger(decoded) })
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val StakingRuntimeApi.nominators: QueryableStorageEntry1<AccountId, Nominations>
     get() = storage1("Nominators", binding = { decoded, _ -> bindNominations(decoded) })
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val StakingRuntimeApi.validators: QueryableStorageEntry1<AccountId, ValidatorPrefs>
     get() = storage1("Validators", binding = { decoded, _ -> bindValidatorPrefs(decoded) })
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val StakingRuntimeApi.bonded: QueryableStorageEntry1<AccountId, AccountId>
     get() = storage1("Bonded", binding = { decoded, _ -> bindAccountId(decoded) })
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val StakingRuntimeApi.activeEra: QueryableStorageEntry0<EraIndex>
     get() = storage0("ActiveEra", binding = ::bindActiveEra)
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val StakingRuntimeApi.erasStartSessionIndex: QueryableStorageEntry1<EraIndex, BigInteger>
     get() = storage1("ErasStartSessionIndex", binding = { decoded, _ -> bindSessionIndex(decoded) })

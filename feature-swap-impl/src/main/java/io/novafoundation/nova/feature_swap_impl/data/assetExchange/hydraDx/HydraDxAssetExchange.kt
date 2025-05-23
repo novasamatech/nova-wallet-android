@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.utils.times
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
@@ -371,7 +371,7 @@ private class HydraDxAssetExchange(
                 )
             ) {
                 executeSwap(args.actualSwapLimit)
-            }.requireOk().mapCatching { (events) ->
+            }.flattenDispatchFailure().mapCatching { (events) ->
                 SwapExecutionCorrection(
                     actualReceivedAmount = events.determineActualSwappedAmount()
                 )

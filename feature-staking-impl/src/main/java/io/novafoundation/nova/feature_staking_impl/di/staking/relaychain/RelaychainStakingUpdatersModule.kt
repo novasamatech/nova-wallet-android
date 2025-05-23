@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.TimelineDelegatingChainIdHolder
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountNominationsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountRewardDestinationUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.AccountValidatorPrefsUpdater
@@ -208,25 +209,25 @@ class RelaychainStakingUpdatersModule {
     @Provides
     @FeatureScope
     fun provideEraStartSessionIndexUpdater(
-        sharedState: StakingSharedState,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
         activeEraScope: ActiveEraScope,
     ) = EraStartSessionIndexUpdater(
         activeEraScope = activeEraScope,
         storageCache = storageCache,
-        stakingSharedState = sharedState,
+        timelineDelegatingChainIdHolder = timelineDelegatingChainIdHolder,
         chainRegistry = chainRegistry
     )
 
     @Provides
     @FeatureScope
     fun provideCurrentSessionIndexUpdater(
-        sharedState: StakingSharedState,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
     ) = CurrentSessionIndexUpdater(
-        sharedState,
+        timelineDelegatingChainIdHolder,
         chainRegistry,
         storageCache
     )
@@ -238,11 +239,13 @@ class RelaychainStakingUpdatersModule {
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
         electionsSessionRegistry: ElectionsSessionRegistry,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
     ) = CurrentSlotUpdater(
         electionsSessionRegistry = electionsSessionRegistry,
         stakingSharedState = sharedState,
         chainRegistry = chainRegistry,
-        storageCache = storageCache
+        storageCache = storageCache,
+        timelineDelegatingChainIdHolder = timelineDelegatingChainIdHolder
     )
 
     @Provides
@@ -252,11 +255,13 @@ class RelaychainStakingUpdatersModule {
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
         electionsSessionRegistry: ElectionsSessionRegistry,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
     ) = GenesisSlotUpdater(
         electionsSessionRegistry = electionsSessionRegistry,
         stakingSharedState = sharedState,
         chainRegistry = chainRegistry,
-        storageCache = storageCache
+        storageCache = storageCache,
+        timelineDelegatingChainIdHolder = timelineDelegatingChainIdHolder
     )
 
     @Provides
@@ -266,11 +271,13 @@ class RelaychainStakingUpdatersModule {
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
         electionsSessionRegistry: ElectionsSessionRegistry,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
     ) = CurrentEpochIndexUpdater(
         electionsSessionRegistry = electionsSessionRegistry,
         stakingSharedState = sharedState,
         chainRegistry = chainRegistry,
-        storageCache = storageCache
+        storageCache = storageCache,
+        timelineDelegatingChainIdHolder = timelineDelegatingChainIdHolder
     )
 
     @Provides

@@ -5,8 +5,11 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.TimelineDelegatingChainIdHolder
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.AsStakingUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.DelegateToTimeLineChainUpdater
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.Mythos
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.MythosStakingUpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolStakingUpdatersModule
@@ -46,7 +49,11 @@ class UpdatersModule {
         blockTimeUpdater: BlockTimeUpdater,
         blockNumberUpdater: SharedAssetBlockNumberUpdater,
         totalIssuanceUpdater: TotalIssuanceUpdater
-    ) = StakingUpdaters.Group(blockTimeUpdater, blockNumberUpdater, totalIssuanceUpdater)
+    ) = StakingUpdaters.Group(
+        DelegateToTimeLineChainUpdater(blockTimeUpdater),
+        DelegateToTimeLineChainUpdater(blockNumberUpdater),
+        AsStakingUpdater(totalIssuanceUpdater)
+    )
 
     @Provides
     @FeatureScope
@@ -85,19 +92,19 @@ class UpdatersModule {
     @Provides
     @FeatureScope
     fun blockTimeUpdater(
-        singleAssetSharedState: StakingSharedState,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
         chainRegistry: ChainRegistry,
         sampledBlockTimeStorage: SampledBlockTimeStorage,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
-    ) = BlockTimeUpdater(singleAssetSharedState, chainRegistry, sampledBlockTimeStorage, remoteStorage)
+    ) = BlockTimeUpdater(timelineDelegatingChainIdHolder, chainRegistry, sampledBlockTimeStorage, remoteStorage)
 
     @Provides
     @FeatureScope
     fun provideBlockNumberUpdater(
         chainRegistry: ChainRegistry,
-        crowdloanSharedState: StakingSharedState,
+        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
         storageCache: StorageCache,
-    ) = SharedAssetBlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+    ) = SharedAssetBlockNumberUpdater(chainRegistry, timelineDelegatingChainIdHolder, storageCache)
 
     @Provides
     @FeatureScope

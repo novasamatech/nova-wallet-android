@@ -36,7 +36,7 @@ interface StakingRepository {
 
     suspend fun getValidatorPrefs(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<ValidatorPrefs?>
 
-    suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean>
+    suspend fun getSlashes(stakingChain: Chain, accountIdsHex: Collection<String>): AccountIdMap<Boolean>
 
     suspend fun getSlashingSpan(chainId: ChainId, accountId: AccountId): SlashingSpans?
 
