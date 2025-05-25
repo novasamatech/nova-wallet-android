@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
-import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
+import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
@@ -60,8 +60,8 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
             RuntimeApi::class,
             AccountFeatureApi::class,
             GovernanceFeatureApi::class,
-            DeepLinkBuildingFeatureApi::class,
-            WalletFeatureApi::class
+            WalletFeatureApi::class,
+            AssetsFeatureApi::class
         ]
     )
     interface PushNotificationsFeatureDependenciesComponent : PushNotificationsFeatureDependencies

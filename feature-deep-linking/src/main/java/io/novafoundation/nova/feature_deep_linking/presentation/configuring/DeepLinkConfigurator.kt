@@ -1,8 +1,8 @@
-package io.novafoundation.nova.feature_deep_link_building.presentation
+package io.novafoundation.nova.feature_deep_linking.presentation.configuring
 
 import android.net.Uri
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_deep_link_building.R
+import io.novafoundation.nova.feature_deep_linking.R
 
 interface DeepLinkConfigurator<T> {
 

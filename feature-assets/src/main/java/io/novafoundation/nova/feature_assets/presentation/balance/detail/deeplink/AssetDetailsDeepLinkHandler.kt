@@ -1,14 +1,13 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers
+package io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink
 
 import android.net.Uri
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
-import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -20,7 +19,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 
 class AssetDetailsDeepLinkHandler(
-    private val router: DeepLinkingRouter,
+    private val router: AssetsRouter,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
     private val automaticInteractionGate: AutomaticInteractionGate,
@@ -48,7 +47,7 @@ class AssetDetailsDeepLinkHandler(
         address?.let { selectMetaAccount(chain, address) }
 
         val payload = AssetPayload(chainId, assetId)
-        router.openAssetDetails(payload)
+        router.openAssetDetailsFromDeepLink(payload)
     }
 
     private suspend fun selectMetaAccount(chain: Chain, address: String) = withContext(Dispatchers.Default) {

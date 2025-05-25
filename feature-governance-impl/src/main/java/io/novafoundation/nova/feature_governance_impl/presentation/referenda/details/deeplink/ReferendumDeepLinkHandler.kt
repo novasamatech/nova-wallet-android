@@ -1,15 +1,15 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers
+package io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.deeplink
 
 import android.net.Uri
-import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ReferendumHandlingException
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.ReferendumHandlingException
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsPayload
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -20,11 +20,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import java.math.BigInteger
 
 class ReferendumDeepLinkHandler(
-    private val router: DeepLinkingRouter,
+    private val router: GovernanceRouter,
     private val chainRegistry: ChainRegistry,
     private val mutableGovernanceState: MutableGovernanceState,
-    private val automaticInteractionGate: AutomaticInteractionGate,
-    private val govDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
+    private val automaticInteractionGate: AutomaticInteractionGate
 ) : DeepLinkHandler {
 
     override val callbackFlow = MutableSharedFlow<CallbackEvent>()
@@ -32,7 +31,7 @@ class ReferendumDeepLinkHandler(
     override suspend fun matches(data: Uri): Boolean {
         val path = data.path ?: return false
 
-        return path.startsWith(govDeepLinkConfigurator.deepLinkPrefix)
+        return path.startsWith(ReferendumDetailsDeepLinkConfigurator.PREFIX)
     }
 
     override suspend fun handleDeepLink(data: Uri) {
@@ -48,21 +47,21 @@ class ReferendumDeepLinkHandler(
         val payload = ReferendumDetailsPayload(referendumId, allowVoting = true, prefilledData = null)
 
         mutableGovernanceState.update(chain.id, chain.utilityAsset.id, governanceType)
-        router.openReferendum(payload)
+        router.openReferendumFromDeepLink(payload)
     }
 
     private fun Uri.getChainIdOrPolkadot(): String {
-        return getQueryParameter(govDeepLinkConfigurator.chainIdParam) ?: ChainGeneses.POLKADOT
+        return getQueryParameter(ReferendumDetailsDeepLinkConfigurator.CHAIN_ID_PARAM) ?: ChainGeneses.POLKADOT
     }
 
     private fun Uri.getReferendumId(): BigInteger? {
-        return getQueryParameter(govDeepLinkConfigurator.referendumIdParam)
+        return getQueryParameter(ReferendumDetailsDeepLinkConfigurator.REFERENDUM_ID_PARAM)
             ?.toBigIntegerOrNull()
     }
 
     private fun Uri.getGovernanceType(chain: Chain): Chain.Governance {
         val supportedGov = chain.governance
-        val govType = getQueryParameter(govDeepLinkConfigurator.governanceTypeParam)
+        val govType = getQueryParameter(ReferendumDetailsDeepLinkConfigurator.GOVERNANCE_TYPE_PARAM)
             ?.toIntOrNull()
 
         val cantSelectGovType = govType == null && supportedGov.size > 1 && !supportedGov.contains(Chain.Governance.V2)

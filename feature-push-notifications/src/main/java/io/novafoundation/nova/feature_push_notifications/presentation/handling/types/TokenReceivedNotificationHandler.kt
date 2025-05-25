@@ -9,14 +9,15 @@ import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkData
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.applyDeepLink
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
-import io.novafoundation.nova.feature_deep_link_building.presentation.addAssetDetailsData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.assetByOnChainAssetIdOrUtility
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.r
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.isEnabled
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
@@ -36,7 +38,7 @@ class TokenReceivedNotificationHandler(
     private val context: Context,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
-    private val configurator: AssetDetailsDeepLinkConfigurator,
+    private val configurator: io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator,
     override val chainRegistry: ChainRegistry,
     activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
@@ -72,7 +74,10 @@ class TokenReceivedNotificationHandler(
                 context,
                 getTitle(recipientMetaAccount),
                 getMessage(chain, asset, amount),
-                activityIntent().addAssetDetailsData(configurator, recipient, chain.id, asset.id)
+                activityIntent().applyDeepLink(
+                    configurator,
+                    AssetDetailsDeepLinkData(recipient, chain.id, asset.id)
+                )
             ).build()
 
         notify(notification)

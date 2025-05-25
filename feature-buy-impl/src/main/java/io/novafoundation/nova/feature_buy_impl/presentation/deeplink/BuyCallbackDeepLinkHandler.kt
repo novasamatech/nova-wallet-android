@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers
+package io.novafoundation.nova.feature_buy_impl.presentation.deeplink
 
 import android.net.Uri
 import io.novafoundation.nova.common.resources.ResourceManager

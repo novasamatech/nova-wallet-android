@@ -103,4 +103,6 @@ interface StakingRouter {
     fun openConfirmRemoveStakingProxy(payload: ConfirmRemoveStakingProxyPayload)
 
     fun openDAppBrowser(url: String)
+
+    fun openStakingDashboard()
 }

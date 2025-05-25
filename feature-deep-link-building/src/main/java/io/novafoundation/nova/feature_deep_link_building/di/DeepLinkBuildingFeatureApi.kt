@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_deep_link_building.di
 
-import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsDeepLinkConfigurator
 
 interface DeepLinkBuildingFeatureApi {
 
-    val referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
+    val referendumDetailsDeepLinkConfigurator: io.novafoundation.nova.feature_governance_api.presentation.referenda.details.ReferendumDetailsDeepLinkConfigurator
 
-    val assetDetailsDeepLinkConfigurator: AssetDetailsDeepLinkConfigurator
+    val assetDetailsDeepLinkConfigurator: io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 }

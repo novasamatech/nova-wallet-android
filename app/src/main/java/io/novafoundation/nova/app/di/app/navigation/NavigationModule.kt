@@ -36,7 +36,6 @@ import io.novafoundation.nova.splash.SplashRouter
         SwapNavigationModule::class,
         BuyNavigationModule::class,
         PushNotificationsNavigationModule::class,
-        DeepLinkingNavigationModule::class,
         CloudBackupNavigationModule::class,
         AssetNavigationModule::class
     ]
@@ -68,9 +67,8 @@ class NavigationModule {
     @Provides
     fun provideNavigator(
         navigationHoldersRegistry: NavigationHoldersRegistry,
-        walletConnectRouter: WalletConnectRouter,
-        stakingDashboardRouter: StakingDashboardRouter,
-    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter, stakingDashboardRouter)
+        walletConnectRouter: WalletConnectRouter
+    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter)
 
     @Provides
     @ApplicationScope
