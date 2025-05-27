@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">Ledger cihazınızda %s</string>
     <string name="account_ledger_import_start_step_2_highlighted">ağ uygulamasını açın</string>
     <string name="account_ledger_import_start_step_3">Nova Cüzdan\'ın %s izin verin</string>
-    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth ve Konum\'a erişimini</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth\'a erişim sağlayın</string>
     <string name="account_ledger_import_start_step_4">Cüzdana eklenecek %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">Hesabı seçin</string>
     <string name="account_ledger_import_start_step_otg">%s telefon ayarlarında</string>

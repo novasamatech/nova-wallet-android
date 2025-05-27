@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">%s no seu dispositivo Ledger</string>
     <string name="account_ledger_import_start_step_2_highlighted">Abra o aplicativo da rede</string>
     <string name="account_ledger_import_start_step_3">Permitir que a Nova Wallet %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">acesse Bluetooth e Localização</string>
+    <string name="account_ledger_import_start_step_3_highlighted">acesso ao Bluetooth</string>
     <string name="account_ledger_import_start_step_4">%s para adicionar à carteira</string>
     <string name="account_ledger_import_start_step_4_highlighted">Selecione a conta</string>
     <string name="account_ledger_import_start_step_otg">%s nas configurações do seu telefone</string>

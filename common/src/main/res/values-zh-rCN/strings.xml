@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">在您的Ledger设备上%s</string>
     <string name="account_ledger_import_start_step_2_highlighted">打开network应用程序</string>
     <string name="account_ledger_import_start_step_3">允许Nova Wallet%s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">访问蓝牙和位置</string>
+    <string name="account_ledger_import_start_step_3_highlighted">访问蓝牙</string>
     <string name="account_ledger_import_start_step_4">%s添加到钱包</string>
     <string name="account_ledger_import_start_step_4_highlighted">选择账户</string>
     <string name="account_ledger_import_start_step_otg">%s 在你的手机设置中</string>

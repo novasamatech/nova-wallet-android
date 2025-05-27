@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Nyisd meg a hálózati alkalmazást</font> a Ledger eszközödön</string>
     <string name="account_ledger_import_start_step_2_highlighted">Nyissa meg a hálózati alkalmazást</string>
     <string name="account_ledger_import_start_step_3"><font color="#FFFFFF">Engedélyezed a Bluetooth-t és helymeghatározást</font> a Nova Wallet számára</string>
-    <string name="account_ledger_import_start_step_3_highlighted">hozzáférés a Bluetooth-hoz és a Helyhez</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth hozzáférést</string>
     <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Válaszd ki a fiókot</font> a hozzáadáshoz</string>
     <string name="account_ledger_import_start_step_4_highlighted">Fiók kiválasztása</string>
     <string name="account_ledger_import_start_step_otg">%s a telefon beállításaiban</string>

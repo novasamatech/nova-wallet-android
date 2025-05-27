@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">%s sur votre appareil Ledger</string>
     <string name="account_ledger_import_start_step_2_highlighted">Ouvrez l\'application réseau</string>
     <string name="account_ledger_import_start_step_3">Autorisez Nova Wallet à %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">accéder au Bluetooth et à la localisation</string>
+    <string name="account_ledger_import_start_step_3_highlighted">accès Bluetooth</string>
     <string name="account_ledger_import_start_step_4">%s à ajouter au portefeuille</string>
     <string name="account_ledger_import_start_step_4_highlighted">Sélectionnez un compte</string>
     <string name="account_ledger_import_start_step_otg">%s dans les paramètres de votre téléphone</string>
