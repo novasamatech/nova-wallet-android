@@ -1,6 +1,5 @@
 package io.novafoundation.nova.app.root.presentation
 
-import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.app.root.domain.RootInteractor
@@ -24,7 +23,6 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor

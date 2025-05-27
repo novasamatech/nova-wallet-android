@@ -128,7 +128,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="https"/>
-                <data android:host="nova-wallet.app.link"/>
+                <data android:host="@string/branch_io_link_host"/>
+                <data android:host="@string/branch_io_link_host_alternate"/>
             </intent-filter>
 
         </activity>

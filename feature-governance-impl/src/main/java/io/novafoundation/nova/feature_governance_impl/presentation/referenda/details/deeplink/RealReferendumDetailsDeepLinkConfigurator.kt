@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_governance_api.presentation.referenda.deta
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator.Companion.REFERENDUM_ID_PARAM
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 
 class RealReferendumDetailsDeepLinkConfigurator(
     private val resourceManager: ResourceManager

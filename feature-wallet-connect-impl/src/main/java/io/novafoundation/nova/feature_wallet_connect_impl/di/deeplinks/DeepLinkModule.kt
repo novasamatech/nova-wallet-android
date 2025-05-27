@@ -20,6 +20,7 @@ class DeepLinkModule {
         walletConnectService,
         automaticInteractionGate
     )
+
     @Provides
     @FeatureScope
     fun provideDeepLinks(buyCallback: WalletConnectPairDeeplinkHandler): WalletConnectDeepLinks {

@@ -75,6 +75,8 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
             insets
         }
 
+        intent?.let(::processIntent)
+
         viewModel.applySafeModeIfEnabled()
     }
 
@@ -106,8 +108,6 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
         super.onStart()
 
         branchIOLinkHandler.onActivityStart(this, viewModel::handleDeepLink)
-
-        intent?.let(::processIntent)
 
         viewModel.noticeInForeground()
     }

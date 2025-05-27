@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.details.deeplink.RealReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource

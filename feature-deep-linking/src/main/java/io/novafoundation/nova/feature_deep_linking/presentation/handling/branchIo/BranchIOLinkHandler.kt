@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import io.branch.referral.Branch
-import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_deep_linking.BuildConfig
 

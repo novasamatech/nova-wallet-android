@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.appendPathOrSkip
 import io.novafoundation.nova.common.utils.appendQueries
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 
-
 private val BRANCH_PARAMS_PREFIX = listOf("~", "$", "+")
 private const val ACTION_QUERY = "action"
 private const val SCREEN_QUERY = "screen"

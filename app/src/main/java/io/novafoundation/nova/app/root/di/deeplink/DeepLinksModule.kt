@@ -54,7 +54,7 @@ class DeepLinksModule {
 
     @Provides
     @FeatureScope
-    fun provideExternalDeepLinkHandler(
+    fun provideBranchIOLinkHandler(
         branchIoLinkConverter: BranchIoLinkConverter
     ): BranchIOLinkHandler {
         return BranchIOLinkHandler(branchIoLinkConverter)
