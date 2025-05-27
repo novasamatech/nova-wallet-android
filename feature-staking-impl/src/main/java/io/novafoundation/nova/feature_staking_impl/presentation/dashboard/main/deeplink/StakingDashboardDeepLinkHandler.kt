@@ -23,7 +23,7 @@ class StakingDashboardDeepLinkHandler(
         return path.startsWith(STAKING_DASHBOARD_DEEP_LINK_PREFIX)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri) = runCatching {
         automaticInteractionGate.awaitInteractionAllowed()
 
         stakingRouter.openStakingDashboard()

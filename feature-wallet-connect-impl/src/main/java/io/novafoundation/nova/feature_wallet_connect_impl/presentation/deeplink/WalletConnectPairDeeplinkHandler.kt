@@ -21,7 +21,7 @@ class WalletConnectPairDeeplinkHandler(
         return WalletConnectUtils.isWalletConnectPairingLink(data)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri) = runCatching {
         automaticInteractionGate.awaitInteractionAllowed()
         walletConnectService.pair(data.toString())
     }

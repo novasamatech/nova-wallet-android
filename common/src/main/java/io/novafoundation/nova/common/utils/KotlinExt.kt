@@ -58,6 +58,14 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
+inline fun <reified E : Throwable> Result<*>.onFailureInstance(action: (E) -> Unit): Result<*> {
+    return onFailure {
+        if (it is E) {
+            action(it)
+        }
+    }
+}
+
 inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
     transform()
     return this

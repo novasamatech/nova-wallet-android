@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_deep_linking.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_deep_linking.R
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 
@@ -27,7 +29,13 @@ class DeepLinkingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBranchIoDeepLinkFactory(
+    fun providePendingDeepLinkProvider(preferences: Preferences): PendingDeepLinkProvider {
+        return PendingDeepLinkProvider(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBranchIoLinkConverter(
         deepLinkingPreferences: DeepLinkingPreferences
     ) = BranchIoLinkConverter(deepLinkingPreferences)
 }

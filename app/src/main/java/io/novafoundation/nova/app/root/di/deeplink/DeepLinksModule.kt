@@ -7,8 +7,8 @@ import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.CompoundDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
@@ -42,20 +42,14 @@ class DeepLinksModule {
 
     @Provides
     @FeatureScope
-    fun provideCompoundDeepLinkHandler(
-        nestedHandlers: @JvmWildcard List<DeepLinkHandler>
-    ): CompoundDeepLinkHandler {
-
-        return CompoundDeepLinkHandler(nestedHandlers)
-    }
-
-    @Provides
-    @FeatureScope
     fun provideRootDeepLinkHandler(
-        baseHandler: CompoundDeepLinkHandler
+        pendingDeepLinkProvider: PendingDeepLinkProvider,
+        nestedHandlers: @JvmWildcard List<DeepLinkHandler>
     ): RootDeepLinkHandler {
-
-        return RootDeepLinkHandler(baseHandler)
+        return RootDeepLinkHandler(
+            pendingDeepLinkProvider,
+            nestedHandlers
+        )
     }
 
     @Provides

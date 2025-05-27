@@ -20,7 +20,7 @@ class BuyCallbackDeepLinkHandler(
         return ProviderUtils.REDIRECT_URL_BASE in link
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri) = runCatching {
         val message = resourceManager.getString(R.string.buy_completed)
         callbackFlow.emit(CallbackEvent.Message(message))
     }

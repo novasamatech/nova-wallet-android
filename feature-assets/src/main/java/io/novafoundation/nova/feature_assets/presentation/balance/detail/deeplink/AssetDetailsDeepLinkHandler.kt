@@ -34,7 +34,7 @@ class AssetDetailsDeepLinkHandler(
         return path.startsWith(assetDetailsDeepLinkConfigurator.deepLinkPrefix)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri): Result<Unit> = runCatching {
         automaticInteractionGate.awaitInteractionAllowed()
 
         val address = data.getAddress()

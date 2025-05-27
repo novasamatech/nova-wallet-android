@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExterna
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
@@ -96,6 +97,8 @@ interface RootDependencies {
     val deepLinkingPreferences: DeepLinkingPreferences
 
     val branchIoLinkConverter: BranchIoLinkConverter
+
+    val pendingDeepLinkProvider: PendingDeepLinkProvider
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
