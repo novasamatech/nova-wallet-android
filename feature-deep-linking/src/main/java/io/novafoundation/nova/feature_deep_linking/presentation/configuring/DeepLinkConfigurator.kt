@@ -22,7 +22,7 @@ fun buildLink(resourceManager: ResourceManager, path: String, type: DeepLinkConf
 
 private fun buildAppLink(resourceManager: ResourceManager, path: String): Uri.Builder {
     val scheme = "https"
-    val host = resourceManager.getString(R.string.app_link_scheme)
+    val host = resourceManager.getString(R.string.app_link_host)
     val handledPath = path.removePrefix("/")
 
     return Uri.Builder()

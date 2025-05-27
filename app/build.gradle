@@ -65,12 +65,12 @@ android {
             buildConfigField "String", "BuildType", "\"release\""
         }
         releaseTest {
-            initWith buildTypes.release
-            matchingFallbacks = ['release']
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
             signingConfig signingConfigs.debug
 
             versionNameSuffix '-releaseTest'
-            applicationIdSuffix '.releaseTest'
+            applicationIdSuffix '.market'
 
             buildConfigField "String", "BuildType", "\"releaseTest\""
         }

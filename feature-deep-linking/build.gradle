@@ -46,6 +46,9 @@ dependencies {
     implementation androidDep
     implementation materialDep
 
+    implementation branchIo
+    implementation playServiceIdentifier
+
     implementation coroutinesDep
 
     implementation daggerDep

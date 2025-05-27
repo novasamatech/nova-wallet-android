@@ -31,6 +31,8 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExterna
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
@@ -90,6 +92,10 @@ interface RootDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val browserTabExternalRepository: BrowserTabExternalRepository
+
+    val deepLinkingPreferences: DeepLinkingPreferences
+
+    val branchIoLinkConverter: BranchIoLinkConverter
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

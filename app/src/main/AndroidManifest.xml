@@ -121,6 +121,16 @@
                 <data android:scheme="http" />
                 <data android:host="app.novawallet.io" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https"/>
+                <data android:host="nova-wallet.app.link"/>
+            </intent-filter>
+
         </activity>
 
         <activity
@@ -185,6 +195,16 @@
             android:name="io.novafoundation.nova.staking_notification_channel_id"
             android:value="@string/staking_notification_channel_id" />
 
+        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_dsxlmUqNhbtOYX6e7cfgrpkbqsjGPYBf" />
+
+        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
+
     </application>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
 </manifest>

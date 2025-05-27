@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="branch_io_link_host" translatable="false">nova-wallet.app.link</string>
+    <string name="branch_io_link_host_alternate" translatable="false">nova-wallet-alternate.app.link</string>
+
     <string name="ledger_verify_addresses_message_both_buttons">Press both buttons on your %s to approve the addresses</string>
     <string name="ledger_verify_addresses_message_confirm_button">Press confirm button on your %s to approve the addresses</string>
 
@@ -126,7 +130,7 @@
     <string name="price_chart_year">1Y</string>
     <string name="price_chart_max">All</string>
 
-    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
+    <string name="app_link_host" translatable="false">app.novawallet.io</string>
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 

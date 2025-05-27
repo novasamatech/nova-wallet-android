@@ -87,7 +87,8 @@ interface RootComponent {
             PushNotificationsFeatureApi::class,
             DeepLinkingFeatureApi::class,
             LedgerFeatureApi::class,
-            BuyFeatureApi::class
+            BuyFeatureApi::class,
+            DeepLinkingFeatureApi::class
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

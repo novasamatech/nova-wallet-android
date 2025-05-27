@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.presentation
 
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.app.root.domain.RootInteractor
