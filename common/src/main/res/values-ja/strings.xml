@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
     <string name="account_ledger_import_start_step_2_highlighted">ネットワークアプリを開く</string>
     <string name="account_ledger_import_start_step_3">Nova Walletに%sしてください</string>
-    <string name="account_ledger_import_start_step_3_highlighted">Bluetoothと位置情報へのアクセスを許可</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetoothへのアクセス</string>
     <string name="account_ledger_import_start_step_4">%s を選択する。</string>
     <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
     <string name="account_ledger_import_start_step_otg">%s を電話の設定で</string>

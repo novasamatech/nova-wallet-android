@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_import_start_step_2_highlighted">Mở ứng dụng mạng</string>
     <string name="account_ledger_import_start_step_3">Cho phép Nova Wallet %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth và Vị trí</string>
+    <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth</string>
     <string name="account_ledger_import_start_step_4">%s để thêm vào ví</string>
     <string name="account_ledger_import_start_step_4_highlighted">Chọn tài khoản</string>
     <string name="account_ledger_import_start_step_otg">%s trong cài đặt điện thoại của bạn</string>

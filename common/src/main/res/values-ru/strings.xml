@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">%s на Вашем Ledger устройстве</string>
     <string name="account_ledger_import_start_step_2_highlighted">Откройте приложение Сети</string>
     <string name="account_ledger_import_start_step_3">Разрешите Nova Wallet %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">доступ к Bluetooth и Гео-локации</string>
+    <string name="account_ledger_import_start_step_3_highlighted">доступ к Bluetooth</string>
     <string name="account_ledger_import_start_step_4">%s для добавления в кошелёк</string>
     <string name="account_ledger_import_start_step_4_highlighted">Выберите аккаунт</string>
     <string name="account_ledger_import_start_step_otg">%s в настройках вашего телефона</string>

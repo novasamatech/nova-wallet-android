@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">%s pada perangkat Ledger Anda</string>
     <string name="account_ledger_import_start_step_2_highlighted">Buka aplikasi jaringan</string>
     <string name="account_ledger_import_start_step_3">Izinkan Nova Wallet untuk %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">akses Bluetooth dan Lokasi</string>
+    <string name="account_ledger_import_start_step_3_highlighted">akses Bluetooth</string>
     <string name="account_ledger_import_start_step_4">%s untuk ditambahkan ke dompet</string>
     <string name="account_ledger_import_start_step_4_highlighted">Pilih akun</string>
     <string name="account_ledger_import_start_step_otg">%s di pengaturan ponsel Anda</string>

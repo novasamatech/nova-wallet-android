@@ -82,7 +82,7 @@
     <string name="account_ledger_import_start_step_2">Ledger 기기에서 %s</string>
     <string name="account_ledger_import_start_step_2_highlighted">네트워크 앱을 여세요</string>
     <string name="account_ledger_import_start_step_3">%s에 대한 Nova Wallet 접근을 허용하십시오</string>
-    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 및 위치</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 접근</string>
     <string name="account_ledger_import_start_step_4">지갑에 추가하려면 %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">계정을 선택</string>
     <string name="account_ledger_import_start_step_otg">%s 전화 설정에서</string>

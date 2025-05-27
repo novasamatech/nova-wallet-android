@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <!--<string name="account_ledger_import_start_step_3_highlighted">access Bluetooth and Location</string>-->
     <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth</string>
 
     <string name="ledger_verify_addresses_message_both_buttons">Press both buttons on your %s to approve the addresses</string>
