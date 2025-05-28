@@ -13,7 +13,9 @@ class ReferendumDeepLinkData(
 interface ReferendumDetailsDeepLinkConfigurator : DeepLinkConfigurator<ReferendumDeepLinkData> {
 
     companion object {
-        const val PREFIX = "/open/gov"
+        const val ACTION = "open"
+        const val SCREEN = "gov"
+        const val PREFIX = "/$ACTION/$SCREEN"
         const val CHAIN_ID_PARAM = "chainId"
         const val REFERENDUM_ID_PARAM = "id"
         const val GOVERNANCE_TYPE_PARAM = "type"

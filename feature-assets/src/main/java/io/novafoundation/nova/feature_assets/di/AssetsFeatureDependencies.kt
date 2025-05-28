@@ -56,6 +56,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
@@ -210,6 +211,8 @@ interface AssetsFeatureDependencies {
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val linkBuilderFactory: LinkBuilderFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

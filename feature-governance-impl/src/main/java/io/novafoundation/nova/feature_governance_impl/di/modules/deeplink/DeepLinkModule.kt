@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
@@ -18,8 +19,10 @@ class DeepLinkModule {
 
     @Provides
     @FeatureScope
-    fun provideDeepLinkConfigurator(resourceManager: ResourceManager): ReferendumDetailsDeepLinkConfigurator {
-        return RealReferendumDetailsDeepLinkConfigurator(resourceManager)
+    fun provideDeepLinkConfigurator(
+        linkBuilderFactory: LinkBuilderFactory
+    ): ReferendumDetailsDeepLinkConfigurator {
+        return RealReferendumDetailsDeepLinkConfigurator(linkBuilderFactory)
     }
 
     @Provides

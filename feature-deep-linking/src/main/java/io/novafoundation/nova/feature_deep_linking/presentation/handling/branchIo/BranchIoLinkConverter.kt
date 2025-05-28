@@ -7,9 +7,6 @@ import io.novafoundation.nova.common.utils.appendQueries
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 
 private val BRANCH_PARAMS_PREFIX = listOf("~", "$", "+")
-private const val ACTION_QUERY = "action"
-private const val SCREEN_QUERY = "screen"
-private const val ENTITY_QUERY = "entity"
 
 class BranchIoLinkConverter(
     private val deepLinkingPreferences: DeepLinkingPreferences
@@ -37,11 +34,11 @@ class BranchIoLinkConverter(
     }
 
     private fun MutableMap<String, String>.extractAction(): String? {
-        return remove(ACTION_QUERY)
+        return remove(BranchIOConstants.ACTION_QUERY)
     }
 
     private fun MutableMap<String, String>.extractSubject(): String? {
-        return remove(SCREEN_QUERY)
-            ?: remove(ENTITY_QUERY)
+        return remove(BranchIOConstants.SCREEN_QUERY)
+            ?: remove(BranchIOConstants.ENTITY_QUERY)
     }
 }

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_deep_linking.R
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
@@ -26,6 +27,10 @@ class DeepLinkingFeatureModule {
             resourceManager.getString(R.string.branch_io_link_host_alternate)
         )
     )
+
+    @Provides
+    @FeatureScope
+    fun provideLinkBuilderFactory(preferences: DeepLinkingPreferences) = LinkBuilderFactory(preferences)
 
     @Provides
     @FeatureScope

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import io.branch.referral.Branch
+import io.branch.referral.Defines
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_deep_linking.BuildConfig
 
@@ -19,7 +20,8 @@ class BranchIOLinkHandler(
                 Branch.enableLogging()
             }
 
-            Branch.getAutoInstance(context)
+            val branchInstance = Branch.getAutoInstance(context)
+            branchInstance.setConsumerProtectionAttributionLevel(Defines.BranchAttributionLevel.REDUCED)
         }
     }
 
@@ -40,7 +42,6 @@ class BranchIOLinkHandler(
     }
 
     fun onActivityNewIntent(activity: Activity, intent: Intent?) {
-        activity.intent = intent
         if (intent != null && intent.getBooleanExtra("branch_force_new_session", false)) {
             Branch.sessionBuilder(activity)
                 .withCallback { _, error ->

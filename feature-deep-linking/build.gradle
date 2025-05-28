@@ -53,4 +53,8 @@ dependencies {
 
     implementation daggerDep
     kapt daggerKapt
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }
