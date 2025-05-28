@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.historical.HistoricalValidatorRewardPointsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.ActiveEraScope
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.BondedErasUpdaterUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentEpochIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSessionIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
@@ -209,15 +210,27 @@ class RelaychainStakingUpdatersModule {
     @Provides
     @FeatureScope
     fun provideEraStartSessionIndexUpdater(
-        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
         activeEraScope: ActiveEraScope,
     ) = EraStartSessionIndexUpdater(
         activeEraScope = activeEraScope,
         storageCache = storageCache,
-        timelineDelegatingChainIdHolder = timelineDelegatingChainIdHolder,
-        chainRegistry = chainRegistry
+        chainRegistry = chainRegistry,
+        stakingSharedState = stakingSharedState
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideBondedErasUpdater(
+        chainRegistry: ChainRegistry,
+        storageCache: StorageCache,
+        stakingSharedState: StakingSharedState,
+    ) = BondedErasUpdaterUpdater(
+        storageCache = storageCache,
+        chainRegistry = chainRegistry,
+        stakingSharedState = stakingSharedState
     )
 
     @Provides
@@ -407,6 +420,7 @@ class RelaychainStakingUpdatersModule {
         genesisSlotUpdater: GenesisSlotUpdater,
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
+        bondedErasUpdaterUpdater: BondedErasUpdaterUpdater,
         proxiesUpdater: ProxiesUpdater
     ) = StakingUpdaters.Group(
         activeEraUpdater,
@@ -430,6 +444,7 @@ class RelaychainStakingUpdatersModule {
         genesisSlotUpdater,
         currentSessionIndexUpdater,
         eraStartSessionIndexUpdater,
-        proxiesUpdater
+        proxiesUpdater,
+        bondedErasUpdaterUpdater
     )
 }

@@ -118,8 +118,7 @@ class EraTimeCalculatorFactory(
             electionsSession.currentEpochIndexFlow(timelineChainId),
             electionsSession.currentSlotFlow(timelineChainId),
         ) { activeEra, currentSessionIndex, currentEpochIndex, currentSlot ->
-            // Important: StartSessionIndex storage is in staking pallet, but we need to access it on timeline chain
-            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(timelineChainId, activeEra)
+            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(stakingChainId, activeEra)
 
             EraTimeCalculator(
                 startTimeStamp = System.currentTimeMillis().toBigInteger(),

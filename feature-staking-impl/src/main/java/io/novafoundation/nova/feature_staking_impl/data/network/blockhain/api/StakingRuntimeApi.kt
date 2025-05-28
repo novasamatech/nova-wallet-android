@@ -3,25 +3,28 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.staking
+import io.novafoundation.nova.feature_staking_api.domain.model.BondedEras
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
+import io.novafoundation.nova.feature_staking_api.domain.model.SessionIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bind
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominations
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
-import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry0
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1
 import io.novafoundation.nova.runtime.storage.source.query.api.storage0
+import io.novafoundation.nova.runtime.storage.source.query.api.storage0OrNull
 import io.novafoundation.nova.runtime.storage.source.query.api.storage1
+import io.novafoundation.nova.runtime.storage.source.query.api.storage1OrNull
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
-import java.math.BigInteger
 
 @JvmInline
 value class StakingRuntimeApi(override val module: Module) : QueryableModule
@@ -51,5 +54,9 @@ val StakingRuntimeApi.activeEra: QueryableStorageEntry0<EraIndex>
     get() = storage0("ActiveEra", binding = ::bindActiveEra)
 
 context(RuntimeContext)
-val StakingRuntimeApi.erasStartSessionIndex: QueryableStorageEntry1<EraIndex, BigInteger>
-    get() = storage1("ErasStartSessionIndex", binding = { decoded, _ -> bindSessionIndex(decoded) })
+val StakingRuntimeApi.erasStartSessionIndexOrNull: QueryableStorageEntry1<EraIndex, SessionIndex>?
+    get() = storage1OrNull("ErasStartSessionIndex", binding = { decoded, _ -> bindSessionIndex(decoded) })
+
+context(RuntimeContext)
+val StakingRuntimeApi.bondedErasOrNull: QueryableStorageEntry0<BondedEras>?
+    get() = storage0OrNull("BondedEras", binding = BondedEras.Companion::bind)

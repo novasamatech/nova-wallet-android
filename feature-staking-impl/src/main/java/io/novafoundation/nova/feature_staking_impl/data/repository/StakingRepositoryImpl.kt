@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.constant
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.staking
@@ -22,8 +23,11 @@ import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_api.domain.model.findStartSessionIndexOf
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.erasStartSessionIndex
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.activeEra
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.bondedErasOrNull
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.erasStartSessionIndexOrNull
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
@@ -45,16 +49,15 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
-import io.novafoundation.nova.common.utils.metadata
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.activeEra
-import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -82,10 +85,23 @@ class StakingRepositoryImpl(
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
 ) : StakingRepository {
 
-    override suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex {
+    override suspend fun eraStartSessionIndex(chainId: ChainId, era: EraIndex): EraIndex {
         return localStorage.query(chainId) {
-            metadata.staking.erasStartSessionIndex.queryNonNull(currentEra)
+            val sessionIndex = eraStartSessionIndexNew(era) ?: eraStartSessionIndexLegacy(era)
+            requireNotNull(sessionIndex) {
+                "No start session index detected for era $era on chain $chainId"
+            }
         }
+    }
+
+    context(StorageQueryContext)
+    private suspend fun eraStartSessionIndexNew(eraIndex: EraIndex): EraIndex? {
+        return metadata.staking.bondedErasOrNull?.query()?.findStartSessionIndexOf(eraIndex)
+    }
+
+    context(StorageQueryContext)
+    private suspend fun eraStartSessionIndexLegacy(eraIndex: EraIndex): EraIndex? {
+        return metadata.staking.erasStartSessionIndexOrNull?.query(eraIndex)
     }
 
     override suspend fun eraLength(chainId: ChainId): BigInteger {

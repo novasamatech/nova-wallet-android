@@ -20,7 +20,7 @@ typealias ExposuresWithEraIndex = Pair<AccountIdMap<Exposure>, EraIndex>
 
 interface StakingRepository {
 
-    suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex
+    suspend fun eraStartSessionIndex(chainId: ChainId, era: EraIndex): EraIndex
 
     suspend fun eraLength(chainId: ChainId): BigInteger
 
