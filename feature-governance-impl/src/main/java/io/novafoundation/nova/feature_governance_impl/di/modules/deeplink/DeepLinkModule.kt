@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.di.modules.deeplink
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
