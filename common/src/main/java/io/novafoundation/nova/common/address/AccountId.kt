@@ -1,11 +1,15 @@
 package io.novafoundation.nova.common.address
 
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class AccountIdKey(val value: AccountId) {
 
-    companion object;
+    companion object {
+
+        fun fromHex(hex: String) = AccountIdKey(hex.fromHex())
+    }
 
     override fun equals(other: Any?): Boolean {
         return this === other || other is AccountIdKey && this.value contentEquals other.value

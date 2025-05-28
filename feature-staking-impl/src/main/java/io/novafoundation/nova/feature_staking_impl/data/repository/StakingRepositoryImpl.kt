@@ -1,8 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository
 
+import android.util.Log
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
 import io.novafoundation.nova.common.utils.constant
+import io.novafoundation.nova.common.utils.filterToSet
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.numberConstantOrNull
@@ -30,6 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.bo
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.erasStartSessionIndexOrNull
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.ledger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.staking
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.unappliedSlashes
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindCurrentEra
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindExposure
@@ -58,6 +64,7 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
+import io.novafoundation.nova.runtime.storage.source.queryCatching
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -212,33 +219,58 @@ class StakingRepositoryImpl(
     }
 
     override suspend fun getSlashes(
-        stakingChain: Chain,
+        chainId: ChainId,
         accountIdsHex: Collection<String>
-    ): AccountIdMap<Boolean> = withContext(Dispatchers.Default) {
-        val activeEra = getActiveEraIndex(stakingChain.id)
+    ): Set<AccountIdKey> = withContext(Dispatchers.Default) {
+        val activeEra = getActiveEraIndex(chainId)
 
-        remoteStorage.query(stakingChain.timelineChainIdOrSelf()) {
-            val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
-            val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
-
-            runtime.metadata.staking().storage("SlashingSpans").entries(
-                keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
-                keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
-                binding = { decoded, _ ->
-                    val span = decoded?.let { bindSlashingSpans(it) }
-
-                    isSlashed(span, activeEra, slashDeferDuration)
-                }
-            )
+        remoteStorage.queryCatching(chainId) {
+            getSlashesFromSpans(accountIdsHex, activeEra)
+                ?: getSlashesFromUnappliedSlashes(accountIdsHex)
         }
+            .onFailure { Log.w("StakingRepository", "Failed to get slashes for chain $chainId", it) }
+            .getOrDefault(emptySet())
+    }
+
+    context(StorageQueryContext)
+    private suspend fun getSlashesFromSpans(
+        accountIdsHex: Collection<String>,
+        activeEraIndex: BigInteger,
+    ): Set<AccountIdKey>? {
+        val slashDeferDurationConstant = runtime.metadata.staking().constant("SlashDeferDuration")
+        val slashDeferDuration = bindSlashDeferDuration(slashDeferDurationConstant, runtime)
+
+        val storage = runtime.metadata.staking().storageOrNull("SlashingSpans") ?: return null
+
+        return storage.entries(
+            keysArguments = accountIdsHex.map { listOf(it.fromHex()) },
+            keyExtractor = { (accountId: AccountId) -> accountId.toHexString() },
+            binding = { decoded, _ ->
+                val span = decoded?.let { bindSlashingSpans(it) }
+
+                isSlashed(span, activeEraIndex, slashDeferDuration)
+            }
+        )
+            .mapNotNull { (key, value) -> AccountIdKey.fromHex(key).takeIf { value } }
+            .toSet()
+    }
+
+    context(StorageQueryContext)
+    private suspend fun getSlashesFromUnappliedSlashes(
+        accountIdsHex: Collection<String>,
+    ): Set<AccountIdKey> {
+        return runtime.metadata.staking.unappliedSlashes.keys()
+            .mapToSet { it.second.validator }
+            .filterToSet { it.toHex() in accountIdsHex }
     }
 
     override suspend fun getSlashingSpan(chainId: ChainId, accountId: AccountId): SlashingSpans? {
-        return remoteStorage.query(
-            keyBuilder = { it.metadata.staking().storage("SlashingSpans").storageKey(it, accountId) },
-            binding = { scale, runtimeSnapshot -> scale?.let { bindSlashingSpans(it, runtimeSnapshot) } },
-            chainId = chainId
-        )
+        return remoteStorage.query(chainId) {
+            metadata.staking().storageOrNull("SlashingSpans")?.query(
+                accountId,
+                binding = { decoded -> decoded?.let { bindSlashingSpans(it) } }
+            )
+        }
     }
 
     override fun stakingStateFlow(

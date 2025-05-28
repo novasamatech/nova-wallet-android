@@ -9,8 +9,10 @@ import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SessionIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.UnappliedSlashKey
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bind
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindActiveEra
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindEraIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindNominations
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSessionIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
@@ -18,10 +20,12 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry0
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1
+import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry2
 import io.novafoundation.nova.runtime.storage.source.query.api.storage0
 import io.novafoundation.nova.runtime.storage.source.query.api.storage0OrNull
 import io.novafoundation.nova.runtime.storage.source.query.api.storage1
 import io.novafoundation.nova.runtime.storage.source.query.api.storage1OrNull
+import io.novafoundation.nova.runtime.storage.source.query.api.storage2
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
@@ -60,3 +64,14 @@ val StakingRuntimeApi.erasStartSessionIndexOrNull: QueryableStorageEntry1<EraInd
 context(RuntimeContext)
 val StakingRuntimeApi.bondedErasOrNull: QueryableStorageEntry0<BondedEras>?
     get() = storage0OrNull("BondedEras", binding = BondedEras.Companion::bind)
+
+context(RuntimeContext)
+val StakingRuntimeApi.unappliedSlashes: QueryableStorageEntry2<EraIndex, UnappliedSlashKey, Unit>
+    get() = storage2(
+        name = "UnappliedSlashes",
+        binding = { _, _, _ -> },
+        key1ToInternalConverter = { it },
+        key2ToInternalConverter = { TODO("Not yet needed") },
+        key1FromInternalConverter = ::bindEraIndex,
+        key2FromInternalConverter = UnappliedSlashKey.Companion::bind
+    )
