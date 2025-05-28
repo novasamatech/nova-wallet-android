@@ -8,8 +8,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.TimelineDelegatingChainIdHolder
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.AsStakingUpdater
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.DelegateToTimeLineChainUpdater
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.Mythos
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.MythosStakingUpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolStakingUpdatersModule
@@ -23,9 +21,11 @@ import io.novafoundation.nova.feature_staking_impl.di.staking.relaychain.Relaych
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.AsSharedStateUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimeLineChainUpdater
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -52,7 +52,7 @@ class UpdatersModule {
     ) = StakingUpdaters.Group(
         DelegateToTimeLineChainUpdater(blockTimeUpdater),
         DelegateToTimeLineChainUpdater(blockNumberUpdater),
-        AsStakingUpdater(totalIssuanceUpdater)
+        AsSharedStateUpdater(totalIssuanceUpdater)
     )
 
     @Provides
@@ -85,7 +85,7 @@ class UpdatersModule {
     ) = StakingUpdateSystem(
         stakingUpdaters = stakingUpdaters,
         chainRegistry = chainRegistry,
-        singleAssetSharedState = singleAssetSharedState,
+        stakingSharedState = singleAssetSharedState,
         storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
     )
 

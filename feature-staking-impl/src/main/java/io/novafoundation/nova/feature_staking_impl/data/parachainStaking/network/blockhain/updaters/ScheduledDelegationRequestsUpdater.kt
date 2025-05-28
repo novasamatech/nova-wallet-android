@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -29,7 +29,7 @@ class ScheduledDelegationRequestsUpdater(
     private val stakingSharedState: StakingSharedState,
     private val remoteStorageDataSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
-) : StakingUpdater<MetaAccount> {
+) : SharedStateBasedUpdater<MetaAccount> {
 
     override suspend fun listenForUpdates(
         storageSubscriptionBuilder: SharedRequestsBuilder,

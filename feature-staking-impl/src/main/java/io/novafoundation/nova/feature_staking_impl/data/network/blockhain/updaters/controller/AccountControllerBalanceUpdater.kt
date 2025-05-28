@@ -5,7 +5,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDefault
@@ -27,7 +27,7 @@ class AccountControllerBalanceUpdater(
     private val sharedState: StakingSharedState,
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
-) : StakingUpdater<AccountStakingLocal> {
+) : SharedStateBasedUpdater<AccountStakingLocal> {
 
     override suspend fun listenForUpdates(
         storageSubscriptionBuilder: SharedRequestsBuilder,

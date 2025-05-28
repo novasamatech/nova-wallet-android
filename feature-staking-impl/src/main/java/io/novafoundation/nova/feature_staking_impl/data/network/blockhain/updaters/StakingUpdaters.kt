@@ -2,10 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updat
 
 import io.novafoundation.nova.common.utils.MultiMap
 import io.novafoundation.nova.common.utils.buildMultiMap
-import io.novafoundation.nova.common.utils.groupByIntoSet
 import io.novafoundation.nova.common.utils.putAll
 import io.novafoundation.nova.core.updater.Updater
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
@@ -17,6 +15,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.groupBySyncingChain
 
 class StakingUpdaters(
     private val relaychainUpdaters: Group,
@@ -27,8 +27,8 @@ class StakingUpdaters(
     private val mythosUpdaters: Group,
 ) {
 
-    class Group(val updaters: List<StakingUpdater<*>>) {
-        constructor(vararg updaters: StakingUpdater<*>) : this(updaters.toList())
+    class Group(val updaters: List<SharedStateBasedUpdater<*>>) {
+        constructor(vararg updaters: SharedStateBasedUpdater<*>) : this(updaters.toList())
     }
 
     fun getUpdaters(stakingChain: Chain, stakingType: StakingType): MultiMap<ChainId, Updater<*>> {
@@ -48,11 +48,11 @@ class StakingUpdaters(
         }
     }
 
-    private fun getCommonUpdaters(stakingChain: Chain): MultiMap<ChainId, StakingUpdater<*>> {
+    private fun getCommonUpdaters(stakingChain: Chain): MultiMap<ChainId, SharedStateBasedUpdater<*>> {
         return commonUpdaters.updaters.groupBySyncingChain(stakingChain)
     }
 
-    private fun getUpdatersByType(stakingChain: Chain, stakingType: StakingType): MultiMap<ChainId, StakingUpdater<*>> {
+    private fun getUpdatersByType(stakingChain: Chain, stakingType: StakingType): MultiMap<ChainId, SharedStateBasedUpdater<*>> {
         val byTypeUpdaters = when (stakingType) {
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters.updaters
             PARACHAIN -> parachainUpdaters.updaters
@@ -63,9 +63,5 @@ class StakingUpdaters(
         }
 
         return byTypeUpdaters.groupBySyncingChain(stakingChain)
-    }
-
-    private fun List<StakingUpdater<*>>.groupBySyncingChain(stakingChain: Chain): MultiMap<ChainId, StakingUpdater<*>> {
-        return groupByIntoSet(keySelector = { it.getSyncChainId(stakingChain) })
     }
 }

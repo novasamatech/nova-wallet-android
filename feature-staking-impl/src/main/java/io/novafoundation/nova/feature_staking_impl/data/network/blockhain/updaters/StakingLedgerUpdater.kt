@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.isUnbondingIn
 import io.novafoundation.nova.feature_staking_api.domain.model.sumStaking
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -56,7 +56,7 @@ class StakingLedgerUpdater(
     private val storageCache: StorageCache,
     private val assetCache: AssetCache,
     override val scope: AccountUpdateScope,
-) : StakingUpdater<MetaAccount> {
+) : SharedStateBasedUpdater<MetaAccount> {
 
     override suspend fun listenForUpdates(
         storageSubscriptionBuilder: SharedRequestsBuilder,

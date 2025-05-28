@@ -8,7 +8,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.fetchPrefixValuesToCache
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -29,7 +29,7 @@ class CurrentRoundCollatorsUpdater(
     private val chainRegistry: ChainRegistry,
     private val storageCache: StorageCache,
     private val currentRoundRepository: CurrentRoundRepository,
-) : GlobalScopeUpdater, StakingUpdater<Unit> {
+) : GlobalScopeUpdater, SharedStateBasedUpdater<Unit> {
 
     override suspend fun listenForUpdates(
         storageSubscriptionBuilder: SharedRequestsBuilder,

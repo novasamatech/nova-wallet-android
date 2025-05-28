@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchai
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.collatorStaking
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.model.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosUserStakeRepository
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -28,7 +28,7 @@ class MythosSelectedCandidatesUpdater(
     private val storageCache: StorageCache,
     private val mythosUserStakeRepository: MythosUserStakeRepository,
     private val remoteStorageDataSource: StorageDataSource,
-) : StakingUpdater<MetaAccount> {
+) : SharedStateBasedUpdater<MetaAccount> {
 
     override suspend fun listenForUpdates(
         storageSubscriptionBuilder: SharedRequestsBuilder,

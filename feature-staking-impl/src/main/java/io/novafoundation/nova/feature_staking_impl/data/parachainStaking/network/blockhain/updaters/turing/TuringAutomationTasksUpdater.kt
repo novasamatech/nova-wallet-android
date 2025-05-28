@@ -9,7 +9,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.chain
@@ -27,7 +27,7 @@ class TuringAutomationTasksUpdater(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
     override val scope: AccountUpdateScope,
-) : StakingUpdater<MetaAccount> {
+) : SharedStateBasedUpdater<MetaAccount> {
 
     override suspend fun listenForUpdates(
         storageSubscriptionBuilder: SharedRequestsBuilder,

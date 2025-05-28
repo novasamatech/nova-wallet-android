@@ -7,7 +7,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.ActiveEraScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -27,7 +27,7 @@ class HistoricalUpdateMediator(
     private val storageCache: StorageCache,
     private val chainRegistry: ChainRegistry,
     private val preferences: Preferences,
-) : Updater<EraIndex>, StakingUpdater<EraIndex> {
+) : Updater<EraIndex>, SharedStateBasedUpdater<EraIndex> {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder, scopeValue: EraIndex): Flow<Updater.SideEffect> {
         val chainId = stakingSharedState.chainId()
