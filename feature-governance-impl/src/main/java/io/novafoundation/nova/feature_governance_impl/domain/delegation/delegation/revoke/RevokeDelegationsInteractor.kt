@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_api.domain.track.matchWith
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.tracksByIdOf
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -65,7 +66,7 @@ class RealRevokeDelegationsInteractor(
             val (chain, source, chainAsset) = useSelectedGovernance()
             val accountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-            val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
+            val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
             val tracks = tracksUseCase.tracksByIdOf(trackIds)
 
             val delegations = source.convictionVoting.votingFor(accountId, chain.id, trackIds)
