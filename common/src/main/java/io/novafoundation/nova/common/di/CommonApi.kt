@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -107,6 +108,8 @@ interface CommonApi {
     val webViewFileChooserFactory: WebViewFileChooserFactory
 
     val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
+
+    val addressSchemeFormatter: AddressSchemeFormatter
 
     fun computationalCache(): ComputationalCache
 

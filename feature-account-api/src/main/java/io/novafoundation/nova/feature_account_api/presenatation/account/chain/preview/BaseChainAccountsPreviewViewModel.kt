@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview.model.ChainAccountPreview
@@ -25,7 +24,8 @@ abstract class BaseChainAccountsPreviewViewModel(
 
     open val subtitle: String? = null
 
-    abstract val chainAccountProjections: Flow<List<AccountInChainUi>>
+    // List<ChainAccountGroupUi | AccountInChainUi>
+    abstract val chainAccountProjections: Flow<List<Any?>>
 
     abstract val buttonState: Flow<DescriptiveButtonState>
 
@@ -41,11 +41,7 @@ abstract class BaseChainAccountsPreviewViewModel(
         externalActions.showAddressActions(item.address, chain)
     }
 
-    protected fun Flow<List<ChainAccountPreview>>.defaultFormat(): Flow<List<AccountInChainUi>> {
-        return mapList(::mapParitySignerAccountInChainToUi)
-    }
-
-    private suspend fun mapParitySignerAccountInChainToUi(account: ChainAccountPreview): AccountInChainUi = with(account) {
+    protected suspend fun mapChainAccountPreviewToUi(account: ChainAccountPreview): AccountInChainUi = with(account) {
         val address = chain.addressOf(accountId)
 
         val icon = iconGenerator.createAccountAddressModel(chain, accountId).image

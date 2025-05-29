@@ -97,7 +97,7 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 @Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
-@Module(includes = [ParallaxCardModule::class, WebViewModule::class])
+@Module(includes = [ParallaxCardModule::class, WebViewModule::class, CommonBindsModule::class])
 class CommonModule {
 
     @Provides

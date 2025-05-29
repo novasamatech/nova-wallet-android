@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">Evm címnek érvényesnek vagy üresnek kell lennie...</string>
     <string name="accoount_enter_substrate_address">Valós Substrate cím megadása...</string>
     <string name="account_add_account">Fiók hozzáadása</string>
+    <string name="account_add_address">Cím hozzáadása</string>
     <string name="account_add_already_exists_message">A fiók már létezik. Kérlek, próbálj meg egy másikat.</string>
     <string name="account_add_watch_only_description">Bármely tárca követése cím alapján</string>
     <string name="account_add_watch_wallet">Csak nézhető tárca hozzáadása</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">Kérlek, próbálj meg egy másikat.</string>
     <string name="account_ethereum_crypto_type">Ethereum kulcspár titkosítási típusa</string>
     <string name="account_ethereum_derivation_path">Ethereum titkos származtatási útvonal</string>
+    <string name="account_evm_accounts">EVM Fiókok</string>
     <string name="account_export">Fiók exportálása</string>
     <string name="account_export_action">Exportálás</string>
     <string name="account_export_existing">Létező importálása</string>
@@ -75,25 +77,22 @@
     <string name="account_ledger_import_fill_description">Győzödj meg róla, hogy a hálózati alkalmazás telepítve van azon a Ledger eszközödön, amelyik a Ledger Live-ot használja. Nyisd meg a hálózati alkalmazást a Ledger eszközödön.</string>
     <string name="account_ledger_import_fill_disabled_hint">Legalább egy fiókot hozzá kell adni</string>
     <string name="account_ledger_import_fill_title">Fiókok hozzáadása a tárcához</string>
-    <string name="account_ledger_import_start_guide">Ledger Kapcsolódási Útmutató</string>
     <string name="account_ledger_import_start_step_1">Győzödj meg róla, hogy a <font color="#FFFFFF">hálózati alkalmazás telepítve van</font> azon a Ledger eszközödön, amelyik a Ledger Live-ot használja</string>
     <string name="account_ledger_import_start_step_1_highlighted">Hálózati alkalmazás telepítve van</string>
     <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Nyisd meg a hálózati alkalmazást</font> a Ledger eszközödön</string>
     <string name="account_ledger_import_start_step_2_highlighted">Nyissa meg a hálózati alkalmazást</string>
     <string name="account_ledger_import_start_step_3"><font color="#FFFFFF">Engedélyezed a Bluetooth-t és helymeghatározást</font> a Nova Wallet számára</string>
-    <string name="account_ledger_import_start_step_3_highlighted">hozzáférés a Bluetooth-hoz és a Helyhez</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth hozzáférést</string>
     <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Válaszd ki a fiókot</font> a hozzáadáshoz</string>
     <string name="account_ledger_import_start_step_4_highlighted">Fiók kiválasztása</string>
     <string name="account_ledger_import_start_step_otg">%s a telefon beállításaiban</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTG engedélyezése</string>
-    <string name="account_ledger_import_start_title">Ledger Csatlakoztatás</string>
     <string name="account_ledger_legacy_warning_message">Az új, Általános Ledger alkalmazásra történő aláírás és a fiókok migrálása érdekében telepítse és nyissa meg a Migration alkalmazást. A legújabb és Migration Ledger alkalmazásokat nem támogatják a jövőben.</string>
     <string name="account_ledger_legacy_warning_title">Új Ledger alkalmazás kiadva</string>
     <string name="account_ledger_migration_app">Polkadot Migráció</string>
     <string name="account_ledger_migration_deprecation_message">A közeljövőben a Migration alkalmazás nem lesz elérhető. Használja azt fiókjainak az új Ledger alkalmazásra történő migrálásához, hogy elkerülje az alapok elvesztését.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Hagyományos</string>
     <string name="account_ledger_select_device_all_description">Ha Ledgert használ Bluetooth-on keresztül, engedélyezze a Bluetooth-t mindkét eszközön, és adja meg a Nova Bluetooth- és helyengedélyeket. USB esetén engedélyezze az OTG-t a telefon beállításaiban.</string>
     <string name="account_ledger_select_device_description">Kérlek, kapcsold be a Bluetooth-t a telefonodon és a Ledger eszközön. Old fel a Ledger eszközt és nyisd meg a(z) %s alkalmazást.</string>
     <string name="account_ledger_select_device_title">Válaszd ki Ledger eszközöd</string>
@@ -150,6 +149,7 @@
     <string name="account_select_secret_source">Válaszd ki a titkos kulcs típusát</string>
     <string name="account_select_wallet">Tárca kiválasztása</string>
     <string name="account_shared_secret">Fiókok közös titkos kulccsal</string>
+    <string name="account_substrate_accounts">Substrate Fiókok</string>
     <string name="account_substrate_crypto_type">Substrate kulcspár titkosítási típusa</string>
     <string name="account_substrate_derivation_path">Substrate titkos származtatási útvonal</string>
     <string name="account_wallet_nickname">Tárca beceneve</string>
@@ -253,8 +253,6 @@
     <string name="buy_completed">Kérlek várj, a vásárlás megkezdődött, ami eltarthat akár 60 percig is. Az állapotot nyomon követheted az e-mailben.</string>
     <string name="buy_network_flow_title">Válasszon hálózatot a vásárláshoz %s</string>
     <string name="buy_order_completed_message">Vásárlás elindítva! Kérjük, várjon legfeljebb 60 percig. A státuszt nyomon követheti az e-mailben.</string>
-    <string name="buy_provider_open_confirmation_message">A vásárlás folytatásához átirányítunk a Nova Wallet alkalmazásból ide: %s</string>
-    <string name="buy_provider_open_confirmation_title">Folytatás a böngészőben?</string>
     <string name="buy_token_not_supported_message">Egyik szolgáltatónk sem támogatja jelenleg ennek a tokennek a vásárlását. Kérjük, válasszon másik tokent, másik hálózatot, vagy térjen vissza később.</string>
     <string name="buy_token_not_supported_title">Ez a token nem támogatott a vásárlás funkció által</string>
     <string name="chain_network_management_auto_balance">Automatikus csomópontok egyensúlyozása</string>
@@ -819,6 +817,7 @@
     <string name="language_title">Nyelv</string>
     <string name="ledger_chain_not_supported">A Ledger nem támogatja a következőt: %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
     <string name="ledger_device_stax">Ledger Stax</string>
@@ -831,6 +830,10 @@
     <string name="ledger_hold_to_sign">Tartsa lenyomva a megerősítő gombot a %s készülékén a tranzakció jóváhagyásához</string>
     <string name="ledger_import_select_address_load_more">További fiókok betöltése</string>
     <string name="ledger_review_approve_title">Ellenőrzés és jóváhagyás</string>
+    <string name="ledger_select_address_account_label">Fiók %s</string>
+    <string name="ledger_select_address_not_found">Fiók nem található</string>
+    <string name="ledger_select_address_update_for_evm_message">A Ledger eszközöd régi általános alkalmazást használ, amely nem támogatja az EVM címeket. Frissítsd a Ledger Live-on keresztül.</string>
+    <string name="ledger_select_address_update_for_evm_title">Ledger General App frissítése</string>
     <string name="ledger_sign_approve_message">Nyomd le mindkét gombot a %s eszközön a tranzakció jóváhagyásához</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Kérlek, frissítsd a %s-ot a Ledger Live-val</string>
     <string name="ledger_sign_metadata_outdated_title">A metaadatok elavultak</string>
@@ -843,6 +846,8 @@
     <string name="ledger_sign_tx_not_supported_title">A tranzakció nem támogatott</string>
     <string name="ledger_verify_address_message_both_buttons">Nyomja meg mindkét gombot a %s készülékén a cím jóváhagyásához</string>
     <string name="ledger_verify_address_message_confirm_button">Nyomja meg a megerősítő gombot a %s készülékén a cím jóváhagyásához</string>
+    <string name="ledger_verify_addresses_message_both_buttons">Nyomd meg mindkét gombot a %s eszközödön a címek jóváhagyásához</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Nyomd meg a megerősítés gombot a %s eszközödön a címek jóváhagyásához</string>
     <string name="ledger_wallet_details_description">Ez a tárca a Ledger-rel van párosítva. A Nova segít bármilyen művelet létrehozásában és azok aláírása a Ledger segítségével történik majd.</string>
     <string name="ledher_import_select_address_title">Válaszd ki a fiókot a hozzáadáshoz</string>
     <string name="loading_network_info">Hálózati információ betöltése...</string>
@@ -1674,6 +1679,8 @@
     <string name="trade_provider_list_buy_title">Válasszon szolgáltatót a(z) %s token vásárlásához</string>
     <string name="trade_provider_list_footer">A fizetési módok, díjak és korlátok szolgáltatónként eltérőek.\nHasonlítsa össze az ajánlatukat, hogy megtalálja a legjobb lehetőséget.</string>
     <string name="trade_provider_list_sell_title">Válasszon szolgáltatót a(z) %s token eladásához</string>
+    <string name="trade_provider_open_confirmation_message">A vásárlás folytatásához átirányítunk a Nova Wallet alkalmazásból ide: %s</string>
+    <string name="trade_provider_open_confirmation_title">Folytatás a böngészőben?</string>
     <string name="trade_token_not_supported_message">Egyik szolgáltatónk sem támogatja jelenleg ennek a tokennek a vásárlását vagy eladását. Kérjük, válasszon másik tokent, másik hálózatot, vagy térjen vissza később.</string>
     <string name="trade_token_not_supported_title">Ez a token nem támogatott a vásárlás/eladás funkció által</string>
     <string name="transaction_details_copy_hash">Hash másolása</string>

@@ -77,6 +77,17 @@ sealed class LedgerMessageCommand {
         ) : Footer()
 
         class Value(val value: String) : Footer()
+
+        class Rows(
+            val first: Column,
+            val second: Column
+        ) : Footer() {
+
+            class Column(
+                val label: String,
+                val value: String
+            )
+        }
     }
 
     class Graphics(@DrawableRes val ledgerImageRes: Int)
@@ -121,6 +132,7 @@ class LedgerMessageBottomSheet(
 
     private fun setupFooterVisibility(visible: Boolean) {
         binder.ledgerMessageFooterMessage.setVisible(visible)
+        binder.ledgerMessageFooterColumns.setVisible(visible)
 
         if (!visible) {
             binder.ledgerMessageFooterMessage.stopTimer()
@@ -128,6 +140,9 @@ class LedgerMessageBottomSheet(
     }
 
     private fun showFooter(footer: LedgerMessageCommand.Footer) {
+        binder.ledgerMessageFooterMessage.setVisible(footer !is LedgerMessageCommand.Footer.Rows)
+        binder.ledgerMessageFooterColumns.setVisible(footer is LedgerMessageCommand.Footer.Rows)
+
         when (footer) {
             is LedgerMessageCommand.Footer.Value -> {
                 binder.ledgerMessageFooterMessage.text = footer.value
@@ -144,6 +159,14 @@ class LedgerMessageBottomSheet(
                     },
                     onFinish = { footer.timerFinished() }
                 )
+            }
+
+            is LedgerMessageCommand.Footer.Rows -> {
+                binder.ledgerMessageFooterTitle1.text = footer.first.label
+                binder.ledgerMessageFooterMessage1.text = footer.first.value
+
+                binder.ledgerMessageFooterTitle2.text = footer.second.label
+                binder.ledgerMessageFooterMessage2.text = footer.second.value
             }
         }
     }

@@ -22,6 +22,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
@@ -166,6 +167,10 @@ fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRippl
 context(View)
 val Int.dp: Int
     get() = dp(this@View.context)
+
+context(ViewBinding)
+val Int.dp: Int
+    get() = dp(this@ViewBinding.root.context)
 
 context(View)
 val Int.dpF: Float

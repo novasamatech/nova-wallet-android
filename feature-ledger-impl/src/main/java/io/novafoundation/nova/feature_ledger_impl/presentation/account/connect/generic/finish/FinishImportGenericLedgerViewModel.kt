@@ -18,7 +18,7 @@ class FinishImportGenericLedgerViewModel(
 
     override fun proceed(name: String) {
         launch {
-            interactor.createWallet(name, payload.account.toDomain())
+            interactor.createWallet(name, payload.substrateAccount.toDomain(), payload.evmAccount?.toDomain())
                 .onSuccess { continueBasedOnCodeStatus() }
                 .onFailure(::showError)
         }

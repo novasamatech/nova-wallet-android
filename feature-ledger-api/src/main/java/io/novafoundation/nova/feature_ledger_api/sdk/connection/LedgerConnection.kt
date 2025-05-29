@@ -29,7 +29,7 @@ interface LedgerConnection {
 }
 
 suspend fun LedgerConnection.ensureConnected() {
-    if (!isConnected()) connect()
+    if (!isConnected()) connect().getOrThrow()
 }
 suspend fun LedgerConnection.awaitConnected() = isActive.first { connected -> connected }
 suspend fun LedgerConnection.isConnected() = isActive.first()

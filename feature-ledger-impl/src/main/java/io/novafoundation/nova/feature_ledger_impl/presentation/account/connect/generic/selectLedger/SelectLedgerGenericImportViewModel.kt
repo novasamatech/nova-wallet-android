@@ -45,7 +45,7 @@ class SelectLedgerGenericImportViewModel(
 
         val payload = SelectLedgerAddressPayload(
             deviceId = device.id,
-            chainId = getPreviewBalanceChainId()
+            substrateChainId = getPreviewBalanceChainId()
         )
 
         router.openSelectAddressGenericLedger(payload)

@@ -7,5 +7,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class SelectLedgerAddressPayload(
     val deviceId: String,
-    val chainId: ChainId
+    val substrateChainId: ChainId
 ) : Parcelable

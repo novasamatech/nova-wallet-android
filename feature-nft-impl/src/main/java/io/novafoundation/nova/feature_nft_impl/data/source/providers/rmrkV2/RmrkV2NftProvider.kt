@@ -54,7 +54,7 @@ class RmrkV2NftProvider(
             )
         }
 
-        nftDao.insertNftsDiff(NftLocal.Type.RMRK2, metaAccount.id, toSave, forceOverwrite)
+        nftDao.insertNftsDiff(NftLocal.Type.RMRK2, chain.id, metaAccount.id, toSave, forceOverwrite)
     }
 
     override suspend fun nftFullSync(nft: Nft) {
