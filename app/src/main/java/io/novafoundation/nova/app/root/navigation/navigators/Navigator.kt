@@ -92,8 +92,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.AddChainAccountSelectLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
@@ -538,6 +540,14 @@ class Navigator(
     override fun closeChainAddressesSelector() {
         navigationBuilder().action(R.id.action_closeChainAddressesFragment)
             .navigateInRoot()
+    }
+
+    override fun openAddGenericEvmAddressSelectLedger(metaId: Long) {
+        val payload = AddEvmAccountSelectGenericLedgerPayload(metaId)
+
+        navigationBuilder().action(R.id.action_accountDetailsFragment_to_addEvmAccountGenericLedgerGraph)
+            .setArgs(AddEvmAccountSelectGenericLedgerFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
     }
 
     override fun returnToMainSwapScreen() {

@@ -54,7 +54,7 @@ class NetworkModule {
             recommendedValidatorsLearnMore = BuildConfig.RECOMMENDED_VALIDATORS_LEARN_MORE,
             paritySignerTroubleShooting = BuildConfig.PARITY_SIGNER_TROUBLESHOOTING,
             polkadotVaultTroubleShooting = BuildConfig.POLKADOT_VAULT_TROUBLESHOOTING,
-            ledgerBluetoothGuide = BuildConfig.LEDGER_BLEUTOOTH_GUIDE,
+            ledgerConnectionGuide = BuildConfig.LEDGER_CONNECTION_GUIDE,
             telegram = BuildConfig.TELEGRAM_URL,
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
