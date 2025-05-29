@@ -12,7 +12,9 @@ import io.novafoundation.nova.feature_account_migration.presentation.AccountMigr
 import io.novafoundation.nova.feature_account_migration.utils.AccountExchangePayload
 import io.novafoundation.nova.feature_account_migration.utils.AccountMigrationMixinProvider
 import io.novafoundation.nova.feature_account_migration.utils.common.ExchangeSecretsMixin
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novasama.substrate_sdk_android.extensions.toHexString
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -21,8 +23,11 @@ class AccountMigrationPairingViewModel(
     private val accountMigrationMixinProvider: AccountMigrationMixinProvider,
     private val accountMigrationInteractor: AccountMigrationInteractor,
     private val payload: AccountMigrationPairingPayload,
-    private val router: AccountMigrationRouter
+    private val router: AccountMigrationRouter,
+    private val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
 ) : BaseViewModel(), Browserable {
+
+    val cloudBackupWarningMixin = cloudBackupChangingWarningMixinFactory.create(this)
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
@@ -33,7 +38,9 @@ class AccountMigrationPairingViewModel(
     }
 
     fun acceptMigration() {
-        exchangeSecretsMixin.acceptKeyExchange()
+        cloudBackupWarningMixin.launchChangingConfirmationIfNeeded {
+            exchangeSecretsMixin.acceptKeyExchange()
+        }
     }
 
     private fun handleEvents() {
@@ -62,7 +69,15 @@ class AccountMigrationPairingViewModel(
         return resourceManager.getString(R.string.account_migration_fallback_name, payload.scheme.capitalize())
     }
 
-    private fun finishFlow() {
-        router.finishMigrationFlow()
+    private suspend fun finishFlow() {
+        if (accountMigrationInteractor.isPinCodeSet()) {
+            router.finishMigrationFlow()
+        } else {
+            router.openPinCodeSet()
+        }
+    }
+
+    fun close() {
+        router.back()
     }
 }

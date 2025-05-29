@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_migration.presentation.AccountMigrationRouter
 import io.novafoundation.nova.feature_account_migration.presentation.pairing.di.AccountMigrationPairingComponent
+import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 
 @Component(
     dependencies = [
@@ -33,7 +34,8 @@ interface AccountMigrationFeatureComponent : AccountMigrationFeatureApi {
     @Component(
         dependencies = [
             CommonApi::class,
-            AccountFeatureApi::class
+            AccountFeatureApi::class,
+            CloudBackupFeatureApi::class
         ]
     )
     interface AccountMigrationFeatureDependenciesComponent : AccountMigrationFeatureDependencies

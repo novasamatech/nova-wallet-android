@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_migration.presentation.AccountMigr
 import io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingPayload
 import io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingViewModel
 import io.novafoundation.nova.feature_account_migration.utils.AccountMigrationMixinProvider
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 
 @Module(includes = [ViewModelModule::class])
 class AccountMigrationPairingModule {
@@ -26,14 +27,16 @@ class AccountMigrationPairingModule {
         accountMigrationMixinProvider: AccountMigrationMixinProvider,
         accountMigrationInteractor: AccountMigrationInteractor,
         payload: AccountMigrationPairingPayload,
-        router: AccountMigrationRouter
+        router: AccountMigrationRouter,
+        cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
     ): ViewModel {
         return AccountMigrationPairingViewModel(
             resourceManager,
             accountMigrationMixinProvider,
             accountMigrationInteractor,
             payload,
-            router
+            router,
+            cloudBackupChangingWarningMixinFactory
         )
     }
 

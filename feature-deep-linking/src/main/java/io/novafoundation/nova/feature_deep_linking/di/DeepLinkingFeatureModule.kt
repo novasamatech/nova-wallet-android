@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.handler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.StakingDashboardDeepLinkHandler
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_migration.utils.AccountMigrationMixinProvider
@@ -33,15 +34,18 @@ class DeepLinkingFeatureModule {
     @FeatureScope
     fun provideRequestMigrationDeepLinkHandler(
         deepLinkingRouter: DeepLinkingRouter,
-        automaticInteractionGate: AutomaticInteractionGate
-    ) = RequestMigrationDeepLinkHandler(deepLinkingRouter, automaticInteractionGate)
+        automaticInteractionGate: AutomaticInteractionGate,
+        repository: AccountRepository,
+        splashPassedObserver: SplashPassedObserver
+    ) = RequestMigrationDeepLinkHandler(deepLinkingRouter, automaticInteractionGate, splashPassedObserver, repository)
 
     @Provides
     @FeatureScope
     fun provideMigrationCompleteDeepLinkHandler(
         automaticInteractionGate: AutomaticInteractionGate,
-        accountMigrationMixinProvider: AccountMigrationMixinProvider
-    ) = MigrationCompleteDeepLinkHandler(automaticInteractionGate, accountMigrationMixinProvider)
+        accountMigrationMixinProvider: AccountMigrationMixinProvider,
+        accountRepository: AccountRepository
+    ) = MigrationCompleteDeepLinkHandler(automaticInteractionGate, accountMigrationMixinProvider, accountRepository)
 
     @Provides
     @FeatureScope

@@ -246,6 +246,16 @@
     <fragment
         android:id="@+id/accountMigrationPairingFragment"
         android:name="io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingFragment"
-        android:label="AccountMigrationPairingFragment" />
+        android:label="AccountMigrationPairingFragment" >
+
+        <action
+            android:id="@+id/action_migration_to_pin"
+            app:destination="@id/pincodeFragment"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/accountMigrationPairingFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
 
 </navigation>

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 
 interface AccountMigrationFeatureDependencies {
 
@@ -14,4 +15,6 @@ interface AccountMigrationFeatureDependencies {
     val encryptionDefaults: EncryptionDefaults
 
     val accountRepository: AccountRepository
+
+    val cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory
 }

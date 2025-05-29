@@ -54,6 +54,7 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -107,6 +108,8 @@ interface CommonApi {
     val webViewFileChooserFactory: WebViewFileChooserFactory
 
     val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
+
+    val splashPassedObserver: SplashPassedObserver
 
     fun computationalCache(): ComputationalCache
 

@@ -74,6 +74,8 @@ import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
+import io.novafoundation.nova.common.utils.splash.RealSplashPassedObserver
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -150,6 +152,10 @@ class CommonModule {
     ): BackgroundAccessObserver {
         return BackgroundAccessObserver(preferences, automaticInteractionGate)
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideSplashPassedObserver(): SplashPassedObserver = RealSplashPassedObserver()
 
     @Provides
     @ApplicationScope

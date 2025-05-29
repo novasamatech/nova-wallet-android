@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_deep_linking.presentation.handling.handle
 import android.net.Uri
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_migration.utils.AccountExchangePayload
 import io.novafoundation.nova.feature_account_migration.utils.AccountMigrationMixinProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
@@ -14,7 +15,8 @@ private const val MIGRATION_COMPLETE_PATH = "/migration-complete"
 
 class MigrationCompleteDeepLinkHandler(
     private val automaticInteractionGate: AutomaticInteractionGate,
-    private val accountMigrationMixinProvider: AccountMigrationMixinProvider
+    private val accountMigrationMixinProvider: AccountMigrationMixinProvider,
+    private val repository: AccountRepository
 ) : DeepLinkHandler {
 
     override val callbackFlow = MutableSharedFlow<CallbackEvent>()
@@ -26,13 +28,15 @@ class MigrationCompleteDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) {
-        automaticInteractionGate.awaitInteractionAllowed()
+        if (repository.isAccountSelected()) {
+            automaticInteractionGate.awaitInteractionAllowed()
+        }
 
-        val mnemonic = data.getQueryParameter("mnemonic") ?: throw IllegalStateException("No secret was passed")
-        val peerPublicKey = data.getQueryParameter("key") ?: throw IllegalStateException("No key was passed")
+        val mnemonic = data.getQueryParameter("mnemonic") ?: error("No secret was passed")
+        val peerPublicKey = data.getQueryParameter("key") ?: error("No key was passed")
         val accountName = data.getQueryParameter("name")
 
-        val mixin = accountMigrationMixinProvider.getMixin() ?: throw IllegalStateException("Migration state invalid")
+        val mixin = accountMigrationMixinProvider.getMixin() ?: error("Migration state invalid")
         mixin.onPeerSecretsReceived(
             secret = mnemonic.fromHex(),
             publicKey = peerPublicKey.fromHex(),

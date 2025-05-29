@@ -14,6 +14,8 @@ class AccountMigrationInteractor(
     private val accountRepository: AccountRepository
 ) {
 
+    suspend fun isPinCodeSet(): Boolean = accountRepository.isCodeSet()
+
     suspend fun addAccount(name: String, entropy: ByteArray) {
         val mnemonic = MnemonicCreator.fromEntropy(entropy)
 
