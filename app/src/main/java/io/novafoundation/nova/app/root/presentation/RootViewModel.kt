@@ -203,7 +203,7 @@ class RootViewModel(
     fun handleDeepLink(data: Uri) {
         launch {
             deepLinkHandler.handleDeepLink(data)
-                .onFailureInstance<DeepLinkHandlingException> {
+                .onFailureInstance<DeepLinkHandlingException, Unit> {
                     val errorMessage = formatDeepLinkHandlingException(resourceManager, it)
                     showError(errorMessage)
                 }
@@ -213,7 +213,7 @@ class RootViewModel(
     private fun handlePendingDeepLink() {
         launch {
             deepLinkHandler.checkAndHandlePendingDeepLink()
-                .onFailureInstance<DeepLinkHandlingException> {
+                .onFailureInstance<DeepLinkHandlingException, Unit> {
                     val errorMessage = formatDeepLinkHandlingException(resourceManager, it)
                     showError(errorMessage)
                 }

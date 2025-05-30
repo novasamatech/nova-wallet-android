@@ -58,7 +58,7 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
-inline fun <reified E : Throwable> Result<*>.onFailureInstance(action: (E) -> Unit): Result<*> {
+inline fun <reified E : Throwable, R> Result<R>.onFailureInstance(action: (E) -> Unit): Result<R> {
     return onFailure {
         if (it is E) {
             action(it)
