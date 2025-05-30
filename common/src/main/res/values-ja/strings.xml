@@ -97,6 +97,8 @@
     <string name="account_ledger_select_device_description">電話の設定とLedgerデバイスでBluetoothを有効にしてください。Ledgerデバイスを解除し、%sアプリを開いてください。</string>
     <string name="account_ledger_select_device_title">Ledgerデバイスを選択</string>
     <string name="account_ledger_select_device_usb_description">Ledgerデバイスを有効にしてください。Ledgerデバイスをアンロックし、%s アプリを開いてください。</string>
+    <string name="account_migration_subtitle">もう少しです！🎉\n 設定を完了して、Polkadot AppとNova Walletの両方でアカウントをスムーズに使用するには、以下をタップしてください。</string>
+    <string name="account_migration_title">Novaへようこそ！</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21または24単語のフレーズ</string>
     <string name="account_needed_message">このネットワークにはアカウントがありません。アカウントを作成するか、インポートすることができます。</string>
     <string name="account_needed_title">アカウントが必要です</string>

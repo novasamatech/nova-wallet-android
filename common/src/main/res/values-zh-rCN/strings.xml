@@ -97,6 +97,8 @@
     <string name="account_ledger_select_device_description">请在手机设置和Ledger设备中启用蓝牙。解锁您的Ledger设备并打开%s应用。</string>
     <string name="account_ledger_select_device_title">选择您的Ledger设备</string>
     <string name="account_ledger_select_device_usb_description">请启用 Ledger 设备。解锁你的 Ledger 设备并打开 %s 应用。</string>
+    <string name="account_migration_subtitle">您快到了！🎉\n 只需点击下面即可完成设置，并在 Polkadot App 和 Nova Wallet 中无缝使用您的账户</string>
+    <string name="account_migration_title">欢迎来到 Nova！</string>
     <string name="account_mnmonic_length_variants">12、15、18、21或24个单词的短语</string>
     <string name="account_needed_message">您在这个网络上没有账户，您可以创建或导入账户。</string>
     <string name="account_needed_title">需要账户</string>
