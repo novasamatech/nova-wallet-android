@@ -31,7 +31,7 @@ class DeepLinksModule {
         assetDeepLinks: AssetDeepLinks,
         walletConnectDeepLinks: WalletConnectDeepLinks,
         accountMigrationDeepLinks: AccountMigrationDeepLinks
-    ): List<@JvmWildcard DeepLinkHandler>  {
+    ): List<@JvmWildcard DeepLinkHandler> {
         return buildList {
             addAll(stakingDeepLinks.deepLinkHandlers)
             addAll(accountDeepLinks.deepLinkHandlers)
