@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
@@ -20,6 +19,7 @@ import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 
 import javax.inject.Inject
@@ -34,6 +34,9 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 
     @Inject
     lateinit var contextManager: ContextManager
+
+    @Inject
+    lateinit var branchIOLinkHandler: BranchIOLinkHandler
 
     override fun createBinding(): ActivityRootBinding {
         return ActivityRootBinding.inflate(LayoutInflater.from(this))
@@ -75,7 +78,6 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
         intent?.let(::processIntent)
 
         viewModel.applySafeModeIfEnabled()
-//        processJsonOpenIntent()
     }
 
     override fun onDestroy() {
@@ -87,7 +89,9 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
 
+        branchIOLinkHandler.onActivityNewIntent(this, intent)
         processIntent(intent)
     }
 
@@ -102,6 +106,8 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 
     override fun onStart() {
         super.onStart()
+
+        branchIOLinkHandler.onActivityStart(this, viewModel::handleDeepLink)
 
         viewModel.noticeInForeground()
     }
@@ -136,20 +142,8 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
     }
 
     private fun processIntent(intent: Intent) {
-        intent.data?.let {
-            viewModel.handleDeepLink(it)
-        }
+        intent.data?.let { viewModel.handleDeepLink(it) }
     }
-
-//    private fun processJsonOpenIntent() {
-//        if (Intent.ACTION_VIEW == intent.action && intent.type != null) {
-//            if ("application/json" == intent.type) {
-//                val file = this.contentResolver.openInputStream(intent.data!!)
-//                val content = file?.reader(Charsets.UTF_8)?.readText()
-//                viewModel.jsonFileOpened(content)
-//            }
-//        }
-//    }
 
     private val rootNavController: NavController by lazy {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.rootNavHost) as NavHostFragment

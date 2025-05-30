@@ -8,7 +8,11 @@ import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigr
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
 import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
 import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
 import io.novafoundation.nova.feature_wallet_connect_api.di.deeplinks.WalletConnectDeepLinks
@@ -18,7 +22,7 @@ class DeepLinksModule {
 
     @Provides
     @FeatureScope
-    fun provideRootDeepLinkHandler(
+    fun provideDeepLinkHandlers(
         stakingDeepLinks: StakingDeepLinks,
         accountDeepLinks: AccountDeepLinks,
         dAppDeepLinks: DAppDeepLinks,
@@ -27,8 +31,8 @@ class DeepLinksModule {
         assetDeepLinks: AssetDeepLinks,
         walletConnectDeepLinks: WalletConnectDeepLinks,
         accountMigrationDeepLinks: AccountMigrationDeepLinks
-    ): RootDeepLinkHandler {
-        val deepLinkHandlers = buildList {
+    ): List<@JvmWildcard DeepLinkHandler> {
+        return buildList {
             addAll(stakingDeepLinks.deepLinkHandlers)
             addAll(accountDeepLinks.deepLinkHandlers)
             addAll(dAppDeepLinks.deepLinkHandlers)
@@ -38,7 +42,25 @@ class DeepLinksModule {
             addAll(walletConnectDeepLinks.deepLinkHandlers)
             addAll(accountMigrationDeepLinks.deepLinkHandlers)
         }
+    }
 
-        return RootDeepLinkHandler(deepLinkHandlers)
+    @Provides
+    @FeatureScope
+    fun provideRootDeepLinkHandler(
+        pendingDeepLinkProvider: PendingDeepLinkProvider,
+        nestedHandlers: @JvmWildcard List<DeepLinkHandler>
+    ): RootDeepLinkHandler {
+        return RootDeepLinkHandler(
+            pendingDeepLinkProvider,
+            nestedHandlers
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBranchIOLinkHandler(
+        branchIoLinkConverter: BranchIoLinkConverter
+    ): BranchIOLinkHandler {
+        return BranchIOLinkHandler(branchIoLinkConverter)
     }
 }

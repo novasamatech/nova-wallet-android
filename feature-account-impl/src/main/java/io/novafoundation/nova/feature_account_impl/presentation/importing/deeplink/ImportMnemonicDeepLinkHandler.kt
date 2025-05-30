@@ -39,7 +39,7 @@ class ImportMnemonicDeepLinkHandler(
         return path.startsWith(IMPORT_WALLET_DEEP_LINK_PREFIX)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri): Result<Unit> = runCatching {
         if (accountRepository.hasActiveMetaAccounts()) {
             automaticInteractionGate.awaitInteractionAllowed()
         }

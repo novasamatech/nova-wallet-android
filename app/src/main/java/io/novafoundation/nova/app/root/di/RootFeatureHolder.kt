@@ -66,6 +66,7 @@ class RootFeatureHolder @Inject constructor(
             .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .ledgerFeatureApi(getFeature(LedgerFeatureApi::class.java))
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
+            .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .accountMigrationFeatureApi(getFeature(AccountMigrationFeatureApi::class.java))
             .build()
 

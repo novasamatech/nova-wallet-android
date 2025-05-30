@@ -1,10 +1,9 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink
 
 import android.net.Uri
-import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.appendNullableQueryParameter
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.DeepLinkConfigurator
-import io.novafoundation.nova.feature_deep_linking.presentation.configuring.buildLink
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.addParamIfNotNull
 
 class AssetDetailsDeepLinkData(
     val accountAddress: String?,
@@ -13,19 +12,23 @@ class AssetDetailsDeepLinkData(
 )
 
 class AssetDetailsDeepLinkConfigurator(
-    private val resourceManager: ResourceManager
+    private val linkBuilderFactory: LinkBuilderFactory
 ) : DeepLinkConfigurator<AssetDetailsDeepLinkData> {
 
-    val deepLinkPrefix = "/open/asset"
+    val action = "open"
+    val screen = "asset"
+    val deepLinkPrefix = "/$action/$screen"
     val addressParam = "address"
     val chainIdParam = "chainId"
     val assetIdParam = "assetId"
 
     override fun configure(payload: AssetDetailsDeepLinkData, type: DeepLinkConfigurator.Type): Uri {
-        return buildLink(resourceManager, deepLinkPrefix, type)
-            .appendNullableQueryParameter(addressParam, payload.accountAddress)
-            .appendQueryParameter(chainIdParam, payload.chainId)
-            .appendQueryParameter(assetIdParam, payload.assetId.toString())
+        return linkBuilderFactory.newLink(type)
+            .setAction(action)
+            .setScreen(screen)
+            .addParamIfNotNull(addressParam, payload.accountAddress)
+            .addParam(chainIdParam, payload.chainId)
+            .addParam(assetIdParam, payload.assetId.toString())
             .build()
     }
 }

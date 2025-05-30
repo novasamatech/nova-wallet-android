@@ -27,7 +27,7 @@ class MigrationCompleteDeepLinkHandler(
         return path.startsWith(MIGRATION_COMPLETE_PATH)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri) = runCatching {
         if (repository.isAccountSelected()) {
             automaticInteractionGate.awaitInteractionAllowed()
         }

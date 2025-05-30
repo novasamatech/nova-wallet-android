@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -131,6 +132,8 @@ interface GovernanceFeatureDependencies {
     val maxActionProviderFactory: MaxActionProviderFactory
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val linkBuilderFactory: LinkBuilderFactory
 
     @Caching
     fun cachingIconGenerator(): AddressIconGenerator

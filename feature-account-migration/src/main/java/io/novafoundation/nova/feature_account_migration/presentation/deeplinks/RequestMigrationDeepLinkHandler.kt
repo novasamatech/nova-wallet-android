@@ -28,15 +28,15 @@ class RequestMigrationDeepLinkHandler(
         return ACTION_MIGRATE_PATH_REGEX.matches(path)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri): Result<Unit> = runCatching {
         if (repository.isAccountSelected()) {
             automaticInteractionGate.awaitInteractionAllowed()
         } else {
             splashPassedObserver.awaitSplashPassed()
         }
 
-        val path = data.path ?: return
-        val matchResult = ACTION_MIGRATE_PATH_REGEX.find(path) ?: return
+        val path = data.path ?: error("Invalid path")
+        val matchResult = ACTION_MIGRATE_PATH_REGEX.find(path) ?: error("Invalid scheme")
         val scheme = matchResult.groupValues[1]
         router.openAccountMigrationPairing(scheme)
     }

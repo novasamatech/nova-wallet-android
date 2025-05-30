@@ -28,7 +28,7 @@ class DAppDeepLinkHandler(
         return path.startsWith(DAPP_DEEP_LINK_PREFIX)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri) = runCatching {
         automaticInteractionGate.awaitInteractionAllowed()
 
         val url = data.getDappUrl() ?: throw DAppHandlingException.UrlIsInvalid

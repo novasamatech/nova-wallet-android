@@ -46,8 +46,15 @@ dependencies {
     implementation androidDep
     implementation materialDep
 
+    implementation branchIo
+    implementation playServiceIdentifier
+
     implementation coroutinesDep
 
     implementation daggerDep
     kapt daggerKapt
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }

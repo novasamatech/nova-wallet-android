@@ -34,7 +34,7 @@ class ReferendumDeepLinkHandler(
         return path.startsWith(ReferendumDetailsDeepLinkConfigurator.PREFIX)
     }
 
-    override suspend fun handleDeepLink(data: Uri) {
+    override suspend fun handleDeepLink(data: Uri) = runCatching {
         automaticInteractionGate.awaitInteractionAllowed()
 
         val chainId = data.getChainIdOrPolkadot()

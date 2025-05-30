@@ -89,6 +89,7 @@ interface RootComponent {
             DeepLinkingFeatureApi::class,
             LedgerFeatureApi::class,
             BuyFeatureApi::class,
+            DeepLinkingFeatureApi::class,
             AccountMigrationFeatureApi::class
         ]
     )
