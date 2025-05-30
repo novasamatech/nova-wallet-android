@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">Địa chỉ EVM phải hợp lệ hoặc để trống...</string>
     <string name="accoount_enter_substrate_address">Nhập địa chỉ substrate hợp lệ...</string>
     <string name="account_add_account">Thêm tài khoản</string>
+    <string name="account_add_address">Thêm địa chỉ</string>
     <string name="account_add_already_exists_message">Tài khoản đã tồn tại. Vui lòng thử tài khoản khác.</string>
     <string name="account_add_watch_only_description">Theo dõi bất kỳ ví nào bằng địa chỉ của nó</string>
     <string name="account_add_watch_wallet">Thêm ví chỉ xem</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">Vui lòng thử cái khác.</string>
     <string name="account_ethereum_crypto_type">Loại cặp khóa Ethereum</string>
     <string name="account_ethereum_derivation_path">Chuỗi dẫn xuất bí mật của Ethereum</string>
+    <string name="account_evm_accounts">Tài khoản EVM</string>
     <string name="account_export">Xuất tài khoản</string>
     <string name="account_export_action">Xuất</string>
     <string name="account_export_existing">Nhập tài khoản hiện có</string>
@@ -75,25 +77,22 @@
     <string name="account_ledger_import_fill_description">Đảm bảo ứng dụng mạng được cài đặt vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live. Mở ứng dụng mạng trên thiết bị Ledger của bạn.</string>
     <string name="account_ledger_import_fill_disabled_hint">Thêm ít nhất một tài khoản</string>
     <string name="account_ledger_import_fill_title">Thêm tài khoản vào ví của bạn</string>
-    <string name="account_ledger_import_start_guide">Hướng dẫn Kết nối Ledger</string>
     <string name="account_ledger_import_start_step_1">Đảm bảo %s vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">Ứng dụng mạng đã được cài đặt</string>
     <string name="account_ledger_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_import_start_step_2_highlighted">Mở ứng dụng mạng</string>
     <string name="account_ledger_import_start_step_3">Cho phép Nova Wallet %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth và Vị trí</string>
+    <string name="account_ledger_import_start_step_3_highlighted">truy cập Bluetooth</string>
     <string name="account_ledger_import_start_step_4">%s để thêm vào ví</string>
     <string name="account_ledger_import_start_step_4_highlighted">Chọn tài khoản</string>
     <string name="account_ledger_import_start_step_otg">%s trong cài đặt điện thoại của bạn</string>
     <string name="account_ledger_import_start_step_otg_highlighted">Bật OTG</string>
-    <string name="account_ledger_import_start_title">Kết nối Ledger</string>
     <string name="account_ledger_legacy_warning_message">Để ký kết các hoạt động và di chuyển các tài khoản của bạn sang ứng dụng Generic Ledger mới, cài đặt và mở ứng dụng Migration. Ứng dụng Ledger (Legacy) và Migration Ledger sẽ không còn được hỗ trợ trong tương lai.</string>
     <string name="account_ledger_legacy_warning_title">Ứng dụng Ledger mới đã được phát hành</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Ứng dụng Migration sẽ không còn khả dụng trong tương lai gần. Sử dụng nó để di chuyển các tài khoản của bạn sang ứng dụng Ledger mới để tránh mất tiền của bạn.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
     <string name="account_ledger_select_device_all_description">Nếu sử dụng Ledger qua Bluetooth, hãy bật Bluetooth trên cả hai thiết bị và cấp quyền Bluetooth và vị trí cho Nova. Đối với USB, hãy bật OTG trong cài đặt điện thoại của bạn.</string>
     <string name="account_ledger_select_device_description">Hãy bật Bluetooth trong cài đặt điện thoại của bạn và thiết bị Ledger. Mở khóa thiết bị Ledger của bạn và mở ứng dụng %s.</string>
     <string name="account_ledger_select_device_title">Chọn thiết bị Ledger của bạn</string>
@@ -150,6 +149,7 @@
     <string name="account_select_secret_source">Chọn loại bí mật của bạn</string>
     <string name="account_select_wallet">Chọn ví</string>
     <string name="account_shared_secret">Tài khoản với bí mật chia sẻ</string>
+    <string name="account_substrate_accounts">Tài khoản Substrate</string>
     <string name="account_substrate_crypto_type">Loại mã hóa keypair Substrate</string>
     <string name="account_substrate_derivation_path">Đường dẫn dẫn xuất bí mật Substrate</string>
     <string name="account_wallet_nickname">Biệt danh ví</string>
@@ -253,8 +253,6 @@
     <string name="buy_completed">Mua hàng đã được khởi tạo! Vui lòng đợi tối đa 60 phút. Bạn có thể theo dõi trạng thái trong email.</string>
     <string name="buy_network_flow_title">Chọn mạng để mua %s</string>
     <string name="buy_order_completed_message">Đã bắt đầu mua! Vui lòng chờ tối đa 60 phút. Bạn có thể theo dõi trạng thái trên email.</string>
-    <string name="buy_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
-    <string name="buy_provider_open_confirmation_title">Tiếp tục trong trình duyệt?</string>
     <string name="buy_token_not_supported_message">Không có nhà cung cấp nào của chúng tôi hiện đang hỗ trợ mua token này. Vui lòng chọn token khác, mạng khác hoặc kiểm tra lại sau.</string>
     <string name="buy_token_not_supported_title">Token này không được tính năng mua hỗ trợ</string>
     <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
@@ -812,6 +810,7 @@
     <string name="language_title">Ngôn ngữ</string>
     <string name="ledger_chain_not_supported">Ledger không hỗ trợ %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
     <string name="ledger_device_stax">Ledger Stax</string>
@@ -824,6 +823,10 @@
     <string name="ledger_hold_to_sign">Giữ nút xác nhận trên %s của bạn để chấp thuận giao dịch</string>
     <string name="ledger_import_select_address_load_more">Tải thêm tài khoản</string>
     <string name="ledger_review_approve_title">Xem xét và Phê duyệt</string>
+    <string name="ledger_select_address_account_label">Tài khoản %s</string>
+    <string name="ledger_select_address_not_found">Không tìm thấy tài khoản</string>
+    <string name="ledger_select_address_update_for_evm_message">Thiết bị Ledger của bạn đang sử dụng ứng dụng Generic cũ không hỗ trợ địa chỉ EVM. Cập nhật qua Ledger Live.</string>
+    <string name="ledger_select_address_update_for_evm_title">Cập nhật ứng dụng Generic Ledger</string>
     <string name="ledger_sign_approve_message">Nhấn cả hai nút trên %s của bạn để phê duyệt giao dịch</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Vui lòng cập nhật %s bằng ứng dụng Ledger Live</string>
     <string name="ledger_sign_metadata_outdated_title">Dữ liệu đã lỗi thời</string>
@@ -836,6 +839,8 @@
     <string name="ledger_sign_tx_not_supported_title">Giao dịch không được hỗ trợ</string>
     <string name="ledger_verify_address_message_both_buttons">Nhấn cả hai nút trên %s của bạn để chấp thuận địa chỉ</string>
     <string name="ledger_verify_address_message_confirm_button">Nhấn nút xác nhận trên %s của bạn để chấp thuận địa chỉ</string>
+    <string name="ledger_verify_addresses_message_both_buttons">Nhấn cả hai nút trên %s của bạn để xác nhận địa chỉ</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Nhấn nút xác nhận trên %s của bạn để xác nhận địa chỉ</string>
     <string name="ledger_wallet_details_description">Ví này đã được ghép đôi với Ledger. Nova sẽ giúp bạn thực hiện bất kỳ thao tác nào bạn muốn, và bạn sẽ được yêu cầu ký chúng bằng Ledger</string>
     <string name="ledher_import_select_address_title">Chọn tài khoản để thêm vào ví</string>
     <string name="loading_network_info">Đang tải thông tin mạng...</string>
@@ -1662,6 +1667,8 @@
     <string name="trade_provider_list_buy_title">Chọn một nhà cung cấp để mua token %s</string>
     <string name="trade_provider_list_footer">Phương thức thanh toán, phí và giới hạn khác nhau tùy theo nhà cung cấp.\n So sánh báo giá của họ để tìm tùy chọn tốt nhất cho bạn.</string>
     <string name="trade_provider_list_sell_title">Chọn một nhà cung cấp để bán token %s</string>
+    <string name="trade_provider_open_confirmation_message">Để tiếp tục mua hàng, bạn sẽ được chuyển hướng từ ứng dụng Nova Wallet tới %s</string>
+    <string name="trade_provider_open_confirmation_title">Tiếp tục trong trình duyệt?</string>
     <string name="trade_token_not_supported_message">Không có nhà cung cấp nào của chúng tôi hiện đang hỗ trợ mua hoặc bán token này. Vui lòng chọn token khác, mạng khác hoặc kiểm tra lại sau.</string>
     <string name="trade_token_not_supported_title">Token này không được tính năng mua/bán hỗ trợ</string>
     <string name="transaction_details_copy_hash">Sao chép hash</string>

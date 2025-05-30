@@ -16,6 +16,8 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.core_db.di.DbHolder
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
+import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
+import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
@@ -271,4 +273,10 @@ interface ComponentHolderModule {
     @ClassKey(XcmFeatureApi::class)
     @IntoMap
     fun provideXcmFeatureHolder(holder: XcmFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(AccountMigrationFeatureApi::class)
+    @IntoMap
+    fun provideAccountMigrationFeatureHolder(holder: AccountMigrationFeatureHolder): FeatureApiHolder
 }
