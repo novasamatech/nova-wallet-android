@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">Evm 주소는 유효해야 하거나 비워야 합니다...</string>
     <string name="accoount_enter_substrate_address">유효한 substrate 주소를 입력하세요...</string>
     <string name="account_add_account">계정 추가</string>
+    <string name="account_add_address">주소 추가</string>
     <string name="account_add_already_exists_message">계정이 이미 존재합니다. 다른 계정을 시도해 주세요.</string>
     <string name="account_add_watch_only_description">주소로 지갑을 추적하세요</string>
     <string name="account_add_watch_wallet">watch-only 지갑 추가</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">다른 것을 시도해 보세요.</string>
     <string name="account_ethereum_crypto_type">Ethereum 키페어 암호화 유형</string>
     <string name="account_ethereum_derivation_path">이더리움 비밀 파생 경로</string>
+    <string name="account_evm_accounts">EVM 계정</string>
     <string name="account_export">계정 내보내기</string>
     <string name="account_export_action">내보내기</string>
     <string name="account_export_existing">기존 계정 가져오기</string>
@@ -75,25 +77,22 @@
     <string name="account_ledger_import_fill_description">Ledger Live 앱을 사용하여 Ledger 장치에 Network 앱이 설치되어 있는지 확인하십시오. Ledger 장치에서 네트워크 앱을 여십시오.</string>
     <string name="account_ledger_import_fill_disabled_hint">계정을 적어도 하나 추가하십시오</string>
     <string name="account_ledger_import_fill_title">지갑에 계정을 추가하십시오</string>
-    <string name="account_ledger_import_start_guide">Ledger 연결 가이드</string>
     <string name="account_ledger_import_start_step_1">Ledger Live 앱을 사용하여 Ledger 기기에 %s 있는지 확인하십시오</string>
     <string name="account_ledger_import_start_step_1_highlighted">네트워크 앱이 설치되었습니다</string>
     <string name="account_ledger_import_start_step_2">Ledger 기기에서 %s</string>
     <string name="account_ledger_import_start_step_2_highlighted">네트워크 앱을 여세요</string>
     <string name="account_ledger_import_start_step_3">%s에 대한 Nova Wallet 접근을 허용하십시오</string>
-    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 및 위치</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 접근</string>
     <string name="account_ledger_import_start_step_4">지갑에 추가하려면 %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">계정을 선택</string>
     <string name="account_ledger_import_start_step_otg">%s 전화 설정에서</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTG 활성화</string>
-    <string name="account_ledger_import_start_title">Ledger 연결</string>
     <string name="account_ledger_legacy_warning_message">작업을 서명하고 계정을 새로운 Generic Ledger 앱으로 마이그레이션하려면 Migration 앱을 설치하고 여십시오. 레거시 구형 및 Migration Ledger 앱은 더 이상 지원되지 않을 것입니다.</string>
     <string name="account_ledger_legacy_warning_title">새로운 Ledger 앱이 출시되었습니다</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 앱은 곧 사용 불가능할 것입니다. 자금을 잃지 않기 위해 새 Ledger 앱으로 계정을 마이그레이션하세요.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_legacy">Ledger 레거시</string>
     <string name="account_ledger_select_device_all_description">Ledger를 Bluetooth로 사용하는 경우, 두 기기에서 Bluetooth를 활성화하고 Nova Bluetooth 및 위치 권한을 부여하세요. USB를 사용하려면, 전화 설정에서 OTG를 활성화하세요.</string>
     <string name="account_ledger_select_device_description">전화 설정에서 Bluetooth를 활성화하고 Ledger 장치를 여십시오. Ledger 장치를 잠금 해제하고 %s 앱을 여십시오.</string>
     <string name="account_ledger_select_device_title">Ledger 장치를 선택하십시오</string>
@@ -150,6 +149,7 @@
     <string name="account_select_secret_source">비밀 유형 선택</string>
     <string name="account_select_wallet">지갑 선택</string>
     <string name="account_shared_secret">공유 비밀이 있는 계정</string>
+    <string name="account_substrate_accounts">Substrate 계정</string>
     <string name="account_substrate_crypto_type">Substrate 키페어 암호화 유형</string>
     <string name="account_substrate_derivation_path">Substrate 비밀 파생 경로</string>
     <string name="account_wallet_nickname">지갑 별명</string>
@@ -253,8 +253,6 @@
     <string name="buy_completed">구매가 시작되었습니다! 최대 60분까지 기다려주세요. 이메일에서 상태를 추적할 수 있습니다.</string>
     <string name="buy_network_flow_title">%s 구매를 위한 네트워크 선택</string>
     <string name="buy_order_completed_message">구매 시작됨! 최대 60분 정도 기다려 주세요. 상태는 이메일에서 확인할 수 있습니다.</string>
-    <string name="buy_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
-    <string name="buy_provider_open_confirmation_title">브라우저에서 계속할까요?</string>
     <string name="buy_token_not_supported_message">현재 제공업체 중 이 토큰을 구매할 수 있는 곳이 없습니다. 다른 토큰이나 네트워크를 선택하거나 나중에 다시 확인하세요.</string>
     <string name="buy_token_not_supported_title">이 토큰은 구매 기능에서 지원되지 않습니다</string>
     <string name="chain_network_management_auto_balance">자동 균형 노드</string>
@@ -812,6 +810,7 @@
     <string name="language_title">언어</string>
     <string name="ledger_chain_not_supported">Ledger는 %s을(를) 지원하지 않습니다</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
     <string name="ledger_device_stax">Ledger Stax</string>
@@ -824,6 +823,10 @@
     <string name="ledger_hold_to_sign">%s의 확인 버튼을 길게 눌러 거래를 승인하세요</string>
     <string name="ledger_import_select_address_load_more">더 많은 계정을 로드</string>
     <string name="ledger_review_approve_title">검토하고 승인하기</string>
+    <string name="ledger_select_address_account_label">계정 %s</string>
+    <string name="ledger_select_address_not_found">계정 찾을 수 없음</string>
+    <string name="ledger_select_address_update_for_evm_message">Ledger 장치가 EVM 주소를 지원하지 않는 구식 Generic 앱을 사용 중입니다. Ledger Live를 통해 업데이트하세요.</string>
+    <string name="ledger_select_address_update_for_evm_title">Ledger Generic 앱 업데이트</string>
     <string name="ledger_sign_approve_message">거래를 승인하려면 %s에서 두 버튼을 모두 누르세요</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Ledger Live 앱을 사용하여 %s을(를) 업데이트하세요</string>
     <string name="ledger_sign_metadata_outdated_title">메타데이터가 오래되었습니다</string>
@@ -836,6 +839,8 @@
     <string name="ledger_sign_tx_not_supported_title">거래가 지원되지 않습니다</string>
     <string name="ledger_verify_address_message_both_buttons">%s의 두 버튼을 눌러 주소를 승인하세요</string>
     <string name="ledger_verify_address_message_confirm_button">%s의 확인 버튼을 눌러 주소를 승인하세요</string>
+    <string name="ledger_verify_addresses_message_both_buttons">%s의 두 버튼을 눌러 주소를 승인하세요</string>
+    <string name="ledger_verify_addresses_message_confirm_button">%s의 확인 버튼을 눌러 주소를 승인하세요</string>
     <string name="ledger_wallet_details_description">이 지갑은 Ledger와 연동되어 있습니다. Nova는 원하는 모든 작업을 생성하는 데 도움을 줄 것이며, Ledger를 사용하여 서명하라는 요청을 받을 것입니다.</string>
     <string name="ledher_import_select_address_title">지갑에 추가할 계정을 선택하세요</string>
     <string name="loading_network_info">네트워크 정보를 불러오는 중...</string>
@@ -1662,6 +1667,8 @@
     <string name="trade_provider_list_buy_title">%s 토큰 구매를 위한 제공업체 선택</string>
     <string name="trade_provider_list_footer">결제 수단, 수수료 및 제한은 제공업체에 따라 다릅니다.\n그들의 견적을 비교하여 최적의 옵션을 찾으세요.</string>
     <string name="trade_provider_list_sell_title">%s 토큰 판매를 위한 제공업체 선택</string>
+    <string name="trade_provider_open_confirmation_message">구매를 계속하려면 Nova Wallet 앱에서 %s로 리디렉션됩니다.</string>
+    <string name="trade_provider_open_confirmation_title">브라우저에서 계속할까요?</string>
     <string name="trade_token_not_supported_message">현재 제공업체 중 이 토큰을 구매하거나 판매할 수 있는 곳이 없습니다. 다른 토큰이나 네트워크를 선택하거나 나중에 다시 확인하세요.</string>
     <string name="trade_token_not_supported_title">이 토큰은 구매/판매 기능에서 지원되지 않습니다</string>
     <string name="transaction_details_copy_hash">해시 복사</string>

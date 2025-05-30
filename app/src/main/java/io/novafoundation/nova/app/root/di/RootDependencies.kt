@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
+import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
@@ -93,6 +94,8 @@ interface RootDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val browserTabExternalRepository: BrowserTabExternalRepository
+
+    val accountMigrationDeepLinks: AccountMigrationDeepLinks
 
     val deepLinkingPreferences: DeepLinkingPreferences
 

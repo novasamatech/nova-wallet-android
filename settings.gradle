@@ -52,3 +52,5 @@ include ':feature-xcm:api'
 include ':feature-xcm:impl'
 include ':feature-banners-api'
 include ':feature-banners-impl'
+include ':feature-account-migration'
+
