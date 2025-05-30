@@ -60,9 +60,9 @@ dependencies {
     implementation project(':feature-buy-api')
     implementation project(':feature-xcm:api')
     implementation project(':feature-banners-api')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
-
 
     implementation androidDep
     implementation swipeRefershLayout

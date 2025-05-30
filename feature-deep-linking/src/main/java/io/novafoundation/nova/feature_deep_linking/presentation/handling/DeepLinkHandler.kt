@@ -9,7 +9,7 @@ interface DeepLinkHandler {
 
     suspend fun matches(data: Uri): Boolean
 
-    suspend fun handleDeepLink(data: Uri)
+    suspend fun handleDeepLink(data: Uri): Result<Unit>
 }
 
 sealed interface CallbackEvent {

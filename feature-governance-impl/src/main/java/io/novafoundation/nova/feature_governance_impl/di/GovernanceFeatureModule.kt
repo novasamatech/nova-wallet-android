@@ -12,12 +12,12 @@ import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentit
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.repository.TreasuryRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSource
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.preimage.PreImageSizer
 import io.novafoundation.nova.feature_governance_impl.data.preimage.RealPreImageSizer
@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.data.repository.RealTreasu
 import io.novafoundation.nova.feature_governance_impl.data.source.RealGovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceDAppsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.GovernanceUpdatersModule
+import io.novafoundation.nova.feature_governance_impl.di.modules.deeplink.DeepLinkModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.DelegateModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumDetailsModule
 import io.novafoundation.nova.feature_governance_impl.di.modules.screens.ReferendumListModule
@@ -79,7 +80,8 @@ import javax.inject.Named
         ReferendumUnlockModule::class,
         DelegateModule::class,
         GovernanceDAppsModule::class,
-        TinderGovModule::class
+        TinderGovModule::class,
+        DeepLinkModule::class
     ]
 )
 class GovernanceFeatureModule {

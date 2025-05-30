@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_assets.data.repository.assetFilters.Prefer
 import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
 import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
+import io.novafoundation.nova.feature_assets.di.modules.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -62,7 +63,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFo
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
+@Module(
+    includes = [
+        SendModule::class,
+        ManageTokensCommonModule::class,
+        AddTokenModule::class,
+        DeepLinkModule::class
+    ]
+)
 class AssetsFeatureModule {
 
     @Provides

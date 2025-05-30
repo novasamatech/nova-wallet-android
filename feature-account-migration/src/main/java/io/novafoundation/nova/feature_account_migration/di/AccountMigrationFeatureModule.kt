@@ -6,11 +6,12 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_migration.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_account_migration.domain.AccountMigrationInteractor
 import io.novafoundation.nova.feature_account_migration.utils.AccountMigrationMixinProvider
 import io.novafoundation.nova.feature_account_migration.utils.common.KeyExchangeUtils
 
-@Module
+@Module(includes = [DeepLinkModule::class])
 class AccountMigrationFeatureModule {
 
     @Provides

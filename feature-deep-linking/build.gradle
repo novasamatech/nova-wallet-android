@@ -40,23 +40,21 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
-    implementation project(':runtime')
-    implementation project(':feature-assets')
-    implementation project(':feature-account-api')
-    implementation project(':feature-governance-api')
-    implementation project(':feature-currency-api')
-    implementation project(':feature-buy-api')
-    implementation project(':feature-wallet-connect-api')
-    implementation project(':feature-deep-link-building')
-    implementation project(':feature-account-migration')
 
     implementation kotlinDep
 
     implementation androidDep
     implementation materialDep
 
+    implementation branchIo
+    implementation playServiceIdentifier
+
     implementation coroutinesDep
 
     implementation daggerDep
     kapt daggerKapt
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }
