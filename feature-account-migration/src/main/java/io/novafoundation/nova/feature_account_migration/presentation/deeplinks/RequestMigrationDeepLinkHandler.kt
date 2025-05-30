@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.accountmigration
+package io.novafoundation.nova.feature_account_migration.presentation.deeplinks
 
 import android.net.Uri
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -6,15 +6,15 @@ import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.splash.awaitSplashPassed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_migration.presentation.AccountMigrationRouter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkingRouter
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 private val ACTION_MIGRATE_PATH_REGEX = Regex("/migrate/([a-zA-Z]+)(?:[/?]|$)")
 
 class RequestMigrationDeepLinkHandler(
-    private val router: DeepLinkingRouter,
+    private val router: AccountMigrationRouter,
     private val automaticInteractionGate: AutomaticInteractionGate,
     private val splashPassedObserver: SplashPassedObserver,
     private val repository: AccountRepository

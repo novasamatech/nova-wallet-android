@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
@@ -87,7 +88,8 @@ interface RootComponent {
             PushNotificationsFeatureApi::class,
             DeepLinkingFeatureApi::class,
             LedgerFeatureApi::class,
-            BuyFeatureApi::class
+            BuyFeatureApi::class,
+            AccountMigrationFeatureApi::class
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

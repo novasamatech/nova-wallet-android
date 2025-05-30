@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.handlers.accountmigration
+package io.novafoundation.nova.feature_account_migration.presentation.deeplinks
 
 import android.net.Uri
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate

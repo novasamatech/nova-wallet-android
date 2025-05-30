@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
+import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
@@ -24,16 +25,19 @@ class DeepLinksModule {
         governanceDeepLinks: GovernanceDeepLinks,
         buyDeepLinks: BuyDeepLinks,
         assetDeepLinks: AssetDeepLinks,
-        walletConnectDeepLinks: WalletConnectDeepLinks
+        walletConnectDeepLinks: WalletConnectDeepLinks,
+        accountMigrationDeepLinks: AccountMigrationDeepLinks
     ): RootDeepLinkHandler {
-        val deepLinkHandlers = stakingDeepLinks.deepLinkHandlers.asSequence()
-            .plus(accountDeepLinks.deepLinkHandlers)
-            .plus(dAppDeepLinks.deepLinkHandlers)
-            .plus(governanceDeepLinks.deepLinkHandlers)
-            .plus(buyDeepLinks.deepLinkHandlers)
-            .plus(assetDeepLinks.deepLinkHandlers)
-            .plus(walletConnectDeepLinks.deepLinkHandlers)
-            .toList()
+        val deepLinkHandlers = buildList {
+            addAll(stakingDeepLinks.deepLinkHandlers)
+            addAll(accountDeepLinks.deepLinkHandlers)
+            addAll(dAppDeepLinks.deepLinkHandlers)
+            addAll(governanceDeepLinks.deepLinkHandlers)
+            addAll(buyDeepLinks.deepLinkHandlers)
+            addAll(assetDeepLinks.deepLinkHandlers)
+            addAll(walletConnectDeepLinks.deepLinkHandlers)
+            addAll(accountMigrationDeepLinks.deepLinkHandlers)
+        }
 
         return RootDeepLinkHandler(deepLinkHandlers)
     }

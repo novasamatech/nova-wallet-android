@@ -41,6 +41,7 @@ dependencies {
     implementation project(":common")
     implementation project(":feature-account-api")
     implementation project(":feature-cloud-backup-api")
+    implementation project(':feature-deep-linking')
 
     implementation daggerDep
     kapt daggerKapt
