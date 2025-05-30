@@ -97,6 +97,8 @@
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
     <string name="account_ledger_select_device_usb_description">Lütfen Ledger cihazını etkinleştirin. Ledger cihazınızı açın ve %s uygulamasını açın.</string>
+    <string name="account_migration_subtitle">Neredeyse geldiniz! 🎉\n Kurulumu tamamlamak ve hesaplarınızı hem Polkadot Uygulaması\'nda hem de Nova Cüzdan\'da sorunsuz bir şekilde kullanmaya başlamak için aşağıya dokunmanız yeterli</string>
+    <string name="account_migration_title">Nova\'ya Hoş Geldiniz!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 veya 24 kelime uzunluğunda ifade</string>
     <string name="account_needed_message">Bu ağ için bir hesabınız yok, hesap oluşturabilir veya hesap aktarabilirsiniz.</string>
     <string name="account_needed_title">Hesap Gerekli</string>

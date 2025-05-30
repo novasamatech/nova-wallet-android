@@ -3,7 +3,7 @@
     <string name="account_migration_title">Welcome to Nova!</string>
     <string name="account_migration_subtitle">You’re almost there! 🎉\n Just tap below to complete the setup and start using your accounts seamlessly in both the Polkadot App and Nova Wallet</string>
 
-    <string name="account_migration_fallback_name">%s Wallet</string>
+    <string name="account_migration_fallback_name" translatable="false">%s Wallet</string>
 
     <string name="account_migration_accepted_url" translatable="false">%s://polkadot/migration-accepted?key=%s</string>
     <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth</string>

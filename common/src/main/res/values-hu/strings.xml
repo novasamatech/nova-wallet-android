@@ -97,6 +97,8 @@
     <string name="account_ledger_select_device_description">Kérlek, kapcsold be a Bluetooth-t a telefonodon és a Ledger eszközön. Old fel a Ledger eszközt és nyisd meg a(z) %s alkalmazást.</string>
     <string name="account_ledger_select_device_title">Válaszd ki Ledger eszközöd</string>
     <string name="account_ledger_select_device_usb_description">Kérem, engedélyezze a Ledger eszközt. Oldja fel a Ledger eszköz zárolását, és nyissa meg a %s alkalmazást.</string>
+    <string name="account_migration_subtitle">Már majdnem kész vagy! 🎉\n Csak koppints az alábbi gombra, hogy befejezd a beállítást, és zökkenőmentesen kezdd el használni a fiókjaidat mind a Polkadot App-ban, mind a Nova Walletben</string>
+    <string name="account_migration_title">Üdvözlünk a Nova-ban!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 vagy 24 szavas kifejezés</string>
     <string name="account_needed_message">Nem rendelkezel fiókkal ezen a hálózaton, hozzáadhatsz vagy importálhatsz egyet.</string>
     <string name="account_needed_title">Fiók szükséges</string>

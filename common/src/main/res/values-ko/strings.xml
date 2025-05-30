@@ -97,6 +97,8 @@
     <string name="account_ledger_select_device_description">전화 설정에서 Bluetooth를 활성화하고 Ledger 장치를 여십시오. Ledger 장치를 잠금 해제하고 %s 앱을 여십시오.</string>
     <string name="account_ledger_select_device_title">Ledger 장치를 선택하십시오</string>
     <string name="account_ledger_select_device_usb_description">Ledger 장치를 활성화해주세요. Ledger 장치를 잠금 해제하고 %s 앱을 여세요.</string>
+    <string name="account_migration_subtitle">거의 다 왔어요! 🎉\n 아래를 탭하여 설정을 완료하고 Polkadot 앱과 Nova Wallet에서 계정을 원활하게 사용하세요</string>
+    <string name="account_migration_title">Nova에 오신 것을 환영합니다!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 또는 24 단어 구</string>
     <string name="account_needed_message">이 네트워크에 사용할 계정이 없습니다. 계정을 생성하거나 가져올 수 있습니다.</string>
     <string name="account_needed_title">계정 필요</string>
