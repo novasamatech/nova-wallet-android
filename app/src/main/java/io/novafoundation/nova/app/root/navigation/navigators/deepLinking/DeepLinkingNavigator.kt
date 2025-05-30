@@ -7,8 +7,6 @@ import io.novafoundation.nova.app.root.navigation.openSplitScreenWithInstantActi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_migration.presentation.AccountMigrationRouter
-import io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingFragment
-import io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload

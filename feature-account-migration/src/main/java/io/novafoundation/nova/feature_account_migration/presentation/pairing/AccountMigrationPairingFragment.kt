@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatu
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureComponent
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
 
-
 class AccountMigrationPairingFragment : BaseFragment<AccountMigrationPairingViewModel, FragmentAccountMigrationPairingBinding>() {
 
     companion object : PayloadCreator<AccountMigrationPairingPayload> by FragmentPayloadCreator()
