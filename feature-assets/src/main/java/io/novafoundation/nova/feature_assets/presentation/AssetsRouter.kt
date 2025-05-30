@@ -81,8 +81,6 @@ interface AssetsRouter {
 
     fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
-    fun openStaking()
-
     fun closeSendFlow()
 
     fun openNovaCard()
@@ -108,4 +106,6 @@ interface AssetsRouter {
     fun openTradeWebInterface(payload: TradeWebPayload)
 
     fun finishTopUp()
+
+    fun openAssetDetailsFromDeepLink(payload: AssetPayload)
 }

@@ -3,8 +3,8 @@ package io.novafoundation.nova.app.root.presentation
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.app.root.domain.RootInteractor
-import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
-import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer

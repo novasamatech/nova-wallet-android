@@ -26,6 +26,7 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -207,6 +208,8 @@ interface AssetsFeatureDependencies {
     val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
 
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
+
+    val automaticInteractionGate: AutomaticInteractionGate
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

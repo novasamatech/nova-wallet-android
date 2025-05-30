@@ -74,6 +74,7 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
 import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
+import io.novafoundation.nova.feature_staking_impl.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -136,7 +137,7 @@ import javax.inject.Named
 const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
 const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
-@Module(includes = [AssetUseCaseModule::class])
+@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class])
 class StakingFeatureModule {
 
     @Provides

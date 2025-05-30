@@ -74,6 +74,7 @@ dependencies {
     implementation project(':feature-external-sign-api')
     implementation project(':feature-banners-api')
     implementation project(':runtime')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 
