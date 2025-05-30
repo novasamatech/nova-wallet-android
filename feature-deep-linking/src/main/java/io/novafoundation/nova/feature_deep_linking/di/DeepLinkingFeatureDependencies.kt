@@ -9,8 +9,10 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_migration.utils.AccountMigrationMixinProvider
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
@@ -36,6 +38,8 @@ interface DeepLinkingFeatureDependencies {
 
     val accountRepository: AccountRepository
 
+    val splashPassedObserver: SplashPassedObserver
+
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val governanceSourceRegistry: GovernanceSourceRegistry
@@ -59,4 +63,6 @@ interface DeepLinkingFeatureDependencies {
     val referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
 
     val assetDetailsDeepLinkConfigurator: AssetDetailsDeepLinkConfigurator
+
+    val accountMigrationMixinProvider: AccountMigrationMixinProvider
 }
