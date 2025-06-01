@@ -28,9 +28,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 
 class NovaCardViewModel(
     private val chainRegistry: ChainRegistry,
@@ -69,6 +71,10 @@ class NovaCardViewModel(
         ensureCardCreationIsBlocking()
 
         observeTopUp()
+    }
+
+    fun backClicked() {
+        assetsRouter.back()
     }
 
     override fun onSellOrderCreated(orderId: String, address: String, amount: BigDecimal) {
@@ -121,11 +127,11 @@ class NovaCardViewModel(
         topUpRequester.responseFlow
             .onEach {
                 when (it) {
-                    TopUpAddressResponder.Response.Cancel -> {
+                    TopUpAddressResponder.Response.Cancel -> withContext(Dispatchers.Main) {
                         assetsRouter.returnToMainScreen()
                     }
 
-                    TopUpAddressResponder.Response.Success -> {
+                    TopUpAddressResponder.Response.Success -> withContext(Dispatchers.Main) {
                         updateCardState()
                         updateLastTopUpTime()
                         assetsRouter.openAwaitingCardCreation()
