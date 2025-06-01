@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkHandler
+import io.novafoundation.nova.feature_assets.presentation.novacard.overview.deeplink.NovaCardDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -42,7 +43,22 @@ class DeepLinkModule {
 
     @Provides
     @FeatureScope
-    fun provideDeepLinks(assetDetails: AssetDetailsDeepLinkHandler): AssetDeepLinks {
-        return AssetDeepLinks(listOf(assetDetails))
+    fun provideNovaCardDeepLinkHandler(
+        router: AssetsRouter,
+        automaticInteractionGate: AutomaticInteractionGate
+    ): NovaCardDeepLinkHandler {
+        return NovaCardDeepLinkHandler(
+            router,
+            automaticInteractionGate
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideDeepLinks(
+        assetDetails: AssetDetailsDeepLinkHandler,
+        novaCardDeepLink: NovaCardDeepLinkHandler
+    ): AssetDeepLinks {
+        return AssetDeepLinks(listOf(assetDetails, novaCardDeepLink))
     }
 }
