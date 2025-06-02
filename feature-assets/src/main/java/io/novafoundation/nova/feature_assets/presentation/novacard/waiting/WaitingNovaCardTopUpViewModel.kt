@@ -45,7 +45,7 @@ class WaitingNovaCardTopUpViewModel(
         assetsRouter.back()
     }
 
-    fun closeNovaCard() {
+    fun onScreenCancelled() {
         assetsRouter.closeNovaCard()
     }
 }

@@ -127,11 +127,11 @@ class NovaCardViewModel(
         topUpRequester.responseFlow
             .onEach {
                 when (it) {
-                    TopUpAddressResponder.Response.Cancel -> withContext(Dispatchers.Main) {
+                    TopUpAddressResponder.Response.Cancel -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
                         assetsRouter.returnToMainScreen()
                     }
 
-                    TopUpAddressResponder.Response.Success -> withContext(Dispatchers.Main) {
+                    TopUpAddressResponder.Response.Success -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
                         updateCardState()
                         updateLastTopUpTime()
                         assetsRouter.openAwaitingCardCreation()

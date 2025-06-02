@@ -19,7 +19,7 @@ class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopU
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        viewModel.closeNovaCard()
+        viewModel.onScreenCancelled()
 
         super.onCancel(dialog)
     }
