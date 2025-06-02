@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.Callbac
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-private val ACTION_MIGRATE_PATH_REGEX = Regex("/migrate/([a-zA-Z]+)(?:[/?]|$)")
+private const val ACTION_MIGRATE_PATH_REGEX = "/migrate"
 
 class RequestMigrationDeepLinkHandler(
     private val router: AccountMigrationRouter,
@@ -25,7 +25,7 @@ class RequestMigrationDeepLinkHandler(
     override suspend fun matches(data: Uri): Boolean {
         val path = data.path ?: return false
 
-        return ACTION_MIGRATE_PATH_REGEX.matches(path)
+        return path.startsWith(ACTION_MIGRATE_PATH_REGEX)
     }
 
     override suspend fun handleDeepLink(data: Uri): Result<Unit> = runCatching {
@@ -35,9 +35,7 @@ class RequestMigrationDeepLinkHandler(
             splashPassedObserver.awaitSplashPassed()
         }
 
-        val path = data.path ?: error("Invalid path")
-        val matchResult = ACTION_MIGRATE_PATH_REGEX.find(path) ?: error("Invalid scheme")
-        val scheme = matchResult.groupValues[1]
+        val scheme = data.getQueryParameter("scheme") ?: error("No scheme was passed")
         router.openAccountMigrationPairing(scheme)
     }
 }

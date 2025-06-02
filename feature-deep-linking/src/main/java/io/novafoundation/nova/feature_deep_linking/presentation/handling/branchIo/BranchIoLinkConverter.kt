@@ -40,6 +40,5 @@ class BranchIoLinkConverter(
     private fun MutableMap<String, String>.extractSubject(): String? {
         return remove(BranchIOConstants.SCREEN_QUERY)
             ?: remove(BranchIOConstants.ENTITY_QUERY)
-            ?: remove(BranchIOConstants.SCHEME_QUERY)
     }
 }
