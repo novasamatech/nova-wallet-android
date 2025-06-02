@@ -457,6 +457,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun closeNovaCard() {
+        navigationBuilder().action(R.id.action_close_nova_card_from_waiting_dialog)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openSendNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_sendFlow_to_sendFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
