@@ -6,7 +6,9 @@ data class UniqueNetworkCollection(
     val description: String?,
     val coverImage: CoverImage?,
     val owner: String,
-    val propertiesMap: Map<String, Property>?
+    val propertiesMap: Map<String, Property>?,
+    val lastTokenId: Int?,
+    val limits: Limits?
 ) {
     data class CoverImage(
         val url: String?
@@ -15,5 +17,9 @@ data class UniqueNetworkCollection(
     data class Property(
         val key: String,
         val value: String
+    )
+
+    data class Limits(
+        val token_limit: Int?,
     )
 }

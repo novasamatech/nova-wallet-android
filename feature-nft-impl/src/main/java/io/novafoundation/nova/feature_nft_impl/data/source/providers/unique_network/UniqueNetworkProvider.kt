@@ -56,6 +56,7 @@ class UniqueNetworkNftProvider(
                     media = remote.image,
                     issuanceType = NftLocal.IssuanceType.UNLIMITED,
                     issuanceTotal = null,
+                    issuanceMyEdition = remote.tokenId.toString(),
                     issuanceMyAmount = null,
                     price = null,
                     pricedUnits = null
@@ -89,15 +90,22 @@ class UniqueNetworkNftProvider(
                 collectionId = nftLocal.collectionId.toInt(),
             )
 
+            val issuanceTotal = collection.limits?.token_limit?.toBigInteger() ?: collection.lastTokenId?.toBigInteger()
+
+            val issuanceType = when {
+                collection.limits?.token_limit != null -> NftLocal.IssuanceType.LIMITED
+                else -> NftLocal.IssuanceType.UNLIMITED
+            }
+
             NftDetails(
                 identifier = nftLocal.identifier,
                 chain = chain,
                 owner = metaAccount.requireAccountIdIn(chain),
                 creator = null,
                 media = nftLocal.media,
-                name = nftLocal.name ?: nftLocal.name ?: nftLocal.instanceId!!,
+                name = nftLocal.name ?: nftLocal.instanceId!!,
                 description = null,
-                issuance = nftIssuance(nftLocal),
+                issuance = nftIssuance(issuanceType, issuanceTotal, nftLocal.issuanceMyEdition, nftLocal.issuanceMyAmount),
                 price = nftPrice(nftLocal),
                 collection = collection.let {
                     NftDetails.Collection(
