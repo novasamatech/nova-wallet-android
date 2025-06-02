@@ -573,6 +573,10 @@ fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
     return externalApi<Chain.ExternalApi.ReferendumSummary>()
 }
 
+fun Chain.timelineChainIdOrSelf(): ChainId {
+    return additional?.timelineChain ?: id
+}
+
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)
 
 fun SignatureVerifier.verifyMultiChain(

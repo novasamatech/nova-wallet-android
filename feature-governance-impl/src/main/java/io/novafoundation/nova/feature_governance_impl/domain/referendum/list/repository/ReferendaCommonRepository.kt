@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
@@ -75,7 +76,7 @@ class RealReferendaCommonRepository(
 
         return combine(
             governanceSource.referendaOffChainInfoFlow(chain),
-            chainStateRepository.currentBlockNumberFlow(chain.id)
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf())
         ) { offChainInfo, currentBlockNumber ->
             coroutineScope {
                 val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
@@ -114,7 +115,7 @@ class RealReferendaCommonRepository(
 
         return combine(
             governanceSource.referendaOffChainInfoFlow(chain),
-            chainStateRepository.currentBlockNumberFlow(chain.id)
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf())
         ) { offChainInfo, currentBlockNumber ->
             coroutineScope {
                 val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
@@ -262,7 +263,7 @@ class RealReferendaCommonRepository(
 
             Voter.Type.ACCOUNT -> {
                 val recentVotesBlockThreshold = if (onlyRecentVotes) {
-                    val blockTimeConverter = chainStateRepository.blockDurationEstimator(chain.id)
+                    val blockTimeConverter = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
                     blockTimeConverter.blockInPast(RECENT_VOTES_PERIOD)
                 } else {
                     null

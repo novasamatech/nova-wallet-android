@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.common
 
+import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 
 class ActiveEraInfo(

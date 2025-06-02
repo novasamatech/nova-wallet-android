@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLockId
 import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.selectedOption
@@ -161,10 +162,10 @@ class RealGovernanceUnlockInteractor(
 
         val trackLocksFlow = governanceSource.convictionVoting.trackLocksFlowOrEmpty(voterAccountId, asset.fullId)
 
-        val intermediateFlow = chainStateRepository.currentBlockNumberFlow(chain.id).map { currentBlockNumber ->
+        val intermediateFlow = chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf()).map { currentBlockNumber ->
             val onChainReferenda = governanceSource.referenda.getAllOnChainReferenda(chain.id).associateBy(OnChainReferendum::id)
             val voting = voterAccountId?.let { governanceSource.convictionVoting.votingFor(voterAccountId, chain.id) }.orEmpty()
-            val blockTime = chainStateRepository.predictedBlockTime(chain.id)
+            val blockTime = chainStateRepository.predictedBlockTime(chain.timelineChainIdOrSelf())
             val durationEstimator = BlockDurationEstimator(currentBlockNumber, blockTime)
 
             IntermediateData(voting, currentBlockNumber, onChainReferenda, durationEstimator)

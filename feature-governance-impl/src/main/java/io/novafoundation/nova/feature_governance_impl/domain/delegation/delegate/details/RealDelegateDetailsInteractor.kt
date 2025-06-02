@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate
 import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimator
@@ -82,9 +83,9 @@ class RealDelegateDetailsInteractor(
             delegateMetadatasDeferred.await() to identity.await()
         }
 
-        return chainStateRepository.currentBlockNumberFlow(chain.id).map {
+        return chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf()).map {
             coroutineScope {
-                val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
+                val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
                 val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
 
                 val delegatesStatsDeferred = async {

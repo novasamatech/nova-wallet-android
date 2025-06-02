@@ -4,6 +4,7 @@ package io.novafoundation.nova.runtime.storage.source.query.api
 
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.common.utils.filterNotNull
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.runtime.storage.source.StorageEntries
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
@@ -26,6 +27,9 @@ interface QueryableStorageEntry2<I1, I2, T : Any> {
 
     context(StorageQueryContext)
     suspend fun entries(keys: List<Pair<I1, I2>>): Map<Pair<I1, I2>, T>
+
+    context(StorageQueryContext)
+    suspend fun keys(): Set<Pair<I1, I2>>
 }
 
 internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
@@ -65,6 +69,11 @@ internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
             keyExtractor = { components -> convertKeyFromInternal(components) },
             binding = { decoded, key -> decoded?.let { binding(it, key.first, key.second) } }
         ).filterNotNull()
+    }
+
+    context(StorageQueryContext)
+    override suspend fun keys(): Set<Pair<I1, I2>> {
+        return storageEntry.keys().mapToSet(::convertKeyFromInternal)
     }
 
     private fun List<Pair<I1, I2>>.toInternal(): List<List<Any?>> {
