@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChoos
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
@@ -72,6 +73,8 @@ interface DAppFeatureDependencies {
     val preferences: Preferences
 
     val walletConnectService: WalletConnectService
+
+    val automaticInteractionGate: AutomaticInteractionGate
 
     fun currencyRepository(): CurrencyRepository
 

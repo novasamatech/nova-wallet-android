@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_buy_api.di
 
+import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
@@ -14,4 +15,6 @@ interface BuyFeatureApi {
     val mercuryoBuyRequestInterceptorFactory: MercuryoBuyRequestInterceptorFactory
 
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
+
+    val buyDeepLinks: BuyDeepLinks
 }

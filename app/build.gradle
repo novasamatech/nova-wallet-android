@@ -214,6 +214,8 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-account-impl')
 
+    implementation project(':feature-account-migration')
+
     implementation project(':feature-wallet-api')
     implementation project(':feature-wallet-impl')
 
@@ -268,7 +270,6 @@ dependencies {
 
     implementation project(':feature-push-notifications')
     implementation project(':feature-deep-linking')
-    implementation project(':feature-deep-link-building')
 
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')

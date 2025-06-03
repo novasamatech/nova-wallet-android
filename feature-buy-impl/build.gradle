@@ -82,6 +82,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-buy-api')
     implementation project(':runtime')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 

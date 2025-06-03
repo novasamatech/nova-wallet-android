@@ -64,7 +64,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="32dp"
-        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/balanceListNovaCardNegativeMargin" />
 
     <io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
@@ -74,5 +73,5 @@
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balanceListTotalBalance" />
+        app:layout_constraintTop_toBottomOf="@+id/balanceListNovaCard" />
 </androidx.constraintlayout.widget.ConstraintLayout>

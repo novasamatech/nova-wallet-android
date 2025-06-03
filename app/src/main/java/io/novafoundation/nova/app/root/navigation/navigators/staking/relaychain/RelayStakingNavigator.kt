@@ -289,4 +289,13 @@ class RelayStakingNavigator(
     override fun openDAppBrowser(url: String) {
         dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url))
     }
+
+    override fun openStakingDashboard() {
+        if (currentDestination?.id != R.id.mainFragment) {
+            navigationBuilder().action(R.id.action_open_split_screen)
+                .navigateInFirstAttachedContext()
+        }
+
+        stakingDashboardRouter.openStakingDashboard()
+    }
 }

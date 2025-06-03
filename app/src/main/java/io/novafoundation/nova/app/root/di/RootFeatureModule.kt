@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.di.busHandler.RequestBusHandlerModule
+import io.novafoundation.nova.app.root.di.deeplink.DeepLinksModule
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
@@ -17,7 +18,13 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RootActionBottomSheetLauncher
 
-@Module(includes = [RequestBusHandlerModule::class, ExternalServiceInitializersModule::class])
+@Module(
+    includes = [
+        RequestBusHandlerModule::class,
+        ExternalServiceInitializersModule::class,
+        DeepLinksModule::class
+    ]
+)
 class RootFeatureModule {
 
     @Provides

@@ -14,8 +14,10 @@ import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExt
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
+import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -43,6 +45,60 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddr
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 
 interface AccountFeatureApi {
+
+    val addressInputMixinFactory: AddressInputMixinFactory
+
+    val walletUiUseCase: WalletUiUseCase
+
+    val signerProvider: SignerProvider
+
+    val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
+
+    val signSharedState: SigningSharedState
+
+    val onChainIdentityRepository: OnChainIdentityRepository
+
+    val metaAccountTypePresentationMapper: MetaAccountTypePresentationMapper
+
+    val legacyLedgerAddAccountRepository: LegacyLedgerAddAccountRepository
+
+    val genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository
+
+    val evmTransactionService: EvmTransactionService
+
+    val identityMixinFactory: IdentityMixin.Factory
+
+    val languageUseCase: LanguageUseCase
+
+    val selectWalletMixinFactory: SelectWalletMixin.Factory
+
+    val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
+
+    val selectAddressMixinFactory: SelectAddressMixin.Factory
+
+    val metaAccountChangesEventBus: MetaAccountChangesEventBus
+
+    val applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase
+
+    val feePaymentProviderRegistry: FeePaymentProviderRegistry
+
+    val customFeeCapabilityFacade: CustomFeeCapabilityFacade
+
+    val hydrationFeeInjector: HydrationFeeInjector
+
+    val addressActionsMixinFactory: AddressActionsMixin.Factory
+
+    val accountDeepLinks: AccountDeepLinks
+
+    val mnemonicAddAccountRepository: MnemonicAddAccountRepository
+
+    @LocalIdentity
+    fun localIdentityProvider(): IdentityProvider
+
+    @OnChainIdentity
+    fun onChainIdentityProvider(): IdentityProvider
+
+    fun proxySyncService(): ProxySyncService
 
     fun metaAccountGroupingInteractor(): MetaAccountGroupingInteractor
 
@@ -77,54 +133,4 @@ interface AccountFeatureApi {
     fun syncWalletsBackupPasswordCommunicator(): SyncWalletsBackupPasswordCommunicator
 
     fun copyAddressMixin(): CopyAddressMixin
-
-    val addressInputMixinFactory: AddressInputMixinFactory
-
-    val walletUiUseCase: WalletUiUseCase
-
-    val signerProvider: SignerProvider
-
-    val watchOnlyMissingKeysPresenter: WatchOnlyMissingKeysPresenter
-
-    val signSharedState: SigningSharedState
-
-    val onChainIdentityRepository: OnChainIdentityRepository
-
-    val metaAccountTypePresentationMapper: MetaAccountTypePresentationMapper
-
-    @LocalIdentity
-    fun localIdentityProvider(): IdentityProvider
-
-    @OnChainIdentity
-    fun onChainIdentityProvider(): IdentityProvider
-
-    fun proxySyncService(): ProxySyncService
-
-    val legacyLedgerAddAccountRepository: LegacyLedgerAddAccountRepository
-
-    val genericLedgerAddAccountRepository: GenericLedgerAddAccountRepository
-
-    val evmTransactionService: EvmTransactionService
-
-    val identityMixinFactory: IdentityMixin.Factory
-
-    val languageUseCase: LanguageUseCase
-
-    val selectWalletMixinFactory: SelectWalletMixin.Factory
-
-    val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider
-
-    val selectAddressMixinFactory: SelectAddressMixin.Factory
-
-    val metaAccountChangesEventBus: MetaAccountChangesEventBus
-
-    val applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase
-
-    val feePaymentProviderRegistry: FeePaymentProviderRegistry
-
-    val customFeeCapabilityFacade: CustomFeeCapabilityFacade
-
-    val hydrationFeeInjector: HydrationFeeInjector
-
-    val addressActionsMixinFactory: AddressActionsMixin.Factory
 }

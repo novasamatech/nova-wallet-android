@@ -9,7 +9,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
     <uses-permission
         android:name="android.permission.BLUETOOTH"
@@ -123,6 +123,17 @@
                 <data android:scheme="http" />
                 <data android:host="app.novawallet.io" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https"/>
+                <data android:host="@string/branch_io_link_host"/>
+                <data android:host="@string/branch_io_link_host_alternate"/>
+            </intent-filter>
+
         </activity>
 
         <activity
@@ -187,6 +198,16 @@
             android:name="io.novafoundation.nova.staking_notification_channel_id"
             android:value="@string/staking_notification_channel_id" />
 
+        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_dsxlmUqNhbtOYX6e7cfgrpkbqsjGPYBf" />
+
+        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
+
     </application>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
 </manifest>

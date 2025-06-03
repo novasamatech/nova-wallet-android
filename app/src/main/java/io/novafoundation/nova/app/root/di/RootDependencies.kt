@@ -18,23 +18,33 @@ import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
+import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
+import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
+import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserTabExternalRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
+import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
+import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
+import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
+import io.novafoundation.nova.feature_wallet_connect_api.di.deeplinks.WalletConnectDeepLinks
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -42,6 +52,20 @@ import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface RootDependencies {
+
+    val stakingDeepLinks: StakingDeepLinks
+
+    val accountDeepLinks: AccountDeepLinks
+
+    val dAppDeepLinks: DAppDeepLinks
+
+    val governanceDeepLinks: GovernanceDeepLinks
+
+    val buyDeepLinks: BuyDeepLinks
+
+    val assetDeepLinks: AssetDeepLinks
+
+    val walletConnectDeepLinks: WalletConnectDeepLinks
 
     val systemCallExecutor: SystemCallExecutor
 
@@ -57,8 +81,6 @@ interface RootDependencies {
 
     val pushNotificationsInteractor: PushNotificationsInteractor
 
-    val rootDeepLinkHandler: RootDeepLinkHandler
-
     val welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor
 
     val applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase
@@ -72,6 +94,14 @@ interface RootDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val browserTabExternalRepository: BrowserTabExternalRepository
+
+    val accountMigrationDeepLinks: AccountMigrationDeepLinks
+
+    val deepLinkingPreferences: DeepLinkingPreferences
+
+    val branchIoLinkConverter: BranchIoLinkConverter
+
+    val pendingDeepLinkProvider: PendingDeepLinkProvider
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

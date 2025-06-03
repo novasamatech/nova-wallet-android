@@ -97,6 +97,8 @@
     <string name="account_ledger_select_device_description">Por favor, activa el Bluetooth en la configuración de tu teléfono y en el dispositivo Ledger. Desbloquea tu dispositivo Ledger y abre la aplicación %s.</string>
     <string name="account_ledger_select_device_title">Selecciona tu dispositivo Ledger</string>
     <string name="account_ledger_select_device_usb_description">Por favor, habilita el dispositivo Ledger. Desbloquea tu dispositivo Ledger y abre la aplicación %s.</string>
+    <string name="account_migration_subtitle">¡Ya casi llegas! 🎉\n Solo toca abajo para completar la configuración y comenzar a usar tus cuentas sin problemas tanto en la Polkadot App como en Nova Wallet</string>
+    <string name="account_migration_title">¡Bienvenido a Nova!</string>
     <string name="account_mnmonic_length_variants">frase de 12, 15, 18, 21 o 24 palabras</string>
     <string name="account_needed_message">No tienes una cuenta para esta red, puedes crear o importar una cuenta.</string>
     <string name="account_needed_title">Se necesita cuenta</string>
