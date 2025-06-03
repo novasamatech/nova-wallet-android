@@ -38,7 +38,7 @@ class RealShowSignParitySignerInteractor(
         payload: SignerPayload,
         mode: ParitySignerSignMode
     ): ParitySignerSignRequest = withContext(Dispatchers.Default) {
-       val uosPayload = when(payload) {
+        val uosPayload = when (payload) {
             is SignerPayload.Extrinsic -> mode.createUOSPayloadFor(payload.extrinsic)
             is SignerPayload.Raw -> createRawMessagePayload(payload.raw)
         }

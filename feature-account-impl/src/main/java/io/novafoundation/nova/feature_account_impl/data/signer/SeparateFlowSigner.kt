@@ -51,7 +51,7 @@ abstract class SeparateFlowSigner(
         }
     }
 
-    private suspend fun awaitConfirmation(state: SeparateFlowSignerState) : SignInterScreenCommunicator.Response {
+    private suspend fun awaitConfirmation(state: SeparateFlowSignerState): SignInterScreenCommunicator.Response {
         signingSharedState.set(state)
 
         return withContext(Dispatchers.Main) {

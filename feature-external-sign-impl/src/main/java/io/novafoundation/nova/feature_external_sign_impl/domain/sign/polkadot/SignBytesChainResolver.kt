@@ -17,7 +17,7 @@ interface SignBytesChainResolver {
 @FeatureScope
 class RealSignBytesChainResolver @Inject constructor(
     private val chainRegistry: ChainRegistry,
-): SignBytesChainResolver {
+) : SignBytesChainResolver {
 
     override suspend fun resolveChainId(address: String): ChainId? {
         return runCatching {
@@ -42,4 +42,3 @@ class RealSignBytesChainResolver @Inject constructor(
         }
     }
 }
-

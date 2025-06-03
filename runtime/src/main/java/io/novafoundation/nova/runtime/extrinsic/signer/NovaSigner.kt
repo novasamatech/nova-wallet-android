@@ -57,7 +57,7 @@ interface FeeSigner : NovaSigner {
     }
 }
 
-suspend fun NovaSigner.signRaw(payloadRaw: SignerPayloadRaw, chainId: ChainId?) : SignedRaw {
+suspend fun NovaSigner.signRaw(payloadRaw: SignerPayloadRaw, chainId: ChainId?): SignedRaw {
     return if (chainId != null) {
         signRawWithChain(payloadRaw.withChain(chainId))
     } else {

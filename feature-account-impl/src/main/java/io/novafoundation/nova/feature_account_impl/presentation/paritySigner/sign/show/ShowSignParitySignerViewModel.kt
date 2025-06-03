@@ -36,8 +36,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.ValidityPeriod
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novasama.substrate_sdk_android.extensions.toHexString
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -145,7 +143,7 @@ class ShowSignParitySignerViewModel(
     }
 
     private suspend fun determineSigningValidityPeriod(): ValidityPeriod? {
-        return when(val payload = signSharedState.getOrThrow().payload) {
+        return when (val payload = signSharedState.getOrThrow().payload) {
             is SignerPayload.Extrinsic -> extrinsicValidityUseCase.extrinsicValidityPeriod(payload.extrinsic)
             is SignerPayload.Raw -> null
         }

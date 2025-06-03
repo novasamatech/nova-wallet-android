@@ -7,7 +7,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 
@@ -17,27 +16,27 @@ class SeparateFlowSignerState(val payload: SignerPayload, val metaAccount: MetaA
 
 sealed class SignerPayload {
 
-    class Extrinsic(val extrinsic: SignerPayloadExtrinsic): SignerPayload()
+    class Extrinsic(val extrinsic: SignerPayloadExtrinsic) : SignerPayload()
 
-    class Raw(val raw: SignerPayloadRawWithChain): SignerPayload()
+    class Raw(val raw: SignerPayloadRawWithChain) : SignerPayload()
 }
 
 fun SignerPayload.chainId(): ChainId {
-    return when(this) {
+    return when (this) {
         is SignerPayload.Extrinsic -> extrinsic.genesisHash.toHexString()
         is SignerPayload.Raw -> raw.chainId
     }
 }
 
 fun SignerPayload.accountId(): AccountId {
-    return when(this) {
+    return when (this) {
         is SignerPayload.Extrinsic -> extrinsic.accountId
         is SignerPayload.Raw -> raw.accountId
     }
 }
 
 fun SignerPayload.signaturePayload(): ByteArray {
-    return when(this) {
+    return when (this) {
         is SignerPayload.Extrinsic -> extrinsic.encodedSignaturePayload(hashBigPayloads = true)
         is SignerPayload.Raw -> raw.message
     }

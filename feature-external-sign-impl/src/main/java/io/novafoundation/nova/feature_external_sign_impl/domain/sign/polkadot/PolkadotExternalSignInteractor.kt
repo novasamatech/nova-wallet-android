@@ -29,7 +29,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExterna
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.tryConvertHexToUtf8
-import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.anyAddressToAccountId
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -39,12 +38,8 @@ import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.generateMetadataProofWithSignerRestrictions
 import io.novafoundation.nova.runtime.extrinsic.signer.signRaw
-import io.novafoundation.nova.runtime.extrinsic.signer.withChain
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novafoundation.nova.runtime.multiNetwork.findChainIds
-import io.novafoundation.nova.runtime.multiNetwork.findChains
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -59,7 +54,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromHex
-import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
