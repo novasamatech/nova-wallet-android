@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot
 
+import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
@@ -27,6 +28,8 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkad
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
+import io.novafoundation.nova.feature_external_sign_impl.domain.sign.tryConvertHexToUtf8
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.anyAddressToAccountId
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -35,8 +38,13 @@ import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerServic
 import io.novafoundation.nova.runtime.extrinsic.signer.FeeSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.NovaSigner
 import io.novafoundation.nova.runtime.extrinsic.signer.generateMetadataProofWithSignerRestrictions
+import io.novafoundation.nova.runtime.extrinsic.signer.signRaw
+import io.novafoundation.nova.runtime.extrinsic.signer.withChain
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.findChainIds
+import io.novafoundation.nova.runtime.multiNetwork.findChains
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -51,6 +59,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.Nonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromHex
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder.addressPrefix
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.chain.RuntimeVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -65,6 +74,7 @@ class PolkadotSignInteractorFactory(
     private val extrinsicGson: Gson,
     private val addressIconGenerator: AddressIconGenerator,
     private val metadataShortenerService: MetadataShortenerService,
+    private val signBytesChainResolver: SignBytesChainResolver,
     private val signerProvider: SignerProvider,
 ) {
 
@@ -77,7 +87,8 @@ class PolkadotSignInteractorFactory(
         request = request,
         wallet = wallet,
         signerProvider = signerProvider,
-        metadataShortenerService = metadataShortenerService
+        metadataShortenerService = metadataShortenerService,
+        signBytesChainResolver = signBytesChainResolver
     )
 }
 
@@ -89,6 +100,7 @@ class PolkadotExternalSignInteractor(
     private val request: ExternalSignRequest.Polkadot,
     private val signerProvider: SignerProvider,
     private val metadataShortenerService: MetadataShortenerService,
+    private val signBytesChainResolver: SignBytesChainResolver,
     wallet: ExternalSignWallet,
     accountRepository: AccountRepository
 ) : BaseExternalSignInteractor(accountRepository, wallet, signerProvider) {
@@ -132,14 +144,16 @@ class PolkadotExternalSignInteractor(
                 is PolkadotSignPayload.Json -> signExtrinsic(signPayload)
                 is PolkadotSignPayload.Raw -> signBytes(signPayload)
             }
-        }.fold(
-            onSuccess = { signedResult ->
-                ExternalSignCommunicator.Response.Signed(request.id, signedResult.signature, signedResult.modifiedTransaction)
-            },
-            onFailure = { error ->
-                error.failedSigningIfNotCancelled(request.id)
-            }
-        )
+        }
+            .onFailure { Log.e("PolkadotExternalSignInteractor", "Failed to sign", it) }
+            .fold(
+                onSuccess = { signedResult ->
+                    ExternalSignCommunicator.Response.Signed(request.id, signedResult.signature, signedResult.modifiedTransaction)
+                },
+                onFailure = { error ->
+                    error.failedSigningIfNotCancelled(request.id)
+                }
+            )
     }
 
     override suspend fun readableOperationContent(): String = withContext(Dispatchers.Default) {
@@ -163,7 +177,7 @@ class PolkadotExternalSignInteractor(
     }
 
     private fun readableBytesContent(signBytesPayload: PolkadotSignPayload.Raw): String {
-        return signBytesPayload.data
+        return signBytesPayload.data.tryConvertHexToUtf8()
     }
 
     private suspend fun readableExtrinsicContent(): String {
@@ -176,8 +190,10 @@ class PolkadotExternalSignInteractor(
         val signer = resolveWalletSigner()
         val payload = SignerPayloadRaw.fromUnsafeString(signBytesPayload.data, accountId)
 
-        val signature = signer.signRaw(payload).asHexString()
-        return SignedResult(signature, modifiedTransaction = null)
+        val chainId = signBytesChainResolver.resolveChainId(signBytesPayload.address)
+        val signature = signer.signRaw(payload, chainId)
+
+        return SignedResult(signature.asHexString(), modifiedTransaction = null)
     }
 
     private suspend fun signExtrinsic(extrinsicPayload: PolkadotSignPayload.Json): SignedResult {

@@ -1,9 +1,12 @@
 package io.novafoundation.nova.runtime.extrinsic.signer
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.Signer
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 
 interface NovaSigner : Signer {
 
@@ -19,6 +22,12 @@ interface NovaSigner : Signer {
     suspend fun signerAccountId(chain: Chain): AccountId
 
     suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic
+
+    // TODO this is a temp solution to workaround Polkadot Vault requiring chain id to sign a raw message
+    // This method should be removed once Vault behavior is improved
+    suspend fun signRawWithChain(payload: SignerPayloadRawWithChain): SignedRaw {
+        return signRaw(payload.withoutChain())
+    }
 }
 
 interface FeeSigner : NovaSigner {
@@ -45,5 +54,13 @@ interface FeeSigner : NovaSigner {
 
     override suspend fun modifyPayload(payloadExtrinsic: SignerPayloadExtrinsic): SignerPayloadExtrinsic {
         throw NotImplementedError("This method should not be called")
+    }
+}
+
+suspend fun NovaSigner.signRaw(payloadRaw: SignerPayloadRaw, chainId: ChainId?) : SignedRaw {
+    return if (chainId != null) {
+        signRawWithChain(payloadRaw.withChain(chainId))
+    } else {
+        signRaw(payloadRaw)
     }
 }

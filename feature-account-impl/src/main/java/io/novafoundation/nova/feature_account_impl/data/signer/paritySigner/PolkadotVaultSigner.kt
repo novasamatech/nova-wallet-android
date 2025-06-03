@@ -5,11 +5,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.signer.SeparateFlowSigner
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.runtime.extrinsic.signer.SignerPayloadRawWithChain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
@@ -62,7 +64,12 @@ abstract class PolkadotVaultVariantSigner(
         return super.signExtrinsic(payloadExtrinsic)
     }
 
+    // Vault does not support chain-less message signing yet
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
+        rawSigningNotSupported()
+    }
+
+    protected suspend fun rawSigningNotSupported(): Nothing {
         val config = polkadotVaultVariantConfigProvider.variantConfigFor(variant)
 
         messageSigningNotSupported.presentSigningNotSupported(
@@ -91,12 +98,17 @@ class ParitySignerSigner(
     variant = PolkadotVaultVariant.PARITY_SIGNER,
     polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
     messageSigningNotSupported = messageSigningNotSupported
-)
+) {
+
+    override suspend fun signRawWithChain(payload: SignerPayloadRawWithChain): SignedRaw {
+        rawSigningNotSupported()
+    }
+}
 
 class PolkadotVaultSigner(
     signingSharedState: SigningSharedState,
     metaAccount: MetaAccount,
-    signFlowRequester: PolkadotVaultVariantSignCommunicator,
+    private val signFlowRequester: PolkadotVaultVariantSignCommunicator,
     resourceManager: ResourceManager,
     polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     messageSigningNotSupported: SigningNotSupportedPresentable
@@ -108,4 +120,11 @@ class PolkadotVaultSigner(
     variant = PolkadotVaultVariant.POLKADOT_VAULT,
     polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
     messageSigningNotSupported = messageSigningNotSupported
-)
+) {
+
+    override suspend fun signRawWithChain(payload: SignerPayloadRawWithChain): SignedRaw {
+        signFlowRequester.setUsedVariant(PolkadotVaultVariant.POLKADOT_VAULT)
+
+        return useSignRawFlowRequester(payload)
+    }
+}

@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_ledger_impl.domain.account.sign
 
 import io.novafoundation.nova.common.utils.chainId
 import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
+import io.novafoundation.nova.feature_account_api.data.signer.chainId
+import io.novafoundation.nova.feature_account_api.data.signer.signaturePayload
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
@@ -49,9 +51,8 @@ class RealSignLedgerInteractor(
         payload: SeparateFlowSignerState,
         signature: SignatureWrapper
     ): Boolean = runCatching {
-        val extrinsic = payload.extrinsic
-        val payloadBytes = extrinsic.encodedSignaturePayload(hashBigPayloads = true)
-        val chainId = extrinsic.chainId
+        val payloadBytes = payload.payload.signaturePayload()
+        val chainId = payload.payload.chainId()
         val chain = chainRegistry.getChain(chainId)
 
         val publicKey = payload.metaAccount.publicKeyIn(chain) ?: throw IllegalStateException("No public key for chain $chainId")
