@@ -132,11 +132,9 @@ class NovaCardViewModel(
                     }
 
                     TopUpAddressResponder.Response.Success -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
-                        if (isCardNotCreated()) {
-                            updateCardState()
-                            updateLastTopUpTime()
-                            assetsRouter.openAwaitingCardCreation()
-                        }
+                        updateCardState()
+                        updateLastTopUpTime()
+                        assetsRouter.openAwaitingCardCreation()
                     }
                 }
             }
@@ -144,14 +142,12 @@ class NovaCardViewModel(
     }
 
     private fun updateCardState() {
-        novaCardInteractor.setNovaCardState(NovaCardState.CREATION)
+        if (!novaCardInteractor.isNovaCardCreated()) {
+            novaCardInteractor.setNovaCardState(NovaCardState.CREATION)
+        }
     }
 
     private fun updateLastTopUpTime() {
         novaCardInteractor.setLastTopUpTime(System.currentTimeMillis())
-    }
-
-    private fun isCardNotCreated(): Boolean {
-        return !novaCardInteractor.isNovaCardCreated()
     }
 }
