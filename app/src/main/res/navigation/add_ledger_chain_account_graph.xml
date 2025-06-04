@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/addChainAccountSelectLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.AddChainAccountSelectLedgerFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment"
         android:label="AddChainAccountSelectLedgerFragment" >
 
         <action
@@ -20,6 +20,6 @@
 
     <fragment
         android:id="@+id/addChainAccountSelectAddressLedgerFragment"
-        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.AddLedgerChainAccountSelectAddressFragment"
+        android:name="io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.AddLedgerChainAccountSelectAddressFragment"
         android:label="AddChainAccountSelectAddressLedgerFragment" />
 </navigation>

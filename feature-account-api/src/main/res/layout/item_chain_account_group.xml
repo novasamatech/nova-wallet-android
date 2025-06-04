@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:toosl="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:orientation="horizontal"
+    tools:background="@color/secondary_screen_background">
+
+    <TextView
+        android:id="@+id/itemChainAccountGroupTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingTop="15dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/text_secondary"
+        tools:text="@tools:sample/lorem[2]" />
+
+    <TextView
+        android:id="@+id/itemChainAccountGroupAction"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textColor="@color/button_text_accent"
+        tools:drawablePadding="4dp"
+        tools:drawableStart="@drawable/ic_add_circle"
+        tools:text="Action text"
+        toosl:drawableTint="@color/icon_accent" />
+</LinearLayout>

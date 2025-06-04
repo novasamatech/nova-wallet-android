@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger
 
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountRepository
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 
 interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedgerAddAccountRepository.Payload> {
@@ -9,7 +10,13 @@ interface GenericLedgerAddAccountRepository : AddAccountRepository<GenericLedger
 
         class NewWallet(
             val name: String,
-            val universalAccount: LedgerSubstrateAccount,
+            val substrateAccount: LedgerSubstrateAccount,
+            val evmAccount: LedgerEvmAccount?,
+        ) : Payload
+
+        class AddEvmAccount(
+            val metaId: Long,
+            val evmAccount: LedgerEvmAccount
         ) : Payload
     }
 }

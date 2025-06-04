@@ -8,16 +8,17 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.applyDeepLink
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatusType
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDeepLinkData
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
-import io.novafoundation.nova.feature_deep_link_building.presentation.addReferendumData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractPayloadFieldsWithPath
@@ -64,7 +65,10 @@ class ReferendumStateUpdateNotificationHandler(
                 context,
                 getTitle(stateTo),
                 getMessage(chain, referendumId, stateFrom, stateTo),
-                activityIntent().addReferendumData(configurator, chain.id, referendumId)
+                activityIntent().applyDeepLink(
+                    configurator,
+                    ReferendumDeepLinkData(chain.id, referendumId, Chain.Governance.V2)
+                )
             ).build()
 
         notify(notification)

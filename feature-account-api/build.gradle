@@ -44,6 +44,7 @@ dependencies {
     implementation project(':feature-ledger-api')
     implementation project(':feature-xcm:api')
     implementation project(':web3names')
+    implementation project(':feature-deep-linking')
 
     implementation liveDataKtxDep
     implementation lifeCycleKtxDep

@@ -4,21 +4,24 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
+import io.novafoundation.nova.common.address.AddressModel
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.AccountsAdapter
-import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
-import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.common.view.setModelOrHide
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.setupAddressActions
 import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerSelectAddressBinding
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessagePresentable
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.setupLedgerMessages
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list.LedgerAccountAdapter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.list.LedgerSelectAddressLoadMoreAdapter
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountRvItem
 import javax.inject.Inject
 
 abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     BaseFragment<V, FragmentImportLedgerSelectAddressBinding>(),
-    AccountHolder.AccountItemHandler,
-    LedgerSelectAddressLoadMoreAdapter.Handler {
+    LedgerSelectAddressLoadMoreAdapter.Handler,
+    LedgerAccountAdapter.Handler {
 
     companion object {
 
@@ -33,12 +36,7 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     override fun createBinding() = FragmentImportLedgerSelectAddressBinding.inflate(layoutInflater)
 
     private val addressesAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        AccountsAdapter(
-            this,
-            imageLoader,
-            chainBorderColor = R.color.secondary_screen_background,
-            AccountHolder.Mode.SELECT
-        )
+        LedgerAccountAdapter(this)
     }
     private val loadMoreAdapter = LedgerSelectAddressLoadMoreAdapter(handler = this, lifecycleOwner = this)
 
@@ -64,14 +62,22 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
 
         viewModel.chainUi.observe(binder.ledgerSelectAddressChain::setChain)
 
-        setupLedgerMessages(ledgerMessagePresentable)
-    }
+        viewModel.alertFlow.observe(binder.ledgerSelectAddressAlert::setModelOrHide)
 
-    override fun itemClicked(accountModel: AccountUi) {
-        viewModel.accountClicked(accountModel)
+        setupLedgerMessages(ledgerMessagePresentable)
+
+        viewModel.addressActionsMixin.setupAddressActions()
     }
 
     override fun loadMoreClicked() {
         viewModel.loadMoreClicked()
+    }
+
+    override fun itemClicked(item: LedgerAccountRvItem) {
+        viewModel.accountClicked(item)
+    }
+
+    override fun addressInfoClicked(addressModel: AddressModel, addressScheme: AddressScheme) {
+        viewModel.addressInfoClicked(addressModel, addressScheme)
     }
 }

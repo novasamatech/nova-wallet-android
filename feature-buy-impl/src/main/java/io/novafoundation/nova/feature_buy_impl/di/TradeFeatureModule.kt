@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.BuildConfig
+import io.novafoundation.nova.feature_buy_impl.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.RealTradeTokenRegistry
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.banxa.BanxaProvider
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.mercurio.MercuryoIntegratorFactory
@@ -20,7 +21,7 @@ import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.m
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoSellRequestInterceptorFactory
 import okhttp3.OkHttpClient
 
-@Module
+@Module(includes = [DeepLinkModule::class])
 class BuyFeatureModule {
 
     @Provides

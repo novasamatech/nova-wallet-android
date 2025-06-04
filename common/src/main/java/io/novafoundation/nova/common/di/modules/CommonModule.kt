@@ -74,6 +74,8 @@ import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
+import io.novafoundation.nova.common.utils.splash.RealSplashPassedObserver
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
@@ -97,7 +99,7 @@ const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 @Retention(AnnotationRetention.BINARY)
 annotation class Caching
 
-@Module(includes = [ParallaxCardModule::class, WebViewModule::class])
+@Module(includes = [ParallaxCardModule::class, WebViewModule::class, CommonBindsModule::class])
 class CommonModule {
 
     @Provides
@@ -150,6 +152,10 @@ class CommonModule {
     ): BackgroundAccessObserver {
         return BackgroundAccessObserver(preferences, automaticInteractionGate)
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideSplashPassedObserver(): SplashPassedObserver = RealSplashPassedObserver()
 
     @Provides
     @ApplicationScope

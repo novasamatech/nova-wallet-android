@@ -14,10 +14,10 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -47,8 +47,6 @@ interface PushNotificationsFeatureDependencies {
 
     val referendaStatusFormatter: ReferendaStatusFormatter
 
-    val referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
-
     val assetDetailsDeepLinkConfigurator: AssetDetailsDeepLinkConfigurator
 
     val tokenRepository: TokenRepository
@@ -56,6 +54,8 @@ interface PushNotificationsFeatureDependencies {
     val provideActivityIntentProvider: ActivityIntentProvider
 
     val appLinksProvider: AppLinksProvider
+
+    val referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
 
     val metaAccountChangesEventBus: MetaAccountChangesEventBus
 

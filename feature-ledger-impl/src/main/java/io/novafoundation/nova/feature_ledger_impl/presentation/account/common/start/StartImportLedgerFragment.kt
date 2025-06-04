@@ -73,15 +73,9 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> :
         )
     }
 
-    private fun networkAppIsInstalledStep() = requireContext().highlightedText(
-        R.string.account_ledger_import_start_step_1,
-        R.string.account_ledger_import_start_step_1_highlighted
-    )
+    abstract fun networkAppIsInstalledStep(): CharSequence
 
-    private fun openingNetworkAppStep() = requireContext().highlightedText(
-        R.string.account_ledger_import_start_step_2,
-        R.string.account_ledger_import_start_step_2_highlighted
-    )
+    abstract fun openingNetworkAppStep(): CharSequence
 
     private fun enableBluetoothStep() = requireContext().highlightedText(
         R.string.account_ledger_import_start_step_3,

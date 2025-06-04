@@ -30,6 +30,10 @@ class LedgerNanoSPlusMapperDelegate(
         return resourceManager.getString(R.string.ledger_verify_address_message_both_buttons, getName())
     }
 
+    override fun getReviewAddressesMessage(): String {
+        return resourceManager.getString(R.string.ledger_verify_addresses_message_both_buttons, getName())
+    }
+
     override fun getSignMessage(): String {
         return resourceManager.getString(R.string.ledger_sign_approve_message, getName())
     }

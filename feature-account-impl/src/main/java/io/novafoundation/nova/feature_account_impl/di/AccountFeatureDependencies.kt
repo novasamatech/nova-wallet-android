@@ -4,6 +4,7 @@ import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
@@ -27,6 +28,7 @@ import io.novafoundation.nova.common.utils.CopyValueMixin
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -123,6 +125,10 @@ interface AccountFeatureDependencies {
     val metadataShortenerService: MetadataShortenerService
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
+
+    val addressSchemeFormatter: AddressSchemeFormatter
+
+    val automaticInteractionGate: AutomaticInteractionGate
 
     fun appLinksProvider(): AppLinksProvider
 

@@ -1,11 +1,15 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet
 
+import io.novafoundation.nova.common.address.format.AddressScheme
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.second
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerApplicationResponse
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_impl.R
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Footer.Rows.Column
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.LedgerMessageCommand.Show.Error.RecoverableError
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.mappers.LedgerDeviceFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatter
@@ -15,11 +19,12 @@ import io.novafoundation.nova.runtime.extrinsic.closeToExpire
 
 class MessageCommandFormatterFactory(
     private val resourceManager: ResourceManager,
-    private val deviceMapper: LedgerDeviceFormatter
+    private val deviceMapper: LedgerDeviceFormatter,
+    private val addressSchemeFormatter: AddressSchemeFormatter
 ) {
 
     fun create(messageFormatter: LedgerMessageFormatter): MessageCommandFormatter {
-        return MessageCommandFormatter(resourceManager, deviceMapper, messageFormatter)
+        return MessageCommandFormatter(resourceManager, deviceMapper, messageFormatter, addressSchemeFormatter)
     }
 }
 
@@ -27,6 +32,7 @@ class MessageCommandFormatter(
     private val resourceManager: ResourceManager,
     private val deviceMapper: LedgerDeviceFormatter,
     private val messageFormatter: LedgerMessageFormatter,
+    private val addressSchemeFormatter: AddressSchemeFormatter,
 ) {
 
     context(Browserable.Presentation)
@@ -145,21 +151,43 @@ class MessageCommandFormatter(
     }
 
     fun reviewAddressCommand(
-        address: String,
+        addresses: List<Pair<AddressScheme, String>>,
         device: LedgerDevice,
         onCancel: () -> Unit,
     ): LedgerMessageCommand {
         val deviceMapper = deviceMapper.createDelegate(device)
 
+        val footer: LedgerMessageCommand.Footer
+        val subtitle: String
+
+        when (addresses.size) {
+            0 -> error("At least one address should be not null")
+
+            1 -> {
+                footer = LedgerMessageCommand.Footer.Value(
+                    value = addresses.single().second.toTwoLinesAddress(),
+                )
+                subtitle = deviceMapper.getReviewAddressMessage()
+            }
+
+            2 -> {
+                footer = LedgerMessageCommand.Footer.Rows(
+                    first = rowFor(addresses.first()),
+                    second = rowFor(addresses.second())
+                )
+                subtitle = deviceMapper.getReviewAddressesMessage()
+            }
+
+            else -> error("Too many addresses passed: ${addresses.size}")
+        }
+
         return LedgerMessageCommand.Show.Info(
             title = resourceManager.getString(R.string.ledger_review_approve_title),
-            subtitle = deviceMapper.getReviewAddressMessage(),
+            subtitle = subtitle,
             onCancel = onCancel,
             alert = null,
             graphics = deviceMapper.getApproveImage(),
-            footer = LedgerMessageCommand.Footer.Value(
-                value = address.toTwoLinesAddress(),
-            )
+            footer = footer
         )
     }
 
@@ -171,4 +199,17 @@ class MessageCommandFormatter(
         val middle = length / 2
         return substring(0, middle) + "\n" + substring(middle)
     }
+
+    private fun rowFor(addressWithScheme: Pair<AddressScheme, String>): Column {
+        val label = addressSchemeFormatter.addressLabel(addressWithScheme.first)
+        return Column(label, addressWithScheme.second.toTwoLinesAddress())
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun createLedgerReviewAddresses(
+    allowedAddressSchemes: List<AddressScheme>,
+    vararg allAddresses: Pair<AddressScheme, String?>
+): List<Pair<AddressScheme, String>> {
+    return allAddresses.filter { it.first in allowedAddressSchemes && it.second != null } as List<Pair<AddressScheme, String>>
 }

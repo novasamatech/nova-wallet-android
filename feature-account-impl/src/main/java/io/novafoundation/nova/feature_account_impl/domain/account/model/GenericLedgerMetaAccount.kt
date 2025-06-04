@@ -41,8 +41,9 @@ class GenericLedgerMetaAccount(
 ) {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {
-        // Generic ledger provides account for every possible account
-        return false
+        // While Generic Ledger now provides support for both Substrate and EVM, initial version only supported Substrate
+        // So user might have a missing EVM account and we should allow them to add it
+        return isSupported(chain)
     }
 
     override fun hasAccountIn(chain: Chain): Boolean {
