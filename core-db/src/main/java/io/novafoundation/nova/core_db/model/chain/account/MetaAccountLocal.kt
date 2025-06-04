@@ -82,7 +82,8 @@ class MetaAccountLocal(
             position = position,
             type = type,
             status = status,
-            globallyUniqueId = globallyUniqueId
+            globallyUniqueId = globallyUniqueId,
+            typeExtras = typeExtras
         ).also {
             it.id = id
         }

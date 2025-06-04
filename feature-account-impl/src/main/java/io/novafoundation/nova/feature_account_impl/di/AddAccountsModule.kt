@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.wa
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.di.AddAccountsModule.BindsModule
-import io.novafoundation.nova.feature_account_impl.di.modules.AccountBindsModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 

@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.processResponseCode
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.json.copyBytes
@@ -29,9 +30,10 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 class GenericSubstrateLedgerApplication(
     private val transport: LedgerTransport,
     metadataShortenerService: MetadataShortenerService,
+    chainRegistry: ChainRegistry,
     private val ledgerRepository: LedgerRepository,
     private val legacyApplicationConfigs: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all()
-) : NewSubstrateLedgerApplication(transport, metadataShortenerService) {
+) : NewSubstrateLedgerApplication(transport, metadataShortenerService, chainRegistry) {
 
     private val universalConfig = legacyApplicationConfigs.getConfig(Chain.Geneses.POLKADOT)
 

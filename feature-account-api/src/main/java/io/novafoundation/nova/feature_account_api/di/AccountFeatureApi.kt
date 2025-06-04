@@ -102,6 +102,8 @@ interface AccountFeatureApi {
 
     val signingContextFactory: SigningContext.Factory
 
+    val extrinsicSplitter: ExtrinsicSplitter
+
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider
 

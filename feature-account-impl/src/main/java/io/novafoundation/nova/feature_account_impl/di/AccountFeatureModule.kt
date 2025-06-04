@@ -51,7 +51,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
-import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -129,7 +128,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.Se
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_impl.di.modules.deeplinks.DeepLinkModule
+import io.novafoundation.nova.feature_account_impl.presentation.account.addressActions.AddressActionsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
@@ -173,7 +174,7 @@ import javax.inject.Named
         CloudBackupModule::class,
         CustomFeeModule::class,
         MultisigModule::class,
-        BindsModule::class
+        BindsModule::class,
         DeepLinkModule::class
     ]
 )
@@ -187,6 +188,9 @@ class AccountFeatureModule {
 
         @Binds
         fun bindSigningContextFactory(real: SigningContextFactory): SigningContext.Factory
+
+        @Binds
+        fun bindAddressActionsMixinFactory(real: AddressActionsMixinFactory): AddressActionsMixin.Factory
     }
 
     @Provides

@@ -15,13 +15,15 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.encodeDerivationPath
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.parseSubstrateAccountResponse
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
 
 abstract class NewSubstrateLedgerApplication(
     private val transport: LedgerTransport,
-    private val metadataShortenerService: MetadataShortenerService
+    private val metadataShortenerService: MetadataShortenerService,
+    private val chainRegistry: ChainRegistry,
 ) : SubstrateLedgerApplication {
 
     abstract val cla: UByte
@@ -73,7 +75,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: SignerPayloadExtrinsic
+        payload: InheritedImplication
     ): SignatureWrapper {
         val multiSignature = sendSignChunks(device, metaId, chainId, payload, defaultCryptoScheme())
         return SubstrateLedgerAppCommon.parseMultiSignature(multiSignature)
@@ -83,7 +85,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: SignerPayloadExtrinsic
+        payload: InheritedImplication
     ): SignatureWrapper {
         val signature = sendSignChunks(device, metaId, chainId, payload, CryptoScheme.ECDSA)
         return SubstrateLedgerAppCommon.parseSignature(signature, CryptoScheme.ECDSA)
@@ -93,7 +95,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: SignerPayloadExtrinsic,
+        payload: InheritedImplication,
         cryptoScheme: CryptoScheme
     ): ByteArray {
         val chunks = prepareExtrinsicChunks(metaId, chainId, payload)

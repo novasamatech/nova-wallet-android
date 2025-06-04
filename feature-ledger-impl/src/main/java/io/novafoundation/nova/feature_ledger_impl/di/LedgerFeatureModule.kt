@@ -73,7 +73,8 @@ class LedgerFeatureModule {
     ) = GenericSubstrateLedgerApplication(
         transport = transport,
         metadataShortenerService = metadataShortenerService,
-        ledgerRepository = ledgerRepository
+        ledgerRepository = ledgerRepository,
+        chainRegistry = chainRegistry
     )
 
     @Provides
