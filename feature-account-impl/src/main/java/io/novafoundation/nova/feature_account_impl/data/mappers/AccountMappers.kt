@@ -175,7 +175,8 @@ class AccountMappers(
                 name = name,
                 type = mapMetaAccountTypeFromLocal(type),
                 status = mapMetaAccountStateFromLocal(status),
-                globallyUniqueId = globallyUniqueId
+                globallyUniqueId = globallyUniqueId,
+                parentMetaId = parentMetaId
             )
         }
     }

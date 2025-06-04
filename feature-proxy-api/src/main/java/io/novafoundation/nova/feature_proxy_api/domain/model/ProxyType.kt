@@ -1,24 +1,24 @@
 package io.novafoundation.nova.feature_proxy_api.domain.model
 
-sealed class ProxyType(val name: String, val controllableFrom: List<ProxyType>) {
+sealed class ProxyType(open val name: String, val controllableFrom: List<ProxyType>) {
 
-    object Any : ProxyType("Any", emptyList())
+    data object Any : ProxyType("Any", emptyList())
 
-    object NonTransfer : ProxyType("NonTransfer", listOf(Any))
+    data object NonTransfer : ProxyType("NonTransfer", listOf(Any))
 
-    object Governance : ProxyType("Governance", listOf(Any, NonTransfer))
+    data object Governance : ProxyType("Governance", listOf(Any, NonTransfer))
 
-    object Staking : ProxyType("Staking", listOf(Any, NonTransfer))
+    data object Staking : ProxyType("Staking", listOf(Any, NonTransfer))
 
-    object IdentityJudgement : ProxyType("IdentityJudgement", listOf(Any, NonTransfer))
+    data object IdentityJudgement : ProxyType("IdentityJudgement", listOf(Any, NonTransfer))
 
-    object CancelProxy : ProxyType("CancelProxy", listOf(Any, NonTransfer))
+    data object CancelProxy : ProxyType("CancelProxy", listOf(Any, NonTransfer))
 
-    object Auction : ProxyType("Auction", listOf(Any, NonTransfer))
+    data object Auction : ProxyType("Auction", listOf(Any, NonTransfer))
 
-    object NominationPools : ProxyType("NominationPools", listOf(Any, NonTransfer, Staking))
+    data object NominationPools : ProxyType("NominationPools", listOf(Any, NonTransfer, Staking))
 
-    class Other(name: String) : ProxyType(name, listOf(Any))
+    data class Other(override val name: String) : ProxyType(name, listOf(Any))
 
     companion object
 }

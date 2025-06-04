@@ -42,6 +42,8 @@ interface LightMetaAccount {
     val type: Type
     val status: Status
 
+    val parentMetaId: Long?
+
     enum class Type {
         SECRETS,
         WATCH_ONLY,
@@ -70,6 +72,7 @@ fun LightMetaAccount(
     name: String,
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
+    parentMetaId: Long?,
 ) = object : LightMetaAccount {
     override val id: Long = id
     override val globallyUniqueId: String = globallyUniqueId
@@ -82,6 +85,7 @@ fun LightMetaAccount(
     override val name: String = name
     override val type: LightMetaAccount.Type = type
     override val status: LightMetaAccount.Status = status
+    override val parentMetaId: Long? = parentMetaId
 }
 
 interface MetaAccount : LightMetaAccount {

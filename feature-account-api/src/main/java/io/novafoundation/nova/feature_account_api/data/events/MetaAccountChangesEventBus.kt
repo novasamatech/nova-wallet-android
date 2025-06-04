@@ -48,11 +48,14 @@ fun MetaAccountChangesEventBus.SingleUpdateEvent.takeMetaIdIfTypeMatches(matcher
 
 inline fun buildChangesEvent(builder: MutableList<Event>.() -> Unit): Event? {
     val allEvents = buildList(builder)
+    return allEvents.combineBusEvents()
+}
 
-    return when (allEvents.size) {
+fun List<Event>.combineBusEvents(): Event? {
+    return when (size) {
         0 -> null
-        1 -> allEvents.single()
-        else -> Event.BatchUpdate(allEvents)
+        1 -> single()
+        else -> Event.BatchUpdate(this)
     }
 }
 

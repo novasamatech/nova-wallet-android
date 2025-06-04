@@ -124,10 +124,6 @@ class AccountRepositoryImpl(
         return accountDataSource.accountNameFor(accountId, chainId)
     }
 
-    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
-        return accountDataSource.allLightMetaAccounts()
-    }
-
     override suspend fun hasActiveMetaAccounts(): Boolean {
         return accountDataSource.hasActiveMetaAccounts()
     }
@@ -285,6 +281,10 @@ class AccountRepositoryImpl(
 
     override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
         return accountDataSource.getActiveMetaAccounts()
+    }
+
+    override suspend fun getAllMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.getAllMetaAccounts()
     }
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {

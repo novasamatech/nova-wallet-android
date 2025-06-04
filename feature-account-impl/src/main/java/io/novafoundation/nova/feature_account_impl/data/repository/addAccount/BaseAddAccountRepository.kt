@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.toEvent
 
 abstract class BaseAddAccountRepository<T>(
     private val metaAccountChangesEventBus: MetaAccountChangesEventBus
@@ -18,19 +19,4 @@ abstract class BaseAddAccountRepository<T>(
     }
 
     protected abstract suspend fun addAccountInternal(payload: T): AddAccountResult
-
-    private fun AddAccountResult.toEvent(): Event? {
-        return when (this) {
-            is AddAccountResult.HadEffect -> toEvent()
-            is AddAccountResult.NoOp -> null
-        }
-    }
-
-    private fun AddAccountResult.HadEffect.toEvent(): Event {
-        return when (this) {
-            is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId, type)
-            is AddAccountResult.AccountChanged -> Event.AccountStructureChanged(metaId, type)
-            is AddAccountResult.Batch -> Event.BatchUpdate(updates.map { it.toEvent() })
-        }
-    }
 }
