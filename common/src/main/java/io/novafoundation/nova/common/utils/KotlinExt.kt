@@ -58,6 +58,14 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
+inline fun <reified E : Throwable, R> Result<R>.onFailureInstance(action: (E) -> Unit): Result<R> {
+    return onFailure {
+        if (it is E) {
+            action(it)
+        }
+    }
+}
+
 inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
     transform()
     return this
@@ -672,8 +680,11 @@ fun Calendar.resetDay() {
     set(Calendar.MILLISECOND, 0)
 }
 
-inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
-    launch { block() }
+inline fun CoroutineScope.launchUnit(
+    context: CoroutineContext = EmptyCoroutineContext,
+    crossinline block: suspend CoroutineScope.() -> Unit
+) {
+    launch(context) { block() }
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }

@@ -30,6 +30,10 @@ class LedgerFlexMapperDelegate(
         return resourceManager.getString(R.string.ledger_verify_address_message_confirm_button, getName())
     }
 
+    override fun getReviewAddressesMessage(): String {
+        return resourceManager.getString(R.string.ledger_verify_addresses_message_confirm_button, getName())
+    }
+
     override fun getSignMessage(): String {
         return resourceManager.getString(R.string.ledger_hold_to_sign, getName())
     }

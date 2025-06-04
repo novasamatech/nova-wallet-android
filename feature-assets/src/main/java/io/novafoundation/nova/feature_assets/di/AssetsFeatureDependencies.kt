@@ -26,6 +26,7 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -56,6 +57,7 @@ import io.novafoundation.nova.feature_crowdloan_api.data.repository.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
@@ -210,6 +212,10 @@ interface AssetsFeatureDependencies {
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
 
     val multisigPendingOperationsService: MultisigPendingOperationsService
+
+    val automaticInteractionGate: AutomaticInteractionGate
+
+    val linkBuilderFactory: LinkBuilderFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

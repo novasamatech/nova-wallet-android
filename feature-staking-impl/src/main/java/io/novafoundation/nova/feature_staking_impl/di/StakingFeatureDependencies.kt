@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core.storage.StorageCache
@@ -124,6 +125,8 @@ interface StakingFeatureDependencies {
     val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 
     val maxActionProviderFactory: MaxActionProviderFactory
+
+    val automaticInteractionGate: AutomaticInteractionGate
 
     fun contextManager(): ContextManager
 

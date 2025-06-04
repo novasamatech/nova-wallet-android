@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin
 
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
@@ -7,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccou
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
@@ -21,6 +23,8 @@ class WalletDetailsMixinFactory(
     private val interactor: WalletDetailsInteractor,
     private val appLinksProvider: AppLinksProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
+    private val router: AccountRouter,
+    private val addressSchemeFormatter: AddressSchemeFormatter
 ) {
 
     suspend fun create(metaId: Long, host: WalletDetailsMixinHost): WalletDetailsMixin {
@@ -56,7 +60,9 @@ class WalletDetailsMixinFactory(
                 accountFormatterFactory = accountFormatterFactory,
                 interactor = interactor,
                 ledgerMigrationTracker = ledgerMigrationTracker,
-                metaAccount = metaAccount
+                metaAccount = metaAccount,
+                router = router,
+                addressSchemeFormatter = addressSchemeFormatter
             )
 
             Type.PARITY_SIGNER,

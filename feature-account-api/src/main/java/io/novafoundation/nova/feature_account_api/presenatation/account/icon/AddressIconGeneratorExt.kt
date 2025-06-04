@@ -5,6 +5,9 @@ import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.OptionalAddressModel
+import io.novafoundation.nova.common.address.format.AddressFormat
+import io.novafoundation.nova.common.address.format.asAccountId
+import io.novafoundation.nova.common.address.format.asAddress
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
@@ -73,6 +76,16 @@ suspend fun AddressIconGenerator.createAddressIcon(
     return createAddressIcon(chain.accountIdOf(address), sizeInDp, background)
 }
 
+suspend fun AddressIconGenerator.createAddressIcon(
+    addressFormat: AddressFormat,
+    address: String,
+    sizeInDp: Int = AddressIconGenerator.SIZE_SMALL,
+    @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT,
+): Drawable {
+    val accountId = addressFormat.accountIdOf(address.asAddress()).value
+    return createAddressIcon(accountId, sizeInDp, background)
+}
+
 suspend fun AddressIconGenerator.createAccountAddressModel(
     chain: Chain,
     address: String,
@@ -84,6 +97,24 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     accountName = name,
     background = AddressIconGenerator.BACKGROUND_TRANSPARENT
 )
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    address: String,
+    addressFormat: AddressFormat,
+    name: String? = null,
+): AddressModel {
+    val icon = createAddressIcon(addressFormat, address)
+    return AddressModel(address, icon, name)
+}
+
+suspend fun AddressIconGenerator.createAccountAddressModel(
+    addressFormat: AddressFormat,
+    accountId: ByteArray,
+    name: String? = null,
+): AddressModel {
+    val icon = createAddressIcon(accountId, AddressIconGenerator.SIZE_SMALL, AddressIconGenerator.BACKGROUND_TRANSPARENT)
+    return AddressModel(addressFormat.addressOf(accountId.asAccountId()).value, icon, name)
+}
 
 suspend fun AddressIconGenerator.createOptionalAccountAddressIcon(
     chain: Chain,

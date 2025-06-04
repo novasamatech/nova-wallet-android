@@ -9,9 +9,12 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
 import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
+import io.novafoundation.nova.feature_ledger_impl.di.modules.LedgerBindsModule
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectAddress.di.AddLedgerChainAccountSelectAddressComponent
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.selectLedger.di.AddChainAccountSelectLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectAddress.di.AddEvmGenericLedgerAccountSelectAddressComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.di.AddEvmAccountSelectGenericLedgerComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectAddress.di.AddLedgerChainAccountSelectAddressComponent
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.di.AddChainAccountSelectLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.finish.di.FinishImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.di.PreviewImportGenericLedgerComponent
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.selectAddress.di.SelectAddressImportGenericLedgerComponent
@@ -33,6 +36,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         LedgerFeatureModule::class,
+        LedgerBindsModule::class
     ]
 )
 @FeatureScope
@@ -67,6 +71,10 @@ interface LedgerFeatureComponent : LedgerFeatureApi {
     fun selectLedgerGenericImportComponentFactory(): SelectLedgerGenericImportComponent.Factory
     fun previewImportGenericLedgerComponentFactory(): PreviewImportGenericLedgerComponent.Factory
     fun finishGenericImportLedgerComponentFactory(): FinishImportGenericLedgerComponent.Factory
+
+    // Generic import EVM account
+    fun addEvmAccountSelectGenericLedgerComponentFactory(): AddEvmAccountSelectGenericLedgerComponent.Factory
+    fun addEvmGenericLedgerAccountSelectAddressComponentFactory(): AddEvmGenericLedgerAccountSelectAddressComponent.Factory
 
     @Component(
         dependencies = [

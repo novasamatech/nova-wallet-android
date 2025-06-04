@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
@@ -45,7 +46,9 @@ class AssetsFeatureHolder @Inject constructor(
             .swapFeatureApi(getFeature(SwapFeatureApi::class.java))
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
             .bannersFeatureApi(getFeature(BannersFeatureApi::class.java))
+            .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .build()
+
         return DaggerAssetsFeatureComponent.factory()
             .create(router, selectAddressCommunicator, topUpAddressCommunicator, dependencies)
     }

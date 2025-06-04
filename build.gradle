@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '9.7.0'
-        versionCode = 194
+        versionName = '10.0.0'
+        versionCode = 209
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -222,6 +222,10 @@ buildscript {
         chartsDep = "com.github.PhilJay:MPAndroidChart:v3.1.0"
 
         swipeRefershLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
+
+        branchIo = "io.branch.sdk.android:library:5.18.0"
+
+        playServiceIdentifier = "com.google.android.gms:play-services-ads-identifier:18.2.0"
     }
 
     repositories {

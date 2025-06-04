@@ -9,14 +9,15 @@ import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_deep_link_building.presentation.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkData
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.applyDeepLink
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NovaNotificationChannel
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
-import io.novafoundation.nova.feature_deep_link_building.presentation.addAssetDetailsData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.assetByOnChainAssetIdOrUtility
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractBigInteger
@@ -37,7 +38,7 @@ class TokenSentNotificationHandler(
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     override val chainRegistry: ChainRegistry,
-    private val configurator: AssetDetailsDeepLinkConfigurator,
+    private val configurator: io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator,
     activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
@@ -74,7 +75,10 @@ class TokenSentNotificationHandler(
                 context,
                 getTitle(senderMetaAccount),
                 getMessage(chain, recipientMetaAccount, recipient, asset, amount),
-                activityIntent().addAssetDetailsData(configurator, sender, chain.id, asset.id)
+                activityIntent().applyDeepLink(
+                    configurator,
+                    AssetDetailsDeepLinkData(sender, chain.id, asset.id)
+                )
             ).build()
 
         notify(notification)

@@ -3,11 +3,16 @@ package io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generi
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.addAccountWithSingleChange
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 
 interface FinishImportGenericLedgerInteractor {
 
-    suspend fun createWallet(name: String, universalAccount: LedgerSubstrateAccount): Result<Unit>
+    suspend fun createWallet(
+        name: String,
+        substrateAccount: LedgerSubstrateAccount,
+        evmAccount: LedgerEvmAccount?,
+    ): Result<Unit>
 }
 
 class RealFinishImportGenericLedgerInteractor(
@@ -15,10 +20,15 @@ class RealFinishImportGenericLedgerInteractor(
     private val accountRepository: AccountRepository,
 ) : FinishImportGenericLedgerInteractor {
 
-    override suspend fun createWallet(name: String, universalAccount: LedgerSubstrateAccount) = runCatching {
+    override suspend fun createWallet(
+        name: String,
+        substrateAccount: LedgerSubstrateAccount,
+        evmAccount: LedgerEvmAccount?,
+    ) = runCatching {
         val payload = GenericLedgerAddAccountRepository.Payload.NewWallet(
             name = name,
-            universalAccount = universalAccount
+            substrateAccount = substrateAccount,
+            evmAccount = evmAccount
         )
 
         val addAccountResult = genericLedgerAddAccountRepository.addAccountWithSingleChange(payload)

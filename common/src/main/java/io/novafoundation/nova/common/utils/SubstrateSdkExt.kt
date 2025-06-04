@@ -38,6 +38,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtensi
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionId
 import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.call
@@ -483,6 +484,30 @@ fun String.hexBytesSize(): Int {
 
 fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
     return apis != null
+}
+
+fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
+    require(signature.size == 65)
+
+    val r = signature.copyOfRange(0, 32)
+    val s = signature.copyOfRange(32, 64)
+    val v = signature[64].ensureValidVByteFormat()
+
+    return SignatureWrapper.Ecdsa(v = byteArrayOf(v), r = r, s = s)
+}
+
+// Web3j supports only one format - when vByte is between [27..34]
+// However, there is a second format - when vByte is between [0..7] - e.g. Ledger and Parity Signer
+private fun Byte.ensureValidVByteFormat(): Byte {
+    if (this in 27..34) {
+        return this
+    }
+
+    if (this in 0..7) {
+        return (this + 27).toByte()
+    }
+
+    throw IllegalArgumentException("Invalid vByte: $this")
 }
 
 object Modules {

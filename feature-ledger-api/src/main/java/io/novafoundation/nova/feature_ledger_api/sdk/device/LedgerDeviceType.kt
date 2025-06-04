@@ -38,8 +38,13 @@ enum class LedgerDeviceType(
     ),
 
     NANO_S_PLUS(
-        bleDevice = BleDevice.NotSupported, // The device doesn't have Bluetooth module to support this connection type
+        bleDevice = BleDevice.NotSupported,
         usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 20480)
+    ),
+
+    NANO_S(
+        bleDevice = BleDevice.NotSupported,
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 4113)
     )
 }
 

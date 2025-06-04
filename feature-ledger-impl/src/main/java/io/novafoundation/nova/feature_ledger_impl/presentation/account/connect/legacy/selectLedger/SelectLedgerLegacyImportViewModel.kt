@@ -47,7 +47,7 @@ class SelectLedgerLegacyImportViewModel(
         val app = migrationUseCase.determineAppForLegacyAccount(selectLedgerPayload.chainId)
 
         // ensure that address loads successfully
-        app.getAccount(device, selectLedgerPayload.chainId, accountIndex = 0, confirmAddress = false)
+        app.getSubstrateAccount(device, selectLedgerPayload.chainId, accountIndex = 0, confirmAddress = false)
 
         val selectAddressPayload = SelectLedgerAddressPayload(device.id, selectLedgerPayload.chainId)
         router.openSelectImportAddress(selectAddressPayload)

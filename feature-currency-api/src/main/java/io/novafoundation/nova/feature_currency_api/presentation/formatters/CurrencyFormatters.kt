@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_currency_api.presentation.formatters
 
 import io.novafoundation.nova.common.utils.formatting.currencyFormatter
+import io.novafoundation.nova.common.utils.formatting.formatWithFullAmount
 import io.novafoundation.nova.common.utils.formatting.simpleCurrencyFormatter
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import java.math.BigDecimal
@@ -8,6 +9,10 @@ import java.math.RoundingMode
 
 private val currencyFormatter = currencyFormatter()
 private val simpleCurrencyFormatter = simpleCurrencyFormatter()
+
+fun BigDecimal.formatAsCurrencyNoAbbreviation(currency: Currency): String {
+    return formatCurrencySymbol(currency.symbol, currency.code) + this.formatWithFullAmount()
+}
 
 fun BigDecimal.formatAsCurrency(currency: Currency, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return formatAsCurrency(currency.symbol, currency.code, roundingMode)

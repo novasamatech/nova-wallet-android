@@ -22,7 +22,7 @@ sealed interface AddAccountResult {
 
     class Batch(val updates: List<HadEffect>) : HadEffect
 
-    object NoOp : AddAccountResult
+    data object NoOp : AddAccountResult
 }
 
 suspend fun <T> AddAccountRepository<T>.addAccountWithSingleChange(payload: T): AddAccountResult.SingleAccountChange {

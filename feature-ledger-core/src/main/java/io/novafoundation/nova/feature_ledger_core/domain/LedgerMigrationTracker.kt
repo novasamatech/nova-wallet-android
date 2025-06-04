@@ -33,8 +33,8 @@ internal class RealLedgerMigrationTracker(
     override suspend fun shouldUseMigrationApp(chainId: ChainId): Boolean {
         val supportedFromRuntime = metadataShortenerService.isCheckMetadataHashAvailable(chainId)
 
-        // We additionally check for configuration flag since Kusama will upgrade before Generic/Migration apps will be released
-        // We can lift this restriction once Generic/Migration apps are released
+        // While automatically detect generic app availability from runtime, it is also usefully to be able to disable this for a specific chain
+        // via a feature flag
         val supportedFromLedger = chainRegistry.getChain(chainId).additional.isGenericLedgerAppSupported()
 
         return supportedFromRuntime && supportedFromLedger

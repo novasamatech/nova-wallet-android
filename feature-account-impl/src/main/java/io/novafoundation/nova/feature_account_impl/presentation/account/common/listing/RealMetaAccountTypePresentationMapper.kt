@@ -59,7 +59,7 @@ class RealMetaAccountTypePresentationMapper(
         }
 
         return if (icon != null && label != null) {
-            ChipLabelModel(icon, label)
+            ChipLabelModel(label, icon)
         } else {
             null
         }

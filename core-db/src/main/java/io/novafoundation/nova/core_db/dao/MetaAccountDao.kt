@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.account.MetaAccountIdsLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
@@ -18,6 +17,9 @@ import kotlinx.coroutines.flow.Flow
 import org.intellij.lang.annotations.Language
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Fetch meta account where either
@@ -117,11 +119,8 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
-    @Query("SELECT globallyUniqueId, id FROM meta_accounts")
-    suspend fun getMetaAccountIds(): List<MetaAccountIdsLocal>
-
-    @Query("SELECT * FROM chain_accounts WHERE metaId = :metaId")
-    suspend fun getChainAccounts(metaId: Long): List<ChainAccountLocal>
+    @Query("SELECT * FROM meta_accounts WHERE id = :id")
+    suspend fun getMetaAccount(id: Long): MetaAccountLocal?
 
     @Query("SELECT COUNT(*) FROM meta_accounts WHERE status = :status")
     @Transaction
@@ -265,6 +264,24 @@ suspend inline fun <T : Any> MetaAccountDao.withTransaction(crossinline action: 
     }
 
     return result!!
+}
+
+@OptIn(ExperimentalContracts::class)
+suspend fun MetaAccountDao.updateMetaAccount(metaId: Long, updateClosure: (MetaAccountLocal) -> MetaAccountLocal) {
+    contract {
+        callsInPlace(updateClosure, InvocationKind.EXACTLY_ONCE)
+    }
+
+    val metaAccount = requireNotNull(getMetaAccount(metaId)) {
+        "Meta account $metaId was not found"
+    }
+
+    val updated = updateClosure(metaAccount)
+    require(updated.id == metaId) {
+        "Cannot modify metaId"
+    }
+
+    updateMetaAccount(updated)
 }
 
 class MetaAccountWithBalanceLocal(

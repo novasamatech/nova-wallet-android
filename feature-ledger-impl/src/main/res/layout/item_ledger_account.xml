@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_height="wrap_content"
+    tools:background="@color/secondary_screen_background">
+
+    <ImageView
+        android:id="@+id/itemLedgerAccountIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/itemLedgerAccountLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/itemLedgerAccountIcon"
+        app:layout_constraintStart_toEndOf="@id/itemLedgerAccountIcon"
+        app:layout_constraintTop_toTopOf="@id/itemLedgerAccountIcon"
+        tools:text="Account 1" />
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/itemLedgerAccountSubstrate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemLedgerAccountIcon"
+        app:title="@string/common_substrate_address" />
+
+    <io.novafoundation.nova.common.view.TableCellView
+        android:id="@+id/itemLedgerAccountEvm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        app:dividerVisible="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemLedgerAccountSubstrate"
+        app:title="@string/common_evm_address" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

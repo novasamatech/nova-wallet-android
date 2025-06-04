@@ -19,7 +19,7 @@ class AppLinksProvider(
 
     val paritySignerTroubleShooting: String,
     val polkadotVaultTroubleShooting: String,
-    val ledgerBluetoothGuide: String,
+    val ledgerConnectionGuide: String,
     val wikiBase: String,
     val wikiProxy: String,
     val integrateNetwork: String,

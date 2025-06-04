@@ -16,6 +16,8 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.core_db.di.DbHolder
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
+import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
+import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
@@ -30,8 +32,6 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_currency_impl.di.CurrencyFeatureHolder
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureHolder
-import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
-import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureHolder
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
@@ -254,12 +254,6 @@ interface ComponentHolderModule {
 
     @ApplicationScope
     @Binds
-    @ClassKey(DeepLinkBuildingFeatureApi::class)
-    @IntoMap
-    fun provideDeepLinkBuildingFeatureHolder(holder: DeepLinkBuildingFeatureHolder): FeatureApiHolder
-
-    @ApplicationScope
-    @Binds
     @ClassKey(CloudBackupFeatureApi::class)
     @IntoMap
     fun provideCloudBackupFeatureHolder(holder: CloudBackupFeatureHolder): FeatureApiHolder
@@ -287,4 +281,10 @@ interface ComponentHolderModule {
     @ClassKey(MultisigOperationsFeatureApi::class)
     @IntoMap
     fun provideMultisigOperationsFeatureHolder(holder: MultisigOperationsFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(AccountMigrationFeatureApi::class)
+    @IntoMap
+    fun provideAccountMigrationFeatureHolder(holder: AccountMigrationFeatureHolder): FeatureApiHolder
 }

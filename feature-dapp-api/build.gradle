@@ -33,6 +33,7 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(":feature-external-sign-api")
     implementation project(':common')
+    implementation project(':feature-deep-linking')
 
     implementation shimmerDep
 

@@ -8,8 +8,9 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
-import io.novafoundation.nova.feature_deep_link_building.presentation.addReferendumData
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.applyDeepLink
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDeepLinkData
+import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.BaseNotificationHandler
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.e
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class NewReferendumNotificationHandler(
     private val context: Context,
@@ -55,7 +57,10 @@ class NewReferendumNotificationHandler(
                 context,
                 resourceManager.getString(R.string.push_new_referendum_title),
                 resourceManager.getString(R.string.push_new_referendum_message, chain.name, referendumId.format()),
-                activityIntent().addReferendumData(configurator, chain.id, referendumId)
+                activityIntent().applyDeepLink(
+                    configurator,
+                    ReferendumDeepLinkData(chain.id, referendumId, Chain.Governance.V2)
+                )
             ).build()
 
         notify(notification)
