@@ -90,10 +90,10 @@ class UniqueNetworkNftProvider(
                 collectionId = nftLocal.collectionId.toInt(),
             )
 
-            val issuanceTotal = collection.limits?.token_limit?.toBigInteger() ?: collection.lastTokenId?.toBigInteger()
+            val issuanceTotal = collection.limits?.tokenLimit?.toBigInteger() ?: collection.lastTokenId?.toBigInteger()
 
             val issuanceType = when {
-                collection.limits?.token_limit != null -> NftLocal.IssuanceType.LIMITED
+                collection.limits?.tokenLimit != null -> NftLocal.IssuanceType.LIMITED
                 else -> NftLocal.IssuanceType.UNLIMITED
             }
 

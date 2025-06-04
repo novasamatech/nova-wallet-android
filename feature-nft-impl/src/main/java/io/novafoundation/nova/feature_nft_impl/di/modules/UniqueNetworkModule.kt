@@ -16,7 +16,7 @@ class UniqueNetworkModule {
     @Provides
     @FeatureScope
     fun provideApi(networkApiCreator: NetworkApiCreator): UniqueNetworkApi {
-        return networkApiCreator.create(UniqueNetworkApi::class.java)
+        return networkApiCreator.create(UniqueNetworkApi::class.java, UniqueNetworkApi.BASE_URL)
     }
 
     @Provides

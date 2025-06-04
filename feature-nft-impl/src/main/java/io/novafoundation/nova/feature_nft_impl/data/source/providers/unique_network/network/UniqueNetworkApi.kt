@@ -8,8 +8,11 @@ import retrofit2.http.Query
 import retrofit2.http.Path
 
 interface UniqueNetworkApi {
+    companion object {
+        const val BASE_URL = "https://api-unique.uniquescan.io/v2/"
+    }
 
-    @GET("https://api-unique.uniquescan.io/v2/nfts")
+    @GET("nfts")
     suspend fun getNftsPage(
         @Query("ownerIn") owner: String,
         @Query("offset") offset: Int,
@@ -17,7 +20,7 @@ interface UniqueNetworkApi {
         @Query("orderByTokenId") order: String = "asc"
     ): UniqueNetworkPaginatedResponse<UniqueNetworkNft>
 
-    @GET("https://api-unique.uniquescan.io/v2/collections/{collectionId}")
+    @GET("collections/{collectionId}")
     suspend fun getCollection(
         @Path("collectionId") collectionId: Int,
     ): UniqueNetworkCollection
