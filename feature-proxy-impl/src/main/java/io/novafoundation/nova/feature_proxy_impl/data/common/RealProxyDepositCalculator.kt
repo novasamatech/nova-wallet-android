@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_proxy_impl.data.common
 import io.novafoundation.nova.feature_proxy_api.data.common.DepositBaseAndFactor
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 

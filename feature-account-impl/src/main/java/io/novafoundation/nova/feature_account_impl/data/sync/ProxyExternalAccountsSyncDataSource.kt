@@ -77,7 +77,7 @@ private class ProxyExternalAccountsSyncDataSource(
 
         return buildMultiMapList {
             allProxiesByProxied.forEach { (proxied, proxies) ->
-                proxies.proxies.forEach innerProxiesLoop@ { proxy ->
+                proxies.proxies.forEach innerProxiesLoop@{ proxy ->
                     if (proxy.delay.isPositive()) return@innerProxiesLoop
 
                     val proxyLink = ProxyLink(
