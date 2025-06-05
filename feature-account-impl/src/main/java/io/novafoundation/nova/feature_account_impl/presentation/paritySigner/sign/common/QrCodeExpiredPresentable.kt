@@ -4,7 +4,10 @@ import android.widget.TextView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.dialog.errorDialog
+import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.polkadotVaultLabelFor
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
@@ -76,22 +79,29 @@ private class RealQrCodeExpiredPresentable(
 }
 
 fun BaseFragment<*, *>.setupQrCodeExpiration(
-    validityPeriodFlow: Flow<ValidityPeriod>,
+    validityPeriodFlow: Flow<ValidityPeriod?>,
     qrCodeExpiredPresentable: QrCodeExpiredPresentable,
     timerView: TextView,
     onTimerFinished: () -> Unit
 ) {
     validityPeriodFlow.observe { validityPeriod ->
-        viewLifecycleOwner.startExtrinsicValidityTimer(
-            validityPeriod = validityPeriod,
-            timerFormat = R.string.account_parity_signer_sign_qr_code_valid_format,
-            timerView = timerView,
-            onTimerFinished = {
-                onTimerFinished()
+        if (validityPeriod != null) {
+            timerView.makeVisible()
 
-                timerView.setText(R.string.account_parity_signer_sign_qr_code_expired)
-            }
-        )
+            viewLifecycleOwner.startExtrinsicValidityTimer(
+                validityPeriod = validityPeriod,
+                timerFormat = R.string.account_parity_signer_sign_qr_code_valid_format,
+                timerView = timerView,
+                onTimerFinished = {
+                    onTimerFinished()
+
+                    timerView.setText(R.string.account_parity_signer_sign_qr_code_expired)
+                }
+            )
+        } else {
+            timerView.stopTimer()
+            timerView.makeGone()
+        }
     }
 
     qrCodeExpiredPresentable.acknowledgeExpired.awaitableActionLiveData.observeEvent {

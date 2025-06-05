@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
+import io.novafoundation.nova.feature_account_api.data.signer.requireExtrinsic
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenResponder
 import io.novafoundation.nova.feature_account_api.presenatation.sign.cancelled
 import io.novafoundation.nova.feature_account_api.presenatation.sign.signed
@@ -68,7 +69,7 @@ class SignLedgerViewModel(
 ) {
 
     private val validityPeriod = flowOf {
-        extrinsicValidityUseCase.extrinsicValidityPeriod(signPayloadState.getOrThrow().extrinsic)
+        extrinsicValidityUseCase.extrinsicValidityPeriod(signPayloadState.getOrThrow().requireExtrinsic())
     }.shareInBackground()
 
     private var signingJob: Deferred<SignatureWrapper>? = null
@@ -117,7 +118,7 @@ class SignLedgerViewModel(
             interactor.getSignature(
                 device = device,
                 metaId = signingMetaAccount.id,
-                payload = signState.extrinsic
+                payload = signState.requireExtrinsic()
             )
         }
 

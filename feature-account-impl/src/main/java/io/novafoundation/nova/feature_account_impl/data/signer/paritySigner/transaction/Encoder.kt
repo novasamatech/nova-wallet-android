@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.transaction
 
 import io.novafoundation.nova.runtime.extrinsic.metadata.ExtrinsicProof
+import io.novafoundation.nova.runtime.extrinsic.signer.SignerPayloadRawWithChain
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedCallData
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedExtensions
@@ -14,6 +16,10 @@ fun SignerPayloadExtrinsic.paritySignerLegacyTxPayload(): ByteArray {
 
 fun SignerPayloadExtrinsic.paritySignerTxPayloadWithProof(proof: ExtrinsicProof): ByteArray {
     return accountId + proof.value + transientCallData() + encodedExtensions() + genesisHash
+}
+
+fun SignerPayloadRawWithChain.polkadotVaultSignRawPayload(): ByteArray {
+    return accountId + message + chainId.fromHex()
 }
 
 private fun SignerPayloadExtrinsic.transientCallData(): ByteArray {
