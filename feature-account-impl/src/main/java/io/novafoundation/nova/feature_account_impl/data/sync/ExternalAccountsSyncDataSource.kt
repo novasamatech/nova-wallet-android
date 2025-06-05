@@ -21,7 +21,6 @@ internal interface ExternalAccountsSyncDataSource {
     suspend fun getControllableExternalAccounts(accountIdsToQuery: Set<AccountIdKey>): List<ExternalControllableAccount>
 }
 
-
 internal interface ExternalControllableAccount {
 
     val accountId: AccountIdKey

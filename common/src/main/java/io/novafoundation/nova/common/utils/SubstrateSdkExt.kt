@@ -41,7 +41,6 @@ import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionId
 import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method

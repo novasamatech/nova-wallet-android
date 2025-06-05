@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.sync
 
 import com.google.gson.Gson
-import dagger.Provides
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
@@ -74,7 +73,6 @@ private class MultisigAccountsSyncDataSource(
                             chain = chain
                         )
                     }
-
             }
     }
 

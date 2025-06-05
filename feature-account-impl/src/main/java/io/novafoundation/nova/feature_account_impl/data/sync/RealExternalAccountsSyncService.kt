@@ -54,7 +54,6 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         private const val ACCOUNTS_CHANGED_SOURCE = "ExternalAccountsSyncService"
     }
 
-
     override fun syncOnAccountChange(changeSource: String?) {
         if (changeSource != ACCOUNTS_CHANGED_SOURCE) {
             sync()
@@ -178,7 +177,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         foundExternalAccounts.onEach { externalAccount ->
             val controllers = controllersByAccountId[externalAccount.controllerAccountId].orEmpty()
 
-            controllers.onEach controllersLoop@ { controller ->
+            controllers.onEach controllersLoop@{ controller ->
                 val controllerAsExternal = dataSource.getExternalCreatedAccount(controller)
                 val canControl = controllerAsExternal == null || controllerAsExternal.canControl(externalAccount)
 
