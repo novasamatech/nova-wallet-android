@@ -87,6 +87,8 @@ class BalanceListAdapter(
 
             is TokenAssetViewHolder -> {
                 val item = getItem(position) as TokenAssetUi
+                holder.updateExpandableItem(item)
+
                 resolvePayload(holder, position, payloads) {
                     when (it) {
                         amountExtractor -> holder.bindTotal(item.asset)
@@ -96,6 +98,8 @@ class BalanceListAdapter(
 
             is TokenAssetGroupViewHolder -> {
                 val item = getItem(position) as TokenGroupUi
+                holder.updateExpandableItem(item)
+
                 resolvePayload(holder, position, payloads) {
                     when (it) {
                         tokenGroupPriceRateExtractor -> holder.bindPriceRate(item)
