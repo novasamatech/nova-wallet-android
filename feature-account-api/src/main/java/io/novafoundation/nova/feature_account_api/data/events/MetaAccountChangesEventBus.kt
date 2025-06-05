@@ -38,14 +38,6 @@ interface MetaAccountChangesEventBus : EventBus<Event> {
     }
 }
 
-fun MetaAccountChangesEventBus.SingleUpdateEvent.takeMetaIdUnlessTypeIs(exceptionType: LightMetaAccount.Type): Long? {
-    return metaId.takeUnless { metaAccountType == exceptionType }
-}
-
-fun MetaAccountChangesEventBus.SingleUpdateEvent.takeMetaIdIfTypeMatches(matcher: (LightMetaAccount.Type) -> Boolean): Long? {
-    return metaId.takeUnless { matcher(metaAccountType) }
-}
-
 inline fun buildChangesEvent(builder: MutableList<Event>.() -> Unit): Event? {
     val allEvents = buildList(builder)
     return allEvents.combineBusEvents()
