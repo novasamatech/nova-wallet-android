@@ -2,6 +2,7 @@ package io.novafoundation.nova;
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
@@ -113,6 +114,10 @@ class MetadataShortenerTest : BaseIntegrationTest() {
 
         val accountId = ByteArray(32) { 1 }
 
+        override suspend fun callExecutionType(): CallExecutionType {
+           return CallExecutionType.IMMEDIATE
+        }
+
         override val metaAccount: MetaAccount = DefaultMetaAccount(
             id = 0,
             globallyUniqueId = "0",
@@ -125,7 +130,8 @@ class MetadataShortenerTest : BaseIntegrationTest() {
             name = "test",
             type = LightMetaAccount.Type.SECRETS,
             chainAccounts = emptyMap(),
-            status = LightMetaAccount.Status.ACTIVE
+            status = LightMetaAccount.Status.ACTIVE,
+            parentMetaId = null
         )
 
         override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
