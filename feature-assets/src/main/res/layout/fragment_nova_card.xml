@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/novaCardContainer"
@@ -8,9 +8,17 @@
     android:orientation="vertical"
     tools:background="@color/secondary_screen_background">
 
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/novaCardToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"/>
+
     <WebView
         android:id="@+id/novaCardWebView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-</FrameLayout>
+</LinearLayout>

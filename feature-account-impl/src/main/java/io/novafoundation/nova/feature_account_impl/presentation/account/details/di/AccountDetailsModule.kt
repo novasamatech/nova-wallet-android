@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -48,6 +49,8 @@ class AccountDetailsModule {
         appLinksProvider: AppLinksProvider,
         ledgerMigrationTracker: LedgerMigrationTracker,
         multisigFormatter: MultisigFormatter,
+        router: AccountRouter,
+        addressSchemeFormatter: AddressSchemeFormatter
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
             polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
@@ -57,7 +60,9 @@ class AccountDetailsModule {
             multisigFormatter = multisigFormatter,
             interactor = interactor,
             appLinksProvider = appLinksProvider,
-            ledgerMigrationTracker = ledgerMigrationTracker
+            ledgerMigrationTracker = ledgerMigrationTracker,
+            router = router,
+            addressSchemeFormatter = addressSchemeFormatter,
         )
     }
 

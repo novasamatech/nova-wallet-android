@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import android.util.Log
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
@@ -86,6 +87,8 @@ class UsbLedgerDeviceDiscoveryService(
     private fun UsbDevice.getLedgerDeviceType(): LedgerDeviceType? {
         val searchingVendorId = this.vendorId
         val searchingProductId = this.productId
+
+        Log.d("Ledger", "Found productId: $searchingProductId")
 
         return LedgerDeviceType.values()
             .firstOrNull { it.usbOptions.vendorId == searchingVendorId && it.usbOptions.productId == searchingProductId }

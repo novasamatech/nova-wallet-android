@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.chunked
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
@@ -23,7 +23,7 @@ class LegacySubstrateLedgerApplication(
     private val supportedApplications: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all(),
 ) : SubstrateLedgerApplication {
 
-    override suspend fun getAccount(
+    override suspend fun getSubstrateAccount(
         device: LedgerDevice,
         chainId: ChainId,
         accountIndex: Int,
@@ -44,9 +44,11 @@ class LegacySubstrateLedgerApplication(
             device = device
         )
 
-        Log.w("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
+        return SubstrateLedgerAppCommon.parseSubstrateAccountResponse(rawResponse, derivationPath)
+    }
 
-        return SubstrateLedgerAppCommon.parseAccountResponse(rawResponse, derivationPath)
+    override suspend fun getEvmAccount(device: LedgerDevice, accountIndex: Int, confirmAddress: Boolean): LedgerEvmAccount? {
+        return null
     }
 
     override suspend fun getSignature(
@@ -80,6 +82,6 @@ class LegacySubstrateLedgerApplication(
 
         val signatureWithType = results.last()
 
-        return SubstrateLedgerAppCommon.parseSignature(signatureWithType)
+        return SubstrateLedgerAppCommon.parseMultiSignature(signatureWithType)
     }
 }

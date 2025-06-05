@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.preview.BaseChainAccountsPreviewViewModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -27,7 +28,7 @@ class PreviewImportParitySignerViewModel(
     override val subtitle: String = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_import_preview_description, payload.variant)
 
     override val chainAccountProjections = flowOf { interactor.deriveSubstrateChainAccounts(payload.accountId) }
-        .defaultFormat()
+        .mapList { mapChainAccountPreviewToUi(it) }
         .shareInBackground()
 
     override val buttonState: Flow<DescriptiveButtonState> = flowOf {

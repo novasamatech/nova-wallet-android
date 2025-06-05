@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.ChainAccountsAdapter
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.ChainAccountGroupUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
@@ -94,5 +95,9 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel, FragmentWalle
 
     override fun chainAccountClicked(item: AccountInChainUi) {
         viewModel.chainAccountClicked(item)
+    }
+
+    override fun onGroupActionClicked(item: ChainAccountGroupUi) {
+        viewModel.groupActionClicked(item)
     }
 }

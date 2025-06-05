@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.headers.TextHeader
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.view.AlertModel
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.withChainComparator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class MultisigWalletDetailsMixin(
     private val resourceManager: ResourceManager,
@@ -48,21 +50,19 @@ class MultisigWalletDetailsMixin(
         )
     }
 
-    override fun accountProjectionsFlow(): Flow<GroupedList<AccountInChain.From, AccountInChain>> = flowOfAll {
+    override fun accountProjectionsFlow(): Flow<List<Any?>> = flowOfAll {
+        // TODO multisig: select chains to display
         val proxiedChainIds = metaAccount.chainAccounts.keys
         val chains = interactor.getAllChains()
             .filter { it.id in proxiedChainIds }
-        interactor.chainProjectionsFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator())
-    }
 
-    override suspend fun mapAccountHeader(from: AccountInChain.From): TextHeader? {
-        return null
-    }
+        interactor.chainProjectionsFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator()).map { accounts ->
+            val availableActions = availableAccountActions.first()
 
-    override suspend fun mapAccount(accountInChain: AccountInChain): AccountInChainUi {
-        return accountFormatter.formatChainAccountProjection(
-            accountInChain,
-            availableAccountActions.first()
-        )
+            accounts.toListWithHeaders(
+                keyMapper = { _, _ -> null },
+                valueMapper = { chainAccount -> accountFormatter.formatChainAccountProjection(chainAccount, availableActions) }
+            )
+        }
     }
 }

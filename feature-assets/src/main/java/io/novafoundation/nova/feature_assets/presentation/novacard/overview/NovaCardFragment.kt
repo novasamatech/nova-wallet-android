@@ -22,7 +22,8 @@ class NovaCardFragment : BaseFragment<NovaCardViewModel, FragmentNovaCardBinding
     }
 
     override fun initViews() {
-        binder.novaCardContainer.applyStatusBarInsets()
+        binder.novaCardToolbar.applyStatusBarInsets()
+        binder.novaCardToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 
     override fun subscribe(viewModel: NovaCardViewModel) {

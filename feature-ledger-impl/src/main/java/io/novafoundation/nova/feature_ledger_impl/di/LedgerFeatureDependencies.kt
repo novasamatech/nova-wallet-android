@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -80,4 +82,8 @@ interface LedgerFeatureDependencies {
     val ledgerMigrationTracker: LedgerMigrationTracker
 
     val externalActions: ExternalActions.Presentation
+
+    val addressActionsMixinFactory: AddressActionsMixin.Factory
+
+    val addressSchemeFormatter: AddressSchemeFormatter
 }

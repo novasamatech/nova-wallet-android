@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.search.di.DAppSearc
 import io.novafoundation.nova.feature_dapp_impl.presentation.tab.di.BrowserTabsComponent
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -66,7 +67,8 @@ interface DAppFeatureComponent : DAppFeatureApi {
             WalletFeatureApi::class,
             RuntimeApi::class,
             CurrencyFeatureApi::class,
-            BannersFeatureApi::class
+            BannersFeatureApi::class,
+            WalletConnectFeatureApi::class
         ]
     )
     interface DAppFeatureDependenciesComponent : DAppFeatureDependencies

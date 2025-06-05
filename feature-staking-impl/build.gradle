@@ -55,6 +55,7 @@ dependencies {
     implementation project(':feature-dapp-api')
     implementation project(':feature-proxy-api')
     implementation project(':runtime')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 

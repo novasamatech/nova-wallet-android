@@ -17,7 +17,7 @@ class SubstrateApplicationConfig(
                 SubstrateApplicationConfig(chainId = Chain.Geneses.POLKADOT, coin = 354, cla = 0x90u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.KUSAMA, coin = 434, cla = 0x99u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.STATEMINT, coin = 354, cla = 0x96u),
-                SubstrateApplicationConfig(chainId = Chain.Geneses.STATEMINE, coin = 434, cla = 0x97u),
+                SubstrateApplicationConfig(chainId = Chain.Geneses.KUSAMA_ASSET_HUB, coin = 434, cla = 0x97u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.EDGEWARE, coin = 523, cla = 0x94u),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.KARURA, coin = 686, cla = 0x9au),
                 SubstrateApplicationConfig(chainId = Chain.Geneses.ACALA, coin = 787, cla = 0x9bu),

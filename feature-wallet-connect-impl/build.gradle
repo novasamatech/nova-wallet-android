@@ -56,6 +56,7 @@ dependencies {
     implementation project(':feature-dapp-api')
     implementation project(':caip')
     implementation project(':runtime')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 

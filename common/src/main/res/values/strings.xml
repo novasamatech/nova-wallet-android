@@ -19,10 +19,31 @@
 
     <string name="multisig_pending_operations">Pending operations</string>
 
-<!--
-    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
-    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
--->
+    <string name="account_migration_title">Welcome to Nova!</string>
+    <string name="account_migration_subtitle">You’re almost there! 🎉\n Just tap below to complete the setup and start using your accounts seamlessly in both the Polkadot App and Nova Wallet</string>
+
+    <string name="account_migration_fallback_name" translatable="false">%s Wallet</string>
+
+    <string name="account_migration_accepted_url" translatable="false">%s://polkadot/migration-accepted?key=%s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth</string>
+
+    <string name="branch_io_link_host" translatable="false">nova-wallet.app.link</string>
+    <string name="branch_io_link_host_alternate" translatable="false">nova-wallet-alternate.app.link</string>
+
+    <string name="ledger_verify_addresses_message_both_buttons">Press both buttons on your %s to approve the addresses</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Press confirm button on your %s to approve the addresses</string>
+
+    <string name="account_add_address">Add address</string>
+    <string name="account_substrate_accounts">Substrate Accounts</string>
+    <string name="account_evm_accounts">EVM Accounts</string>
+
+    <string name="ledger_select_address_update_for_evm_title">Update Ledger Generic App</string>
+    <string name="ledger_select_address_update_for_evm_message">Your Ledger device is using an outdated Generic app that doesn’t support EVM addresses. Update it via Ledger Live.</string>
+
+    <string name="ledger_select_address_not_found">Account not found</string>
+
+    <string name="ledger_select_address_account_label">Account %s</string>
+    <string name="ledger_device_nano_s">Nano S</string>
 
     <string name="trade_provider_open_confirmation_title">Continue in browser?</string>
     <string name="trade_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
@@ -130,7 +151,7 @@
     <string name="price_chart_year">1Y</string>
     <string name="price_chart_max">All</string>
 
-    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
+    <string name="app_link_host" translatable="false">app.novawallet.io</string>
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 
@@ -255,7 +276,6 @@
     <string name="account_ledger_generic_import_start_step_2">%s on your Ledger device</string>
 
     <string name="account_ledger_import_start_step_3">Allow Nova Wallet to %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth and Location</string>
 
     <string name="account_ledger_import_start_step_4">%s to add to wallet</string>
     <string name="account_ledger_import_start_step_4_highlighted">Select account</string>

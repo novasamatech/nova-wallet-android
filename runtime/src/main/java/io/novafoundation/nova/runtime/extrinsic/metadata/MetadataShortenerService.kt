@@ -25,7 +25,7 @@ interface MetadataShortenerService {
 
     suspend fun isCheckMetadataHashAvailable(chainId: ChainId): Boolean
 
-    suspend fun generateExtrinsicProof(payloadExtrinsic: InheritedImplication): ExtrinsicProof
+    suspend fun generateExtrinsicProof(inheritedImplication: InheritedImplication): ExtrinsicProof
 
     suspend fun generateMetadataProof(chainId: ChainId): MetadataProof
 

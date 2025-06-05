@@ -18,8 +18,8 @@ import kotlin.math.roundToInt
 private const val BASE_ICON_PADDING_DP = 6
 
 data class ChipLabelModel(
-    val icon: TintedIcon,
-    val title: String
+    val title: String,
+    val icon: TintedIcon? = null
 )
 
 data class TintedIcon(val canApplyOwnTint: Boolean, @DrawableRes val icon: Int) {
@@ -51,8 +51,8 @@ class ChipLabelView @JvmOverloads constructor(
     }
 
     fun setModel(model: ChipLabelModel) {
-        val tintColor = R.color.icon_secondary.takeIf { model.icon.canApplyOwnTint }
-        setDrawableStart(model.icon.icon, widthInDp = 16, paddingInDp = 6, tint = tintColor)
+        val tintColor = R.color.icon_secondary.takeIf { model.icon?.canApplyOwnTint ?: false }
+        setDrawableStart(model.icon?.icon, widthInDp = 16, paddingInDp = 6, tint = tintColor)
 
         text = model.title
     }

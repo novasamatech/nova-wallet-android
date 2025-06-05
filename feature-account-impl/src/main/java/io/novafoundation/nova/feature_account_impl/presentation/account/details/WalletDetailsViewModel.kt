@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.ChainAccountGroupUi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
@@ -54,7 +56,7 @@ class WalletDetailsViewModel(
     val typeAlert = flowOfAll { walletDetailsMixin().typeAlert }
         .shareInBackground()
 
-    val chainAccountProjections = flowOfAll { walletDetailsMixin().chainAccountProjections }
+    val chainAccountProjections = flowOfAll { walletDetailsMixin().accountProjectionsFlow() }
         .shareInBackground()
 
     init {
@@ -91,6 +93,10 @@ class WalletDetailsViewModel(
         launch {
             addAccountLauncherMixin.initiateLaunch(inChain, walletDetailsMixin().metaAccount)
         }
+    }
+
+    fun groupActionClicked(groupUi: ChainAccountGroupUi) = launchUnit {
+        walletDetailsMixin().groupActionClicked(groupUi.id)
     }
 
     override fun onCleared() {

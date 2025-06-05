@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_ledger_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDisco
 import io.novafoundation.nova.feature_ledger_api.sdk.transport.LedgerTransport
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.feature_ledger_impl.data.repository.RealLedgerRepository
+import io.novafoundation.nova.feature_ledger_impl.di.modules.GenericLedgerModule
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.RealSelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.common.selectAddress.SelectAddressLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.migration.LedgerMigrationUseCase
@@ -30,11 +32,10 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.CompoundLedgerDi
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.ble.BleLedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.discovery.usb.UsbLedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_impl.sdk.transport.ChunkedLedgerTransport
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module
+@Module(includes = [GenericLedgerModule::class])
 class LedgerFeatureModule {
 
     @Provides
@@ -72,7 +73,8 @@ class LedgerFeatureModule {
     ) = GenericSubstrateLedgerApplication(
         transport = transport,
         metadataShortenerService = metadataShortenerService,
-        ledgerRepository = ledgerRepository
+        ledgerRepository = ledgerRepository,
+        chainRegistry = chainRegistry
     )
 
     @Provides
@@ -143,12 +145,10 @@ class LedgerFeatureModule {
     fun provideSelectAddressInteractor(
         migrationUseCase: LedgerMigrationUseCase,
         ledgerDeviceDiscoveryService: LedgerDeviceDiscoveryService,
-        assetSourceRegistry: AssetSourceRegistry,
     ): SelectAddressLedgerInteractor {
         return RealSelectAddressLedgerInteractor(
             migrationUseCase = migrationUseCase,
             ledgerDeviceDiscoveryService = ledgerDeviceDiscoveryService,
-            assetSourceRegistry = assetSourceRegistry
         )
     }
 
@@ -162,6 +162,7 @@ class LedgerFeatureModule {
     @FeatureScope
     fun provideMessageCommandFormatterFactory(
         resourceManager: ResourceManager,
-        deviceMapper: LedgerDeviceFormatter
-    ) = MessageCommandFormatterFactory(resourceManager, deviceMapper)
+        deviceMapper: LedgerDeviceFormatter,
+        addressSchemeFormatter: AddressSchemeFormatter
+    ) = MessageCommandFormatterFactory(resourceManager, deviceMapper, addressSchemeFormatter)
 }

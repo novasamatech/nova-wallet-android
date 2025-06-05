@@ -38,7 +38,7 @@ data class NftLocal(
 ) : Identifiable {
 
     enum class Type {
-        UNIQUES, RMRK1, RMRK2, PDC20
+        UNIQUES, RMRK1, RMRK2, PDC20, KODADOT
     }
 
     enum class IssuanceType {

@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdates
 import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -50,7 +51,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
-import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -81,7 +81,6 @@ import io.novafoundation.nova.feature_account_impl.data.proxy.RealProxySyncServi
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
@@ -128,6 +127,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
+import io.novafoundation.nova.feature_account_impl.di.modules.deeplinks.DeepLinkModule
+import io.novafoundation.nova.feature_account_impl.presentation.account.addressActions.AddressActionsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.AddAccountLauncherPresentationFactory
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.addAccountChooser.RealAddAccountLauncherPresentationFactory
@@ -171,7 +174,8 @@ import javax.inject.Named
         CloudBackupModule::class,
         CustomFeeModule::class,
         MultisigModule::class,
-        BindsModule::class
+        BindsModule::class,
+        DeepLinkModule::class
     ]
 )
 class AccountFeatureModule {
@@ -184,6 +188,9 @@ class AccountFeatureModule {
 
         @Binds
         fun bindSigningContextFactory(real: SigningContextFactory): SigningContext.Factory
+
+        @Binds
+        fun bindAddressActionsMixinFactory(real: AddressActionsMixinFactory): AddressActionsMixin.Factory
     }
 
     @Provides

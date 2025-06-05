@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_account_api.data.repository.addAccount.led
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.multisig.MultisigAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
@@ -18,7 +20,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.mu
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.RealProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RealMnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
@@ -56,7 +58,7 @@ class AddAccountsModule {
         accountSecretsFactory: AccountSecretsFactory,
         chainRegistry: ChainRegistry,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
-    ) = MnemonicAddAccountRepository(
+    ): MnemonicAddAccountRepository = RealMnemonicAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
         chainRegistry,
@@ -144,10 +146,12 @@ class AddAccountsModule {
     fun provideGenericLedgerAddAccountRepository(
         accountDao: MetaAccountDao,
         secretStoreV2: SecretStoreV2,
-        metaAccountChangesEventBus: MetaAccountChangesEventBus
+        metaAccountChangesEventBus: MetaAccountChangesEventBus,
+        accountMappers: AccountMappers,
     ): GenericLedgerAddAccountRepository = RealGenericLedgerAddAccountRepository(
         accountDao,
         secretStoreV2,
-        metaAccountChangesEventBus
+        accountMappers,
+        metaAccountChangesEventBus,
     )
 }
