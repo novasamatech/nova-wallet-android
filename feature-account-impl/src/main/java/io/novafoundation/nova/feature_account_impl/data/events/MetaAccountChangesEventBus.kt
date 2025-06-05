@@ -19,7 +19,6 @@ class RealMetaAccountChangesEventBus(
         super.notify(event, source)
 
         cloudBackupAccountsModificationsTracker.recordAccountModified(event.allAffectedMetaAccountTypes())
-
-        externalAccountsSyncService.get().syncOnAccountChange(source)
+        externalAccountsSyncService.get().syncOnAccountChange(event, source)
     }
 }

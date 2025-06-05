@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.put
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.events.checkIncludes
 import io.novafoundation.nova.feature_account_api.data.events.combineBusEvents
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
@@ -54,9 +55,23 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         private const val ACCOUNTS_CHANGED_SOURCE = "ExternalAccountsSyncService"
     }
 
-    override fun syncOnAccountChange(changeSource: String?) {
-        if (changeSource != ACCOUNTS_CHANGED_SOURCE) {
+    override fun syncOnAccountChange(event: MetaAccountChangesEventBus.Event, changeSource: String?) {
+        val hasRelevantEvents = event.checkIncludes(
+            checkAdd = true,
+            checkStructureChange = true,
+            checkNameChange = false, // Name changes are irrelevant as they don't affect structure
+            checkAccountRemoved = false // All dependent accounts are cleaned up automatically by DB so we don't need to re-sync on delete
+        )
+        val notCausedByItself = changeSource != ACCOUNTS_CHANGED_SOURCE
+
+        if (hasRelevantEvents && notCausedByItself) {
             sync()
+        } else {
+            Log.d(
+                "ExternalAccountsDiscovery",
+                "syncOnAccountChange was ignored due to conditions not being met:" +
+                    " hasRelevantEvents=$hasRelevantEvents, notCausedByItself=$notCausedByItself"
+            )
         }
     }
 

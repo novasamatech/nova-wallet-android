@@ -92,6 +92,54 @@ fun <T> Event.collect(
     return result
 }
 
+typealias SingleAccountEventVisitor<T> = (T) -> Unit
+
+fun Event.visit(
+    onAdd: SingleAccountEventVisitor<Event.AccountAdded>? = null,
+    onStructureChanged: SingleAccountEventVisitor<Event.AccountStructureChanged>? = null,
+    onNameChanged: SingleAccountEventVisitor<Event.AccountNameChanged>? = null,
+    onRemoved: SingleAccountEventVisitor<Event.AccountRemoved>? = null,
+) {
+    visit(object : MetaAccountChangesEventBus.EventVisitor {
+        override fun visitAccountAdded(added: Event.AccountAdded) {
+            onAdd?.invoke(added)
+        }
+
+        override fun visitAccountStructureChanged(structureChanged: Event.AccountStructureChanged) {
+            onStructureChanged?.invoke(structureChanged)
+        }
+
+        override fun visitAccountNameChanged(accountNameChanged: Event.AccountNameChanged) {
+            onNameChanged?.invoke(accountNameChanged)
+        }
+
+        override fun visitAccountRemoved(accountRemoved: Event.AccountRemoved) {
+            onRemoved?.invoke(accountRemoved)
+        }
+    })
+}
+
+fun Event.checkIncludes(
+    checkAdd: Boolean = false,
+    checkStructureChange: Boolean = false,
+    checkNameChange: Boolean = false,
+    checkAccountRemoved: Boolean = false
+): Boolean {
+    var includes = false
+    val updateClosure: SingleAccountEventVisitor<Any> = {
+        includes = true
+    }
+
+    visit(
+        onAdd = updateClosure.takeIf { checkAdd },
+        onStructureChanged = updateClosure.takeIf { checkStructureChange },
+        onNameChanged = updateClosure.takeIf { checkNameChange },
+        onRemoved = updateClosure.takeIf { checkAccountRemoved }
+    )
+
+    return includes
+}
+
 fun Event.allAffectedMetaAccountTypes(): List<LightMetaAccount.Type> {
     return collect(
         onAdd = { it.metaAccountType },
