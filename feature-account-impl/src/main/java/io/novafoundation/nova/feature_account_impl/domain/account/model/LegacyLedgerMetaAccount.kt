@@ -20,7 +20,8 @@ class LegacyLedgerMetaAccount(
     name: String,
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
-    chainAccounts: Map<ChainId, MetaAccount.ChainAccount>
+    chainAccounts: Map<ChainId, MetaAccount.ChainAccount>,
+    parentMetaId: Long?
 ) : DefaultMetaAccount(
     id = id,
     globallyUniqueId = globallyUniqueId,
@@ -34,6 +35,7 @@ class LegacyLedgerMetaAccount(
     type = type,
     status = status,
     chainAccounts = chainAccounts,
+    parentMetaId = parentMetaId
 ) {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {

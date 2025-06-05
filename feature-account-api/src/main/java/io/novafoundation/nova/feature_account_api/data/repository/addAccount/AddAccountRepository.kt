@@ -26,18 +26,18 @@ sealed interface AddAccountResult {
     data object NoOp : AddAccountResult
 }
 
-fun AddAccountResult.toEvent(): Event? {
+fun AddAccountResult.toAccountBusEvent(): Event? {
     return when (this) {
-        is AddAccountResult.HadEffect -> toEvent()
+        is AddAccountResult.HadEffect -> toAccountBusEvent()
         is AddAccountResult.NoOp -> null
     }
 }
 
-fun AddAccountResult.HadEffect.toEvent(): Event {
+fun AddAccountResult.HadEffect.toAccountBusEvent(): Event {
     return when (this) {
         is AddAccountResult.AccountAdded -> Event.AccountAdded(metaId, type)
         is AddAccountResult.AccountChanged -> Event.AccountStructureChanged(metaId, type)
-        is AddAccountResult.Batch -> Event.BatchUpdate(updates.map { it.toEvent() })
+        is AddAccountResult.Batch -> Event.BatchUpdate(updates.map { it.toAccountBusEvent() })
     }
 }
 

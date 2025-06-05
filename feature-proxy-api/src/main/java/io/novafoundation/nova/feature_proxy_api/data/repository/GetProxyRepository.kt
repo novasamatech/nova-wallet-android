@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_proxy_api.data.repository
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -12,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface GetProxyRepository {
 
-    suspend fun findAllProxiedsForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<NestedProxiesGraphConstructor.Node>
+    suspend fun getAllProxies(chainId: ChainId): ProxiesMap
 
     suspend fun getDelegatedProxyTypesRemote(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType>
 
@@ -28,3 +27,16 @@ interface GetProxyRepository {
 
     fun proxiesQuantityByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<Int>
 }
+
+class OnChainProxiedModel(
+    val proxies: List<OnChainProxyModel>,
+    val deposit: BigInteger
+)
+
+class OnChainProxyModel(
+    val proxy: AccountIdKey,
+    val proxyType: ProxyType,
+    val delay: BigInteger
+)
+
+typealias ProxiesMap = Map<AccountIdKey, OnChainProxiedModel>

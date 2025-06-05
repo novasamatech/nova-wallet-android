@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDiscoveryService
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -38,8 +37,6 @@ interface MultisigOperationsFeatureDependencies {
     val selectedAccountUseCase: SelectedAccountUseCase
 
     val walletUiUseCase: WalletUiUseCase
-
-    val multisigDiscoveryService: MultisigDiscoveryService
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson

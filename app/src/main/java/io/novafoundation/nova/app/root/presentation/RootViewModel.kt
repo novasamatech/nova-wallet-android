@@ -139,13 +139,7 @@ class RootViewModel(
     }
 
     private fun syncDelegatedAccounts() {
-        interactor.syncProxies()
-            .inBackground()
-            .launchIn(rootScope)
-
-        interactor.syncMultisigs()
-            .inBackground()
-            .launchIn(rootScope)
+        interactor.syncExternalAccounts()
 
         interactor.syncPendingMultisigOperations()
             .inBackground()

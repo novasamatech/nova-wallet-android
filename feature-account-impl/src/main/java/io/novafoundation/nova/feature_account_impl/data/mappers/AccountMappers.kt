@@ -64,7 +64,8 @@ class AccountMappers(
                     isSelected = isSelected,
                     name = name,
                     type = type,
-                    status = mapMetaAccountStateFromLocal(status)
+                    status = mapMetaAccountStateFromLocal(status),
+                    parentMetaId = parentMetaId
                 )
 
                 LightMetaAccount.Type.PARITY_SIGNER,
@@ -80,7 +81,8 @@ class AccountMappers(
                     isSelected = isSelected,
                     name = name,
                     type = type,
-                    status = mapMetaAccountStateFromLocal(status)
+                    status = mapMetaAccountStateFromLocal(status),
+                    parentMetaId = parentMetaId
                 )
 
                 LightMetaAccount.Type.LEDGER -> GenericLedgerMetaAccount(
@@ -96,7 +98,8 @@ class AccountMappers(
                     name = name,
                     type = type,
                     status = mapMetaAccountStateFromLocal(status),
-                    supportedGenericLedgerChains = supportedGenericLedgerChains()
+                    supportedGenericLedgerChains = supportedGenericLedgerChains(),
+                    parentMetaId = parentMetaId
                 )
 
                 LightMetaAccount.Type.LEDGER_LEGACY -> LegacyLedgerMetaAccount(
@@ -111,7 +114,8 @@ class AccountMappers(
                     isSelected = isSelected,
                     name = name,
                     type = type,
-                    status = mapMetaAccountStateFromLocal(status)
+                    status = mapMetaAccountStateFromLocal(status),
+                    parentMetaId = parentMetaId
                 )
 
                 LightMetaAccount.Type.PROXIED -> {
@@ -134,7 +138,8 @@ class AccountMappers(
                         ethereumPublicKey = ethereumPublicKey,
                         isSelected = isSelected,
                         name = name,
-                        status = mapMetaAccountStateFromLocal(status)
+                        status = mapMetaAccountStateFromLocal(status),
+                        parentMetaId = parentMetaId
                     )
                 }
 
@@ -153,31 +158,11 @@ class AccountMappers(
                         signatoryMetaId = requireNotNull(parentMetaId) { "parentMetaId is null: $id" },
                         otherSignatories = multisigTypeExtras.otherSignatories,
                         threshold = multisigTypeExtras.threshold,
-                        signatoryAccountId = multisigTypeExtras.signatoryAccountId
+                        signatoryAccountId = multisigTypeExtras.signatoryAccountId,
+                        parentMetaId = parentMetaId
                     )
                 }
             }
-        }
-    }
-
-    fun mapMetaAccountLocalToLightMetaAccount(
-        metaAccountLocal: MetaAccountLocal
-    ): LightMetaAccount {
-        return with(metaAccountLocal) {
-            LightMetaAccount(
-                id = id,
-                substratePublicKey = substratePublicKey,
-                substrateCryptoType = substrateCryptoType,
-                substrateAccountId = substrateAccountId,
-                ethereumAddress = ethereumAddress,
-                ethereumPublicKey = ethereumPublicKey,
-                isSelected = isSelected,
-                name = name,
-                type = mapMetaAccountTypeFromLocal(type),
-                status = mapMetaAccountStateFromLocal(status),
-                globallyUniqueId = globallyUniqueId,
-                parentMetaId = parentMetaId
-            )
         }
     }
 

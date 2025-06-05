@@ -21,6 +21,7 @@ class GenericLedgerMetaAccount(
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
     chainAccounts: Map<ChainId, MetaAccount.ChainAccount>,
+    parentMetaId: Long?,
     private val supportedGenericLedgerChains: Set<ChainId>
 ) : DefaultMetaAccount(
     id = id,
@@ -35,6 +36,7 @@ class GenericLedgerMetaAccount(
     type = type,
     status = status,
     chainAccounts = chainAccounts,
+    parentMetaId = parentMetaId
 ) {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {
