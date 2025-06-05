@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.hash.isPositive
 import javax.inject.Inject
 
 @FeatureScope
@@ -71,23 +72,25 @@ private class ProxyExternalAccountsSyncDataSource(
         }
     }
 
-    private suspend fun fetchProxiedsByProxy(): Map<AccountIdKey, List<ProxyPermission>> {
+    private suspend fun fetchProxiedsByProxy(): Map<AccountIdKey, List<ProxyLink>> {
         val allProxiesByProxied = getProxyRepository.getAllProxies(chain.id)
 
         return buildMultiMapList {
             allProxiesByProxied.forEach { (proxied, proxies) ->
-                proxies.proxies.forEach { proxy ->
-                    val proxyPermission = ProxyPermission(
+                proxies.proxies.forEach innerProxiesLoop@ { proxy ->
+                    if (proxy.delay.isPositive()) return@innerProxiesLoop
+
+                    val proxyLink = ProxyLink(
                         proxiedAccountId = proxied,
                         proxyType = proxy.proxyType
                     )
-                    put(proxy.proxy, proxyPermission)
+                    put(proxy.proxy, proxyLink)
                 }
             }
         }
     }
 
-    private class ProxyPermission(
+    private class ProxyLink(
         val proxiedAccountId: AccountIdKey,
         val proxyType: ProxyType
     )

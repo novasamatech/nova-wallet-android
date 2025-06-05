@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_proxy_api.data.repository
 
-import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_proxy_api.data.model.ProxiesMap
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import java.math.BigInteger
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
+import java.math.BigInteger
 
 interface GetProxyRepository {
 
@@ -27,16 +27,3 @@ interface GetProxyRepository {
 
     fun proxiesQuantityByTypeFlow(chain: Chain, accountId: AccountId, proxyType: ProxyType): Flow<Int>
 }
-
-class OnChainProxiedModel(
-    val proxies: List<OnChainProxyModel>,
-    val deposit: BigInteger
-)
-
-class OnChainProxyModel(
-    val proxy: AccountIdKey,
-    val proxyType: ProxyType,
-    val delay: BigInteger
-)
-
-typealias ProxiesMap = Map<AccountIdKey, OnChainProxiedModel>

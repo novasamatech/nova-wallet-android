@@ -8,7 +8,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 
 class RealProxyDepositCalculator(
-    private val chainRegestry: ChainRegistry,
     private val proxyConstantsRepository: ProxyConstantsRepository
 ) : ProxyDepositCalculator {
 

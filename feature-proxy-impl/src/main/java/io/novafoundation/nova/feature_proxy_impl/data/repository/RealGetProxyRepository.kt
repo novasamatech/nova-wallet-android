@@ -10,11 +10,11 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.proxy
+import io.novafoundation.nova.feature_proxy_api.data.model.OnChainProxiedModel
+import io.novafoundation.nova.feature_proxy_api.data.model.OnChainProxyModel
+import io.novafoundation.nova.feature_proxy_api.data.model.ProxiesMap
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
-import io.novafoundation.nova.feature_proxy_api.data.repository.OnChainProxiedModel
-import io.novafoundation.nova.feature_proxy_api.data.repository.OnChainProxyModel
-import io.novafoundation.nova.feature_proxy_api.data.repository.ProxiesMap
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.model.fromString
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -22,12 +22,12 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.math.BigInteger
 
 class RealGetProxyRepository(
     private val remoteSource: StorageDataSource,
