@@ -47,10 +47,10 @@ class UniqueNetworkNftProvider(
                     metaId = metaAccount.id,
                     chainId = chain.id,
                     collectionId = remote.collectionId.toString(),
-                    instanceId = remote.key,
+                    instanceId = remote.tokenId.toString(),
                     metadata = null,
                     type = NftLocal.Type.UNIQUE_NETWORK,
-                    wholeDetailsLoaded = true,
+                    wholeDetailsLoaded = false,
                     name = remote.name,
                     label = "#${remote.tokenId}",
                     media = remote.image,
@@ -73,7 +73,24 @@ class UniqueNetworkNftProvider(
     }
 
     override suspend fun nftFullSync(nft: Nft) {
-        // do nothing
+        val collection = uniqueNetworkApi.getCollection(
+            collectionId = nft.collectionId.toInt(),
+        )
+
+        val issuanceTotal = collection.limits?.tokenLimit?.toBigInteger() ?: collection.lastTokenId?.toBigInteger()
+
+        val issuanceType = when {
+            collection.limits?.tokenLimit != null -> NftLocal.IssuanceType.LIMITED
+            else -> NftLocal.IssuanceType.UNLIMITED
+        }
+
+        nftDao.updateNft(nft.identifier) { local ->
+            local.copy(
+                issuanceType = issuanceType,
+                issuanceTotal = issuanceTotal,
+                wholeDetailsLoaded = true,
+            )
+        }
     }
 
     override fun nftDetailsFlow(nftIdentifier: String): Flow<NftDetails> {
@@ -86,16 +103,14 @@ class UniqueNetworkNftProvider(
             val chain = chainRegistry.getChain(nftLocal.chainId)
             val metaAccount = accountRepository.getMetaAccount(nftLocal.metaId)
 
+            val remoteNft = uniqueNetworkApi.getNft(
+                collectionId = nftLocal.collectionId.toInt(),
+                tokenId = nftLocal.instanceId!!.toInt()
+            )
+
             val collection = uniqueNetworkApi.getCollection(
                 collectionId = nftLocal.collectionId.toInt(),
             )
-
-            val issuanceTotal = collection.limits?.tokenLimit?.toBigInteger() ?: collection.lastTokenId?.toBigInteger()
-
-            val issuanceType = when {
-                collection.limits?.tokenLimit != null -> NftLocal.IssuanceType.LIMITED
-                else -> NftLocal.IssuanceType.UNLIMITED
-            }
 
             NftDetails(
                 identifier = nftLocal.identifier,
@@ -104,8 +119,8 @@ class UniqueNetworkNftProvider(
                 creator = null,
                 media = nftLocal.media,
                 name = nftLocal.name ?: nftLocal.instanceId!!,
-                description = null,
-                issuance = nftIssuance(issuanceType, issuanceTotal, nftLocal.issuanceMyEdition, nftLocal.issuanceMyAmount),
+                description = remoteNft.description,
+                issuance = nftIssuance(nftLocal),
                 price = nftPrice(nftLocal),
                 collection = collection.let {
                     NftDetails.Collection(

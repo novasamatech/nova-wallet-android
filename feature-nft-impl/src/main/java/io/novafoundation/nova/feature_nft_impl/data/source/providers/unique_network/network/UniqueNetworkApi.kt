@@ -20,6 +20,12 @@ interface UniqueNetworkApi {
         @Query("orderByTokenId") order: String = "asc"
     ): UniqueNetworkPaginatedResponse<UniqueNetworkNft>
 
+    @GET("nfts/{collectionId}/{tokenId}")
+    suspend fun getNft(
+        @Path("collectionId") collectionId: Int,
+        @Path("tokenId") tokenId: Int,
+    ): UniqueNetworkNft
+
     @GET("collections/{collectionId}")
     suspend fun getCollection(
         @Path("collectionId") collectionId: Int,

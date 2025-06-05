@@ -6,4 +6,5 @@ data class UniqueNetworkNft(
     val tokenId: Int,
     val image: String?,
     val name: String?,
+    val description: String?,
 )
