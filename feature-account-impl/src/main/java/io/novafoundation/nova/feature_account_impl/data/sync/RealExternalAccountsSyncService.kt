@@ -83,6 +83,36 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         }
     }
 
+    /**
+     * Sync all reachable accounts from accounts that user directly controls.
+     *
+     * The terminology used here:
+     * * Controller - an account that can operation on behalf of another account
+     * * Controlled accounts - account that is controlled by a controller
+     *
+     * The high-level of the algorithm is the following:
+     * 1. We perform BFS starting from accounts user directly controls, fetching reachable accounts iteratively:
+     * once we fetched a new non-empty list of controllable accounts from data-sources, we start fetching again, now with just obtained accounts
+     * This way, we will be able to crawl all the reachable accounts
+     * Note that at this step, we do not yet check whether a certain pair of Controller + Controlled is actually usable
+     * Also, this step operates just with account ids and not with wallet ids to make it easier to implement data-sources
+     * It is also important to note, that each [ExternalControllableAccount] represents a unique Controller + Controlled pair. However, if there are
+     * several meta accounts with the same account ids that are controllers, [ExternalControllableAccount] will result in a separate meta account created for each of them
+     * On the other hand, if multiple different controllers control a single controlled accounts, they will have different corresponding [ExternalControllableAccount] instances
+     *
+     * 2. Once we fetched all accessible [ExternalControllableAccount] we start comparing already added meta accounts with the fetched list. The goal is to only add those accounts
+     * that has not been added yet
+     * For each external account, [addNewExternalAccounts] achieve this by doing the following:
+     *   a. It first checks whether this pair of controller + controlled can actually be used.
+     *   In particular, a controller, via [ExternalSourceCreatedAccount], checks that it can actually control the controlled account. This is usefully for Proxies
+     *   since only Any/NonTransfer proxy account can dispatch proxy.proxy / multisig.as_multi calls, and thus, be able to control such accounts despite the permission being granted
+     *   b. Get meta accounts for controllers that can control this external account
+     *   c. For each controller, check all of its controlled accounts that are already in db. This is done via [MetaAccount.parentMetaId] field
+     *   d. Compare each such controlled account with external account we are analyzing.
+     *   Check is done comparing accountId of controlled account + allowing [ExternalControllableAccount] to do some extra check
+     *   For example, it is not enough for a Proxy to just check for controlled and controller account ids match
+     *   as there might be multiple connection between same pairs of accounts via multiple proxy types.
+     */
     private suspend fun sync(chain: Chain, dataSource: ExternalAccountsSyncDataSource) = runCatching {
         Log.d("ExternalAccountsDiscovery", "Started syncing external accounts on ${chain.name}")
 
@@ -148,7 +178,17 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         foundExternalAccounts.onEach { externalAccount ->
             val controllers = controllersByAccountId[externalAccount.controllerAccountId].orEmpty()
 
-            controllers.onEach { controller ->
+            controllers.onEach controllersLoop@ { controller ->
+                val controllerAsExternal = dataSource.getExternalCreatedAccount(controller)
+                val canControl = controllerAsExternal == null || controllerAsExternal.canControl(externalAccount)
+
+                if (!canControl) {
+                    val controlledAddress = chain.addressOf(externalAccount.accountId)
+                    val controllerAddress = chain.addressOf(externalAccount.controllerAccountId)
+                    Log.v("ExternalAccountsDiscovery", "Discovered account $controlledAddress cannot be controlled by $controllerAddress")
+                    return@controllersLoop
+                }
+
                 val existingControlledAccounts = existingAccountsByParentId[controller.id].orEmpty()
 
                 val existingAccountRepresentedByExternal = existingControlledAccounts.find { existingAccount ->
@@ -159,22 +199,13 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                 if (existingAccountRepresentedByExternal != null) {
                     reachableExistingMetaIds.add(existingAccountRepresentedByExternal.id)
                 } else {
-                    val controllerAsExternal = dataSource.getExternalCreatedAccount(controller)
-                    val canControl = controllerAsExternal == null || controllerAsExternal.canControl(externalAccount)
+                    val addResult = externalAccount.addAccount(controller, identities[externalAccount.accountId], position)
 
-                    if (canControl) {
-                        val addResult = externalAccount.addAccount(controller, identities[externalAccount.accountId], position)
+                    val newMetaAccount = accountRepository.getMetaAccount(addResult.metaId)
 
-                        val newMetaAccount = accountRepository.getMetaAccount(addResult.metaId)
-
-                        position++
-                        controllersByAccountId.put(externalAccount.accountId, newMetaAccount)
-                        added.add(addResult)
-                    } else {
-                        val controlledAddress = chain.addressOf(externalAccount.accountId)
-                        val controllerAddress = chain.addressOf(externalAccount.controllerAccountId)
-                        Log.v("ExternalAccountsDiscovery", "Discovered account $controlledAddress cannot be controlled by $controllerAddress")
-                    }
+                    position++
+                    controllersByAccountId.put(externalAccount.accountId, newMetaAccount)
+                    added.add(addResult)
                 }
             }
         }
