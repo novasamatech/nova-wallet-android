@@ -129,6 +129,26 @@ interface MultisigMetaAccount : MetaAccount {
     val otherSignatories: List<AccountIdKey>
 
     val threshold: Int
+
+    val availability: MultisigAvailability
+}
+
+sealed class MultisigAvailability {
+
+    data object Universal : MultisigAvailability()
+
+    class SingleChain(val chainId: ChainId) : MultisigAvailability()
+}
+
+fun MetaAccount.isUniversal(): Boolean {
+    return substrateAccountId != null || ethereumAddress != null
+}
+
+fun MultisigAvailability.singleChainId(): ChainId? {
+    return when (this) {
+        is MultisigAvailability.SingleChain -> chainId
+        MultisigAvailability.Universal -> null
+    }
 }
 
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts

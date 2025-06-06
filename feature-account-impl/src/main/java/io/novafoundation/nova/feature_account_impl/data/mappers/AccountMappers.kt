@@ -152,6 +152,7 @@ class AccountMappers(
                         substrateAccountId = substrateAccountId,
                         ethereumAddress = ethereumAddress,
                         ethereumPublicKey = ethereumPublicKey,
+                        chainAccounts = chainAccounts,
                         isSelected = isSelected,
                         name = name,
                         status = mapMetaAccountStateFromLocal(status),

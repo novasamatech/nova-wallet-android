@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MultisigTypeExtras
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
@@ -35,9 +36,7 @@ internal class MultisigAccountsSyncDataSourceFactory @Inject constructor(
 
 /*
 TODO multisig:
-1. Multisig account should be created as universal/chain account depending on the signatory account type -
-chain account signatory should create chain account multisig, evm signatory should create evm multisig
-2. Integrate multisigs to MetaAccountsUpdatesRegistry - just adding ids to the repository isn't enough as ui only shows proxies, see
+1. Integrate multisigs to MetaAccountsUpdatesRegistry - just adding ids to the repository isn't enough as ui only shows proxies, see
 MetaAccountGroupingInteractor.updatedProxieds
  */
 private class MultisigAccountsSyncDataSource(
@@ -94,16 +93,68 @@ private class MultisigAccountsSyncDataSource(
             identity: Identity?,
             position: Int
         ): AddAccountResult.AccountAdded {
-            val metaAccount = createMetaAccount(controller.id, identity, position)
-            val newMetaId = accountDao.insertMetaAccount(metaAccount)
-            return AddAccountResult.AccountAdded(newMetaId, LightMetaAccount.Type.MULTISIG)
+            val newId = addMultisig(controller, identity, position)
+            return AddAccountResult.AccountAdded(newId, LightMetaAccount.Type.MULTISIG)
         }
 
         override fun dispatchChangesOriginFilters(): Boolean {
             return true
         }
 
-        private fun createMetaAccount(
+        private suspend fun addMultisig(
+            controller: MetaAccount,
+            identity: Identity?,
+            position: Int
+        ): Long {
+            return when (controller.type) {
+                LightMetaAccount.Type.SECRETS,
+                LightMetaAccount.Type.WATCH_ONLY -> addMultisigForComplexSigner(controller, identity, position)
+
+                LightMetaAccount.Type.PARITY_SIGNER,
+                LightMetaAccount.Type.POLKADOT_VAULT -> addUniversalMultisig(controller, identity, position)
+
+                LightMetaAccount.Type.LEDGER_LEGACY,
+                LightMetaAccount.Type.LEDGER -> addSingleChainMultisig(controller, identity, position)
+
+                LightMetaAccount.Type.PROXIED -> addSingleChainMultisig(controller, identity, position)
+
+                LightMetaAccount.Type.MULTISIG -> addMultisigForComplexSigner(controller, identity, position)
+            }
+        }
+
+        private suspend fun addMultisigForComplexSigner(
+            controller: MetaAccount,
+            identity: Identity?,
+            position: Int
+        ): Long {
+            return if (controller.chainAccounts.isEmpty()) {
+                addUniversalMultisig(controller, identity, position)
+            } else {
+                addSingleChainMultisig(controller, identity, position)
+            }
+        }
+
+        private suspend fun addSingleChainMultisig(
+            controller: MetaAccount,
+            identity: Identity?,
+            position: Int
+        ): Long {
+            val metaAccount = createSingleChainMetaAccount(controller.id, identity, position)
+            return accountDao.insertMetaAndChainAccounts(metaAccount) { newId ->
+                listOf(createChainAccount(newId))
+            }
+        }
+
+        private suspend fun addUniversalMultisig(
+            controller: MetaAccount,
+            identity: Identity?,
+            position: Int
+        ): Long {
+            val metaAccount = createUniversalMetaAccount(controller.id, identity, position)
+            return accountDao.insertMetaAccount(metaAccount)
+        }
+
+        private fun createUniversalMetaAccount(
             controllerMetaId: Long,
             identity: Identity?,
             position: Int
@@ -122,6 +173,40 @@ private class MultisigAccountsSyncDataSource(
                 status = MetaAccountLocal.Status.ACTIVE,
                 globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
                 typeExtras = typeExtras()
+            )
+        }
+
+        private fun createSingleChainMetaAccount(
+            controllerMetaId: Long,
+            identity: Identity?,
+            position: Int
+        ): MetaAccountLocal {
+            return MetaAccountLocal(
+                substratePublicKey = null,
+                substrateCryptoType = null,
+                substrateAccountId = null,
+                ethereumPublicKey = null,
+                ethereumAddress = null,
+                name = accountName(identity),
+                parentMetaId = controllerMetaId,
+                isSelected = false,
+                position = position,
+                type = MetaAccountLocal.Type.MULTISIG,
+                status = MetaAccountLocal.Status.ACTIVE,
+                globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+                typeExtras = typeExtras()
+            )
+        }
+
+        private fun createChainAccount(
+            multisigId: Long,
+        ): ChainAccountLocal {
+            return ChainAccountLocal(
+                metaId = multisigId,
+                chainId = chain.id,
+                publicKey = null,
+                accountId = accountId.value,
+                cryptoType = null
             )
         }
 
