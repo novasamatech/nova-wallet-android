@@ -89,7 +89,7 @@ private class MultisigAccountsSyncDataSource(
             return localAccount is MultisigMetaAccount
         }
 
-        override suspend fun addAccount(
+        override suspend fun addControlledAccount(
             controller: MetaAccount,
             identity: Identity?,
             position: Int

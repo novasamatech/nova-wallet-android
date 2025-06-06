@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.data.sync
 
-import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -106,7 +105,7 @@ private class ProxyExternalAccountsSyncDataSource(
             return localAccount is ProxiedMetaAccount && localAccount.proxy.proxyType == proxyType
         }
 
-        override suspend fun addAccount(
+        override suspend fun addControlledAccount(
             controller: MetaAccount,
             identity: Identity?,
             position: Int

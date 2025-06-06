@@ -213,7 +213,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                 if (existingAccountRepresentedByExternal != null) {
                     reachableExistingMetaIds.add(existingAccountRepresentedByExternal.id)
                 } else {
-                    val addResult = externalAccount.addAccount(controller, identities[externalAccount.accountId], position)
+                    val addResult = externalAccount.addControlledAccount(controller, identities[externalAccount.accountId], position)
 
                     val newMetaAccount = accountRepository.getMetaAccount(addResult.metaId)
 

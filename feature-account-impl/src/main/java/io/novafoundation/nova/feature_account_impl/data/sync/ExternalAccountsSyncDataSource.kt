@@ -29,7 +29,7 @@ internal interface ExternalControllableAccount {
 
     /**
      * Check whether [localAccount] represents self in the data-base
-     * Implementation can assume that [accountId] and [controller] check has already been done
+     * Implementation can assume that [accountId] and [controllerAccountId] check has already been done
      */
     fun isRepresentedBy(localAccount: MetaAccount): Boolean
 
@@ -39,7 +39,7 @@ internal interface ExternalControllableAccount {
      *
      * @return id of newly created account
      */
-    suspend fun addAccount(
+    suspend fun addControlledAccount(
         controller: MetaAccount,
         identity: Identity?,
         position: Int
