@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin
 
 import android.text.SpannableStringBuilder
-import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -10,10 +8,8 @@ import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
-import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.AccountInChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
-import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory

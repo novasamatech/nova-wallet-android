@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.cloudBackup
 
+import com.google.gson.Gson
 import io.novafoundation.feature_cloud_backup_test.TEST_MODIFIED_AT
 import io.novafoundation.feature_cloud_backup_test.buildTestCloudBackup
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
@@ -75,6 +76,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
     @Mock
     lateinit var ledgerMigrationTracker: LedgerMigrationTracker
 
+    @Mock
+    lateinit var gson: Gson
+
     private val ethereumDerivationPath = "//44//60//0/0/0"
 
 
@@ -86,7 +90,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
             metaAccountChangedEvents = metaAccountChangesEventBus,
             chainRegistry = chainRegistry,
-            accountMappers = AccountMappers(ledgerMigrationTracker)
+            accountMappers = AccountMappers(ledgerMigrationTracker,gson)
 
         )
 

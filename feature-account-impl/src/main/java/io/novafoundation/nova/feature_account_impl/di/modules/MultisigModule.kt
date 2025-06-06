@@ -5,10 +5,8 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDiscoveryService
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
-import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigDiscoveryService
 import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.FindMultisigsApi
 import io.novafoundation.nova.feature_account_impl.di.modules.MultisigModule.BindsModule
@@ -19,9 +17,6 @@ class MultisigModule {
 
     @Module
     internal interface BindsModule {
-
-        @Binds
-        fun bindMultisigSyncService(real: RealMultisigDiscoveryService): MultisigDiscoveryService
 
         @Binds
         fun bindMultisigSyncRepository(real: RealMultisigRepository): MultisigRepository

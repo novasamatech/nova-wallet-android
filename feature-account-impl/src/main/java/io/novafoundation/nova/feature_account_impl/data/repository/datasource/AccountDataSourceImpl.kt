@@ -145,6 +145,11 @@ class AccountDataSourceImpl(
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
+    override suspend fun getAllMetaAccounts(): List<MetaAccount> {
+        val local = metaAccountDao.getFullMetaAccounts()
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
+    }
+
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
     }
@@ -159,10 +164,6 @@ class AccountDataSourceImpl(
 
     override suspend fun hasSecretsAccounts(): Boolean {
         return metaAccountDao.hasMetaAccountsByType(MetaAccountLocal.Type.SECRETS)
-    }
-
-    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
-        return metaAccountDao.getMetaAccounts().map(accountMappers::mapMetaAccountLocalToLightMetaAccount)
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {

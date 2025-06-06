@@ -5,14 +5,13 @@ import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
+import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDiscoveryService
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
@@ -96,21 +95,19 @@ interface AccountFeatureApi {
 
     val mnemonicAddAccountRepository: MnemonicAddAccountRepository
 
-    val multisigDiscoveryService: MultisigDiscoveryService
-
     val multisigPendingOperationsService: MultisigPendingOperationsService
 
     val signingContextFactory: SigningContext.Factory
 
     val extrinsicSplitter: ExtrinsicSplitter
 
+    val externalAccountsSyncService: ExternalAccountsSyncService
+
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider
 
     @OnChainIdentity
     fun onChainIdentityProvider(): IdentityProvider
-
-    fun proxySyncService(): ProxySyncService
 
     fun metaAccountGroupingInteractor(): MetaAccountGroupingInteractor
 

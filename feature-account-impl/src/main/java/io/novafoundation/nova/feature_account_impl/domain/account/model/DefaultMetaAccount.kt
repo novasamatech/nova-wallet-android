@@ -22,7 +22,8 @@ open class DefaultMetaAccount(
     override val name: String,
     override val type: LightMetaAccount.Type,
     override val status: LightMetaAccount.Status,
-    override val chainAccounts: Map<ChainId, MetaAccount.ChainAccount>
+    override val chainAccounts: Map<ChainId, MetaAccount.ChainAccount>,
+    override val parentMetaId: Long?
 ) : MetaAccount {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {

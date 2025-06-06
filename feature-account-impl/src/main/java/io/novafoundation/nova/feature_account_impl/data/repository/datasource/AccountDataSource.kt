@@ -46,8 +46,6 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
-
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
@@ -100,6 +98,8 @@ interface AccountDataSource : SecretStoreV1 {
     fun removeDeactivatedMetaAccounts()
 
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
+
+    suspend fun getAllMetaAccounts(): List<MetaAccount>
 
     suspend fun getActiveMetaAccountsQuantity(): Int
 

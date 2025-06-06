@@ -17,7 +17,8 @@ class RealMultisigMetaAccount(
     override val signatoryMetaId: Long,
     override val signatoryAccountId: AccountIdKey,
     override val otherSignatories: List<AccountIdKey>,
-    override val threshold: Int
+    override val threshold: Int,
+    parentMetaId: Long?
 ) : DefaultMetaAccount(
     id = id,
     globallyUniqueId = globallyUniqueId,
@@ -31,6 +32,7 @@ class RealMultisigMetaAccount(
     type = LightMetaAccount.Type.MULTISIG,
     status = status,
     chainAccounts = emptyMap(),
+    parentMetaId = parentMetaId
 ),
     MultisigMetaAccount {
 

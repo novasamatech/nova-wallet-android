@@ -78,6 +78,7 @@ class LocalMetaAccountMockBuilder(
     private var _type: MetaAccountLocal.Type = MetaAccountLocal.Type.SECRETS
     private var _status: MetaAccountLocal.Status = MetaAccountLocal.Status.ACTIVE
     private var _globallyUniqueId: String = MetaAccountLocal.generateGloballyUniqueId()
+    private var _typeExtras: String? = null
 
 
     fun chainAccount(chainId: ChainId, builder: LocalChainAccountMockBuilder.() -> Unit) {
@@ -129,6 +130,10 @@ class LocalMetaAccountMockBuilder(
         _globallyUniqueId = value
     }
 
+    fun typeExtras(typeExtras: String) {
+        _typeExtras = typeExtras
+    }
+
     fun build(): JoinedMetaAccountInfo {
         return RelationJoinedMetaAccountInfo(
             metaAccount = MetaAccountLocal(
@@ -144,6 +149,7 @@ class LocalMetaAccountMockBuilder(
                 _type,
                 _status,
                 _globallyUniqueId,
+                _typeExtras
             ).also {
                 it.id = metaId
             },

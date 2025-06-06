@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.di
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -9,16 +8,12 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.multisig.MultisigAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.multisig.RealMultisigAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.RealProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RealMnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
@@ -33,11 +28,7 @@ import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 class AddAccountsModule {
 
     @Module
-    interface BindsModule {
-
-        @Binds
-        fun bindMultisigAddAccountRepository(implementation: RealMultisigAddAccountRepository): MultisigAddAccountRepository
-    }
+    interface BindsModule
 
     @Provides
     @FeatureScope
@@ -112,18 +103,6 @@ class AddAccountsModule {
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = ParitySignerAddAccountRepository(
         accountDao,
-        metaAccountChangesEventBus
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideProxiedAddAccountRepository(
-        accountDao: MetaAccountDao,
-        chainRegistry: ChainRegistry,
-        metaAccountChangesEventBus: MetaAccountChangesEventBus
-    ): ProxiedAddAccountRepository = RealProxiedAddAccountRepository(
-        accountDao,
-        chainRegistry,
         metaAccountChangesEventBus
     )
 

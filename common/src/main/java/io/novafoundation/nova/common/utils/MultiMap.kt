@@ -17,3 +17,11 @@ fun <K, V> MutableMultiMap<K, V>.put(key: K, value: V) {
 fun <K, V> MutableMultiMapList<K, V>.put(key: K, value: V) {
     getOrPut(key, ::mutableListOf).add(value)
 }
+
+fun <K, V> MutableMultiMapList<K, V>.put(key: K, values: List<V>) {
+    getOrPut(key, ::mutableListOf).addAll(values)
+}
+
+inline fun <K, V> buildMultiMapList(builder: MutableMultiMapList<K, V>.() -> Unit): MultiMapList<K, V> {
+    return mutableMultiListMapOf<K, V>().apply(builder)
+}
