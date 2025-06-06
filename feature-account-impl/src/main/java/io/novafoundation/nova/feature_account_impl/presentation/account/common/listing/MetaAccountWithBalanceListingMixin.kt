@@ -85,8 +85,9 @@ private class MetaAccountWithBalanceListingMixin(
         return when (this) {
             is MetaAccountListingItem.Proxied -> proxyChain.iconOrFallback()
 
-            is MetaAccountListingItem.TotalBalance,
-            is MetaAccountListingItem.Multisig -> null
+            is MetaAccountListingItem.Multisig -> singleChain?.iconOrFallback()
+
+            is MetaAccountListingItem.TotalBalance -> null
         }
     }
 
