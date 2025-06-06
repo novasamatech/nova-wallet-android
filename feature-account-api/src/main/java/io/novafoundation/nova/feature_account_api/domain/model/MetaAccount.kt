@@ -135,9 +135,9 @@ interface MultisigMetaAccount : MetaAccount {
 
 sealed class MultisigAvailability {
 
-    data object Universal: MultisigAvailability()
+    data object Universal : MultisigAvailability()
 
-    class SingleChain(val chainId: ChainId): MultisigAvailability()
+    class SingleChain(val chainId: ChainId) : MultisigAvailability()
 }
 
 fun MetaAccount.isUniversal(): Boolean {
@@ -145,7 +145,7 @@ fun MetaAccount.isUniversal(): Boolean {
 }
 
 fun MultisigAvailability.singleChainId(): ChainId? {
-    return when(this) {
+    return when (this) {
         is MultisigAvailability.SingleChain -> chainId
         MultisigAvailability.Universal -> null
     }

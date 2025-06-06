@@ -555,7 +555,6 @@ inline fun <T, R> Iterable<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutable
 
 inline fun <T, R> Iterable<T>.flatMapToSet(mapper: (T) -> Iterable<R>): Set<R> = flatMapTo(mutableSetOf(), mapper)
 
-
 inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fold(mutableSetOf()) { acc, value ->
     acc += mapper(value)
     acc

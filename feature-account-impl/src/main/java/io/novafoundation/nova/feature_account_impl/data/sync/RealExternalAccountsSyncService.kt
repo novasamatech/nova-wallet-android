@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.filterToSet
-import io.novafoundation.nova.common.utils.flatMapToSet
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.mutableMultiListMapOf
@@ -184,8 +183,10 @@ internal class RealExternalAccountsSyncService @Inject constructor(
     private suspend fun updateAccountStatusesForSingleChain(reachabilityReport: ChainReachabilityReport, chain: Chain) {
         val singleChainNonReachable = reachabilityReport.singleChainNonReachable
         if (singleChainNonReachable.isNotEmpty()) {
-            Log.d("ExternalAccountsDiscovery", "Disabling ${singleChainNonReachable.size} non-reachable accounts" +
-                " when syncing ${chain.name}: $singleChainNonReachable"
+            Log.d(
+                "ExternalAccountsDiscovery",
+                "Disabling ${singleChainNonReachable.size} non-reachable accounts" +
+                    " when syncing ${chain.name}: $singleChainNonReachable"
             )
             accountDao.changeAccountsStatus(singleChainNonReachable.toList(), MetaAccountLocal.Status.DEACTIVATED)
         } else {
@@ -306,7 +307,6 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         val universalNonReachable: Set<Long>,
         val stillReachable: Set<Long>
     )
-
 
     private data class ReachableExternalAccounts(
         val accounts: List<ExternalControllableAccount>,
