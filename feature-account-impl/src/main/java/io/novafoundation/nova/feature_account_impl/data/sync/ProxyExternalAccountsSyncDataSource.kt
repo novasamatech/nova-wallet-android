@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.sync
 
+import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -51,8 +52,8 @@ private class ProxyExternalAccountsSyncDataSource(
     }
 
     override suspend fun getExternalCreatedAccount(metaAccount: MetaAccount): ExternalSourceCreatedAccount? {
-        return if (isCreatedFromDataSource(metaAccount)) {
-            ProxyExternalSourceAccount()
+        return if (metaAccount is ProxiedMetaAccount) {
+            ProxyExternalSourceAccount(metaAccount.proxy.proxyType)
         } else {
             null
         }
@@ -171,10 +172,12 @@ private class ProxyExternalAccountsSyncDataSource(
         }
     }
 
-    private class ProxyExternalSourceAccount : ExternalSourceCreatedAccount {
+    private inner class ProxyExternalSourceAccount(private val proxyType: ProxyType) : ExternalSourceCreatedAccount {
 
         override fun canControl(candidate: ExternalControllableAccount): Boolean {
-            return !candidate.dispatchChangesOriginFilters()
+            if (!candidate.dispatchChangesOriginFilters()) return true
+
+            return proxyType is ProxyType.Any || proxyType is ProxyType.NonTransfer
         }
     }
 }
