@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 internal interface ExternalAccountsSyncDataSource {
@@ -26,6 +27,8 @@ internal interface ExternalControllableAccount {
     val accountId: AccountIdKey
 
     val controllerAccountId: AccountIdKey
+
+    val chain: Chain
 
     /**
      * Check whether [localAccount] represents self in the data-base
@@ -56,4 +59,12 @@ internal interface ExternalControllableAccount {
 internal interface ExternalSourceCreatedAccount {
 
     fun canControl(candidate: ExternalControllableAccount): Boolean
+}
+
+internal fun ExternalControllableAccount.address(): String {
+    return chain.addressOf(accountId)
+}
+
+internal fun ExternalControllableAccount.controllerAddress(): String {
+    return chain.addressOf(controllerAccountId)
 }

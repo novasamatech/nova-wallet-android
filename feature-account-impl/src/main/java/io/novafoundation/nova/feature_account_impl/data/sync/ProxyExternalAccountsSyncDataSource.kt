@@ -66,7 +66,8 @@ private class ProxyExternalAccountsSyncDataSource(
                 ProxiedExternalAccount(
                     accountId = proxied.proxiedAccountId,
                     controllerAccountId = proxyCandidate,
-                    proxyType = proxied.proxyType
+                    proxyType = proxied.proxyType,
+                    chain = chain
                 )
             }
         }
@@ -99,6 +100,7 @@ private class ProxyExternalAccountsSyncDataSource(
         override val accountId: AccountIdKey,
         override val controllerAccountId: AccountIdKey,
         private val proxyType: ProxyType,
+        override val chain: Chain
     ) : ExternalControllableAccount {
 
         override fun isRepresentedBy(localAccount: MetaAccount): Boolean {
