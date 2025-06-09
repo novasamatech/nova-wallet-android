@@ -17,7 +17,8 @@ sealed interface AccountDelegation {
 
     class Multisig(
         val metaAccount: MultisigMetaAccount,
-        val signatory: MetaAccount
+        val signatory: MetaAccount,
+        val singleChain: Chain?, // null in case multisig is universal
     ) : AccountDelegation {
 
         override val delegator = metaAccount
@@ -26,7 +27,7 @@ sealed interface AccountDelegation {
 
 fun AccountDelegation.getChainOrNull(): Chain? {
     return when (this) {
-        is AccountDelegation.Multisig -> null
+        is AccountDelegation.Multisig -> singleChain
         is AccountDelegation.Proxy -> chain
     }
 }

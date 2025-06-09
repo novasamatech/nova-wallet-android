@@ -88,15 +88,21 @@ class MetaAccountGroupingInteractorImpl(
                 .mapNotNull {
                     when (it) {
                         is ProxiedMetaAccount -> AccountDelegation.Proxy(
-                            it,
-                            metaById[it.proxy.proxyMetaId] ?: return@mapNotNull null,
-                            chainsById[it.proxy.chainId] ?: return@mapNotNull null
+                            proxied = it,
+                            proxy = metaById[it.proxy.proxyMetaId] ?: return@mapNotNull null,
+                            chain = chainsById[it.proxy.chainId] ?: return@mapNotNull null
                         )
 
-                        is MultisigMetaAccount -> AccountDelegation.Multisig(
-                            it,
-                            metaById[it.signatoryMetaId] ?: return@mapNotNull null
-                        )
+                        is MultisigMetaAccount -> {
+                            val singleChainId = it.availability.singleChainId()
+                            val singleChain = singleChainId?.let { chainsById[it] ?: return@mapNotNull null }
+
+                            AccountDelegation.Multisig(
+                                metaAccount = it,
+                                signatory = metaById[it.signatoryMetaId] ?: return@mapNotNull null,
+                                singleChain = singleChain
+                            )
+                        }
 
                         else -> null
                     }
