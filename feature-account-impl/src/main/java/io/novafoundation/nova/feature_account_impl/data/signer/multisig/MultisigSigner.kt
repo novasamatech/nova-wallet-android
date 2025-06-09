@@ -75,9 +75,9 @@ class MultisigSigner(
 
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForSubmission(context: SigningContext) {
-        wrapCallsInAsMultiForSubmission()
-
         delegateSigner().setSignerDataForSubmission(context)
+
+        wrapCallsInAsMultiForSubmission()
 
         // TODO multisig: implement acknowledge and validation
         // 1. Balance is enough
@@ -90,9 +90,9 @@ class MultisigSigner(
 
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForFee(context: SigningContext) {
-        wrapCallsInProxyForFee()
-
         delegateSigner().setSignerDataForFee(context)
+
+        wrapCallsInProxyForFee()
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
