@@ -9,7 +9,10 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.common.utils.metadata
+import io.novafoundation.nova.runtime.storage.source.query.AtBlock
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNullWithBlockHash
+import io.novafoundation.nova.runtime.storage.source.query.api.observeWithBlockHash
 import io.novafoundation.nova.runtime.storage.typed.events
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
@@ -28,7 +31,7 @@ interface EventsRepository {
 
     suspend fun getExtrinsicWithEvents(chainId: ChainId, extrinsicHash: String, blockHash: BlockHash? = null): ExtrinsicWithEvents?
 
-    fun subscribeEventRecords(chainId: ChainId): Flow<List<EventRecord>>
+    fun subscribeEventRecords(chainId: ChainId): Flow<AtBlock<List<EventRecord>>>
 }
 
 internal class RemoteEventsRepository(
@@ -104,9 +107,9 @@ internal class RemoteEventsRepository(
         }
     }
 
-    override fun subscribeEventRecords(chainId: ChainId): Flow<List<EventRecord>> {
+    override fun subscribeEventRecords(chainId: ChainId): Flow<AtBlock<List<EventRecord>>> {
         return remoteStorageSource.subscribe(chainId) {
-            metadata.system.events.observeNonNull()
+            metadata.system.events.observeNonNullWithBlockHash()
         }
     }
 

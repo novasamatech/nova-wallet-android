@@ -12,9 +12,11 @@ import java.util.Collections
 
 interface LazyAsyncMultiCache<K, V> {
 
-    suspend fun getOrCompute(keys: List<K>): Map<K, V>
+    suspend fun getOrCompute(keys: Collection<K>): Map<K, V>
 
     suspend fun put(key: K, value: V)
+
+    suspend fun putAll(map: Map<K, V>)
 }
 
 /**
@@ -41,7 +43,7 @@ private class RealLazyAsyncMultiCache<K, V>(
     private val mutex = Mutex()
     private val cache = mutableMapOf<K, V>()
 
-    override suspend fun getOrCompute(keys: List<K>): Map<K, V> {
+    override suspend fun getOrCompute(keys: Collection<K>): Map<K, V> {
         mutex.withLock {
             Log.d(debugLabel, "Requested to fetch ${keys.size} keys")
 
@@ -67,6 +69,12 @@ private class RealLazyAsyncMultiCache<K, V>(
     override suspend fun put(key: K, value: V) {
         mutex.withLock {
             cache[key] = value
+        }
+    }
+
+    override suspend fun putAll(map: Map<K, V>) {
+        mutex.withLock {
+            cache.putAll(map)
         }
     }
 

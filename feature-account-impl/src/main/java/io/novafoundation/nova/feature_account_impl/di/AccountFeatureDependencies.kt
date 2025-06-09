@@ -61,6 +61,7 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -132,6 +133,8 @@ interface AccountFeatureDependencies {
     val addressSchemeFormatter: AddressSchemeFormatter
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val extrinsicWalk: ExtrinsicWalk
 
     fun appLinksProvider(): AppLinksProvider
 

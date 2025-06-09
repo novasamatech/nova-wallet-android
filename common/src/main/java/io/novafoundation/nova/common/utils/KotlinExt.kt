@@ -543,6 +543,10 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     return newList
 }
 
+fun <K, V> MutableMap<K, V>.put(entry: Pair<K, V>) {
+    put(entry.first, entry.second)
+}
+
 fun <T> Set<T>.added(toAdd: T): Set<T> {
     return toMutableSet().apply { add(toAdd) }
 }
