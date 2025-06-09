@@ -91,7 +91,6 @@ class RealMetaAccountTypePresentationMapper(
             LightMetaAccount.Type.LEDGER -> R.drawable.ic_ledger.asTintedIcon(canApplyOwnTint = true)
             LightMetaAccount.Type.PROXIED -> R.drawable.ic_proxy.asTintedIcon(canApplyOwnTint = true)
 
-            // TODO multisig: replace ic_multisig with actual icon
             LightMetaAccount.Type.MULTISIG -> R.drawable.ic_multisig.asTintedIcon(canApplyOwnTint = true)
         }
     }
