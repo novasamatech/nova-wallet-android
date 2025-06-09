@@ -36,6 +36,7 @@ sealed interface MetaAccountListingItem {
 
     class Multisig(
         val signatory: MetaAccount,
+        val singleChain: Chain?, // null in case multisig is universal
         override val totalBalance: BigDecimal,
         override val currency: Currency,
         override val metaAccount: MultisigMetaAccount,

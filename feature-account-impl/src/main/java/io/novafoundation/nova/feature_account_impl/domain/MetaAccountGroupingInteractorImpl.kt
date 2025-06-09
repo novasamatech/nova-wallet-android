@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccou
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
+import io.novafoundation.nova.feature_account_api.domain.model.singleChainId
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -120,10 +121,10 @@ class MetaAccountGroupingInteractorImpl(
             totalInPlanks.amountFromPlanks(it.precision) * it.rate.orZero()
         }
 
-        return when {
-            metaAccount is ProxiedMetaAccount -> {
+        return when (metaAccount) {
+            is ProxiedMetaAccount -> {
                 val proxyMetaAccount = allMetaAccounts.firstOrNull { it.id == metaAccount.proxy.proxyMetaId } ?: return null
-                val proxyChain = metaAccount.proxy.chainId.let(chains::getValue)
+                val proxyChain = metaAccount.proxy.chainId.let(chains::get) ?: return null
 
                 MetaAccountListingItem.Proxied(
                     proxyMetaAccount = proxyMetaAccount,
@@ -135,15 +136,19 @@ class MetaAccountGroupingInteractorImpl(
                 )
             }
 
-            metaAccount is MultisigMetaAccount -> {
+            is MultisigMetaAccount -> {
                 val signatoryMetaAccount = allMetaAccounts.firstOrNull { it.id == metaAccount.signatoryMetaId } ?: return null
+
+                val singleChainId = metaAccount.availability.singleChainId()
+                val singleChain = singleChainId?.let { chains[it] ?: return null }
 
                 MetaAccountListingItem.Multisig(
                     signatory = signatoryMetaAccount,
                     metaAccount = metaAccount,
                     hasUpdates = hasUpdates,
                     totalBalance = totalBalance,
-                    currency = selectedCurrency
+                    currency = selectedCurrency,
+                    singleChain = singleChain
                 )
             }
 
