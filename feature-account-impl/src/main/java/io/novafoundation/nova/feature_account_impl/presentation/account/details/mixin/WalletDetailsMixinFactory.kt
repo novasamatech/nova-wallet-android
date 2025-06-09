@@ -9,8 +9,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccoun
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 

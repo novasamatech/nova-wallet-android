@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
+package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated
 
 import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
@@ -21,13 +21,21 @@ class MultisigFormatter @Inject constructor(
 ) {
 
     suspend fun formatSignatorySubtitle(signatory: MetaAccount): CharSequence {
-        // TODO multisig: this does db request for each icon. We should probably batch it. Same with proxieds
-        val icon = walletUiUseCase.walletIcon(signatory, 16)
+        val icon = makeAccountDrawable(signatory)
+        return formatSignatorySubtitle(signatory, icon)
+    }
+
+    fun formatSignatorySubtitle(signatory: MetaAccount, icon: Drawable): CharSequence {
         val formattedProxyMetaAccount = formatAccount(signatory.name, icon)
 
         return SpannableStringBuilder(resourceManager.getString(R.string.multisig_signatory))
             .appendSpace()
             .append(formattedProxyMetaAccount)
+    }
+
+    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
+        // TODO multisig: this does db request for each icon. We should probably batch it. Same with proxieds
+        return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
     }
 
     // TODO multisig: refactor duplication with ProxyFormatter

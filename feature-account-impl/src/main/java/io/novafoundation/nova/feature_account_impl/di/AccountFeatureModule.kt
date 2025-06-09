@@ -118,10 +118,10 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Real
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.addressActions.AddressActionsMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
@@ -565,8 +565,9 @@ class AccountFeatureModule {
         walletUseCase: WalletUiUseCase,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         proxyFormatter: ProxyFormatter,
+        multisigFormatter: MultisigFormatter,
         resourceManager: ResourceManager
-    ) = DelegatedMetaAccountUpdatesListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, proxyFormatter, resourceManager)
+    ) = DelegatedMetaAccountUpdatesListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, proxyFormatter, multisigFormatter, resourceManager)
 
     @Provides
     @FeatureScope

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
+package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated
 
 import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
@@ -59,6 +59,6 @@ class ProxyFormatter(
     }
 
     suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
-        return walletUiUseCase.walletIcon(metaAccount, 16)
+        return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
     }
 }

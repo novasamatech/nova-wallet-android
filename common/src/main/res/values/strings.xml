@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <!--<string name="delegated_accounts_fragment_title">Delegated accounts update</string>-->
+    <string name="delegated_accounts_fragment_title">Wallet list has been updated</string>
+
+    <!--<string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>-->
+    <string name="delegated_accounts_fragment_explanation">Proxy and Multisig accounts auto-detected and organized for you. Manage anytime in Settings.</string>
+
+    <!--<string name="proxy_about">What is a Proxy?</string>-->
+
+    <string name="account_proxied">Proxied</string>
+    <string name="active_multisig_title">Shared control</string>
+
+    <!--<string name="proxieds_updates_deactivated_title">No longer valid</string>-->
+    <string name="delegation_updates_deactivated_title">No longer valid</string>
+
     <string name="multisig_operation_details_call_data_not_found">Call-data not found</string>
 
     <string name="multisig_operation_details_approve">Approve</string>
@@ -820,12 +835,6 @@
     <string name="proxy_signing_not_enough_permission_message">%1$s delegated %2$s only for %3$s</string>
 
     <string name="proxy_signing_is_not_supported_message">Proxied wallets do not support signing arbitrary messages — only transactions</string>
-
-    <string name="delegated_accounts_fragment_title">Delegated accounts update</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>
-    <string name="proxy_about">What is a Proxy?</string>
-
-    <string name="proxieds_updates_deactivated_title">No longer valid</string>
 
     <string name="proxy_wallet_type">%s proxy</string>
     <string name="account_proxy_type_any">Any</string>

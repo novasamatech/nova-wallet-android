@@ -415,3 +415,15 @@ fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharS
 fun View.bounds(): Rect {
     return Rect(0, 0, width, height)
 }
+
+fun TabLayout.setTabSelectedListener(callback: (TabLayout.Tab) -> Unit) {
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            callback(tab)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+        override fun onTabReselected(tab: TabLayout.Tab) {}
+    })
+}
