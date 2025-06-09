@@ -10,12 +10,12 @@ import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
+import io.novafoundation.nova.feature_account_api.domain.model.AccountDelegation
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountListingItem
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.ProxiedAndProxyMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.metaAccountTypeComparator
 import io.novafoundation.nova.feature_account_api.domain.model.singleChainId
@@ -75,7 +75,7 @@ class MetaAccountGroupingInteractorImpl(
             .toSortedMap(metaAccountTypeComparator())
     }
 
-    override fun updatedProxieds(): Flow<GroupedList<LightMetaAccount.Status, ProxiedAndProxyMetaAccount>> {
+    override fun updatedDelegates(): Flow<GroupedList<LightMetaAccount.Status, AccountDelegation>> {
         return combine(
             metaAccountsUpdatesRegistry.observeUpdates(),
             accountRepository.allMetaAccountsFlow(),
@@ -84,16 +84,24 @@ class MetaAccountGroupingInteractorImpl(
             val metaById = metaAccounts.associateBy(MetaAccount::id)
 
             metaAccounts
-                .filterIsInstance<ProxiedMetaAccount>()
                 .filter { updatedMetaIds.contains(it.id) }
                 .mapNotNull {
-                    ProxiedAndProxyMetaAccount(
-                        it,
-                        metaById[it.proxy.proxyMetaId] ?: return@mapNotNull null,
-                        chainsById[it.proxy.chainId] ?: return@mapNotNull null
-                    )
+                    when (it) {
+                        is ProxiedMetaAccount -> AccountDelegation.Proxy(
+                            it,
+                            metaById[it.proxy.proxyMetaId] ?: return@mapNotNull null,
+                            chainsById[it.proxy.chainId] ?: return@mapNotNull null
+                        )
+
+                        is MultisigMetaAccount -> AccountDelegation.Multisig(
+                            it,
+                            metaById[it.signatoryMetaId] ?: return@mapNotNull null
+                        )
+
+                        else -> null
+                    }
                 }
-                .groupBy { it.proxied.status }
+                .groupBy { it.delegator.status }
                 .toSortedMap(metaAccountStateComparator())
         }
     }
