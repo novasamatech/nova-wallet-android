@@ -75,7 +75,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -92,7 +92,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -113,7 +113,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -134,7 +134,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -166,7 +166,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -198,7 +198,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)

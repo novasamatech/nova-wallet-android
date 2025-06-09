@@ -159,6 +159,8 @@ internal class RealMultisigChainPendingOperationsSyncer(
         eventsRepository.subscribeEventRecords(chain.id).map { eventRecords ->
             val newCallHashes = eventRecords.events().findOurNewMultisigs(accountId)
             pendingCallHashesFlow.update { it + newCallHashes }
+
+
         }
             .catch { Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to detect new pending operations from events", it) }
             .launchIn(this)

@@ -593,13 +593,17 @@ fun String.toUuid() = UUID.fromString(this)
 val Int.kilobytes: BigInteger
     get() = this.toBigInteger() * 1024.toBigInteger()
 
-operator fun ByteArray.compareTo(other: ByteArray): Int {
+fun ByteArray.compareTo(other: ByteArray, unsigned: Boolean): Int {
     if (size != other.size) {
         return size - other.size
     }
 
     for (i in 0 until size) {
-        val result = this[i].compareTo(other[i])
+        val result = if (unsigned) {
+            this[i].toUByte().compareTo(other[i].toUByte())
+        } else {
+            this[i].compareTo(other[i])
+        }
 
         if (result != 0) {
             return result
@@ -609,7 +613,7 @@ operator fun ByteArray.compareTo(other: ByteArray): Int {
     return 0
 }
 
-fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }
+fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b, unsigned = false) }
 
 inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
     val childScope = childScope()

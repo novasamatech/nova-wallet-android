@@ -13,6 +13,8 @@ import java.util.Collections
 interface LazyAsyncMultiCache<K, V> {
 
     suspend fun getOrCompute(keys: List<K>): Map<K, V>
+
+    suspend fun put(key: K, value: V)
 }
 
 /**
@@ -59,6 +61,12 @@ private class RealLazyAsyncMultiCache<K, V>(
 
             // Return the view of the whole cache to avoid extra allocations of the map
             return Collections.unmodifiableMap(cache)
+        }
+    }
+
+    override suspend fun put(key: K, value: V) {
+        mutex.withLock {
+            cache[key] = value
         }
     }
 

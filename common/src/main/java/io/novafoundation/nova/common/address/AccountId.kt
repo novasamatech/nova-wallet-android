@@ -11,7 +11,7 @@ class AccountIdKey(val value: AccountId) : Comparable<AccountIdKey> {
     companion object;
 
     override fun compareTo(other: AccountIdKey): Int {
-        return value.compareTo(other.value)
+        return value.compareTo(other.value, unsigned = false)
     }
 
     override fun equals(other: Any?): Boolean {
