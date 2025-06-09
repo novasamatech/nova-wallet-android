@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.repository.datasource
 
+import android.util.Log
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.KeyPairSchema
@@ -36,10 +37,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -69,11 +73,9 @@ class AccountDataSourceImpl(
         }
     }
 
-    private val selectedMetaAccountLocal = metaAccountDao.selectedMetaAccountInfoFlow()
-        .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
-
-    // TODO multisig: add distinct until changed so `selectedMetaAccountFlow` wont emit when something else in `meta_accounts` table changes
-    private val selectedMetaAccountFlow = selectedMetaAccountLocal
+    private val selectedMetaAccountFlow = metaAccountDao.selectedMetaAccountInfoFlow()
+        .distinctUntilChanged()
+        .onEach { Log.d("AccountDataSourceImpl", "Current meta account: ${it?.metaAccount?.id}") }
         .filterNotNull()
         .map(accountMappers::mapMetaAccountLocalToMetaAccount)
         .inBackground()
