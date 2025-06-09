@@ -52,7 +52,7 @@ class EventsRealtimeCallDataWatcher(
 
     override val realtimeCallData = MutableStateFlow<Map<MultiChainCallHash, GenericCall.Instance>>(emptyMap())
 
-    override val newMultisigEvents= MutableSharedFlow<MultiChainMultisigEvent>(extraBufferCapacity = 10)
+    override val newMultisigEvents = MutableSharedFlow<MultiChainMultisigEvent>(extraBufferCapacity = 10)
 
     init {
         launch {

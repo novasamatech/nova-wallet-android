@@ -152,7 +152,7 @@ class AccountDataSourceImpl(
     }
 
     override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
-       return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
+        return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
     }
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
