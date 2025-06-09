@@ -128,7 +128,7 @@ WalletDetailsInteractor(
     }
 
     private fun createAccountInChainOrNull(chain: Chain, metaAccount: MetaAccount): AccountInChain? {
-       val accountInChain = createAccountInChain(chain, metaAccount)
+        val accountInChain = createAccountInChain(chain, metaAccount)
         return accountInChain.takeIf { it.hasChainAccount }
     }
 }

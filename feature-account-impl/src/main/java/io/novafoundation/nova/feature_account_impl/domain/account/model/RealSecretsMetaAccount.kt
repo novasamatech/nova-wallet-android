@@ -37,7 +37,8 @@ class RealSecretsMetaAccount(
     status = status,
     chainAccounts = chainAccounts,
     parentMetaId = parentMetaId
-), SecretsMetaAccount {
+),
+    SecretsMetaAccount {
 
     override fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
         return when {
