@@ -119,7 +119,7 @@ class BalanceListFragment :
 
         viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                binder.balanceListAssets?.invalidateItemDecorations()
+                binder.balanceListAssets.invalidateItemDecorations()
             }
         }
 
