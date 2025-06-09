@@ -53,22 +53,4 @@ open class DefaultMetaAccount(
             else -> substratePublicKey
         }
     }
-
-    override fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
-        return when {
-            hasChainAccountIn(chain.id) -> {
-                val cryptoType = chainAccounts.getValue(chain.id).cryptoType ?: return null
-
-                if (chain.isEthereumBased) {
-                    MultiChainEncryption.Ethereum
-                } else {
-                    MultiChainEncryption.substrateFrom(cryptoType)
-                }
-            }
-
-            chain.isEthereumBased -> MultiChainEncryption.Ethereum
-
-            else -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
-        }
-    }
 }

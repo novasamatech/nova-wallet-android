@@ -80,14 +80,6 @@ class RealMultisigMetaAccount(
         }
     }
 
-    override fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
-        return if (isSupported(chain)) {
-            super.multiChainEncryptionIn(chain)
-        } else {
-            null
-        }
-    }
-
     private fun isSupported(chain: Chain): Boolean {
         return multisigRepository.supportsMultisigSync(chain)
     }
