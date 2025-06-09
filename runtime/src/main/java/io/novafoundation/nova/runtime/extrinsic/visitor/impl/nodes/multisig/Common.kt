@@ -29,7 +29,6 @@ fun generateMultisigAddress(
 
         writeCompact(sortedAccounts.size)
         sortedAccounts.forEach {
-
             directWrite(it.value)
         }
 

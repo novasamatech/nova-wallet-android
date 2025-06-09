@@ -10,9 +10,7 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.runtime.storage.source.query.AtBlock
-import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNullWithBlockHash
-import io.novafoundation.nova.runtime.storage.source.query.api.observeWithBlockHash
 import io.novafoundation.nova.runtime.storage.typed.events
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull

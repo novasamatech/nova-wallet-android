@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindGenericCal
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.proxy
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.EventCountingContext
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedCallNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedExtrinsicVisit

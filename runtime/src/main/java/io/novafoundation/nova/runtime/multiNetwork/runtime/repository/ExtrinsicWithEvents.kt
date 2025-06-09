@@ -85,7 +85,6 @@ fun List<GenericEvent.Instance>.findEvents(module: String, event: String): List<
     return filter { it.instanceOf(module, event) }
 }
 
-
 fun List<GenericEvent.Instance>.findEvents(module: String, vararg events: String): List<GenericEvent.Instance> {
     return filter { it.instanceOf(module, *events) }
 }

@@ -32,13 +32,13 @@ interface QueryableStorageEntry0<T : Any> {
 }
 
 context(StorageQueryContext)
-fun <V: Any> QueryableStorageEntry0<V>.observeWithBlockHash(): Flow<AtBlock<V?>> {
+fun <V : Any> QueryableStorageEntry0<V>.observeWithBlockHash(): Flow<AtBlock<V?>> {
     return observeWithRaw().map { it.toAtBlock() }
 }
 
 context(StorageQueryContext)
 @Suppress("UNCHECKED_CAST")
-fun <V: Any> QueryableStorageEntry0<V>.observeNonNullWithBlockHash(): Flow<AtBlock<V>> {
+fun <V : Any> QueryableStorageEntry0<V>.observeNonNullWithBlockHash(): Flow<AtBlock<V>> {
     return observeWithBlockHash().filter { it.value != null } as Flow<AtBlock<V>>
 }
 

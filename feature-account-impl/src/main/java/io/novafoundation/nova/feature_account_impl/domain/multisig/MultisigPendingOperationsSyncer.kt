@@ -36,7 +36,6 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvents
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -198,7 +197,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private suspend fun tryAddNewCallDatas(newCallHashes: List<CallHash>, blockHash: BlockHash): Result<Unit> = runCatching {
         if (newCallHashes.isEmpty()) return@runCatching
 
-        Log.d("RealMultisigChainPendingOperationsSyncer", "Detected own multisig at block ${blockHash}, trying to find call-data")
+        Log.d("RealMultisigChainPendingOperationsSyncer", "Detected own multisig at block $blockHash, trying to find call-data")
 
         val blockWithEvents = eventsRepository.getBlockEvents(chain.id, blockHash)
 
