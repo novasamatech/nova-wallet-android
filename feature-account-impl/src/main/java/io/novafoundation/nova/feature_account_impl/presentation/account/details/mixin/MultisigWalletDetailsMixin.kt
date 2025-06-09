@@ -46,19 +46,11 @@ class MultisigWalletDetailsMixin(
         )
     }
 
-    override fun accountProjectionsFlow(): Flow<List<Any?>> = flowOfAll {
-        // TODO multisig: select chains to display
-        val proxiedChainIds = metaAccount.chainAccounts.keys
-        val chains = interactor.getAllChains()
-            .filter { it.id in proxiedChainIds }
+    override fun accountProjectionsFlow(): Flow<List<Any?>> = interactor.allPresentChainProjections(metaAccount).map { accounts ->
+        val availableActions = availableAccountActions.first()
 
-        interactor.chainProjectionsFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator()).map { accounts ->
-            val availableActions = availableAccountActions.first()
-
-            accounts.toListWithHeaders(
-                keyMapper = { _, _ -> null },
-                valueMapper = { chainAccount -> accountFormatter.formatChainAccountProjection(chainAccount, availableActions) }
-            )
+        accounts.map {
+            accountFormatter.formatChainAccountProjection(it, availableActions)
         }
     }
 }

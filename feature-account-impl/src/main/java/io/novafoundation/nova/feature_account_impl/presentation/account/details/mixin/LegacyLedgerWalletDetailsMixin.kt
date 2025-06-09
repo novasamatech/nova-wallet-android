@@ -63,7 +63,7 @@ class LegacyLedgerWalletDetailsMixin(
         val chains = interactor.getAllChains()
             .filter { it.id in ledgerSupportedChainIds }
 
-        interactor.chainProjectionsFlow(
+        interactor.chainProjectionsBySourceFlow(
             metaAccount.id,
             chains,
             hasAccountComparator().withChainComparator()

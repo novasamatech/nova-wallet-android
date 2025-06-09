@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_multisig_group_label">shared control (multisig)</string>
 
     <!--<string name="delegated_accounts_fragment_title">Delegated accounts update</string>-->
     <string name="delegated_accounts_fragment_title">Wallet list has been updated</string>
@@ -29,7 +30,7 @@
     <string name="multisig_operations_unknown_calldata">[Unknown operation] (%s)</string>
 
     <string name="account_multisig">Multisig</string>
-    <string name="multisig_wallet_details_info_warning">This account is a multisig:</string>
+    <string name="multisig_wallet_details_info_warning">Transactions from this wallet require approval from multiple signatories. Your account is one of the signatories:</string>
     <string name="multisig_signatory">Signatory:</string>
 
     <string name="multisig_pending_operations">Pending operations</string>

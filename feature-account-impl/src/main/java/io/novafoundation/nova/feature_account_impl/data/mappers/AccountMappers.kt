@@ -10,6 +10,7 @@ import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MultisigTypeExtras
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.GenericLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.LegacyLedgerMetaAccount
@@ -22,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 class AccountMappers(
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val gson: Gson,
+    private val multisigRepository: MultisigRepository
 ) {
 
     suspend fun mapMetaAccountsLocalToMetaAccounts(joinedMetaAccountInfo: List<JoinedMetaAccountInfo>): List<MetaAccount> {
@@ -160,7 +162,8 @@ class AccountMappers(
                         otherSignatories = multisigTypeExtras.otherSignatories,
                         threshold = multisigTypeExtras.threshold,
                         signatoryAccountId = multisigTypeExtras.signatoryAccountId,
-                        parentMetaId = parentMetaId
+                        parentMetaId = parentMetaId,
+                        multisigRepository = multisigRepository
                     )
                 }
             }

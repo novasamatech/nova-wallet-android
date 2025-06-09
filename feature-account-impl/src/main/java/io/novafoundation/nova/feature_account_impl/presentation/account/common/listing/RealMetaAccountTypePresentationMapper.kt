@@ -55,7 +55,7 @@ class RealMetaAccountTypePresentationMapper(
 
             LightMetaAccount.Type.PROXIED -> resourceManager.getString(R.string.account_proxieds)
 
-            LightMetaAccount.Type.MULTISIG -> resourceManager.getString(R.string.account_multisig)
+            LightMetaAccount.Type.MULTISIG -> resourceManager.getString(R.string.account_multisig_group_label)
         }
 
         return if (icon != null && label != null) {
