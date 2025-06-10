@@ -111,6 +111,9 @@ interface MetaAccount : LightMetaAccount {
     fun accountIdIn(chain: Chain): AccountId?
 
     fun publicKeyIn(chain: Chain): ByteArray?
+}
+
+interface SecretsMetaAccount : MetaAccount {
 
     fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption?
 }
@@ -182,6 +185,10 @@ fun MetaAccount.requireAccountIdIn(chain: Chain): ByteArray {
 
 fun MetaAccount.requireAccountIdKeyIn(chain: Chain): AccountIdKey {
     return requireAccountIdIn(chain).intoKey()
+}
+
+fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
+    return (this as? SecretsMetaAccount)?.multiChainEncryptionIn(chain)
 }
 
 fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType? {

@@ -4,10 +4,8 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
-import io.novafoundation.nova.feature_account_api.domain.model.substrateFrom
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 open class DefaultMetaAccount(
@@ -51,24 +49,6 @@ open class DefaultMetaAccount(
             hasChainAccountIn(chain.id) -> chainAccounts.getValue(chain.id).publicKey
             chain.isEthereumBased -> ethereumPublicKey
             else -> substratePublicKey
-        }
-    }
-
-    override fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
-        return when {
-            hasChainAccountIn(chain.id) -> {
-                val cryptoType = chainAccounts.getValue(chain.id).cryptoType ?: return null
-
-                if (chain.isEthereumBased) {
-                    MultiChainEncryption.Ethereum
-                } else {
-                    MultiChainEncryption.substrateFrom(cryptoType)
-                }
-            }
-
-            chain.isEthereumBased -> MultiChainEncryption.Ethereum
-
-            else -> substrateCryptoType?.let(MultiChainEncryption.Companion::substrateFrom)
         }
     }
 }

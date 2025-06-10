@@ -71,6 +71,7 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicS
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
+import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
@@ -351,9 +352,10 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideAccountMappers(
         ledgerMigrationTracker: LedgerMigrationTracker,
+        multisigRepository: MultisigRepository,
         gson: Gson
     ): AccountMappers {
-        return AccountMappers(ledgerMigrationTracker, gson)
+        return AccountMappers(ledgerMigrationTracker, gson, multisigRepository)
     }
 
     @Provides
@@ -365,7 +367,6 @@ class AccountFeatureModule {
         secretStoreV1: SecretStoreV1,
         accountDataMigration: AccountDataMigration,
         metaAccountDao: MetaAccountDao,
-        chainRegistry: ChainRegistry,
         secretsMetaAccountLocalFactory: SecretsMetaAccountLocalFactory,
         secretStoreV2: SecretStoreV2,
         accountMappers: AccountMappers,

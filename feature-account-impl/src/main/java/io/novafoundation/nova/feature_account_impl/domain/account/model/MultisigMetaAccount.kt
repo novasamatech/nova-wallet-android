@@ -5,8 +5,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigAvailability
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class RealMultisigMetaAccount(
     id: Long,
@@ -22,6 +24,7 @@ class RealMultisigMetaAccount(
     override val signatoryAccountId: AccountIdKey,
     override val otherSignatories: List<AccountIdKey>,
     override val threshold: Int,
+    private val multisigRepository: MultisigRepository,
     parentMetaId: Long?
 ) : DefaultMetaAccount(
     id = id,
@@ -50,5 +53,33 @@ class RealMultisigMetaAccount(
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {
         // User cannot manually add accounts to multisig meta account
         return false
+    }
+
+    override fun hasAccountIn(chain: Chain): Boolean {
+        return if (isSupported(chain)) {
+            super.hasAccountIn(chain)
+        } else {
+            false
+        }
+    }
+
+    override fun accountIdIn(chain: Chain): AccountId? {
+        return if (isSupported(chain)) {
+            super.accountIdIn(chain)
+        } else {
+            null
+        }
+    }
+
+    override fun publicKeyIn(chain: Chain): ByteArray? {
+        return if (isSupported(chain)) {
+            super.publicKeyIn(chain)
+        } else {
+            null
+        }
+    }
+
+    private fun isSupported(chain: Chain): Boolean {
+        return multisigRepository.supportsMultisigSync(chain)
     }
 }

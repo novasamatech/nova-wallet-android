@@ -10,18 +10,21 @@ import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MultisigTypeExtras
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.GenericLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.LegacyLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.PolkadotVaultMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.RealMultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.RealProxiedMetaAccount
+import io.novafoundation.nova.feature_account_impl.domain.account.model.RealSecretsMetaAccount
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class AccountMappers(
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val gson: Gson,
+    private val multisigRepository: MultisigRepository
 ) {
 
     suspend fun mapMetaAccountsLocalToMetaAccounts(joinedMetaAccountInfo: List<JoinedMetaAccountInfo>): List<MetaAccount> {
@@ -51,7 +54,21 @@ class AccountMappers(
 
         return with(joinedMetaAccountInfo.metaAccount) {
             when (val type = mapMetaAccountTypeFromLocal(type)) {
-                LightMetaAccount.Type.SECRETS,
+                LightMetaAccount.Type.SECRETS -> RealSecretsMetaAccount(
+                    id = id,
+                    globallyUniqueId = globallyUniqueId,
+                    chainAccounts = chainAccounts,
+                    substratePublicKey = substratePublicKey,
+                    substrateCryptoType = substrateCryptoType,
+                    substrateAccountId = substrateAccountId,
+                    ethereumAddress = ethereumAddress,
+                    ethereumPublicKey = ethereumPublicKey,
+                    isSelected = isSelected,
+                    name = name,
+                    status = mapMetaAccountStateFromLocal(status),
+                    parentMetaId = parentMetaId
+                )
+
                 LightMetaAccount.Type.WATCH_ONLY -> DefaultMetaAccount(
                     id = id,
                     globallyUniqueId = globallyUniqueId,
@@ -160,7 +177,8 @@ class AccountMappers(
                         otherSignatories = multisigTypeExtras.otherSignatories,
                         threshold = multisigTypeExtras.threshold,
                         signatoryAccountId = multisigTypeExtras.signatoryAccountId,
-                        parentMetaId = parentMetaId
+                        parentMetaId = parentMetaId,
+                        multisigRepository = multisigRepository
                     )
                 }
             }

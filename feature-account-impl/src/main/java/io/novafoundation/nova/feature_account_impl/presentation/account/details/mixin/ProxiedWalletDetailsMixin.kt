@@ -54,7 +54,7 @@ class ProxiedWalletDetailsMixin(
         val chains = interactor.getAllChains()
             .filter { it.id in proxiedChainIds }
 
-        interactor.chainProjectionsFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator())
+        interactor.chainProjectionsBySourceFlow(metaAccount.id, chains, hasAccountComparator().withChainComparator())
             .map { accounts ->
                 val availableActions = availableAccountActions.first()
 
