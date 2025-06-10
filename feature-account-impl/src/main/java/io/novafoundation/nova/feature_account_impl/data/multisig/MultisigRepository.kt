@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.fromHexOrThrow
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.fromHex
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.FindMultisigsApi
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.FindMultisigsRequest
@@ -37,12 +38,12 @@ interface MultisigRepository {
 
     suspend fun findMultisigAccounts(chain: Chain, accountIds: Set<AccountIdKey>): List<DiscoveredMultisig>
 
-    suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): List<CallHash>
+    suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash>
 
     suspend fun subscribePendingOperations(
         chain: Chain,
         accountIdKey: AccountIdKey,
-        operationIds: List<CallHash>
+        operationIds: Collection<CallHash>
     ): Flow<Map<CallHash, OnChainMultisig?>>
 
     /**
@@ -70,17 +71,17 @@ class RealMultisigRepository @Inject constructor(
         return api.findMultisigs(apiConfig.url, request).toDiscoveredMultisigs()
     }
 
-    override suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): List<CallHash> {
+    override suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash> {
         return remoteStorageSource.query(chain.id) {
             runtime.metadata.multisig.multisigs.keys(accountIdKey)
-                .map { it.second }
+                .mapToSet { it.second }
         }
     }
 
     override suspend fun subscribePendingOperations(
         chain: Chain,
         accountIdKey: AccountIdKey,
-        operationIds: List<CallHash>
+        operationIds: Collection<CallHash>
     ): Flow<Map<CallHash, OnChainMultisig?>> {
         return remoteStorageSource.subscribeBatched(chain.id) {
             val allKeys = operationIds.map { accountIdKey to it }

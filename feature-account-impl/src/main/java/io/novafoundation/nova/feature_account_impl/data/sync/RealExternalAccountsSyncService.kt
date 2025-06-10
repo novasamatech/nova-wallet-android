@@ -95,6 +95,8 @@ internal class RealExternalAccountsSyncService @Inject constructor(
     private suspend fun syncInternal(chain: Chain): Result<NonReachableUniversalIds?> {
         val dataSources = dataSourceFactories.mapNotNull { it.create(chain) }
         if (dataSources.isNotEmpty()) {
+            Log.d("ExternalAccountsDiscovery", "Created data sources for ${chain.name}: ${dataSources.map { it::class.simpleName }}")
+
             val aggregateSource = dataSources.aggregate()
             return sync(chain, aggregateSource)
         }

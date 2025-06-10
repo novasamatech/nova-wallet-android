@@ -5,6 +5,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisitor
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.BatchAllNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.ForceBatchNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.multisig.MultisigNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.proxy.ProxyNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -24,7 +25,14 @@ internal class RealExtrinsicWalk(
 
     companion object {
 
-        fun defaultNodes() = listOf(ProxyNode(), BatchAllNode(), ForceBatchNode())
+        fun defaultNodes() = listOf(
+            ProxyNode(),
+
+            BatchAllNode(),
+            ForceBatchNode(),
+
+            MultisigNode()
+        )
     }
 
     override suspend fun walk(
@@ -34,12 +42,12 @@ internal class RealExtrinsicWalk(
     ) {
         val runtime = chainRegistry.getRuntime(chainId)
 
-        val rootVisit = ExtrinsicVisit(
+        val rootVisit = NestedExtrinsicVisit(
             rootExtrinsic = source,
             call = source.extrinsic.call,
             success = source.isSuccess(),
             events = source.events,
-            origin = source.extrinsic.signer() ?: error("Unsigned extrinsic")
+            origin = source.extrinsic.signer() ?: error("Unsigned extrinsic"),
         )
 
         nestedVisit(runtime, visitor, rootVisit, depth = 0)
@@ -48,10 +56,13 @@ internal class RealExtrinsicWalk(
     private fun nestedVisit(
         runtime: RuntimeSnapshot,
         visitor: ExtrinsicVisitor,
-        visitedCall: ExtrinsicVisit,
+        visitedCall: NestedExtrinsicVisit,
         depth: Int,
     ) {
         val nestedNode = findNestedNode(visitedCall.call)
+        val publicVisit = visitedCall.toVisit(hasRegisteredNode = nestedNode != null)
+
+        visitor.visit(publicVisit)
 
         if (nestedNode == null) {
             val call = visitedCall.call
@@ -59,9 +70,7 @@ internal class RealExtrinsicWalk(
             val origin = visitedCall.origin
             val newLogger = IndentVisitorLogger(indent = depth + 1)
 
-            newLogger.info("Visiting leaf: $display, success: ${visitedCall.success}, origin: ${origin.toAddress(42)}")
-
-            visitor.visit(visitedCall)
+            newLogger.info("Visited leaf: $display, success: ${visitedCall.success}, origin: ${origin.toAddress(42)}")
         } else {
             val eventQueue = RealEventQueue(visitedCall.events)
             val newLogger = IndentVisitorLogger(indent = depth)
@@ -104,6 +113,10 @@ internal class RealExtrinsicWalk(
         return knownNodes.find { it.canVisit(call) }
     }
 
+    private fun NestedExtrinsicVisit.toVisit(hasRegisteredNode: Boolean): ExtrinsicVisit {
+        return ExtrinsicVisit(rootExtrinsic, call, success, events, origin, hasRegisteredNode)
+    }
+
     private inner class RealVisitingContext(
         private val eventsSize: Int,
         private val depth: Int,
@@ -116,7 +129,7 @@ internal class RealExtrinsicWalk(
         override val eventQueue: MutableEventQueue
     ) : VisitingContext {
 
-        override fun nestedVisit(visit: ExtrinsicVisit) {
+        override fun nestedVisit(visit: NestedExtrinsicVisit) {
             return this@RealExtrinsicWalk.nestedVisit(runtime, visitor, visit, depth + 1)
         }
 

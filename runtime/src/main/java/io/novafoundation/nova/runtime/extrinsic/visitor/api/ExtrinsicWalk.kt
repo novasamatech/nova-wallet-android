@@ -46,5 +46,10 @@ class ExtrinsicVisit(
     /**
      * Origin's account id that this call has been dispatched with
      */
-    val origin: AccountId
+    val origin: AccountId,
+
+    /**
+     * Whether this visit is related to a registered node or not
+     */
+    val hasRegisteredNode: Boolean = false
 )

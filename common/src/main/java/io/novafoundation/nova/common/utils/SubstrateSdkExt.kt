@@ -30,6 +30,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extr
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.findExplicitOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
@@ -408,6 +409,10 @@ fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Bo
     return functionCandidates.any { candidate -> candidate != null && function == candidate }
 }
 
+fun Extrinsic.Instance.isSigned(): Boolean {
+    return signer() != null
+}
+
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
@@ -415,6 +420,8 @@ fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boole
 fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String): Boolean = moduleName == module.name && function.name in callNames
 
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
+
+fun GenericEvent.Instance.instanceOf(moduleName: String, vararg eventNames: String): Boolean = moduleName == module.name && event.name in eventNames
 
 fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == this.event.index
 
