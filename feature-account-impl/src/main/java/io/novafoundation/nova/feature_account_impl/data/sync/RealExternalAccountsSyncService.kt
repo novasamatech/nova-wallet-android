@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.isUniversal
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_impl.BuildConfig
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
@@ -230,6 +229,24 @@ internal class RealExternalAccountsSyncService @Inject constructor(
             controllersByAccountId.put(accountId, metaAccounts)
         }
 
+        val controllersById = mutableMapOf<Long, MetaAccount>()
+        allAccounts.onEach { metaAccount ->
+            controllersById[metaAccount.id] = metaAccount
+        }
+
+        fun signingPath(metaAccount: MetaAccount): List<AccountIdKey> {
+            val path = mutableListOf(metaAccount.requireAccountIdKeyIn(chain))
+            var current = metaAccount
+
+            while (current.parentMetaId != null) {
+                val parent = controllersById[current.parentMetaId] ?: break
+                path.add(parent.requireAccountIdKeyIn(chain))
+                current = parent
+            }
+
+            return path
+        }
+
         val reachableExistingMetaIds = mutableSetOf<Long>()
         val added = mutableListOf<AddAccountResult.AccountAdded>()
         directlyControlledAccounts.forEach { reachableExistingMetaIds.add(it.id) }
@@ -240,13 +257,24 @@ internal class RealExternalAccountsSyncService @Inject constructor(
             val controllers = controllersByAccountId[externalAccount.controllerAccountId].orEmpty()
 
             controllers.onEach controllersLoop@{ controller ->
+                val signingPath = signingPath(controller)
+                if (externalAccount.accountId in signingPath) {
+                    Log.v(
+                        "ExternalAccountsDiscovery",
+                        "Loop detected: ${externalAccount.address()} already present " +
+                            "in the signing path of ${externalAccount.controllerAddress()}"
+                    )
+                    return@controllersLoop
+                }
+
                 val controllerAsExternal = dataSource.getExternalCreatedAccount(controller)
                 val canControl = controllerAsExternal == null || controllerAsExternal.canControl(externalAccount)
 
                 if (!canControl) {
-                    val controlledAddress = chain.addressOf(externalAccount.accountId)
-                    val controllerAddress = chain.addressOf(externalAccount.controllerAccountId)
-                    Log.v("ExternalAccountsDiscovery", "Discovered account $controlledAddress cannot be controlled by $controllerAddress")
+                    Log.v(
+                        "ExternalAccountsDiscovery",
+                        "Discovered account ${externalAccount.address()} cannot be controlled by ${externalAccount.controllerAddress()}"
+                    )
                     return@controllersLoop
                 }
 
@@ -266,6 +294,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
                     position++
                     controllersByAccountId.put(externalAccount.accountId, newMetaAccount)
+                    controllersById[newMetaAccount.id] = newMetaAccount
                     added.add(addResult)
                 }
             }

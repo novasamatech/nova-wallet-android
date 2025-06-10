@@ -80,7 +80,7 @@ private class MultisigAccountsSyncDataSource(
         override val controllerAccountId: AccountIdKey,
         private val threshold: Int,
         private val otherSignatories: List<AccountIdKey>,
-        private val chain: Chain,
+        override val chain: Chain,
     ) : ExternalControllableAccount {
 
         override fun isRepresentedBy(localAccount: MetaAccount): Boolean {
