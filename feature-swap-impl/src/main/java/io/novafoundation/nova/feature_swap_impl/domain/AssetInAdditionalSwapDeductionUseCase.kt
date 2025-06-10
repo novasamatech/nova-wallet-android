@@ -30,7 +30,6 @@ class RealAssetInAdditionalSwapDeductionUseCase(
         val shouldKeepEdForAssetIn = !canDustAssetIn
 
         return if (shouldKeepEdForAssetIn) {
-            val chainIn = chainRegistry.getChain(assetIn.chainId)
             assetSourceRegistry.existentialDepositInPlanks(assetIn)
         } else {
             Balance.ZERO
