@@ -13,7 +13,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/a41fd96db045c299cf019e7cc0ffbf3f2a2d531c/chains/v22/chains_dev.json\""
+        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/chains_dev.json\""
         buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v3/assets_dev.json\""
         buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/chains_dev.json\""
         buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/detailsDev\""
