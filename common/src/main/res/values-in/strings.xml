@@ -1587,6 +1587,7 @@
     <string name="swap_execution_time">Waktu eksekusi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Anda harus menyisihkan setidaknya %s setelah membayar biaya jaringan %s karena Anda memegang token yang tidak mencukupi</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Anda harus menyisihkan setidaknya %s untuk menerima token %s</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Anda harus memiliki setidaknya %s di %s untuk menerima %s token</string>
     <string name="swap_failure_insufficient_balance_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan dan juga mengonversi %3$s ke %4$s untuk mencapai saldo minimum %5$s.</string>
     <string name="swap_failure_swap_max_button">Tukar maksimum</string>
