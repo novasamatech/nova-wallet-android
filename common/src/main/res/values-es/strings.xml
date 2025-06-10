@@ -1603,6 +1603,7 @@
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Puedes intercambiar hasta %1$s ya que necesitas pagar %2$s de tasa de red y también convertir %3$s a %4$s para cumplir con el saldo mínimo de %5$s.</string>
     <string name="swap_failure_swap_max_button">Intercambiar máximo</string>
     <string name="swap_failure_swap_min_button">Intercambiar mínimo</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Debes tener al menos %s en %s para recibir %s token</string>
     <string name="swap_failure_too_small_remaining_balance_message">Deberías dejar al menos %1$s en tu saldo. ¿Quieres realizar el intercambio completo agregando también el %2$s restante?</string>
     <string name="swap_failure_too_small_remaining_balance_title">El monto restante en tu balance es demasiado pequeño</string>
     <string name="swap_failure_too_small_remaining_balance_with_buy_ed_message">Deberías mantener al menos %1$s después de pagar %2$s de tasa de red y convertir %3$s a %4$s para cumplir con el saldo mínimo de %5$s.\n\n¿Quieres realizar el intercambio completo agregando también el %6$s restante?</string>

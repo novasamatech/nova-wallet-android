@@ -1587,6 +1587,7 @@
     <string name="swap_execution_time">Thời gian thực hiện</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Bạn cần giữ ít nhất %s sau khi trả phí mạng %s vì bạn giữ các token không đủ</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Bạn cần giữ ít nhất %s để nhận được token %s</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Bạn phải có ít nhất %s trên %s để nhận %s token</string>
     <string name="swap_failure_insufficient_balance_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả %2$s cho phí mạng.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả phí mạng %2$s và cũng chuyển đổi %3$s sang %4$s để giữ mức tối thiểu %5$s.</string>
     <string name="swap_failure_swap_max_button">Hoán đổi tối đa</string>

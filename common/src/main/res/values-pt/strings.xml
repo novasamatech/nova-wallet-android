@@ -1599,6 +1599,7 @@
     <string name="swap_execution_time">Tempo de execução</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Você deve manter pelo menos %s após pagar a taxa de rede %s, pois você está com tokens insuficientes</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Você deve manter pelo menos %s para receber o token %s</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Você deve ter pelo menos %s em %s para receber %s token</string>
     <string name="swap_failure_insufficient_balance_message">Você pode trocar até %1$s, pois você precisa pagar %2$s de taxa de rede.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Você pode trocar até %1$s, pois você precisa pagar %2$s de taxa de rede e também converter %3$s em %4$s para atender ao saldo mínimo de %5$s.</string>
     <string name="swap_failure_swap_max_button">Trocar máximo</string>

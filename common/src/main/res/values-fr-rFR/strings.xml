@@ -1599,6 +1599,7 @@
     <string name="swap_execution_time">Temps d\'exécution</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Vous devez conserver au moins %s après avoir payé %s de frais de réseau car vous détenez des tokens insuffisants</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Vous devez conserver au moins %s pour recevoir des tokens %s</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Vous devez avoir au moins %s sur %s pour recevoir %s jeton</string>
     <string name="swap_failure_insufficient_balance_message">Vous pouvez échanger jusqu\'à %1$s car vous devez payer %2$s pour les frais de réseau.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Vous pouvez échanger jusqu\'à %1$s car vous devez payer %2$s pour les frais de réseau et également convertir %3$s en %4$s pour atteindre le solde minimum de %5$s.</string>
     <string name="swap_failure_swap_max_button">Échanger max</string>

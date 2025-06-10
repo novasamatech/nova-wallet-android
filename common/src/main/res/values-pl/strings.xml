@@ -1623,6 +1623,7 @@
     <string name="swap_execution_time">Czas wykonania</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Powinieneś zachować co najmniej %s po opłaceniu %s opłaty sieciowej, ponieważ posiadasz niewystarczającą ilość tokenów</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Musisz zachować co najmniej %s, aby otrzymać token %s</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Musisz mieć co najmniej %s na %s, aby otrzymać %s token</string>
     <string name="swap_failure_insufficient_balance_message">Możesz zamienić do %1$s, ponieważ musisz zapłacić %2$s jako opłatę sieciową.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Możesz zamienić do %1$s, ponieważ musisz zapłacić %2$s jako opłatę sieciową oraz przekonwertować %3$s na %4$s, aby spełnić minimalny bilans %5$s.</string>
     <string name="swap_failure_swap_max_button">Zamień max</string>
