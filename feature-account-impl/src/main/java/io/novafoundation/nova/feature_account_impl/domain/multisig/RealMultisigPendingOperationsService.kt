@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
+import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.RealtimeCallDataWatcher
+import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.RealtimeCallDataWatcherFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +26,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-private const val CACHE_KEY = "RealMultisigPendingOperationsService"
+private const val OPERATIONS_SYNCER_CACHE_KEY = "OPERATIONS_SYNCER_CACHE_KEY"
+private const val CALL_DATA_SYNCER_CACHE_KEY = "CALL_DATA_SYNCER_CACHE_KEY"
 
 @FeatureScope
 internal class RealMultisigPendingOperationsService @Inject constructor(
@@ -33,6 +36,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     private val accountRepository: AccountRepository,
     private val multisigRepository: MultisigRepository,
     private val chainRegistry: ChainRegistry,
+    private val realtimeCallDataWatcherFactory: RealtimeCallDataWatcherFactory,
 ) : SharedComputation(computationalCache), MultisigPendingOperationsService {
 
     context(ComputationalScope)
@@ -57,27 +61,42 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
 
     context(ComputationalScope)
     private fun getCachedSyncer(): Flow<MultisigPendingOperationsSyncer> {
-        return cachedFlow(CACHE_KEY) {
+        return cachedFlow(OPERATIONS_SYNCER_CACHE_KEY) {
             accountRepository.selectedMetaAccountFlow().flatMapLatest {
                 parentCancellableFlowScope { scope ->
-                    createSyncer(it, scope)
+                    createSyncer(it, getCachedRealtimeCallDataWatcher(), scope)
                 }
             }
         }
     }
 
-    private suspend fun createSyncer(account: MetaAccount, scope: CoroutineScope): MultisigPendingOperationsSyncer {
+    context(ComputationalScope)
+    private suspend fun getCachedRealtimeCallDataWatcher(): RealtimeCallDataWatcher {
+        return cachedValue(CALL_DATA_SYNCER_CACHE_KEY) {
+            realtimeCallDataWatcherFactory.createOnlyMultisig(coroutineScope = this)
+        }
+    }
+
+    private suspend fun createSyncer(
+        account: MetaAccount,
+        callDataWatcher: RealtimeCallDataWatcher,
+        scope: CoroutineScope
+    ): MultisigPendingOperationsSyncer {
         return if (account is MultisigMetaAccount) {
-            createMultisigSynced(account, scope)
+            createMultisigSynced(account, callDataWatcher, scope)
         } else {
             NoOpSyncer()
         }
     }
 
-    private suspend fun createMultisigSynced(account: MultisigMetaAccount, scope: CoroutineScope): MultisigPendingOperationsSyncer {
+    private suspend fun createMultisigSynced(
+        account: MultisigMetaAccount,
+        callDataWatcher: RealtimeCallDataWatcher,
+        scope: CoroutineScope
+    ): MultisigPendingOperationsSyncer {
         val multisigChainSyncers = chainRegistry.enabledChains()
             .filter { chain -> multisigRepository.supportsMultisigSync(chain) }
-            .map { chain -> syncerFactory.create(chain, account, scope) }
+            .map { chain -> syncerFactory.create(chain, account, callDataWatcher, scope) }
 
         return MultiChainSyncer(multisigChainSyncers, scope)
     }

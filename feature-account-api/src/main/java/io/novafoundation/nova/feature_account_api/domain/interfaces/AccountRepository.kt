@@ -128,7 +128,7 @@ interface AccountRepository {
 
     suspend fun getActiveMetaAccountsQuantity(): Int
 
-    suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+    fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean>
 
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
 

@@ -81,7 +81,6 @@ class MultisigSigner(
 
         // TODO multisig: implement acknowledge and validation
         // 1. Balance is enough
-        // 2. There is no pending mst with this exact call
 //        if (isRootSigner) {
 //            acknowledgeProxyOperation(signatoryMetaAccount())
 //            validateExtrinsic(context.chain)

@@ -151,12 +151,12 @@ class AccountDataSourceImpl(
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
-    override suspend fun getActiveMetaAccountsQuantity(): Int {
-        return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
+    override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
+        return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
     }
 
-    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
-        return metaAccountDao.getMetaAccountIdsByType(mapMetaAccountTypeToLocal(type))
+    override suspend fun getActiveMetaAccountsQuantity(): Int {
+        return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
     }
 
     override suspend fun deleteProxiedMetaAccountsByChain(chainId: String) {
