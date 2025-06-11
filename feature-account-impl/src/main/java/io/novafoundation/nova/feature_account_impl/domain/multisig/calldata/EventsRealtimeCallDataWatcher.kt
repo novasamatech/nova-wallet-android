@@ -12,9 +12,9 @@ import io.novafoundation.nova.common.utils.put
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_api.domain.multisig.bindCallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.walkToList
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains

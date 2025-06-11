@@ -93,7 +93,7 @@ import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfers
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.api
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api
 
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents

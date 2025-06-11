@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.domain.multisig.calldata
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import kotlinx.coroutines.CoroutineScope

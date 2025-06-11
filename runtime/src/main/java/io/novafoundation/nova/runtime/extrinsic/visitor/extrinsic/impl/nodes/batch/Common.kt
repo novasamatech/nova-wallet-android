@@ -1,7 +1,7 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.batch
 
 import io.novafoundation.nova.common.utils.utility
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.VisitingContext
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.VisitingContext
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
