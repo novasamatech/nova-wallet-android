@@ -1599,6 +1599,7 @@
     <string name="swap_execution_time">Végrehajtási idő</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Nincs elegendő tokent a számládon. Legalább %s kell, hogy maradjon a(z) %s hálozati díj megfizetése után</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Legalább %s meg kell maradjon, ahhoz hogy %s tokent fogadhass</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">Legalább %s szükséges a %s hálózaton a %s token fogadásához</string>
     <string name="swap_failure_insufficient_balance_message">Legfeljebb %1$s értékben válthatsz, mivel fizetned kell %2$s hálózati díjat is.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Legfeljebb %1$s értékben válthatsz, mivel fizetned kell %2$s hálózati díjat és konverziót is végre kell hajts %3$s és %4$s között, hogy megmaradjon a(z) %5$s minimális egyenleged.</string>
     <string name="swap_failure_swap_max_button">Max. váltás</string>

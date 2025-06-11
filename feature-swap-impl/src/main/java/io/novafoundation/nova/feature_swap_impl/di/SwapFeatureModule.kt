@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.RealSwapAvaila
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.CanReceiveAssetOutValidationFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
@@ -114,9 +115,9 @@ class SwapFeatureModule {
         accountRepository: AccountRepository,
         buyTokenRegistry: TradeTokenRegistry,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
-        swapTransactionHistoryRepository: SwapTransactionHistoryRepository,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
-        assetsValidationContextFactory: AssetsValidationContext.Factory
+        assetsValidationContextFactory: AssetsValidationContext.Factory,
+        canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
     ): SwapInteractor {
         return SwapInteractor(
             priceImpactThresholds = priceImpactThresholds,
@@ -124,7 +125,7 @@ class SwapFeatureModule {
             buyTokenRegistry = buyTokenRegistry,
             crossChainTransfersUseCase = crossChainTransfersUseCase,
             accountRepository = accountRepository,
-            swapTransactionHistoryRepository = swapTransactionHistoryRepository,
+            canReceiveAssetOutValidationFactory = canReceiveAssetOutValidationFactory,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             assetsValidationContextFactory = assetsValidationContextFactory,
             tokenRepository = tokenRepository

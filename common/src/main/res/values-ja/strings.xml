@@ -1587,6 +1587,7 @@
     <string name="swap_execution_time">実行時間</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">十分なトークンを保持していないため、%sのネットワーク手数料を支払った後に少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%sトークンを受け取るために少なくとも%sを保持する必要があります</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">%sトークンを受け取るには、%s上に少なくとも%sが必要です</string>
     <string name="swap_failure_insufficient_balance_message">ネットワーク手数料として%2$sを支払うため、最大%1$sをスワップできます。</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">ネットワーク手数料として%2$sを支払う必要があり、さらに%3$sを%4$sに変換して%5$sの最低バランスを確保する必要があるため、最大%1$sをスワップできます。</string>
     <string name="swap_failure_swap_max_button">最大をスワップ</string>

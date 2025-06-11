@@ -1587,6 +1587,7 @@
     <string name="swap_execution_time">执行时间</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">您在支付%s网络费后至少应保留%s，因为您持有的代币不足</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">您必须至少保留%s，以接收%s代币</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">要接收 %s 代币，您必须在 %s 至少拥有 %s</string>
     <string name="swap_failure_insufficient_balance_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费并将%3$s兑换为%4$s，以满足%5$s的最低余额</string>
     <string name="swap_failure_swap_max_button">最大交换</string>

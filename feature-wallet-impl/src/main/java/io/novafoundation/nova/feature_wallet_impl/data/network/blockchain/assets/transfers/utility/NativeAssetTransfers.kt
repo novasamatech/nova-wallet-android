@@ -24,10 +24,6 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 
 class NativeAssetTransfers(
     chainRegistry: ChainRegistry,
@@ -50,19 +46,6 @@ class NativeAssetTransfers(
         )
 
         return accountInfo != null && accountInfo.consumers.isZero
-    }
-
-    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
-            val chain = chainRegistry.getChain(chainAsset.chainId)
-
-            storageDataSource.observe(
-                chainAsset.chainId,
-                keyBuilder = { getAccountInfoStorageKey(metaAccount, chain, it) },
-                binder = { it, runtime -> it?.let { bindAccountInfo(it, runtime) } }
-            ).filterNotNull()
-                .map { it.consumers.isZero }
-        }
     }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {

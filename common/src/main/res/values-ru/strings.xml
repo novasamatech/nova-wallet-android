@@ -1623,6 +1623,7 @@
     <string name="swap_execution_time">Время выполнения</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Вы должны сохранить как минимум %s после оплаты сетевой комиссии %s, поскольку вы храните не самодостаточные токены</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Вы должны сохранить как минимум %s, чтобы получить %s токены</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">У вас должно быть как минимум %s на %s, чтобы получить %s токен</string>
     <string name="swap_failure_insufficient_balance_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Вы можете обменять до %1$s так как вам нужно заплатить комиссию сети в размере %2$s, а также конвертировать %3$s в %4$s, чтобы сохранить минимальный баланс %5$s.</string>
     <string name="swap_failure_swap_max_button">Использовать максимум</string>
