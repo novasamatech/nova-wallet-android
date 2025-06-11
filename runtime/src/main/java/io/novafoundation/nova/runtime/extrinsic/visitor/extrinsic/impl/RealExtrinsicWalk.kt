@@ -1,12 +1,12 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl
 
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisitor
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.BatchAllNode
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.ForceBatchNode
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.multisig.MultisigNode
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.proxy.ProxyNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisitor
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.batch.BatchAllNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.batch.ForceBatchNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.multisig.MultisigNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.proxy.ProxyNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime

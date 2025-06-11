@@ -1,7 +1,7 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl
 
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisitor
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisitor
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot

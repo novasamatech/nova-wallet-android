@@ -1,9 +1,10 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.multisig.MultisigNode
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.multisig.generateMultisigAddress
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.RealExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.multisig.MultisigNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.multisig.generateMultisigAddress
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.test_shared.any
