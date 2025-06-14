@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.TrackAvailability.AVAILABLE
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -131,7 +132,7 @@ class RealChooseTrackInteractor(
 
             val userAccountId = accountRepository.requireIdOfSelectedMetaAccountIn(chain)
 
-            chainStateRepository.currentBlockNumberFlow(chain.id).map {
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf()).map {
                 val userVotings = governanceSource.convictionVoting.votingFor(userAccountId, chain.id)
 
                 val partition = partitionConstructor(userVotings, allTracks)

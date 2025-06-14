@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.storage.source.query.StorageKeyComponents
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
 import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
+import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
@@ -13,6 +14,8 @@ import kotlinx.coroutines.flow.filterNotNull
 typealias QueryableStorageBinder1<K, V> = (dynamicInstance: Any, key: K) -> V
 
 interface QueryableStorageEntry1<I, T> {
+
+    val storageEntry: StorageEntry
 
     context(StorageQueryContext)
     suspend fun keys(): List<I>
@@ -45,10 +48,12 @@ context(StorageQueryContext)
 fun <I, T : Any> QueryableStorageEntry1<I, T>.observeNonNull(argument: I): Flow<T> = observe(argument).filterNotNull()
 
 context(StorageQueryContext)
-suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.queryNonNull(argument: I): T = requireNotNull(query(argument))
+suspend fun <I, T : Any> QueryableStorageEntry1<I, T>.queryNonNull(argument: I): T = requireNotNull(query(argument)) {
+    "Null value was not expected when querying ${storageEntry.fullName} with $argument"
+}
 
 internal class RealQueryableStorageEntry1<I, T>(
-    private val storageEntry: StorageEntry,
+    override val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder1<I, T>,
     runtimeContext: RuntimeContext,
     @Suppress("UNCHECKED_CAST") private val keyBinding: QueryableStorageKeyFromInternalBinder<I>? = null

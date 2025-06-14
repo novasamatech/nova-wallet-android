@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.babe
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindSlot
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -14,18 +15,18 @@ import java.math.BigInteger
 @JvmInline
 value class BabeRuntimeApi(override val module: Module) : QueryableModule
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val RuntimeMetadata.babe: BabeRuntimeApi
     get() = BabeRuntimeApi(babe())
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val BabeRuntimeApi.currentSlot: QueryableStorageEntry0<BigInteger>
     get() = storage0("CurrentSlot", binding = ::bindSlot)
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val BabeRuntimeApi.genesisSlot: QueryableStorageEntry0<BigInteger>
     get() = storage0("GenesisSlot", binding = ::bindSlot)
 
-context(StorageQueryContext)
+context(RuntimeContext)
 val BabeRuntimeApi.epochIndex: QueryableStorageEntry0<BigInteger>
     get() = storage0("EpochIndex", binding = ::bindNumber)

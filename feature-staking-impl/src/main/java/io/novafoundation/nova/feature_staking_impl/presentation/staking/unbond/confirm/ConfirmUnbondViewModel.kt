@@ -132,16 +132,14 @@ class ConfirmUnbondViewModel(
     private fun sendTransaction(validPayload: UnbondValidationPayload) = launch {
         val amountInPlanks = validPayload.asset.token.configuration.planksFromAmount(payload.amount)
 
-        val result = unbondInteractor.unbond(validPayload.stash, validPayload.asset.bondedInPlanks, amountInPlanks)
+        unbondInteractor.unbond(validPayload.stash, validPayload.asset.bondedInPlanks, amountInPlanks)
+            .onSuccess {
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+
+                router.returnToStakingMain()
+            }
+            .onFailure(::showError)
 
         _showNextProgress.value = false
-
-        if (result.isSuccess) {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-
-            router.returnToStakingMain()
-        } else {
-            showError(result.requireException())
-        }
     }
 }

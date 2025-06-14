@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.Tran
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -144,7 +144,7 @@ class RealCrossChainTransactor(
         Log.d("CrossChain", "Starting cross-chain transfer")
 
         return performTransferOfExactAmount(configuration, transfer)
-            .requireOk()
+            .flattenDispatchFailure()
             .flatMap {
                 Log.d("CrossChain", "Cross chain transfer for successfully executed on origin, waiting for destination")
 
