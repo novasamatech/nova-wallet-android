@@ -21,7 +21,7 @@ interface NovaSigner : Signer {
     val metaAccount: MetaAccount
 
     /**
-     * Returns full signing hierarchy for root and nested signers starting from root
+     * Returns full signing hierarchy for root and nested signers
      */
     suspend fun getSigningHierarchy(): SubmissionHierarchy
 
