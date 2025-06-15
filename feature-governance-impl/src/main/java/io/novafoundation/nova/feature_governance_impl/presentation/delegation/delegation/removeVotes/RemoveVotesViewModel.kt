@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -53,10 +55,12 @@ class RemoveVotesViewModel(
     private val validationSystem: RemoteVotesValidationSystem,
     private val resourceManager: ResourceManager,
     private val tracksUseCase: TracksUseCase,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -126,7 +130,7 @@ class RemoveVotesViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.back()
+                startNavigation(it.submissionHierarchy) { router.back() }
             }
             .onFailure(::showError)
 

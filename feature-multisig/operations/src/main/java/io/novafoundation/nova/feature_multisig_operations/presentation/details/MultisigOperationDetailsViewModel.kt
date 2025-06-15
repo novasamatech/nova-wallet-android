@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter

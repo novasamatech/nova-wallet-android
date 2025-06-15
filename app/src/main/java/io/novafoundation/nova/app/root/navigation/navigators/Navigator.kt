@@ -914,4 +914,9 @@ class Navigator(
         navigationBuilder().action(R.id.action_mainFragment_to_multisigPendingOperationsFlow)
             .navigateInFirstAttachedContext()
     }
+
+    override fun showMultisigCreatedScreen() {
+        navigationBuilder().action(R.id.action_open_multisigCreatedDialog)
+            .navigateInFirstAttachedContext()
+    }
 }

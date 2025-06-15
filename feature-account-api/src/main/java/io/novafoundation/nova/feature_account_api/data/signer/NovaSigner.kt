@@ -21,6 +21,11 @@ interface NovaSigner : Signer {
     val metaAccount: MetaAccount
 
     /**
+     * Returns full signing hierarchy for root and nested signers starting from root
+     */
+    suspend fun getSigningHierarchy(): SubmissionHierarchy
+
+    /**
      * Modify the extrinsic to enrich it with the signing data relevant for this type
      * In all situations, at least nonce and signature will be required
      * However some signers may even modify the call (e.g. Proxied signer will wrap the current call into proxy call)

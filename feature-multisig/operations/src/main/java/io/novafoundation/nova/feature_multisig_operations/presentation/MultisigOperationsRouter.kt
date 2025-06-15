@@ -5,6 +5,8 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.details.M
 
 interface MultisigOperationsRouter : ReturnableRouter {
 
+    fun openPendingOperations()
+
     fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload)
 
     fun openMultisigCallDetails(extrinsicContent: String)

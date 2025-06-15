@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
@@ -53,7 +54,7 @@ interface GovernanceUnlockInteractor {
 
     suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee?
 
-    suspend fun unlock(claimable: UnlockChunk.Claimable?): Result<ExtrinsicStatus.InBlock>
+    suspend fun unlock(claimable: UnlockChunk.Claimable?): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     fun locksOverviewFlow(scope: CoroutineScope): Flow<GovernanceLocksOverview>
 

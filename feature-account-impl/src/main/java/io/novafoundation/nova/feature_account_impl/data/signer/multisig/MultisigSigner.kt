@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -62,6 +63,10 @@ class MultisigSigner(
 
     private val delegateSigner = SingleValueCache {
         signerProvider.nestedSignerFor(signatoryMetaAccount())
+    }
+
+    override suspend fun getSigningHierarchy(): SubmissionHierarchy {
+        return SubmissionHierarchy(metaAccount) + delegateSigner().getSigningHierarchy()
     }
 
     override suspend fun callExecutionType(): CallExecutionType {

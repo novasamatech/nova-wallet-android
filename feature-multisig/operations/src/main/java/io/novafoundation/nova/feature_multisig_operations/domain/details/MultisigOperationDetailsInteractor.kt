@@ -3,10 +3,10 @@ package io.novafoundation.nova.feature_multisig_operations.domain.details
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigAsMulti
@@ -27,7 +27,7 @@ interface MultisigOperationDetailsInteractor {
 
     suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee?
 
-    suspend fun performAction(operation: PendingMultisigOperation): Result<Unit>
+    suspend fun performAction(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult>
 }
 
 @FeatureScope
@@ -52,7 +52,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         }
     }
 
-    override suspend fun performAction(operation: PendingMultisigOperation): Result<Unit> {
+    override suspend fun performAction(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult> {
         val action = operation.userAction().toInternalAction() ?: return Result.failure(IllegalStateException("No action found"))
 
         return when (action) {
@@ -83,7 +83,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         }
     }
 
-    private suspend fun performApprove(operation: PendingMultisigOperation): Result<Unit> {
+    private suspend fun performApprove(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult> {
         val call = operation.call
         requireNotNull(call) { "Call data not found" }
 
@@ -93,20 +93,16 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         ) { buildingContext ->
             val weight = extrinsicSplitter.estimateCallWeight(buildingContext.signer, call, buildingContext.chain)
             approve(operation, weight)
-        }
-            .requireOk()
-            .coerceToUnit()
+        }.requireOk()
     }
 
-    private suspend fun performReject(operation: PendingMultisigOperation): Result<Unit> {
+    private suspend fun performReject(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult> {
         return extrinsicService.submitExtrinsicAndAwaitExecution(
             chain = operation.chain,
             origin = TransactionOrigin.WalletWithId(operation.signatoryMetaId)
         ) {
             reject(operation)
-        }
-            .requireOk()
-            .coerceToUnit()
+        }.requireOk()
     }
 
     private suspend fun ExtrinsicBuilder.approve(

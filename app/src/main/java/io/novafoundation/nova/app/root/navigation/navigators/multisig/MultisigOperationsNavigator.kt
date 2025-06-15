@@ -10,6 +10,11 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.details.M
 
 class MultisigOperationsNavigator(navigationHoldersRegistry: NavigationHoldersRegistry) : BaseNavigator(navigationHoldersRegistry), MultisigOperationsRouter {
 
+    override fun openPendingOperations() {
+        navigationBuilder().action(R.id.action_mainFragment_to_multisigPendingOperationsFlow)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload) {
         navigationBuilder().action(R.id.action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment)
             .setArgs(MultisigOperationDetailsFragment.getBundle(payload))

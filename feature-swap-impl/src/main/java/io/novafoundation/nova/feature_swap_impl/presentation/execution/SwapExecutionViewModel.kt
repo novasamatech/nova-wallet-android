@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
@@ -52,8 +53,10 @@ class SwapExecutionViewModel(
     private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
 ) : BaseViewModel(),
-    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 

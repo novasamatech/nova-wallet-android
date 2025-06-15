@@ -138,6 +138,10 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_multisigCreatedDialog"
+        app:destination="@id/multisigCreatedDialog" />
+
+    <action
         android:id="@+id/action_open_select_wallet"
         app:destination="@id/selectWalletFragment" />
 
@@ -246,7 +250,7 @@
     <fragment
         android:id="@+id/accountMigrationPairingFragment"
         android:name="io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingFragment"
-        android:label="AccountMigrationPairingFragment" >
+        android:label="AccountMigrationPairingFragment">
 
         <action
             android:id="@+id/action_migration_to_pin"
@@ -257,5 +261,10 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <dialog
+        android:id="@+id/multisigCreatedDialog"
+        android:name="io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet"
+        android:label="MultisigCreatedBottomSheet" />
 
 </navigation>
