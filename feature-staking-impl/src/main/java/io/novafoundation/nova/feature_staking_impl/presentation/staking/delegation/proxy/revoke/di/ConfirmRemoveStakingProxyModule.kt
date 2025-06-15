@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RemoveStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.remove.RemoveStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -41,7 +42,8 @@ class ConfirmRemoveStakingProxyModule {
         walletUiUseCase: WalletUiUseCase,
         removeStakingProxyInteractor: RemoveStakingProxyInteractor,
         removeStakingProxyValidationSystem: RemoveStakingProxyValidationSystem,
-        feeLoaderMixinFactory: FeeLoaderMixin.Factory
+        feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmRemoveStakingProxyViewModel(
             router = router,
@@ -56,7 +58,8 @@ class ConfirmRemoveStakingProxyModule {
             walletUiUseCase = walletUiUseCase,
             removeStakingProxyInteractor = removeStakingProxyInteractor,
             removeStakingProxyValidationSystem = removeStakingProxyValidationSystem,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
@@ -41,6 +42,7 @@ class ConfirmBondMoreModule {
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         hintsMixinFactory: ResourcesHintsMixinFactory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmBondMoreViewModel(
             router = router,
@@ -54,7 +56,8 @@ class ConfirmBondMoreModule {
             payload = payload,
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
-            hintsMixinFactory = hintsMixinFactory
+            hintsMixinFactory = hintsMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

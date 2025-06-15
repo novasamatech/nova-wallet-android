@@ -8,13 +8,14 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
@@ -50,10 +51,12 @@ class ConfirmRewardDestinationViewModel(
     private val validationExecutor: ValidationExecutor,
     private val payload: ConfirmRewardDestinationPayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -150,16 +153,16 @@ class ConfirmRewardDestinationViewModel(
         stashState: StakingState.Stash,
         rewardDestination: RewardDestination,
     ) = launch {
-        val setupResult = rewardDestinationInteractor.changeRewardDestination(stashState, rewardDestination)
+        rewardDestinationInteractor.changeRewardDestination(stashState, rewardDestination)
+            .onSuccess {
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
+            }
+            .onFailure {
+                showError(it)
+            }
 
         _showNextProgress.value = false
-
-        if (setupResult.isSuccess) {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-
-            router.returnToStakingMain()
-        } else {
-            showError(setupResult.requireException())
-        }
     }
 }

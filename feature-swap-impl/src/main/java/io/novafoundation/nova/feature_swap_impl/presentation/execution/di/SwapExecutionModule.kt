@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
@@ -35,6 +36,7 @@ class SwapExecutionModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     ): ViewModel {
         return SwapExecutionViewModel(
             swapStateStoreProvider = swapStateStoreProvider,
@@ -46,6 +48,7 @@ class SwapExecutionModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapFlowScopeAggregator = swapFlowScopeAggregator,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

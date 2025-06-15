@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -47,12 +49,14 @@ class ConfirmRebondViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val payload: ConfirmRebondPayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     hintsMixinFactory: ResourcesHintsMixinFactory,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -143,7 +147,7 @@ class ConfirmRebondViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
             .onFailure(::showError)
 

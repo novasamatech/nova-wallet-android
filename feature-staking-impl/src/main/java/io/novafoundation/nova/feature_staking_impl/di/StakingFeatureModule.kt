@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalI
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
@@ -661,6 +662,7 @@ class StakingFeatureModule {
         getProxyRepository: GetProxyRepository,
         proxyConstantsRepository: ProxyConstantsRepository,
         externalAccountsSyncService: ExternalAccountsSyncService,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): AddStakingProxyInteractor {
         return RealAddStakingProxyInteractor(
             extrinsicService,
@@ -668,6 +670,7 @@ class StakingFeatureModule {
             getProxyRepository,
             proxyConstantsRepository,
             externalAccountsSyncService,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

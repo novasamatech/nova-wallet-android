@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -56,7 +57,8 @@ class ConfirmSendModule {
         transferDraft: TransferDraft,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
-        confirmSendHintsMixinFactory: ConfirmSendHintsMixinFactory
+        confirmSendHintsMixinFactory: ConfirmSendHintsMixinFactory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmSendViewModel(
             interactor = interactor,
@@ -72,7 +74,8 @@ class ConfirmSendModule {
             walletUiUseCase = walletUiUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             transferDraft = transferDraft,
-            hintsFactory = confirmSendHintsMixinFactory
+            hintsFactory = confirmSendHintsMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

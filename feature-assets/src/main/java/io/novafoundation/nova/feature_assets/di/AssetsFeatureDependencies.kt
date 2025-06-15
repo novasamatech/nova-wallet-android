@@ -48,6 +48,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
@@ -216,6 +217,8 @@ interface AssetsFeatureDependencies {
     val automaticInteractionGate: AutomaticInteractionGate
 
     val linkBuilderFactory: LinkBuilderFactory
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

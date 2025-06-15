@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
@@ -71,6 +72,7 @@ class ParachainStakingRebondModule {
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ParachainStakingRebondViewModel(
             router = router,
@@ -87,7 +89,8 @@ class ParachainStakingRebondModule {
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
             validationSystem = validationSystem,
-            resourcesHintsMixinFactory = resourcesHintsMixinFactory
+            resourcesHintsMixinFactory = resourcesHintsMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

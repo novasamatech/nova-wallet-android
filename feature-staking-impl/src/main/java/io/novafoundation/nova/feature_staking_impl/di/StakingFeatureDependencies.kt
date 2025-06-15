@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
@@ -127,6 +128,8 @@ interface StakingFeatureDependencies {
     val maxActionProviderFactory: MaxActionProviderFactory
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     fun contextManager(): ContextManager
 

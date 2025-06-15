@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddr
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_account_impl.RealBiometricServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 import io.novafoundation.nova.feature_account_impl.data.ethereum.transaction.RealEvmTransactionService
@@ -137,6 +138,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.secrets.common.RealManualBackupSecretsAdapterItemFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.navigation.RealExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
@@ -755,4 +757,16 @@ class AccountFeatureModule {
         preferences,
         router
     )
+
+    @Provides
+    @FeatureScope
+    fun provideExtrinsicNavigationWrapper(
+        accountRouter: AccountRouter,
+        accountUseCase: AccountInteractor
+    ): ExtrinsicNavigationWrapper {
+        return RealExtrinsicNavigationWrapper(
+            accountRouter = accountRouter,
+            accountUseCase = accountUseCase
+        )
+    }
 }

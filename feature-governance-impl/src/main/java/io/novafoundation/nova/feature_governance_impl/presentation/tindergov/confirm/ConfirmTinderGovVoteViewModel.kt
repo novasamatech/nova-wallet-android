@@ -7,9 +7,12 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.multiSubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.accountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
@@ -57,6 +60,7 @@ class ConfirmTinderGovVoteViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val tinderGovInteractor: TinderGovInteractor,
     private val tinderGovBasketInteractor: TinderGovBasketInteractor,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : ConfirmVoteViewModel(
     router,
@@ -69,7 +73,8 @@ class ConfirmTinderGovVoteViewModel(
     addressIconGenerator,
     assetUseCase,
     validationExecutor
-) {
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val basketFlow = tinderGovBasketInteractor.observeTinderGovBasket()
         .map { it.associateBy { it.referendumId } }
@@ -143,7 +148,7 @@ class ConfirmTinderGovVoteViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                onVoteSuccess(payload.basket)
+                startNavigation(it.multiSubmissionHierarchy()) { onVoteSuccess(payload.basket) }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }

@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.remove.RemoveStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.remove.RemoveStakingProxyValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.remove.RemoveStakingProxyValidationSystem
@@ -51,10 +53,12 @@ class ConfirmRemoveStakingProxyViewModel(
     private val removeStakingProxyValidationSystem: RemoveStakingProxyValidationSystem,
     private val walletUiUseCase: WalletUiUseCase,
     private val removeStakingProxyInteractor: RemoveStakingProxyInteractor,
-    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory
+    private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val selectedMetaAccountFlow = accountRepository.selectedMetaAccountFlow()
         .shareInBackground()
@@ -145,7 +149,9 @@ class ConfirmRemoveStakingProxyViewModel(
 
         validationProgressFlow.value = false
 
-        result.onSuccess { router.returnToStakingMain() }
+        result.onSuccess {
+            startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
+        }
             .onFailure(::showError)
     }
 

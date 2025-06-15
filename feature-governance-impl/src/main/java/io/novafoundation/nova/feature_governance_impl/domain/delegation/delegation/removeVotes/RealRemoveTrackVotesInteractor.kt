@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegat
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
@@ -37,7 +38,7 @@ class RealRemoveTrackVotesInteractor(
         }
     }
 
-    override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<ExtrinsicStatus.InBlock> = withContext(Dispatchers.IO) {
+    override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()
 
         extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { buildingContext ->

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.moonbeam.MoonbeamTermsValidationSystem
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
@@ -33,6 +34,7 @@ class MoonbeamCrowdloanTermsModule {
         assetUseCase: AssetUseCase,
         validationSystem: MoonbeamTermsValidationSystem,
         validationExecutor: ValidationExecutor,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return MoonbeamCrowdloanTermsViewModel(
             interactor,
@@ -42,7 +44,8 @@ class MoonbeamCrowdloanTermsModule {
             router,
             assetUseCase,
             validationExecutor,
-            validationSystem
+            validationSystem,
+            extrinsicNavigationWrapper
         )
     }
 

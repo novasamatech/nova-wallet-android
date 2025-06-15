@@ -8,13 +8,14 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
@@ -44,11 +45,13 @@ class ConfirmBondMoreViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val payload: ConfirmBondMorePayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
     hintsMixinFactory: ResourcesHintsMixinFactory,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -117,17 +120,16 @@ class ConfirmBondMoreViewModel(
         val token = stashAssetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
-        val result = bondMoreInteractor.bondMore(payload.stashAddress, amountInPlanks)
+        bondMoreInteractor.bondMore(payload.stashAddress, amountInPlanks)
+            .onSuccess {
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+
+                startNavigation(it.submissionHierarchy) { finishFlow() }
+            }.onFailure {
+                showError(it)
+            }
 
         _showNextProgress.value = false
-
-        if (result.isSuccess) {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-
-            finishFlow()
-        } else {
-            showError(result.requireException())
-        }
     }
 
     private fun finishFlow() {

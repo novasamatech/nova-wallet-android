@@ -15,11 +15,14 @@ import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.multiSubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.create.chooseAmount.NewDelegationChooseAmountInteractor
 import io.novafoundation.nova.feature_governance_impl.R
@@ -78,11 +81,13 @@ class NewDelegationConfirmViewModel(
     private val tracksUseCase: TracksUseCase,
     private val delegateFormatters: DelegateMappers,
     private val delegateLabelUseCase: DelegateLabelUseCase,
-    private val partialRetriableMixinFactory: PartialRetriableMixin.Factory
+    private val partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     val partialRetriableMixin = partialRetriableMixinFactory.create(this)
 
@@ -210,7 +215,8 @@ class NewDelegationConfirmViewModel(
             multiResult = result,
             onSuccess = {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-                router.backToYourDelegations()
+
+                startNavigation(it.multiSubmissionHierarchy()) { router.backToYourDelegations() }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.backToYourDelegations() }

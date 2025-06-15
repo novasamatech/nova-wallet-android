@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
@@ -33,6 +34,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
 import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -60,6 +62,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class RealExtrinsicService(
     private val rpcCalls: RpcCalls,
@@ -80,10 +83,10 @@ class RealExtrinsicService(
         submissionOptions: SubmissionOptions,
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicSubmission> = runCatching {
-        val (extrinsic, submissionOrigin, _, callExecutionType) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        val (extrinsic, submissionOrigin, _, callExecutionType, signingHierarchy) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
 
-        ExtrinsicSubmission(hash, submissionOrigin, callExecutionType)
+        ExtrinsicSubmission(hash, submissionOrigin, callExecutionType, signingHierarchy)
     }
 
     override suspend fun submitMultiExtrinsicAwaitingInclusion(
@@ -91,15 +94,17 @@ class RealExtrinsicService(
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions,
         formExtrinsic: FormMultiExtrinsicWithOrigin
-    ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
+    ): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
         return runMultiCatching(
             intermediateListLoading = {
-                constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, SigningMode.SUBMISSION)
-                    .extrinsics
+                val submission = constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, SigningMode.SUBMISSION)
+
+                submission.extrinsics.map { it to submission }
             },
-            listProcessing = { extrinsic ->
+            listProcessing = { (extrinsic, submission) ->
                 rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
                     .filterIsInstance<ExtrinsicStatus.InBlock>()
+                    .map { ExtrinsicWatchResult(it, submission.submissionHierarchy) }
                     .first()
             }
         )
@@ -112,11 +117,12 @@ class RealExtrinsicService(
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions,
         formExtrinsic: FormExtrinsicWithOrigin
-    ): Result<Flow<ExtrinsicStatus>> = runCatching {
-        val (extrinsic) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+    ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> = runCatching {
+        val singleSubmission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
 
-        rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
-            .takeWhileInclusive { !it.terminal }
+        rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic)
+            .map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
+            .takeWhileInclusive { !it.status.terminal }
     }
 
     override suspend fun submitExtrinsicAndAwaitExecution(
@@ -193,11 +199,13 @@ class RealExtrinsicService(
     }
 
     private suspend fun determineExtrinsicOutcome(
-        inBlock: ExtrinsicStatus.InBlock,
+        watchResult: ExtrinsicWatchResult<ExtrinsicStatus.InBlock>,
         chain: Chain
     ): ExtrinsicExecutionResult {
+        val status = watchResult.status
+
         val outcome = runCatching {
-            val extrinsicWithEvents = eventsRepository.getExtrinsicWithEvents(chain.id, inBlock.extrinsicHash, inBlock.blockHash)
+            val extrinsicWithEvents = eventsRepository.getExtrinsicWithEvents(chain.id, status.extrinsicHash, status.blockHash)
             val runtime = chainRegistry.getRuntime(chain.id)
 
             requireNotNull(extrinsicWithEvents) {
@@ -212,9 +220,10 @@ class RealExtrinsicService(
         }
 
         return ExtrinsicExecutionResult(
-            extrinsicHash = inBlock.extrinsicHash,
-            blockHash = inBlock.blockHash,
-            outcome = outcome
+            extrinsicHash = status.extrinsicHash,
+            blockHash = status.blockHash,
+            outcome = outcome,
+            submissionHierarchy = watchResult.submissionHierarchy
         )
     }
 
@@ -285,7 +294,9 @@ class RealExtrinsicService(
             }
         }
 
-        return MultiSubmission(extrinsics, submissionOrigin, feePayment)
+        val signingHierarchy = signer.getSigningHierarchy()
+
+        return MultiSubmission(extrinsics, submissionOrigin, feePayment, signingHierarchy)
     }
 
     private suspend fun buildSubmissionExtrinsic(
@@ -314,6 +325,7 @@ class RealExtrinsicService(
         signingMode: SigningMode
     ): SingleSubmission {
         val signer = getSigner(chain, origin)
+
         val submissionOrigin = signer.submissionOrigin(chain)
 
         // Create empty builder
@@ -340,7 +352,9 @@ class RealExtrinsicService(
         // Build extrinsic
         val extrinsic = extrinsicBuilder.buildExtrinsic()
 
-        return SingleSubmission(extrinsic, submissionOrigin, feePayment, signer.callExecutionType())
+        val signingHierarchy = signer.getSigningHierarchy()
+
+        return SingleSubmission(extrinsic, submissionOrigin, feePayment, signer.callExecutionType(), signingHierarchy)
     }
 
     private fun SubmissionOptions.toBuilderFactoryOptions(): ExtrinsicBuilderFactory.Options {
@@ -357,12 +371,14 @@ class RealExtrinsicService(
         val submissionOrigin: SubmissionOrigin,
         val feePayment: FeePayment,
         val callExecutionType: CallExecutionType,
+        val submissionHierarchy: SubmissionHierarchy,
     )
 
     private data class MultiSubmission(
         val extrinsics: List<SendableExtrinsic>,
         val submissionOrigin: SubmissionOrigin,
-        val feePayment: FeePayment
+        val feePayment: FeePayment,
+        val submissionHierarchy: SubmissionHierarchy
     )
 
     private suspend fun NovaSigner.submissionOrigin(chain: Chain): SubmissionOrigin {

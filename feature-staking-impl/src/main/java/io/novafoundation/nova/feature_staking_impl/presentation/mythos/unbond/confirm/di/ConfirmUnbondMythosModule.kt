@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.UnbondMythosStakingInteractor
@@ -47,6 +48,7 @@ class ConfirmUnbondMythosModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmUnbondMythosViewModel(
             router = router,
@@ -63,7 +65,8 @@ class ConfirmUnbondMythosModule {
             validationFailureFormatter = validationFailureFormatter,
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

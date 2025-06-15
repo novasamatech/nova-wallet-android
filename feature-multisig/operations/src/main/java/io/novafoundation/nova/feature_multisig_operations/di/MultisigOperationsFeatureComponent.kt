@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.presentation.created.di.MultisigCreatedComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.di.MultisigOperationDetailsComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.di.MultisigPendingOperationsComponent
@@ -26,6 +27,8 @@ interface MultisigOperationsFeatureComponent : MultisigOperationsFeatureApi {
     fun multisigPendingOperations(): MultisigPendingOperationsComponent.Factory
 
     fun multisigOperationDetails(): MultisigOperationDetailsComponent.Factory
+
+    fun multisigCreated(): MultisigCreatedComponent.Factory
 
     @Component.Factory
     interface Factory {
