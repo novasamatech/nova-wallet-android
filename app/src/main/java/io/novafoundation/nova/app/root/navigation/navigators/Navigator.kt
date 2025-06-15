@@ -915,8 +915,7 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun showMultisigCreatedScreen() {
-        navigationBuilder().action(R.id.action_open_multisigCreatedDialog)
-            .navigateInFirstAttachedContext()
+    override fun finishMultisigTransaction() {
+        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = null)
     }
 }

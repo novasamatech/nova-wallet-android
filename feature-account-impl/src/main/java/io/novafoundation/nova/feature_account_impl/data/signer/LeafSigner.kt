@@ -33,7 +33,7 @@ abstract class LeafSigner(
 ) : NovaSigner, GeneralTransactionSigner {
 
     override suspend fun getSigningHierarchy(): SubmissionHierarchy {
-        return SubmissionHierarchy(metaAccount)
+        return SubmissionHierarchy(metaAccount, callExecutionType())
     }
 
     // All leaf signers are immediate atm so we implement it here to reduce boilerplate

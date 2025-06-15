@@ -21,7 +21,7 @@ class MultisigCreatedViewModel(
             title = resourceManager.getString(R.string.multisig_transaction_created_title),
             subtitle = getSubtitle(),
             actionButtonPreferences = ButtonPreferences.primary(primaryButtonText(), ::viewDetailsClicked),
-            neutralButtonPreferences = ButtonPreferences.secondary(secondaryButtonText()),
+            neutralButtonPreferences = ButtonPreferences.secondary(secondaryButtonText(), ::back),
             checkBoxPreferences = null
         )
     }
@@ -32,7 +32,7 @@ class MultisigCreatedViewModel(
 
     private fun getSubtitle() = resourceManager.highlightedText(
         mainRes = R.string.multisig_transaction_created_subtitle,
-        R.string.corrupted_backup_error_subtitle_highlighted
+        R.string.multisig_transaction_created_subtitle_highlight
     )
 
     private fun primaryButtonText() = resourceManager.getString(R.string.multisig_transaction_created_view_details)

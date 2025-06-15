@@ -105,14 +105,15 @@ internal class RealEvmTransactionService(
         val toSubmit = signTransaction(txForSign, submittingMetaAccount, chain)
 
         val txHash = web3Api.sendTransaction(toSubmit)
+        val callExecutionType = CallExecutionType.IMMEDIATE
 
         ExtrinsicSubmission(
             hash = txHash,
             submissionOrigin = SubmissionOrigin.singleOrigin(submittingAccountId),
             // Well, actually some smart-contracts might be "delayed", e.g. Gnosis Multisigs
             // But we don't care at this point since this service is used for internal app txs only, basically just for the transfers
-            callExecutionType = CallExecutionType.IMMEDIATE,
-            submissionHierarchy = SubmissionHierarchy(submittingMetaAccount)
+            callExecutionType = callExecutionType,
+            submissionHierarchy = SubmissionHierarchy(submittingMetaAccount, callExecutionType)
         )
     }
 

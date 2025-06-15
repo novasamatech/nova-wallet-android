@@ -10,6 +10,10 @@ abstract class ActionBottomSheetDialogFragment<T : ActionBottomSheetViewModel> :
     override fun createBinding() = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
 
     override fun initViews() {
-        binder.setupView(viewModel.getPayload()) { viewModel.back() }
+        binder.setupView(viewModel.getPayload()) { tryToDismiss() }
+    }
+
+    open fun tryToDismiss() {
+        viewModel.back()
     }
 }

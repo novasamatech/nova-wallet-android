@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.navigation
 
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.signer.isDelayed
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -16,16 +17,17 @@ class RealExtrinsicNavigationWrapper(
         submissionHierarchy: SubmissionHierarchy,
         fallback: suspend () -> Unit
     ) {
-        val lastMultisigAccount = submissionHierarchy.lastMultisigOrNull()
+        if (submissionHierarchy.isDelayed()) {
+            val multisigAccount = submissionHierarchy.firstMultisigOrNull()
 
-        if (lastMultisigAccount == null) {
-            fallback()
+            if (multisigAccount == null) {
+                accountRouter.openMain()
+            } else {
+                accountUseCase.selectMetaAccount(multisigAccount.id)
+                accountRouter.finishMultisigTransaction()
+            }
         } else {
-            accountUseCase.selectMetaAccount(lastMultisigAccount.id)
-
-            accountRouter.openMain()
-
-            accountRouter.showMultisigCreatedScreen()
+            fallback()
         }
     }
 
@@ -42,8 +44,8 @@ class RealExtrinsicNavigationWrapper(
         }
     }
 
-    // TODO: we can check delayed operations instead of meta accounts in future
-    private fun SubmissionHierarchy.lastMultisigOrNull(): MetaAccount? {
-        return path.lastOrNull { it.type == LightMetaAccount.Type.MULTISIG }
+    private fun SubmissionHierarchy.firstMultisigOrNull(): MetaAccount? {
+        return path.firstOrNull { it.account.type == LightMetaAccount.Type.MULTISIG }
+            ?.account
     }
 }

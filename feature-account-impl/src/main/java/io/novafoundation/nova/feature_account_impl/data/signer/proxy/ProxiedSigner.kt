@@ -84,7 +84,7 @@ class ProxiedSigner(
     }
 
     override suspend fun getSigningHierarchy(): SubmissionHierarchy {
-        return SubmissionHierarchy(metaAccount) + delegateSigner().getSigningHierarchy()
+        return delegateSigner().getSigningHierarchy() + SubmissionHierarchy(metaAccount, callExecutionType())
     }
 
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {

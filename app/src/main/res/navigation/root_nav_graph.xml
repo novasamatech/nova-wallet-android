@@ -138,10 +138,6 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_open_multisigCreatedDialog"
-        app:destination="@id/multisigCreatedDialog" />
-
-    <action
         android:id="@+id/action_open_select_wallet"
         app:destination="@id/selectWalletFragment" />
 
@@ -261,10 +257,5 @@
             app:popUpToInclusive="true" />
 
     </fragment>
-
-    <dialog
-        android:id="@+id/multisigCreatedDialog"
-        android:name="io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet"
-        android:label="MultisigCreatedBottomSheet" />
 
 </navigation>
