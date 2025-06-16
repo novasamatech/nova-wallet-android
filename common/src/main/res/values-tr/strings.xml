@@ -1599,6 +1599,7 @@
     <string name="swap_execution_time">Gerçekleşme süresi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Ödeme yaptıktan sonra ağ ücreti olarak %s tutarında en azından %s tutmanız gerekmektedir çünkü yeterli olmayan tokenlara sahipsiniz</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s token almak için en az %s tutmalısınız</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">%s tokenini almak için %s üzerinde en az %s olmalıdır</string>
     <string name="swap_failure_insufficient_balance_message">Ağ ücreti için %2$s ödemeniz gerektiği için en fazla %1$s tutarında takas yapabilirsiniz.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Ağ ücreti olarak %2$s ödemeniz ve %5$s asgari bakiyeyi karşılamak için %3$s\'i %4$s\'e dönüştürmeniz gerektiği için en fazla %1$s kadar takas yapabilirsiniz.</string>
     <string name="swap_failure_swap_max_button">Maksimuma Takas</string>

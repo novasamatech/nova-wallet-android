@@ -65,8 +65,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
@@ -92,14 +90,11 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
 
 @Module
 class WalletFeatureModule {
@@ -166,14 +161,6 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSubstrateSource(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-    ): SubstrateRemoteSource = WssSubstrateSource(
-        remoteStorageSource,
-    )
-
-    @Provides
-    @FeatureScope
     fun provideTokenRepository(
         tokenDao: TokenDao,
     ): TokenRepository = TokenRepositoryImpl(
@@ -187,7 +174,6 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideWalletRepository(
-        substrateSource: SubstrateRemoteSource,
         operationsDao: OperationDao,
         phishingApi: PhishingApi,
         phishingAddressDao: PhishingAddressDao,
@@ -196,7 +182,6 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry,
         coinPriceRemoteDataSource: CoinPriceRemoteDataSource
     ): WalletRepository = WalletRepositoryImpl(
-        substrateSource,
         operationsDao,
         phishingApi,
         accountRepository,
