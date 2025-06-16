@@ -54,7 +54,6 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.common.utils.metadata
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult

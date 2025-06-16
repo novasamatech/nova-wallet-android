@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_swap_api.domain.swap
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress

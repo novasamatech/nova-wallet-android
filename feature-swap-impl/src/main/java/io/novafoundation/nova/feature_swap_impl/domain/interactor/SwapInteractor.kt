@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount

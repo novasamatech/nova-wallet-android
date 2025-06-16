@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTrackingTransferResult
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
@@ -54,7 +53,7 @@ interface CrossChainTransfersUseCase {
     suspend fun ExtrinsicService.performTransferAndTrackTransfer(
         transfer: AssetTransferBase,
         computationalScope: CoroutineScope
-    ): Result<CrossChainTrackingTransferResult>
+    ): Result<Balance>
 
     suspend fun maximumExecutionTime(
         assetTransferDirection: AssetTransferDirection,

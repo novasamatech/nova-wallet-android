@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
-import io.novafoundation.nova.common.utils.onEachInstance
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -25,7 +24,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
@@ -63,7 +61,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn

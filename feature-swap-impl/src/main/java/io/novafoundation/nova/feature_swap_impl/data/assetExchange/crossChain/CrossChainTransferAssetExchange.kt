@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.addPlanks
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -244,12 +243,12 @@ class CrossChainTransferAssetExchange(
         override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
-            val transferResult = with(crossChainTransfersUseCase) {
+            val outcome = with(crossChainTransfersUseCase) {
                 swapHost.extrinsicService().performTransferAndTrackTransfer(transfer, swapHost.scope)
             }
 
-            return transferResult.map { result ->
-                SwapExecutionCorrection(result.balance)
+            return outcome.map { balance ->
+                SwapExecutionCorrection(balance)
             }
         }
 

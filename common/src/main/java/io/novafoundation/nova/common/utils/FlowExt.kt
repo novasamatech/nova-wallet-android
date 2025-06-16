@@ -90,13 +90,6 @@ fun <T> Flow<T>.onEachLatest(action: suspend (T) -> Unit): Flow<T> = transformLa
     return@transformLatest emit(value)
 }
 
-inline fun <reified R> Flow<*>.onEachInstance(crossinline action: suspend (R) -> Unit): Flow<*> = onEach { value ->
-    if (value is R) {
-        action(value)
-    }
-}
-
-
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state.
  * Then emits each element from upstream wrapped into [LoadingState.Loaded] state.
