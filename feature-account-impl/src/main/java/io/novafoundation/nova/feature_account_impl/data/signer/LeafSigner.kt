@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
@@ -30,6 +31,10 @@ private val FAKE_CRYPTO_TYPE = EncryptionType.ECDSA
 abstract class LeafSigner(
     override val metaAccount: MetaAccount,
 ) : NovaSigner, GeneralTransactionSigner {
+
+    override suspend fun getSigningHierarchy(): SubmissionHierarchy {
+        return SubmissionHierarchy(metaAccount, callExecutionType())
+    }
 
     // All leaf signers are immediate atm so we implement it here to reduce boilerplate
     // Feel free to move it down if some leaf signer is actually immediate

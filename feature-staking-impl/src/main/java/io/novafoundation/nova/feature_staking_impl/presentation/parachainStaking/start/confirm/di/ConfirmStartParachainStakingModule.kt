@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -54,6 +55,7 @@ class ConfirmStartParachainStakingModule {
         hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
         delegatorStateUseCase: DelegatorStateUseCase,
         stakingStartedDetectionService: StakingStartedDetectionService,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             parachainStakingRouter = router,
@@ -73,7 +75,8 @@ class ConfirmStartParachainStakingModule {
             collatorsUseCase = collatorsUseCase,
             delegatorStateUseCase = delegatorStateUseCase,
             startStakingRouter = startStakingRouter,
-            stakingStartedDetectionService = stakingStartedDetectionService
+            stakingStartedDetectionService = stakingStartedDetectionService,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.start
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -46,7 +46,7 @@ interface StartMythosStakingInteractor {
         currentState: MythosDelegatorState,
         candidate: AccountIdKey,
         amount: Balance
-    ): Result<Unit>
+    ): Result<ExtrinsicExecutionResult>
 
     suspend fun checkDelegationsLimit(
         delegatorState: MythosDelegatorState
@@ -82,7 +82,7 @@ class RealStartMythosStakingInteractor @Inject constructor(
         }
     }
 
-    override suspend fun stake(currentState: MythosDelegatorState, candidate: AccountIdKey, amount: Balance): Result<Unit> {
+    override suspend fun stake(currentState: MythosDelegatorState, candidate: AccountIdKey, amount: Balance): Result<ExtrinsicExecutionResult> {
         val chain = stakingSharedState.chain()
 
         return extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.SelectedWallet) {
@@ -91,7 +91,6 @@ class RealStartMythosStakingInteractor @Inject constructor(
             stakeMore(chain, currentState, candidate, amount)
         }
             .requireOk()
-            .coerceToUnit()
     }
 
     override suspend fun checkDelegationsLimit(delegatorState: MythosDelegatorState): DelegationsLimit {

@@ -397,6 +397,10 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_multisigCreatedDialog"
+        app:destination="@id/multisigCreatedDialog" />
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="io.novafoundation.nova.app.root.presentation.main.MainFragment"
@@ -1316,5 +1320,22 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <dialog
+        android:id="@+id/multisigCreatedDialog"
+        android:name="io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet"
+        android:label="MultisigCreatedBottomSheet">
+
+        <action
+            android:id="@+id/action_multisigCreatedDialog_to_multisigPendingOperationsFlow"
+            app:destination="@id/multisig_pending_operations_graph"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/multisigCreatedDialog"
+            app:popUpToInclusive="true" />
+
+    </dialog>
 
 </navigation>

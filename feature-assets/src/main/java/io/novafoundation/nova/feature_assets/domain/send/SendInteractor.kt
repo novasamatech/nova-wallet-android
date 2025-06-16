@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.signer.isImmediate
@@ -66,7 +67,7 @@ class SendInteractor(
         originFee: OriginFee,
         crossChainFee: FeeBase?,
         coroutineScope: CoroutineScope
-    ): Result<*> = withContext(Dispatchers.Default) {
+    ): Result<ExtrinsicSubmission> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 

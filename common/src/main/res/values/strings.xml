@@ -16,6 +16,12 @@
     <!--<string name="proxieds_updates_deactivated_title">No longer valid</string>-->
     <string name="delegation_updates_deactivated_title">No longer valid</string>
 
+
+    <string name="multisig_transaction_created_title">Multisig transaction created</string>
+    <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Multisig transactions.</string>
+    <string name="multisig_transaction_created_view_details">View details</string>
+
     <string name="multisig_operation_details_call_data_not_found">Call-data not found</string>
 
     <string name="multisig_operation_details_approve">Approve</string>

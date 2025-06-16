@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -11,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -24,6 +26,7 @@ class ExtrinsicSubmission(
     val hash: String,
     val submissionOrigin: SubmissionOrigin,
     val callExecutionType: CallExecutionType,
+    val submissionHierarchy: SubmissionHierarchy
 )
 
 class ExtrinsicBuildingContext(
@@ -66,7 +69,7 @@ interface ExtrinsicService {
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormExtrinsicWithOrigin
-    ): Result<Flow<ExtrinsicStatus>>
+    ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>>
 
     suspend fun submitExtrinsicAndAwaitExecution(
         chain: Chain,
@@ -80,7 +83,7 @@ interface ExtrinsicService {
         origin: TransactionOrigin,
         submissionOptions: SubmissionOptions = SubmissionOptions(),
         formExtrinsic: FormMultiExtrinsicWithOrigin
-    ): RetriableMultiResult<ExtrinsicStatus.InBlock>
+    ): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     suspend fun paymentInfo(
         chain: Chain,

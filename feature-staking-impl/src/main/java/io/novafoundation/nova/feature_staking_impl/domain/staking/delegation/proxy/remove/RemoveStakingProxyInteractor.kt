@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.into
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_proxy_api.data.calls.removeProxyCall
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
@@ -18,7 +19,7 @@ interface RemoveStakingProxyInteractor {
 
     suspend fun estimateFee(chain: Chain, proxiedAccountId: AccountId): Fee
 
-    suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicStatus.InBlock>
+    suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 }
 
 class RealRemoveStakingProxyInteractor(
@@ -34,7 +35,11 @@ class RealRemoveStakingProxyInteractor(
         }
     }
 
-    override suspend fun removeProxy(chain: Chain, proxiedAccountId: AccountId, proxyAccountId: AccountId): Result<ExtrinsicStatus.InBlock> {
+    override suspend fun removeProxy(
+        chain: Chain,
+        proxiedAccountId: AccountId,
+        proxyAccountId: AccountId
+    ): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
         return withContext(Dispatchers.Default) {
             val result = extrinsicService.submitAndWatchExtrinsic(chain, proxiedAccountId.intoOrigin()) {
                 removeProxyCall(proxyAccountId, ProxyType.Staking)

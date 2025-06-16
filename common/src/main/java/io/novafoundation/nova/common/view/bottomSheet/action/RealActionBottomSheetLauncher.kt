@@ -14,17 +14,17 @@ class RealActionBottomSheetLauncherFactory : ActionBottomSheetLauncherFactory {
 
 class RealActionBottomSheetLauncher : ActionBottomSheetLauncher {
 
-    override val showActionEvent = MutableLiveData<Event<ActionBottomSheet.Payload>>()
+    override val showActionEvent = MutableLiveData<Event<ActionBottomSheetPayload>>()
 
     override fun launchBottomSheet(
         @DrawableRes imageRes: Int,
         title: CharSequence,
         subtitle: CharSequence,
-        actionButtonPreferences: ActionBottomSheet.ButtonPreferences,
-        neutralButtonPreferences: ActionBottomSheet.ButtonPreferences?,
-        checkBoxPreferences: ActionBottomSheet.CheckBoxPreferences?
+        actionButtonPreferences: ButtonPreferences,
+        neutralButtonPreferences: ButtonPreferences?,
+        checkBoxPreferences: CheckBoxPreferences?
     ) {
-        showActionEvent.value = ActionBottomSheet.Payload(
+        showActionEvent.value = ActionBottomSheetPayload(
             imageRes = imageRes,
             title = title,
             subtitle = subtitle,
