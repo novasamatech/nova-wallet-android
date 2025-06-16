@@ -24,6 +24,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.common.utils.metadata
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
@@ -67,12 +68,14 @@ class OrmlAssetBalance(
         return chainAsset.requireOrml().existentialDeposit
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
-        return remoteStorageSource.query(
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
+        val balance = remoteStorageSource.query(
             chainId = chain.id,
             keyBuilder = { it.ormlBalanceKey(accountId, chainAsset) },
             binding = { scale, runtime -> bindOrmlAccountBalanceOrEmpty(scale, runtime) }
         )
+
+        return ChainAssetBalance.default(balance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(
@@ -95,11 +98,6 @@ class OrmlAssetBalance(
         }
     }
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val accountBalance = queryAccountBalance(chain, chainAsset, accountId)
-
-        return accountBalance.free + accountBalance.reserved
-    }
 
     override suspend fun startSyncingBalance(
         chain: Chain,

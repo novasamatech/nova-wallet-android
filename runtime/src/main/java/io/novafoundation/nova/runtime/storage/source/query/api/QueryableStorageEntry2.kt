@@ -8,7 +8,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageEntries
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 typealias QueryableStorageBinder2<K1, K2, V> = (dynamicInstance: Any, key1: K1, key2: K2) -> V
@@ -17,6 +16,9 @@ interface QueryableStorageEntry2<I1, I2, T : Any> {
 
     context(StorageQueryContext)
     fun observe(argument1: I1, argument2: I2): Flow<T?>
+
+    context(StorageQueryContext)
+    suspend fun query(argument1: I1, argument2: I2): T?
 
     context(StorageQueryContext)
     suspend fun observe(keys: List<Pair<I1, I2>>): Flow<Map<Pair<I1, I2>, T?>>
@@ -49,7 +51,11 @@ internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
 
     context(StorageQueryContext)
     override fun observe(argument1: I1, argument2: I2): Flow<T?> {
-        return storageEntry.observe(argument1, argument2, binding = { decoded -> decoded?.let { binding(it, argument1, argument2) } })
+        return storageEntry.observe(
+            convertKey1ToInternal(argument1),
+            convertKey2ToInternal(argument2),
+            binding = { decoded -> decoded?.let { binding(it, argument1, argument2) } }
+        )
     }
 
     context(StorageQueryContext)
@@ -79,6 +85,15 @@ internal class RealQueryableStorageEntry2<I1, I2, T : Any>(
     override suspend fun keys(argument1: I1): List<Pair<I1, I2>> {
         return storageEntry.keys(convertKey1ToInternal(argument1))
             .map { convertKeyFromInternal(it) }
+    }
+
+    context(StorageQueryContext)
+    override suspend fun query(argument1: I1, argument2: I2): T? {
+        return storageEntry.query(
+            convertKey1ToInternal(argument1),
+            convertKey2ToInternal(argument2),
+            binding = { decoded -> decoded?.let { binding(it, argument1, argument2) } }
+        )
     }
 
     private fun List<Pair<I1, I2>>.toInternal(): List<List<Any?>> {

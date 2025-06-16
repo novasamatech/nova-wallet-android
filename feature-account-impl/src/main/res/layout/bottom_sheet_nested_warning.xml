@@ -13,24 +13,26 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="88dp"
+        android:id="@+id/nestedSigningWarningIcon"
         android:layout_height="88dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/bg_icon_big"
         android:padding="12dp"
-        android:src="@drawable/ic_proxy"
+        tools:src="@drawable/ic_proxy"
         android:tint="@color/icon_primary" />
 
     <TextView
+        android:id="@+id/nestedSigningWarningTitle"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="@string/proxy_signing_warning_title"
+        tools:text="@string/proxy_signing_warning_title"
         android:textColor="@color/text_primary" />
 
     <TextView
-        android:id="@+id/proxySigningWarningMessage"
+        android:id="@+id/nestedSigningWarningMessage"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +42,7 @@
         android:textColor="@color/text_secondary" />
 
     <CheckBox
-        android:id="@+id/proxySigningWarningDontShowAgain"
+        android:id="@+id/nestedSigningWarningDontShowAgain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -56,7 +58,7 @@
         android:orientation="horizontal">
 
         <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/proxySigningWarningCancel"
+            android:id="@+id/nestedSigningWarningCancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
@@ -65,7 +67,7 @@
             app:appearance="secondary" />
 
         <io.novafoundation.nova.common.view.PrimaryButton
-            android:id="@+id/proxySigningWarningContinue"
+            android:id="@+id/nestedSigningWarningContinue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"

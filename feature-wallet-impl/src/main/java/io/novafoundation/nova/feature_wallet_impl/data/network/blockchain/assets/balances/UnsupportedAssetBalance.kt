@@ -32,8 +32,6 @@ class UnsupportedAssetBalance : AssetBalance {
         sharedSubscriptionBuilder: SharedRequestsBuilder?
     ): Flow<TransferableBalanceUpdate> = unsupported()
 
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId) = unsupported()
-
     override suspend fun startSyncingBalance(
         chain: Chain,
         chainAsset: Chain.Asset,

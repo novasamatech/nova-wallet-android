@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
@@ -51,15 +52,11 @@ class EvmNativeAssetBalance(
         return BigInteger.ZERO
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
         val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
         val balance = ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
-        return AccountBalance(
-            free = balance,
-            reserved = BigInteger.ZERO,
-            frozen = BigInteger.ZERO,
-        )
+        return ChainAssetBalance.fromFree(balance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(
@@ -69,10 +66,6 @@ class EvmNativeAssetBalance(
         sharedSubscriptionBuilder: SharedRequestsBuilder?
     ): Flow<TransferableBalanceUpdate> {
         TODO("Not yet implemented")
-    }
-
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

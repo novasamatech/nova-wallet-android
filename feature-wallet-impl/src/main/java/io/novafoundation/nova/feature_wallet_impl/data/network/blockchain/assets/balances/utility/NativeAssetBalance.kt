@@ -24,7 +24,9 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDef
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.toChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
@@ -104,8 +106,8 @@ class NativeAssetBalance(
         return runtime.metadata.balances().numberConstant("ExistentialDeposit", runtime)
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
-        return substrateRemoteSource.getAccountInfo(chain.id, accountId).data
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
+        return substrateRemoteSource.getAccountInfo(chain.id, accountId).data.toChainAssetBalance()
     }
 
     override suspend fun subscribeTransferableAccountBalance(
@@ -124,12 +126,6 @@ class NativeAssetBalance(
                 )
             }
         }
-    }
-
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val accountData = queryAccountBalance(chain, chainAsset, accountId)
-
-        return accountData.free + accountData.reserved
     }
 
     override suspend fun startSyncingBalance(

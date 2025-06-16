@@ -420,18 +420,6 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideProxyHaveEnoughFeeValidationFactory(
-        assetSourceRegistry: AssetSourceRegistry,
-        walletRepository: WalletRepository,
-        extrinsicService: ExtrinsicService,
-    ) = ProxyHaveEnoughFeeValidationFactory(
-        assetSourceRegistry,
-        walletRepository,
-        extrinsicService
-    )
-
-    @Provides
-    @FeatureScope
     fun provideAssetsValidationContextFactory(
         arbitraryAssetUseCase: ArbitraryAssetUseCase,
         chainRegistry: ChainRegistry,

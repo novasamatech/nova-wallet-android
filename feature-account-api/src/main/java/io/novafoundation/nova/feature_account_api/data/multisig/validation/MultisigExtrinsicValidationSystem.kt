@@ -1,0 +1,9 @@
+package io.novafoundation.nova.feature_account_api.data.multisig.validation
+
+import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.common.validation.ValidationSystemBuilder
+
+typealias MultisigExtrinsicValidationBuilder = ValidationSystemBuilder<MultisigExtrinsicValidationPayload, MultisigExtrinsicValidationFailure>
+typealias MultisigExtrinsicValidation = Validation<MultisigExtrinsicValidationPayload, MultisigExtrinsicValidationFailure>
+typealias MultisigExtrinsicValidationSystem = ValidationSystem<MultisigExtrinsicValidationPayload, MultisigExtrinsicValidationFailure>

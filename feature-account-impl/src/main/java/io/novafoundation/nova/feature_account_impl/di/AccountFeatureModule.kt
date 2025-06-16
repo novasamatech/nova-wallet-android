@@ -94,7 +94,6 @@ import io.novafoundation.nova.feature_account_impl.di.modules.ExternalAccountsDi
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.MultisigModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ParitySignerModule
-import io.novafoundation.nova.feature_account_impl.di.modules.ProxySigningModule
 import io.novafoundation.nova.feature_account_impl.di.modules.WatchOnlyModule
 import io.novafoundation.nova.feature_account_impl.di.modules.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_account_impl.di.modules.signers.SignersModule
@@ -119,11 +118,11 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Real
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.addressActions.AddressActionsMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
@@ -138,6 +137,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.manualBackup.sec
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.identity.RealIdentityMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.mixin.selectWallet.RealRealSelectWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.config.RealPolkadotVaultVariantConfigProvider
+import io.novafoundation.nova.feature_account_impl.presentation.sign.NestedSigningPresenter
+import io.novafoundation.nova.feature_account_impl.presentation.sign.RealNestedSigningPresenter
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
@@ -161,7 +162,6 @@ import javax.inject.Named
     includes = [
         SignersModule::class,
         WatchOnlyModule::class,
-        ProxySigningModule::class,
         ParitySignerModule::class,
         IdentityProviderModule::class,
         AdvancedEncryptionStoreModule::class,
@@ -187,6 +187,9 @@ class AccountFeatureModule {
 
         @Binds
         fun bindAddressActionsMixinFactory(real: AddressActionsMixinFactory): AddressActionsMixin.Factory
+
+        @Binds
+        fun bindNestedSigningPresenter(real: RealNestedSigningPresenter): NestedSigningPresenter
     }
 
     @Provides

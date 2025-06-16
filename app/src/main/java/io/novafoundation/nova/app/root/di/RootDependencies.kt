@@ -18,6 +18,7 @@ import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
+import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -44,6 +45,7 @@ import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.MultisigExtrinsicValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_connect_api.di.deeplinks.WalletConnectDeepLinks
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -107,6 +109,10 @@ interface RootDependencies {
     val branchIoLinkConverter: BranchIoLinkConverter
 
     val pendingDeepLinkProvider: PendingDeepLinkProvider
+
+    val multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus
+
+    val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

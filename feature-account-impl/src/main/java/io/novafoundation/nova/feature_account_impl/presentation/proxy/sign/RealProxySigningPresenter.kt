@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.presentation.proxy.sign
 
 import android.text.SpannableStringBuilder
-import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.amountFromPlanks
@@ -9,45 +9,35 @@ import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.toSpannable
-import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
+import io.novafoundation.nova.feature_account_impl.presentation.sign.NestedSigningPresenter
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigInteger
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-private const val KEY_DONT_SHOW_AGAIN = "proxy_sign_warning_dont_show_again"
-
-class RealProxySigningPresenter(
+@FeatureScope
+class RealProxySigningPresenter @Inject constructor(
     private val contextManager: ContextManager,
     private val resourceManager: ResourceManager,
     private val signingNotSupportedPresentable: SigningNotSupportedPresentable,
-    private val preferences: Preferences
+    private val nestedSigningPresenter: NestedSigningPresenter,
 ) : ProxySigningPresenter {
 
-    override suspend fun acknowledgeProxyOperation(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean = withContext(Dispatchers.Main) {
-        if (noNeedToShowWarning(proxiedMetaAccount)) {
-            return@withContext true
-        }
-
-        val resumingAllowed = suspendCoroutine { continuation ->
-            ProxySignWarningBottomSheet(
-                context = contextManager.getActivity()!!,
-                subtitle = formatSubtitleForWarning(proxyMetaAccount),
-                onFinish = {
-                    continuation.resume(it)
-                },
-                dontShowAgain = { dontShowAgain(proxiedMetaAccount) }
-            ).show()
-        }
-
-        return@withContext resumingAllowed
+    override suspend fun acknowledgeProxyOperation(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean {
+        return nestedSigningPresenter.acknowledgeNestedSignOperation(
+            warningShowFor = proxiedMetaAccount,
+            title = { resourceManager.getString(R.string.proxy_signing_warning_title) },
+            subtitle = { formatSubtitleForWarning(proxyMetaAccount) },
+            iconRes = { R.drawable.ic_proxy }
+        )
     }
 
     override suspend fun notEnoughPermission(
@@ -78,34 +68,16 @@ class RealProxySigningPresenter(
         chainAsset: Chain.Asset,
         availableBalance: BigInteger,
         fee: BigInteger
-    ) = withContext(Dispatchers.Main) {
-        suspendCoroutine { continuation ->
-            dialog(contextManager.getActivity()!!) {
-                setTitle(R.string.error_not_enough_to_pay_fee_title)
-                setMessage(
-                    resourceManager.getString(
-                        R.string.proxy_error_not_enough_to_pay_fee_message,
-                        metaAccount.name,
-                        fee.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol),
-                        availableBalance.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol)
-                    )
-                )
-
-                setPositiveButton(io.novafoundation.nova.common.R.string.common_close) { _, _ -> continuation.resume(Unit) }
-            }
-        }
-    }
-
-    private fun noNeedToShowWarning(proxyMetaAccount: MetaAccount): Boolean {
-        return preferences.getBoolean(makePrefsKey(proxyMetaAccount), false)
-    }
-
-    private fun dontShowAgain(proxyMetaAccount: MetaAccount) {
-        preferences.putBoolean(makePrefsKey(proxyMetaAccount), true)
-    }
-
-    private fun makePrefsKey(proxyMetaAccount: MetaAccount): String {
-        return "${KEY_DONT_SHOW_AGAIN}_${proxyMetaAccount.id}"
+    ) {
+        nestedSigningPresenter.presentValidationFailure(
+            title = resourceManager.getString(R.string.error_not_enough_to_pay_fee_title),
+            message =  resourceManager.getString(
+                R.string.proxy_error_not_enough_to_pay_fee_message,
+                metaAccount.name,
+                fee.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol),
+                availableBalance.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol)
+            )
+        )
     }
 
     private fun formatSubtitleForWarning(proxyMetaAccount: MetaAccount): CharSequence {

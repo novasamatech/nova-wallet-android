@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.StatemineAssetDetails
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.transfersFrozen
@@ -60,7 +61,7 @@ class StatemineAssetBalance(
         return queryAssetDetails(chainAsset).minimumBalance
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
         val statemineType = chainAsset.requireStatemine()
 
         val assetAccount = remoteStorage.query(chain.id) {
@@ -73,7 +74,8 @@ class StatemineAssetBalance(
             )
         }
 
-        return assetAccount.toAccountBalance()
+        val accountBalance = assetAccount.toAccountBalance()
+        return ChainAssetBalance.default(accountBalance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(
@@ -114,10 +116,6 @@ class StatemineAssetBalance(
             reserved = BigInteger.ZERO,
             frozen = frozenBalance
         )
-    }
-
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(
