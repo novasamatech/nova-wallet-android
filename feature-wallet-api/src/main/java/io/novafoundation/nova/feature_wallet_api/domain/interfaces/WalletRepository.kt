@@ -5,11 +5,9 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
-import java.math.BigInteger
 
 interface WalletRepository {
 
@@ -64,6 +62,4 @@ interface WalletRepository {
     suspend fun updatePhishingAddresses()
 
     suspend fun isAccountIdFromPhishingList(accountId: AccountId): Boolean
-
-    suspend fun getAccountFreeBalance(chainId: ChainId, accountId: AccountId): BigInteger
 }
