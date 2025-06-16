@@ -61,7 +61,8 @@ data class Chain(
         val supportLedgerGenericApp: Boolean?,
         val identityChain: ChainId?,
         val disabledCheckMetadataHash: Boolean?,
-        val sessionLength: Int?
+        val sessionLength: Int?,
+        val timelineChain: ChainId?
     )
 
     data class Types(

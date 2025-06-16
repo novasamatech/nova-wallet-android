@@ -289,6 +289,24 @@ inline fun <T> Iterable<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(
     acc + extractor(element)
 }
 
+inline fun <T, K> Iterable<T>.groupByIntoSet(keySelector: (T) -> K): Map<K, Set<T>> {
+    return groupByInto(valueCollectionCreator = { mutableSetOf() }, keySelector = keySelector)
+}
+
+inline fun <T, K, C : MutableCollection<T>> Iterable<T>.groupByInto(
+    valueCollectionCreator: () -> C,
+    keySelector: (T) -> K
+): Map<K, C> {
+    val result = mutableMapOf<K, C>()
+
+    for (element in this) {
+        val key = keySelector(element)
+        val collection = result.getOrPut(key) { valueCollectionCreator() }
+        collection.add(element)
+    }
+    return result
+}
+
 inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T
 }

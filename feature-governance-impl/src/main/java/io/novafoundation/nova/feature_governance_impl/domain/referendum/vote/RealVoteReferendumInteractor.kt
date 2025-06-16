@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -160,7 +161,7 @@ class RealVoteReferendumInteractor(
         val balanceLocksFlow = locksRepository.observeBalanceLocks(metaId, chain, chainAsset)
 
         return combine(votingInformation, selectedReferendaFlow, balanceLocksFlow) { (locksByTrack, voting, votedReferenda), selectedReferenda, locks ->
-            val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
+            val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
 
             RealGovernanceLocksEstimator(
                 onChainReferenda = selectedReferenda,

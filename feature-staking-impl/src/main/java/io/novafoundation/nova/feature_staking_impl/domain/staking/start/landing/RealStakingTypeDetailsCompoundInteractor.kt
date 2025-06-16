@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 import io.novafoundation.nova.common.utils.combine as combineList
 
@@ -69,7 +71,9 @@ class RealStakingTypeDetailsCompoundInteractor(
     }
 
     override fun observeStartStakingInfo(): Flow<StartStakingCompoundData> {
-        val startStakingDataFlow = interactors.map { it.observeData() }.combineList()
+        val startStakingDataFlow = interactors.map { interactor ->
+            interactor.observeData()
+        }.combineList()
         val assetFlow = assetFlow()
         val eraInfoDataFlow = stakingEraInteractor.observeEraInfo()
 

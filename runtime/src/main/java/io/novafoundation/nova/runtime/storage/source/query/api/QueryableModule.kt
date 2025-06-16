@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.storage.source.query.api
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 
 typealias QueryableStorageKeyFromInternalBinder<K> = (keyInstance: Any) -> K
 typealias QueryableStorageKeyToInternalBinder<K> = (key: K) -> Any?
@@ -19,12 +20,26 @@ fun <T : Any> QueryableModule.storage0(name: String, binding: QueryableStorageBi
 }
 
 context(RuntimeContext)
+fun <T : Any> QueryableModule.storage0OrNull(name: String, binding: QueryableStorageBinder0<T>): QueryableStorageEntry0<T>? {
+    return module.storageOrNull(name)?.let { RealQueryableStorageEntry0(it, binding, this@RuntimeContext) }
+}
+
+context(RuntimeContext)
 fun <I, T> QueryableModule.storage1(
     name: String,
     binding: QueryableStorageBinder1<I, T>,
     keyBinding: QueryableStorageKeyFromInternalBinder<I>? = null
 ): QueryableStorageEntry1<I, T> {
     return RealQueryableStorageEntry1(module.storage(name), binding, this@RuntimeContext, keyBinding)
+}
+
+context(RuntimeContext)
+fun <I, T> QueryableModule.storage1OrNull(
+    name: String,
+    binding: QueryableStorageBinder1<I, T>,
+    keyBinding: QueryableStorageKeyFromInternalBinder<I>? = null
+): QueryableStorageEntry1<I, T>? {
+    return module.storageOrNull(name)?.let { RealQueryableStorageEntry1(it, binding, this@RuntimeContext, keyBinding) }
 }
 
 context(RuntimeContext)
