@@ -4,8 +4,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 
 /**
  * A signing chain of accounts.
+ * Contains at least 1 item in path.
+ * Ordering of accounts is built in the following order:
+ * - path[0] always contains account for Leaf Signer
+ * - path[1] Nested account
+ * ...
+ * - path[n - 1] Nested account
+ * - path[n] is always Selected account
  *
- * LeafSigner is the last of the order
  */
 class SubmissionHierarchy(
     val path: List<Node>

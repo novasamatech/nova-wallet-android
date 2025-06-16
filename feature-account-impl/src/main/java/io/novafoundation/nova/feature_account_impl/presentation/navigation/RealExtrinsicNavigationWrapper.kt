@@ -24,7 +24,7 @@ class RealExtrinsicNavigationWrapper(
             accountUseCase.selectMetaAccount(delayedAccount.id)
 
             if (delayedAccount.type == LightMetaAccount.Type.MULTISIG) {
-                accountRouter.finishMultisigTransaction()
+                accountRouter.openMainWithFinishMultisigTransaction()
             } else {
                 accountRouter.openMain()
             }
