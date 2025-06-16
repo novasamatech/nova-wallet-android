@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
+import io.novafoundation.nova.common.utils.graph.CompoundEdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
@@ -32,6 +33,8 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookup
 import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
@@ -106,7 +109,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.runningFold
@@ -140,6 +142,7 @@ internal class RealSwapService(
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val chainStateRepository: ChainStateRepository,
+    private val signerProvider: SignerProvider,
     private val debug: Boolean = BuildConfig.DEBUG
 ) : SwapService {
 
@@ -153,7 +156,9 @@ internal class RealSwapService(
     }
 
     private suspend fun warmUpChain(chainId: ChainId, computationScope: CoroutineScope) {
-        canPayFeeNodeFilter(computationScope).warmUpChain(chainId)
+        nodeVisitFilter(computationScope).filters
+            .filterIsInstance<ChainWarmingUp>()
+            .map { it.warmUpChain(chainId) }
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
@@ -175,7 +180,7 @@ internal class RealSwapService(
         computationScope: CoroutineScope
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map {
-            val filter = canPayFeeNodeFilter(computationScope)
+            val filter = nodeVisitFilter(computationScope)
             measureExecution("findAllPossibleDestinations") {
                 it.findAllPossibleDestinations(asset.fullId, filter) - asset.fullId
             }
@@ -404,6 +409,14 @@ internal class RealSwapService(
         }.debounce(500.milliseconds)
     }
 
+    override suspend fun isDeepSwapAllowed(): Boolean {
+        val signer = signerProvider.rootSignerFor(accountRepository.getSelectedMetaAccount())
+        return when (signer.callExecutionType()) {
+            CallExecutionType.IMMEDIATE -> true
+            CallExecutionType.DELAYED -> false
+        }
+    }
+
     private fun SwapQuoteArgs.calculatePriceImpact(amountIn: Balance, amountOut: Balance): Fraction {
         val fiatIn = tokenIn.planksToFiat(amountIn)
         val fiatOut = tokenOut.planksToFiat(amountOut)
@@ -466,12 +479,15 @@ internal class RealSwapService(
         }
     }
 
-    private suspend fun canPayFeeNodeFilter(computationScope: CoroutineScope): CanPayFeeNodeVisitFilter {
+    private suspend fun nodeVisitFilter(computationScope: CoroutineScope): CompoundEdgeVisitFilter<SwapGraphEdge> {
         return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
-            CanPayFeeNodeVisitFilter(
-                computationScope = this,
-                chainsById = chainRegistry.chainsById(),
-                selectedAccount = accountRepository.getSelectedMetaAccount()
+            CompoundEdgeVisitFilter(
+                CanPayFeeNodeVisitFilter(
+                    computationScope = this,
+                    chainsById = chainRegistry.chainsById(),
+                    selectedAccount = accountRepository.getSelectedMetaAccount()
+                ),
+                AvailableDepthFilter(accountRepository.getSelectedMetaAccount())
             )
         }
     }
@@ -563,7 +579,7 @@ internal class RealSwapService(
     private suspend fun getPathQuoter(computationScope: CoroutineScope): PathQuoter<SwapGraphEdge> {
         return computationalCache.useCache(QUOTER_CACHE, computationScope) {
             val graphFlow = directionsGraph(computationScope)
-            val filter = canPayFeeNodeFilter(computationScope)
+            val filter = nodeVisitFilter(computationScope)
 
             quoterFactory.create(graphFlow, this, SwapPathFeeEstimator(), filter)
         }
@@ -802,6 +818,10 @@ internal class RealSwapService(
         }
     }
 
+    interface ChainWarmingUp {
+        suspend fun warmUpChain(chainId: ChainId)
+    }
+
     /**
      * Check that it is possible to pay fees in moving asset
      */
@@ -809,11 +829,11 @@ internal class RealSwapService(
         val computationScope: CoroutineScope,
         val chainsById: ChainsById,
         val selectedAccount: MetaAccount,
-    ) : EdgeVisitFilter<SwapGraphEdge> {
+    ) : EdgeVisitFilter<SwapGraphEdge>, ChainWarmingUp {
 
         private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
 
-        suspend fun warmUpChain(chainId: ChainId) {
+        override suspend fun warmUpChain(chainId: ChainId) {
             getFeeCustomFeeCapability(chainId)
         }
 
@@ -862,6 +882,31 @@ internal class RealSwapService(
             return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
                 .onFailure { Log.e("Swap", "Failed to construct fast custom fee lookup for chain $chainId", it) }
                 .getOrNull()
+        }
+    }
+
+    private inner class AvailableDepthFilter(
+        selectedAccount: MetaAccount,
+    ) : EdgeVisitFilter<SwapGraphEdge> {
+
+        private val signer = signerProvider.rootSignerFor(selectedAccount)
+        private var callExecutionType: CallExecutionType? = null
+
+        override suspend fun shouldVisit(edge: SwapGraphEdge, pathPredecessor: SwapGraphEdge?): Boolean {
+            // First path segments don't have any extra restrictions
+            if (pathPredecessor == null) return true
+
+            if (getCallExecutionType() == CallExecutionType.DELAYED) return false
+
+            return true
+        }
+
+        private suspend fun getCallExecutionType(): CallExecutionType {
+            if (callExecutionType == null) {
+                callExecutionType = signer.callExecutionType()
+            }
+
+            return callExecutionType!!
         }
     }
 

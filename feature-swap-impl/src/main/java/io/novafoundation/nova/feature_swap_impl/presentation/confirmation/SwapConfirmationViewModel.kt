@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
@@ -94,10 +95,12 @@ class SwapConfirmationViewModel(
     private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val resourceManager: ResourceManager,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
-    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 
@@ -243,9 +246,13 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap(validPayload: SwapValidationPayload) = launchUnit {
-        swapStateStoreProvider.setState(validPayload.toSwapState())
+        if (swapInteractor.isDeepSwapAvailable()) {
+            swapStateStoreProvider.setState(validPayload.toSwapState())
 
-        swapRouter.openSwapExecution()
+            swapRouter.openSwapExecution()
+        } else {
+            swapInteractor.executeSwap(validPayload.fee)
+        }
     }
 
     private suspend fun getValidationPayload(): SwapValidationPayload {

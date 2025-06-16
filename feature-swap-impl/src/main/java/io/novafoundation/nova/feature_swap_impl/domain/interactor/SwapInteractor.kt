@@ -155,6 +155,10 @@ class SwapInteractor(
         return swapService.runSubscriptions(metaAccount)
     }
 
+    suspend fun isDeepSwapAvailable(): Boolean {
+        return swapService.isDeepSwapAllowed()
+    }
+
     private fun buyAvailable(chainAssetFlow: Flow<Chain.Asset?>): Flow<Boolean> {
         return chainAssetFlow.map { it != null && buyTokenRegistry.hasProvider(it, TradeTokenRegistry.TradeType.BUY) }
     }

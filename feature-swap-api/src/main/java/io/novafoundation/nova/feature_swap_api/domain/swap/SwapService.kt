@@ -38,4 +38,6 @@ interface SwapService {
     suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig
 
     fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
+
+    suspend fun isDeepSwapAllowed(): Boolean
 }

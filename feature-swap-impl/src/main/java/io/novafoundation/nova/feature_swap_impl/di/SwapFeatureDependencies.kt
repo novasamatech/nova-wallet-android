@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -150,6 +151,8 @@ interface SwapFeatureDependencies {
     val xcmVersionDetector: XcmVersionDetector
 
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+
+    val signerProvider: SignerProvider
 
     fun maxActionProviderFactory(): MaxActionProviderFactory
 }
