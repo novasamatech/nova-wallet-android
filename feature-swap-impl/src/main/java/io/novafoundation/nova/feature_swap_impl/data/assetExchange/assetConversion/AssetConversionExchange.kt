@@ -54,7 +54,10 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.common.utils.metadata
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
@@ -287,7 +290,21 @@ private class AssetConversionExchange(
             )
         }
 
-        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
+        override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
+            return submitInternal(args)
+                .mapCatching {
+                    SwapExecutionCorrection(
+                        actualReceivedAmount = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
+                    )
+                }
+        }
+
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
+            return submitInternal(args)
+                .map { SwapSubmissionResult(it.submissionHierarchy) }
+        }
+
+        private suspend fun submitInternal(args: AtomicSwapOperationSubmissionArgs): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -297,11 +314,7 @@ private class AssetConversionExchange(
             ) { buildingContext ->
                 // Send swapped funds to the executingAccount since it the account doing the swap
                 executeSwap(swapLimit = args.actualSwapLimit, sendTo = buildingContext.submissionOrigin.executingAccount)
-            }.requireOk().mapCatching {
-                SwapExecutionCorrection(
-                    actualReceivedAmount = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
-                )
-            }
+            }.requireOk()
         }
 
         private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {

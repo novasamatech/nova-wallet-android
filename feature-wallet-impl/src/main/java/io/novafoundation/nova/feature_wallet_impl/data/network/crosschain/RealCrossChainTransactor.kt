@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.e
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTrackingTransferResult
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
@@ -135,7 +136,7 @@ class RealCrossChainTransactor(
     override suspend fun performAndTrackTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-    ): Result<Balance> {
+    ): Result<CrossChainTrackingTransferResult> {
         // Start balances updates eagerly to not to miss events in case tx has been included to block right after submission
         val balancesUpdates = observeTransferableBalance(transfer)
             .wrapInResult()
@@ -145,10 +146,11 @@ class RealCrossChainTransactor(
 
         return performTransferOfExactAmount(configuration, transfer)
             .requireOk()
-            .flatMap {
+            .flatMap { executionResult ->
                 Log.d("CrossChain", "Cross chain transfer for successfully executed on origin, waiting for destination")
 
                 balancesUpdates.awaitCrossChainArrival(transfer)
+                    .map { CrossChainTrackingTransferResult(executionResult, it) }
             }
     }
 

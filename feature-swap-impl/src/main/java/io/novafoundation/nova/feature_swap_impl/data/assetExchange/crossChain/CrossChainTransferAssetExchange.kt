@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.addPlanks
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrect
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.crossChain
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
@@ -239,15 +241,24 @@ class CrossChainTransferAssetExchange(
             )
         }
 
-        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
+        override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
-            val outcome = with(crossChainTransfersUseCase) {
-                swapHost.extrinsicService().performTransfer(transfer, swapHost.scope)
+            val transferResult = with(crossChainTransfersUseCase) {
+                swapHost.extrinsicService().performTransferAndTrackTransfer(transfer, swapHost.scope)
             }
 
-            return outcome.map { receivedAmount ->
-                SwapExecutionCorrection(receivedAmount)
+            return transferResult.map { result ->
+                SwapExecutionCorrection(result.balance)
+            }
+        }
+
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
+            val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
+
+            return with(crossChainTransfersUseCase) {
+                swapHost.extrinsicService().performTransferOfExactAmount(transfer, swapHost.scope)
+                    .map { SwapSubmissionResult(it.submissionHierarchy) }
             }
         }
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -13,6 +14,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
@@ -138,6 +140,8 @@ class SwapInteractor(
     }
 
     suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = swapService.swap(calculatedFee)
+
+    suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> = swapService.submitFirstSwapStep(calculatedFee)
 
     suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {
         swapService.warmUpCommonChains(computationalScope)

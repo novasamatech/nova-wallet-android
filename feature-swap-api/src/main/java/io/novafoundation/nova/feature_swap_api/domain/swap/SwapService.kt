@@ -1,13 +1,16 @@
 package io.novafoundation.nova.feature_swap_api.domain.swap
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -34,6 +37,8 @@ interface SwapService {
     suspend fun estimateFee(executeArgs: SwapFeeArgs): SwapFee
 
     suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress>
+
+    suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult>
 
     suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig
 

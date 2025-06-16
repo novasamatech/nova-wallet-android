@@ -36,7 +36,7 @@ interface CrossChainTransactor {
     suspend fun performAndTrackTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
-    ): Result<Balance>
+    ): Result<CrossChainTrackingTransferResult>
 
     suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration
 }

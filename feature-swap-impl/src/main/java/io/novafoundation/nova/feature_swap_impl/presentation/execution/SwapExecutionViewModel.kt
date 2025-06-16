@@ -145,7 +145,7 @@ class SwapExecutionViewModel(
 
     private suspend fun SwapProgress.toUi(swapState: SwapState): SwapProgressModel {
         return when (this) {
-            SwapProgress.Done -> createCompletedStatus()
+            is SwapProgress.Done -> createCompletedStatus()
             is SwapProgress.Failure -> toUi()
             is SwapProgress.StepStarted -> toUi(swapState)
         }

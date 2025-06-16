@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTrackingTransferResult
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
@@ -145,10 +147,18 @@ internal class RealCrossChainTransfersUseCase(
         )
     }
 
-    override suspend fun ExtrinsicService.performTransfer(
+    override suspend fun ExtrinsicService.performTransferOfExactAmount(
         transfer: AssetTransferBase,
         computationalScope: CoroutineScope
-    ): Result<Balance> {
+    ): Result<ExtrinsicSubmission> {
+        val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
+        return crossChainTransactor.performTransfer(transferConfiguration, transfer, crossChainFee = Balance.ZERO)
+    }
+
+    override suspend fun ExtrinsicService.performTransferAndTrackTransfer(
+        transfer: AssetTransferBase,
+        computationalScope: CoroutineScope
+    ): Result<CrossChainTrackingTransferResult> {
         val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
         return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
     }

@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.onEachInstance
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -23,6 +24,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
@@ -32,6 +35,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
@@ -52,12 +56,14 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -251,8 +257,26 @@ class SwapConfirmationViewModel(
 
             swapRouter.openSwapExecution()
         } else {
-            swapInteractor.executeSwap(validPayload.fee)
+            executeFirstSwapStep(validPayload.fee)
         }
+    }
+
+    private suspend fun executeFirstSwapStep(fee: SwapFee) {
+        swapInteractor.submitFirstSwapStep(fee)
+            .onSuccess {
+                _validationInProgress.value = false
+
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+
+                startNavigation(it.submissionHierarchy) {
+                    val asset = assetOutFlow.first()
+                    swapRouter.openBalanceDetails(asset.token.configuration.toAssetPayload())
+                }
+            }.onFailure {
+                _validationInProgress.value = false
+
+                showError(resourceManager.getString(R.string.common_undefined_error_message))
+            }
     }
 
     private suspend fun getValidationPayload(): SwapValidationPayload {
