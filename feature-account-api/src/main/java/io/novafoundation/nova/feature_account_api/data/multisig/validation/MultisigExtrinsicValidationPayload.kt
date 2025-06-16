@@ -23,7 +23,7 @@ sealed class SignatoryFeePaymentMode {
     class PaysSubmissionFee(
         // The inner-most call (e.g. transfer)
         val actualCall: GenericCall.Instance
-    ): SignatoryFeePaymentMode()
+    ) : SignatoryFeePaymentMode()
 
     data object NothingToPay : SignatoryFeePaymentMode()
 }

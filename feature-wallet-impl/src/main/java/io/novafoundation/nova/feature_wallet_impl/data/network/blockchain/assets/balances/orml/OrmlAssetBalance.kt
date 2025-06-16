@@ -98,7 +98,6 @@ class OrmlAssetBalance(
         }
     }
 
-
     override suspend fun startSyncingBalance(
         chain: Chain,
         chainAsset: Chain.Asset,

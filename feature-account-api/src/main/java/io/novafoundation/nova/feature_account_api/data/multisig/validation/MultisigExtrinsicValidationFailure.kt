@@ -6,9 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccou
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-
 sealed interface MultisigExtrinsicValidationFailure {
-
 
     sealed interface NotEnoughSignatoryBalance : MultisigExtrinsicValidationFailure {
 
@@ -20,24 +18,24 @@ sealed interface MultisigExtrinsicValidationFailure {
             val fee: BigInteger,
             val deposit: BigInteger,
             val availableBalance: BigInteger
-        ): NotEnoughSignatoryBalance
+        ) : NotEnoughSignatoryBalance
 
         class ToPlaceDeposit(
             override val signatory: MetaAccount,
             val asset: Chain.Asset,
             val deposit: BigInteger,
             val availableBalance: BigInteger
-        ): NotEnoughSignatoryBalance
+        ) : NotEnoughSignatoryBalance
 
         class ToPayFeeAndStayAboveEd(
             override val signatory: MetaAccount,
             val asset: Chain.Asset,
             val neededBalance: BalanceOf,
             val availableBalance: BigInteger
-        ): NotEnoughSignatoryBalance
+        ) : NotEnoughSignatoryBalance
     }
 
     class OperationAlreadyExists(
         val multisigAccount: MultisigMetaAccount
-    ): MultisigExtrinsicValidationFailure
+    ) : MultisigExtrinsicValidationFailure
 }

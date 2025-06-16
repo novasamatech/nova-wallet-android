@@ -25,7 +25,7 @@ class MultisigExtrinsicValidationRequestBusHandler(
             }.launchIn(scope)
     }
 
-    private fun createValidationSystem(): MultisigExtrinsicValidationSystem  {
+    private fun createValidationSystem(): MultisigExtrinsicValidationSystem {
         return ValidationSystem {
             multisigExtrinsicValidationFactory.multisigSignatoryHasEnoughBalance()
             multisigExtrinsicValidationFactory.noPendingMultisigWithSameCallData()

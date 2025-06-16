@@ -71,7 +71,7 @@ class RealProxySigningPresenter @Inject constructor(
     ) {
         nestedSigningPresenter.presentValidationFailure(
             title = resourceManager.getString(R.string.error_not_enough_to_pay_fee_title),
-            message =  resourceManager.getString(
+            message = resourceManager.getString(
                 R.string.proxy_error_not_enough_to_pay_fee_message,
                 metaAccount.name,
                 fee.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol),

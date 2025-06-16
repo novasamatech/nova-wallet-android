@@ -493,7 +493,6 @@ fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
     return apis != null
 }
 
-
 fun GenericCall.Instance.toByteArray(runtimeSnapshot: RuntimeSnapshot): ByteArray {
     return GenericCall.toByteArray(runtimeSnapshot, this)
 }

@@ -55,6 +55,7 @@ interface AssetBalance {
         accountId: AccountId,
         sharedSubscriptionBuilder: SharedRequestsBuilder?,
     ): Flow<TransferableBalanceUpdate>
+
     /**
      * @return emits hash of the blocks where changes occurred. If no change were detected based on the upstream event - should emit null
      */

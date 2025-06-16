@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_impl.data.multisig.repository.Real
 import io.novafoundation.nova.feature_account_impl.presentation.multisig.MultisigSigningPresenter
 import io.novafoundation.nova.feature_account_impl.presentation.multisig.RealMultisigSigningPresenter
 
-
 @Module(includes = [MultisigSignerModule.BindsModule::class])
 class MultisigSignerModule {
 

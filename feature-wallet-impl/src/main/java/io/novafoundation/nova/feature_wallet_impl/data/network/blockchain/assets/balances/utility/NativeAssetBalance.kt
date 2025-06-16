@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import android.util.Log
 import io.novafoundation.nova.common.data.network.ext.transferableBalance
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber

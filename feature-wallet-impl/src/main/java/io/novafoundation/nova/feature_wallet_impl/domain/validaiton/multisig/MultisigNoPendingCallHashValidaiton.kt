@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 class MultisigNoPendingCallHashValidation(
     private val chainRegistry: ChainRegistry,
     private val multisigValidationsRepository: MultisigValidationsRepository,
-): MultisigExtrinsicValidation {
+) : MultisigExtrinsicValidation {
 
     override suspend fun validate(value: MultisigExtrinsicValidationPayload): ValidationStatus<MultisigExtrinsicValidationFailure> {
         val runtime = chainRegistry.getRuntime(value.chain.id)

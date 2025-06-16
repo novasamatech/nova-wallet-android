@@ -54,7 +54,7 @@ class RealMultisigSigningPresenter @Inject constructor(
     }
 
     override suspend fun presentValidationFailure(failure: MultisigExtrinsicValidationFailure) {
-        val (title, message) = when(failure) {
+        val (title, message) = when (failure) {
             is NotEnoughSignatoryBalance -> formatBalanceFailure(failure)
 
             is MultisigExtrinsicValidationFailure.OperationAlreadyExists -> formatOperationAlreadyExists(failure)
@@ -68,7 +68,7 @@ class RealMultisigSigningPresenter @Inject constructor(
 
         val messageFormat = resourceManager.getString(R.string.multisig_callhash_exists_message)
         val nameFormatted = formatName(failure.multisigAccount)
-        val message= SpannableFormatter.format(messageFormat, nameFormatted)
+        val message = SpannableFormatter.format(messageFormat, nameFormatted)
 
         return title to message
     }

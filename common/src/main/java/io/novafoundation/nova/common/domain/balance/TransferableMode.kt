@@ -14,8 +14,8 @@ fun TransferableMode.calculateTransferable(free: BigInteger, frozen: BigInteger,
     }
 }
 
-fun TransferableMode.calculateReservable(free: BigInteger, frozen: BigInteger, ed: BigInteger) : BigInteger {
-    return when(this) {
+fun TransferableMode.calculateReservable(free: BigInteger, frozen: BigInteger, ed: BigInteger): BigInteger {
+    return when (this) {
         TransferableMode.REGULAR -> legacyReservable(free, frozen, ed)
         TransferableMode.HOLDS_AND_FREEZES -> holdsAndFreezesReservable(free, ed)
     }
