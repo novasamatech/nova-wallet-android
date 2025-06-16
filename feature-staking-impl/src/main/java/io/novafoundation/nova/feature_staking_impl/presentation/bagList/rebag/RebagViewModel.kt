@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -54,10 +56,12 @@ class RebagViewModel(
     private val resourceManager: ResourceManager,
     private val iconGenerator: AddressIconGenerator,
     private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val accountStakingFlow = stakingInteractor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
@@ -138,7 +142,7 @@ class RebagViewModel(
         result.onSuccess {
             showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-            router.back()
+            startNavigation(it.submissionHierarchy) { router.back() }
         }
             .onFailure(::showError)
 

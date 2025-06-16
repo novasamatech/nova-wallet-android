@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
@@ -147,6 +148,8 @@ interface SwapFeatureDependencies {
     val assetsValidationContextFactory: AssetsValidationContext.Factory
 
     val xcmVersionDetector: XcmVersionDetector
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     fun maxActionProviderFactory(): MaxActionProviderFactory
 }

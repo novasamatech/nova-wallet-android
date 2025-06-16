@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
+import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.mock.LocalAccountsMocker
 import io.novafoundation.nova.feature_account_impl.mock.SecretStoreMocker
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo.KeyPairSecrets
@@ -57,6 +58,9 @@ import org.mockito.junit.MockitoJUnitRunner
 class RealLocalAccountsCloudBackupFacadeTest {
 
     @Mock
+    lateinit var multisigRepository: MultisigRepository
+
+    @Mock
     lateinit var metaAccountDao: MetaAccountDao
 
     @Mock
@@ -90,7 +94,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
             metaAccountChangedEvents = metaAccountChangesEventBus,
             chainRegistry = chainRegistry,
-            accountMappers = AccountMappers(ledgerMigrationTracker,gson)
+            accountMappers = AccountMappers(ledgerMigrationTracker, gson, multisigRepository)
 
         )
 

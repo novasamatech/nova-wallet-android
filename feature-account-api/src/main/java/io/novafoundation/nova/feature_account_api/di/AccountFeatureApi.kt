@@ -48,6 +48,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.I
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 
 interface AccountFeatureApi {
 
@@ -108,6 +109,8 @@ interface AccountFeatureApi {
     val multisigValidationsRepository: MultisigValidationsRepository
 
     val multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

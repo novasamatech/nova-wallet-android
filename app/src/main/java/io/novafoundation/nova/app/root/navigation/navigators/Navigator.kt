@@ -914,4 +914,8 @@ class Navigator(
         navigationBuilder().action(R.id.action_mainFragment_to_multisigPendingOperationsFlow)
             .navigateInFirstAttachedContext()
     }
+
+    override fun openMainWithFinishMultisigTransaction() {
+        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = null)
+    }
 }

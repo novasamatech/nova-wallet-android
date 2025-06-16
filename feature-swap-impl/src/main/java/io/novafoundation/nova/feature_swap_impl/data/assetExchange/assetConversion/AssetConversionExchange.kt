@@ -54,6 +54,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.common.utils.metadata
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
@@ -298,7 +299,7 @@ private class AssetConversionExchange(
                 executeSwap(swapLimit = args.actualSwapLimit, sendTo = buildingContext.submissionOrigin.executingAccount)
             }.requireOk().mapCatching {
                 SwapExecutionCorrection(
-                    actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
+                    actualReceivedAmount = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
                 )
             }
         }

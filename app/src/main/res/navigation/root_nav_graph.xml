@@ -246,7 +246,7 @@
     <fragment
         android:id="@+id/accountMigrationPairingFragment"
         android:name="io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingFragment"
-        android:label="AccountMigrationPairingFragment" >
+        android:label="AccountMigrationPairingFragment">
 
         <action
             android:id="@+id/action_migration_to_pin"

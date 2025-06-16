@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -74,6 +75,8 @@ class ProxiedSigner(
 
     override val metaAccount = proxiedMetaAccount
 
+    private val selfCallExecutionType = CallExecutionType.IMMEDIATE
+
     private val proxyMetaAccount = SingleValueCache {
         computeProxyMetaAccount()
     }
@@ -82,13 +85,16 @@ class ProxiedSigner(
         signerProvider.nestedSignerFor(proxyMetaAccount())
     }
 
+    override suspend fun getSigningHierarchy(): SubmissionHierarchy {
+        return delegateSigner().getSigningHierarchy() + SubmissionHierarchy(metaAccount, selfCallExecutionType)
+    }
+
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
         return delegateSigner().submissionSignerAccountId(chain)
     }
 
     override suspend fun callExecutionType(): CallExecutionType {
-        val selfExecutionType = CallExecutionType.IMMEDIATE
-        return delegateSigner().callExecutionType().intersect(selfExecutionType)
+        return delegateSigner().callExecutionType().intersect(selfCallExecutionType)
     }
 
     context(ExtrinsicBuilder)
