@@ -8,6 +8,6 @@ class ExtrinsicWatchResult<T : ExtrinsicStatus>(
     val submissionHierarchy: SubmissionHierarchy
 )
 
-fun List<ExtrinsicWatchResult<*>>.multiSubmissionHierarchy() = map { it.submissionHierarchy }
+fun List<ExtrinsicWatchResult<*>>.submissionHierarchy() = first().submissionHierarchy
 
 inline fun <reified T : ExtrinsicStatus> ExtrinsicWatchResult<*>.mapWithStatus() = ExtrinsicWatchResult(status as T, submissionHierarchy)

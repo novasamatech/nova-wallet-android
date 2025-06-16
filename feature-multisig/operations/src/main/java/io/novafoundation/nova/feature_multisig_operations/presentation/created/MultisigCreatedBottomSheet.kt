@@ -15,8 +15,4 @@ class MultisigCreatedBottomSheet : ActionBottomSheetDialogFragment<MultisigCreat
     }
 
     override fun subscribe(viewModel: MultisigCreatedViewModel) {}
-
-    override fun tryToDismiss() {
-        // Nothing to do. We handle dismissing in view model
-    }
 }

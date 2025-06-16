@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.multiSubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -138,7 +138,7 @@ class ConfirmPayoutViewModel(
             onSuccess = {
                 showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
 
-                startNavigation(it.multiSubmissionHierarchy()) { router.returnToStakingMain() }
+                startNavigation(it.submissionHierarchy()) { router.returnToStakingMain() }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }

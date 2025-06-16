@@ -13,20 +13,20 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigO
 class MultisigCreatedViewModel(
     private val resourceManager: ResourceManager,
     private val router: MultisigOperationsRouter
-) : ActionBottomSheetViewModel(router) {
+) : ActionBottomSheetViewModel() {
 
     override fun getPayload(): ActionBottomSheetPayload {
         return ActionBottomSheetPayload(
             imageRes = R.drawable.ic_multisig,
             title = resourceManager.getString(R.string.multisig_transaction_created_title),
             subtitle = getSubtitle(),
-            actionButtonPreferences = ButtonPreferences.primary(primaryButtonText(), ::viewDetailsClicked),
-            neutralButtonPreferences = ButtonPreferences.secondary(secondaryButtonText(), ::back),
+            actionButtonPreferences = ButtonPreferences.primary(primaryButtonText()),
+            neutralButtonPreferences = ButtonPreferences.secondary(secondaryButtonText()),
             checkBoxPreferences = null
         )
     }
 
-    fun viewDetailsClicked() {
+    override fun onActionClicked() {
         router.openPendingOperations()
     }
 

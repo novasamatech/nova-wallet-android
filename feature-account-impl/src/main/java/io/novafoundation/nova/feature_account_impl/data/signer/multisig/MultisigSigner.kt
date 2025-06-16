@@ -45,6 +45,7 @@ class MultisigSignerFactory @Inject constructor(
 // TODO multisig:
 // 1. support threshold 1 multisigs (including weight estimation upon submission)
 // 2. certain operations cannot execute multisig (in general - CallExecutionType.DELAYED). We should add corresponding checks and validations
+// 3. Create a base class NestedSigner for Multisig and Proxieds
 // Example: 1 click swaps
 class MultisigSigner(
     private val multisigAccount: MultisigMetaAccount,
@@ -57,6 +58,8 @@ class MultisigSigner(
 
     override val metaAccount = multisigAccount
 
+    private val selfCallExecutionType = CallExecutionType.DELAYED
+
     private val signatoryMetaAccount = SingleValueCache {
         computeSignatoryMetaAccount()
     }
@@ -66,12 +69,11 @@ class MultisigSigner(
     }
 
     override suspend fun getSigningHierarchy(): SubmissionHierarchy {
-        return delegateSigner().getSigningHierarchy() + SubmissionHierarchy(metaAccount, callExecutionType())
+        return delegateSigner().getSigningHierarchy() + SubmissionHierarchy(metaAccount, selfCallExecutionType)
     }
 
     override suspend fun callExecutionType(): CallExecutionType {
-        val selfExecutionType = CallExecutionType.DELAYED
-        return delegateSigner().callExecutionType().intersect(selfExecutionType)
+        return delegateSigner().callExecutionType().intersect(selfCallExecutionType)
     }
 
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {

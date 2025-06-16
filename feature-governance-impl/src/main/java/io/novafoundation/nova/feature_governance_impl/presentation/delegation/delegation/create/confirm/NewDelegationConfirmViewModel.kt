@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.multiSubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -216,7 +216,7 @@ class NewDelegationConfirmViewModel(
             onSuccess = {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                startNavigation(it.multiSubmissionHierarchy()) { router.backToYourDelegations() }
+                startNavigation(it.submissionHierarchy()) { router.backToYourDelegations() }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.backToYourDelegations() }

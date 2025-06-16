@@ -8,9 +8,4 @@ interface ExtrinsicNavigationWrapper {
         submissionHierarchy: SubmissionHierarchy,
         fallback: suspend () -> Unit
     )
-
-    suspend fun startNavigation(
-        multiSubmissionHierarchy: List<SubmissionHierarchy>,
-        fallback: suspend () -> Unit
-    )
 }

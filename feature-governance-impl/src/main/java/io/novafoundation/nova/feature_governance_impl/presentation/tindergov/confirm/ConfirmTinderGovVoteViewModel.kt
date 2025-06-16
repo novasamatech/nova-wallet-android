@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.multiSubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -148,7 +148,7 @@ class ConfirmTinderGovVoteViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                startNavigation(it.multiSubmissionHierarchy()) { onVoteSuccess(payload.basket) }
+                startNavigation(it.submissionHierarchy()) { onVoteSuccess(payload.basket) }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }

@@ -2,6 +2,11 @@ package io.novafoundation.nova.feature_account_api.data.signer
 
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 
+/**
+ * A signing chain of accounts.
+ *
+ * LeafSigner is the last of the order
+ */
 class SubmissionHierarchy(
     val path: List<Node>
 ) {

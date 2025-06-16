@@ -75,6 +75,8 @@ class ProxiedSigner(
 
     override val metaAccount = proxiedMetaAccount
 
+    private val selfCallExecutionType = CallExecutionType.IMMEDIATE
+
     private val proxyMetaAccount = SingleValueCache {
         computeProxyMetaAccount()
     }
@@ -84,7 +86,7 @@ class ProxiedSigner(
     }
 
     override suspend fun getSigningHierarchy(): SubmissionHierarchy {
-        return delegateSigner().getSigningHierarchy() + SubmissionHierarchy(metaAccount, callExecutionType())
+        return delegateSigner().getSigningHierarchy() + SubmissionHierarchy(metaAccount, selfCallExecutionType)
     }
 
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {
@@ -92,8 +94,7 @@ class ProxiedSigner(
     }
 
     override suspend fun callExecutionType(): CallExecutionType {
-        val selfExecutionType = CallExecutionType.IMMEDIATE
-        return delegateSigner().callExecutionType().intersect(selfExecutionType)
+        return delegateSigner().callExecutionType().intersect(selfCallExecutionType)
     }
 
     context(ExtrinsicBuilder)

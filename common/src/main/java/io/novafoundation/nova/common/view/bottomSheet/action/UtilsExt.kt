@@ -9,7 +9,8 @@ import io.novafoundation.nova.common.view.PrimaryButton
 
 fun BottomSheetActionBinding.setupView(
     payload: ActionBottomSheetPayload,
-    onDismiss: () -> Unit
+    onPositiveButtonClicked: (() -> Unit)?,
+    onNeutralButtonClicked: (() -> Unit)?
 ) {
     val iconView: ImageView = actionBottomSheetImage
     val titleView: TextView = actionBottomSheetTitle
@@ -27,7 +28,7 @@ fun BottomSheetActionBinding.setupView(
         setAppearance(payload.actionButtonPreferences.style)
         setOnClickListener {
             payload.actionButtonPreferences.onClick?.invoke()
-            onDismiss()
+            onPositiveButtonClicked?.invoke()
         }
     }
 
@@ -37,7 +38,7 @@ fun BottomSheetActionBinding.setupView(
             setAppearance(preferences.style)
             setOnClickListener {
                 preferences.onClick?.invoke()
-                onDismiss()
+                onNeutralButtonClicked?.invoke()
             }
         }
     } ?: neutralButton.makeGone()

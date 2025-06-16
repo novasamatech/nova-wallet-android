@@ -14,6 +14,10 @@ class ActionBottomSheet(
     override val binder: BottomSheetActionBinding = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
 
     init {
-        binder.setupView(payload) { dismiss() }
+        binder.setupView(
+            payload,
+            onPositiveButtonClicked = ::dismiss, // We handle click using payload.actionButtonPreferences.onClick
+            onNeutralButtonClicked = ::dismiss
+        )
     }
 }
