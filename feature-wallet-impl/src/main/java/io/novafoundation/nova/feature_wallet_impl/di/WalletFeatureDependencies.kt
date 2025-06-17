@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -98,6 +99,8 @@ interface WalletFeatureDependencies {
     val xcmVersionDetector: XcmVersionDetector
 
     val dryRunApi: DryRunApi
+
+    val multisigValidationsRepository: MultisigValidationsRepository
 
     fun preferences(): Preferences
 

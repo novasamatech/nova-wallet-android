@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.moonbeam.MoonbeamCrowdloanInteractor
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.validations.custom.moonbeam.MoonbeamTermsPayload
@@ -49,10 +50,12 @@ class MoonbeamCrowdloanTermsViewModel(
     private val assetUseCase: AssetUseCase,
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: MoonbeamTermsValidationSystem,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     FeeLoaderMixin by feeLoaderMixin,
     Validatable by validationExecutor,
-    Browserable {
+    Browserable,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     init {
         loadFee()
@@ -121,7 +124,7 @@ class MoonbeamCrowdloanTermsViewModel(
         interactor.submitAgreement(parachainMetadata.first())
             .onFailure(::showError)
             .onSuccess {
-                router.openContribute(payload)
+                startNavigation(it.submissionHierarchy) { router.openContribute(payload) }
             }
 
         submittingInProgressFlow.value = false

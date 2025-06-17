@@ -2,11 +2,15 @@ package io.novafoundation.nova.runtime.storage.source.query.api
 
 import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.createStorageKey
+import io.novafoundation.nova.runtime.storage.source.query.AtBlock
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
+import io.novafoundation.nova.runtime.storage.source.query.toAtBlock
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 
 typealias QueryableStorageBinder0<V> = (dynamicInstance: Any) -> V
 
@@ -25,6 +29,17 @@ interface QueryableStorageEntry0<T : Any> {
     fun observeWithRaw(): Flow<WithRawValue<T?>>
 
     fun storageKey(): String
+}
+
+context(StorageQueryContext)
+fun <V : Any> QueryableStorageEntry0<V>.observeWithBlockHash(): Flow<AtBlock<V?>> {
+    return observeWithRaw().map { it.toAtBlock() }
+}
+
+context(StorageQueryContext)
+@Suppress("UNCHECKED_CAST")
+fun <V : Any> QueryableStorageEntry0<V>.observeNonNullWithBlockHash(): Flow<AtBlock<V>> {
+    return observeWithBlockHash().filter { it.value != null } as Flow<AtBlock<V>>
 }
 
 context(StorageQueryContext)

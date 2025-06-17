@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.cloudBackup
 
+import com.google.gson.Gson
 import io.novafoundation.feature_cloud_backup_test.TEST_MODIFIED_AT
 import io.novafoundation.feature_cloud_backup_test.buildTestCloudBackup
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.events.buildChangesEvent
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
+import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.mock.LocalAccountsMocker
 import io.novafoundation.nova.feature_account_impl.mock.SecretStoreMocker
 import io.novafoundation.nova.feature_cloud_backup_api.domain.model.CloudBackup.WalletPrivateInfo.KeyPairSecrets
@@ -56,6 +58,9 @@ import org.mockito.junit.MockitoJUnitRunner
 class RealLocalAccountsCloudBackupFacadeTest {
 
     @Mock
+    lateinit var multisigRepository: MultisigRepository
+
+    @Mock
     lateinit var metaAccountDao: MetaAccountDao
 
     @Mock
@@ -75,6 +80,9 @@ class RealLocalAccountsCloudBackupFacadeTest {
     @Mock
     lateinit var ledgerMigrationTracker: LedgerMigrationTracker
 
+    @Mock
+    lateinit var gson: Gson
+
     private val ethereumDerivationPath = "//44//60//0/0/0"
 
 
@@ -86,7 +94,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
             cloudBackupAccountsModificationsTracker = cloudBackupAccountsModificationsTracker,
             metaAccountChangedEvents = metaAccountChangesEventBus,
             chainRegistry = chainRegistry,
-            accountMappers = AccountMappers(ledgerMigrationTracker)
+            accountMappers = AccountMappers(ledgerMigrationTracker, gson, multisigRepository)
 
         )
 

@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import java.math.BigDecimal
 
+// TODO we should remove duplication between Asset and ChainAssetBalance in regard to calculation of different balance types
 data class Asset(
     val token: Token,
 

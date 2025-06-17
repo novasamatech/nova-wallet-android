@@ -52,4 +52,28 @@ data class ProxyAccountLocal(
             return "$proxyMetaId:$chainId:${proxiedAccountId.toHexString()}:$proxyType"
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ProxyAccountLocal) return false
+
+        if (proxiedMetaId != other.proxiedMetaId) return false
+        if (proxyMetaId != other.proxyMetaId) return false
+        if (chainId != other.chainId) return false
+        if (!proxiedAccountId.contentEquals(other.proxiedAccountId)) return false
+        if (proxyType != other.proxyType) return false
+        if (identifier != other.identifier) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = proxiedMetaId.hashCode()
+        result = 31 * result + proxyMetaId.hashCode()
+        result = 31 * result + chainId.hashCode()
+        result = 31 * result + proxiedAccountId.contentHashCode()
+        result = 31 * result + proxyType.hashCode()
+        result = 31 * result + identifier.hashCode()
+        return result
+    }
 }

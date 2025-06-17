@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.utils.DEFAULT_PREFIX
@@ -41,6 +42,8 @@ interface LightMetaAccount {
     val type: Type
     val status: Status
 
+    val parentMetaId: Long?
+
     enum class Type {
         SECRETS,
         WATCH_ONLY,
@@ -48,7 +51,8 @@ interface LightMetaAccount {
         LEDGER_LEGACY,
         LEDGER,
         POLKADOT_VAULT,
-        PROXIED
+        PROXIED,
+        MULTISIG
     }
 
     enum class Status {
@@ -68,6 +72,7 @@ fun LightMetaAccount(
     name: String,
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
+    parentMetaId: Long?,
 ) = object : LightMetaAccount {
     override val id: Long = id
     override val globallyUniqueId: String = globallyUniqueId
@@ -80,12 +85,10 @@ fun LightMetaAccount(
     override val name: String = name
     override val type: LightMetaAccount.Type = type
     override val status: LightMetaAccount.Status = status
+    override val parentMetaId: Long? = parentMetaId
 }
 
 interface MetaAccount : LightMetaAccount {
-
-    // TODO we can now subclass MetaAccount and have this field only in subclass
-    val proxy: ProxyAccount?
 
     // TODO this should not be exposed as its a implementation detail
     // We should rather use something like
@@ -108,8 +111,47 @@ interface MetaAccount : LightMetaAccount {
     fun accountIdIn(chain: Chain): AccountId?
 
     fun publicKeyIn(chain: Chain): ByteArray?
+}
+
+interface SecretsMetaAccount : MetaAccount {
 
     fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption?
+}
+
+interface ProxiedMetaAccount : MetaAccount {
+
+    val proxy: ProxyAccount
+}
+
+interface MultisigMetaAccount : MetaAccount {
+
+    val signatoryMetaId: Long
+
+    val signatoryAccountId: AccountIdKey
+
+    val otherSignatories: List<AccountIdKey>
+
+    val threshold: Int
+
+    val availability: MultisigAvailability
+}
+
+sealed class MultisigAvailability {
+
+    data object Universal : MultisigAvailability()
+
+    class SingleChain(val chainId: ChainId) : MultisigAvailability()
+}
+
+fun MetaAccount.isUniversal(): Boolean {
+    return substrateAccountId != null || ethereumAddress != null
+}
+
+fun MultisigAvailability.singleChainId(): ChainId? {
+    return when (this) {
+        is MultisigAvailability.SingleChain -> chainId
+        MultisigAvailability.Universal -> null
+    }
 }
 
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
@@ -139,6 +181,14 @@ fun MetaAccount.substrateMultiChainEncryption(): MultiChainEncryption? {
 
 fun MetaAccount.requireAccountIdIn(chain: Chain): ByteArray {
     return requireNotNull(accountIdIn(chain))
+}
+
+fun MetaAccount.requireAccountIdKeyIn(chain: Chain): AccountIdKey {
+    return requireAccountIdIn(chain).intoKey()
+}
+
+fun MetaAccount.multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
+    return (this as? SecretsMetaAccount)?.multiChainEncryptionIn(chain)
 }
 
 fun MetaAccount.cryptoTypeIn(chain: Chain): CryptoType? {
@@ -183,7 +233,8 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.LEDGER,
         LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-        LightMetaAccount.Type.PROXIED -> false
+        LightMetaAccount.Type.PROXIED,
+        LightMetaAccount.Type.MULTISIG -> false
     }
 }
 

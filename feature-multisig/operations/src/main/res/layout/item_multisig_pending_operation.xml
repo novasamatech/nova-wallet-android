@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="4dp"
+    android:orientation="vertical"
+    android:paddingVertical="16dp"
+    tools:background="@color/block_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:gravity="top"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/itemPendingOperationChain"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:lines="1"
+            android:textColor="@color/text_primary"
+            tools:text="Passings" />
+
+        <TextView
+            android:id="@+id/itemPendingOperationProgress"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_secondary"
+            tools:text="3/5 signed" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/item_pending_operation_title"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/text_primary"
+        tools:text="Balances.transfer" />
+
+    <TextView
+        android:id="@+id/itemPendingOperationAction"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/button_text_accent"
+        tools:text="Pending Signature" />
+</LinearLayout>

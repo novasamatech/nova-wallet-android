@@ -35,6 +35,7 @@ import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
@@ -47,6 +48,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnl
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
@@ -210,9 +212,13 @@ interface AssetsFeatureDependencies {
 
     val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory
 
+    val multisigPendingOperationsService: MultisigPendingOperationsService
+
     val automaticInteractionGate: AutomaticInteractionGate
 
     val linkBuilderFactory: LinkBuilderFactory
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

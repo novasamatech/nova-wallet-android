@@ -90,7 +90,7 @@ interface RootComponent {
             LedgerFeatureApi::class,
             BuyFeatureApi::class,
             DeepLinkingFeatureApi::class,
-            AccountMigrationFeatureApi::class
+            AccountMigrationFeatureApi::class,
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

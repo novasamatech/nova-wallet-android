@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_external_sign_impl.di.modules.sign.PolkadotSignModule.BindsModule
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot.PolkadotSignInteractorFactory
@@ -37,6 +38,7 @@ class PolkadotSignModule {
         addressIconGenerator: AddressIconGenerator,
         signerProvider: SignerProvider,
         metadataShortenerService: MetadataShortenerService,
+        signingContextFactory: SigningContext.Factory,
         signBytesChainResolver: SignBytesChainResolver
     ) = PolkadotSignInteractorFactory(
         extrinsicService = extrinsicService,
@@ -46,6 +48,7 @@ class PolkadotSignModule {
         addressIconGenerator = addressIconGenerator,
         signerProvider = signerProvider,
         metadataShortenerService = metadataShortenerService,
+        signingContextFactory = signingContextFactory,
         signBytesChainResolver = signBytesChainResolver
     )
 }

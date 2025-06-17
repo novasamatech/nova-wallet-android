@@ -157,7 +157,7 @@ class BalancesIntegrationTest(
             type = LightMetaAccount.Type.WATCH_ONLY,
             status = LightMetaAccount.Status.ACTIVE,
             chainAccounts = emptyMap(),
-            proxy = null
+            parentMetaId = null
         )
         return metaAccount
     }

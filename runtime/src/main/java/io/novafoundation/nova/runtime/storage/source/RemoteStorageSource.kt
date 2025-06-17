@@ -53,7 +53,7 @@ class RemoteStorageSource(
             chainId = chainId,
             at = at,
             runtime = runtime,
-            applyStorageDefault = applyStorageDefault
+            applyStorageDefault = applyStorageDefault,
         )
     }
 

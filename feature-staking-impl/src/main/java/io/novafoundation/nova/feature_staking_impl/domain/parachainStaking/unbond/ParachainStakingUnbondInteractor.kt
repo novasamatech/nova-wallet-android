@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.delegationAmountTo
@@ -12,10 +13,11 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -24,7 +26,7 @@ interface ParachainStakingUnbondInteractor {
 
     suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee
 
-    suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*>
+    suspend fun unbond(amount: BigInteger, collator: AccountId): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     suspend fun canUnbond(fromCollator: AccountId, delegatorState: DelegatorState): Boolean
 
@@ -47,7 +49,7 @@ class RealParachainStakingUnbondInteractor(
         }
     }
 
-    override suspend fun unbond(amount: BigInteger, collator: AccountId): Result<*> = withContext(Dispatchers.IO) {
+    override suspend fun unbond(amount: BigInteger, collator: AccountId) = withContext(Dispatchers.IO) {
         val chain = selectedAssetSharedState.chain()
 
         extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {

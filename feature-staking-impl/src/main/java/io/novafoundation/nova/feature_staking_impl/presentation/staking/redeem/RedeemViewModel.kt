@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
@@ -42,11 +44,13 @@ class RedeemViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -121,10 +125,10 @@ class RedeemViewModel(
 
     private fun sendTransaction(redeemValidationPayload: RedeemValidationPayload) = launch {
         redeemInteractor.redeem(accountStakingFlow.first(), redeemValidationPayload.asset)
-            .onSuccess { redeemConsequences ->
+            .onSuccess { (submissionResult, redeemConsequences) ->
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishRedeemFlow(redeemConsequences)
+                startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }
             .onFailure(::showError)
 

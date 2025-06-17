@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
@@ -31,6 +33,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
@@ -51,6 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,10 +98,12 @@ class SwapConfirmationViewModel(
     private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val resourceManager: ResourceManager,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
-    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 
@@ -243,9 +249,31 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap(validPayload: SwapValidationPayload) = launchUnit {
-        swapStateStoreProvider.setState(validPayload.toSwapState())
+        if (swapInteractor.isDeepSwapAvailable()) {
+            swapStateStoreProvider.setState(validPayload.toSwapState())
 
-        swapRouter.openSwapExecution()
+            swapRouter.openSwapExecution()
+        } else {
+            executeFirstSwapStep(validPayload.fee)
+        }
+    }
+
+    private suspend fun executeFirstSwapStep(fee: SwapFee) {
+        swapInteractor.submitFirstSwapStep(fee)
+            .onSuccess {
+                _validationInProgress.value = false
+
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+
+                startNavigation(it.submissionHierarchy) {
+                    val asset = assetOutFlow.first()
+                    swapRouter.openBalanceDetails(asset.token.configuration.toAssetPayload())
+                }
+            }.onFailure {
+                _validationInProgress.value = false
+
+                showError(resourceManager.getString(R.string.common_undefined_error_message))
+            }
     }
 
     private suspend fun getValidationPayload(): SwapValidationPayload {

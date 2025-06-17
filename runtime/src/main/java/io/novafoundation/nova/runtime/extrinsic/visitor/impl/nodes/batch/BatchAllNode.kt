@@ -2,9 +2,9 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindGenericCallList
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.EventCountingContext
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedCallNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedExtrinsicVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.VisitingContext
 import io.novafoundation.nova.runtime.extrinsic.visitor.impl.indexOfLastOrThrow
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -52,7 +52,7 @@ internal class BatchAllNode : NestedCallNode {
                 context.eventQueue.popFromEnd(itemCompletedEventType)
                 val alNestedEvents = context.takeCompletedBatchItemEvents(innerCall)
 
-                ExtrinsicVisit(
+                NestedExtrinsicVisit(
                     rootExtrinsic = context.rootExtrinsic,
                     call = innerCall,
                     success = true,
@@ -60,7 +60,7 @@ internal class BatchAllNode : NestedCallNode {
                     origin = context.origin
                 )
             } else {
-                ExtrinsicVisit(
+                NestedExtrinsicVisit(
                     rootExtrinsic = context.rootExtrinsic,
                     call = innerCall,
                     success = false,

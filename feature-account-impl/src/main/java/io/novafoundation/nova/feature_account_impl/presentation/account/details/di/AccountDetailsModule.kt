@@ -19,7 +19,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
@@ -47,19 +48,21 @@ class AccountDetailsModule {
         interactor: WalletDetailsInteractor,
         appLinksProvider: AppLinksProvider,
         ledgerMigrationTracker: LedgerMigrationTracker,
+        multisigFormatter: MultisigFormatter,
         router: AccountRouter,
         addressSchemeFormatter: AddressSchemeFormatter
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
-            polkadotVaultVariantConfigProvider,
-            resourceManager,
-            accountFormatterFactory,
-            proxyFormatter,
-            interactor,
-            appLinksProvider,
-            ledgerMigrationTracker,
-            router,
-            addressSchemeFormatter
+            polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
+            resourceManager = resourceManager,
+            accountFormatterFactory = accountFormatterFactory,
+            proxyFormatter = proxyFormatter,
+            multisigFormatter = multisigFormatter,
+            interactor = interactor,
+            appLinksProvider = appLinksProvider,
+            ledgerMigrationTracker = ledgerMigrationTracker,
+            router = router,
+            addressSchemeFormatter = addressSchemeFormatter,
         )
     }
 

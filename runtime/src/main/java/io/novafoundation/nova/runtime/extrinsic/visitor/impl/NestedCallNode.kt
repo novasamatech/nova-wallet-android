@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicW
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 
 internal interface NestedCallNode {
 
@@ -39,10 +40,23 @@ internal interface VisitingContext {
 
     val eventQueue: MutableEventQueue
 
-    fun nestedVisit(visit: ExtrinsicVisit)
+    fun nestedVisit(visit: NestedExtrinsicVisit)
 
     fun endExclusiveToSkipInternalEvents(call: GenericCall.Instance): Int
 }
+
+/**
+ * Version of [ExtrinsicVisit] intended for nested usage
+ *
+ * @see [ExtrinsicVisit]
+ */
+internal class NestedExtrinsicVisit(
+    val rootExtrinsic: ExtrinsicWithEvents,
+    val call: GenericCall.Instance,
+    val success: Boolean,
+    val events: List<GenericEvent.Instance>,
+    val origin: AccountId,
+)
 
 internal interface EventCountingContext {
 

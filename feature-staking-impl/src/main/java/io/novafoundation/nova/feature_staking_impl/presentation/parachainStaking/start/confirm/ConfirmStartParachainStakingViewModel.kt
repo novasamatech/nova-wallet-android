@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
@@ -72,6 +74,7 @@ class ConfirmStartParachainStakingViewModel(
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : ConfirmStartSingleTargetStakingViewModel<ParachainConfirmStartStakingState>(
     stateFactory = { computationalScope ->
@@ -93,7 +96,8 @@ class ConfirmStartParachainStakingViewModel(
     assetUseCase = assetUseCase,
     walletUiUseCase = walletUiUseCase,
     payload = payload,
-) {
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     override val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
 
@@ -142,7 +146,7 @@ class ConfirmStartParachainStakingViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow()
+                startNavigation(it.submissionHierarchy) { finishFlow() }
             }
 
         _showNextProgress.value = false

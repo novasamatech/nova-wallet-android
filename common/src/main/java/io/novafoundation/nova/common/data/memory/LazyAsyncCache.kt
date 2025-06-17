@@ -32,12 +32,12 @@ inline fun <K, V> SharedFlowCache(
     coroutineScope: CoroutineScope,
     crossinline compute: suspend (key: K) -> Flow<V>
 ): LazyAsyncCache<K, SharedFlow<V>> {
-    return LazyAsyncCache(coroutineScope) { key, scope ->
-        compute(key).shareIn(scope, SharingStarted.Eagerly, replay = 1)
+    return LazyAsyncCache(coroutineScope) { key ->
+        compute(key).shareIn(coroutineScope, SharingStarted.Eagerly, replay = 1)
     }
 }
 
-typealias AsyncCacheCompute<K, V> = suspend (key: K, scope: CoroutineScope) -> V
+typealias AsyncCacheCompute<K, V> = suspend (key: K) -> V
 
 private class RealLazyAsyncCache<K, V>(
     private val lifetime: CoroutineScope,
@@ -51,7 +51,7 @@ private class RealLazyAsyncCache<K, V>(
         mutex.withLock {
             if (key in cache) return cache.getValue(key)
 
-            return compute(key, lifetime).also {
+            return compute(key).also {
                 cache[key] = it
             }
         }

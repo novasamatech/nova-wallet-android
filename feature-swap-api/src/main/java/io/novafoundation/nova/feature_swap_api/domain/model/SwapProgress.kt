@@ -6,7 +6,7 @@ sealed class SwapProgress {
 
     class Failure(val error: Throwable, val attemptedStep: SwapProgressStep) : SwapProgress()
 
-    object Done : SwapProgress()
+    data object Done : SwapProgress()
 }
 
 class SwapProgressStep(

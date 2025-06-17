@@ -3,11 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.splitByWeights
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosDe
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.MythosDelegatorState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -47,7 +47,7 @@ interface MythosClaimRewardsInteractor {
     suspend fun claimRewards(
         claimableRewards: Balance,
         shouldRestake: Boolean
-    ): Result<Unit>
+    ): Result<ExtrinsicExecutionResult>
 }
 
 private const val SHOULD_RESTAKE_DEFAULT = true
@@ -92,7 +92,7 @@ class RealMythosClaimRewardsInteractor @Inject constructor(
     override suspend fun claimRewards(
         claimableRewards: Balance,
         shouldRestake: Boolean
-    ): Result<Unit> {
+    ): Result<ExtrinsicExecutionResult> {
         val chain = stakingSharedState.chain()
 
         return extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.SelectedWallet) {
@@ -100,7 +100,6 @@ class RealMythosClaimRewardsInteractor @Inject constructor(
         }
             .requireOk()
             .onSuccess { userStakeRepository.setLastShouldRestakeSelection(shouldRestake) }
-            .coerceToUnit()
     }
 
     private suspend fun ExtrinsicBuilder.claimRewards(

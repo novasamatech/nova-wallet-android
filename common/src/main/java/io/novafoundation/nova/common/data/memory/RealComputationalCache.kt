@@ -47,17 +47,17 @@ internal class RealComputationalCache : ComputationalCache, CoroutineScope by Co
     override fun <T> useSharedFlow(
         key: String,
         scope: CoroutineScope,
-        flowLazy: suspend () -> Flow<T>
+        flowLazy: suspend CoroutineScope.() -> Flow<T>
     ): Flow<T> {
         return flowOfAll {
             useCacheInternal(key, scope) {
                 val inner = singleReplaySharedFlow<T>()
 
                 launch {
-                    flowLazy()
+                    flowLazy(this@useCacheInternal)
                         .onEach { inner.emit(it) }
                         .inBackground()
-                        .launchIn(this)
+                        .launchIn(this@useCacheInternal)
                 }
 
                 return@useCacheInternal { inner }

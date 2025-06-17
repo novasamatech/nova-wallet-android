@@ -79,7 +79,7 @@ internal class BatchAllWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(signer, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -95,7 +95,7 @@ internal class BatchAllWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(signer, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -121,7 +121,7 @@ internal class BatchAllWalkTest {
             events = events
         )
 
-        val visits = extrinsicWalk.walkMultiple(extrinsic, expectedSize = 2)
+        val visits = extrinsicWalk.walkMultipleIgnoringBranches(extrinsic, expectedSize = 2)
         visits.forEach { visit ->
             assertEquals(true, visit.success)
             assertArrayEquals(signer, visit.origin)
@@ -139,7 +139,7 @@ internal class BatchAllWalkTest {
             events = events
         )
 
-        val visits = extrinsicWalk.walkMultiple(extrinsic, expectedSize = 2)
+        val visits = extrinsicWalk.walkMultipleIgnoringBranches(extrinsic, expectedSize = 2)
 
         visits.forEach { visit ->
             assertEquals(false, visit.success)
@@ -199,7 +199,7 @@ internal class BatchAllWalkTest {
             events = events
         )
 
-        val visits = extrinsicWalk.walkMultiple(extrinsic, expectedSize = 5)
+        val visits = extrinsicWalk.walkMultipleIgnoringBranches(extrinsic, expectedSize = 5)
         visits.forEach { visit ->
             assertEquals(true, visit.success)
             assertArrayEquals(signer, visit.origin)

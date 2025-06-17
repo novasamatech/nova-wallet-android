@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -46,6 +47,8 @@ interface CrowdloanFeatureDependencies {
     val externalBalanceDao: ExternalBalanceDao
 
     val assetIconProvider: AssetIconProvider
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     fun contributionDao(): ContributionDao
 

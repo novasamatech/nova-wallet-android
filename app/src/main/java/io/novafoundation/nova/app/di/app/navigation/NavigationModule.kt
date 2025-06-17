@@ -37,7 +37,8 @@ import io.novafoundation.nova.splash.SplashRouter
         PushNotificationsNavigationModule::class,
         CloudBackupNavigationModule::class,
         AssetNavigationModule::class,
-        AccountMigrationNavigationModule::class
+        AccountMigrationNavigationModule::class,
+        MultisigNavigationModule::class
     ]
 )
 class NavigationModule {

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -90,7 +91,8 @@ class BalanceListModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetListMixinFactory: AssetListMixinFactory,
         amountFormatter: AmountFormatter,
-        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+        multisigPendingOperationsService: MultisigPendingOperationsService,
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -106,7 +108,8 @@ class BalanceListModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
             amountFormatter = amountFormatter,
-            buySellSelectorMixinFactory = buySellSelectorMixinFactory
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory,
+            multisigPendingOperationsService = multisigPendingOperationsService
         )
     }
 
