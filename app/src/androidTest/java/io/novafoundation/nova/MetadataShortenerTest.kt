@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -133,6 +134,10 @@ class MetadataShortenerTest : BaseIntegrationTest() {
             status = LightMetaAccount.Status.ACTIVE,
             parentMetaId = null
         )
+
+        override suspend fun getSigningHierarchy(): SubmissionHierarchy {
+            return SubmissionHierarchy(metaAccount, CallExecutionType.IMMEDIATE)
+        }
 
         override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
             error("Not implemented")
