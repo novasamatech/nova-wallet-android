@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.common.Mu
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsViewModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.di.MultisigOperationDetailsModule.BindsModule
-import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 

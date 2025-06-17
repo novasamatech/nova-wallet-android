@@ -225,7 +225,6 @@ class MultisigOperationDetailsViewModel(
                         router.back()
                     }
                 }
-
             }
 
         showNextProgress.value = false

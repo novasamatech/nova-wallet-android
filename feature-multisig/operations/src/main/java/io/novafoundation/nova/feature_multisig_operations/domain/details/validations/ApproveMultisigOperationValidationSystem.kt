@@ -10,7 +10,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.validate
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 
 typealias ApproveMultisigOperationValidationSystem = ValidationSystem<ApproveMultisigOperationValidationPayload, ApproveMultisigOperationValidationFailure>
-typealias ApproveMultisigOperationValidationSystemBuilder = ValidationSystemBuilder<ApproveMultisigOperationValidationPayload, ApproveMultisigOperationValidationFailure>
+typealias ApproveMultisigOperationValidationSystemBuilder =
+    ValidationSystemBuilder<ApproveMultisigOperationValidationPayload, ApproveMultisigOperationValidationFailure>
 
 fun ValidationSystem.Companion.approveMultisigOperation(
     edFactory: EnoughTotalToStayAboveEDValidationFactory
