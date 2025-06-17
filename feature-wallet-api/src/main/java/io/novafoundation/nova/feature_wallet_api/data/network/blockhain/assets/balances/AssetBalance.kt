@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances
 
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -47,7 +47,7 @@ interface AssetBalance {
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId
-    ): AccountBalance
+    ): ChainAssetBalance
 
     suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
@@ -55,12 +55,6 @@ interface AssetBalance {
         accountId: AccountId,
         sharedSubscriptionBuilder: SharedRequestsBuilder?,
     ): Flow<TransferableBalanceUpdate>
-
-    suspend fun queryTotalBalance(
-        chain: Chain,
-        chainAsset: Chain.Asset,
-        accountId: AccountId
-    ): BigInteger
 
     /**
      * @return emits hash of the blocks where changes occurred. If no change were detected based on the upstream event - should emit null

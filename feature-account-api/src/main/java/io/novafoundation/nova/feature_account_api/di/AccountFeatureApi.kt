@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
@@ -103,6 +105,10 @@ interface AccountFeatureApi {
     val extrinsicSplitter: ExtrinsicSplitter
 
     val externalAccountsSyncService: ExternalAccountsSyncService
+
+    val multisigValidationsRepository: MultisigValidationsRepository
+
+    val multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus
 
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 

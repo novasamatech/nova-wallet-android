@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_impl.data.signer.proxy.ProxiedSign
 import io.novafoundation.nova.feature_account_impl.data.signer.secrets.SecretsSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.watchOnly.WatchOnlySignerFactory
 
-@Module(includes = [ProxiedSignerModule::class])
+@Module(includes = [ProxiedSignerModule::class, MultisigSignerModule::class])
 class SignersModule {
 
     @Provides

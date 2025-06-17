@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -12,6 +13,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.launch
 import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -24,8 +26,6 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -201,6 +201,8 @@ fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initi
 fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
+
+operator fun BigInteger.times(int: Int): BigInteger = multiply(int.toBigInteger())
 
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
@@ -715,3 +717,5 @@ fun Int.collectionIndexOrNull(): Int? {
 fun <T> Set<T>.hasIntersectionWith(other: Set<T>): Boolean {
     return this.any { it in other }
 }
+
+typealias LazyGet<T> = () -> T

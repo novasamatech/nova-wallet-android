@@ -32,6 +32,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.findExplicitOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
@@ -39,9 +40,9 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtensi
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionId
 import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
@@ -490,6 +491,14 @@ fun String.hexBytesSize(): Int {
 
 fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
     return apis != null
+}
+
+fun GenericCall.Instance.toByteArray(runtimeSnapshot: RuntimeSnapshot): ByteArray {
+    return GenericCall.toByteArray(runtimeSnapshot, this)
+}
+
+fun GenericCall.Instance.callHash(runtimeSnapshot: RuntimeSnapshot): ByteArray {
+    return toByteArray(runtimeSnapshot).blake2b256()
 }
 
 fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
