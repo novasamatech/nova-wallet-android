@@ -7,6 +7,8 @@ interface MultisigOperationsRouter : ReturnableRouter {
 
     fun openPendingOperations()
 
+    fun openMain()
+
     fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload)
 
     fun openMultisigCallDetails(extrinsicContent: String)

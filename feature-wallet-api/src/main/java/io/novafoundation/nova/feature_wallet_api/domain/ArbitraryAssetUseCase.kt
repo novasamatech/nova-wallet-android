@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 
@@ -17,6 +18,8 @@ interface ArbitraryAssetUseCase {
     fun assetFlow(chainId: ChainId, assetId: ChainAssetId): Flow<Asset>
 
     fun assetFlow(chainAsset: Chain.Asset): Flow<Asset>
+
+    fun assetFlow(metaId: Long, assetId: FullChainAssetId): Flow<Asset>
 
     suspend fun getAsset(chainAsset: Chain.Asset): Asset?
 }
@@ -38,6 +41,14 @@ class RealArbitraryAssetUseCase(
     override fun assetFlow(chainAsset: Chain.Asset): Flow<Asset> {
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             walletRepository.assetFlow(metaAccount.id, chainAsset)
+        }
+    }
+
+    override fun assetFlow(metaId: Long, assetId: FullChainAssetId): Flow<Asset> {
+        return flowOfAll {
+            val chainAsset = chainRegistry.asset(assetId.chainId, assetId.assetId)
+
+            walletRepository.assetFlow(metaId, chainAsset)
         }
     }
 

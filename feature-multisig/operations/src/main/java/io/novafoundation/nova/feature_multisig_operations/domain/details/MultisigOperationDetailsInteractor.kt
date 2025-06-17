@@ -15,10 +15,18 @@ import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAc
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.queryAccountBalanceCatching
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface MultisigOperationDetailsInteractor {
@@ -28,6 +36,10 @@ interface MultisigOperationDetailsInteractor {
     suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee?
 
     suspend fun performAction(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult>
+
+    fun signatoryFlow(signatoryMetaId: Long): Flow<MetaAccount>
+
+    suspend fun getSignatoryBalance(signatory: MetaAccount, chain: Chain): Result<ChainAssetBalance>
 }
 
 @FeatureScope
@@ -35,8 +47,9 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val extrinsicService: ExtrinsicService,
     private val extrinsicSplitter: ExtrinsicSplitter,
     private val accountRepository: AccountRepository,
+    private val assetSourceRegistry: AssetSourceRegistry,
     @ExtrinsicSerialization
-    private val extrinsicGson: Gson
+    private val extrinsicGson: Gson,
 ) : MultisigOperationDetailsInteractor {
 
     override fun callDetails(call: GenericCall.Instance): String {
@@ -59,6 +72,16 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
             Action.APPROVE -> performApprove(operation)
             Action.REJECT -> performReject(operation)
         }
+    }
+
+    override fun signatoryFlow(signatoryMetaId: Long): Flow<MetaAccount> {
+        return accountRepository.metaAccountFlow(signatoryMetaId)
+    }
+
+    override suspend fun getSignatoryBalance(signatory: MetaAccount, chain: Chain): Result<ChainAssetBalance> {
+        val asset = chain.utilityAsset
+        val signatoryAccountId = signatory.requireAccountIdIn(chain)
+        return assetSourceRegistry.sourceFor(asset).balance.queryAccountBalanceCatching(chain, asset, signatoryAccountId)
     }
 
     private suspend fun estimateApproveFee(operation: PendingMultisigOperation): Fee? {

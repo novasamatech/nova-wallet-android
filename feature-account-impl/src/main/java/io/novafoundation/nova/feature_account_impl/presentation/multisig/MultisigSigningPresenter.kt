@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.amountFromPlanks
-import io.novafoundation.nova.common.utils.boldSpan
+import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
@@ -118,7 +118,7 @@ class RealMultisigSigningPresenter @Inject constructor(
     }
 
     private fun formatName(metaAccount: MetaAccount): CharSequence {
-        return metaAccount.name.toSpannable(boldSpan())
+        return metaAccount.name.bold()
     }
 
     private fun formatSubtitleForWarning(signatory: MetaAccount): CharSequence {

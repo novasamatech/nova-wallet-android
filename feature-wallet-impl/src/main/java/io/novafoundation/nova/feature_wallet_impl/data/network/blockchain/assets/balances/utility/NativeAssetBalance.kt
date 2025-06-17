@@ -27,8 +27,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.toChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -106,7 +106,7 @@ class NativeAssetBalance(
     }
 
     override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
-        return accountInfoRepository.getAccountInfo(chain.id, accountId).data.toChainAssetBalance()
+        return accountInfoRepository.getAccountInfo(chain.id, accountId).data.toChainAssetBalance(chainAsset)
     }
 
     override suspend fun subscribeTransferableAccountBalance(

@@ -128,6 +128,7 @@ class EquilibriumAssetBalance(
         val lockedBalance = assetBalances.lock.orZero().takeIf { chainAsset.isUtilityAsset } ?: BigInteger.ZERO
 
         return ChainAssetBalance.default(
+            chainAsset = chainAsset,
             free = assetBalance,
             reserved = reservedBalance,
             frozen = lockedBalance

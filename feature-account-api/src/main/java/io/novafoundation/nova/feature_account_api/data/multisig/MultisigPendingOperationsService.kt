@@ -11,7 +11,10 @@ interface MultisigPendingOperationsService {
     fun performMultisigOperationsSync(): Flow<Unit>
 
     context(ComputationalScope)
-    fun pendingOperationsCount(): Flow<Int>
+    fun pendingOperationsCountFlow(): Flow<Int>
+
+    context(ComputationalScope)
+    suspend fun getPendingOperationsCount(): Int
 
     context(ComputationalScope)
     fun pendingOperations(): Flow<List<PendingMultisigOperation>>

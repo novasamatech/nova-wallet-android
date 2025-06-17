@@ -27,6 +27,10 @@ fun CharSequence.toSpannable(span: Any): Spannable {
     return this.toSpannable().setFullSpan(span)
 }
 
+fun CharSequence.bold(): Spannable {
+    return toSpannable(boldSpan())
+}
+
 fun Spannable.setFullSpan(span: Any): Spannable {
     setSpan(span, 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     return this
