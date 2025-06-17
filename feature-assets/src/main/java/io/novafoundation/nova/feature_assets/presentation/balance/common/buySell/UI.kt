@@ -9,10 +9,13 @@ import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.input.selector.DynamicSelectorBottomSheet
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.observeMultisigCheck
 
 fun BaseFragmentMixin<*>.setupBuySellSelectorMixin(
     buySellSelectorMixin: BuySellSelectorMixin
 ) {
+    observeMultisigCheck(buySellSelectorMixin.multisigRestrictionCheckMixin)
+
     buySellSelectorMixin.actionLiveData.observeEvent { action ->
         DynamicSelectorBottomSheet(
             context = fragment.requireContext(),
