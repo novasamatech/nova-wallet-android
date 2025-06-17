@@ -65,7 +65,6 @@ class MultisigOperationDetailsModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         validationSystem: ApproveMultisigOperationValidationSystem,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        arbitraryAssetUseCase: ArbitraryAssetUseCase,
         walletUiUseCase: WalletUiUseCase,
     ): ViewModel {
         return MultisigOperationDetailsViewModel(
@@ -81,7 +80,6 @@ class MultisigOperationDetailsModule {
             selectedAccountUseCase = selectedAccountUseCase,
             walletUiUseCase = walletUiUseCase,
             validationSystem = validationSystem,
-            assetUseCase = arbitraryAssetUseCase,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }

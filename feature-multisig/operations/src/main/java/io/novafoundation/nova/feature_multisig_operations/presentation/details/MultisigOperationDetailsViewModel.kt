@@ -29,13 +29,11 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
-import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -51,7 +49,6 @@ class MultisigOperationDetailsViewModel(
     private val resourceManager: ResourceManager,
     private val operationFormatter: MultisigOperationFormatter,
     private val interactor: MultisigOperationDetailsInteractor,
-    private val assetUseCase: ArbitraryAssetUseCase,
     private val multisigOperationsService: MultisigPendingOperationsService,
     private val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     private val externalActions: ExternalActions.Presentation,
@@ -91,11 +88,6 @@ class MultisigOperationDetailsViewModel(
         .map { it.signatoryMetaId }
         .distinctUntilChanged()
         .flatMapLatest(interactor::signatoryFlow)
-        .shareInBackground()
-
-    val signatoryBalance = operationFlow.flatMapLatest {
-        assetUseCase.assetFlow(it.signatoryMetaId, it.chain.utilityAsset.fullId)
-    }
         .shareInBackground()
 
     private val showNextProgress = MutableStateFlow(false)
