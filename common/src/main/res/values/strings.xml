@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
     <string name="account_multisig_group_label">shared control (multisig)</string>
 
     <!--<string name="delegated_accounts_fragment_title">Delegated accounts update</string>-->
