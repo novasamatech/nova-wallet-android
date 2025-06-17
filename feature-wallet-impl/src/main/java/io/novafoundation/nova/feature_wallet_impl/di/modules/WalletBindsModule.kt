@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
+import io.novafoundation.nova.feature_wallet_api.domain.validation.MultisigExtrinsicValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.RealAccountInfoRepository
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.AssetIssuerRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.RealAssetIssuerRegistry
