@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
@@ -73,6 +74,8 @@ interface WalletFeatureApi {
     val statemineAssetsRepository: StatemineAssetsRepository
 
     val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
+
+    val accountInfoRepository: AccountInfoRepository
 
     fun provideWalletRepository(): WalletRepository
 

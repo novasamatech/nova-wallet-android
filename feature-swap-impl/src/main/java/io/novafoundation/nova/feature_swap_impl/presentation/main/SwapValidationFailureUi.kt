@@ -121,6 +121,16 @@ fun mapSwapValidationFailureToUI(
                 reason.existentialDeposit.formatPlanks(reason.asset)
             )
         ).asDefault()
+
+        is SwapValidationFailure.CannotReceiveAssetOut -> TitleAndMessage(
+            resourceManager.getString(R.string.common_not_enough_funds_title),
+            resourceManager.getString(
+                R.string.swap_failure_cannot_receive_insufficient_asset_out,
+                reason.requiredNativeAssetOnChainOut.formatPlanks(),
+                reason.destination.chain.name,
+                reason.destination.asset.symbol
+            )
+        ).asDefault()
     }
 }
 

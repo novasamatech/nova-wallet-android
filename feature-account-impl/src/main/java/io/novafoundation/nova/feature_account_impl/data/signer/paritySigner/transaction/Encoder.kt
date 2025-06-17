@@ -13,3 +13,7 @@ fun InheritedImplication.paritySignerLegacyTxPayload(): ByteArray {
 fun InheritedImplication.paritySignerTxPayloadWithProof(proof: ExtrinsicProof): ByteArray {
     return getAccountIdOrThrow() + proof.value + transientEncodedCallData() + encodedExtensions() + getGenesisHashOrThrow()
 }
+
+fun SignerPayloadRawWithChain.polkadotVaultSignRawPayload(): ByteArray {
+    return accountId + message + chainId.fromHex()
+}

@@ -16,8 +16,6 @@ import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import java.math.BigDecimal
 
 interface AssetTransferDirection {
@@ -154,10 +152,6 @@ interface AssetTransfers {
 
     suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         return true
-    }
-
-    fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(true)
     }
 
     suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean

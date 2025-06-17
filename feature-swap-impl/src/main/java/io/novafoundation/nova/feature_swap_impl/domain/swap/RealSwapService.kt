@@ -862,6 +862,12 @@ internal class RealSwapService(
             // Destination asset must be sufficient
             if (!isSufficient(chainAndAssetOut)) return false
 
+            val chainAndAssetIn = chainsById.chainWithAssetOrNull(edge.from) ?: return false
+
+            // Since we allow insufficient asset out in paths with length 1, we want to reject paths with length > 1
+            // by checking sufficiency of assetIn (which was assetOut in the previous segment)
+            if (!isSufficient(chainAndAssetIn)) return false
+
             // Besides checks above, utility assets don't have any other restrictions
             if (edge.from.isUtility) return true
 

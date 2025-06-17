@@ -20,7 +20,7 @@ data class TokenGroupUi(
 ) : AssetGroupRvItem, ExpandableParentItem {
 
     sealed interface GroupType {
-        object Group : GroupType
+        data object Group : GroupType
 
         data class SingleItem(val asset: Chain.Asset) : GroupType
     }
