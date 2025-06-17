@@ -17,7 +17,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
 
-typealias TitleAndMessage = Pair<String, String?>
+typealias TitleAndMessage = Pair<String, CharSequence?>
 
 open class BaseViewModel :
     ViewModel(),
@@ -49,7 +49,7 @@ open class BaseViewModel :
         _messageLiveData.postValue(Event(text))
     }
 
-    fun showError(title: String, text: String) {
+    fun showError(title: String, text: CharSequence) {
         _errorWithTitleLiveData.postValue(Event(title to text))
     }
 
@@ -81,7 +81,7 @@ open class BaseViewModel :
     ) = requireValid(
         validationSystem = validationSystem,
         payload = payload,
-        errorDisplayer = ::showError,
+        errorDisplayer = { showError(it) },
         validationFailureTransformerDefault = validationFailureTransformer,
         progressConsumer = progressConsumer,
         autoFixPayload = autoFixPayload,

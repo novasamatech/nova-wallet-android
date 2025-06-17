@@ -21,6 +21,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -45,8 +46,13 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     }
 
     context(ComputationalScope)
-    override fun pendingOperationsCount(): Flow<Int> {
+    override fun pendingOperationsCountFlow(): Flow<Int> {
         return getCachedSyncer().flatMapLatest { it.pendingOperationsCount }
+    }
+
+    context(ComputationalScope)
+    override suspend fun getPendingOperationsCount(): Int {
+        return pendingOperationsCountFlow().first()
     }
 
     context(ComputationalScope)

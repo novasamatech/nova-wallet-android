@@ -67,3 +67,11 @@ interface AssetBalance {
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BalanceSyncUpdate>
 }
+
+suspend fun AssetBalance.queryAccountBalanceCatching(
+    chain: Chain,
+    chainAsset: Chain.Asset,
+    accountId: AccountId
+): Result<ChainAssetBalance> {
+    return runCatching { queryAccountBalance(chain, chainAsset, accountId) }
+}

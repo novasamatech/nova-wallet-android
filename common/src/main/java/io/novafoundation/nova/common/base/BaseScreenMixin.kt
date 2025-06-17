@@ -24,7 +24,7 @@ interface BaseScreenMixin<T : BaseViewModel> : WithContextExtensions, WithLifecy
         }
     }
 
-    fun showErrorWithTitle(title: String, errorMessage: String?) {
+    fun showErrorWithTitle(title: String, errorMessage: CharSequence?) {
         dialog(providedContext) {
             setTitle(title)
             setMessage(errorMessage)

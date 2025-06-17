@@ -55,7 +55,7 @@ class EvmNativeAssetBalance(
         val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
         val balance = ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
-        return ChainAssetBalance.fromFree(balance)
+        return ChainAssetBalance.fromFree(chainAsset, balance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(

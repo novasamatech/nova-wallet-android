@@ -75,7 +75,7 @@ class StatemineAssetBalance(
         }
 
         val accountBalance = assetAccount.toAccountBalance()
-        return ChainAssetBalance.default(accountBalance)
+        return ChainAssetBalance.default(chainAsset, accountBalance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(

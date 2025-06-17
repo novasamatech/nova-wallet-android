@@ -73,7 +73,7 @@ class EvmErc20AssetBalance(
         val balance = erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)
             .balanceOfAsync(accountAddress)
             .await()
-        return ChainAssetBalance.fromFree(free = balance)
+        return ChainAssetBalance.fromFree(chainAsset, free = balance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(

@@ -14,7 +14,7 @@ interface CustomDialogDisplayer {
 
     class Payload(
         val title: String,
-        val message: String?,
+        val message: CharSequence?,
         val okAction: DialogAction?,
         val cancelAction: DialogAction? = null,
         @StyleRes val customStyle: Int? = null,

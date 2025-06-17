@@ -181,7 +181,7 @@ class BalanceListViewModel(
         }
     }.distinctUntilChanged()
 
-    val pendingOperationsCountModel = multisigPendingOperationsService.pendingOperationsCount()
+    val pendingOperationsCountModel = multisigPendingOperationsService.pendingOperationsCountFlow()
         .withSafeLoading()
         .map { it.formatPendingOperationsCount() }
         .shareInBackground()
