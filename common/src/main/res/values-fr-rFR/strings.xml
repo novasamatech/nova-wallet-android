@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">Vous y êtes presque ! 🎉\n Appuyez simplement ci-dessous pour terminer la configuration et commencer à utiliser vos comptes sans effort à la fois dans l\'application Polkadot et le Nova Wallet</string>
     <string name="account_migration_title">Bienvenue sur Nova !</string>
     <string name="account_mnmonic_length_variants">Phrase de 12, 15, 18, 21 ou 24 mots</string>
+    <string name="account_multisig">Multisig</string>
+    <string name="account_multisig_group_label">Contrôle partagé (multisig)</string>
     <string name="account_needed_message">Vous n\'avez pas de compte pour ce réseau, vous pouvez créer ou importer un compte.</string>
     <string name="account_needed_title">Compte nécessaire</string>
     <string name="account_no_chain_projection">Aucun compte trouvé</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault vous fournira un %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">code QR à scanner</string>
     <string name="account_private_key">Clé privée</string>
+    <string name="account_proxied">Délégué</string>
     <string name="account_proxieds">Délégué à vous (Proxieds)</string>
     <string name="account_proxy_type_any">N\'importe quel</string>
     <string name="account_proxy_type_auction">Enchère</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">Modifier le compte %s</string>
     <string name="accounts_change_chain_secrets">Changer de compte</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="active_multisig_title">Contrôle partagé</string>
     <string name="add_custom_node">Ajouter un nœud personnalisé</string>
     <string name="add_delegation_missing_account_message">Vous devez ajouter le compte %s au portefeuille afin de déléguer</string>
     <string name="add_network_title">Entrez les détails du réseau</string>
@@ -692,8 +696,8 @@
     <string name="delegate_search_hint">Recherche par adresse ou nom</string>
     <string name="delegate_search_placeholder_empty">Le format de l\'adresse n\'est pas valide. Assurez-vous que l\'adresse appartient au bon réseau</string>
     <string name="delegate_search_result_count">résultats de la recherche : %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Wallet ajoute automatiquement les autorités déléguées (Proxy) à une catégorie séparée pour vous. Vous pouvez toujours gérer les portefeuilles dans les Paramètres.</string>
-    <string name="delegated_accounts_fragment_title">Mise à jour des comptes délégués</string>
+    <string name="delegated_accounts_fragment_explanation">Les comptes Proxy et Multisig sont automatiquement détectés et organisés pour vous. Gérez-les à tout moment dans les Paramètres.</string>
+    <string name="delegated_accounts_fragment_title">La liste des portefeuilles a été mise à jour</string>
     <string name="delegation_all_votes">Historique</string>
     <string name="delegation_delegate">Déléguer</string>
     <string name="delegation_delegate_filter_all">Tous les comptes</string>
@@ -730,6 +734,7 @@
     <string name="delegation_tracks_governance_preset">Gouvernance</string>
     <string name="delegation_tracks_treasury_preset">Trésorerie</string>
     <string name="delegation_undelegating_period">Période de non-délégation</string>
+    <string name="delegation_updates_deactivated_title">N\'est plus valide</string>
     <string name="delegation_your_delegation">Votre délégation</string>
     <string name="delegation_your_delegations">Vos délégations</string>
     <string name="delegations_filter">Afficher</string>
@@ -889,6 +894,29 @@
         <item quantity="one">Sélectionnez au moins %d portefeuille</item>
         <item quantity="other">Sélectionnez au moins %d portefeuilles</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s a déjà initié la même opération et elle est actuellement en attente de signature par d\'autres signataires.</string>
+    <string name="multisig_callhash_exists_title">Opération déjà existante</string>
+    <string name="multisig_operation_details_approve">Approuver</string>
+    <string name="multisig_operation_details_approve_and_execute">Approuver &amp; Exécuter</string>
+    <string name="multisig_operation_details_call_data_not_found">Données d\'appel introuvables</string>
+    <string name="multisig_operation_details_reject">Rejeter</string>
+    <string name="multisig_operations_pending_signature">Signature en attente</string>
+    <string name="multisig_operations_progress" formatted="false">%s de %s Signés</string>
+    <string name="multisig_operations_signed">Signé</string>
+    <string name="multisig_operations_unknown_calldata">[Opération inconnue] (%s)</string>
+    <string name="multisig_pending_operations">Opérations en attente</string>
+    <string name="multisig_signatory">Signataire :</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s n\'a pas assez de solde pour placer un dépôt multisig de %s. Solde disponible : %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s n\'a pas assez de solde pour payer les frais de réseau de %s et placer un dépôt multisig de %s. Solde disponible : %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s doit avoir au moins %s pour payer les frais de cette transaction et rester au-dessus du solde minimum du réseau. Le solde actuel est : %s</string>
+    <string name="multisig_signing_is_not_supported_message">Les portefeuilles multisig ne prennent pas en charge la signature de messages arbitraires — uniquement les transactions</string>
+    <string name="multisig_signing_warning_message">La transaction multisig sera initiée par %s. L\'initiateur paie les frais de réseau et réserve un dépôt multisig, qui sera libéré une fois la transaction exécutée.</string>
+    <string name="multisig_signing_warning_title">Transaction multisig</string>
+    <string name="multisig_transaction_created_subtitle">D\'autres signataires peuvent maintenant confirmer la transaction.\nVous pouvez suivre son statut dans le %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">transactions multisig.</string>
+    <string name="multisig_transaction_created_title">Transaction multisig créée</string>
+    <string name="multisig_transaction_created_view_details">Voir les détails</string>
+    <string name="multisig_wallet_details_info_warning">Les transactions de ce portefeuille nécessitent l\'approbation de plusieurs signataires. Votre compte est l\'un des signataires :</string>
     <string name="network_already_exist_failure_title">Ce nœud existe déjà</string>
     <string name="network_fee">Frais de réseau</string>
     <string name="network_info_address">Adresse du nœud</string>
@@ -985,8 +1013,6 @@
     <string name="profile_settings_safe_mode_title">Mode sans échec</string>
     <string name="profile_settings_title">Paramètres</string>
     <string name="proxied_wallet_details_info_warning">Ce compte a accordé l\'accès pour effectuer des transactions au compte suivant:</string>
-    <string name="proxieds_updates_deactivated_title">Plus valide</string>
-    <string name="proxy_about">Qu\'est-ce qu\'un Proxy ?</string>
     <string name="proxy_access_type_staking_operations">Opérations de Staking</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Le compte délégué %s n\'a pas un solde suffisant pour payer les frais de réseau de %s. Solde disponible pour payer les frais : %s</string>
     <string name="proxy_signing_is_not_supported_message">Les portefeuilles proxifiés ne prennent pas en charge la signature de messages arbitraires - seulement des transactions</string>
@@ -1599,7 +1625,7 @@
     <string name="swap_execution_time">Temps d\'exécution</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Vous devez conserver au moins %s après avoir payé %s de frais de réseau car vous détenez des tokens insuffisants</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Vous devez conserver au moins %s pour recevoir des tokens %s</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">Vous devez avoir au moins %s sur %s pour recevoir %s jeton</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">Vous devez avoir au moins %s sur %s pour recevoir %s jeton</string>
     <string name="swap_failure_insufficient_balance_message">Vous pouvez échanger jusqu\'à %1$s car vous devez payer %2$s pour les frais de réseau.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Vous pouvez échanger jusqu\'à %1$s car vous devez payer %2$s pour les frais de réseau et également convertir %3$s en %4$s pour atteindre le solde minimum de %5$s.</string>
     <string name="swap_failure_swap_max_button">Échanger max</string>

@@ -14,20 +14,14 @@
 
     <string name="account_multisig_group_label">shared control (multisig)</string>
 
-    <!--<string name="delegated_accounts_fragment_title">Delegated accounts update</string>-->
     <string name="delegated_accounts_fragment_title">Wallet list has been updated</string>
 
-    <!--<string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>-->
     <string name="delegated_accounts_fragment_explanation">Proxy and Multisig accounts auto-detected and organized for you. Manage anytime in Settings.</string>
-
-    <!--<string name="proxy_about">What is a Proxy?</string>-->
 
     <string name="account_proxied">Proxied</string>
     <string name="active_multisig_title">Shared control</string>
 
-    <!--<string name="proxieds_updates_deactivated_title">No longer valid</string>-->
     <string name="delegation_updates_deactivated_title">No longer valid</string>
-
 
     <string name="multisig_transaction_created_title">Multisig transaction created</string>
     <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>

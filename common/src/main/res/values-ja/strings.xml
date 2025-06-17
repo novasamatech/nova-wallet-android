@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">もう少しです！🎉\n 設定を完了して、Polkadot AppとNova Walletの両方でアカウントをスムーズに使用するには、以下をタップしてください。</string>
     <string name="account_migration_title">Novaへようこそ！</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21または24単語のフレーズ</string>
+    <string name="account_multisig">マルチシグ</string>
+    <string name="account_multisig_group_label">共有コントロール（マルチシグ）</string>
     <string name="account_needed_message">このネットワークにはアカウントがありません。アカウントを作成するか、インポートすることができます。</string>
     <string name="account_needed_title">アカウントが必要です</string>
     <string name="account_no_chain_projection">アカウントが見つかりません</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが%s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">スキャン用のQRコード</string>
     <string name="account_private_key">プライベートキー</string>
+    <string name="account_proxied">プロキシ</string>
     <string name="account_proxieds">あなたに委任された（プロキシ）</string>
     <string name="account_proxy_type_any">任意の操作</string>
     <string name="account_proxy_type_auction">オークション</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">%s アカウントを変更</string>
     <string name="accounts_change_chain_secrets">アカウントを変更</string>
     <string name="accounts_ledger_legacy">Ledger（Legacy）</string>
+    <string name="active_multisig_title">共有コントロール</string>
     <string name="add_custom_node">カスタムノードを追加</string>
     <string name="add_delegation_missing_account_message">委任するためにはウォレットに%sアカウントを追加する必要があります</string>
     <string name="add_network_title">ネットワークの詳細を入力してください</string>
@@ -686,8 +690,8 @@
     <string name="delegate_search_hint">アドレスまたは名前で検索</string>
     <string name="delegate_search_placeholder_empty">アドレス形式が無効です。アドレスが正しいネットワークに属していることを確認してください</string>
     <string name="delegate_search_result_count">検索結果: %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Walletは代理機関 (プロキシ) を自動的にカテゴリに分けます。設定からウォレットを管理できます。</string>
-    <string name="delegated_accounts_fragment_title">代理アカウントの更新</string>
+    <string name="delegated_accounts_fragment_explanation">プロキシとマルチシグアカウントが自動検出されて整理されます。設定でいつでも管理できます。</string>
+    <string name="delegated_accounts_fragment_title">ウォレットリストが更新されました</string>
     <string name="delegation_all_votes">全期間の投票</string>
     <string name="delegation_delegate">デリゲート</string>
     <string name="delegation_delegate_filter_all">全アカウント</string>
@@ -724,6 +728,7 @@
     <string name="delegation_tracks_governance_preset">ガバナンス</string>
     <string name="delegation_tracks_treasury_preset">トレジャリー</string>
     <string name="delegation_undelegating_period">未委任期間</string>
+    <string name="delegation_updates_deactivated_title">無効になりました</string>
     <string name="delegation_your_delegation">あなたの委任</string>
     <string name="delegation_your_delegations">あなたの委任</string>
     <string name="delegations_filter">表示</string>
@@ -881,6 +886,29 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">%dウォレットを少なくとも選択してください</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%sは同じ操作をすでに開始しており、現在他の署名者による署名を待っています。</string>
+    <string name="multisig_callhash_exists_title">操作は既に存在します</string>
+    <string name="multisig_operation_details_approve">承認</string>
+    <string name="multisig_operation_details_approve_and_execute">承認と実行</string>
+    <string name="multisig_operation_details_call_data_not_found">コールデータが見つかりません</string>
+    <string name="multisig_operation_details_reject">拒否</string>
+    <string name="multisig_operations_pending_signature">署名待ち</string>
+    <string name="multisig_operations_progress" formatted="false">%s / %s 署名済み</string>
+    <string name="multisig_operations_signed">署名済み</string>
+    <string name="multisig_operations_unknown_calldata">[不明な操作] (%s)</string>
+    <string name="multisig_pending_operations">保留中の操作</string>
+    <string name="multisig_signatory">署名者：</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%sはマルチシグのデポジット%sを配置するのに十分な残高がありません。利用可能な残高: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%sはネットワーク手数料%sを払い、マルチシグのデポジット%sを配置するのに十分な残高がありません。利用可能な残高: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%sはこの取引手数料を支払い、最低ネットワーク残高を超えるために少なくとも%sが必要です。現在の残高は: %s</string>
+    <string name="multisig_signing_is_not_supported_message">マルチシグウォレットは任意のメッセージの署名をサポートしていません — トランザクションのみ</string>
+    <string name="multisig_signing_warning_message">マルチシグトランザクションは%sによって開始されます。開始者はネットワーク手数料を支払い、マルチシグデポジットを予約します。このデポジットはトランザクションが実行されるとアンリザーブされます。</string>
+    <string name="multisig_signing_warning_title">マルチシグトランザクション</string>
+    <string name="multisig_transaction_created_subtitle">他の署名者がトランザクションを確認できます。 \nそのステータスを %s で追跡できます</string>
+    <string name="multisig_transaction_created_subtitle_highlight">マルチシグトランザクション。</string>
+    <string name="multisig_transaction_created_title">マルチシグトランザクションが作成されました</string>
+    <string name="multisig_transaction_created_view_details">詳細を表示</string>
+    <string name="multisig_wallet_details_info_warning">このウォレットからのトランザクションには、複数の署名者の承認が必要です。あなたのアカウントはその署名者の一つです：</string>
     <string name="network_already_exist_failure_title">このノードはすでに存在します</string>
     <string name="network_fee">ネットワーク手数料</string>
     <string name="network_info_address">ノードアドレス</string>
@@ -977,8 +1005,6 @@
     <string name="profile_settings_safe_mode_title">セーフモード</string>
     <string name="profile_settings_title">設定</string>
     <string name="proxied_wallet_details_info_warning">このアカウントは以下のアカウントに取引を行うアクセスを許可しています:</string>
-    <string name="proxieds_updates_deactivated_title">もはや有効ではありません</string>
-    <string name="proxy_about">プロキシとは?</string>
     <string name="proxy_access_type_staking_operations">Stakingオペレーション</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">委任されたアカウント%sは、ネットワーク手数料%sを支払うのに十分な残高がありません。手数料支払いに利用可能な残高: %s</string>
     <string name="proxy_signing_is_not_supported_message">プロキシされたウォレットは任意のメッセージの署名をサポートしていません - 取引のみ</string>
@@ -1587,7 +1613,7 @@
     <string name="swap_execution_time">実行時間</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">十分なトークンを保持していないため、%sのネットワーク手数料を支払った後に少なくとも%sを保持する必要があります</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%sトークンを受け取るために少なくとも%sを保持する必要があります</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">%sトークンを受け取るには、%s上に少なくとも%sが必要です</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">%sトークンを受け取るには、%s上に少なくとも%sが必要です</string>
     <string name="swap_failure_insufficient_balance_message">ネットワーク手数料として%2$sを支払うため、最大%1$sをスワップできます。</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">ネットワーク手数料として%2$sを支払う必要があり、さらに%3$sを%4$sに変換して%5$sの最低バランスを確保する必要があるため、最大%1$sをスワップできます。</string>
     <string name="swap_failure_swap_max_button">最大をスワップ</string>

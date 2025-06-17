@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">Neredeyse geldiniz! 🎉\n Kurulumu tamamlamak ve hesaplarınızı hem Polkadot Uygulaması\'nda hem de Nova Cüzdan\'da sorunsuz bir şekilde kullanmaya başlamak için aşağıya dokunmanız yeterli</string>
     <string name="account_migration_title">Nova\'ya Hoş Geldiniz!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 veya 24 kelime uzunluğunda ifade</string>
+    <string name="account_multisig">Çoklu İmza</string>
+    <string name="account_multisig_group_label">Paylaşılan kontrol (çoklu imza)</string>
     <string name="account_needed_message">Bu ağ için bir hesabınız yok, hesap oluşturabilir veya hesap aktarabilirsiniz.</string>
     <string name="account_needed_title">Hesap Gerekli</string>
     <string name="account_no_chain_projection">Hesap bulunamadı</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">taramak için QR kodu</string>
     <string name="account_private_key">Özel anahtar</string>
+    <string name="account_proxied">Vekil</string>
     <string name="account_proxieds">Size Delege Edilenler (Proksi)</string>
     <string name="account_proxy_type_any">Herhangi</string>
     <string name="account_proxy_type_auction">Açık Artırma</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">%s hesabını değiştir</string>
     <string name="accounts_change_chain_secrets">Hesabı değiştir</string>
     <string name="accounts_ledger_legacy">Ledger (Eski)</string>
+    <string name="active_multisig_title">Paylaşılan kontrol</string>
     <string name="add_custom_node">Özel düğüm ekle</string>
     <string name="add_delegation_missing_account_message">Delege etmek için cüzdana %s hesabı eklemeniz gerekiyor</string>
     <string name="add_network_title">Ağ detaylarını girin</string>
@@ -692,8 +696,8 @@
     <string name="delegate_search_hint">Adrese veya isme göre ara</string>
     <string name="delegate_search_placeholder_empty">Adres formatı geçersiz. Adresin doğru ağa ait olduğundan emin olun</string>
     <string name="delegate_search_result_count">arama sonuçları: %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Cüzdan otomatik olarak yetkilendirdiğiniz hesapları (Vekil) sizin için ayrı bir kategoriye ekler. Ayarlarda cüzdanları daima yönetebilirsiniz.</string>
-    <string name="delegated_accounts_fragment_title">Yetkilendirilmiş hesapların güncellenmesi</string>
+    <string name="delegated_accounts_fragment_explanation">Vekil ve Çoklu İmza hesapları otomatik algılandı ve sizin için düzenlendi. İstediğiniz zaman Ayarlar\'da yönetin.</string>
+    <string name="delegated_accounts_fragment_title">Cüzdan listesi güncellendi</string>
     <string name="delegation_all_votes">Tüm zamanlar için oylama</string>
     <string name="delegation_delegate">Yetkilendir</string>
     <string name="delegation_delegate_filter_all">Tüm hesaplar</string>
@@ -730,6 +734,7 @@
     <string name="delegation_tracks_governance_preset">Yönetim</string>
     <string name="delegation_tracks_treasury_preset">Hazine</string>
     <string name="delegation_undelegating_period">Delege Edilmeme Süresi</string>
+    <string name="delegation_updates_deactivated_title">Artık geçerli değil</string>
     <string name="delegation_your_delegation">Delegasyonunuz</string>
     <string name="delegation_your_delegations">Delegasyonlarınız</string>
     <string name="delegations_filter">Göster</string>
@@ -889,6 +894,29 @@
         <item quantity="one">En az %d cüzdan seçin</item>
         <item quantity="other">En az %d cüzdan seçin</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s aynı işlemi başlattı ve şu anda diğer imzalayanlar tarafından imzalanmayı bekliyor.</string>
+    <string name="multisig_callhash_exists_title">İşlem zaten mevcut</string>
+    <string name="multisig_operation_details_approve">Onayla</string>
+    <string name="multisig_operation_details_approve_and_execute">Onayla ve Gerçekleştir</string>
+    <string name="multisig_operation_details_call_data_not_found">Çağrı verisi bulunamadı</string>
+    <string name="multisig_operation_details_reject">Reddet</string>
+    <string name="multisig_operations_pending_signature">Bekleyen imza</string>
+    <string name="multisig_operations_progress" formatted="false">%s / %s İmzalandı</string>
+    <string name="multisig_operations_signed">İmzalandı</string>
+    <string name="multisig_operations_unknown_calldata">[Bilinmeyen işlem] (%s)</string>
+    <string name="multisig_pending_operations">Bekleyen işlemler</string>
+    <string name="multisig_signatory">İmza Sahibi:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s çoklu imza depozitosu için %s yatıracak yeterli bakiyeye sahip değil. Mevcut bakiye: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s ağ ücreti %s ve çoklu imza depozitosu için yeterli bakiyeye sahip değil. Mevcut bakiye: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s bu işlem ücretini ödemek ve minimum ağ bakiyesi üzerinde kalmak için en az %s\'e ihtiyaç duyar. Mevcut bakiye: %s</string>
+    <string name="multisig_signing_is_not_supported_message">Çoklu imza cüzdanları rastgele mesaj imzalamayı desteklemez — sadece işlemler</string>
+    <string name="multisig_signing_warning_message">Çoklu imza işlemi %s tarafından başlatılacak. Başlatıcı ağ ücretini öder ve bir çoklu imza depozitosu ayırır, işlem tamamlandığında bu yeniden ayırılır.</string>
+    <string name="multisig_signing_warning_title">Çoklu İmza işlemi</string>
+    <string name="multisig_transaction_created_subtitle">Diğer imza sahipleri şimdi işlemi onaylayabilir.\nDurumunu %s içinde izleyebilirsiniz</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Çoklu imza işlemleri.</string>
+    <string name="multisig_transaction_created_title">Çoklu İmza işlemi oluşturuldu</string>
+    <string name="multisig_transaction_created_view_details">Detayları Görüntüle</string>
+    <string name="multisig_wallet_details_info_warning">Bu cüzdandan yapılan işlemler birden fazla imza sahibinin onayını gerektirir. Hesabınız bu imza sahiplerinden biridir:</string>
     <string name="network_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
     <string name="network_fee">Ağ ücreti</string>
     <string name="network_info_address">Düğüm adresi</string>
@@ -985,8 +1013,6 @@
     <string name="profile_settings_safe_mode_title">Güvenli mod</string>
     <string name="profile_settings_title">Ayarlar</string>
     <string name="proxied_wallet_details_info_warning">Bu hesap aşağıdaki hesaba işlem yapma yetkisi verdi:</string>
-    <string name="proxieds_updates_deactivated_title">Artık geçerli değil</string>
-    <string name="proxy_about">Proxy nedir?</string>
     <string name="proxy_access_type_staking_operations">Staking operasyonları</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Temsil edilen hesap %s, %s tutarındaki ağ ücretini ödemek için yeterli bakiyeye sahip değil. Ücreti ödemek için kullanılabilir bakiye: %s</string>
     <string name="proxy_signing_is_not_supported_message">Temsilci cüzdanlar rastgele mesajların imzalanmasını desteklemiyor - yalnızca işlemler</string>
@@ -1599,7 +1625,7 @@
     <string name="swap_execution_time">Gerçekleşme süresi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Ödeme yaptıktan sonra ağ ücreti olarak %s tutarında en azından %s tutmanız gerekmektedir çünkü yeterli olmayan tokenlara sahipsiniz</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s token almak için en az %s tutmalısınız</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">%s tokenini almak için %s üzerinde en az %s olmalıdır</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">%s tokenini almak için %s üzerinde en az %s olmalıdır</string>
     <string name="swap_failure_insufficient_balance_message">Ağ ücreti için %2$s ödemeniz gerektiği için en fazla %1$s tutarında takas yapabilirsiniz.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Ağ ücreti olarak %2$s ödemeniz ve %5$s asgari bakiyeyi karşılamak için %3$s\'i %4$s\'e dönüştürmeniz gerektiği için en fazla %1$s kadar takas yapabilirsiniz.</string>
     <string name="swap_failure_swap_max_button">Maksimuma Takas</string>
