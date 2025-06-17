@@ -41,7 +41,8 @@ class RealMultisigMetaAccount(
     status = status,
     chainAccounts = chainAccounts,
     parentMetaId = parentMetaId
-), MultisigMetaAccount {
+),
+    MultisigMetaAccount {
 
     override val otherSignatories by lazy(LazyThreadSafetyMode.PUBLICATION) {
         otherSignatoriesUnsorted.sortedWith { a, b -> a.value.compareTo(b.value, unsigned = true) }
