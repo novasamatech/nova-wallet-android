@@ -228,7 +228,7 @@ class MultisigOperationDetailsViewModel(
                     val isLeastOperation = isLastOperationFlow.first()
 
                     if (isLeastOperation) {
-                        router.openPendingOperations()
+                        router.openMain()
                     } else {
                         router.back()
                     }
