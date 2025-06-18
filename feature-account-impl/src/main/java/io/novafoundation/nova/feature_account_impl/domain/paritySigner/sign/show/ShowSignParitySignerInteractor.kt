@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.uos.
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.uos.paritySignerUOSCryptoType
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.signer.SignerPayloadRawWithChain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,7 +38,7 @@ class RealShowSignParitySignerInteractor(
         mode: ParitySignerSignMode
     ): ParitySignerSignRequest = withContext(Dispatchers.Default) {
         val uosPayload = when (payload) {
-            is SignerPayload.Extrinsic -> mode.createUOSPayloadFor(payload.extrinsic)
+            is SignerPayload.Extrinsic -> mode.createUOSPayloadFor(payload)
             is SignerPayload.Raw -> createRawMessagePayload(payload.raw)
         }
 
@@ -61,14 +60,14 @@ class RealShowSignParitySignerInteractor(
         )
     }
 
-    private suspend fun ParitySignerSignMode.createUOSPayloadFor(payload: InheritedImplication): ByteArray {
+    private suspend fun ParitySignerSignMode.createUOSPayloadFor(payload: SignerPayload.Extrinsic): ByteArray {
         return when (this) {
             ParitySignerSignMode.LEGACY -> createLegacyUOSPayload(payload)
             ParitySignerSignMode.WITH_METADATA_PROOF -> createUOSPayloadWithProof(payload)
         }
     }
 
-    private fun createLegacyUOSPayload(payload: InheritedImplication): ByteArray {
+    private fun createLegacyUOSPayload(payload: SignerPayload.Extrinsic): ByteArray {
         val txPayload = payload.paritySignerLegacyTxPayload()
         return UOS.createUOSPayload(
             payload = txPayload,
@@ -78,8 +77,8 @@ class RealShowSignParitySignerInteractor(
         )
     }
 
-    private suspend fun createUOSPayloadWithProof(payload: InheritedImplication): ByteArray {
-        val proof = metadataShortenerService.generateExtrinsicProof(payload)
+    private suspend fun createUOSPayloadWithProof(payload: SignerPayload.Extrinsic): ByteArray {
+        val proof = metadataShortenerService.generateExtrinsicProof(payload.extrinsic)
         val txPayload = payload.paritySignerTxPayloadWithProof(proof)
         return UOS.createUOSPayload(
             payload = txPayload,
