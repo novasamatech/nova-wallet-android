@@ -8,7 +8,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtensi
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.transientEncodedCallData
 
 fun SignerPayload.Extrinsic.paritySignerLegacyTxPayload(): ByteArray {
-    return accountId +  extrinsic.transientEncodedCallData() + extrinsic.encodedExtensions() + extrinsic.getGenesisHashOrThrow()
+    return accountId + extrinsic.transientEncodedCallData() + extrinsic.encodedExtensions() + extrinsic.getGenesisHashOrThrow()
 }
 
 fun SignerPayload.Extrinsic.paritySignerTxPayloadWithProof(proof: ExtrinsicProof): ByteArray {
