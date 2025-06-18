@@ -28,7 +28,7 @@ abstract class SeparateFlowSigner(
         inheritedImplication: InheritedImplication,
         accountId: AccountId
     ): SignatureWrapper {
-        val payload = SeparateFlowSignerState(SignerPayload.Extrinsic(inheritedImplication), metaAccount)
+        val payload = SeparateFlowSignerState(SignerPayload.Extrinsic(inheritedImplication, accountId), metaAccount)
 
         val result = awaitConfirmation(payload)
 
