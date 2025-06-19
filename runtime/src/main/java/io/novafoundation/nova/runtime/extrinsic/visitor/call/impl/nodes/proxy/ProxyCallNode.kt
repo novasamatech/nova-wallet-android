@@ -38,7 +38,7 @@ internal class ProxyCallNode : NestedCallVisitNode {
     }
 
     private fun innerCall(proxyCall: GenericCall.Instance): GenericCall.Instance {
-        return  bindGenericCall(proxyCall.arguments["call"])
+        return bindGenericCall(proxyCall.arguments["call"])
     }
 
     private class RealProxyVisit(

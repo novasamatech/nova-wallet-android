@@ -19,4 +19,3 @@ data class PendingMultisigOperationModel(
         val icon: ColoredDrawable?
     )
 }
-

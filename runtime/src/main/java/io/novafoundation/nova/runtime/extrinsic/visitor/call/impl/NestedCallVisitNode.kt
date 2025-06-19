@@ -33,7 +33,6 @@ internal fun CallVisitingContext.nestedVisit(call: GenericCall.Instance, origin:
     nestedVisit(NestedCallVisit(call, origin))
 }
 
-
 /**
  * Version of [CallVisit] intended for nested usage
  *

@@ -18,7 +18,7 @@ interface CallVisit {
 class LeafCallVisit(
     override val call: GenericCall.Instance,
     override val callOrigin: AccountIdKey
-): CallVisit
+) : CallVisit
 
 val CallVisit.isLeaf: Boolean
     get() = this is LeafCallVisit

@@ -41,7 +41,6 @@ class MultisigPendingOperationsViewModel(
         .withSafeLoading()
         .shareInBackground()
 
-
     fun backClicked() {
         router.back()
     }
@@ -61,7 +60,7 @@ class MultisigPendingOperationsViewModel(
             action = formatAction(),
             call = formattedCall,
             progress = formatProgress(),
-            time =null // TODO multisig api has some bugs that prevents us from properly fetching the time
+            time = null // TODO multisig api has some bugs that prevents us from properly fetching the time
         )
     }
 
@@ -81,7 +80,7 @@ class MultisigPendingOperationsViewModel(
                 icon = null
             )
 
-            MultisigAction.Signed ->  SigningAction(
+            MultisigAction.Signed -> SigningAction(
                 text = ColoredText(
                     text = resourceManager.getText(R.string.multisig_operations_signed),
                     colorRes = R.color.text_positive

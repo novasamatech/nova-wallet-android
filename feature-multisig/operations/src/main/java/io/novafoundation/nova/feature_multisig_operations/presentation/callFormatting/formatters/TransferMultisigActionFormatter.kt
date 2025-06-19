@@ -17,7 +17,7 @@ import javax.inject.Inject
 class TransferMultisigActionFormatter @Inject constructor(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val resourceManager: ResourceManager,
-): MultisigActionFormatterDelegate {
+) : MultisigActionFormatterDelegate {
 
     override suspend fun formatAction(
         visit: CallVisit,

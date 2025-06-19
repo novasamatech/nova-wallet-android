@@ -491,7 +491,6 @@ fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
     splitCamelCase()
 }
 
-
 fun String.splitAndCapitalizeWords(): String {
     val split = splitSnakeOrCamelCase()
 
