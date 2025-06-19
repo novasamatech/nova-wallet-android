@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="multisig_pending_operations">Transactions to sign</string>
+<!--    <string name="multisig_pending_operations">Pending operations</string>-->
+
     <string name="multisig_operations_progress">Signing (%s of %s)</string>
 <!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
 
@@ -53,7 +56,6 @@
     <string name="multisig_wallet_details_info_warning">Transactions from this wallet require approval from multiple signatories. Your account is one of the signatories:</string>
     <string name="multisig_signatory">Signatory:</string>
 
-    <string name="multisig_pending_operations">Pending operations</string>
 
     <string name="swap_failure_cannot_receive_insufficient_asset_out">You must have at least %s on %s to receive %s token</string>
 
