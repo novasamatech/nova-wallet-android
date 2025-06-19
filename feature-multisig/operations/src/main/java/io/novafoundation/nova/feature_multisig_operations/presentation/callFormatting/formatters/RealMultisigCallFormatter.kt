@@ -20,6 +20,7 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.collect
+import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.isLeaf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -42,14 +43,31 @@ class RealMultisigCallFormatter @Inject constructor(
     ): MultisigCallPreviewModel {
         if (call == null) return formatUnknown()
 
-        val formatted = callTraversal.collect(call, initialOrigin)
-            .mapNotNull { formatCallVisit(it, chain) }
+        val singleFormattedVisit = callTraversal.collect(call, initialOrigin)
+            .map { formatCallVisit(it, chain) }
+            .ensureSingleFormattedVisit()
 
-        return if (formatted.size == 1) {
-            val (singleMatch, singleMatchVisit) = formatted.single()
-            createCallPreview(singleMatchVisit, singleMatch, initialOrigin, chain)
+        return if (singleFormattedVisit != null) {
+            val (singleMatch, singleMatchVisit) = singleFormattedVisit
+            createCallPreview(singleMatchVisit, singleMatch!!, initialOrigin, chain)
         } else {
             formatDefault(call, chain)
+        }
+    }
+
+    private fun List<DelegateResultWithVisit>.ensureSingleFormattedVisit(): DelegateResultWithVisit? {
+        // We do not want to present a formatted call when there was at least one not resolved leaf - it might make signers not notice unformatted part whatsoever
+        // So, we always forbid formatting if some leaf was not resolved
+        val hasUnformattedLeafs = any { (formatResult, callVisit) -> formatResult == null && callVisit.isLeaf }
+        // We do not have a meaningful way to concat multiple formatted visits, so we only format when there is only single successfully one
+        val successfullyFormattedVisits = filter { it.first != null }
+
+        val canShowFormattedResult = !hasUnformattedLeafs && successfullyFormattedVisits.size == 1
+
+        return if (canShowFormattedResult) {
+            successfullyFormattedVisits.single()
+        } else {
+            null
         }
     }
 
@@ -82,8 +100,8 @@ class RealMultisigCallFormatter @Inject constructor(
     private suspend fun formatCallVisit(
         callVisit: CallVisit,
         chain: Chain,
-    ): DelegateResultWithVisit? {
-        val result = delegates.tryFindNonNull { it.formatAction(callVisit, chain) } ?: return null
+    ): DelegateResultWithVisit {
+        val result = delegates.tryFindNonNull { it.formatAction(callVisit, chain) }
         return result to callVisit
     }
 
@@ -108,4 +126,4 @@ class RealMultisigCallFormatter @Inject constructor(
     }
 }
 
-private typealias DelegateResultWithVisit = Pair<MultisigActionFormatterDelegateResult, CallVisit>
+private typealias DelegateResultWithVisit = Pair<MultisigActionFormatterDelegateResult?, CallVisit>
