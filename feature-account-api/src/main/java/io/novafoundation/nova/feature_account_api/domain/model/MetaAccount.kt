@@ -240,3 +240,5 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
 
 val LightMetaAccount.Type.isProxied: Boolean
     get() = this == LightMetaAccount.Type.PROXIED
+
+fun MultisigMetaAccount.allSignatories() = otherSignatories.toSet() + this.signatoryAccountId

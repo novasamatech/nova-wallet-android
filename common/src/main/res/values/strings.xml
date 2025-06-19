@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="multisig_wallet_details_info_warning_other_signatories">Other signatories:</string>
+    <string name="multisig_wallet_details_info_warning_title">Threshold %d out of %d</string>
+
     <string name="multisig_callhash_exists_title">Operation already exists</string>
     <string name="multisig_callhash_exists_message">%s has already initiated the same operation and it is currently waiting to be signed by other signatories.</string>
 
