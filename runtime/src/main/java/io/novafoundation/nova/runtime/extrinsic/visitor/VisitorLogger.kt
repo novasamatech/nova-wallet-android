@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl
+package io.novafoundation.nova.runtime.extrinsic.visitor
 
 import android.util.Log
 

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl
 
+import io.novafoundation.nova.runtime.extrinsic.visitor.ExtrinsicVisitorLogger
+import io.novafoundation.nova.runtime.extrinsic.visitor.IndentVisitorLogger
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisitor
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
@@ -124,9 +126,9 @@ internal class RealExtrinsicWalk(
         override val runtime: RuntimeSnapshot,
         override val origin: AccountId,
         override val callSucceeded: Boolean,
-        override val visitor: ExtrinsicVisitor,
         override val logger: ExtrinsicVisitorLogger,
-        override val eventQueue: MutableEventQueue
+        override val eventQueue: MutableEventQueue,
+        private val visitor: ExtrinsicVisitor
     ) : VisitingContext {
 
         override fun nestedVisit(visit: NestedExtrinsicVisit) {

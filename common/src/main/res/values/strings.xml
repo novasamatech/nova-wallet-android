@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="multisig_operations_progress">Signing (%s of %s)</string>
+<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
+
+
+    <string name="multisig_operations_created">Created by you</string>
+    <string name="multisig_operations_signed">Signed by you</string>
+<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
+<!--    <string name="multisig_operations_signed">Signed</string>-->
+
+
+    <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
+    
+<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
+    <string name="multisig_operations_unknown_calldata">Unknown operation</string>
+
     <string name="multisig_callhash_exists_title">Operation already exists</string>
     <string name="multisig_callhash_exists_message">%s has already initiated the same operation and it is currently waiting to be signed by other signatories.</string>
 
@@ -33,13 +48,6 @@
     <string name="multisig_operation_details_approve">Approve</string>
     <string name="multisig_operation_details_approve_and_execute">Approve &amp; Execute</string>
     <string name="multisig_operation_details_reject">Reject</string>
-
-    <string name="multisig_operations_progress">%s of %s Signed</string>
-
-    <string name="multisig_operations_pending_signature">Pending signature</string>
-    <string name="multisig_operations_signed">Signed</string>
-
-    <string name="multisig_operations_unknown_calldata">[Unknown operation] (%s)</string>
 
     <string name="account_multisig">Multisig</string>
     <string name="multisig_wallet_details_info_warning">Transactions from this wallet require approval from multiple signatories. Your account is one of the signatories:</string>

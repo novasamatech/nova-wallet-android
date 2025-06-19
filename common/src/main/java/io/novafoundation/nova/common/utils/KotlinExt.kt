@@ -491,6 +491,13 @@ fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
     splitCamelCase()
 }
 
+
+fun String.splitAndCapitalizeWords(): String {
+    val split = splitSnakeOrCamelCase()
+
+    return split.joinToString(separator = " ") { it.capitalize() }
+}
+
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.
  *

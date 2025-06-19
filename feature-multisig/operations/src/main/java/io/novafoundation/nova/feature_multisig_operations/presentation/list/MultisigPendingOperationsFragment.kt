@@ -23,7 +23,7 @@ class MultisigPendingOperationsFragment :
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    private val adapter: MultisigPendingOperationsAdapter by lazy(LazyThreadSafetyMode.NONE) { MultisigPendingOperationsAdapter(this) }
+    private val adapter: MultisigPendingOperationsAdapter by lazy(LazyThreadSafetyMode.NONE) { MultisigPendingOperationsAdapter(this, imageLoader) }
 
     override fun initViews() {
         binder.multisigPendingOperationsList.setHasFixedSize(true)
