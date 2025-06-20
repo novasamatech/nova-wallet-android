@@ -10,11 +10,14 @@ import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin.SelectorType
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.isNotMultisig
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 interface BuySellSelectorMixin {
 
@@ -27,6 +30,8 @@ interface BuySellSelectorMixin {
 
     class SelectorPayload(vararg val items: ListSelectorMixin.Item)
 
+    val multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin
+
     val tradingEnabledFlow: Flow<Boolean>
     val actionLiveData: LiveData<Event<SelectorPayload>>
     val errorLiveData: MutableLiveData<Event<Pair<String, String>>>
@@ -35,6 +40,7 @@ interface BuySellSelectorMixin {
 }
 
 class RealBuySellSelectorMixin(
+    override val multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin,
     private val router: AssetsRouter,
     private val tradeTokenRegistry: TradeTokenRegistry,
     private val chainRegistry: ChainRegistry,
@@ -69,15 +75,16 @@ class RealBuySellSelectorMixin(
         }
     }
 
-    private fun openAllAssetsSelector() = BuySellSelectorMixin.SelectorPayload(
+    private suspend fun openAllAssetsSelector() = BuySellSelectorMixin.SelectorPayload(
         buyItem(enabled = true) { router.openBuyFlow() },
-        sellItem(enabled = true) { router.openSellFlow() }
+        sellItem(enabled = multisigRestrictionCheckMixin.isNotMultisig()) { router.openSellFlow() }
     )
 
     private suspend fun openSpecifiedAssetSelector(selectorType: SelectorType.Asset): BuySellSelectorMixin.SelectorPayload? {
         val chainAsset = chainRegistry.asset(selectorType.chaiId, selectorType.assetId)
         val buyAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.BUY)
-        val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.SELL)
+        val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.SELL) &&
+            multisigRestrictionCheckMixin.isNotMultisig()
 
         if (!buyAvailable && !sellAvailable) {
             showErrorMessage(R.string.trade_token_not_supported_title, R.string.trade_token_not_supported_message)
@@ -106,8 +113,21 @@ class RealBuySellSelectorMixin(
             if (enabled) R.color.icon_primary else R.color.icon_inactive,
             R.string.wallet_asset_sell_tokens,
             if (enabled) R.color.text_primary else R.color.button_text_inactive,
-            if (enabled) action else errorAction(R.string.sell_token_not_supported_title, R.string.sell_token_not_supported_message)
+            if (enabled) action else sellErrorAction()
         )
+    }
+
+    private fun sellErrorAction(): () -> Unit = {
+        coroutineScope.launch {
+            if (multisigRestrictionCheckMixin.isMultisig()) {
+                multisigRestrictionCheckMixin.showWarning(
+                    resourceManager.getString(R.string.multisig_sell_not_supported_title),
+                    resourceManager.getString(R.string.multisig_sell_not_supported_message)
+                )
+            } else {
+                showErrorMessage(R.string.sell_token_not_supported_title, R.string.sell_token_not_supported_message)
+            }
+        }
     }
 
     private fun errorAction(titleRes: Int, messageRes: Int): () -> Unit = { showErrorMessage(titleRes, messageRes) }

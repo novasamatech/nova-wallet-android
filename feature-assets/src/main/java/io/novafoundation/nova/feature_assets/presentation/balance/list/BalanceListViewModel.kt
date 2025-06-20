@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
@@ -83,7 +84,10 @@ class BalanceListViewModel(
     private val amountFormatter: AmountFormatter,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
+    private val multisigRestrictionCheckMixinFactory: MultisigRestrictionCheckMixinFactory,
 ) : BaseViewModel() {
+
+    val multisigRestrictionCheckMixin = multisigRestrictionCheckMixinFactory.create()
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
@@ -335,7 +339,16 @@ class BalanceListViewModel(
     }
 
     fun novaCardClicked() {
-        router.openNovaCard()
+        launch {
+            if (multisigRestrictionCheckMixin.isMultisig()) {
+                multisigRestrictionCheckMixin.showWarning(
+                    resourceManager.getString(R.string.multisig_card_not_supported_title),
+                    resourceManager.getString(R.string.multisig_card_not_supported_message)
+                )
+            } else {
+                router.openNovaCard()
+            }
+        }
     }
 
     fun switchViewMode() {
