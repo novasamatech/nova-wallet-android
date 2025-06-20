@@ -44,26 +44,19 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:textColor="@color/button_text_accent"
-        app:layout_constraintStart_toStartOf="@+id/alertSubMessage"
-        app:layout_constraintTop_toBottomOf="@+id/alertSubMessage"
+        app:layout_constraintStart_toStartOf="@+id/alertSubMessageContainer"
+        app:layout_constraintTop_toBottomOf="@+id/alertSubMessageContainer"
         tools:text="@string/common_how_it_works" />
 
-    <TextView
-        android:id="@+id/alertSubMessage"
-        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+    <LinearLayout
+        android:id="@+id/alertSubMessageContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:includeFontPadding="false"
-        android:visibility="gone"
-        android:textColor="@color/text_secondary"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/alertIcon"
-        app:layout_constraintTop_toBottomOf="@id/alertMessage"
-        tools:text="@tools:sample/lorem[20]" />
+        app:layout_constraintTop_toBottomOf="@id/alertMessage" />
 
     <ImageView
         android:id="@+id/alertActionArrow"

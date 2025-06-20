@@ -41,10 +41,10 @@ class WalletDetailsViewModel(
     val addAccountLauncherMixin = addAccountLauncherPresentationFactory.create(viewModelScope)
 
     private val detailsHost = WalletDetailsMixinHost(
-        browserableDelegate = externalActions
+        externalActions = externalActions
     )
 
-    private val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId, detailsHost) }
+    private val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId, coroutineScope = viewModelScope, detailsHost) }
 
     private val startAccountName = async { walletDetailsMixin().metaAccount.name }
 

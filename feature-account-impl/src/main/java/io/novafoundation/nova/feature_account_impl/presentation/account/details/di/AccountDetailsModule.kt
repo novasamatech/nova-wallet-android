@@ -50,7 +50,8 @@ class AccountDetailsModule {
         ledgerMigrationTracker: LedgerMigrationTracker,
         multisigFormatter: MultisigFormatter,
         router: AccountRouter,
-        addressSchemeFormatter: AddressSchemeFormatter
+        addressSchemeFormatter: AddressSchemeFormatter,
+        chainRegistry: ChainRegistry
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
             polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
@@ -63,6 +64,7 @@ class AccountDetailsModule {
             ledgerMigrationTracker = ledgerMigrationTracker,
             router = router,
             addressSchemeFormatter = addressSchemeFormatter,
+            chainRegistry = chainRegistry
         )
     }
 
