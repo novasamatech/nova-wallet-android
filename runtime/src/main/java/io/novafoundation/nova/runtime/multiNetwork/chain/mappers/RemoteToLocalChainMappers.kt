@@ -215,6 +215,7 @@ private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "governance" -> ApiType.GOVERNANCE_REFERENDA
     "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS
     "referendum-summary" -> ApiType.REFERENDUM_SUMMARY
+    "multisig" -> ApiType.MULTISIG
     else -> ApiType.UNKNOWN
 }
 

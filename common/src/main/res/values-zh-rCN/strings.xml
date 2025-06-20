@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">您快到了！🎉\n 只需点击下面即可完成设置，并在 Polkadot App 和 Nova Wallet 中无缝使用您的账户</string>
     <string name="account_migration_title">欢迎来到 Nova！</string>
     <string name="account_mnmonic_length_variants">12、15、18、21或24个单词的短语</string>
+    <string name="account_multisig">多重签名</string>
+    <string name="account_multisig_group_label">共享控制（多重签名）</string>
     <string name="account_needed_message">您在这个网络上没有账户，您可以创建或导入账户。</string>
     <string name="account_needed_title">需要账户</string>
     <string name="account_no_chain_projection">没有找到账户</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您%s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR 码扫描</string>
     <string name="account_private_key">私钥</string>
+    <string name="account_proxied">代理</string>
     <string name="account_proxieds">委托给您的（代理）</string>
     <string name="account_proxy_type_any">任何</string>
     <string name="account_proxy_type_auction">拍卖</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">更改%s帐户</string>
     <string name="accounts_change_chain_secrets">更改帐户</string>
     <string name="accounts_ledger_legacy">Ledger（旧版）</string>
+    <string name="active_multisig_title">共享控制</string>
     <string name="add_custom_node">添加自定义节点</string>
     <string name="add_delegation_missing_account_message">您需要添加一个%s帐户到钱包才能委托</string>
     <string name="add_network_title">输入网络详情</string>
@@ -686,8 +690,8 @@
     <string name="delegate_search_hint">通过地址或名称搜索</string>
     <string name="delegate_search_placeholder_empty">地址格式无效。请确保地址属于正确的网络</string>
     <string name="delegate_search_result_count">搜索结果：%d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova钱包自动为您将代理权限（Proxy）添加到单独的类别中。您可以在设置中随时管理钱包。</string>
-    <string name="delegated_accounts_fragment_title">代理账户更新</string>
+    <string name="delegated_accounts_fragment_explanation">为您自动检测并组织代理和多重签名账户。可以随时在设置中管理。</string>
+    <string name="delegated_accounts_fragment_title">钱包列表已更新</string>
     <string name="delegation_all_votes">所有时间的投票</string>
     <string name="delegation_delegate">代理</string>
     <string name="delegation_delegate_filter_all">所有账户</string>
@@ -724,6 +728,7 @@
     <string name="delegation_tracks_governance_preset">管理</string>
     <string name="delegation_tracks_treasury_preset">财政</string>
     <string name="delegation_undelegating_period">取消委托期</string>
+    <string name="delegation_updates_deactivated_title">不再有效</string>
     <string name="delegation_your_delegation">您的委托</string>
     <string name="delegation_your_delegations">您的委托</string>
     <string name="delegations_filter">显示</string>
@@ -881,6 +886,29 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">请至少选择%d个钱包</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s 已经发起相同操作，当前正等待其他签署人签署。</string>
+    <string name="multisig_callhash_exists_title">操作已存在</string>
+    <string name="multisig_operation_details_approve">批准</string>
+    <string name="multisig_operation_details_approve_and_execute">批准并执行</string>
+    <string name="multisig_operation_details_call_data_not_found">未找到调用数据</string>
+    <string name="multisig_operation_details_reject">拒绝</string>
+    <string name="multisig_operations_pending_signature">待签名</string>
+    <string name="multisig_operations_progress" formatted="false">已签：%s/%s</string>
+    <string name="multisig_operations_signed">已签名</string>
+    <string name="multisig_operations_unknown_calldata">[未知操作] (%s)</string>
+    <string name="multisig_pending_operations">待处理操作</string>
+    <string name="multisig_signatory">签署人：</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s 的余额不足以支付多签存款 %s。可用余额：%s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s 的余额不足以支付网络费用 %s 和多签存款 %s。可用余额：%s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s 需要至少 %s 才能支付此交易费用并保持在最低网络余额之上。当前余额为：%s</string>
+    <string name="multisig_signing_is_not_supported_message">多签钱包不支持签署任意消息 —— 仅限交易</string>
+    <string name="multisig_signing_warning_message">多签交易将由 %s 发起。发起人承担网络费用并保留多签存款，一旦交易完成，存款将被解除保留。</string>
+    <string name="multisig_signing_warning_title">多重签名交易</string>
+    <string name="multisig_transaction_created_subtitle">其他签署人现在可以确认交易。\n您可以在%s中跟踪其状态</string>
+    <string name="multisig_transaction_created_subtitle_highlight">多重签名交易。</string>
+    <string name="multisig_transaction_created_title">多重签名交易已创建</string>
+    <string name="multisig_transaction_created_view_details">查看详细信息</string>
+    <string name="multisig_wallet_details_info_warning">从此钱包进行的交易需要多个签署人的批准。您的账户是其中之一的签署人：</string>
     <string name="network_already_exist_failure_title">该节点已存在</string>
     <string name="network_fee">网络费用</string>
     <string name="network_info_address">节点地址</string>
@@ -977,8 +1005,6 @@
     <string name="profile_settings_safe_mode_title">安全模式</string>
     <string name="profile_settings_title">设置</string>
     <string name="proxied_wallet_details_info_warning">该账户已授权以下账户执行交易：</string>
-    <string name="proxieds_updates_deactivated_title">不再有效</string>
-    <string name="proxy_about">什么是代理？</string>
     <string name="proxy_access_type_staking_operations">赌注操作</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">委托账户%s的余额不足以支付%s的网络费用。可用余额支付费用：%s</string>
     <string name="proxy_signing_is_not_supported_message">代理钱包不支持签署任意消息 - 仅支持交易</string>
@@ -1587,7 +1613,7 @@
     <string name="swap_execution_time">执行时间</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">您在支付%s网络费后至少应保留%s，因为您持有的代币不足</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">您必须至少保留%s，以接收%s代币</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">要接收 %s 代币，您必须在 %s 至少拥有 %s</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">要接收 %s 代币，您必须在 %s 至少拥有 %s</string>
     <string name="swap_failure_insufficient_balance_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费并将%3$s兑换为%4$s，以满足%5$s的最低余额</string>
     <string name="swap_failure_swap_max_button">最大交换</string>

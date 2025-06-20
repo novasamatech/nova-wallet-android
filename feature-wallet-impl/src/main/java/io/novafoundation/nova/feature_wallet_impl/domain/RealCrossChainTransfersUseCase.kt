@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
@@ -145,7 +146,15 @@ internal class RealCrossChainTransfersUseCase(
         )
     }
 
-    override suspend fun ExtrinsicService.performTransfer(
+    override suspend fun ExtrinsicService.performTransferOfExactAmount(
+        transfer: AssetTransferBase,
+        computationalScope: CoroutineScope
+    ): Result<ExtrinsicSubmission> {
+        val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
+        return crossChainTransactor.performTransfer(transferConfiguration, transfer, crossChainFee = Balance.ZERO)
+    }
+
+    override suspend fun ExtrinsicService.performTransferAndTrackTransfer(
         transfer: AssetTransferBase,
         computationalScope: CoroutineScope
     ): Result<Balance> {

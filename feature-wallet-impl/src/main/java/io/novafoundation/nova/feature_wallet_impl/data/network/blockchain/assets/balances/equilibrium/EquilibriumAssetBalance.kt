@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.equilibrium
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.HelperBinding
 import io.novafoundation.nova.common.data.network.runtime.binding.UseCaseBinding
@@ -32,6 +31,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindEquilibriumBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
@@ -106,7 +106,7 @@ class EquilibriumAssetBalance(
         }
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
         val assetBalances = remoteStorageSource.query(
             chain.id,
             keyBuilder = { it.getAccountStorage().storageKey(it, accountId) },
@@ -127,7 +127,8 @@ class EquilibriumAssetBalance(
 
         val lockedBalance = assetBalances.lock.orZero().takeIf { chainAsset.isUtilityAsset } ?: BigInteger.ZERO
 
-        return AccountBalance(
+        return ChainAssetBalance.default(
+            chainAsset = chainAsset,
             free = assetBalance,
             reserved = reservedBalance,
             frozen = lockedBalance
@@ -141,11 +142,6 @@ class EquilibriumAssetBalance(
         sharedSubscriptionBuilder: SharedRequestsBuilder?
     ): Flow<TransferableBalanceUpdate> {
         TODO("Not yet implemented")
-    }
-
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        val accountBalance = queryAccountBalance(chain, chainAsset, accountId)
-        return accountBalance.free + accountBalance.reserved
     }
 
     override suspend fun startSyncingBalance(

@@ -8,7 +8,8 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
+import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -33,13 +34,15 @@ class RootFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         balancesUpdateSystem: BalancesUpdateSystem,
-        proxySyncService: ProxySyncService
+        multisigPendingOperationsService: MultisigPendingOperationsService,
+        externalAccountsSyncService: ExternalAccountsSyncService,
     ): RootInteractor {
         return RootInteractor(
             updateSystem = balancesUpdateSystem,
             walletRepository = walletRepository,
             accountRepository = accountRepository,
-            proxySyncService = proxySyncService
+            multisigPendingOperationsService = multisigPendingOperationsService,
+            externalAccountsSyncService = externalAccountsSyncService
         )
     }
 

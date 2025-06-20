@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.domain.model.substrateMultiChainEncryption
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
@@ -122,10 +123,6 @@ class AccountRepositoryImpl(
 
     override suspend fun accountNameFor(accountId: AccountId, chainId: String): String? {
         return accountDataSource.accountNameFor(accountId, chainId)
-    }
-
-    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
-        return accountDataSource.allLightMetaAccounts()
     }
 
     override suspend fun hasActiveMetaAccounts(): Boolean {
@@ -287,12 +284,16 @@ class AccountRepositoryImpl(
         return accountDataSource.getActiveMetaAccounts()
     }
 
+    override suspend fun getAllMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.getAllMetaAccounts()
+    }
+
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return accountDataSource.getActiveMetaAccountsQuantity()
     }
 
-    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
-        return accountDataSource.getMetaAccountIdsByType(type)
+    override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
+        return accountDataSource.hasMetaAccountsCountOfTypeFlow(type)
     }
 
     override suspend fun hasSecretsAccounts(): Boolean {

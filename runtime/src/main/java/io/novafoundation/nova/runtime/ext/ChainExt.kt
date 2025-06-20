@@ -158,10 +158,6 @@ fun Chain.Additional?.shouldDisableMetadataHashCheck(): Boolean {
     return this?.disabledCheckMetadataHash ?: false
 }
 
-fun Chain.Additional?.isMigrationLedgerAppSupported(): Boolean {
-    return isGenericLedgerAppSupported()
-}
-
 fun ChainId.chainIdHexPrefix16(): String {
     return removeHexPrefix()
         .take(32)
@@ -196,6 +192,10 @@ fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
 
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
+}
+
+inline fun <reified T : Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
+    return externalApis.any { it is T }
 }
 
 const val UTILITY_ASSET_ID = 0
@@ -261,6 +261,10 @@ fun Chain.addressOf(accountId: ByteArray): String {
     } else {
         accountId.toAddress(addressPrefix.toShort())
     }
+}
+
+fun Chain.addressOf(accountId: AccountIdKey): String {
+    return addressOf(accountId.value)
 }
 
 fun Chain.legacyAddressOfOrNull(accountId: ByteArray): String? {

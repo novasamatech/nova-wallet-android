@@ -15,7 +15,7 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.assetTxFeePaidEvent
-import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findAllOfType
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +62,7 @@ class AssetConversionSwapExtractor(
     private fun ExtrinsicVisit.extractSwapAmounts(): Pair<Balance, Balance> {
         // We check for custom fee usage from root extrinsic since `extrinsicVisit` will cut it out when nested calls are present
         val isCustomFeeTokenUsed = rootExtrinsic.events.assetTxFeePaidEvent() != null
-        val allSwaps = events.findAllOfType(Modules.ASSET_CONVERSION, "SwapExecuted")
+        val allSwaps = events.findEvents(Modules.ASSET_CONVERSION, "SwapExecuted")
 
         val swapExecutedEvent = when {
             !success -> null // we wont be able to extract swap from event

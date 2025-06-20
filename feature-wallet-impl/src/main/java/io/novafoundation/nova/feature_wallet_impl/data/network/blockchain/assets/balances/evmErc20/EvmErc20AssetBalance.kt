@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20
 
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.core.ethereum.log.Topic
 import io.novafoundation.nova.core.updater.EthereumSharedRequestsBuilder
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -10,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -66,18 +66,14 @@ class EvmErc20AssetBalance(
         return BigInteger.ZERO
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
         val erc20Type = chainAsset.requireErc20()
         val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
         val accountAddress = chain.addressOf(accountId)
         val balance = erc20Standard.querySingle(erc20Type.contractAddress, ethereumApi)
             .balanceOfAsync(accountAddress)
             .await()
-        return AccountBalance(
-            free = balance,
-            reserved = BigInteger.ZERO,
-            frozen = BigInteger.ZERO,
-        )
+        return ChainAssetBalance.fromFree(chainAsset, free = balance)
     }
 
     override suspend fun subscribeTransferableAccountBalance(
@@ -87,10 +83,6 @@ class EvmErc20AssetBalance(
         sharedSubscriptionBuilder: SharedRequestsBuilder?
     ): Flow<TransferableBalanceUpdate> {
         TODO("Not yet implemented")
-    }
-
-    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
-        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

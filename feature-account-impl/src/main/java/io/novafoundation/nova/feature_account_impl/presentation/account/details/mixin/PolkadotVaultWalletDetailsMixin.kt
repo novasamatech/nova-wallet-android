@@ -39,7 +39,7 @@ class PolkadotVaultWalletDetailsMixin(
     }
 
     override fun accountProjectionsFlow(): Flow<List<Any>> = flowOfAll {
-        interactor.chainProjectionsFlow(metaAccount.id, interactor.getAllChains(), hasAccountComparator().withChainComparator())
+        interactor.chainProjectionsBySourceFlow(metaAccount.id, interactor.getAllChains(), hasAccountComparator().withChainComparator())
     }.map { accounts ->
         val availableActions = availableAccountActions.first()
 

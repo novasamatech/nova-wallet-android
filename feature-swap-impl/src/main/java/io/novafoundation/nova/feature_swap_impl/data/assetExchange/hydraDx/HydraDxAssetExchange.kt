@@ -13,7 +13,9 @@ import io.novafoundation.nova.common.utils.times
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
@@ -37,6 +39,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrect
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.createAggregated
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
@@ -78,7 +81,8 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -361,7 +365,21 @@ private class HydraDxAssetExchange(
             )
         }
 
-        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
+        override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
+            return submitInternal(args)
+                .mapCatching {
+                    SwapExecutionCorrection(
+                        actualReceivedAmount = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
+                    )
+                }
+        }
+
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
+            return submitInternal(args)
+                .map { SwapSubmissionResult(it.submissionHierarchy) }
+        }
+
+        private suspend fun submitInternal(args: AtomicSwapOperationSubmissionArgs): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -371,11 +389,7 @@ private class HydraDxAssetExchange(
                 )
             ) {
                 executeSwap(args.actualSwapLimit)
-            }.requireOk().mapCatching { (events) ->
-                SwapExecutionCorrection(
-                    actualReceivedAmount = events.determineActualSwappedAmount()
-                )
-            }
+            }.requireOk()
         }
 
         private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {

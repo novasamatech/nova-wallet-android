@@ -30,7 +30,7 @@ fun nftIssuance(
         NftLocal.IssuanceType.LIMITED -> {
             val myEditionInt = issuanceMyEdition?.toIntOrNull()
 
-            if (issuanceTotal != null && issuanceTotal.isZero && myEditionInt != null) {
+            if (issuanceTotal != null && !issuanceTotal.isZero && myEditionInt != null) {
                 Nft.Issuance.Limited(max = issuanceTotal.toInt(), edition = myEditionInt)
             } else {
                 Nft.Issuance.Unlimited

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -60,11 +61,12 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
@@ -98,8 +100,6 @@ interface AccountFeatureDependencies {
 
     val extrinsicValidityUseCase: ExtrinsicValidityUseCase
 
-    val extrinsicSplitter: ExtrinsicSplitter
-
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val rootScope: RootScope
@@ -126,9 +126,15 @@ interface AccountFeatureDependencies {
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
 
+    val blockLimitsRepository: BlockLimitsRepository
+
+    val networkApiCreator: NetworkApiCreator
+
     val addressSchemeFormatter: AddressSchemeFormatter
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val extrinsicWalk: ExtrinsicWalk
 
     fun appLinksProvider(): AppLinksProvider
 

@@ -94,7 +94,7 @@ interface MetaAccountDao {
     }
 
     @Transaction
-    suspend fun withTransaction(action: suspend () -> Unit) {
+    suspend fun runInTransaction(action: suspend () -> Unit) {
         action()
     }
 
@@ -126,15 +126,13 @@ interface MetaAccountDao {
     @Transaction
     suspend fun getMetaAccountsQuantityByStatus(status: MetaAccountLocal.Status): Int
 
-    @Query("SELECT id FROM meta_accounts WHERE status = :status")
-    suspend fun getMetaAccountIdsByStatus(status: MetaAccountLocal.Status): List<Long>
-
-    @Query("SELECT id FROM meta_accounts WHERE type = :type")
-    suspend fun getMetaAccountIdsByType(type: MetaAccountLocal.Type): List<Long>
-
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
     @Transaction
     suspend fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
+
+    @Query("SELECT * FROM meta_accounts")
+    @Transaction
+    suspend fun getFullMetaAccounts(): List<RelationJoinedMetaAccountInfo>
 
     @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>
@@ -147,9 +145,6 @@ interface MetaAccountDao {
 
     @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
     fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
-
-    @Query("SELECT * FROM proxy_accounts WHERE chainId = :chainId")
-    suspend fun getProxyAccounts(chainId: String): List<ProxyAccountLocal>
 
     @Query("UPDATE meta_accounts SET isSelected = (id = :metaId)")
     suspend fun selectMetaAccount(metaId: Long)
@@ -219,6 +214,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts WHERE isSelected = 1")
     suspend fun selectedMetaAccount(): RelationJoinedMetaAccountInfo?
 
+    @Query("SELECT EXISTS(SELECT id FROM meta_accounts WHERE type = :type)")
+    fun hasMetaAccountsCountOfTypeFlow(type: MetaAccountLocal.Type): Flow<Boolean>
+
     @Query(
         """
         DELETE FROM meta_accounts
@@ -254,6 +252,16 @@ interface MetaAccountDao {
 
     @Query("DELETE FROM meta_accounts WHERE status = :status ")
     fun removeMetaAccountsByStatus(status: MetaAccountLocal.Status)
+}
+
+suspend inline fun <T : Any> MetaAccountDao.withTransaction(crossinline action: suspend () -> T): T {
+    var result: T? = null
+
+    runInTransaction {
+        result = action()
+    }
+
+    return result!!
 }
 
 @OptIn(ExperimentalContracts::class)

@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.MythosClaimRewardsInteractor
@@ -41,13 +43,15 @@ class MythosClaimRewardsViewModel(
     private val validationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val stakingSharedState: StakingSharedState,
     private val externalActions: ExternalActions.Presentation,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
@@ -127,7 +131,7 @@ class MythosClaimRewardsViewModel(
             .onSuccess {
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
             .onFailure(::showError)
 

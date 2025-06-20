@@ -74,4 +74,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/balanceListNovaCard" />
+
+    <io.novafoundation.nova.feature_assets.presentation.balance.list.view.PendingOperationsCountView
+        android:id="@+id/balanceListPendingOperations"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balanceListNfts" />
 </androidx.constraintlayout.widget.ConstraintLayout>

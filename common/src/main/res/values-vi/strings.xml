@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">Bạn sắp hoàn tất! 🎉\n Chỉ cần nhấn bên dưới để hoàn tất thiết lập và bắt đầu sử dụng tài khoản của bạn một cách liền mạch trong cả Polkadot App và Nova Wallet</string>
     <string name="account_migration_title">Chào mừng đến với Nova!</string>
     <string name="account_mnmonic_length_variants">Cụm từ gồm 12, 15, 18, 21 hoặc 24 từ</string>
+    <string name="account_multisig">Đa chữ ký</string>
+    <string name="account_multisig_group_label">Kiểm soát chung (đa chữ ký)</string>
     <string name="account_needed_message">Bạn không có tài khoản cho mạng này, bạn có thể tạo hoặc nhập tài khoản.</string>
     <string name="account_needed_title">Cần tài khoản</string>
     <string name="account_no_chain_projection">Không tìm thấy tài khoản</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault sẽ cung cấp cho bạn %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">quét mã QR</string>
     <string name="account_private_key">Khoá riêng tư</string>
+    <string name="account_proxied">Được ủy quyền</string>
     <string name="account_proxieds">Được ủy quyền cho bạn (Proxieds)</string>
     <string name="account_proxy_type_any">Bất kỳ</string>
     <string name="account_proxy_type_auction">Đấu giá</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">Thay đổi tài khoản %s</string>
     <string name="accounts_change_chain_secrets">Thay đổi tài khoản</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="active_multisig_title">Kiểm soát chung</string>
     <string name="add_custom_node">Thêm node tùy chỉnh</string>
     <string name="add_delegation_missing_account_message">Bạn cần thêm tài khoản %s vào ví để ủy quyền</string>
     <string name="add_network_title">Nhập chi tiết mạng</string>
@@ -686,8 +690,8 @@
     <string name="delegate_search_hint">Tìm kiếm theo địa chỉ hoặc tên</string>
     <string name="delegate_search_placeholder_empty">Định dạng địa chỉ không hợp lệ. Hãy chắc chắn rằng địa chỉ thuộc về mạng đúng</string>
     <string name="delegate_search_result_count">kết quả tìm kiếm: %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Wallet tự động thêm các ủy quyền được giao (Proxy) vào một danh mục riêng cho bạn. Bạn luôn có thể quản lý ví trong Cài đặt.</string>
-    <string name="delegated_accounts_fragment_title">Cập nhật tài khoản được ủy thác</string>
+    <string name="delegated_accounts_fragment_explanation">Tài khoản Proxy và Đa chữ ký tự động được phát hiện và tổ chức cho bạn. Quản lý bất kỳ lúc nào trong Cài đặt.</string>
+    <string name="delegated_accounts_fragment_title">Danh sách ví đã được cập nhật</string>
     <string name="delegation_all_votes">Đã bỏ phiếu cho toàn bộ thời gian</string>
     <string name="delegation_delegate">Delegate</string>
     <string name="delegation_delegate_filter_all">Tất cả các tài khoản</string>
@@ -724,6 +728,7 @@
     <string name="delegation_tracks_governance_preset">Quản trị</string>
     <string name="delegation_tracks_treasury_preset">Kho bạc</string>
     <string name="delegation_undelegating_period">Thời gian Undelegating</string>
+    <string name="delegation_updates_deactivated_title">Không còn hiệu lực</string>
     <string name="delegation_your_delegation">Ủy quyền của bạn</string>
     <string name="delegation_your_delegations">Ủy quyền của bạn</string>
     <string name="delegations_filter">Hiển thị</string>
@@ -881,6 +886,29 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">Chọn ít nhất %d ví</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s đã khởi tạo hoạt động tương tự và hiện đang chờ để được ký bởi các bên ký khác.</string>
+    <string name="multisig_callhash_exists_title">Hoạt động đã tồn tại</string>
+    <string name="multisig_operation_details_approve">Phê duyệt</string>
+    <string name="multisig_operation_details_approve_and_execute">Phê duyệt &amp; Thực hiện</string>
+    <string name="multisig_operation_details_call_data_not_found">Dữ liệu cuộc gọi không tìm thấy</string>
+    <string name="multisig_operation_details_reject">Từ chối</string>
+    <string name="multisig_operations_pending_signature">Chờ chữ ký</string>
+    <string name="multisig_operations_progress" formatted="false">%s trong %s đã ký</string>
+    <string name="multisig_operations_signed">Đã ký</string>
+    <string name="multisig_operations_unknown_calldata">[Thao tác không rõ] (%s)</string>
+    <string name="multisig_pending_operations">Thao tác đang chờ</string>
+    <string name="multisig_signatory">Người ký:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s không có đủ số dư để đặt cọc multisig %s. Số dư khả dụng: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s không có đủ số dư để trả phí mạng %s và đặt cọc multisig %s. Số dư khả dụng: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s cần ít nhất %s để trả phí giao dịch này và duy trì trên số dư tối thiểu của mạng. Số dư hiện tại là: %s</string>
+    <string name="multisig_signing_is_not_supported_message">Ví multisig không hỗ trợ ký các tin nhắn tùy ý — chỉ có các giao dịch</string>
+    <string name="multisig_signing_warning_message">Giao dịch multisig sẽ được khởi tạo bởi %s. Người khởi tạo trả phí mạng và dự trữ một khoản đặt cọc multisig, sẽ được giải phóng sau khi giao dịch được thực thi.</string>
+    <string name="multisig_signing_warning_title">Giao dịch Đa chữ ký</string>
+    <string name="multisig_transaction_created_subtitle">Các người ký khác bây giờ có thể xác nhận giao dịch.\nBạn có thể theo dõi trạng thái của nó trong %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">các giao dịch Đa chữ ký.</string>
+    <string name="multisig_transaction_created_title">Giao dịch Đa chữ ký đã được tạo</string>
+    <string name="multisig_transaction_created_view_details">Xem chi tiết</string>
+    <string name="multisig_wallet_details_info_warning">Các giao dịch từ ví này yêu cầu sự chấp thuận từ nhiều người ký. Tài khoản của bạn là một trong những người ký:</string>
     <string name="network_already_exist_failure_title">Node này đã tồn tại</string>
     <string name="network_fee">Phí mạng</string>
     <string name="network_info_address">Địa chỉ nút</string>
@@ -977,8 +1005,6 @@
     <string name="profile_settings_safe_mode_title">Chế độ an toàn</string>
     <string name="profile_settings_title">Cài đặt</string>
     <string name="proxied_wallet_details_info_warning">Tài khoản này đã cấp quyền thực hiện giao dịch cho tài khoản sau:</string>
-    <string name="proxieds_updates_deactivated_title">Không còn hiệu lực</string>
-    <string name="proxy_about">Proxy là gì?</string>
     <string name="proxy_access_type_staking_operations">Giao dịch Staking</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Tài khoản được ủy quyền %s không có đủ số dư để trả phí mạng là %s. Số dư có sẵn để trả phí: %s</string>
     <string name="proxy_signing_is_not_supported_message">Ví Proxy không hỗ trợ ký tin nhắn tùy ý — chỉ hỗ trợ giao dịch</string>
@@ -1587,7 +1613,7 @@
     <string name="swap_execution_time">Thời gian thực hiện</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Bạn cần giữ ít nhất %s sau khi trả phí mạng %s vì bạn giữ các token không đủ</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Bạn cần giữ ít nhất %s để nhận được token %s</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">Bạn phải có ít nhất %s trên %s để nhận %s token</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">Bạn phải có ít nhất %s trên %s để nhận %s token</string>
     <string name="swap_failure_insufficient_balance_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả %2$s cho phí mạng.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Bạn có thể hoán đổi tối đa %1$s vì bạn cần trả phí mạng %2$s và cũng chuyển đổi %3$s sang %4$s để giữ mức tối thiểu %5$s.</string>
     <string name="swap_failure_swap_max_button">Hoán đổi tối đa</string>

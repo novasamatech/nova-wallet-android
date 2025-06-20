@@ -176,7 +176,8 @@ fun testMetaAccount(name: String = "Test") = MetaAccountLocal(
     type = MetaAccountLocal.Type.WATCH_ONLY,
     globallyUniqueId = "",
     parentMetaId = 1,
-    status = MetaAccountLocal.Status.ACTIVE
+    status = MetaAccountLocal.Status.ACTIVE,
+    typeExtras = null
 )
 
 fun testChainAccount(

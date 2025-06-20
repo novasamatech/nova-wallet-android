@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '10.0.1'
-        versionCode = 211
+        versionName = '10.0.2'
+        versionCode = 215
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.4.0'
+        substrateSdkVersion = '2.7.0'
 
         gifVersion = '1.2.19'
 
@@ -164,7 +164,8 @@ buildscript {
         zXingCoreDep = "com.google.zxing:core:$zXingVersion"
         zXingEmbeddedDep = "com.journeyapps:zxing-android-embedded:$zXingEmbeddedVersion"
 
-        substrateSdkDep = "io.github.nova-wallet:substrate-sdk-android:$substrateSdkVersion"
+        substrateSdkDep = "io.github.nova-wallet.substrate-sdk-android:core:$substrateSdkVersion"
+        substrateSdkSerializationDep = "io.github.nova-wallet.substrate-sdk-android:kotlinx-serialization-scale:$substrateSdkVersion"
 
         gifDep = "pl.droidsonroids.gif:android-gif-drawable:$gifVersion"
 

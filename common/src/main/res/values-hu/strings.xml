@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">Már majdnem kész vagy! 🎉\n Csak koppints az alábbi gombra, hogy befejezd a beállítást, és zökkenőmentesen kezdd el használni a fiókjaidat mind a Polkadot App-ban, mind a Nova Walletben</string>
     <string name="account_migration_title">Üdvözlünk a Nova-ban!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 vagy 24 szavas kifejezés</string>
+    <string name="account_multisig">Többaláírás</string>
+    <string name="account_multisig_group_label">Megosztott irányítás (többaláírás)</string>
     <string name="account_needed_message">Nem rendelkezel fiókkal ezen a hálózaton, hozzáadhatsz vagy importálhatsz egyet.</string>
     <string name="account_needed_title">Fiók szükséges</string>
     <string name="account_no_chain_projection">A fiók nem található</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">A Polkadot Vault egy %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-kód a beolvasáshoz</string>
     <string name="account_private_key">Privát kulcs</string>
+    <string name="account_proxied">Meghatalmazott</string>
     <string name="account_proxieds">Hozzád delegálva (Proxieds)</string>
     <string name="account_proxy_type_any">Bármilyen</string>
     <string name="account_proxy_type_auction">Aukció</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">%s fiók módosítása</string>
     <string name="accounts_change_chain_secrets">Fiók módosítása</string>
     <string name="accounts_ledger_legacy">Ledger (Örökség)</string>
+    <string name="active_multisig_title">Megosztott irányítás</string>
     <string name="add_custom_node">Egyéni csomópont hozzáadása</string>
     <string name="add_delegation_missing_account_message">Hozzá kell adj egy %s fiókot a tárcádhoz, ahhoz hogy delegálhass</string>
     <string name="add_network_title">Adja meg a hálózati adatokat</string>
@@ -692,8 +696,8 @@
     <string name="delegate_search_hint">Keresés cím vagy név alapján</string>
     <string name="delegate_search_placeholder_empty">Nem megfelelő cím formátum. Győzödj meg róla, hogy a cím a megfelelő hálózathoz tartozik.</string>
     <string name="delegate_search_result_count">keresési eredmények: %d</string>
-    <string name="delegated_accounts_fragment_explanation">A Nova Wallet automatikusan hozzáadja a delegált hatásköröket (Proxy) egy külön kategóriához. A tárcákat bármikor módosíthatod a Beállításokban.</string>
-    <string name="delegated_accounts_fragment_title">Értesítés delegált fiókokról</string>
+    <string name="delegated_accounts_fragment_explanation">Meghatalmazott és Többaláírásos fiókok automatikusan észlelve és rendszerezve Önnek. Bármikor kezelheti a Beállításokban.</string>
+    <string name="delegated_accounts_fragment_title">A pénztárca listája frissült</string>
     <string name="delegation_all_votes">Összes szavazat</string>
     <string name="delegation_delegate">Delegálás</string>
     <string name="delegation_delegate_filter_all">Minden fiók</string>
@@ -730,6 +734,7 @@
     <string name="delegation_tracks_governance_preset">Kormányzás</string>
     <string name="delegation_tracks_treasury_preset">Kincstár</string>
     <string name="delegation_undelegating_period">Delegálás visszavonási időszakasz</string>
+    <string name="delegation_updates_deactivated_title">Már nem érvényes</string>
     <string name="delegation_your_delegation">Delegálásod</string>
     <string name="delegation_your_delegations">Delegálásaid</string>
     <string name="delegations_filter">Mutat</string>
@@ -889,6 +894,29 @@
         <item quantity="one">Legalább %d tárcát kell választani</item>
         <item quantity="other">Legalább %d tárcát kell választani</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s már kezdeményezett egy ugyanilyen műveletet, amely jelenleg aláírásra vár a többi aláíró részéről.</string>
+    <string name="multisig_callhash_exists_title">Művelet már létezik</string>
+    <string name="multisig_operation_details_approve">Jóváhagyás</string>
+    <string name="multisig_operation_details_approve_and_execute">Jóváhagyás és végrehajtás</string>
+    <string name="multisig_operation_details_call_data_not_found">Hívási adatok nem találhatóak</string>
+    <string name="multisig_operation_details_reject">Elutasítás</string>
+    <string name="multisig_operations_pending_signature">Függőben lévő aláírás</string>
+    <string name="multisig_operations_progress" formatted="false">%s a %s Ból aláírva</string>
+    <string name="multisig_operations_signed">Aláírva</string>
+    <string name="multisig_operations_unknown_calldata">[Ismeretlen művelet] (%s)</string>
+    <string name="multisig_pending_operations">Függőben lévő műveletek</string>
+    <string name="multisig_signatory">Aláíró:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s-nak nincs elegendő egyenlege a %s értékű multisig letét elhelyezéséhez. Elérhető egyenleg: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s-nak nincs elegendő egyenlege a %s hálózati díj megfizetéséhez és a %s multisig letét elhelyezéséhez. Elérhető egyenleg: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s-nak legalább %s-ra van szüksége a tranzakciós díj megfizetéséhez, és hogy a minimális hálózati egyenleg fölött maradjon. Jelenlegi egyenleg: %s</string>
+    <string name="multisig_signing_is_not_supported_message">A multisig pénztárcák nem támogatják tetszőleges üzenetek aláírását — csak a tranzakciókat</string>
+    <string name="multisig_signing_warning_message">A multisig tranzakciót %s kezdeményezi. A kezdeményező fizeti a hálózati díjat és lefoglal egy multisig letétet, amely felszabadul a tranzakció végrehajtásakor.</string>
+    <string name="multisig_signing_warning_title">Többaláírásos tranzakció</string>
+    <string name="multisig_transaction_created_subtitle">Más aláírók most megerősíthetik a tranzakciót.\nNyomon követheti annak állapotát a %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Többaláírásos tranzakciók.</string>
+    <string name="multisig_transaction_created_title">Többaláírásos tranzakció létrehozva</string>
+    <string name="multisig_transaction_created_view_details">Részletek megtekintése</string>
+    <string name="multisig_wallet_details_info_warning">Ennél a fióknál a tranzakciók több aláíró jóváhagyását igénylik. Az Ön fiókja egyike az aláíróknak:</string>
     <string name="network_already_exist_failure_title">Ez a node már létezik</string>
     <string name="network_fee">Hálózati díj</string>
     <string name="network_info_address">Csomópont címe</string>
@@ -985,8 +1013,6 @@
     <string name="profile_settings_safe_mode_title">Biztonságos mód</string>
     <string name="profile_settings_title">Beállítások</string>
     <string name="proxied_wallet_details_info_warning">Ez a fiók tranzakciók végrehajtásához adott hozzáférést a következőnek:</string>
-    <string name="proxieds_updates_deactivated_title">Már nem érvényes</string>
-    <string name="proxy_about">Mi az a proxy?</string>
     <string name="proxy_access_type_staking_operations">Stake-elési műveletek</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">A delegált fiók %s nem rendelkezik elegendő egyenleggel a hálózati díj megfizetéséhez, ami %s. Az elérhető egyenleg: %s</string>
     <string name="proxy_signing_is_not_supported_message">A proxy tárcák csak a tranzakciók aláírását támogatják, egyéb üzenetekét nem.</string>
@@ -1599,7 +1625,7 @@
     <string name="swap_execution_time">Végrehajtási idő</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Nincs elegendő tokent a számládon. Legalább %s kell, hogy maradjon a(z) %s hálozati díj megfizetése után</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Legalább %s meg kell maradjon, ahhoz hogy %s tokent fogadhass</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">Legalább %s szükséges a %s hálózaton a %s token fogadásához</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">Legalább %s szükséges a %s hálózaton a %s token fogadásához</string>
     <string name="swap_failure_insufficient_balance_message">Legfeljebb %1$s értékben válthatsz, mivel fizetned kell %2$s hálózati díjat is.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Legfeljebb %1$s értékben válthatsz, mivel fizetned kell %2$s hálózati díjat és konverziót is végre kell hajts %3$s és %4$s között, hogy megmaradjon a(z) %5$s minimális egyenleged.</string>
     <string name="swap_failure_swap_max_button">Max. váltás</string>

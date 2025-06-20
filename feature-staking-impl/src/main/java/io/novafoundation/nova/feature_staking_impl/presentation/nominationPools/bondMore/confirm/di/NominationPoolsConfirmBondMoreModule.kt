@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.NominationPoolsBondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.validations.NominationPoolsBondMoreValidationSystem
@@ -44,6 +45,7 @@ class NominationPoolsConfirmBondMoreModule {
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return NominationPoolsConfirmBondMoreViewModel(
             router = router,
@@ -58,7 +60,8 @@ class NominationPoolsConfirmBondMoreModule {
             hintsFactory = hintsFactory,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            selectedAccountUseCase = selectedAccountUseCase
+            selectedAccountUseCase = selectedAccountUseCase,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

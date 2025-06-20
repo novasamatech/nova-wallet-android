@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
@@ -53,6 +54,7 @@ class SwapConfirmationModule {
         confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
         resourceManager: ResourceManager,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter = swapRouter,
@@ -72,7 +74,8 @@ class SwapConfirmationModule {
             maxActionProviderFactory = maxActionProviderFactory,
             swapConfirmationDetailsFormatter = confirmationDetailsFormatter,
             resourceManager = resourceManager,
-            swapFlowScopeAggregator = swapFlowScopeAggregator
+            swapFlowScopeAggregator = swapFlowScopeAggregator,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper
         )
     }
 

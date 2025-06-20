@@ -19,7 +19,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncod
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import java.math.BigInteger
 

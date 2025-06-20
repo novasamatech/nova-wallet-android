@@ -109,5 +109,7 @@ interface AssetsRouter {
 
     fun finishTopUp()
 
+    fun openPendingMultisigOperations()
+
     fun openAssetDetailsFromDeepLink(payload: AssetPayload)
 }

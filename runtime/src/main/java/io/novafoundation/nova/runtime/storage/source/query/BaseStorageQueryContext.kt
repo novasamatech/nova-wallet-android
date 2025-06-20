@@ -176,12 +176,12 @@ abstract class BaseStorageQueryContext(
     override fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>
-    ): Flow<Map<K, V>> {
+        binding: DynamicInstanceBinderWithKey<K, V?>
+    ): Flow<Map<K, V?>> {
         val storageKeys = storageKeys(runtime, keysArguments)
 
         return observeKeys(storageKeys).map { valuesByKey ->
-            applyMappersToEntries(
+            applyMappersToEntriesNullable(
                 entries = valuesByKey,
                 storageEntry = this,
                 keyExtractor = keyExtractor,
@@ -239,6 +239,28 @@ abstract class BaseStorageQueryContext(
                 binding(decoded, key)
             } catch (e: Exception) {
                 recover(e, value)
+                null
+            }
+        }
+    }
+
+    private fun <K, V> applyMappersToEntriesNullable(
+        entries: Map<String, String?>,
+        storageEntry: StorageEntry,
+        keyExtractor: (StorageKeyComponents) -> K,
+        binding: DynamicInstanceBinderWithKey<K, V>,
+    ): Map<K, V?> {
+        val returnType = storageEntry.type.value ?: incompatible()
+
+        return entries.mapKeys { (key, _) ->
+            val keyComponents = ComponentHolder(storageEntry.splitKey(runtime, key))
+
+            keyExtractor(keyComponents)
+        }.mapValues { (key, value) ->
+            try {
+                val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
+                binding(decoded, key)
+            } catch (e: Exception) {
                 null
             }
         }
