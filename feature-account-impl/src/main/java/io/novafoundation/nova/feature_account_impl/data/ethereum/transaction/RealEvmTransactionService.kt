@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.toEcdsaSignatureData
 import io.novafoundation.nova.core.ethereum.Web3Api
@@ -63,12 +64,16 @@ internal class RealEvmTransactionService(
         val gasPrice = gasPriceProviderFactory.createKnown(chain).getGasPrice()
         val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
+        val b = web3Api.ethGetL1
+
         return EvmFee(
             gasLimit,
             gasPrice,
             SubmissionOrigin.singleOrigin(submittingMetaAccount.requireAccountIdIn(chain)),
             chain.commissionAsset
-        )
+        ).also {
+            Log.d("EvmFee", "Calculated Evm fee. Gas price: ${gasPrice}, gas limit: ${gasLimit}, total: ${it.amount}")
+        }
     }
 
     override suspend fun transact(
@@ -98,6 +103,9 @@ internal class RealEvmTransactionService(
                 chain.commissionAsset
             )
         }
+
+        Log.d("EvmFee", "Transacting with Gas price: ${evmFee.gasPrice}, gas limit: ${evmFee.gasLimit}, total fee: ${evmFee.amount}")
+
 
         val nonce = web3Api.getNonce(submittingAddress)
 

@@ -7,10 +7,13 @@ import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmountByExecutingAccount
 import io.novafoundation.nova.feature_account_api.domain.validation.handleSystemAccountValidationFailure
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
+import io.novafoundation.nova.feature_wallet_api.domain.validation.FeeChangeDetectedFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
@@ -19,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleNonPositiveAmount
 import kotlinx.coroutines.CoroutineScope
+import java.math.BigDecimal
 
 fun CoroutineScope.mapAssetTransferValidationFailureToUI(
     resourceManager: ResourceManager,
@@ -118,11 +122,23 @@ fun autoFixSendValidationPayload(
         )
     )
 
-    is AssetTransferValidationFailure.FeeChangeDetected -> payload.copy(
-        transfer = payload.transfer.copy(
-            fee = payload.transfer.fee.replaceSubmissionFee(failureReason.payload.newFee)
+    is AssetTransferValidationFailure.FeeChangeDetected -> {
+        payload.copy(
+            transfer = payload.transfer.copy(
+                fee = payload.transfer.fee.replaceSubmissionFee(failureReason.payload.newFee),
+                amount = payload.transfer.adjustAmountForFeeChange(failureReason.payload)
+            ),
         )
-    )
+    }
 
     else -> payload
+}
+
+private fun AssetTransfer.adjustAmountForFeeChange(feeChange: FeeChangeDetectedFailure.Payload<SubmissionFee>): BigDecimal {
+    if (!transferringMaxAmount) return amount
+
+    val newFee = feeChange.newFee.decimalAmountByExecutingAccount
+    val adjustment = newFee - feeChange.oldFee
+
+    return amount - adjustment
 }

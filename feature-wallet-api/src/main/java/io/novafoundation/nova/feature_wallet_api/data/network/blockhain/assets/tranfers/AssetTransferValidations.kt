@@ -80,11 +80,14 @@ sealed class AssetTransferValidationFailure {
 
 data class AssetTransferPayload(
     val transfer: WeightedAssetTransfer,
-    val originFee: OriginFee,
     val crossChainFee: FeeBase?,
     val originCommissionAsset: Asset,
     val originUsedAsset: Asset
-)
+) {
+
+    val originFee: OriginFee
+        get() = transfer.fee
+}
 
 val AssetTransferPayload.commissionChainAsset: Chain.Asset
     get() = originCommissionAsset.token.configuration

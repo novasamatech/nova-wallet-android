@@ -3,11 +3,13 @@ package io.novafoundation.nova.feature_assets.presentation.send.confirm
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.memory.getOrThrow
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -27,17 +29,16 @@ import io.novafoundation.nova.feature_account_api.presenatation.navigation.Extri
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
-import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
+import io.novafoundation.nova.feature_assets.domain.send.TransferFeeScopedStore
+import io.novafoundation.nova.feature_assets.domain.send.model.transferFee
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
-import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
 import io.novafoundation.nova.feature_assets.presentation.send.common.fee.TransferFeeDisplayFormatter
 import io.novafoundation.nova.feature_assets.presentation.send.common.fee.createForTransfer
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.send.isCrossChain
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
@@ -48,7 +49,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Deferred
@@ -78,6 +78,7 @@ class ConfirmSendViewModel(
     private val walletUiUseCase: WalletUiUseCase,
     private val hintsFactory: ConfirmSendHintsMixinFactory,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val transferFeeScopedStore: TransferFeeScopedStore,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val transferDraft: TransferDraft,
 ) : BaseViewModel(),
@@ -202,32 +203,9 @@ class ConfirmSendViewModel(
         }
     }
 
-    private fun AssetTransferPayload.transferFee(): TransferFee {
-        return TransferFee(originFee, crossChainFee)
-    }
-
-    private fun setupFee() {
-        feeMixin.loadFee {
-            val assetTransfer = buildTransfer()
-            sendInteractor.getFee(assetTransfer, viewModelScope)
-        }
-    }
-
-    private suspend fun buildTransfer(): AssetTransfer {
-        val originChainWithAsset = ChainWithAsset(originChain(), originAsset())
-        val destinationChainWithAsset = ChainWithAsset(destinationChain(), destinationChainAsset())
-        val amount = transferDraft.amount
-        val address = transferDraft.recipientAddress
-
-        return buildAssetTransfer(
-            metaAccount = selectedAccountUseCase.getSelectedMetaAccount(),
-            feePaymentCurrency = transferDraft.feePaymentCurrency.toDomain(),
-            origin = originChainWithAsset,
-            destination = destinationChainWithAsset,
-            amount = amount,
-            address = address,
-            transferringMaxAmount = transferDraft.transferringMaxAmount
-        )
+    private fun setupFee() = launchUnit{
+        val fee = transferFeeScopedStore.getOrThrow()
+        feeMixin.setFee(fee)
     }
 
     private suspend fun createAddressModel(
@@ -288,7 +266,6 @@ class ConfirmSendViewModel(
                 fee = fee.originFee,
                 transferringMaxAmount = transferDraft.transferringMaxAmount
             ),
-            originFee = fee.originFee,
             originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = assetFlow.first(),
             crossChainFee = fee.crossChainFee

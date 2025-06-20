@@ -116,7 +116,6 @@ class TopUpAddressViewModel(
                 fee = originFee,
             ),
             crossChainFee = null,
-            originFee = originFee,
             originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = assetFlow.first()
         )

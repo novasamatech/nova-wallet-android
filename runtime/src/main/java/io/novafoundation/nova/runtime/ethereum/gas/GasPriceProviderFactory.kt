@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.ethereum.gas
 
 import io.novafoundation.nova.runtime.ethereum.gas.etherscan.EtherscanGasApi
-import io.novafoundation.nova.runtime.ethereum.gas.etherscan.EtherscanGasPriceProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
@@ -39,7 +38,8 @@ class RealGasPriceProviderFactory(
 
     private fun create(web3j: Web3j, chain: Chain?) : GasPriceProvider {
         val providers = listOfNotNull(
-            chain?.let { EtherscanGasPriceProvider(api, etherscanApiKeys, chain) },
+//            chain?.let { EtherscanGasPriceProvider(api, etherscanApiKeys, chain) },
+            MedianPriorityFeeFeeGasProvider(web3j),
             MaxPriorityFeeGasProvider(web3j),
             LegacyGasPriceProvider(web3j)
         )

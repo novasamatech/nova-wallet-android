@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
+import io.novafoundation.nova.feature_assets.domain.send.TransferFeeScopedStore
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendViewModel
@@ -58,7 +59,8 @@ class ConfirmSendModule {
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
         confirmSendHintsMixinFactory: ConfirmSendHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        transferFeeScopedStore: TransferFeeScopedStore
     ): ViewModel {
         return ConfirmSendViewModel(
             interactor = interactor,
@@ -75,7 +77,8 @@ class ConfirmSendModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             transferDraft = transferDraft,
             hintsFactory = confirmSendHintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            transferFeeScopedStore = transferFeeScopedStore
         )
     }
 

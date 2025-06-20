@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
+import io.novafoundation.nova.feature_assets.domain.send.TransferFeeScopedStore
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendViewModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -52,6 +53,7 @@ class SelectSendModule {
         accountRepository: AccountRepository,
         selectAddressMixinFactory: SelectAddressMixin.Factory,
         maxActionProviderFactory: MaxActionProviderFactory,
+        transferFeeScopedStore: TransferFeeScopedStore
     ): ViewModel {
         return SelectSendViewModel(
             chainRegistry = chainRegistry,
@@ -71,7 +73,8 @@ class SelectSendModule {
             amountChooserMixinFactory = amountChooserMixinFactory,
             accountRepository = accountRepository,
             selectAddressMixinFactory = selectAddressMixinFactory,
-            maxActionProviderFactory = maxActionProviderFactory
+            maxActionProviderFactory = maxActionProviderFactory,
+            transferFeeScopedStore = transferFeeScopedStore
         )
     }
 

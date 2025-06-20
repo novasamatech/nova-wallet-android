@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -54,10 +54,9 @@ class SendInteractor(
         }
     }
 
-    suspend fun getOriginFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): OriginFee = withContext(Dispatchers.Default) {
+    private suspend fun getOriginFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): OriginFee = withContext(Dispatchers.Default) {
         OriginFee(getSubmissionFee(transfer, coroutineScope), null)
     }
-
     suspend fun getSubmissionFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): SubmissionFee = withContext(Dispatchers.Default) {
         getAssetTransfers(transfer).calculateFee(transfer, coroutineScope = coroutineScope)
     }

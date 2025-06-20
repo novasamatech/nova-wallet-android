@@ -20,3 +20,20 @@ class MaxPriorityFeeGasProvider(private val api: Web3j) : GasPriceProvider {
         return block.block.baseFeePerGas
     }
 }
+
+class MedianPriorityFeeFeeGasProvider(private val api: Web3j) : GasPriceProvider {
+
+    companion object {
+        private const val REWARD_PERCENTILE = 75.0
+        private const val NUMBER_OF_BLOCKS = 5
+    }
+
+    override suspend fun getGasPrice(): BigInteger {
+        val history = api.ethFeeHistory(NUMBER_OF_BLOCKS, DefaultBlockParameterName.LATEST, listOf(REWARD_PERCENTILE)).sendSuspend()
+
+        val priorityFee = history.feeHistory.reward.maxOf { it.first() }
+        val baseFee = history.feeHistory.baseFeePerGas.max()
+
+        return baseFee + priorityFee
+    }
+}

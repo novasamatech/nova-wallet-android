@@ -420,6 +420,18 @@ fun List<Double>.median(): Double = sorted().let {
     (middleLeft + middleRight) / 2
 }
 
+/**
+ * Complexity: O(n * log(n))
+ */
+// TODO possible to optimize
+fun List<BigInteger>.median(): BigInteger = sorted().let {
+    val middleRight = it[it.size / 2]
+    val middleLeft = it[(it.size - 1) / 2] // will be same as middleRight if list size is odd
+
+    (middleLeft + middleRight) / 2.toBigInteger()
+}
+
+
 fun Collection<BigInteger>.average(): BigInteger {
     if (isEmpty()) throw NoSuchFieldException("Collection is empty")
 

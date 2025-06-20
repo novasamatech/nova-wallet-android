@@ -29,6 +29,8 @@ import io.novafoundation.nova.feature_account_api.view.ChainChipModel
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
+import io.novafoundation.nova.feature_assets.domain.send.TransferFeeScopedStore
+import io.novafoundation.nova.feature_assets.domain.send.model.transferFee
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDirectionModel
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
@@ -86,6 +88,7 @@ class SelectSendViewModel(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val accountRepository: AccountRepository,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val transferFeeScopedStore: TransferFeeScopedStore,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -221,7 +224,6 @@ class SelectSendViewModel(
                 fee = fee.originFee,
             ),
             crossChainFee = fee.crossChainFee,
-            originFee = fee.originFee,
             originCommissionAsset = feeMixin.feeAsset(),
             originUsedAsset = originAssetFlow.first()
         )
@@ -362,6 +364,8 @@ class SelectSendViewModel(
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
+        transferFeeScopedStore.store(validPayload.transferFee())
+
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
             transferringMaxAmount = validPayload.transfer.transferringMaxAmount,

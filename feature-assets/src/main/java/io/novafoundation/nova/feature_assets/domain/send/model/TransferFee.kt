@@ -4,9 +4,10 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.model.getAmount
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.maxAction.MaxAvailableDeduction
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 data class TransferFee(
@@ -37,4 +38,8 @@ data class TransferFee(
 
         return submission + delivery + execution
     }
+}
+
+fun AssetTransferPayload.transferFee(): TransferFee {
+    return TransferFee(originFee, crossChainFee)
 }
