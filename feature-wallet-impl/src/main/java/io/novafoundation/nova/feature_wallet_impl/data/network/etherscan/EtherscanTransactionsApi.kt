@@ -2,8 +2,9 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.etherscan
 
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
-import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanResponse
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.network.etherscan.EtherscanApiKeys
+import io.novafoundation.nova.runtime.network.etherscan.model.EtherscanResponse
 
 interface EtherscanTransactionsApi {
 

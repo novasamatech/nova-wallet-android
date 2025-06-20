@@ -198,6 +198,10 @@ inline fun <reified T : Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
     return externalApis.any { it is T }
 }
 
+fun Chain.evmTransfersApi(): Chain.ExternalApi.Transfers.Evm? {
+    return externalApi()
+}
+
 const val UTILITY_ASSET_ID = 0
 
 val Chain.Asset.isUtilityAsset: Boolean
@@ -447,6 +451,8 @@ object ChainGeneses {
 object ChainIds {
 
     const val ETHEREUM = "$EIP_155_PREFIX:1"
+
+    const val BASE = "$EIP_155_PREFIX:8453"
 
     const val MOONBEAM = ChainGeneses.MOONBEAM
     const val MOONRIVER = ChainGeneses.MOONRIVER

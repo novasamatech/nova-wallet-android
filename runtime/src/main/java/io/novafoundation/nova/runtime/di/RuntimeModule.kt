@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -14,6 +15,7 @@ import io.novafoundation.nova.runtime.call.RealMultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.gas.RealGasPriceProviderFactory
+import io.novafoundation.nova.runtime.ethereum.gas.etherscan.EtherscanGasApi
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -33,6 +35,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.DbRuntimeV
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RemoteEventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
+import io.novafoundation.nova.runtime.network.etherscan.EtherscanApiKeys
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
@@ -202,9 +205,17 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
+    fun provideEtherscanGasApi(networkApiCreator: NetworkApiCreator): EtherscanGasApi {
+        return networkApiCreator.create(EtherscanGasApi::class.java)
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideGasPriceProviderFactory(
-        chainRegistry: ChainRegistry
-    ): GasPriceProviderFactory = RealGasPriceProviderFactory(chainRegistry)
+        chainRegistry: ChainRegistry,
+        etherscanGasApi: EtherscanGasApi,
+        etherscanApiKeys: EtherscanApiKeys,
+    ): GasPriceProviderFactory = RealGasPriceProviderFactory(chainRegistry, etherscanGasApi, etherscanApiKeys)
 
     @Provides
     @ApplicationScope
@@ -274,4 +285,8 @@ class RuntimeModule {
             gson
         )
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideEtherscanApiKeys() = EtherscanApiKeys.default()
 }

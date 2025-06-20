@@ -51,6 +51,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
+import io.novafoundation.nova.runtime.network.etherscan.EtherscanApiKeys
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -101,6 +102,8 @@ interface WalletFeatureDependencies {
     val dryRunApi: DryRunApi
 
     val multisigValidationsRepository: MultisigValidationsRepository
+
+    val etherscanApiKeys: EtherscanApiKeys
 
     fun preferences(): Preferences
 

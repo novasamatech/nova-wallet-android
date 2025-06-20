@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceReposi
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.satisfies
-import io.novafoundation.nova.runtime.ext.externalApi
+import io.novafoundation.nova.runtime.ext.evmTransfersApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
@@ -101,9 +101,5 @@ abstract class EvmAssetHistory(
         val filteredOperations = operations.filter { it.type.satisfies(filters) }
 
         return DataPage(newPageOffset, filteredOperations)
-    }
-
-    fun Chain.evmTransfersApi(): Chain.ExternalApi.Transfers.Evm? {
-        return externalApi()
     }
 }

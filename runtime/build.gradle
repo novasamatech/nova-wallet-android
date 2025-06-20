@@ -18,6 +18,11 @@ android {
         buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/chains_dev.json\""
         buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/detailsDev\""
 
+        buildConfigField "String", "EHTERSCAN_API_KEY_MOONBEAM", readStringSecret("EHTERSCAN_API_KEY_MOONBEAM")
+        buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readStringSecret("EHTERSCAN_API_KEY_MOONRIVER")
+        buildConfigField "String", "EHTERSCAN_API_KEY_ETHEREUM", readStringSecret("EHTERSCAN_API_KEY_ETHEREUM")
+        buildConfigField "String", "EHTERSCAN_API_KEY_BASE", readStringSecret("EHTERSCAN_API_KEY_BASE")
+
         buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/tests/chains_for_testBalance.json\""
 
         buildConfigField "String", "INFURA_API_KEY", readStringSecret("INFURA_API_KEY")

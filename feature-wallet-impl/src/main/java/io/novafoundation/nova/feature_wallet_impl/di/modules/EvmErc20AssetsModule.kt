@@ -13,12 +13,12 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmErc20.EvmErc20AssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.evmErc20.EvmErc20AssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.evmErc20.EvmErc20AssetTransfers
-import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanApiKeys
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.EtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RealEtherscanTransactionsApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RetrofitEtherscanTransactionsApi
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.etherscan.EtherscanApiKeys
 import javax.inject.Qualifier
 
 @Qualifier
@@ -52,10 +52,6 @@ class EvmErc20AssetsModule {
     fun provideEtherscanTransfersApi(
         networkApiCreator: NetworkApiCreator
     ): RetrofitEtherscanTransactionsApi = networkApiCreator.create(RetrofitEtherscanTransactionsApi::class.java)
-
-    @Provides
-    @FeatureScope
-    fun provideEtherscanApiKeys() = EtherscanApiKeys.default()
 
     @Provides
     @FeatureScope

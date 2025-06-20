@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model
+package io.novafoundation.nova.runtime.network.etherscan.model
 
 class EtherscanResponse<T>(
     val status: String,

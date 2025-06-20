@@ -60,7 +60,7 @@ internal class RealEvmTransactionService(
         val txBuilder = EvmTransactionBuilder().apply(building)
         val txForFee = txBuilder.buildForFee(submittingAddress)
 
-        val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
+        val gasPrice = gasPriceProviderFactory.createKnown(chain).getGasPrice()
         val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
         return EvmFee(
@@ -88,7 +88,7 @@ internal class RealEvmTransactionService(
 
         val evmFee = presetFee?.castOrNull<EvmFee>() ?: run {
             val txForFee = txBuilder.buildForFee(submittingAddress)
-            val gasPrice = gasPriceProviderFactory.createKnown(chainId).getGasPrice()
+            val gasPrice = gasPriceProviderFactory.createKnown(chain).getGasPrice()
             val gasLimit = web3Api.gasLimitOrDefault(txForFee, fallbackGasLimit)
 
             EvmFee(

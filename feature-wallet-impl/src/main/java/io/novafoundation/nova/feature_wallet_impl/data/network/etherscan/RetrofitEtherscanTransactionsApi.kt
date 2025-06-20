@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.etherscan
 import io.novafoundation.nova.common.data.network.UserAgent
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanAccountTransfer
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanNormalTxResponse
-import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.model.EtherscanResponse
+import io.novafoundation.nova.runtime.network.etherscan.model.EtherscanResponse
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query

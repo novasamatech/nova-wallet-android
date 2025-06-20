@@ -22,6 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeFilesCache
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
+import io.novafoundation.nova.runtime.network.etherscan.EtherscanApiKeys
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
@@ -113,4 +114,6 @@ interface RuntimeApi {
     val remoteToDomainChainMapperFacade: RemoteToDomainChainMapperFacade
 
     val blockLimitsRepository: BlockLimitsRepository
+
+    val etherscanApiKeys: EtherscanApiKeys
 }
