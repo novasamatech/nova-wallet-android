@@ -135,8 +135,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         val selectedAccount = accountRepository.getSelectedMetaAccount() as MultisigMetaAccount
 
         val approveCall = runtime.composeMultisigAsMulti(
-            threshold = selectedAccount.threshold,
-            otherSignatories = selectedAccount.otherSignatories,
+            multisigMetaAccount = selectedAccount,
             maybeTimePoint = operation.timePoint,
             call = operation.call!!,
             maxWeight = maxWeight
@@ -149,8 +148,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         val selectedAccount = accountRepository.getSelectedMetaAccount() as MultisigMetaAccount
 
         val approveCall = runtime.composeMultisigCancelAsMulti(
-            threshold = selectedAccount.threshold,
-            otherSignatories = selectedAccount.otherSignatories,
+            multisigMetaAccount = selectedAccount,
             maybeTimePoint = operation.timePoint,
             callHash = operation.callHash
         )

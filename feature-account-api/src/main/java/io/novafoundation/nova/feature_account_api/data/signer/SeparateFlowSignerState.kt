@@ -7,7 +7,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getAccountIdOrThrow
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.signingPayload
 
@@ -17,7 +16,7 @@ class SeparateFlowSignerState(val payload: SignerPayload, val metaAccount: MetaA
 
 sealed class SignerPayload {
 
-    class Extrinsic(val extrinsic: InheritedImplication) : SignerPayload()
+    class Extrinsic(val extrinsic: InheritedImplication, val accountId: AccountId) : SignerPayload()
 
     class Raw(val raw: SignerPayloadRawWithChain) : SignerPayload()
 }
@@ -31,7 +30,7 @@ fun SignerPayload.chainId(): ChainId {
 
 fun SignerPayload.accountId(): AccountId {
     return when (this) {
-        is SignerPayload.Extrinsic -> extrinsic.getAccountIdOrThrow()
+        is SignerPayload.Extrinsic -> accountId
         is SignerPayload.Raw -> raw.accountId
     }
 }

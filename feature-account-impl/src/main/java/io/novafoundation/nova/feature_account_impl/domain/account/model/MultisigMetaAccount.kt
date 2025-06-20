@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.utils.compareTo
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigAvailability
@@ -22,7 +23,7 @@ class RealMultisigMetaAccount(
     status: LightMetaAccount.Status,
     override val signatoryMetaId: Long,
     override val signatoryAccountId: AccountIdKey,
-    override val otherSignatories: List<AccountIdKey>,
+    private val otherSignatoriesUnsorted: List<AccountIdKey>,
     override val threshold: Int,
     private val multisigRepository: MultisigRepository,
     parentMetaId: Long?
@@ -42,6 +43,10 @@ class RealMultisigMetaAccount(
     parentMetaId = parentMetaId
 ),
     MultisigMetaAccount {
+
+    override val otherSignatories by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        otherSignatoriesUnsorted.sortedWith { a, b -> a.value.compareTo(b.value, unsigned = true) }
+    }
 
     override val availability: MultisigAvailability
         get() = if (chainAccounts.isEmpty()) {

@@ -174,7 +174,7 @@ class AccountMappers(
                         name = name,
                         status = mapMetaAccountStateFromLocal(status),
                         signatoryMetaId = requireNotNull(parentMetaId) { "parentMetaId is null: $id" },
-                        otherSignatories = multisigTypeExtras.otherSignatories,
+                        otherSignatoriesUnsorted = multisigTypeExtras.otherSignatories,
                         threshold = multisigTypeExtras.threshold,
                         signatoryAccountId = multisigTypeExtras.signatoryAccountId,
                         parentMetaId = parentMetaId,
