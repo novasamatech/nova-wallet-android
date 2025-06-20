@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.multisig
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.multisig
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
