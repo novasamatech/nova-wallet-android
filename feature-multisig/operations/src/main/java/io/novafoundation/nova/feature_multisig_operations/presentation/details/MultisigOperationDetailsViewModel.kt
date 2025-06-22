@@ -101,10 +101,12 @@ class MultisigOperationDetailsViewModel(
         when {
             submissionInProgress -> DescriptiveButtonState.Loading
 
+            operation.call == null -> DescriptiveButtonState.Enabled(
+                action = resourceManager.getString(R.string.multisig_operation_details_call_data_not_found)
+            )
+
             action is MultisigAction.CanApprove -> when {
-                operation.call == null -> DescriptiveButtonState.Enabled(
-                    action = resourceManager.getString(R.string.multisig_operation_details_call_data_not_found)
-                )
+
 
                 action.isFinalApproval -> DescriptiveButtonState.Enabled(
                     action = resourceManager.getString(R.string.multisig_operation_details_approve_and_execute)
@@ -125,8 +127,8 @@ class MultisigOperationDetailsViewModel(
 
     val buttonAppearance = operationFlow.map { operation ->
         when {
-            operation.userAction() is MultisigAction.CanReject -> PrimaryButton.Appearance.PRIMARY_NEGATIVE
             operation.call == null -> PrimaryButton.Appearance.SECONDARY
+            operation.userAction() is MultisigAction.CanReject -> PrimaryButton.Appearance.PRIMARY_NEGATIVE
             else -> PrimaryButton.Appearance.PRIMARY
         }
     }.shareInBackground()
@@ -141,7 +143,7 @@ class MultisigOperationDetailsViewModel(
 
     fun actionClicked() = launchUnit {
         val operation = operationFlow.first()
-        if (operation.userAction() is MultisigAction.CanApprove && operation.call == null) {
+        if (operation.call == null) {
             router.openEnterCallDetails(MultisigOperationEnterCallPayload(payload.operationId))
         } else {
             sendTransactionIfValid()
