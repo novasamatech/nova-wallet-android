@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.presentation.created.di.MultisigCreatedComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.di.MultisigOperationDetailsComponent
+import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.di.MultisigOperationEnterCallComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.di.MultisigPendingOperationsComponent
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -27,6 +28,8 @@ interface MultisigOperationsFeatureComponent : MultisigOperationsFeatureApi {
     fun multisigPendingOperations(): MultisigPendingOperationsComponent.Factory
 
     fun multisigOperationDetails(): MultisigOperationDetailsComponent.Factory
+
+    fun multisigOperationEnterCall(): MultisigOperationEnterCallComponent.Factory
 
     fun multisigCreated(): MultisigCreatedComponent.Factory
 

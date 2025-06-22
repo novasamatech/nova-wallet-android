@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigC
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
@@ -30,6 +31,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface MultisigOperationDetailsInteractor {
+
+    suspend fun setCall(operation: PendingMultisigOperation, call: String)
 
     fun callDetails(call: GenericCall.Instance): String
 
@@ -48,9 +51,19 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val extrinsicSplitter: ExtrinsicSplitter,
     private val accountRepository: AccountRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     @ExtrinsicSerialization
     private val extrinsicGson: Gson,
 ) : MultisigOperationDetailsInteractor {
+
+    override suspend fun setCall(operation: PendingMultisigOperation, call: String) {
+        multisigOperationLocalCallRepository.setMultisigCall(
+            chainId = operation.chain.id,
+            operationId = operation.identifier,
+            callHash = operation.callHash,
+            call = call
+        )
+    }
 
     override fun callDetails(call: GenericCall.Instance): String {
         return extrinsicGson.toJson(call)

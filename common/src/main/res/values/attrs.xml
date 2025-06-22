@@ -70,6 +70,7 @@
         <attr name="editTextHint" format="string" />
         <attr name="editTextHintColor" format="color" />
         <attr name="android:textAppearance" />
+        <attr name="editTextMinHeight" format="dimension" />
         <attr name="editTextPaddingStart" format="dimension" />
         <attr name="editTextPaddingEnd" format="dimension" />
         <attr name="editTextPaddingTop" format="dimension" />

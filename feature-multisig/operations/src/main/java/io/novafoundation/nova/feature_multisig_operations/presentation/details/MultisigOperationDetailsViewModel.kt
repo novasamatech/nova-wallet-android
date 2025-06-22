@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -101,8 +102,8 @@ class MultisigOperationDetailsViewModel(
             submissionInProgress -> DescriptiveButtonState.Loading
 
             action is MultisigAction.CanApprove -> when {
-                operation.call == null -> DescriptiveButtonState.Disabled(
-                    reason = resourceManager.getString(R.string.multisig_operation_details_call_data_not_found)
+                operation.call == null -> DescriptiveButtonState.Enabled(
+                    action = resourceManager.getString(R.string.multisig_operation_details_call_data_not_found)
                 )
 
                 action.isFinalApproval -> DescriptiveButtonState.Enabled(
@@ -123,10 +124,10 @@ class MultisigOperationDetailsViewModel(
     }.shareInBackground()
 
     val buttonAppearance = operationFlow.map { operation ->
-        if (operation.userAction() == MultisigAction.CanReject) {
-            PrimaryButton.Appearance.PRIMARY_NEGATIVE
-        } else {
-            PrimaryButton.Appearance.PRIMARY
+        when {
+            operation.userAction() is MultisigAction.CanReject -> PrimaryButton.Appearance.PRIMARY_NEGATIVE
+            operation.call == null -> PrimaryButton.Appearance.SECONDARY
+            else -> PrimaryButton.Appearance.PRIMARY
         }
     }.shareInBackground()
 
@@ -138,8 +139,13 @@ class MultisigOperationDetailsViewModel(
         loadFee()
     }
 
-    fun actionClicked() {
-        sendTransactionIfValid()
+    fun actionClicked() = launchUnit {
+        val operation = operationFlow.first()
+        if (operation.userAction() is MultisigAction.CanApprove && operation.call == null) {
+            router.openEnterCallDetails(MultisigOperationEnterCallPayload(payload.operationId))
+        } else {
+            sendTransactionIfValid()
+        }
     }
 
     fun backClicked() {

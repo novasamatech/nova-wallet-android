@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
-import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.RealtimeCallDataWatcher
+import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +38,7 @@ internal class MultisigChainPendingOperationsSyncerFactory @Inject constructor(
     fun create(
         chain: Chain,
         multisig: MultisigMetaAccount,
-        callDataWatcher: RealtimeCallDataWatcher,
+        callDataWatcher: MultisigCallDataWatcher,
         scope: CoroutineScope,
     ): MultisigPendingOperationsSyncer {
         return RealMultisigChainPendingOperationsSyncer(
@@ -62,7 +62,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private val chain: Chain,
     private val multisig: MultisigMetaAccount,
     private val scope: CoroutineScope,
-    private val callDataWatcher: RealtimeCallDataWatcher,
+    private val callDataWatcher: MultisigCallDataWatcher,
     private val multisigRepository: MultisigRepository,
 ) : CoroutineScope by scope, MultisigPendingOperationsSyncer {
 
@@ -116,7 +116,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
         val callDatasFromFetchFlow = flowOf { knownCallDatas.getOrCompute(callHashes) }
 
         return combine(
-            callDataWatcher.realtimeCallData,
+            callDataWatcher.callData,
             callDatasFromFetchFlow,
             multisigRepository.subscribePendingOperations(this.chain, accountId, callHashes)
         ) { realtimeCallDatas, callDatas, onChainOperations ->
