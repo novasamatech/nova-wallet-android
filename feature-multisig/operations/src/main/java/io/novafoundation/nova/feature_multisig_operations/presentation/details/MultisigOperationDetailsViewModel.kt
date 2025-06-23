@@ -107,7 +107,6 @@ class MultisigOperationDetailsViewModel(
 
             action is MultisigAction.CanApprove -> when {
 
-
                 action.isFinalApproval -> DescriptiveButtonState.Enabled(
                     action = resourceManager.getString(R.string.multisig_operation_details_approve_and_execute)
                 )
