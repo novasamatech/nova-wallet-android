@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.common.
 
 import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
+import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.append
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @FeatureScope
 class MultisigFormatter @Inject constructor(
     private val walletUiUseCase: WalletUiUseCase,
-    private val resourceManager: ResourceManager,
+    private val addressIconGenerator: AddressIconGenerator,
+    private val resourceManager: ResourceManager
 ) {
 
     suspend fun formatSignatorySubtitle(signatory: MetaAccount): CharSequence {
@@ -26,16 +29,16 @@ class MultisigFormatter @Inject constructor(
     }
 
     fun formatSignatorySubtitle(signatory: MetaAccount, icon: Drawable): CharSequence {
-        val formattedProxyMetaAccount = formatAccount(signatory.name, icon)
+        val formattedMetaAccount = formatAccount(signatory.name, icon)
 
         return SpannableStringBuilder(resourceManager.getString(R.string.multisig_signatory))
             .appendSpace()
-            .append(formattedProxyMetaAccount)
+            .append(formattedMetaAccount)
     }
 
-    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
-        // TODO multisig: this does db request for each icon. We should probably batch it. Same with proxieds
-        return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
+    suspend fun formatSignatory(signatory: MetaAccount): CharSequence {
+        val icon = makeAccountDrawable(signatory)
+        return formatAccount(signatory.name, icon)
     }
 
     // TODO multisig: refactor duplication with ProxyFormatter
@@ -44,5 +47,14 @@ class MultisigFormatter @Inject constructor(
             .appendEnd(drawableSpan(proxyAccountIcon))
             .appendSpace()
             .append(proxyAccountName, colorSpan(resourceManager.getColor(R.color.text_primary)))
+    }
+
+    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
+        // TODO multisig: this does db request for each icon. We should probably batch it. Same with proxieds
+        return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
+    }
+
+    suspend fun makeAccountDrawable(accountId: ByteArray): Drawable {
+        return addressIconGenerator.createAddressIcon(accountId, SUBTITLE_ICON_SIZE_DP, backgroundColorRes = BACKGROUND_TRANSPARENT)
     }
 }
