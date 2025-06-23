@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="multisig_card_not_supported_title">Debit Card not supported for Multisig</string>
+    <string name="multisig_card_not_supported_message">To manage your Debit Card, please switch to a different type of wallet.</string>
+
+    <string name="multisig_sell_not_supported_title">Sell not supported for Multisig</string>
+    <string name="multisig_sell_not_supported_message">To sell crypto for fiat, please switch to a different type of wallet.</string>
+
     <string name="multisig_pending_operations">Transactions to sign</string>
 <!--    <string name="multisig_pending_operations">Pending operations</string>-->
 
