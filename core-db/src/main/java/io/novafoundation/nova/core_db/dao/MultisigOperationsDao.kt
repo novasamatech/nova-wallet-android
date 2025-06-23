@@ -15,4 +15,7 @@ abstract class MultisigOperationsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertOperation(operation: MultisigOperationCallLocal)
+
+    @Query("DELETE FROM multisig_operation_call WHERE metaId = :metaId AND chainId = :chainId AND callHash NOT IN (:excludedCallHashes)")
+    abstract fun removeOperationsExclude(metaId: Long, chainId: String, excludedCallHashes: List<String>)
 }

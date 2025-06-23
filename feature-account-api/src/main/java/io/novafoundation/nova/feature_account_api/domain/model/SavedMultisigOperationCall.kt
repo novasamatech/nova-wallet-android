@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
 class SavedMultisigOperationCall(
-    val operationId: String,
+    val metaId: Long,
     val chainId: String,
-    val callHash: String,
+    val callHash: ByteArray,
     val callInstance: String
 )

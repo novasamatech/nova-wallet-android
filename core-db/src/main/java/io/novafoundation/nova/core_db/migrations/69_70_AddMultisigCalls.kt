@@ -8,11 +8,12 @@ val AddMultisigCalls_69_70 = object : Migration(69, 70) {
         db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `multisig_operation_call` (
-                `operationId` TEXT NOT NULL, 
+                `metaId` INTEGER NOT NULL,
                 `chainId` TEXT NOT NULL, 
                 `callHash` TEXT NOT NULL, 
                 `callInstance` TEXT NOT NULL, 
-                PRIMARY KEY(`operationId`), 
+                PRIMARY KEY(`metaId`, `chainId`, `callHash`), 
+                FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE,
                 FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
             )
             """.trimIndent()

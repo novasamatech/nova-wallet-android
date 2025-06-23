@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
@@ -33,6 +35,8 @@ import javax.inject.Inject
 @FeatureScope
 internal class MultisigChainPendingOperationsSyncerFactory @Inject constructor(
     private val multisigRepository: MultisigRepository,
+    private val operationLocalCallRepository: MultisigOperationLocalCallRepository,
+    private val accountRepository: AccountRepository
 ) {
 
     fun create(
@@ -46,7 +50,9 @@ internal class MultisigChainPendingOperationsSyncerFactory @Inject constructor(
             multisig = multisig,
             scope = scope,
             multisigRepository = multisigRepository,
-            callDataWatcher = callDataWatcher
+            callDataWatcher = callDataWatcher,
+            operationLocalCallRepository = operationLocalCallRepository,
+            accountRepository = accountRepository
         )
     }
 }
@@ -64,6 +70,8 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private val scope: CoroutineScope,
     private val callDataWatcher: MultisigCallDataWatcher,
     private val multisigRepository: MultisigRepository,
+    private val accountRepository: AccountRepository,
+    private val operationLocalCallRepository: MultisigOperationLocalCallRepository
 ) : CoroutineScope by scope, MultisigPendingOperationsSyncer {
 
     private val pendingCallHashesFlow = MutableStateFlow<Set<CallHash>>(emptySet())
@@ -97,7 +105,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private fun observePendingCallHashes() = launchUnit {
         val accountId = multisig.accountIdKeyIn(chain) ?: return@launchUnit
 
-        loadInitialHashes(accountId)
+        syncInitialHashes(accountId)
         startDetectingNewPendingCallHashesFromEvents(accountId)
     }
 
@@ -150,12 +158,22 @@ internal class RealMultisigChainPendingOperationsSyncer(
         )
     }
 
-    private suspend fun loadInitialHashes(accountId: AccountIdKey) {
+    private suspend fun syncInitialHashes(accountId: AccountIdKey) {
         runCatching {
             val pendingOperationsHashes = multisigRepository.getPendingOperationIds(chain, accountId)
+            removeOutdatedLocalCallHashes(pendingOperationsHashes)
             pendingCallHashesFlow.value = pendingOperationsHashes
         }.onFailure {
             Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to load initial call hashes", it)
         }
+    }
+
+    private suspend fun removeOutdatedLocalCallHashes(callHashes: Set<CallHash>) {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        operationLocalCallRepository.removeCallHashesExclude(
+            metaAccount.id,
+            chain.id,
+            callHashes
+        )
     }
 }

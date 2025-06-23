@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:paddingBottom="16dp"
         android:clipToPadding="false"
         android:overScrollMode="never">
 
@@ -49,12 +50,21 @@
     </ScrollView>
 
     <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/multisigPendingOperationDetailsEnterCallData"
+        style="@style/Widget.Nova.Button.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/multisig_operation_details_call_data_not_found" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/multisigPendingOperationDetailsAction"
         style="@style/Widget.Nova.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="@string/common_confirm" />

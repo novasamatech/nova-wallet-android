@@ -20,7 +20,7 @@ class LocalMultisigCallDataWatcher(
     override val newMultisigEvents = MutableSharedFlow<MultiChainMultisigEvent>(extraBufferCapacity = 0)
 
     override val callData = multisigOperationLocalCallRepository.callsFlow().map { operations ->
-        operations.associateBy { it.chainId to it.callHash.fromHex().intoKey() }
+        operations.associateBy { it.chainId to it.callHash.intoKey() }
             .mapValues { (_, value) ->
                 val runtime = getRuntime(value.chainId) ?: return@mapValues null
                 GenericCall.fromHex(runtime, value.callInstance)

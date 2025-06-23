@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details
 
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -33,6 +34,7 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
 
         binder.multisigPendingOperationDetailsExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
+        binder.multisigPendingOperationDetailsEnterCallData.setOnClickListener { viewModel.enterCallDataClicked() }
         binder.multisigPendingOperationDetailsAction.prepareForProgress(viewLifecycleOwner)
         binder.multisigPendingOperationDetailsAction.setOnClickListener { viewModel.actionClicked() }
 
@@ -57,7 +59,8 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, binder.multisigPendingOperationDetailsExtrinsicInfo.fee)
 
-        viewModel.buttonState.observe(binder.multisigPendingOperationDetailsAction::setState)
+        viewModel.showCallButtonState.observe(binder.multisigPendingOperationDetailsEnterCallData::isVisible::set)
+        viewModel.actionButtonState.observe(binder.multisigPendingOperationDetailsAction::setState)
         viewModel.buttonAppearance.observe(binder.multisigPendingOperationDetailsAction::setAppearance)
 
         viewModel.currentAccountModelFlow.observe(binder.multisigPendingOperationDetailsExtrinsicInfo::setAccount)

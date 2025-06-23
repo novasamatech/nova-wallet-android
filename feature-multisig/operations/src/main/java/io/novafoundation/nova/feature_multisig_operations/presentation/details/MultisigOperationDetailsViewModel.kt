@@ -95,17 +95,18 @@ class MultisigOperationDetailsViewModel(
 
     val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)
 
-    val buttonState = combine(showNextProgress, operationFlow) { submissionInProgress, operation ->
+    val showCallButtonState = operationFlow.map { it.call == null }
+        .shareInBackground()
+
+    val actionButtonState = combine(showNextProgress, operationFlow) { submissionInProgress, operation ->
         val action = operation.userAction()
 
         when {
             submissionInProgress -> DescriptiveButtonState.Loading
 
-            operation.call == null -> DescriptiveButtonState.Enabled(
-                action = resourceManager.getString(R.string.multisig_operation_details_call_data_not_found)
-            )
-
             action is MultisigAction.CanApprove -> when {
+
+                operation.call == null -> DescriptiveButtonState.Gone
 
                 action.isFinalApproval -> DescriptiveButtonState.Enabled(
                     action = resourceManager.getString(R.string.multisig_operation_details_approve_and_execute)
@@ -126,7 +127,6 @@ class MultisigOperationDetailsViewModel(
 
     val buttonAppearance = operationFlow.map { operation ->
         when {
-            operation.call == null -> PrimaryButton.Appearance.SECONDARY
             operation.userAction() is MultisigAction.CanReject -> PrimaryButton.Appearance.PRIMARY_NEGATIVE
             else -> PrimaryButton.Appearance.PRIMARY
         }
@@ -140,13 +140,12 @@ class MultisigOperationDetailsViewModel(
         loadFee()
     }
 
-    fun actionClicked() = launchUnit {
-        val operation = operationFlow.first()
-        if (operation.call == null) {
-            router.openEnterCallDetails(MultisigOperationEnterCallPayload(payload.operationId))
-        } else {
-            sendTransactionIfValid()
-        }
+    fun enterCallDataClicked() {
+        router.openEnterCallDetails(MultisigOperationEnterCallPayload(payload.operationId))
+    }
+
+    fun actionClicked() {
+        sendTransactionIfValid()
     }
 
     fun backClicked() {

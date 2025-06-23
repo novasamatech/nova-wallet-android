@@ -6,6 +6,8 @@ import io.novafoundation.nova.core_db.model.MultisigOperationCallLocal
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.model.SavedMultisigOperationCall
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 
@@ -13,18 +15,13 @@ class RealMultisigOperationLocalCallRepository(
     private val multisigOperationsDao: MultisigOperationsDao
 ) : MultisigOperationLocalCallRepository {
 
-    override suspend fun setMultisigCall(
-        chainId: String,
-        operationId: String,
-        callHash: CallHash,
-        call: String
-    ) {
+    override suspend fun setMultisigCall(operation: SavedMultisigOperationCall) {
         multisigOperationsDao.insertOperation(
             MultisigOperationCallLocal(
-                operationId = operationId,
-                chainId = chainId,
-                callHash = callHash.value.toHexString(),
-                callInstance = call
+                chainId = operation.chainId,
+                metaId = operation.metaId,
+                callHash = operation.callHash.toHexString(),
+                callInstance = operation.callInstance
             )
         )
     }
@@ -33,11 +30,19 @@ class RealMultisigOperationLocalCallRepository(
         return multisigOperationsDao.observeOperations()
             .mapList {
                 SavedMultisigOperationCall(
-                    operationId = it.operationId,
+                    metaId = it.metaId,
                     chainId = it.chainId,
-                    callHash = it.callHash,
-                    callInstance = it.callInstance
+                    callHash = it.callHash.fromHex(),
+                    callInstance = it.callInstance,
                 )
             }
+    }
+
+    override suspend fun removeCallHashesExclude(metaId: Long, chainId: ChainId, excludedCallHashes: Set<CallHash>) {
+        multisigOperationsDao.removeOperationsExclude(
+            metaId,
+            chainId,
+            excludedCallHashes.map { it.value.toHexString() }
+        )
     }
 }

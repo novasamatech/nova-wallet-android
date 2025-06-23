@@ -501,6 +501,14 @@ fun GenericCall.Instance.callHash(runtimeSnapshot: RuntimeSnapshot): ByteArray {
     return toByteArray(runtimeSnapshot).blake2b256()
 }
 
+fun String.callHash(): ByteArray {
+    return fromHex().blake2b256()
+}
+
+fun String.callHashString(): String {
+    return callHash().toHexString(withPrefix = true)
+}
+
 fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
     require(signature.size == 65)
 
