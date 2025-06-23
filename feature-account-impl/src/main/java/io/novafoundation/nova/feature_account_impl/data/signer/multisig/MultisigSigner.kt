@@ -182,8 +182,7 @@ class MultisigSigner(
         val call = getWrappedCall()
 
         val multisigCall = runtime.composeMultisigAsMulti(
-            threshold = multisigAccount.threshold,
-            otherSignatories = multisigAccount.otherSignatories,
+            multisigMetaAccount = multisigAccount,
             maybeTimePoint = null,
             call = call,
             maxWeight = maxWeight

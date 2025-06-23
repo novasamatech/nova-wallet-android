@@ -46,6 +46,17 @@ class TypeBasedAssetSourceRegistry(
         }
     }
 
+    override fun allSources(): List<AssetSource> {
+        return listOf(
+            nativeSource.get(),
+            statemineSource.get(),
+            ormlSource.get(),
+            evmNativeSource.get(),
+            evmErc20Source.get(),
+            equilibriumAssetSource.get()
+        )
+    }
+
     override suspend fun getEventDetector(chainAsset: Chain.Asset): AssetEventDetector {
         return when (chainAsset.type) {
             is Chain.Asset.Type.Equilibrium,

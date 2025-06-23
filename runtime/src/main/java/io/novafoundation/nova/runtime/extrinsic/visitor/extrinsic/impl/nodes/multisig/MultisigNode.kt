@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.multisig
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.multisig
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
@@ -10,12 +10,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.utils.multisig
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.EventCountingContext
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedCallNode
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.NestedExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.VisitingContext
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.peekItemFromEndOrThrow
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.takeFromEndOrThrow
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.EventCountingContext
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.NestedCallNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.NestedExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.VisitingContext
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.peekItemFromEndOrThrow
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.takeFromEndOrThrow
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent

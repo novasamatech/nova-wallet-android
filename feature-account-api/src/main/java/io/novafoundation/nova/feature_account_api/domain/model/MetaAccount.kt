@@ -129,6 +129,9 @@ interface MultisigMetaAccount : MetaAccount {
 
     val signatoryAccountId: AccountIdKey
 
+    /**
+     * A **sorted** list of other signatories signatories of the account
+     */
     val otherSignatories: List<AccountIdKey>
 
     val threshold: Int

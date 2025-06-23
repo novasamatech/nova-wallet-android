@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+
     <string name="multisig_wallet_details_info_warning_other_signatories">Other signatories:</string>
     <string name="multisig_wallet_details_info_warning_title">Threshold %d out of %d</string>
+
+    <string name="multisig_card_not_supported_title">Debit Card not supported for Multisig</string>
+    <string name="multisig_card_not_supported_message">To manage your Debit Card, please switch to a different type of wallet.</string>
+
+    <string name="multisig_sell_not_supported_title">Sell not supported for Multisig</string>
+    <string name="multisig_sell_not_supported_message">To sell crypto for fiat, please switch to a different type of wallet.</string>
+
+    <string name="multisig_pending_operations">Transactions to sign</string>
+<!--    <string name="multisig_pending_operations">Pending operations</string>-->
+
+    <string name="multisig_operations_progress">Signing (%s of %s)</string>
+<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
+
+
+    <string name="multisig_operations_created">Created by you</string>
+    <string name="multisig_operations_signed">Signed by you</string>
+<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
+<!--    <string name="multisig_operations_signed">Signed</string>-->
+
+
+    <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
+    
+<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
+    <string name="multisig_operations_unknown_calldata">Unknown operation</string>
+
 
     <string name="multisig_callhash_exists_title">Operation already exists</string>
     <string name="multisig_callhash_exists_message">%s has already initiated the same operation and it is currently waiting to be signed by other signatories.</string>
@@ -38,18 +64,10 @@
     <string name="multisig_operation_details_approve_and_execute">Approve &amp; Execute</string>
     <string name="multisig_operation_details_reject">Reject</string>
 
-    <string name="multisig_operations_progress">%s of %s Signed</string>
-
-    <string name="multisig_operations_pending_signature">Pending signature</string>
-    <string name="multisig_operations_signed">Signed</string>
-
-    <string name="multisig_operations_unknown_calldata">[Unknown operation] (%s)</string>
-
     <string name="account_multisig">Multisig</string>
     <string name="multisig_wallet_details_info_warning">Transactions from this wallet require approval from multiple signatories. Your account is one of the signatories:</string>
     <string name="multisig_signatory">Signatory:</string>
 
-    <string name="multisig_pending_operations">Pending operations</string>
 
     <string name="swap_failure_cannot_receive_insufficient_asset_out">You must have at least %s on %s to receive %s token</string>
 
