@@ -34,11 +34,6 @@ internal class MultisigAccountsSyncDataSourceFactory @Inject constructor(
     }
 }
 
-/*
-TODO multisig:
-1. Integrate multisigs to MetaAccountsUpdatesRegistry - just adding ids to the repository isn't enough as ui only shows proxies, see
-MetaAccountGroupingInteractor.updatedProxieds
- */
 private class MultisigAccountsSyncDataSource(
     private val multisigRepository: MultisigRepository,
     private val gson: Gson,

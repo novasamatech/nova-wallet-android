@@ -3,9 +3,9 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindMultiAddress
 import io.novafoundation.nova.runtime.ext.Geneses
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.walkToList
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novafoundation.nova.test_shared.whenever

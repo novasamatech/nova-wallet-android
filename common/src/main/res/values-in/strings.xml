@@ -100,6 +100,8 @@
     <string name="account_migration_subtitle">Anda hampir selesai! 🎉\n Cukup ketuk di bawah untuk menyelesaikan pengaturan dan mulai menggunakan akun Anda dengan lancar di Aplikasi Polkadot dan Nova Wallet</string>
     <string name="account_migration_title">Selamat datang di Nova!</string>
     <string name="account_mnmonic_length_variants">Frasa 12, 15, 18, 21 atau 24 kata</string>
+    <string name="account_multisig">Multisig</string>
+    <string name="account_multisig_group_label">Kontrol bersama (multisig)</string>
     <string name="account_needed_message">Anda tidak memiliki akun untuk jaringan ini, Anda dapat membuat atau mengimpor akun.</string>
     <string name="account_needed_title">Akun Diperlukan</string>
     <string name="account_no_chain_projection">Tidak ditemukan akun</string>
@@ -136,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">kode QR untuk dipindai</string>
     <string name="account_private_key">Kunci privat</string>
+    <string name="account_proxied">Diwakilkan</string>
     <string name="account_proxieds">Didelegasikan kepada Anda (Proxieds)</string>
     <string name="account_proxy_type_any">Sembarang</string>
     <string name="account_proxy_type_auction">Lelang</string>
@@ -170,6 +173,7 @@
     <string name="accounts_change_chain_account">Ubah akun %s</string>
     <string name="accounts_change_chain_secrets">Ubah akun</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="active_multisig_title">Kontrol bersama</string>
     <string name="add_custom_node">Tambahkan node kustom</string>
     <string name="add_delegation_missing_account_message">Anda perlu menambahkan akun %s ke dompet untuk mendelagasikan</string>
     <string name="add_network_title">Masukkan detail jaringan</string>
@@ -686,8 +690,8 @@
     <string name="delegate_search_hint">Cari berdasarkan alamat atau nama</string>
     <string name="delegate_search_placeholder_empty">Format alamat tidak valid. Pastikan alamat sesuai dengan jaringan yang benar</string>
     <string name="delegate_search_result_count">hasil pencarian: %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Wallet secara otomatis menambahkan otoritas yang didelegasikan (Proxy) ke kategori terpisah untuk Anda. Anda selalu dapat mengelola dompet di Pengaturan.</string>
-    <string name="delegated_accounts_fragment_title">Pembaruan akun yang didelegasikan</string>
+    <string name="delegated_accounts_fragment_explanation">Akun Proxy dan Multisig terdeteksi otomatis dan diorganisir untuk anda. Kelola kapan saja di Pengaturan.</string>
+    <string name="delegated_accounts_fragment_title">Daftar dompet telah diperbarui</string>
     <string name="delegation_all_votes">Menggunakan suara sepanjang waktu</string>
     <string name="delegation_delegate">Delegasi</string>
     <string name="delegation_delegate_filter_all">Semua akun</string>
@@ -724,6 +728,7 @@
     <string name="delegation_tracks_governance_preset">Pemerintahan</string>
     <string name="delegation_tracks_treasury_preset">Kekayaan</string>
     <string name="delegation_undelegating_period">Periode Pembatalan Delegasi</string>
+    <string name="delegation_updates_deactivated_title">Tidak lagi valid</string>
     <string name="delegation_your_delegation">Delegasi Anda</string>
     <string name="delegation_your_delegations">Delegasi Anda</string>
     <string name="delegations_filter">Tampilkan</string>
@@ -881,6 +886,29 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">Pilih setidaknya %d dompet</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s sudah memulai operasi yang sama dan saat ini menunggu untuk ditandatangani oleh penandatangan lainnya.</string>
+    <string name="multisig_callhash_exists_title">Operasi sudah ada</string>
+    <string name="multisig_operation_details_approve">Setujui</string>
+    <string name="multisig_operation_details_approve_and_execute">Setujui &amp; Eksekusi</string>
+    <string name="multisig_operation_details_call_data_not_found">Data panggilan tidak ditemukan</string>
+    <string name="multisig_operation_details_reject">Tolak</string>
+    <string name="multisig_operations_pending_signature">Menunggu tanda tangan</string>
+    <string name="multisig_operations_progress" formatted="false">%s dari %s Tertanda</string>
+    <string name="multisig_operations_signed">Tertanda</string>
+    <string name="multisig_operations_unknown_calldata">[Operasi tidak dikenal] (%s)</string>
+    <string name="multisig_pending_operations">Operasi yang menunggu</string>
+    <string name="multisig_signatory">Penandatangan:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s tidak memiliki saldo yang cukup untuk melakukan penyetoran multisig sebesar %s. Saldo yang tersedia: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s tidak memiliki saldo yang cukup untuk membayar biaya jaringan sebesar %s dan melakukan penyetoran multisig sebesar %s. Saldo yang tersedia: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s memerlukan setidaknya %s untuk membayar biaya transaksi ini dan tetap berada di atas saldo minimum jaringan. Saldo saat ini adalah: %s</string>
+    <string name="multisig_signing_is_not_supported_message">Dompet multisig tidak mendukung penandatanganan pesan sembarangan — hanya transaksi saja</string>
+    <string name="multisig_signing_warning_message">Transaksi multisig akan dimulai oleh %s. Pemulai membayar biaya jaringan dan menyisihkan deposit multisig, yang akan dikembalikan saat transaksi dieksekusi.</string>
+    <string name="multisig_signing_warning_title">Transaksi Multisig</string>
+    <string name="multisig_transaction_created_subtitle">Penandatangan lain sekarang dapat mengonfirmasi transaksi.\nAnda dapat melacak statusnya dalam %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">transaksi Multisig.</string>
+    <string name="multisig_transaction_created_title">Transaksi Multisig dibuat</string>
+    <string name="multisig_transaction_created_view_details">Lihat rincian</string>
+    <string name="multisig_wallet_details_info_warning">Transaksi dari dompet ini memerlukan persetujuan dari beberapa penandatangan. Akun anda adalah salah satu penandatangan:</string>
     <string name="network_already_exist_failure_title">Node ini sudah ada</string>
     <string name="network_fee">Biaya jaringan</string>
     <string name="network_info_address">Alamat node</string>
@@ -977,8 +1005,6 @@
     <string name="profile_settings_safe_mode_title">Mode Aman</string>
     <string name="profile_settings_title">Pengaturan</string>
     <string name="proxied_wallet_details_info_warning">Akun ini diberi akses untuk melakukan transaksi ke akun berikut:</string>
-    <string name="proxieds_updates_deactivated_title">Tidak lagi valid</string>
-    <string name="proxy_about">Apa itu Proxy?</string>
     <string name="proxy_access_type_staking_operations">Operasi Staking</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Akun yang didelegasikan %s tidak memiliki cukup saldo untuk membayar biaya jaringan sebesar %s. Saldo yang tersedia untuk membayar biaya: %s</string>
     <string name="proxy_signing_is_not_supported_message">Dompet yang diproses tidak mendukung penandatanganan pesan sembarang - hanya transaksi</string>
@@ -1587,7 +1613,7 @@
     <string name="swap_execution_time">Waktu eksekusi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Anda harus menyisihkan setidaknya %s setelah membayar biaya jaringan %s karena Anda memegang token yang tidak mencukupi</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Anda harus menyisihkan setidaknya %s untuk menerima token %s</string>
-    <string name="swap_failure_cannot_receive_insufficient_asset_out">Anda harus memiliki setidaknya %s di %s untuk menerima %s token</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">Anda harus memiliki setidaknya %s di %s untuk menerima %s token</string>
     <string name="swap_failure_insufficient_balance_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Anda dapat menukar hingga %1$s karena Anda perlu membayar %2$s untuk biaya jaringan dan juga mengonversi %3$s ke %4$s untuk mencapai saldo minimum %5$s.</string>
     <string name="swap_failure_swap_max_button">Tukar maksimum</string>

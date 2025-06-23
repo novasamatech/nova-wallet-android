@@ -1,4 +1,4 @@
-package io.novafoundation.nova.runtime.extrinsic.visitor.impl
+package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl
 
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent

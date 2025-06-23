@@ -21,8 +21,10 @@ import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.RealExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
 import io.novafoundation.nova.runtime.extrinsic.metadata.RealMetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.RealExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
+import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.RealCallTraversal
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.RealExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainChainMapperFacade
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
@@ -211,6 +213,10 @@ class RuntimeModule {
     fun provideExtrinsicWalk(
         chainRegistry: ChainRegistry,
     ): ExtrinsicWalk = RealExtrinsicWalk(chainRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideCallTraversal(): CallTraversal = RealCallTraversal()
 
     @Provides
     @ApplicationScope
