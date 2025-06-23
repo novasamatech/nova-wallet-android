@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.common.l
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.CoroutineScope
 
 class WalletDetailsMixinFactory(
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
@@ -24,10 +26,11 @@ class WalletDetailsMixinFactory(
     private val appLinksProvider: AppLinksProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val router: AccountRouter,
-    private val addressSchemeFormatter: AddressSchemeFormatter
+    private val addressSchemeFormatter: AddressSchemeFormatter,
+    private val chainRegistry: ChainRegistry
 ) {
 
-    suspend fun create(metaId: Long, host: WalletDetailsMixinHost): WalletDetailsMixin {
+    suspend fun create(metaId: Long, coroutineScope: CoroutineScope, host: WalletDetailsMixinHost): WalletDetailsMixin {
         val metaAccount = interactor.getMetaAccount(metaId)
 
         return when (metaAccount.type) {
@@ -87,7 +90,10 @@ class WalletDetailsMixinFactory(
                 accountFormatterFactory = accountFormatterFactory,
                 interactor = interactor,
                 multisigFormatter = multisigFormatter,
-                metaAccount = metaAccount as MultisigMetaAccount
+                metaAccount = metaAccount as MultisigMetaAccount,
+                host = host,
+                chainRegistry = chainRegistry,
+                coroutineScope = coroutineScope
             )
         }
     }

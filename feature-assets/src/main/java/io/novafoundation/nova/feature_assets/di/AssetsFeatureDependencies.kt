@@ -30,6 +30,7 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -219,6 +220,8 @@ interface AssetsFeatureDependencies {
     val linkBuilderFactory: LinkBuilderFactory
 
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+
+    val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
 
     fun web3NamesInteractor(): Web3NamesInteractor
 
