@@ -2,7 +2,10 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.details
 
 import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.AddressFormat
+import io.novafoundation.nova.common.address.format.asAccountId
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.UNIFIED_ADDRESS_PREFIX
 import io.novafoundation.nova.common.utils.append
 import io.novafoundation.nova.common.utils.appendEnd
 import io.novafoundation.nova.common.utils.appendSpace
@@ -10,6 +13,7 @@ import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.AlertModel
@@ -24,15 +28,13 @@ import io.novafoundation.nova.feature_account_impl.domain.account.details.Wallet
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
-import io.novafoundation.nova.runtime.ext.ChainGeneses
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.util.forChain
+import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class MultisigWalletDetailsMixin(
     private val resourceManager: ResourceManager,
@@ -97,9 +99,10 @@ class MultisigWalletDetailsMixin(
     }
 
     private suspend fun getAccountFormat(metaAccount: MultisigMetaAccount, accountIdKey: AccountIdKey): CharSequence {
-        val chain = getChain(metaAccount)
+        val addressFormat = getAddressFormat(metaAccount)
         val accountDrawable = multisigFormatter.makeAccountDrawable(accountIdKey.value)
-        val accountAddress = chain.addressOf(accountIdKey.value)
+        val accountAddress = addressFormat.addressOf(accountIdKey.value.asAccountId())
+            .value
             .ellipsizeMiddle(shownSymbols = 9)
 
         val addressColor = resourceManager.getColor(R.color.text_secondary)
@@ -115,14 +118,18 @@ class MultisigWalletDetailsMixin(
             .appendEnd(drawableSpan(infoIcon))
             .setFullSpan(
                 clickableSpan {
-                    showAddress(accountIdKey, chain)
+                    showAddress(metaAccount, accountIdKey, addressFormat)
                 }
             )
     }
 
-    private fun showAddress(accountIdKey: AccountIdKey, chain: Chain) {
-        launch {
-            host.externalActions.showAddressActions(accountIdKey.value, chain)
+    private fun showAddress(metaAccount: MultisigMetaAccount, accountIdKey: AccountIdKey, addressFormat: AddressFormat) = launchUnit {
+        when (val availability = metaAccount.availability) {
+            is MultisigAvailability.Universal -> host.addressActionsMixin.showAddressActions(accountIdKey.value, addressFormat)
+            is MultisigAvailability.SingleChain -> {
+                val chain = chainRegistry.getChain(availability.chainId)
+                host.externalActions.showAddressActions(accountIdKey.value, chain)
+            }
         }
     }
 
@@ -134,10 +141,17 @@ class MultisigWalletDetailsMixin(
             .append(this.substring(length - shownSymbols))
     }
 
-    private suspend fun getChain(metaAccount: MultisigMetaAccount): Chain {
+    private suspend fun getAddressFormat(metaAccount: MultisigMetaAccount): AddressFormat {
         return when (val availability = metaAccount.availability) {
-            MultisigAvailability.Universal -> chainRegistry.getChain(ChainGeneses.POLKADOT)
-            is MultisigAvailability.SingleChain -> chainRegistry.getChain(availability.chainId)
+            is MultisigAvailability.Universal -> AddressFormat.defaultForScheme(
+                availability.addressScheme,
+                substrateAddressPrefix = SS58Encoder.UNIFIED_ADDRESS_PREFIX
+            )
+
+            is MultisigAvailability.SingleChain -> {
+                val chain = chainRegistry.getChain(availability.chainId)
+                AddressFormat.forChain(chain)
+            }
         }
     }
 }

@@ -84,6 +84,9 @@ val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
 val SS58Encoder.DEFAULT_PREFIX: Short
     get() = 42.toShort()
 
+val SS58Encoder.UNIFIED_ADDRESS_PREFIX: Short
+    get() = 0.toShort()
+
 val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
     get() = DEFAULT_PREFIX
 
