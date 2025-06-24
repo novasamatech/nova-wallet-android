@@ -1,25 +1,31 @@
 package io.novafoundation.nova.feature_wallet_impl.domain.validaiton.multisig
 
 import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.common.validation.isTrueOrError
-import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.getMultisigDeposit
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidation
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationFailure
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationPayload
+import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationStatus
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.SignatoryFeePaymentMode
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.signatoryAccountId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDepositInPlanks
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.accountBalanceForValidation
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.BalanceValidationResult
+import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.beginValidation
+import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.toValidationStatus
+import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.tryReserve
+import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.tryWithdrawFee
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+
 
 class MultisigSignatoryHasEnoughBalanceValidation(
     private val assetSourceRegistry: AssetSourceRegistry,
@@ -31,68 +37,50 @@ class MultisigSignatoryHasEnoughBalanceValidation(
         val chain = value.chain
         val chainAsset = chain.utilityAsset
 
-        val balance = assetSourceRegistry.sourceFor(chainAsset).balance.queryAccountBalance(value.chain, chainAsset, value.signatoryAccountId())
-        val multisigDeposit = multisigValidationsRepository.getMultisigDeposit(chain.id, value.multisig.threshold)
-        val ed = assetSourceRegistry.existentialDepositInPlanks(chainAsset)
+        val fee = calculateFee(value)
+        val deposit = determineNeededDeposit(value)
 
-        return when (val mode = value.signatoryFeePaymentMode) {
-            SignatoryFeePaymentMode.NothingToPay -> validateDeposit(value, balance, multisigDeposit, ed)
-            is SignatoryFeePaymentMode.PaysSubmissionFee -> validateFeeAndDeposit(value, balance, multisigDeposit, ed, mode.actualCall)
+        var balanceValidation = assetSourceRegistry.sourceFor(chainAsset).balance
+            .accountBalanceForValidation(value.chain, chainAsset, value.signatoryAccountId())
+            .beginValidation()
+
+        if (fee != null) {
+            balanceValidation = balanceValidation.tryWithdrawFee(fee)
+        }
+
+        if (deposit != null) {
+            balanceValidation = balanceValidation.tryReserve(deposit)
+        }
+
+        return balanceValidation.toValidationStatus { prepareError(value, fee, deposit, it) }
+    }
+
+    private suspend fun calculateFee(payload: MultisigExtrinsicValidationPayload): Fee? {
+        return when (val mode = payload.signatoryFeePaymentMode) {
+            SignatoryFeePaymentMode.NothingToPay -> null
+
+            is SignatoryFeePaymentMode.PaysSubmissionFee -> calculateFee(payload, mode.actualCall)
         }
     }
 
-    private fun validateDeposit(
-        value: MultisigExtrinsicValidationPayload,
-        balance: ChainAssetBalance,
-        deposit: Balance,
-        existentialDeposit: Balance,
-    ): ValidationStatus<MultisigExtrinsicValidationFailure> {
-        val reservable = balance.legacyAdapter().reservable(existentialDeposit)
-
-        return (reservable >= deposit) isTrueOrError {
-            MultisigExtrinsicValidationFailure.NotEnoughSignatoryBalance.ToPlaceDeposit(
-                signatory = value.signatory,
-                asset = value.chain.utilityAsset,
-                deposit = deposit,
-                availableBalance = balance.free
-            )
-        }
+    private suspend fun determineNeededDeposit(payload: MultisigExtrinsicValidationPayload): Balance? {
+        return multisigValidationsRepository.getMultisigDeposit(payload.chain.id, payload.multisig.threshold)
+            .takeIf { it.isPositive() }
     }
 
-    private suspend fun validateFeeAndDeposit(
-        value: MultisigExtrinsicValidationPayload,
-        balance: ChainAssetBalance,
-        deposit: Balance,
-        existentialDeposit: Balance,
-        signatoryCall: GenericCall.Instance,
-    ): ValidationStatus<MultisigExtrinsicValidationFailure> {
-        val fee = calculateFee(value, signatoryCall)
-        val asset = value.chain.utilityAsset
-
-        val reservable = balance.legacyAdapter().reservable(existentialDeposit)
-
-        if (deposit + fee.amount > reservable) {
-            return MultisigExtrinsicValidationFailure.NotEnoughSignatoryBalance.ToPayFeeAndDeposit(
-                signatory = value.signatory,
-                asset = asset,
-                fee = fee.amount,
-                deposit = deposit,
-                availableBalance = reservable
-            ).validationError()
-        }
-
-        val ed = assetSourceRegistry.existentialDepositInPlanks(asset)
-        val neededBalance = ed + fee.amount
-        if (balance.countedTowardsEd < neededBalance) {
-            return MultisigExtrinsicValidationFailure.NotEnoughSignatoryBalance.ToPayFeeAndStayAboveEd(
-                signatory = value.signatory,
-                asset = asset,
-                neededBalance = neededBalance,
-                availableBalance = balance.countedTowardsEd
-            ).validationError()
-        }
-
-        return valid()
+    private fun prepareError(
+        payload: MultisigExtrinsicValidationPayload,
+        fee: FeeBase?,
+        deposit: Balance?,
+        balanceError: BalanceValidationResult.Failure
+    ): MultisigExtrinsicValidationStatus {
+        return MultisigExtrinsicValidationFailure.NotEnoughSignatoryBalance(
+            signatory = payload.signatory,
+            asset = payload.chain.utilityAsset,
+            fee = fee?.amount,
+            deposit = deposit,
+            balanceToAdd = balanceError.negativeImbalance.value
+        ).validationError()
     }
 
     private suspend fun calculateFee(value: MultisigExtrinsicValidationPayload, signatoryCall: GenericCall.Instance): Fee {

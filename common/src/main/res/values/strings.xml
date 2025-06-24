@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-
+    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. You need to add %s more to your balance</string>
+    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. You need to add %s more to your balance</string>
+    <string name="multisig_signatory_validation_fee">%s doesn’t have enough balance to pay the network fee of %s. You need to add %s more to your balance</string>
+    <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
+<!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
+    <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
 
     <string name="multisig_wallet_details_info_warning_other_signatories">Other signatories:</string>
     <string name="multisig_wallet_details_info_warning_title">Threshold %d out of %d</string>
@@ -33,8 +38,6 @@
     <string name="multisig_callhash_exists_title">Operation already exists</string>
     <string name="multisig_callhash_exists_message">%s has already initiated the same operation and it is currently waiting to be signed by other signatories.</string>
 
-    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>
-    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>
     <string name="multisig_signatory_validation_ed">%s needs at least %s to pay this transaction fee and stay above the minimum network balance. Current balance is: %s</string>
 
     <string name="multisig_signing_is_not_supported_message">Multisig wallets do not support signing arbitrary messages — only transactions</string>
