@@ -120,7 +120,6 @@ data class ValidatingBalance(
         )
     }
 
-
     private fun ChainAssetBalance.ensureMeetsEdOrDust(): ChainAssetBalance {
         return ensureMeetsEdOrDust(existentialDeposit)
     }

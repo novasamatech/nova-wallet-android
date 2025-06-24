@@ -15,7 +15,7 @@ fun EDCountingMode.calculateBalanceCountedTowardsEd(free: BigInteger, reserved: 
 }
 
 fun EDCountingMode.reservedPreventsDusting(reserved: BigInteger): Boolean {
-    return when(this) {
+    return when (this) {
         EDCountingMode.TOTAL -> false
         EDCountingMode.FREE -> reserved.isPositive()
     }

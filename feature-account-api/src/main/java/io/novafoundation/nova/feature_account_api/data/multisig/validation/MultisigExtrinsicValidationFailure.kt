@@ -13,7 +13,7 @@ sealed interface MultisigExtrinsicValidationFailure {
         val deposit: BigInteger?,
         val fee: BigInteger?,
         val balanceToAdd: BigInteger
-    ): MultisigExtrinsicValidationFailure
+    ) : MultisigExtrinsicValidationFailure
 
     class OperationAlreadyExists(
         val multisigAccount: MultisigMetaAccount

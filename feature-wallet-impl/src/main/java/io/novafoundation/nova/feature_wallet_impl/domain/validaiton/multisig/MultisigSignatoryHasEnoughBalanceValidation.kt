@@ -26,7 +26,6 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
-
 class MultisigSignatoryHasEnoughBalanceValidation(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,

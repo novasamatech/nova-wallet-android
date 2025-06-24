@@ -25,7 +25,6 @@ fun BalanceValidationResult.tryReserve(amount: Balance): BalanceValidationResult
     return tryDeduct { balance -> balance.tryReserve(amount) }
 }
 
-
 fun BalanceValidationResult.tryFreeze(amount: Balance): BalanceValidationResult {
     return tryDeduct { balance -> balance.tryFreeze(amount) }
 }
@@ -35,21 +34,21 @@ fun BalanceValidationResult.tryWithdrawFee(fee: FeeBase): BalanceValidationResul
 }
 
 fun <E> BalanceValidationResult.toValidationStatus(onError: (BalanceValidationResult.Failure) -> ValidationStatus<E>): ValidationStatus<E> {
-    return when(this) {
+    return when (this) {
         is BalanceValidationResult.Failure -> onError(this)
         is BalanceValidationResult.Success -> valid()
     }
 }
 
 private fun BalanceValidationResult.tryDeduct(deduct: (ValidatingBalance) -> BalanceValidationResult): BalanceValidationResult {
-    return when(this) {
+    return when (this) {
         is BalanceValidationResult.Failure -> deduct(newBalanceAfterFixingImbalance).increaseImbalance(negativeImbalance)
         is BalanceValidationResult.Success -> deduct(newBalance)
     }
 }
 
 private fun BalanceValidationResult.increaseImbalance(increase: NegativeImbalance): BalanceValidationResult {
-    return when(this) {
+    return when (this) {
         is BalanceValidationResult.Failure -> BalanceValidationResult.Failure(
             newBalanceAfterFixingImbalance = newBalanceAfterFixingImbalance,
             negativeImbalance = negativeImbalance + increase
