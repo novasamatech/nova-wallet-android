@@ -34,3 +34,4 @@ fun <C> ContractStandard<C, *>.querySingle(
     address: String,
     web3j: Web3j,
 ): C = query(address, SingleContractCaller(web3j))
+

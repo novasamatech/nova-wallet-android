@@ -615,4 +615,6 @@ object Modules {
     const val ASSET_REGISTRY = "AssetRegistry"
 
     const val COLLATOR_STAKING = "CollatorStaking"
+
+    const val EVM = "EVM"
 }
