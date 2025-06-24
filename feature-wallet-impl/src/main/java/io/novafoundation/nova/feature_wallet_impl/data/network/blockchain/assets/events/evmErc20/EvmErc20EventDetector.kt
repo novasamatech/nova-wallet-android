@@ -26,7 +26,6 @@ class EvmErc20EventDetectorFactory @Inject constructor() {
     }
 }
 
-
 class EvmErc20EventDetector(
     private val erc20AssetType: Chain.Asset.Type.EvmErc20
 ) : AssetEventDetector {
