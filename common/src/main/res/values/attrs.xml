@@ -117,7 +117,12 @@
 
     <declare-styleable name="TableView">
         <attr name="title" />
+        <attr name="drawDividers" format="boolean" />
         <attr name="showBackground" format="boolean" />
+        <attr name="childrenPaddingStart" format="dimension" />
+        <attr name="childrenPaddingEnd" format="dimension" />
+        <attr name="childrenPaddingTop" format="dimension" />
+        <attr name="childrenPaddingBottom" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
