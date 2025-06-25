@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -94,16 +95,18 @@ class MultisigOperationDetailsViewModel(
 
     val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)
 
-    val buttonState = combine(showNextProgress, operationFlow) { submissionInProgress, operation ->
+    val showCallButtonState = operationFlow.map { it.call == null }
+        .shareInBackground()
+
+    val actionButtonState = combine(showNextProgress, operationFlow) { submissionInProgress, operation ->
         val action = operation.userAction()
 
         when {
             submissionInProgress -> DescriptiveButtonState.Loading
 
             action is MultisigAction.CanApprove -> when {
-                operation.call == null -> DescriptiveButtonState.Disabled(
-                    reason = resourceManager.getString(R.string.multisig_operation_details_call_data_not_found)
-                )
+
+                operation.call == null -> DescriptiveButtonState.Gone
 
                 action.isFinalApproval -> DescriptiveButtonState.Enabled(
                     action = resourceManager.getString(R.string.multisig_operation_details_approve_and_execute)
@@ -123,10 +126,9 @@ class MultisigOperationDetailsViewModel(
     }.shareInBackground()
 
     val buttonAppearance = operationFlow.map { operation ->
-        if (operation.userAction() == MultisigAction.CanReject) {
-            PrimaryButton.Appearance.PRIMARY_NEGATIVE
-        } else {
-            PrimaryButton.Appearance.PRIMARY
+        when {
+            operation.userAction() is MultisigAction.CanReject -> PrimaryButton.Appearance.PRIMARY_NEGATIVE
+            else -> PrimaryButton.Appearance.PRIMARY
         }
     }.shareInBackground()
 
@@ -136,6 +138,10 @@ class MultisigOperationDetailsViewModel(
 
     init {
         loadFee()
+    }
+
+    fun enterCallDataClicked() {
+        router.openEnterCallDetails(MultisigOperationEnterCallPayload(payload.operationId))
     }
 
     fun actionClicked() {

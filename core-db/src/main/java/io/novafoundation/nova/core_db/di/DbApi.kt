@@ -18,6 +18,7 @@ import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.dao.MultisigOperationsDao
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -92,4 +93,6 @@ interface DbApi {
     fun tinderGovDao(): TinderGovDao
 
     fun browserTabsDao(): BrowserTabsDao
+
+    fun multisigOperationsDao(): MultisigOperationsDao
 }

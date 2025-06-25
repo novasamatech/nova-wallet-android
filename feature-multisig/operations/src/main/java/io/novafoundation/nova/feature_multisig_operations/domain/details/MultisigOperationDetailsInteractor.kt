@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_multisig_operations.domain.details
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.callHash
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
@@ -14,9 +15,11 @@ import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigC
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.SavedMultisigOperationCall
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
@@ -31,6 +34,8 @@ import javax.inject.Inject
 
 interface MultisigOperationDetailsInteractor {
 
+    suspend fun setCall(operation: PendingMultisigOperation, call: String)
+
     fun callDetails(call: GenericCall.Instance): String
 
     suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee?
@@ -40,6 +45,8 @@ interface MultisigOperationDetailsInteractor {
     fun signatoryFlow(signatoryMetaId: Long): Flow<MetaAccount>
 
     suspend fun getSignatoryBalance(signatory: MetaAccount, chain: Chain): Result<ChainAssetBalance>
+
+    fun isCallValid(operation: PendingMultisigOperation, enteredCall: String): Boolean
 }
 
 @FeatureScope
@@ -48,9 +55,22 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val extrinsicSplitter: ExtrinsicSplitter,
     private val accountRepository: AccountRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     @ExtrinsicSerialization
     private val extrinsicGson: Gson,
 ) : MultisigOperationDetailsInteractor {
+
+    override suspend fun setCall(operation: PendingMultisigOperation, call: String) {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        multisigOperationLocalCallRepository.setMultisigCall(
+            SavedMultisigOperationCall(
+                metaId = metaAccount.id,
+                chainId = operation.chain.id,
+                callHash = operation.callHash.value,
+                callInstance = call
+            )
+        )
+    }
 
     override fun callDetails(call: GenericCall.Instance): String {
         return extrinsicGson.toJson(call)
@@ -83,6 +103,13 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         val signatoryAccountId = signatory.requireAccountIdIn(chain)
         return assetSourceRegistry.sourceFor(asset).balance.queryAccountBalanceCatching(chain, asset, signatoryAccountId)
     }
+
+    override fun isCallValid(operation: PendingMultisigOperation, enteredCall: String): Boolean = runCatching {
+        val operationHash = operation.callHash.value
+        val enteredHash = enteredCall.callHash()
+
+        operationHash.contentEquals(enteredHash)
+    }.getOrDefault(false)
 
     private suspend fun estimateApproveFee(operation: PendingMultisigOperation): Fee? {
         if (operation.call == null) return null

@@ -41,7 +41,7 @@ class EventsRealtimeCallDataWatcher(
     private val chainRegistry: ChainRegistry,
     private val multisigRepository: MultisigRepository,
     coroutineScope: CoroutineScope,
-) : RealtimeCallDataWatcher, CoroutineScope by coroutineScope {
+) : MultisigCallDataWatcher, CoroutineScope by coroutineScope {
 
     companion object {
 
@@ -50,7 +50,7 @@ class EventsRealtimeCallDataWatcher(
         private const val MULTISIG_APPROVAL = "MultisigApproval"
     }
 
-    override val realtimeCallData = MutableStateFlow<Map<MultiChainCallHash, GenericCall.Instance>>(emptyMap())
+    override val callData = MutableStateFlow<Map<MultiChainCallHash, GenericCall.Instance>>(emptyMap())
 
     override val newMultisigEvents = MutableSharedFlow<MultiChainMultisigEvent>(extraBufferCapacity = 10)
 
@@ -96,7 +96,7 @@ class EventsRealtimeCallDataWatcher(
 
         Log.d("ChainRealtimeCallDataWatcher", "Found call-datas: ${newCallDatas.size}")
 
-        realtimeCallData.value += newCallDatasWithChain
+        callData.value += newCallDatasWithChain
     }.onFailure {
         Log.e("ChainRealtimeCallDataWatcher", "Error while detecting call-data from chain", it)
     }

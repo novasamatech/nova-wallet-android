@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_external_sign_impl.presentation.extrinsicD
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsFragment
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallFragment
+import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 
 class MultisigOperationsNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
@@ -32,6 +34,12 @@ class MultisigOperationsNavigator(
     override fun openMultisigCallDetails(extrinsicContent: String) {
         navigationBuilder().action(R.id.action_multisigOperationDetailsFragment_to_externalExtrinsicDetailsFragment)
             .setArgs(ExternalExtrinsicDetailsFragment.getBundle(extrinsicContent))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openEnterCallDetails(payload: MultisigOperationEnterCallPayload) {
+        navigationBuilder().action(R.id.action_multisigOperationDetailsFragment_to_enterCallDetails)
+            .setArgs(MultisigOperationEnterCallFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 }

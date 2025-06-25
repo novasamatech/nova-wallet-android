@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -53,6 +54,8 @@ interface MultisigOperationsFeatureDependencies {
     val edValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 
     val assetSourceRegistry: AssetSourceRegistry
+
+    val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository
 
     val callTraversal: CallTraversal
 

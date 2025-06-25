@@ -6,11 +6,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.flow.Flow
 
-interface RealtimeCallDataWatcher {
+interface MultisigCallDataWatcher {
 
     val newMultisigEvents: Flow<MultiChainMultisigEvent>
 
-    val realtimeCallData: Flow<Map<MultiChainCallHash, GenericCall.Instance>>
+    val callData: Flow<Map<MultiChainCallHash, GenericCall.Instance>>
 }
 
 class MultiChainMultisigEvent(

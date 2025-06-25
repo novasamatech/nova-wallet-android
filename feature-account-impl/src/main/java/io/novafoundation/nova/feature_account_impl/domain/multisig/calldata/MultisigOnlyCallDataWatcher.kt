@@ -5,11 +5,13 @@ import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 
@@ -19,8 +21,9 @@ class MultisigOnlyCallDataWatcher(
     private val chainRegistry: ChainRegistry,
     private val multisigRepository: MultisigRepository,
     private val accountRepository: AccountRepository,
+    private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     private val coroutineScope: CoroutineScope,
-) : RealtimeCallDataWatcher, CoroutineScope by coroutineScope {
+) : MultisigCallDataWatcher, CoroutineScope by coroutineScope {
 
     private val delegate = accountRepository.hasMetaAccountsCountOfTypeFlow(Type.MULTISIG).mapLatest { hasMultisigs ->
         if (hasMultisigs) {
@@ -36,7 +39,16 @@ class MultisigOnlyCallDataWatcher(
         }
     }.shareInBackground()
 
-    override val realtimeCallData = delegate.flatMapLatest { it.realtimeCallData }
+    private val localCallDataWatcher = LocalMultisigCallDataWatcher(chainRegistry, multisigOperationLocalCallRepository)
+
+    override val callData = combine(
+        delegate.flatMapLatest { it.callData },
+        localCallDataWatcher.callData
+    ) { realtimeCallData, localCallData ->
+        val newLocalCallData = localCallData.filter { it.key !in realtimeCallData }
+
+        realtimeCallData + newLocalCallData
+    }
 
     override val newMultisigEvents: Flow<MultiChainMultisigEvent> = delegate.flatMapLatest { it.newMultisigEvents }
 }
