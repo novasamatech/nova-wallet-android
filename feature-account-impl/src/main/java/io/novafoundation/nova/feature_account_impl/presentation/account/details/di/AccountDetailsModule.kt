@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -80,7 +81,8 @@ class AccountDetailsModule {
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
-        walletDetailsMixinFactory: WalletDetailsMixinFactory
+        walletDetailsMixinFactory: WalletDetailsMixinFactory,
+        addressActionsMixinFactory: AddressActionsMixin.Factory
     ): ViewModel {
         return WalletDetailsViewModel(
             rootScope = rootScope,
@@ -91,7 +93,8 @@ class AccountDetailsModule {
             chainRegistry = chainRegistry,
             importTypeChooserMixin = importTypeChooserMixin,
             addAccountLauncherPresentationFactory = addAccountLauncherPresentationFactory,
-            walletDetailsMixinFactory = walletDetailsMixinFactory
+            walletDetailsMixinFactory = walletDetailsMixinFactory,
+            addressActionsMixinFactory = addressActionsMixinFactory
         )
     }
 
