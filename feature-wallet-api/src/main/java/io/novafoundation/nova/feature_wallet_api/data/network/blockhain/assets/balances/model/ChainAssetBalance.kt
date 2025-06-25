@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.common.domain.balance.calculateBalanceCountedTowardsEd
 import io.novafoundation.nova.common.domain.balance.calculateReservable
 import io.novafoundation.nova.common.domain.balance.calculateTransferable
+import io.novafoundation.nova.common.domain.balance.reservedPreventsDusting
 import io.novafoundation.nova.common.domain.balance.totalBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -56,6 +57,19 @@ data class ChainAssetBalance(
 
     fun reservable(existentialDeposit: Balance): Balance {
         return transferableMode.calculateReservable(free = free, frozen = frozen, ed = existentialDeposit)
+    }
+
+    fun shouldBeDusted(existentialDeposit: Balance): Boolean {
+        // https://github.com/paritytech/polkadot-sdk/blob/e5ac83cd28610bd10a85638d90a8ee082ef2d908/substrate/frame/balances/src/lib.rs#L1096
+        return free < existentialDeposit && !edCountingMode.reservedPreventsDusting(reserved)
+    }
+}
+
+fun ChainAssetBalance.ensureMeetsEdOrDust(existentialDeposit: Balance): ChainAssetBalance {
+    return if (shouldBeDusted(existentialDeposit)) {
+        copy(free = BigInteger.ZERO, reserved = BigInteger.ZERO, frozen = BigInteger.ZERO)
+    } else {
+        this
     }
 }
 

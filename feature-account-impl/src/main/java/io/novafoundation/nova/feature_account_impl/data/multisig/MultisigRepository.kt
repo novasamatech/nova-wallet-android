@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.Fin
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.GetCallDatasRequest
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.FindMultisigsResponse
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetCallDatasResponse
+import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.MultisigRemote
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multisigs
@@ -131,11 +132,16 @@ class RealMultisigRepository @Inject constructor(
         return data.accounts.nodes.mapNotNull { multisigNode ->
             DiscoveredMultisig(
                 accountId = AccountIdKey.fromHexOrNull(multisigNode.id) ?: return@mapNotNull null,
-                threshold = multisigNode.threshold,
+                threshold = multisigNode.thresholdIfValid() ?: return@mapNotNull null,
                 allSignatories = multisigNode.signatories.nodes.map { signatoryNode ->
                     AccountIdKey.fromHexOrNull(signatoryNode.signatory.id) ?: return@mapNotNull null
                 }
             )
         }
+    }
+
+    private fun MultisigRemote.thresholdIfValid(): Int? {
+        // TODO there is a but on SubQuery that results in threshold=0 for threshold 1 multisigs
+        return threshold.takeIf { it >= 1 }
     }
 }

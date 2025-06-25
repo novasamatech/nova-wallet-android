@@ -157,6 +157,10 @@ fun MultisigAvailability.singleChainId(): ChainId? {
     }
 }
 
+fun MultisigMetaAccount.isThreshold1(): Boolean {
+    return threshold == 1
+}
+
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
 fun MetaAccount.addressIn(chain: Chain): String? {
