@@ -89,7 +89,11 @@ class DynamicCrossChainTransactor @Inject constructor(
         val supportsXcmExecute = features.supportsXcmExecute
         val hasXcmPaymentApi = xcmPaymentApi.isSupported(originChainId)
 
-        return supportsXcmExecute && hasXcmPaymentApi
+        // For now, only enable xcm execute approach for the directions that will hugely benefit from it
+        // In particular, xcm execute allows us to pay delivery fee from the holding register and not in JIT mode (from account)
+        val hasDeliveryFee = features.hasDeliveryFee
+
+        return supportsXcmExecute && hasXcmPaymentApi && hasDeliveryFee
     }
 
     private suspend fun supportsXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {

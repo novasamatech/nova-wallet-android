@@ -45,6 +45,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.transferFeatures
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.hasDeliveryFee
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -84,9 +85,6 @@ class CrossChainTransferAssetExchange(
     private val accountRepository: AccountRepository,
     private val swapHost: AssetExchange.SwapHost,
 ) : AssetExchange {
-
-    private var executionTimeCounter: Duration = Duration.ZERO
-    private var executionIterations: Int = 0
 
     private val crossChainConfig = MutableStateFlow<CrossChainTransfersConfiguration?>(null)
 
@@ -147,11 +145,21 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
-            return canUseXcmExecute()
+            // By default, delivery fees are not payable in non native assets
+            return !hasDeliveryFees() ||
+                // ... but xcm execute allows to workaround it
+                canUseXcmExecute()
         }
 
         override suspend fun canTransferOutWholeAccountBalance(): Boolean {
-            return canUseXcmExecute()
+            // Precisely speaking just checking for delivery fees is not enough
+            // AssetTransactor on origin should also use Preserve transfers when executing TransferAssets instruction
+            // However it is much harder to check and there are no chains yet that have limitations on AssetTransactor level
+            // but don't have delivery fees, so we only check for delivery fees
+            return !hasDeliveryFees() ||
+                // When direction has delivery fees, xcm execute can be used to pay them from holding, thus allowing to transfer whole balance
+                // and also workaround AssetTransactor issue as "Withdraw" instruction doesn't use Preserve transfers but rather use burn
+                canUseXcmExecute()
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
@@ -164,6 +172,11 @@ class CrossChainTransferAssetExchange(
             }
 
             return canUseXcmExecute!!
+        }
+
+        private fun hasDeliveryFees(): Boolean {
+            val config = crossChainConfig.value ?: return false
+            return config.hasDeliveryFee(delegate.from, delegate.to)
         }
 
         private suspend fun calculateCanUseXcmExecute(): Boolean {
