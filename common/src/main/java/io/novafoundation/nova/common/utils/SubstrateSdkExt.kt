@@ -46,6 +46,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
+import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
@@ -494,6 +495,12 @@ fun String.hexBytesSize(): Int {
 
 fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
     return apis != null
+}
+
+fun RuntimeMetadata.hasDetectedRuntimeApi(section: String, method: String): Boolean {
+    if (!hasRuntimeApisMetadata()) return false
+
+    return runtimeApiOrNull(section)?.methodOrNull(method) != null
 }
 
 fun GenericCall.Instance.toByteArray(runtimeSnapshot: RuntimeSnapshot): ByteArray {

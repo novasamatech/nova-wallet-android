@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
@@ -145,6 +146,9 @@ val AssetTransfer.isCrossChain
 fun AssetTransfer.recipientOrNull(): AccountId? {
     return destinationChain.accountIdOrNull(recipient)
 }
+
+val AssetTransfer.senderAccountId: AccountIdKey
+    get() = sender.requireAccountIdKeyIn(originChain)
 
 interface AssetTransfers {
 

@@ -1,12 +1,15 @@
 package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 
 import io.novafoundation.nova.common.utils.firstNotNull
+import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.graph.Edge
+import io.novafoundation.nova.common.utils.mapError
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.addPlanks
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData
@@ -22,6 +25,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrect
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapOperationSubmissionException
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.crossChain
@@ -35,10 +39,12 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentPro
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.XcmTransferDryRunOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.transferFeatures
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.hasDeliveryFee
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
@@ -109,6 +115,8 @@ class CrossChainTransferAssetExchange(
         val delegate: Edge<FullChainAssetId>
     ) : SwapGraphEdge, Edge<FullChainAssetId> by delegate {
 
+        private var canUseXcmExecute: Boolean? = null
+
         override val weight: Int
             get() = Weights.CrossChainTransfer.TRANSFER
 
@@ -137,8 +145,10 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
-            // Delivery fees cannot be paid in non-native assets
-            return !hasDeliveryFees()
+            // By default, delivery fees are not payable in non native assets
+            return !hasDeliveryFees() ||
+                // ... but xcm execute allows to workaround it
+                canUseXcmExecute()
         }
 
         override suspend fun canTransferOutWholeAccountBalance(): Boolean {
@@ -146,7 +156,22 @@ class CrossChainTransferAssetExchange(
             // AssetTransactor on origin should also use Preserve transfers when executing TransferAssets instruction
             // However it is much harder to check and there are no chains yet that have limitations on AssetTransactor level
             // but don't have delivery fees, so we only check for delivery fees
-            return !hasDeliveryFees()
+            return !hasDeliveryFees() ||
+                // When direction has delivery fees, xcm execute can be used to pay them from holding, thus allowing to transfer whole balance
+                // and also workaround AssetTransactor issue as "Withdraw" instruction doesn't use Preserve transfers but rather use burn
+                canUseXcmExecute()
+        }
+
+        override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
+            return amount
+        }
+
+        private suspend fun canUseXcmExecute(): Boolean {
+            if (canUseXcmExecute == null) {
+                canUseXcmExecute = calculateCanUseXcmExecute()
+            }
+
+            return canUseXcmExecute!!
         }
 
         private fun hasDeliveryFees(): Boolean {
@@ -154,8 +179,9 @@ class CrossChainTransferAssetExchange(
             return config.hasDeliveryFee(delegate.from, delegate.to)
         }
 
-        override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
-            return amount
+        private suspend fun calculateCanUseXcmExecute(): Boolean {
+            val features = crossChainConfig.value?.dynamic?.transferFeatures(delegate.from, delegate.to.chainId) ?: return false
+            return crossChainTransfersUseCase.supportsXcmExecute(delegate.from.chainId, features)
         }
     }
 
@@ -233,32 +259,41 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction {
-            val (chain, chainAsset) = chainRegistry.chainWithAsset(edge.from)
+            val (originChain, originChainAsset) = chainRegistry.chainWithAsset(edge.from)
+            val destinationChain = chainRegistry.getChain(edge.to.chainId)
 
             return SwapMaxAdditionalAmountDeduction(
-                fromCountedTowardsEd = crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(chainAsset, chain)
+                fromCountedTowardsEd = crossChainTransfersUseCase.requiredRemainingAmountAfterTransfer(originChain, originChainAsset, destinationChain)
             )
         }
 
         override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
-            val outcome = with(crossChainTransfersUseCase) {
-                swapHost.extrinsicService().performTransferAndTrackTransfer(transfer, swapHost.scope)
-            }
-
-            return outcome.map { balance ->
-                SwapExecutionCorrection(balance)
-            }
+            return dryRunTransfer(transfer)
+                .flatMap { with(crossChainTransfersUseCase) { swapHost.extrinsicService().performTransferAndTrackTransfer(transfer, swapHost.scope) } }
+                .map(::SwapExecutionCorrection)
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
-            return with(crossChainTransfersUseCase) {
-                swapHost.extrinsicService().performTransferOfExactAmount(transfer, swapHost.scope)
-                    .map { SwapSubmissionResult(it.submissionHierarchy) }
-            }
+            return dryRunTransfer(transfer)
+                .flatMap { with(crossChainTransfersUseCase) { swapHost.extrinsicService().performTransferOfExactAmount(transfer, swapHost.scope) } }
+                .map { SwapSubmissionResult(it.submissionHierarchy) }
+        }
+
+        private suspend fun dryRunTransfer(transfer: AssetTransferBase): Result<Unit> {
+            val metaAccount = accountRepository.getSelectedMetaAccount()
+            val origin = metaAccount.requireAccountIdKeyIn(transfer.originChain)
+
+            return crossChainTransfersUseCase.dryRunTransferIfPossible(
+                transfer = transfer,
+                // We are transferring exact amount, so we use zero for the fee here
+                origin = XcmTransferDryRunOrigin.Signed(origin, crossChainFee = Balance.ZERO),
+                computationalScope = swapHost.scope
+            )
+                .mapError { SwapOperationSubmissionException.SimulationFailed() }
         }
 
         private suspend fun createTransfer(amount: Balance): AssetTransferBase {
@@ -293,21 +328,21 @@ class CrossChainTransferAssetExchange(
 
         override val postSubmissionFees = AtomicSwapOperationFee.PostSubmissionFees(
             paidByAccount = listOfNotNull(
-                SubmissionFeeWithLabel(crossChainFee.deliveryFee, debugLabel = "Delivery"),
+                SubmissionFeeWithLabel(crossChainFee.postSubmissionByAccount, debugLabel = "Delivery"),
             ),
             paidFromAmount = listOf(
-                FeeWithLabel(crossChainFee.executionFee, debugLabel = "Execution")
+                FeeWithLabel(crossChainFee.postSubmissionFromAmount, debugLabel = "Execution")
             )
         )
 
         override fun constructDisplayData(): AtomicOperationFeeDisplayData {
-            val deliveryFee = crossChainFee.deliveryFee
-            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != crossChainFee.executionFee.asset.fullId
+            val deliveryFee = crossChainFee.postSubmissionByAccount
+            val shouldSeparateDeliveryFromExecution = deliveryFee != null && deliveryFee.asset.fullId != crossChainFee.postSubmissionFromAmount.asset.fullId
 
             val crossChainFeeComponentDisplay = if (shouldSeparateDeliveryFromExecution) {
-                SwapFeeComponentDisplay.crossChain(crossChainFee.executionFee, deliveryFee!!)
+                SwapFeeComponentDisplay.crossChain(crossChainFee.postSubmissionFromAmount, deliveryFee!!)
             } else {
-                val totalCrossChain = crossChainFee.executionFee.addPlanks(deliveryFee?.amount.orZero())
+                val totalCrossChain = crossChainFee.postSubmissionFromAmount.addPlanks(deliveryFee?.amount.orZero())
                 SwapFeeComponentDisplay.crossChain(totalCrossChain)
             }
 

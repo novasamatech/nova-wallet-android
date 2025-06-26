@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.OriginCaller
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 interface AssetIssuer {
