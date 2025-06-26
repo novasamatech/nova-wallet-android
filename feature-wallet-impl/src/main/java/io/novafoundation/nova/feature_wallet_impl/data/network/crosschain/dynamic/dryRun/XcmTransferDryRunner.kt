@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun
 
+import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -8,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.XcmTransferDryRunOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemoteReserve
@@ -83,6 +85,7 @@ class RealXcmTransferDryRunner @Inject constructor(
                 destination = destinationResult.toPublicResult()
             )
         }
+            .onFailure { Log.w(LOG_TAG, "Dry run failed", it) }
     }
 
     private suspend fun dryRunOnOrigin(

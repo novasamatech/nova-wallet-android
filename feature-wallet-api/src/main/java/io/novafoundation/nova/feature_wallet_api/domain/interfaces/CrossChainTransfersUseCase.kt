@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.XcmTransferDryRunOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
@@ -63,6 +64,12 @@ interface CrossChainTransfersUseCase {
         assetTransferDirection: AssetTransferDirection,
         computationalScope: CoroutineScope
     ): Duration
+
+    suspend fun dryRunTransferIfPossible(
+        transfer: AssetTransferBase,
+        origin: XcmTransferDryRunOrigin,
+        computationalScope: CoroutineScope
+    ): Result<Unit>
 }
 
 fun CrossChainTransfersUseCase.incomingCrossChainDirectionsAvailable(destination: Flow<Chain.Asset?>): Flow<Boolean> {

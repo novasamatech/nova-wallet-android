@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.domain
 
+import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
@@ -16,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.XcmTransferDryRunOrigin
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.paidByAccountOrNull
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -28,6 +32,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTran
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableOutDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.XcmTransferDryRunner
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -61,6 +66,7 @@ internal class RealCrossChainTransfersUseCase(
     private val crossChainWeigher: CrossChainWeigher,
     private val crossChainTransactor: CrossChainTransactor,
     private val parachainInfoRepository: ParachainInfoRepository,
+    private val assetTransferDryRunner: XcmTransferDryRunner,
 ) : CrossChainTransfersUseCase {
 
     override suspend fun syncCrossChainConfig() {
@@ -170,6 +176,26 @@ internal class RealCrossChainTransfersUseCase(
     ): Duration {
         val transferConfiguration = transferConfigurationFor(assetTransferDirection, computationalScope)
         return crossChainTransactor.estimateMaximumExecutionTime(transferConfiguration)
+    }
+
+    override suspend fun dryRunTransferIfPossible(
+        transfer: AssetTransferBase,
+        origin: XcmTransferDryRunOrigin,
+        computationalScope: CoroutineScope
+    ): Result<Unit> {
+        val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
+
+        if (transferConfiguration !is CrossChainTransferConfiguration.Dynamic) {
+            Log.d(LOG_TAG, "Transfer dry run is not available - skipping")
+            return Result.success(Unit)
+        }
+
+        return assetTransferDryRunner.dryRunXcmTransfer(
+            config = transferConfiguration.config,
+            transfer = transfer,
+            origin = origin
+        )
+            .coerceToUnit()
     }
 
     override suspend fun transferConfigurationFor(

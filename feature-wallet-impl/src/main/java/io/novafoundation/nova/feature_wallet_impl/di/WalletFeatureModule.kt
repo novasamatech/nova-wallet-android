@@ -54,7 +54,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
@@ -70,9 +69,9 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCr
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.RealCrossChainWeigher
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainWeigher
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.XcmTransferDryRunner
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainWeigher
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.DryRunSucceedsValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
@@ -369,6 +368,7 @@ class WalletFeatureModule {
         crossChainWeigher: CrossChainWeigher,
         crossChainTransactor: CrossChainTransactor,
         parachainInfoRepository: ParachainInfoRepository,
+        xcmTransferDryRunner: XcmTransferDryRunner,
     ): CrossChainTransfersUseCase {
         return RealCrossChainTransfersUseCase(
             crossChainTransfersRepository = crossChainTransfersRepository,
@@ -378,7 +378,8 @@ class WalletFeatureModule {
             computationalCache = computationalCache,
             crossChainWeigher = crossChainWeigher,
             crossChainTransactor = crossChainTransactor,
-            parachainInfoRepository = parachainInfoRepository
+            parachainInfoRepository = parachainInfoRepository,
+            assetTransferDryRunner = xcmTransferDryRunner
         )
     }
 

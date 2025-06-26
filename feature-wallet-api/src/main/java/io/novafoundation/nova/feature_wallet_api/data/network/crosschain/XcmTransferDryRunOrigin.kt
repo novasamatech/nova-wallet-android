@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun
+package io.novafoundation.nova.feature_wallet_api.data.network.crosschain
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
