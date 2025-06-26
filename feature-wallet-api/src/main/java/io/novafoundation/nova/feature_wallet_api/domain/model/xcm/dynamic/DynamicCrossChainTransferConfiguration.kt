@@ -18,8 +18,7 @@ class DynamicCrossChainTransferConfiguration(
     val destinationChain: XcmChain,
     val originChainAsset: Chain.Asset,
     val reserve: TokenReserve,
-    val hasDeliveryFee: Boolean,
-    val supportsXcmExecute: Boolean
+    val features: DynamicCrossChainTransferFeatures,
 ) : CrossChainTransferConfigurationBase {
 
     val assetAbsoluteLocation = reserve.tokenLocation

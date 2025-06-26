@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -110,6 +111,13 @@ class RealCrossChainTransactor(
 
                 balancesUpdates.awaitCrossChainArrival(transfer)
             }
+    }
+
+    override suspend fun supportsXcmExecute(
+        originChainId: ChainId,
+        features: DynamicCrossChainTransferFeatures
+    ): Boolean {
+        return dynamic.supportsXcmExecute(originChainId, features)
     }
 
     override suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration {

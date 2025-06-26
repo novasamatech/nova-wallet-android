@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTran
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableOutDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.XcmTransferDryRunner
 import io.novafoundation.nova.runtime.ext.commissionAsset
@@ -38,6 +39,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.assets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 import kotlinx.coroutines.CoroutineScope
@@ -196,6 +198,10 @@ internal class RealCrossChainTransfersUseCase(
             origin = origin
         )
             .coerceToUnit()
+    }
+
+    override suspend fun supportsXcmExecute(originChainId: ChainId, features: DynamicCrossChainTransferFeatures): Boolean {
+        return crossChainTransactor.supportsXcmExecute(originChainId, features)
     }
 
     override suspend fun transferConfigurationFor(

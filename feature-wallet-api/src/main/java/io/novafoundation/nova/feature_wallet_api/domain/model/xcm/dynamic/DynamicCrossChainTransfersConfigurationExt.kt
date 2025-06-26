@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.TransferDestination
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 fun DynamicCrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
@@ -42,6 +44,13 @@ fun DynamicCrossChainTransfersConfiguration.availableInDestinations(): List<Edge
     }
 }
 
+fun DynamicCrossChainTransfersConfiguration.transferFeatures(
+    originAsset: FullChainAssetId,
+    destinationChainId: ChainId
+): DynamicCrossChainTransferFeatures? {
+    return outComingAssetTransfers(originAsset)?.getDestination(destinationChainId)?.getTransferFeatures()
+}
+
 suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     originXcmChain: XcmChain,
     originAsset: Chain.Asset,
@@ -50,7 +59,7 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     val destinationChain = destinationXcmChain.chain
 
     val assetTransfers = outComingAssetTransfers(originAsset.fullId) ?: return null
-    val targetTransfer = assetTransfers.destinations.find { it.fullChainAssetId.chainId == destinationChain.id } ?: return null
+    val targetTransfer = assetTransfers.getDestination(destinationChain.id) ?: return null
 
     val reserve = reserveRegistry.getReserve(originAsset)
 
@@ -59,8 +68,18 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
         destinationChain = destinationXcmChain,
         originChainAsset = originAsset,
         reserve = reserve,
-        hasDeliveryFee = targetTransfer.hasDeliveryFee,
-        supportsXcmExecute = targetTransfer.supportsXcmExecute
+        features = targetTransfer.getTransferFeatures(),
+    )
+}
+
+private fun AssetTransfers.getDestination(destinationChainId: ChainId): TransferDestination? {
+    return destinations.find { it.fullChainAssetId.chainId == destinationChainId }
+}
+
+private fun TransferDestination.getTransferFeatures(): DynamicCrossChainTransferFeatures {
+    return DynamicCrossChainTransferFeatures(
+        hasDeliveryFee = hasDeliveryFee,
+        supportsXcmExecute = supportsXcmExecute
     )
 }
 

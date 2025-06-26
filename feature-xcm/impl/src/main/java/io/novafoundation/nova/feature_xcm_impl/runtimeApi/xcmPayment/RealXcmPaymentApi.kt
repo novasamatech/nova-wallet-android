@@ -26,7 +26,7 @@ class RealXcmPaymentApi @Inject constructor(
     }
 
     override suspend fun isSupported(chainId: ChainId): Boolean {
-        return multiChainRuntimeCallsApi.forChain(chainId).isSupported("XcmPaymentApi", "query_xcm_weight")
+        return multiChainRuntimeCallsApi.isSupported(chainId, "XcmPaymentApi", "query_xcm_weight")
     }
 
     private suspend fun RuntimeCallsApi.queryXcmWeight(

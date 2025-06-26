@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.destinationChainLocationOnOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferReserve
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
@@ -34,6 +35,7 @@ import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -63,7 +65,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     suspend fun requiredRemainingAmountAfterTransfer(
         configuration: DynamicCrossChainTransferConfiguration
     ): Balance {
-        return if (shouldUseXcmExecute(configuration)) {
+        return if (supportsXcmExecute(configuration)) {
             BigInteger.ZERO
         } else {
             val chainAsset = configuration.originChainAsset
@@ -76,21 +78,22 @@ class DynamicCrossChainTransactor @Inject constructor(
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ): GenericCall.Instance {
-        return if (shouldUseXcmExecute(configuration)) {
+        return if (supportsXcmExecute(configuration)) {
             composeXcmExecuteCall(configuration, transfer, crossChainFee)
         } else {
             composeTransferAssetsCall(configuration, transfer, crossChainFee)
         }
     }
 
-    private suspend fun shouldUseXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {
-        val supportsXcmExecute = configuration.supportsXcmExecute
-        val hasXcmPaymentApi = xcmPaymentApi.isSupported(configuration.originChainId)
-        // For now, only enable xcm execute approach for the directions that will hugely benefit from it
-        // In particular, xcm execute allows us to pay delivery fee from the holding register and not in JIT mode (from account)
-        val hasDeliveryFee = configuration.hasDeliveryFee
+    suspend fun supportsXcmExecute(originChainId: ChainId, features: DynamicCrossChainTransferFeatures): Boolean {
+        val supportsXcmExecute = features.supportsXcmExecute
+        val hasXcmPaymentApi = xcmPaymentApi.isSupported(originChainId)
 
-        return supportsXcmExecute && hasXcmPaymentApi && hasDeliveryFee
+        return supportsXcmExecute && hasXcmPaymentApi
+    }
+
+    private suspend fun supportsXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {
+        return supportsXcmExecute(configuration.originChainId, configuration.features)
     }
 
     private suspend fun composeTransferAssetsCall(

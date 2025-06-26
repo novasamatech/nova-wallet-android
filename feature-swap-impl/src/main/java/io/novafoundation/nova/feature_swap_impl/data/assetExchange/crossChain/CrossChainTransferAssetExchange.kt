@@ -44,6 +44,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTra
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.availableInDestinations
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.transferFeatures
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -84,6 +85,9 @@ class CrossChainTransferAssetExchange(
     private val swapHost: AssetExchange.SwapHost,
 ) : AssetExchange {
 
+    private var executionTimeCounter: Duration = Duration.ZERO
+    private var executionIterations: Int = 0
+
     private val crossChainConfig = MutableStateFlow<CrossChainTransfersConfiguration?>(null)
 
     override suspend fun sync() {
@@ -113,6 +117,8 @@ class CrossChainTransferAssetExchange(
         val delegate: Edge<FullChainAssetId>
     ) : SwapGraphEdge, Edge<FullChainAssetId> by delegate {
 
+        private var canUseXcmExecute: Boolean? = null
+
         override val weight: Int
             get() = Weights.CrossChainTransfer.TRANSFER
 
@@ -141,19 +147,28 @@ class CrossChainTransferAssetExchange(
         }
 
         override suspend fun canPayNonNativeFeesInIntermediatePosition(): Boolean {
-            // TODO check whether `shouldExecuteXcm` is used when delivery fee is present
-            // This should be done before PR is merged!!
-            return true
+            return canUseXcmExecute()
         }
 
         override suspend fun canTransferOutWholeAccountBalance(): Boolean {
-            // TODO check whether `shouldExecuteXcm` is used when delivery fee is present
-            // This should be done before PR is merged!!
-            return true
+            return canUseXcmExecute()
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             return amount
+        }
+
+        private suspend fun canUseXcmExecute(): Boolean {
+            if (canUseXcmExecute == null) {
+                canUseXcmExecute = calculateCanUseXcmExecute()
+            }
+
+            return canUseXcmExecute!!
+        }
+
+        private suspend fun calculateCanUseXcmExecute(): Boolean {
+            val features = crossChainConfig.value?.dynamic?.transferFeatures(delegate.from, delegate.to.chainId) ?: return false
+            return crossChainTransfersUseCase.supportsXcmExecute(delegate.from.chainId, features)
         }
     }
 
