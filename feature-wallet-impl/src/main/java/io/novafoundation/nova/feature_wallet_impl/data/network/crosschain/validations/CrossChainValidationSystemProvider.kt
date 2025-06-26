@@ -26,7 +26,7 @@ class RealCrossChainValidationSystemProvider @Inject constructor(
     private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val dryRunSucceedsValidationFactory: DryRunSucceedsValidationFactory,
     private val assetSourceRegistry: AssetSourceRegistry,
-): CrossChainValidationSystemProvider {
+) : CrossChainValidationSystemProvider {
 
     override fun createValidationSystem(): AssetTransfersValidationSystem = ValidationSystem {
         positiveAmount()

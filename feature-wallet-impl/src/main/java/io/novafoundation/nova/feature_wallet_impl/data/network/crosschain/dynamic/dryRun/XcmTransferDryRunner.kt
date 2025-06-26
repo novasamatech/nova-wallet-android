@@ -328,4 +328,3 @@ class RealXcmTransferDryRunner @Inject constructor(
 
     private data class OriginCallParams(val call: GenericCall.Instance, val origin: OriginCaller)
 }
-

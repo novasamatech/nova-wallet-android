@@ -208,12 +208,12 @@ internal class RealCrossChainTransfersUseCase(
         transfer: AssetTransferDirection,
         cachingScope: CoroutineScope?
     ): CrossChainTransferConfiguration {
-       return transferConfigurationFor(
-           originChain = transfer.originChain,
-           sendingAsset = transfer.originChainAsset,
-           destinationChain = transfer.destinationChain,
-           cachingScope = cachingScope
-       )
+        return transferConfigurationFor(
+            originChain = transfer.originChain,
+            sendingAsset = transfer.originChainAsset,
+            destinationChain = transfer.destinationChain,
+            cachingScope = cachingScope
+        )
     }
 
     private suspend fun transferConfigurationFor(

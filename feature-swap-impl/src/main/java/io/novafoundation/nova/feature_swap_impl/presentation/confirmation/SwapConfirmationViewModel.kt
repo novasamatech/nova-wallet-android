@@ -283,7 +283,7 @@ class SwapConfirmationViewModel(
             return
         }
 
-        when(error) {
+        when (error) {
             is SwapOperationSubmissionException.SimulationFailed -> showError(
                 title = resourceManager.getString(R.string.common_dry_run_failed_title),
                 text = resourceManager.getText(R.string.common_dry_run_failed_message)

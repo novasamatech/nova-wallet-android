@@ -201,7 +201,7 @@ class SwapExecutionViewModel(
         val errorFormatted = formatThrowable()
 
         return if (errorFormatted != null) {
-            "${genericErrorMessage}: $errorFormatted"
+            "$genericErrorMessage: $errorFormatted"
         } else {
             genericErrorMessage
         }

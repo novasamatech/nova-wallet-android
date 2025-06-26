@@ -17,5 +17,5 @@ sealed class XcmTransferDryRunOrigin {
      * [crossChainFee] will be added to the transfer amount
      * Useful for final dry run, when all transfer parameters are known and finalized
      */
-    class Signed(val accountId: AccountIdKey, val crossChainFee: Balance): XcmTransferDryRunOrigin()
+    class Signed(val accountId: AccountIdKey, val crossChainFee: Balance) : XcmTransferDryRunOrigin()
 }
