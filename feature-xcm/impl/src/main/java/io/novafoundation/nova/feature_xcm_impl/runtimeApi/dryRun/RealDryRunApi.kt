@@ -3,12 +3,12 @@ package io.novafoundation.nova.feature_xcm_impl.runtimeApi.dryRun
 import io.novafoundation.nova.common.data.network.runtime.binding.ScaleResult
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.provideContext
+import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.CallDryRunEffects
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.DryRunEffectsResultErr
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.XcmDryRunEffects
-import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcmLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
@@ -77,7 +77,7 @@ class RealDryRunApi @Inject constructor(
                 arguments = mapOf(
                     "origin" to originCaller.toEncodableInstance(),
                     "call" to call,
-                    "xcm_results_version" to xcmResultsVersion.version.toBigInteger()
+                    "result_xcms_version" to xcmResultsVersion.version.toBigInteger()
                 ),
                 returnBinding = {
                     runtime.provideContext {

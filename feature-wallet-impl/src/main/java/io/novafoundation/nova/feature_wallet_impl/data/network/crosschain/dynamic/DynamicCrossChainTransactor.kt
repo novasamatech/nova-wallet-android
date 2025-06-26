@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynam
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.metadata
@@ -194,8 +195,9 @@ class DynamicCrossChainTransactor @Inject constructor(
         // Origin
         withdrawAsset(assetLocation, amount)
         // Here and onward: we use buy execution for the very first segment to be able to pay delivery fees in sending asset
-        // WeightLimit.zero() is used since it doesn't matter anyways as the message on origin is already weighted
-        buyExecution(assetLocation, feesAmount, WeightLimit.zero())
+        // WeightLimit.one() is used since it doesn't matter anyways as the message on origin is already weighted
+        // The only restriction is that it cannot be zero or Unlimited
+        buyExecution(assetLocation, feesAmount, WeightLimit.one())
         initiateTeleport(MultiAssetFilter.singleCounted(), destinationChainLocation)
 
         // Destination
@@ -213,7 +215,7 @@ class DynamicCrossChainTransactor @Inject constructor(
 
         // Origin
         withdrawAsset(assetLocation, amount)
-        buyExecution(assetLocation, feesAmount, WeightLimit.zero())
+        buyExecution(assetLocation, feesAmount, WeightLimit.one())
         depositReserveAsset(MultiAssetFilter.singleCounted(), destinationChainLocation)
 
         // Destination
@@ -231,7 +233,7 @@ class DynamicCrossChainTransactor @Inject constructor(
 
         // Origin
         withdrawAsset(assetLocation, amount)
-        buyExecution(assetLocation, feesAmount, WeightLimit.zero())
+        buyExecution(assetLocation, feesAmount, WeightLimit.one())
         initiateReserveWithdraw(MultiAssetFilter.singleCounted(), destinationChainLocation)
 
         // Destination
@@ -250,7 +252,7 @@ class DynamicCrossChainTransactor @Inject constructor(
 
         // Origin
         withdrawAsset(assetLocation, amount)
-        buyExecution(assetLocation, feesAmount, WeightLimit.zero())
+        buyExecution(assetLocation, feesAmount, WeightLimit.one())
         initiateReserveWithdraw(MultiAssetFilter.singleCounted(), remoteReserveLocation)
 
         // Remote reserve
@@ -267,5 +269,9 @@ class DynamicCrossChainTransactor @Inject constructor(
     private fun AssetTransferBase.beneficiaryLocation(): RelativeMultiLocation {
         val accountId = destinationChain.accountIdOrDefault(recipient).intoKey()
         return accountId.toMultiLocation()
+    }
+
+    private fun WeightLimit.Companion.one(): WeightLimit.Limited {
+        return WeightLimit.Limited(WeightV2(1.toBigInteger(), 1.toBigInteger()))
     }
 }
